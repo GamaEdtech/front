@@ -70,7 +70,7 @@ async function generateSitemapIndex(contentType) {
 
 // Fetch the total number of pages for the given content type using `num` from API response
 async function getTotalPages(contentType) {
-  const itemsPerPage = 50; // Adjust based on your pagination logic
+  const itemsPerPage = 1000; // Adjust based on your pagination logic
   let baseUrl = "https://core.gamatrain.com/api/v1/";
   let apiUrl;
 
@@ -105,7 +105,7 @@ async function getTotalPages(contentType) {
 }
 
 async function fetchPaginatedData(contentType, page) {
-  const itemsPerPage = 50; // Define items per page
+  const itemsPerPage = 1000; // Define items per page
   let apiUrl;
 
   // Determine the API URL based on the content type
@@ -134,10 +134,10 @@ async function fetchPaginatedData(contentType, page) {
   }
 
   // Fetch data for the specified page
-  let finalUrl = `${apiUrl}&page=${page}&perpage=${itemsPerPage}`;
+  let finalUrl = `${apiUrl}&page=${page}&perpage=${itemsPerPage}&ineedmore=1`;
 
   if (contentType == "blog") {
-    finalUrl = `${apiUrl}?page=${page}&perpage=${itemsPerPage}`;
+    finalUrl = `${apiUrl}?page=${page}&perpage=${itemsPerPage}&ineedmore=1`;
   }
 
   const response = await axios.get(finalUrl);
