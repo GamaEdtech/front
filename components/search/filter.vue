@@ -2,7 +2,7 @@
   <div id="search-page-filter">
     <div class="content-search">
       <!--Selected filter, user can disable any filter from here-->
-      <div v-if="enabledAppliedFilter()" id="chip-container">
+      <div v-show="enabledAppliedFilter()" id="chip-container">
         <p class="my-2 mb-md-2 font-size-16 font-weight-bold black--text">
           Applied filter
         </p>
@@ -63,9 +63,7 @@
           outlined
           @click:close="file_type_val = 0"
         >
-          <span>
-            {{ applied_filter.select_file_type_title }}
-          </span>
+          <span> {{ applied_filter.select_file_type_title }}</span>
         </v-chip>
         <v-chip
           v-if="applied_filter.select_test_level_title"
@@ -495,7 +493,7 @@ export default {
     if (this.$route.query.type === "tutor")
       this.getFilterList({ type: "state" }, "state");
 
-    this.setBreadcrumbInfo();
+    // this.setBreadcrumbInfo();
 
     if (this.$route.query.level > 0) {
       this.test_level_val = this.$route.query.level;
@@ -540,7 +538,11 @@ export default {
           section_id: val,
         };
         this.getFilterList(params, "base");
-        this.getFileType();
+        if (
+          this.$route.query.type === "test" ||
+          this.$route.query.type == "learnfiles"
+        )
+          this.getFileType();
       } else {
         this.applied_filter.select_section_title = "";
         this.loadtime = false;
@@ -711,16 +713,20 @@ export default {
           console.error(err);
         });
     },
+    setAppliedFilter(filters) {
+      this.applied_filter = filters;
+      this.setBreadcrumbInfo();
+    },
 
     //Check user selected at least one filter
     enabledAppliedFilter() {
       if (
-        this.applied_filter.select_base_title !== "" ||
-        this.applied_filter.select_section_title !== "" ||
-        this.applied_filter.select_lesson_title !== "" ||
-        this.applied_filter.select_topic_title !== "" ||
-        this.applied_filter.select_file_type_title !== "" ||
-        this.applied_filter.select_test_level_title !== ""
+        this.applied_filter.select_base_title ||
+        this.applied_filter.select_section_title ||
+        this.applied_filter.select_lesson_title ||
+        this.applied_filter.select_topic_title ||
+        this.applied_filter.select_file_type_title ||
+        this.applied_filter.select_test_level_title
       )
         return true;
       else return false;
@@ -888,7 +894,7 @@ export default {
     },
 
     //set breadcrumbs
-    setBreadcrumbInfo() {
+    setBreadcrumbInfo(setTitle = true) {
       this.breadcrumbs = [];
 
       //Type breadcrumb
@@ -934,8 +940,38 @@ export default {
         });
       }
 
-      //Emit to parent
-      this.$emit("setPageTitle", this.applied_filter.select_section_title);
+      if (setTitle) {
+        let page_title = "";
+        if (this.$route.query.type === "test") {
+          page_title = this.applied_filter.select_section_title
+            ? `${this.applied_filter.select_section_title ?? ""} ${
+                this.applied_filter.select_base_title ?? ""
+              } ${this.applied_filter?.select_lesson_title ?? ""} ${
+                this.applied_filter.select_file_type_title ?? ""
+              }`
+            : "Educational Resources | K12 Education Papers and Materials";
+        } else if (this.$route.query.type === "learnfiles") {
+          page_title = this.applied_filter.select_section_title
+            ? `${this.applied_filter.select_section_title ?? ""} ${
+                this.applied_filter.select_base_title ?? ""
+              } ${this.applied_filter.select_file_type_title ?? ""}`
+            : "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
+        } else if (this.$route.query.type === "question") {
+          page_title = `${this.applied_filter.select_section_title ?? ""} ${
+            this.applied_filter.select_base_title ?? ""
+          } ${this.applied_filter.select_lesson_title ?? ""} Forum`;
+        } else if (this.$route.query.type === "azmoon") {
+          page_title = `${this.applied_filter.select_section_title ?? ""} ${
+            this.applied_filter.select_base_title ?? ""
+          } ${this.applied_filter.select_lesson_title ?? ""} Online test`;
+        } else if (this.$route.query.type === "dars") {
+          page_title = `${this.applied_filter.select_section_title ?? ""} ${
+            this.applied_filter.select_base_title ?? ""
+          } ${this.applied_filter.select_lesson_title ?? ""} Textbook`;
+        }
+        //Emit to parent
+        this.$emit("setPageTitle", page_title);
+      }
       this.$emit("update:setBreadCrumbs", this.breadcrumbs);
     },
     setFilter(type, list) {
