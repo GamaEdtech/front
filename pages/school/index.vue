@@ -80,7 +80,7 @@
                               Search result
                             </span>
                             <span class="gama-text-button">
-                              {{ resultCount }}
+                              {{ resultCount | numberFormat }}
                             </span>
                           </div>
                         </v-col>

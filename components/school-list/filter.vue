@@ -153,7 +153,7 @@
                 <v-btn class="gtext-t4 font-weight-regular text-capitalize">
                   <span class="gray--text">Search result</span> &nbsp;
                   <span class="white--text">
-                    {{ resultCount }}
+                    {{ resultCount | numberFormat }}
                   </span>
                 </v-btn>
               </div>
@@ -175,7 +175,7 @@
                 <v-autocomplete
                   v-model="filterForm.country"
                   :items="filter.countryList"
-                  item-text="name"
+                  item-text="title"
                   item-value="id"
                   label="Country"
                   outlined
@@ -473,7 +473,7 @@
                           label="Country"
                           @change="countryChange()"
                           :items="filter.countryList"
-                          itemTitle="name"
+                          itemTitle="title"
                           v-model="filterForm.country"
                         />
                       </v-col>
@@ -699,7 +699,7 @@
               label="Country"
               @change="countryChange()"
               :items="filter.countryList"
-              itemTitle="name"
+              itemTitle="title"
               v-model="filterForm.country"
             />
           </v-col>
@@ -817,7 +817,13 @@ export default {
     var params = {
       type: "section",
     };
-    this.getFilterList({ type: "countries" }, "countries");
+
+    this.getFilterList(
+      {
+        "PagingDto.PageFilter.Size": 250,
+      },
+      "countries"
+    );
     this.getFilterList(params, "section");
     this.getFilterList({ type: "school_type" }, "school_type");
     this.getFilterList({ type: "boarding_type" }, "boarding_type");
@@ -834,7 +840,9 @@ export default {
     if (this.$route.query.country) {
       this.filterForm.country = this.$route.query.country;
       this.getFilterList(
-        { type: "states", country_id: this.filterForm.country },
+        {
+          "PagingDto.PageFilter.Size": 1000,
+        },
         "states"
       );
     }
@@ -842,9 +850,7 @@ export default {
       this.filterForm.state = this.$route.query.state;
       this.getFilterList(
         {
-          type: "cities",
-          country_id: this.filterForm.country,
-          state_id: this.filterForm.state,
+          "PagingDto.PageFilter.Size": 1000,
         },
         "cities"
       );
@@ -919,20 +925,26 @@ export default {
   },
   methods: {
     getFilterList(params, type) {
+      let endpoint = "/api/v1/types/list";
+      if (type == "countries") endpoint = "/api/v2/locations/countries";
+      if (type == "states")
+        endpoint = `/api/v2/locations/states/${this.filterForm.country}`;
+      if (type == "cities")
+        endpoint = `/api/v2/locations/cities/${this.filterForm.state}`;
       this.$axios
-        .$get("/api/v1/types/list", {
+        .$get(endpoint, {
           params,
         })
         .then((res) => {
           var data = {};
           if (type == "countries") {
-            this.filter.countryList = res.data;
+            this.filter.countryList = res.data.list;
             this.filterLoadedStatus.country = true;
           } else if (type == "states") {
-            this.filter.stateList = res.data;
+            this.filter.stateList = res.data.list;
             this.filterLoadedStatus.state = true;
           } else if (type == "cities") {
-            this.filter.cityList = res.data;
+            this.filter.cityList = res.data.list;
             this.filterLoadedStatus.city = true;
           } else if (type == "school_type") {
             this.filter.schoolTypeList = res.data;
@@ -1053,7 +1065,9 @@ export default {
       this.updateQueryParams();
       if (this.filterForm.country) {
         this.getFilterList(
-          { type: "states", country_id: this.filterForm.country },
+          {
+            "PagingDto.PageFilter.Size": 10000,
+          },
           "states"
         );
       }
@@ -1138,9 +1152,7 @@ export default {
       if (this.filterForm.state) {
         this.getFilterList(
           {
-            type: "cities",
-            country_id: this.filterForm.country,
-            state_id: this.filterForm.state,
+            "PagingDto.PageFilter.Size": 10000,
           },
           "cities"
         );

@@ -188,12 +188,18 @@ export default {
     let paperTypeList = {};
     let topicList = {};
     let multimediaTypeTitle = "";
+    let applied_filter = {
+      select_section_title: "",
+      select_base_title: "",
+      select_lesson_title: "",
+    };
     boardList = await $axios.$get(`/api/v1/types/list`, { params });
     if (query.section) {
       const boardIndex = boardList.data.findIndex(
         (x) => x.id === query.section
       );
       boardTitle = boardList.data[boardIndex].title;
+      applied_filter.select_section_title = boardTitle;
 
       //Also list base list for filter
       params.type = "base";
@@ -204,6 +210,7 @@ export default {
     if (query.base) {
       const gradeIndex = gradeList.data.findIndex((x) => x.id === query.base);
       gradeTitle = gradeList.data[gradeIndex].title;
+      applied_filter.select_base_title = gradeTitle;
 
       //Also list subject list for filter
       params.type = "lesson";
@@ -216,6 +223,7 @@ export default {
         (x) => x.id === query.lesson
       );
       subjectTitle = subjectList.data[subjectIndex].title;
+      applied_filter.select_lesson_title = subjectTitle;
 
       //Also list topic list for filter
       params.type = "topic";
@@ -283,6 +291,7 @@ export default {
       paperTypeList,
       subjectList,
       topicList,
+      applied_filter,
     };
   },
   head() {
@@ -352,20 +361,7 @@ export default {
         );
     }
 
-    if (this.$refs.side_filter) {
-      this.$refs.side_filter.setFilter("board", this.boardList?.data);
-      if (this.$route.query.section)
-        this.$refs.side_filter.setFilter("grade", this.gradeList?.data);
-      if (this.$route.query.base)
-        this.$refs.side_filter.setFilter("subject", this.subjectList?.data);
-      if (this.$route.query.lesson)
-        this.$refs.side_filter.setFilter("topic", this.topicList?.data);
-      if (this.$route.query.type == "test")
-        this.$refs.side_filter.setFilter(
-          "paper_type",
-          this.paperTypeList?.data
-        );
-    }
+    this.$refs.side_filter.setAppliedFilter(this.applied_filter);
 
     if (!this.$route.query.type) {
       const query = { type: "test" };
@@ -547,7 +543,7 @@ export default {
   },
   methods: {
     setPageTitle(e) {
-      // this.page_title = e;
+      this.page_title = e;
     },
     // Get content list
     async getContentList() {
