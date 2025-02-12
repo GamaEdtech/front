@@ -1,14 +1,19 @@
 <template>
   <div>
-    <v-footer>
+    <v-footer v-if="!isPageToHideFooter">
       <v-container id="footer" class="px-0">
         <v-row>
           <v-col cols="12" sm="6" md="6" class="text-center text-sm-left">
             <nuxt-link to="/">
-              <img id="logo" alt="gamatrain" src="/images/gamatrain-logo-black.svg" />
+              <img
+                id="logo"
+                alt="gamatrain"
+                src="/images/gamatrain-logo-black.svg"
+              />
             </nuxt-link>
             <div id="short-describe" class="gama-text-body2">
-              Our mission is to provide all training services to anyone and anywhere.
+              Our mission is to provide all training services to anyone and
+              anywhere.
             </div>
             <div class="mt-4">
               <nuxt-link to="/" class="v-btn">
@@ -68,7 +73,7 @@
         </v-row>
       </v-container>
     </v-footer>
-    <v-container fluid id="footer-copy-right">
+    <v-container fluid id="footer-copy-right" v-if="!isPageToHideFooter">
       <v-row>
         <v-col cols="12" class="pt-3 pb-1 text-center px-0">
           <span class="describe gama-text-overline"
@@ -83,6 +88,8 @@
 export default {
   data() {
     return {
+      isPageToHideFooter: this.$route.name === "admin",
+
       footerLinks: [
         {
           mainTitle: "We",

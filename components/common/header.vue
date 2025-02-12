@@ -2,13 +2,13 @@
   <div>
     <header id="main-header">
       <!--Desktop menu-->
-
       <v-app-bar
         flat
         :fixed="menuSetting.fixedStatus"
         id="main-menu"
         :class="menuSetting.class"
         class="d-none d-lg-block"
+         v-if="!isPageToHideHeader"
       >
         <v-container class="px-0">
           <v-row>
@@ -638,6 +638,7 @@ export default {
       dialog: false,
       logo: "mainlogo-gamatrain.png",
       avatar: "dexter-morse.png",
+      isPageToHideHeader: this.$route.name === 'admin',
       menuItems: [
         {
           title: "About us",
