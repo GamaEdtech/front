@@ -684,7 +684,7 @@ export default {
               name: this.$route.query.keyword,
               section: this.$route.query.stage,
               tuition_fee: this.$route.query.tuition_fee,
-              country: this.$route.query.country,
+              CountryIds: this.$route.query.country,
               state: this.$route.query.state,
               city: this.$route.query.city,
               school_type: this.$route.query.school_type,

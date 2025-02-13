@@ -1000,7 +1000,7 @@ export default {
     return {
       script: [
         {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+          src: `${process.env.STORAGE_BASE_URL}/static/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
         },
       ],
       title: this.contentData.title,
