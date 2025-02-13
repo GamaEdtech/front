@@ -1147,7 +1147,7 @@ export default {
       title: "New Exam",
       script: [
         {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+          src: `${process.env.STORAGE_BASE_URL}/static/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
           defer: true,
         },
       ],
