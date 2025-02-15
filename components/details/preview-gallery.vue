@@ -4,7 +4,10 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Mobile side section-->
-          <v-col cols="12" class="pr-0 d-flex d-md-none">
+          <v-col
+            cols="12"
+            class="pr-0 d-flex d-md-none justify-center align-center"
+          >
             <v-btn
               icon
               small
@@ -19,7 +22,7 @@
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="' icon icong-' + item.icon"
+                    :class="' icon icon-' + item.icon"
                   />
                 </template>
                 <span>{{ item.text }}</span>

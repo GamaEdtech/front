@@ -21,6 +21,10 @@
       "destination": "https://core.gamatrain.com/api/v1/:path*"
     },
     {
+      "source": "/api/v2/:path*",
+      "destination": "https://api.gamaedtech.com/api/v1/:path*"
+    },
+    {
       "source": "/uploads/:path*",
       "destination": "https://core.gamatrain.com/uploads/:path*"
     }
