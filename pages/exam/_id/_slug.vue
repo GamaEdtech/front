@@ -118,6 +118,15 @@
                             v-show="contentData.edu_month_title">
                       {{ contentData.edu_month_title }}
                     </v-chip> -->
+                    <v-chip
+                      :small="$vuetify.breakpoint.mdAndDown"
+                      link
+                      v-show="contentData.paperID"
+                      :to="`/paper/${contentData.paperID}`"
+                      class="ma-1 primary"
+                    >
+                      Past Paper
+                    </v-chip>
                   </div>
                 </div>
               </div>
