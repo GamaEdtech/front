@@ -317,14 +317,14 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.site"
-                  :href="normalizeURL(contentData.site)"
+                  v-show="contentData.webSite"
+                  :href="normalizeURL(contentData.webSite)"
                   target="_blank"
                 >
-                  {{ contentData.site }}
+                  {{ contentData.webSite }}
                 </a>
                 <span
-                  v-show="!(contentData.site || generalDataEditMode.website)"
+                  v-show="!(contentData.webSite || generalDataEditMode.website)"
                   @click="editGeneralInfo('website')"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
@@ -393,14 +393,16 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phone1"
-                  :href="`tel: ${contentData.phone1}`"
+                  v-show="contentData.phoneNumber"
+                  :href="`tel: ${contentData.phoneNumber}`"
                 >
-                  {{ contentData.phone1 }}
+                  {{ contentData.phoneNumber }}
                 </a>
                 <span
                   @click="editGeneralInfo('phone')"
-                  v-show="!(contentData.phone1 || generalDataEditMode.phone1)"
+                  v-show="
+                    !(contentData.phoneNumber || generalDataEditMode.phone1)
+                  "
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
                   You enter
@@ -1373,11 +1375,16 @@ export default {
     locationSearch,
   },
   async asyncData({ params, $axios }) {
-    const content = await $axios.$get(`/api/v1/schools/${params.id}`);
+    const baseURL = process.server
+      ? `https://api.gamaedtech.com/api/v1/`
+      : "/api/v2/";
+
+    const content = await $axios.$get(`${baseURL}schools/${params.id}`);
+
     var contentData = [];
 
     //Check data exist
-    if (content.status === 1) {
+    if (content.succeeded) {
       contentData = content.data;
     }
 
@@ -1390,8 +1397,8 @@ export default {
       iconAnchor: [16, 32], // Adjust the anchor point as needed
     });
 
-    this.map.center = [this.contentData.lat, this.contentData.lng];
-    this.map.latLng = [this.contentData.lat, this.contentData.lng];
+    this.map.center = [this.contentData.latitude, this.contentData.longitude];
+    this.map.latLng = [this.contentData.latitude, this.contentData.longitude];
 
     //Load comments
     this.loadComments();
@@ -1399,7 +1406,7 @@ export default {
   methods: {
     normalizeURL(url) {
       // Check if the URL starts with 'http://' or 'https://'
-      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
         // If not, assume it's 'http://'
         return "http://" + url;
       }
