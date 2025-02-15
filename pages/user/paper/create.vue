@@ -244,6 +244,7 @@
                           label="Pdf question & answer file"
                           color="red"
                           :loading="file_pdf_loading"
+                          :disabled="input_stauts.file_pdf"
                           @change="uploadFile('file_pdf', $event), validate"
                           prepend-inner-icon="mdi-file-pdf-box"
                           append-icon="mdi-folder-open"
@@ -269,6 +270,7 @@
                           color="blue"
                           @change="uploadFile('file_word', $event), validate"
                           prepend-inner-icon="mdi-file-word-outline"
+                          :disabled="input_stauts.file_word"
                           append-icon="mdi-folder-open"
                           outlined
                         />
@@ -293,6 +295,7 @@
                           color="default"
                           @change="uploadFile('file_answer', $event), validate"
                           prepend-inner-icon="mdi-file"
+                          :disabled="input_stauts.file_answer"
                           append-icon="mdi-folder-open"
                           outlined
                         />
@@ -322,6 +325,7 @@
                             color="green"
                             :value="item.file_extra"
                             @change="uploadFile('file_extra', $event, index)"
+                            :disabled="input_stauts.file_extra"
                             prepend-inner-icon="mdi-plus"
                             append-icon="mdi-folder-open"
                             outlined
@@ -419,6 +423,13 @@ export default {
       file_word_loading: false,
       file_answer_loading: false,
       file_extra_loading: false,
+
+      input_stauts: {
+        file_pdf: false,
+        file_word: false,
+        file_answer: false,
+        file_extra: false,
+      },
       //End file section
 
       section_list: [],
@@ -679,9 +690,8 @@ export default {
     },
 
     async uploadFile(file_name, value, index = "") {
-      if (!value)
-        //Check empty request
-        return;
+      if (!value) return; //Check empty request
+
       let formData = new FormData();
       if (file_name == "file_pdf") {
         const { valid } = await this.$refs.file_pdf_provider.validate(value);
@@ -689,6 +699,9 @@ export default {
 
         formData.append("file", value);
         this.file_pdf_loading = true;
+        this.input_stauts.file_word = true;
+        this.input_stauts.file_answer = true;
+        this.input_stauts.file_extra = true;
         this.loading.form = true;
       } else if (file_name == "file_word") {
         const { valid } = await this.$refs.file_word_provider.validate(value);
@@ -697,6 +710,9 @@ export default {
         formData.append("file", value);
         this.file_word_loading = true;
         this.loading.form = true;
+        this.input_stauts.file_pdf = true;
+        this.input_stauts.file_answer = true;
+        this.input_stauts.file_extra = true;
       } else if (file_name == "file_answer") {
         const { valid } = await this.$refs.file_answer_provider.validate(value);
         if (!valid) return;
@@ -704,9 +720,15 @@ export default {
         formData.append("file", value);
         this.file_answer_loading = true;
         this.loading.form = true;
+        this.input_stauts.file_pdf = true;
+        this.input_stauts.file_word = true;
+        this.input_stauts.file_extra = true;
       } else if (file_name == "file_extra") {
         formData.append("file", value);
         // this.file_extra_loading = true;
+        this.input_stauts.file_pdf = true;
+        this.input_stauts.file_word = true;
+        this.input_stauts.file_answer = true;
       }
 
       this.$axios
@@ -728,12 +750,17 @@ export default {
         })
         .catch((err) => {
           if (err.response.status == 403) this.$auth.logout();
+          else this.$toast.error("Error uploading the file");
         })
         .finally(() => {
           this.file_pdf_loading = false;
           this.file_word_loading = false;
           this.file_answer_loading = false;
           this.loading.form = false;
+          this.input_stauts.file_pdf = false;
+          this.input_stauts.file_word = false;
+          this.input_stauts.file_answer = false;
+          this.input_stauts.file_extra = false;
         });
       // }
     },
