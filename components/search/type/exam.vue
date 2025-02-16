@@ -8,7 +8,7 @@
     >
       <v-card-text class="pb-0">
         <div class="d-flex">
-          <div class="py-4 img-holder">
+          <div class="pb-4 py-sm-4 img-holder">
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
@@ -31,7 +31,7 @@
               </v-card>
             </div>
           </div>
-          <div class="content-holder">
+          <div class="content-holder py-sm-4">
             <v-card
               flat
               class="tutorial-content d-flex flex-column pl-3 justify-space-between"

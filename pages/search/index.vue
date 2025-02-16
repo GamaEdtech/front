@@ -650,7 +650,6 @@ export default {
 <style>
 .content-items {
   .content-item {
-    min-height: 23rem !important;
     .img-holder {
       min-width: 12rem;
       float: left;
