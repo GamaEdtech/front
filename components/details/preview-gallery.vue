@@ -45,7 +45,8 @@
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="`icon icon-${item.icon}`"
+                    style="font-size: 20px"
+                    :class="`icon icon-${item.icon} grey--text text--darken-1`"
                   />
                 </template>
                 <span>{{ item.text }}</span>

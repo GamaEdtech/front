@@ -8,7 +8,7 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Side section-->
-          <v-col cols="12" class="pb-0 d-flex">
+          <v-col cols="12" class="mt-3 mt-md-0 pb-0 d-flex">
             <v-btn
               icon
               :small="$vuetify.breakpoint.xs"
@@ -23,7 +23,8 @@
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="`icon icon-${item.icon} pt-1`"
+                    :style="`font-size:${$vuetify.breakpoint.xs ? '' : '20px'}`"
+                    :class="`icon icon-${item.icon} pt-1 grey--text text--darken-1`"
                   />
                 </template>
                 <span>{{ item.text }}</span>

@@ -62,7 +62,11 @@
                     <!--Description-->
                     <span
                       v-show="editMode.describe == false"
-                      class="gama-text-body2"
+                      :class="
+                        $vuetify.breakpoint.xs
+                          ? 'gama-text-body1'
+                          : 'gama-text-body2'
+                      "
                       v-html="
                         contentData.description
                           ? contentData.description.replace(/\n/g, '<br />')
@@ -152,8 +156,8 @@
                 </div>
               </div>
               <!--   Download Btn and Description  -->
-              <div class="text-center download-sec">
-                <div class="d-none d-md-block mb-4" v-if="isFree == false">
+              <!-- <div class="text-center download-sec"> -->
+              <!-- <div class="d-none d-md-block mb-4" v-show="isFree == false">
                   <p v-if="!$auth.loggedIn" class="gama-text-body2">
                     <span class="mdi mdi-bell icon"></span>
                     <span @click="openAuthDialog('login')" class="login"
@@ -173,12 +177,12 @@
                     to="/user/charge-wallet"
                     >(Top Up Wallet)</nuxt-link
                   >
-                </div>
-                <!-- <div class="font-weight-bold answer gama-text-body2">
+                </div> -->
+              <!-- <div class="font-weight-bold answer gama-text-body2">
                   <span class="mdi mdi-checkbox-marked icon"></span>
                   <span> The key answer sheet is at the end of the exam file.</span>
                 </div> -->
-              </div>
+              <!-- </div> -->
               <!--   fileCopyRight  -->
               <!-- <div class="d-none d-md-block text-center">
                 <p class="gama-text-body2 file-copy-right">
