@@ -117,11 +117,11 @@ export default {
             },
             {
               title: "School Finder",
-              link: "/school-service",
+              link: "/school",
             },
             {
-              title: "Exam",
-              link: "/search?type=azmoon",
+              title: "GET Token",
+              link: "/get-token",
             },
           ],
         },
