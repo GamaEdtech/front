@@ -5,10 +5,15 @@
         <v-row>
           <v-col cols="12" sm="6" md="6" class="text-center text-sm-left">
             <nuxt-link to="/">
-              <img id="logo" alt="gamatrain" src="/images/gamatrain-logo-black.svg" />
+              <img
+                id="logo"
+                alt="gamatrain"
+                src="/images/gamatrain-logo-black.svg"
+              />
             </nuxt-link>
             <div id="short-describe" class="gama-text-body2">
-              Our mission is to provide all training services to anyone and anywhere.
+              Our mission is to provide all training services to anyone and
+              anywhere.
             </div>
             <div class="mt-4">
               <nuxt-link to="/" class="v-btn">
@@ -110,11 +115,11 @@ export default {
             },
             {
               title: "School Finder",
-              link: "/school-service",
+              link: "/school",
             },
             {
-              title: "Exam",
-              link: "/search?type=azmoon",
+              title: "GET Token",
+              link: "/get-token",
             },
           ],
         },
