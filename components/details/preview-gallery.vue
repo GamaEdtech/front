@@ -10,19 +10,22 @@
           >
             <v-btn
               icon
-              small
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon mr-1"
+              class="grey lighten-5 mx-3"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="' icon icon-' + item.icon"
+                    style="font-size: 26px"
+                    :class="
+                      'primary--text text--lighten-1 icon icon-' + item.icon
+                    "
                   />
                 </template>
                 <span>{{ item.text }}</span>
