@@ -21,7 +21,7 @@
             <v-card-text>
               <h2 class="gama-text-h4">GET Tokenomics</h2>
               <ul class="gama-text-body1">
-                <li>10 billion GET</li>
+                <li class="font-weight-bold">10 billion GET</li>
                 <li>
                   <span class="font-weight-bold">Allocation:</span>
                   <ul>
@@ -188,26 +188,30 @@
 export default {
   head() {
     return {
-      title: "School Service",
+      title: "GET Token",
       script: [
         {
           src: `https://terminal.jup.ag/main-v3.js`,
+          defer: true,
         },
       ],
     };
   },
   auth: false,
   mounted() {
-    window.Jupiter.init({
-      displayMode: "integrated",
-      integratedTargetId: "integrated-terminal",
-      defaultExplorer: "Solscan",
-      endpoint:
-        "https://indulgent-cosmological-sailboat.solana-mainnet.quiknode.pro/3e2900150853164fcd9b1e055aaef070f28b04ac",
-      formProps: {
-        swapMode: "ExactIn",
-        initialOutputMint: "GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv",
-      },
+    this.$nextTick(() => {
+      if (typeof window !== "undefined")
+        window.Jupiter.init({
+          displayMode: "integrated",
+          integratedTargetId: "integrated-terminal",
+          defaultExplorer: "Solscan",
+          endpoint:
+            "https://indulgent-cosmological-sailboat.solana-mainnet.quiknode.pro/3e2900150853164fcd9b1e055aaef070f28b04ac",
+          formProps: {
+            swapMode: "ExactIn",
+            initialOutputMint: "GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv",
+          },
+        });
     });
   },
 };
