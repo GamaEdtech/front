@@ -109,7 +109,7 @@
                         item-value="id"
                         item-text="title"
                         v-model="form.level"
-                        label="Level"
+                        label="Difficulty Level"
                         outlined
                       />
                     </v-col>
@@ -245,12 +245,36 @@
                           :prepend-icon="null"
                           accept="application/pdf"
                           ref="file_pdf_provider"
-                          label="Pdf question & answer file"
+                          label="PDF Question"
                           color="red"
                           :loading="file_pdf_loading"
                           :disabled="input_stauts.file_pdf"
                           @change="uploadFile('file_pdf', $event), validate"
                           prepend-inner-icon="mdi-file-pdf-box"
+                          append-icon="mdi-folder-open"
+                          outlined
+                        />
+                      </validation-provider>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                      <validation-provider
+                        v-slot="{ validate, errors }"
+                        name="file_answer"
+                        ref="file_answer_provider"
+                        rules="mimes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      >
+                        <v-file-input
+                          dense
+                          v-model="file_answer"
+                          label="PDF Solution"
+                          :prepend-icon="null"
+                          :error-messages="errors"
+                          accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          :loading="file_answer_loading"
+                          color="teal accent-3"
+                          @change="uploadFile('file_answer', $event), validate"
+                          prepend-inner-icon="mdi-file"
+                          :disabled="input_stauts.file_answer"
                           append-icon="mdi-folder-open"
                           outlined
                         />
@@ -266,7 +290,7 @@
                         <v-file-input
                           dense
                           v-model="file_word"
-                          label="Word question & answer file"
+                          label="Word Q & S"
                           :prepend-icon="null"
                           :error-messages="errors"
                           accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -275,31 +299,6 @@
                           @change="uploadFile('file_word', $event), validate"
                           prepend-inner-icon="mdi-file-word-outline"
                           :disabled="input_stauts.file_word"
-                          append-icon="mdi-folder-open"
-                          outlined
-                        />
-                      </validation-provider>
-                    </v-col>
-
-                    <v-col cols="12" md="4">
-                      <validation-provider
-                        v-slot="{ validate, errors }"
-                        name="file_answer"
-                        ref="file_answer_provider"
-                        rules="mimes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                      >
-                        <v-file-input
-                          dense
-                          v-model="file_answer"
-                          label="Answer file"
-                          :prepend-icon="null"
-                          :error-messages="errors"
-                          accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          :loading="file_answer_loading"
-                          color="default"
-                          @change="uploadFile('file_answer', $event), validate"
-                          prepend-inner-icon="mdi-file"
-                          :disabled="input_stauts.file_answer"
                           append-icon="mdi-folder-open"
                           outlined
                         />

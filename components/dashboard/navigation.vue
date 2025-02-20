@@ -55,7 +55,7 @@ export default {
           machine_name: "add_content",
           subMenuList: [
             {
-              title: "Past Paper",
+              title: "Past Papers",
               link: "/user/paper",
               icon: "icong-test",
               icon_type: "custom",

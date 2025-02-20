@@ -220,6 +220,7 @@
                         <v-textarea
                           v-model="form.description"
                           :error-messages="errors"
+                          height="240"
                           label="Content outline"
                           hint="You must enter at least 70 characters."
                           persistent-hint
