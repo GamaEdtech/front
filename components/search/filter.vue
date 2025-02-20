@@ -208,9 +208,12 @@
             color="#f5f5f5"
             class="px-0 font-size-16 font-weight-bold"
           >
-            {{ $route.query.type === "test" ? "Paper" : "Multimedia" }}
-            Type</v-expansion-panel-header
-          >
+            {{
+              $route.query.type === "test"
+                ? "Classification"
+                : "Multimedia Type"
+            }}
+          </v-expansion-panel-header>
           <v-expansion-panel-content color="#f5f5f5">
             <v-row align="center" justify="center">
               <v-col cols="12" class="content-box">

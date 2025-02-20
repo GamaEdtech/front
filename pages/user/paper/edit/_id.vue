@@ -3,8 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Paper submission form </span>
+          <span class="text-h4 teal--text">Past Papers Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -28,7 +27,7 @@
                           @change="changeOption('section', $event)"
                           item-text="title"
                           item-value="id"
-                          label="Curriculum"
+                          label="Board"
                           outlined
                         />
                       </validation-provider>
@@ -71,7 +70,7 @@
                         />
                       </validation-provider>
                     </v-col>
-                    <v-col cols="12" md="12">
+                    <v-col cols="12" md="12" v-show="topic_list.length">
                       <!--                      <validation-provider name="topic" rules="required" v-slot="{errors}">-->
                       <topic-selector
                         ref="topic-selector"
@@ -88,7 +87,7 @@
                         item-value="id"
                         item-text="title"
                         v-model="form.test_type"
-                        label="Test type"
+                        label="Classification"
                         outlined
                       />
                     </v-col>
@@ -110,7 +109,7 @@
                         item-value="id"
                         item-text="title"
                         v-model="form.level"
-                        label="Level"
+                        label="Difficulty Level"
                         outlined
                       />
                     </v-col>
@@ -155,7 +154,7 @@
                         v-model="form.holding_level"
                         item-text="title"
                         item-value="id"
-                        label="Holding level"
+                        label="Testing Scope"
                         outlined
                       />
                     </v-col>
@@ -207,6 +206,7 @@
                           v-model="form.title"
                           :error-messages="errors"
                           label="Title"
+                          placeholder="Write a concise, descriptive, and SEO-friendly title."
                           outlined
                         />
                       </validation-provider>
@@ -218,13 +218,12 @@
                         rules="required"
                       >
                         <v-textarea
-                          dense
                           v-model="form.description"
                           :error-messages="errors"
-                          label="Describe"
+                          label="Content outline"
                           hint="You must enter at least 70 characters."
                           persistent-hint
-                          placeholder="Write a brief description about the files to help the user make an informed choice"
+                          placeholder="A brief overview of the content, outlining sections, topics, and question formats."
                           outlined
                         />
                       </validation-provider>
@@ -242,7 +241,7 @@
                           accept="application/pdf"
                           :error-messages="errors"
                           :prepend-icon="null"
-                          label="Pdf question & answer file"
+                          label="PDF Question"
                           color="red"
                           :loading="file_pdf_loading"
                           @change="uploadFile('file_pdf', $event)"
@@ -257,7 +256,7 @@
                               @click="startDownload('q_pdf')"
                               v-show="paperData.files.pdf.exist"
                             >
-                              <v-icon> mdi-download </v-icon>
+                              <v-icon color="red"> mdi-download </v-icon>
                             </v-btn>
                           </template>
                         </v-file-input>
@@ -265,7 +264,44 @@
                     </v-col>
                     <v-col cols="12" md="4">
                       <validation-provider
-                        v-slot="{ validate, errors }"
+                        v-slot="{ errors }"
+                        name="file_answer"
+                        ref="file_answer_provider"
+                        rules="mimes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      >
+                        <v-file-input
+                          dense
+                          v-model="file_answer"
+                          label="PDF Solution"
+                          :prepend-icon="null"
+                          :loading="file_answer_loading"
+                          color="teal accent-3"
+                          accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          @change="uploadFile('file_answer', $event)"
+                          prepend-inner-icon="mdi-file"
+                          append-icon="mdi-folder-open"
+                          outlined
+                          :error-messages="errors"
+                        >
+                          <template slot="append-outer">
+                            <v-btn
+                              small
+                              icon
+                              @click="startDownload('a_file')"
+                              v-show="paperData.files.answer.exist"
+                            >
+                              <v-icon color="teal accent-3">
+                                mdi-download
+                              </v-icon>
+                            </v-btn>
+                          </template>
+                        </v-file-input>
+                      </validation-provider>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                      <validation-provider
+                        v-slot="{ errors }"
                         name="file_word"
                         ref="file_word_provider"
                         rules="mimes:application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -273,7 +309,7 @@
                         <v-file-input
                           dense
                           v-model="file_word"
-                          label="Word question & answer file"
+                          label="Word Q & S"
                           :prepend-icon="null"
                           :loading="file_word_loading"
                           color="blue"
@@ -291,42 +327,7 @@
                               @click="startDownload('q_word')"
                               v-show="paperData.files.word.exist"
                             >
-                              <v-icon> mdi-download </v-icon>
-                            </v-btn>
-                          </template>
-                        </v-file-input>
-                      </validation-provider>
-                    </v-col>
-
-                    <v-col cols="12" md="4">
-                      <validation-provider
-                        v-slot="{ validate, errors }"
-                        name="file_answer"
-                        ref="file_answer_provider"
-                        rules="mimes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                      >
-                        <v-file-input
-                          dense
-                          v-model="file_answer"
-                          label="Answer file"
-                          :prepend-icon="null"
-                          :loading="file_answer_loading"
-                          color="blue"
-                          accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          @change="uploadFile('file_answer', $event)"
-                          prepend-inner-icon="mdi-file"
-                          append-icon="mdi-folder-open"
-                          outlined
-                          :error-messages="errors"
-                        >
-                          <template slot="append-outer">
-                            <v-btn
-                              small
-                              icon
-                              @click="startDownload('a_file')"
-                              v-show="paperData.files.answer.exist"
-                            >
-                              <v-icon> mdi-download </v-icon>
+                              <v-icon color="blue"> mdi-download </v-icon>
                             </v-btn>
                           </template>
                         </v-file-input>
@@ -379,19 +380,6 @@
                         <v-icon> mdi-plus </v-icon>
                         Add Solution video
                       </v-btn>
-                    </v-col>
-                    <v-col cols="12" md="12">
-                      <validation-provider
-                        v-slot="{ errors }"
-                        name="word_question_answer_file"
-                      >
-                        <v-checkbox
-                          dense
-                          v-model="form.free_agreement"
-                          :error-messages="errors"
-                          label="I would like the file to be freely available to others."
-                        />
-                      </validation-provider>
                     </v-col>
 
                     <v-col cols="12" md="6" class="pb-0">
@@ -448,7 +436,7 @@ export default {
         state: "",
         area: "",
         school: "",
-        free_agreement: 0,
+        free_agreement: 1,
       },
       //File section
       file_pdf: null,
@@ -475,11 +463,11 @@ export default {
       test_level_list: [
         {
           id: "1",
-          title: "Simple",
+          title: "Easy",
         },
         {
           id: "2",
-          title: "Medium",
+          title: "Moderate",
         },
         {
           id: "3",
@@ -505,10 +493,11 @@ export default {
         { id: 12, title: "December" },
       ],
       holding_level_list: [
-        { id: 1, title: "School" },
-        { id: 2, title: "District" },
-        { id: 3, title: "State" },
-        { id: 4, title: "Country" },
+        // { id: 1, title: "School" },
+        // { id: 2, title: "District" },
+        // { id: 3, title: "State" },
+        { id: 4, title: "National" },
+        { id: 5, title: "International" },
       ],
       state_list: [],
       area_list: [],
@@ -546,7 +535,6 @@ export default {
   },
   mounted() {
     this.getTypeList("section");
-    this.getTypeList("test_type");
     this.getTypeList("state");
     this.getExtraFileType();
     this.initData();
@@ -567,9 +555,11 @@ export default {
         this.grade_list = [];
         this.lesson_list = [];
         this.topic_list = [];
+        this.test_type_list = [];
         this.$refs["topic-selector"].lesson_selected = false;
 
         this.getTypeList("base", optionVal);
+        this.getTypeList("test_type", optionVal);
         if (this.form.area) this.getTypeList("school");
 
         this.$refs["topic-selector"].lesson_selected = false;
@@ -602,6 +592,7 @@ export default {
       };
 
       if (type === "base") params.section_id = parent;
+      if (type === "test_type") params.section_id = parent;
       if (type === "lesson") {
         params.base_id = parent;
       }
@@ -633,6 +624,7 @@ export default {
             this.topic_list = res.data;
           } else if (type === "test_type") {
             this.test_type_list = res.data;
+            this.form.test_type = this.paperData.test_type;
           } else if (type === "state") {
             this.state_list = res.data;
           } else if (type === "area") {
@@ -804,6 +796,7 @@ export default {
         this.topic_list = [];
 
         this.getTypeList("base", this.form.section);
+        this.getTypeList("test_type", this.form.section);
         if (this.form.area) this.getTypeList("school");
       }
       this.form.base = this.paperData.base;
@@ -822,7 +815,6 @@ export default {
       if (this.paperData.topic)
         this.form.topics = this.paperData.topic.split("+");
 
-      this.form.test_type = this.paperData.test_type;
       this.form.answer_type = parseInt(this.paperData.answer_type);
       this.form.level = this.paperData.level;
       this.form.edu_year = parseInt(this.paperData.edu_year);

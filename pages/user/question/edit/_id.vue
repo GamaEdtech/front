@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Q & A edit </span>
+          <span class="text-h4 teal--text"> Forum Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -28,7 +28,7 @@
                           :error-messages="errors"
                           item-text="title"
                           item-value="id"
-                          label="Curriculum"
+                          label="Board"
                           outlined
                         />
                       </validation-provider>

@@ -3,8 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Paper submission form </span>
+          <span class="text-h4 teal--text"> Past Papers Submission Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -68,7 +67,7 @@
                         />
                       </validation-provider>
                     </v-col>
-                    <v-col cols="12" md="12">
+                    <v-col cols="12" md="12" v-show="topic_list.length">
                       <topic-selector
                         ref="topic-selector"
                         :topic-list="topic_list"
@@ -82,7 +81,7 @@
                         item-value="id"
                         item-text="title"
                         v-model="form.test_type"
-                        label="Test type"
+                        label="Classification"
                         outlined
                       />
                     </v-col>
@@ -155,7 +154,8 @@
                         v-model="form.holding_level"
                         item-text="title"
                         item-value="id"
-                        label="Holding level"
+                        label="Testing Scope"
+                        clearable
                         outlined
                       />
                     </v-col>
@@ -205,6 +205,7 @@
                           v-model="form.title"
                           :error-messages="errors"
                           label="Title"
+                          placeholder="Write a concise, descriptive, and SEO-friendly title."
                           outlined
                         />
                       </validation-provider>
@@ -216,14 +217,17 @@
                         rules="required|min:70"
                       >
                         <v-textarea
-                          dense
                           v-model="form.description"
+                          @focus="increaseTextAreaHeight()"
+                          :height="textAreaHeight"
                           :error-messages="errors"
-                          label="Describe"
+                          auto-grow
+                          label="Content outline"
                           hint="You must enter at least 70 characters."
                           persistent-hint
-                          placeholder="Write a brief description about the files to help the user make an informed choice"
+                          placeholder="A brief overview of the content, outlining sections, topics, and question formats."
                           outlined
+                          :rows="1"
                         />
                       </validation-provider>
                     </v-col>
@@ -339,19 +343,6 @@
                         Add Solution video
                       </v-btn>
                     </v-col>
-                    <v-col cols="12" md="12">
-                      <validation-provider
-                        v-slot="{ errors }"
-                        name="word_question_answer_file"
-                      >
-                        <v-checkbox
-                          dense
-                          v-model="form.free_agreement"
-                          :error-messages="errors"
-                          label="I would like the file to be freely available to others."
-                        />
-                      </validation-provider>
-                    </v-col>
 
                     <v-col cols="12" md="6" class="pb-0">
                       <v-btn
@@ -391,13 +382,14 @@ export default {
   name: "add-paper",
   data() {
     return {
+      textAreaHeight: 40,
       form: {
         section: "",
         base: "",
         lesson: "",
         topics: "",
         test_type: "",
-        answer_type: 0,
+        answer_type: 2,
         level: 2,
         year: "",
         month: "",
@@ -410,7 +402,7 @@ export default {
         file_pdf: "",
         file_word: "",
         file_answer: "",
-        free_agreement: 0,
+        free_agreement: 1,
         edu_year: "",
         edu_month: "",
       },
@@ -445,15 +437,15 @@ export default {
       ],
       test_level_list: [
         {
-          id: 1,
-          title: "Simple",
+          id: "1",
+          title: "Easy",
         },
         {
-          id: 2,
-          title: "Medium",
+          id: "2",
+          title: "Moderate",
         },
         {
-          id: 3,
+          id: "3",
           title: "Hard",
         },
       ],
@@ -476,10 +468,11 @@ export default {
         { id: 12, title: "December" },
       ],
       holding_level_list: [
-        { id: 1, title: "School" },
-        { id: 2, title: "District" },
-        { id: 3, title: "State" },
-        { id: 4, title: "Country" },
+        // { id: 1, title: "School" },
+        // { id: 2, title: "District" },
+        // { id: 3, title: "State" },
+        { id: 4, title: "National" },
+        { id: 5, title: "International" },
       ],
       state_list: [],
       area_list: [],
@@ -504,7 +497,6 @@ export default {
   },
   mounted() {
     this.getTypeList("section");
-    this.getTypeList("test_type");
     this.getTypeList("state");
     this.getExtraFileType();
   },
@@ -519,6 +511,7 @@ export default {
       this.topic_list = [];
 
       this.getTypeList("base", val);
+      this.getTypeList("test_type", val);
       if (this.form.area) this.getTypeList("school");
     },
     "form.base"(val) {
@@ -552,12 +545,16 @@ export default {
     },
   },
   methods: {
+    increaseTextAreaHeight() {
+      this.textAreaHeight = 240;
+    },
     getTypeList(type, parent = "") {
       var params = {
         type: type,
       };
 
       if (type === "base") params.section_id = parent;
+      if (type === "test_type") params.section_id = parent;
       if (type === "lesson") {
         params.base_id = parent;
       }
