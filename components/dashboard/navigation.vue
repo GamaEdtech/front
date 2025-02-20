@@ -55,7 +55,7 @@ export default {
           machine_name: "add_content",
           subMenuList: [
             {
-              title: "Paper",
+              title: "Past Paper",
               link: "/user/paper",
               icon: "icong-test",
               icon_type: "custom",
@@ -69,7 +69,7 @@ export default {
               status: this.$auth.user.group_id == "5" ? false : true,
             },
             {
-              title: "Q & A",
+              title: "Forum",
               link: "/user/question",
               icon: "icong-test",
               icon_type: "custom",

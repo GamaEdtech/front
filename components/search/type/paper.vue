@@ -95,7 +95,9 @@
                       >
                         <i class="fa-solid fa-sticky-note fa-xl"></i>
                         <span class="mx-2">
-                          <span class="d-none d-lg-inline"> Paper type: </span>
+                          <span class="d-none d-lg-inline">
+                            Classification:
+                          </span>
                           <span class="date_string d-inline-block">
                             {{ item.test_type_title }}
                           </span>
@@ -165,7 +167,7 @@
               >
                 <i class="fa-solid fa-sticky-note"></i>
                 <span class="mx-2">
-                  <span class="d-none d-sm-inline"> Paper type: </span>
+                  <span class="d-none d-sm-inline"> Classification: </span>
                   <span class="date_string d-inline-block">
                     {{ item.test_type_title }}
                   </span>

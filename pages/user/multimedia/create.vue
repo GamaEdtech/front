@@ -3,8 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-learnfiles text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Multimedia submission form </span>
+          <span class="text-h4 teal--text"> Multimedia Submission Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -27,7 +26,7 @@
                           :error-messages="errors"
                           item-text="title"
                           item-value="id"
-                          label="Curriculum"
+                          label="Board"
                           outlined
                         />
                       </validation-provider>

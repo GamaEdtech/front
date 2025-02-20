@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="icon-q-a teal--text"></span>
-          <span class="text-h4 teal--text"> Q & A submission form </span>
+          <span class="text-h4 teal--text"> Forum Submission Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">

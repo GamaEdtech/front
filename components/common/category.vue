@@ -1,7 +1,7 @@
 <template>
   <div id="main-category ">
     <!--   Start: category  main-container Desktop -->
-    <v-container id="main-category-container">
+    <v-container id="main-category-container" class="pb-6">
       <v-row>
         <v-col cols="12">
           <v-sheet class="category-sheet mx-auto">
