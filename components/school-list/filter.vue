@@ -39,12 +39,14 @@
                 <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
+                      disabled
                       :class="{ 'menu-opened': menuOpened }"
                       class="text-capitalize gtext-t4 font-weight-medium menu-btn"
                       @click="desktopFilter = false"
                       v-bind="attrs"
                       v-on="on"
-                      >Stage
+                    >
+                      <span class="grey--text">Board</span>
                       <v-icon right dark color="primary" large>
                         mdi-chevron-down
                       </v-icon>
@@ -73,9 +75,11 @@
                       class="text-transform-none gtext-t4 font-weight-medium"
                       @click="desktopFilter = false"
                       v-bind="attrs"
+                      disabled
                       v-on="on"
                     >
-                      Tuition fee
+                      <span class="grey--text"> Tuition fee</span>
+
                       <!-- &nbsp;<span style="color: #667085; text-transform: none"
                         >to</span
                       >&nbsp;${{ filterForm.tuition_fee | numberFormat }} -->
@@ -114,7 +118,7 @@
                   @click="openDesktopFilter"
                 >
                   <v-icon right dark size="24"> mdi-filter </v-icon>
-                  &nbsp;&nbsp;&nbsp; Filter
+                  &nbsp;&nbsp;&nbsp; Region
                   <v-icon right dark color="primary" large>
                     mdi-chevron-down
                   </v-icon>
@@ -127,10 +131,11 @@
                       class="text-capitalize gtext-t4 font-weight-medium"
                       @click="desktopFilter = false"
                       v-bind="attrs"
+                      disabled
                       v-on="on"
                     >
                       <v-icon right dark size="24"> mdi-filter-variant </v-icon>
-                      &nbsp;&nbsp;&nbsp; Sort
+                      &nbsp;&nbsp;&nbsp; <span class="grey--text">Sort</span>
                       <v-icon size="24" right dark color="primary">
                         mdi-chevron-down
                       </v-icon>
@@ -210,7 +215,7 @@
                 ></v-autocomplete>
               </v-col>
             </v-row>
-            <v-row>
+            <!-- <v-row>
               <v-col cols="3">
                 <p class="gtext-t4 font-weight-medium">School type</p>
                 <div class="pl-8">
@@ -259,7 +264,7 @@
                   ></v-checkbox>
                 </div>
               </v-col>
-            </v-row>
+            </v-row> -->
           </v-container>
         </v-card>
       </v-container>
@@ -312,7 +317,7 @@
                 <v-card id="filter-card">
                   <v-toolbar color="#fff">
                     <v-toolbar-title class="gtext-h5 primary-gray-600"
-                      >Filter</v-toolbar-title
+                      >Region</v-toolbar-title
                     >
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
@@ -495,9 +500,9 @@
                         />
                       </v-col>
 
-                      <v-col cols="12" sm="4">
+                      <!-- <v-col cols="12" sm="4">
                         <p class="gtext-t4 font-weight-medium primary-gray-900">
-                          Stage
+                          Board
                         </p>
                         <div class="pl-8">
                           <v-radio-group v-model="filterForm.stage">
@@ -609,7 +614,7 @@
                             </template>
                           </v-slider>
                         </div>
-                      </v-col>
+                      </v-col> -->
                     </v-row>
                   </v-card-text>
 

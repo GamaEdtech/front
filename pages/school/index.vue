@@ -685,8 +685,8 @@ export default {
               section: this.$route.query.stage,
               tuition_fee: this.$route.query.tuition_fee,
               CountryIds: this.$route.query.country,
-              state: this.$route.query.state,
-              city: this.$route.query.city,
+              StateIds: this.$route.query.state,
+              CityIds: this.$route.query.city,
               school_type: this.$route.query.school_type,
               religion: this.$route.query.religion,
               boarding_type: this.$route.query.boarding_type,
@@ -831,11 +831,11 @@ export default {
         ).title;
       if (type == "sort") {
         title = this.sortList.find((x) => x.value == id).title;
-      } else if (type == "country")
+      } else if (type == "country") {
         title = this.$refs.schoolFilter.filter.countryList.find(
           (x) => x.id == id
-        ).name;
-      else if (type == "state")
+        ).title;
+      } else if (type == "state")
         title = this.$refs.schoolFilter.filter.stateList.find(
           (x) => x.id == id
         ).title;
@@ -1197,8 +1197,8 @@ export default {
 
             .item-info {
               float: left;
-              width: 85.5%;
-              min-width: 85.5%;
+              width: 100%;
+              min-width: 100%;
 
               .main-data {
                 min-height: 8rem;
