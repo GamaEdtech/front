@@ -7,6 +7,7 @@
           v-for="item in schoolList"
           :key="item.id"
           class="list-item"
+          v-show="item.name"
           :to="`/school/${item.id}/${$slugGenerator.convert(item.name)}`"
         >
           <v-card-text>
@@ -17,8 +18,24 @@
                     {{ item.name }}
                   </h2>
 
+                  <div class="mb-2">
+                    <v-chip class="blue-grey darken-1 white--text" small>
+                      Canada
+                    </v-chip>
+                    <v-chip
+                      class="blue-grey darken-1 white--text"
+                      :x-small="$vuetify.breakpoint.xs"
+                      small
+                    >
+                      Alberta
+                    </v-chip>
+                    <v-chip class="blue-grey darken-1 white--text" small>
+                      Banff
+                    </v-chip>
+                  </div>
+
                   <!-- <v-chip class="primary">
-              
+
              </v-chip> -->
 
                   <v-chip
@@ -30,16 +47,16 @@
                   </v-chip>
 
                   <!-- <v-chip class="primary">
-              
+
              </v-chip>
 
              <v-chip class="primary">
-              
+
              </v-chip> -->
                 </div>
-                <div class="item-img" v-if="!$parent.isExpanded">
+                <!-- <div class="item-img" v-if="!$parent.isExpanded">
                   <img :src="require('assets/images/default-school.png')" />
-                </div>
+                </div> -->
               </div>
               <v-divider class="mb-3" />
               <div class="item-footer">
@@ -59,12 +76,12 @@
                 </div>
 
                 <div class="float-right d-flex mt-1">
-                  <div class="rate-section gtext-t6 font-weight-semibold mr-1">
-                    {{ item.score }}
+                  <div class="rate-section gtext-t6 font-weight-semibold mr-4">
                     <v-icon color="primary"> mdi-star </v-icon>
+                    {{ item.score ? item.score : "New" }}
                   </div>
                   <div class="gtext-t6 primary-gray-300">
-                    Update:
+                    <v-icon>mdi-update</v-icon>
                     <span class="primary-gray-600">{{
                       $moment(item.up_date).format("YYYY-MM-DD")
                     }}</span>
@@ -73,12 +90,12 @@
               </div>
             </div>
 
-            <div class="item-img" v-if="$parent.isExpanded">
+            <!-- <div class="item-img" v-if="$parent.isExpanded">
               <img
                 class="float-right"
                 :src="require('assets/images/default-school.png')"
               />
-            </div>
+            </div> -->
           </v-card-text>
         </v-card>
 
@@ -117,9 +134,9 @@ export default {
   name: "school-data-list",
   props: {
     schoolList: [],
-    schoolLoading:true,
+    schoolLoading: true,
     resultCount: 0,
-    allDataLoaded:false
+    allDataLoaded: false,
   },
   data() {
     return {};

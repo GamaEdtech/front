@@ -22,7 +22,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
         <client-only>
@@ -63,7 +63,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
       </v-col>
@@ -119,7 +119,7 @@
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
         <v-file-input
@@ -137,9 +137,9 @@
         <v-row class="mt-6 d-flex d-md-none">
           <v-col cols="3" class="text-left d-block d-md-none">
             <div class="text-center">
-              <div class="gtext-t6 primary-gray-400">Update:</div>
-              <div class="gtext-t6 primary-gray-500">
-                {{ $moment(contentData.up_date).format("YYYY/MM/DD") }}
+              <div class="gama-text-body2 primary-gray-500 pt-1">
+                <v-icon small>mdi-update</v-icon>
+                {{ $moment(contentData.up_date).format("YY/MM/DD") }}
               </div>
             </div>
           </v-col>
@@ -163,8 +163,8 @@
             </v-btn-toggle>
           </v-col>
           <v-col cols="3" class="text-right d-block d-md-none">
-            <div class="rate-section gtext-t4 font-weight-semibold ml-4">
-              {{ contentData.score }}
+            <div class="rate-section gtext-t4 font-weight-semibold ml-1">
+              {{ contentData.score ? contentData.score : "New" }}
               <v-icon size="20" color="primary"> mdi-star </v-icon>
             </div>
           </v-col>
@@ -193,7 +193,7 @@
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                {{ contentData.score }}
+                {{ contentData.score ? contentData.score : "New" }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
             </div>
@@ -204,6 +204,34 @@
           <v-col cols="12" md="8">
             <div class="d-flex">
               <v-sheet class="chips-container" v-scroll-x>
+                <v-chip
+                  v-if="contentData.countryTitle"
+                  class="list-chip gtext-t5 font-weight-medium"
+                  small
+                >
+                  {{ contentData.countryTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.stateTitle"
+                  class="list-chip gtext-t5 font-weight-medium"
+                  small
+                >
+                  {{ contentData.stateTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.cityTitle"
+                  class="list-chip gtext-t5 font-weight-medium"
+                  small
+                >
+                  {{ contentData.cityTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.schoolType && contentData.schoolType.name"
+                  class="list-chip gtext-t5 font-weight-medium"
+                  small
+                >
+                  {{ contentData?.schoolType?.name }}
+                </v-chip>
                 <v-chip
                   :to="`/school?school_type=${contentData.school_type}`"
                   v-if="contentData.school_type_title"
@@ -255,7 +283,7 @@
               </v-sheet>
               <v-spacer />
 
-              <div class="gtext-t4 primary-blue-500">You enter</div>
+              <div class="gtext-t4 primary-blue-500">Contribute</div>
             </div>
 
             <div class="d-flex mt-11 mb-9">
@@ -263,11 +291,14 @@
                 Tuition fee
               </div>
               <v-spacer />
-              <!-- <div class="gtext-t4 primary-blue-500">You enter</div> -->
+              <!-- <div class="gtext-t4 primary-blue-500">Contribute</div> -->
 
               <div class="gtext-t2 font-weight-heavy primary-gray-800">
-                <span class="gtext-t6">$</span>
-                {{ contentData.tuition_fee | numberFormat }}
+                <span v-show="contentData.tuition_fee"
+                  ><span class="gtext-t6">$</span>
+                  {{ contentData.tuition_fee | numberFormat }}</span
+                >
+                <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
             </div>
             <div class="d-flex">
@@ -306,7 +337,7 @@
                 @click="facilitiesDialog = true"
                 class="gtext-t4 primary-blue-500 align-self-center pointer"
               >
-                You enter
+                Contribute
               </div>
             </div>
           </v-col>
@@ -328,7 +359,7 @@
                   @click="editGeneralInfo('website')"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
 
                 <v-text-field
@@ -366,7 +397,7 @@
                   @click="editGeneralInfo('email')"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
                 <v-text-field
                   v-if="generalDataEditMode.email"
@@ -405,7 +436,7 @@
                   "
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
                 <v-text-field
                   v-if="generalDataEditMode.phone1"
@@ -439,7 +470,7 @@
                   v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
 
                 <v-text-field
@@ -468,7 +499,9 @@
         <!-- Users score -->
         <v-row class="mt-16">
           <v-col cols="12" md="4">
-            <h3 class="gtext-h5 primary-gray-600 mb-15">Users score</h3>
+            <h3 class="gtext-h5 primary-gray-600 mb-15 font-weight-bold">
+              Score
+            </h3>
             <div class="d-flex">
               <img
                 src="/images/score.png"
@@ -506,7 +539,7 @@
                 rounded
                 x-large
                 @click="leaveCommentDialog = true"
-                >Leave comment</v-btn
+                >Leave a Comment</v-btn
               >
             </div>
           </v-col>
@@ -642,11 +675,11 @@
         <!-- End users score -->
 
         <!-- Recent comments -->
-        <v-row>
+        <v-row v-show="false">
           <v-col cols="12">
-            <h3 class="gtext-h5 primary-gray-600">Recent comments</h3>
+            <h3 class="gtext-h5 primary-gray-600">Comments</h3>
           </v-col>
-          <v-col cols="12" md="9">
+          <v-col cols="12" md="12">
             <v-card
               v-for="comment in commentList"
               :key="comment.id"
@@ -718,16 +751,16 @@
               >
             </div>
           </v-col>
-          <v-col cols="12" md="3" class="d-none d-md-block pl-15">
+          <!-- <v-col cols="12" md="3" class="d-none d-md-block pl-15">
             <div id="advert-section">
               <div class="vertical-text">Advertising</div>
             </div>
-          </v-col>
+          </v-col> -->
         </v-row>
         <!-- End recent comments -->
 
         <!-- Similar schools -->
-        <v-row id="similar-schools">
+        <v-row id="similar-schools" v-show="false">
           <v-col cols="12">
             <h3 class="gtext-h5 primary-gray-600">Similar schools</h3>
           </v-col>
@@ -922,9 +955,9 @@
       style="z-index: 20001"
     >
       <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-12">
+        <v-card-text class="pt-6 pb-0 pt-md-8 pb-2 px-6 px-md-12">
           <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">Leave a comment</div>
+            <div class="gtext-h5 priamry-gray-700">Leave a Comment</div>
             <v-spacer></v-spacer>
             <v-btn icon
               ><v-icon size="20" @click="leaveCommentDialog = false"
@@ -1341,8 +1374,8 @@ export default {
       rating: 3.5,
       slideToggler: "map",
       topSlideClass: {
-        image: "center-image",
-        map: "under-image-left",
+        image: "under-image-left",
+        map: "center-image",
         tour: "under-image-right",
       },
       leaveCommentDialog: false,
