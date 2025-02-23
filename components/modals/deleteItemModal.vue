@@ -3,7 +3,8 @@
     <v-card class="boxs">
       <div class="d-flex flex-column align-center justify-center">
         <div class="icon-container">
-          <img src="~assets/images/Vector (1).svg" alt="Icon" />
+          <!-- <img src="~assets/images/Vector (1).svg" alt="Icon" /> -->
+          <v-icon color="red" large>mdi-delete</v-icon>
         </div>
         <v-card-title class="text-h5">Are you Sure?</v-card-title>
       </div>
