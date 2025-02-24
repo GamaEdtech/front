@@ -1049,6 +1049,12 @@ export default {
       ) {
         query.center = this.filterForm.center.join(",");
       }
+      if (this.filterForm.lat != "") {
+        query.lat = this.filterForm.lat;
+      }
+      if (this.filterForm.lng != "") {
+        query.lng = this.filterForm.lng;
+      }
 
       // Handle more query parameters here ...
       this.$router.replace({ query: query }).catch((err) => {

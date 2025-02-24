@@ -1,14 +1,14 @@
 <template>
   <div id="data-list">
     <v-container id="school-list-container">
-      <div v-if="resultCount > 0">
+      <div v-if="resultCount > 0 && !schoolLoading">
         <v-card
           rounded
           v-for="item in schoolList"
           :key="item.id"
           class="list-item"
           v-show="item.name"
-          :to="`/school/${item.id}/${$slugGenerator.convert(item.name)}`"
+          :to="`/school/${item.id}/${item.slug}`"
         >
           <v-card-text>
             <div class="item-info">
@@ -19,18 +19,27 @@
                   </h2>
 
                   <div class="mb-2">
-                    <v-chip class="blue-grey darken-1 white--text" small>
-                      Canada
+                    <v-chip
+                      v-show="item.countryTitle"
+                      class="blue-grey darken-1 white--text"
+                      small
+                    >
+                      {{ item.countryTitle }}
                     </v-chip>
                     <v-chip
+                      v-show="item.stateTitle"
                       class="blue-grey darken-1 white--text"
                       :x-small="$vuetify.breakpoint.xs"
                       small
                     >
-                      Alberta
+                      {{ item.stateTitle }}
                     </v-chip>
-                    <v-chip class="blue-grey darken-1 white--text" small>
-                      Banff
+                    <v-chip
+                      v-show="item.cityTitle"
+                      class="blue-grey darken-1 white--text"
+                      small
+                    >
+                      {{ item.cityTitle }}
                     </v-chip>
                   </div>
 
@@ -61,16 +70,16 @@
               <v-divider class="mb-3" />
               <div class="item-footer">
                 <div class="float-left">
-                  <v-btn :disabled="!item.location" icon>
+                  <v-btn :disabled="!item.hasLocation" icon>
                     <v-icon> mdi-map-marker </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.phone1" icon>
+                  <v-btn :disabled="!item.hasPhone" icon>
                     <v-icon> mdi-phone </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.address" icon>
+                  <v-btn :disabled="!item.hasEmail" icon>
                     <v-icon> mdi-email </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.site" icon>
+                  <v-btn :disabled="!item.hasWebsite" icon>
                     <v-icon> mdi-web </v-icon>
                   </v-btn>
                 </div>
@@ -83,7 +92,7 @@
                   <div class="gtext-t6 primary-gray-300">
                     <v-icon>mdi-update</v-icon>
                     <span class="primary-gray-600">{{
-                      $moment(item.up_date).format("YYYY-MM-DD")
+                      $moment(item.lastModifyDate).format("YYYY-MM-DD")
                     }}</span>
                   </div>
                 </div>

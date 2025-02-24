@@ -21,7 +21,7 @@
           <l-marker
             v-for="(marker, index) in map.markers"
             :key="index"
-            @click="$router.push(`/school/1`)"
+            @click="$router.push(`/school/${marker.id}/${marker.slug}`)"
             :lat-lng="marker.latLng"
             :icon="map.schoolIcon"
           ></l-marker>
@@ -368,6 +368,8 @@ export default {
         coed_status: "",
         distance: 15,
         center: [],
+        lat: 41,
+        lng: 91,
       },
       filterLoadedStatus: {
         stage: false,
@@ -394,7 +396,7 @@ export default {
 
       schoolList: [],
       currentZoom: 5,
-      geoSearch: false,
+      geoSearch: true,
 
       sortList: [
         {
@@ -464,6 +466,8 @@ export default {
         this.timer = null;
       }
 
+      if (val) this.isExpanded = true;
+
       this.timer = setTimeout(() => {
         this.filter.keyword = val;
         this.$refs.schoolFilter.searchLoading = true;
@@ -499,6 +503,7 @@ export default {
       }, 800);
     },
     "$route.query.country"(val) {
+      this.isExpanded = true;
       this.filter.country = val;
 
       if (!this.schoolLoading) {
@@ -585,10 +590,17 @@ export default {
     isExpanded(val) {
       if (val) {
         this.geoSearch = false;
+        this.filter.country = null;
+        this.filter.state = null;
+        this.filter.city = null;
+        this.filter.keyword = null;
         this.$refs.schoolFilter.filterForm.distance = "";
+
         this.$refs.schoolFilter.filterForm.center = [];
         this.$refs.schoolFilter.updateQueryParams();
       } else {
+        this.filter.keyword = null;
+        this.$refs.schoolFilter.filterForm.keyword = "";
         this.geoSearch = true;
       }
       if (!this.schoolLoading) {
@@ -608,10 +620,14 @@ export default {
       if (!this.isExpanded) {
         const bounds = event.target.getBounds();
         const center = event.target.getCenter(); //Center of map
+        this.filter.lat = center.lat; //Update filter
+        this.filter.lng = center.lng; //Update filter
         this.filter.center = [center.lat, center.lng]; //Update filter
         const ne = bounds.getNorthEast(); //Corner of map
         this.calcDistance(center, ne);
-        this.$refs.schoolFilter.filterForm.center = this.filter.center;
+        this.$refs.schoolFilter.filterForm.lat = this.filter.lat;
+        this.$refs.schoolFilter.filterForm.lng = this.filter.lng;
+        // this.$refs.schoolFilter.filterForm.center = this.filter.center;
         this.$refs.schoolFilter.filterForm.distance = this.filter.distance;
         this.$refs.schoolFilter.updateQueryParams();
 
@@ -642,7 +658,7 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber(R * c); //retrun distance
+      this.filter.distance = this.formatNumber((R * c) / 1000); //retrun distance
     },
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side
@@ -681,27 +697,32 @@ export default {
               page: this.pageNum,
               "PagingDto.PageFilter.Size": 20,
               "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-              name: this.$route.query.keyword,
+              Name: this.$route.query.keyword,
               section: this.$route.query.stage,
               tuition_fee: this.$route.query.tuition_fee,
-              CountryIds: this.$route.query.country,
-              StateIds: this.$route.query.state,
-              CityIds: this.$route.query.city,
+              CountryId: this.$route.query.country,
+              StateId: this.$route.query.state,
+              CityId: this.$route.query.city,
               school_type: this.$route.query.school_type,
               religion: this.$route.query.religion,
               boarding_type: this.$route.query.boarding_type,
               coed_status: this.$route.query.coed_status,
               sort: this.$route.query.sort,
-              distance: this.isExpanded
-                ? ""
+              "Location.Radius": this.isExpanded
+                ? null
                 : this.$route.query.distance
                 ? this.$route.query.distance
                 : this.filter.distance,
-              center: this.isExpanded
-                ? []
-                : this.$route.query.center
-                ? this.$route.query.center
-                : this.map.center.join(","),
+              "Location.Latitude": this.isExpanded
+                ? null
+                : this.$route.query.lat
+                ? this.$route.query.lat
+                : this.filter.lat,
+              "Location.Longitude": this.isExpanded
+                ? null
+                : this.$route.query.lng
+                ? this.$route.query.lng
+                : this.filter.lng,
             },
           })
           .then((response) => {
@@ -713,9 +734,13 @@ export default {
             if (this.geoSearch) {
               this.schoolList = response.data.list;
               var newPlaceData = response.data.list
-                .filter((obj) => obj.lat !== undefined && obj.lng !== undefined) // Filter out objects with undefined lat or lng
+                .filter(
+                  (obj) => obj.lat !== undefined && obj.long !== undefined
+                ) // Filter out objects with undefined lat or lng
                 .map((obj) => ({
-                  latLng: [obj.lat, obj.lng],
+                  latLng: [obj.lat, obj.long],
+                  id: obj.id,
+                  slug: obj.slug,
                 }));
               if (newPlaceData.length) {
                 this.map.markers.push(...newPlaceData);
