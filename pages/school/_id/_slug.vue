@@ -977,7 +977,7 @@
                     Classes quality
                   </div>
                   <v-rating
-                    v-model="commentForm.classes_quality"
+                    v-model="commentForm.classesQualityRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -993,7 +993,7 @@
                     Education
                   </div>
                   <v-rating
-                    v-model="commentForm.education"
+                    v-model="commentForm.educationRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1009,7 +1009,7 @@
                     IT training
                   </div>
                   <v-rating
-                    v-model="commentForm.it_training"
+                    v-model="commentForm.itTrainingRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1025,7 +1025,7 @@
                     Safe and happy
                   </div>
                   <v-rating
-                    v-model="commentForm.safe_and_happy"
+                    v-model="commentForm.safetyAndHappinessRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1041,7 +1041,7 @@
                     Behavior
                   </div>
                   <v-rating
-                    v-model="commentForm.behavior"
+                    v-model="commentForm.behaviorRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1057,7 +1057,7 @@
                     Tuition ratio
                   </div>
                   <v-rating
-                    v-model="commentForm.tuition_ratio"
+                    v-model="commentForm.tuitionRatioRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1073,7 +1073,7 @@
                     Facilities
                   </div>
                   <v-rating
-                    v-model="commentForm.facilities"
+                    v-model="commentForm.tuitionRatioRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1089,7 +1089,7 @@
                     Artistic activities
                   </div>
                   <v-rating
-                    v-model="commentForm.artistic_activities"
+                    v-model="commentForm.artisticActivitiesRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1384,7 +1384,14 @@ export default {
 
       commentForm: {
         comment: "",
-        classes_quality: 0,
+        classesQualityRate: 4.1,
+        educationRate: 4.2,
+        itTrainingRate: 4,
+        safetyAndHappinessRate: 38,
+        behaviorRate: 4,
+        tuitionRatioRate: 4.2,
+        facilitiesRate: 4.2,
+        artisticActivitiesRate: 4.1,
       },
       selectLocationDialog: false,
       imgInput: null,
@@ -1508,15 +1515,21 @@ export default {
     },
     submitComment() {
       this.loading.submitComment = true;
-      const querystring = require("querystring");
 
       this.$axios
         .post(
-          `/api/v1/schools/${this.$route.params.id}/comments`,
-          querystring.stringify(this.commentForm)
+          `/api/v2/schools/${this.$route.params.id}/comments`,
+          this.commentForm
         )
         .then((response) => {
-          this.$toast.success("Your comment has been successfully submitted");
+          if (response.data.succeeded) {
+            this.$toast.success("Your comment has been successfully submitted");
+            this.loadComments();
+          } else {
+            console.log(response.data.errors);
+            this.$toast.error(response.data?.errors[0]?.message);
+          }
+          this.loadComments();
         })
         .catch((err) => {
           console.log(err);
@@ -1528,7 +1541,7 @@ export default {
     },
     loadComments() {
       this.$axios
-        .get(`/api/v1/schools/${this.$route.params.id}/comments`)
+        .get(`/api/v2/schools/${this.$route.params.id}/comments`)
         .then((response) => {
           this.commentList = response.data.data.list;
         })

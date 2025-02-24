@@ -174,10 +174,21 @@
       </v-container>
     </v-container>
 
-    <v-container fluid id="service-education-future">
+    <v-container fluid>
       <v-row>
         <v-col cols="12" md="12">
-          <p class="gama-text-h4">Join the Future of Education Today!</p>
+          <div class="d-flex align-center justify-center">
+            <p class="gama-text-h4">Join the Future of Education Today!</p>
+
+            <v-btn
+              class="primary ml-4 text-h5"
+              rounded
+              large
+              href="https://jup.ag/swap/SOL-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
+              target="_blank"
+              >Buy Now</v-btn
+            >
+          </div>
         </v-col>
       </v-row>
     </v-container>
