@@ -1,7 +1,7 @@
 <template>
   <div id="data-list">
     <v-container id="school-list-container">
-      <div v-if="resultCount > 0 && !schoolLoading">
+      <div v-if="resultCount > 0">
         <v-card
           rounded
           v-for="item in schoolList"
@@ -122,8 +122,8 @@
       <div v-else-if="resultCount == 0 && schoolLoading == false">
         <span class="gtext-t4"> Opps! no data found </span>
       </div>
-      <div v-else>
-        <v-card class="list-item" v-for="i in 5" :key="i">
+      <!-- <div v-else>
+        <v-card class="list-item" v-for="i in 4" :key="i">
           <div class="item-info">
             <div class="main-data">
               <v-skeleton-loader
@@ -133,7 +133,7 @@
             <div></div>
           </div>
         </v-card>
-      </div>
+      </div> -->
     </v-container>
   </div>
 </template>

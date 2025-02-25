@@ -185,9 +185,10 @@
                   label="Country"
                   outlined
                   clearable
+                  autocomplete="new-password"
                   rounded
                   @change="countryChange()"
-                ></v-autocomplete>
+                />
               </v-col>
               <v-col cols="4">
                 <v-autocomplete
@@ -197,6 +198,7 @@
                   item-value="id"
                   label="State"
                   outlined
+                  autocomplete="new-password"
                   rounded
                   clearable
                   @change="stateChange()"
@@ -209,6 +211,7 @@
                   item-text="title"
                   item-value="id"
                   label="City"
+                  autocomplete="new-password"
                   outlined
                   rounded
                   clearable
@@ -435,7 +438,7 @@
                           close
                           outlined
                           class="mb-1 mr-1"
-                          v-if="
+                          v-show="
                             $route.query.boarding_type &&
                             filterLoadedStatus.boarding_type
                           "
@@ -450,7 +453,7 @@
                           close
                           outlined
                           class="mb-1 mr-1"
-                          v-if="
+                          v-show="
                             $route.query.coed_status &&
                             filterLoadedStatus.coed_status
                           "
