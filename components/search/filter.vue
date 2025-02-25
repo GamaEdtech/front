@@ -394,6 +394,7 @@
 </template>
 
 <script>
+import { title } from "process";
 export default {
   name: "search-filter",
   props: {
@@ -418,9 +419,14 @@ export default {
       base_val: this.$route.query.base ? this.$route.query.base : 0,
       lesson_val: this.$route.query.lesson ? this.$route.query.lesson : 0,
       topic_val: this.$route.query.topic ? this.$route.query.topic : 0,
-      file_type_val: this.$route.query.test_type
-        ? this.$route.query.test_type
-        : 0,
+      file_type_val:
+        this.$route.query.type == "learnfiles"
+          ? this.$route.query.file_type
+            ? this.$route.query.file_type
+            : 0
+          : this.$route.query.test_type
+          ? this.$route.query.test_type
+          : 0,
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
@@ -569,8 +575,8 @@ export default {
     file_type_val(val) {
       if (val == 0) {
         this.applied_filter.select_file_type_title = "";
-        this.updateQueryParams();
       }
+      this.updateQueryParams();
     },
 
     state_val(val) {
@@ -718,7 +724,7 @@ export default {
     },
     setAppliedFilter(filters) {
       this.applied_filter = filters;
-      this.setBreadcrumbInfo();
+      this.setBreadcrumbInfo(false);
     },
 
     //Check user selected at least one filter
@@ -818,6 +824,7 @@ export default {
     //Change file type option
     changeFileTypeVal() {
       this.updateQueryParams();
+
       //Enable topic title tag
 
       if (this.file_type_val > 0)
@@ -826,6 +833,8 @@ export default {
             (x) => x.id === this.file_type_val
           ).title;
       else this.applied_filter.select_file_type_title = "";
+
+      this.setBreadcrumbInfo();
     },
 
     changeStateVal() {
@@ -868,6 +877,9 @@ export default {
       }
       if (this.file_type_val !== 0 && query.type === "test") {
         query.test_type = this.file_type_val;
+      }
+      if (this.file_type_val !== 0 && query.type === "learnfiles") {
+        query.file_type = this.file_type_val;
       }
       if (this.test_level_val !== 0 && query.type === "test") {
         query.level = this.test_level_val;
@@ -949,15 +961,23 @@ export default {
           page_title = this.applied_filter.select_section_title
             ? `${this.applied_filter.select_section_title ?? ""} ${
                 this.applied_filter.select_base_title ?? ""
-              } ${this.applied_filter?.select_lesson_title ?? ""} ${
-                this.applied_filter.select_file_type_title ?? ""
-              }`
+              } ${this.applied_filter?.select_lesson_title ?? ""}
+                ${
+                  this.applied_filter.select_file_type_title
+                    ? this.applied_filter.select_file_type_title
+                    : " Past Papers"
+                }`
             : "Educational Resources | K12 Education Papers and Materials";
         } else if (this.$route.query.type === "learnfiles") {
           page_title = this.applied_filter.select_section_title
             ? `${this.applied_filter.select_section_title ?? ""} ${
                 this.applied_filter.select_base_title ?? ""
-              } ${this.applied_filter.select_file_type_title ?? ""}`
+              }
+                ${this.applied_filter?.select_lesson_title ?? ""} ${
+                this.applied_filter.select_file_type_title
+                  ? this.applied_filter.select_file_type_title
+                  : " Multimedia"
+              }`
             : "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
         } else if (this.$route.query.type === "question") {
           page_title = `${this.applied_filter.select_section_title ?? ""} ${
@@ -982,7 +1002,7 @@ export default {
       if (type == "grade") this.filter.base_list = list;
       if (type == "subject") this.filter.lesson_list = list;
       if (type == "topic") this.filter.topic_list = list;
-      if (type == "paper_type") this.filter.file_type_list = list;
+      if (type == "file_type") this.filter.file_type_list = list;
     },
 
     //Get file type

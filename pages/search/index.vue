@@ -187,6 +187,7 @@ export default {
     let paperTypeTitle = "";
     let paperTypeList = {};
     let topicList = {};
+    let multimediaTypeList = {};
     let multimediaTypeTitle = "";
     let applied_filter = {
       select_section_title: "",
@@ -243,26 +244,33 @@ export default {
       }
     }
 
-    if (query.type === "learnfiles" && query.file_type) {
+    if (query.type === "learnfiles") {
       params.type = "file_type";
-      const multimediaTypeList = await $axios.$get(`/api/v1/types/list`, {
+      multimediaTypeList = await $axios.$get(`/api/v1/types/list`, {
         params,
       });
-      const multimediaTypeIndex = multimediaTypeList.data.findIndex(
-        (x) => x.id == query.file_type
-      );
-      multimediaTypeTitle = multimediaTypeList.data[multimediaTypeIndex].title;
+      if (query.test_type) {
+        const multimediaTypeIndex = multimediaTypeList.data.findIndex(
+          (x) => x.id == query.file_type
+        );
+        multimediaTypeTitle =
+          multimediaTypeList.data[multimediaTypeIndex].title;
+      }
     }
 
     if (query.type === "test") {
       page_title = boardTitle
-        ? `${boardTitle} ${gradeTitle} ${subjectTitle} ${paperTypeTitle}`
+        ? `${boardTitle} ${gradeTitle} ${subjectTitle} ${
+            paperTypeTitle ? paperTypeTitle : "Past Papers"
+          }`
         : "Educational Resources | K12 Education Papers and Materials";
       page_describe =
         "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
     } else if (query.type === "learnfiles") {
       page_title = boardTitle
-        ? `${boardTitle} ${gradeTitle} ${subjectTitle} ${multimediaTypeTitle}`
+        ? `${boardTitle} ${gradeTitle} ${subjectTitle} ${
+            multimediaTypeTitle ? multimediaTypeTitle : "Multimedia"
+          }`
         : "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
       page_describe =
         "Elevate your learning experience with GamaTrain's captivating multimedia content, including PowerPoint presentations, informative videos, and diverse educational materials.";
@@ -289,6 +297,7 @@ export default {
       boardList,
       gradeList,
       paperTypeList,
+      multimediaTypeList,
       subjectList,
       topicList,
       applied_filter,
@@ -355,9 +364,11 @@ export default {
       if (this.$route.query.lesson)
         this.$refs.side_filter.setFilter("topic", this.topicList?.data);
       if (this.$route.query.type == "test")
+        this.$refs.side_filter.setFilter("file_type", this.paperTypeList?.data);
+      if (this.$route.query.type == "learnfiles")
         this.$refs.side_filter.setFilter(
-          "paper_type",
-          this.paperTypeList?.data
+          "file_type",
+          this.multimediaTypeList?.data
         );
     }
 
@@ -365,7 +376,7 @@ export default {
 
     if (!this.$route.query.type) {
       const query = { type: "test" };
-      this.page_title = "Papers";
+      this.page_title = "Past Papers";
       this.$router.replace({ query: query });
       this.getContentList();
     } else this.getContentList();
