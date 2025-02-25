@@ -342,7 +342,7 @@ export default {
       },
       schoolLoading: true,
       pageNum: 1,
-      perPage: 10,
+      perPage: 20,
       allDataLoaded: false,
       resultCount: "--",
       loadingData: false,
@@ -396,7 +396,7 @@ export default {
 
       schoolList: [],
       currentZoom: 5,
-      geoSearch: true,
+      geoSearch: false,
 
       sortList: [
         {
@@ -581,6 +581,7 @@ export default {
       this.filter.sort = val;
 
       if (!this.schoolLoading) {
+        a;
         this.pageNum = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
@@ -694,8 +695,8 @@ export default {
         this.$axios
           .$get("/api/v2/schools", {
             params: {
-              page: this.pageNum,
-              "PagingDto.PageFilter.Size": 20,
+              "PagingDto.PageFilter.Skip": (this.pageNum - 1) * this.perPage,
+              "PagingDto.PageFilter.Size": this.perPage,
               "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
               Name: this.$route.query.keyword,
               section: this.$route.query.stage,
@@ -749,19 +750,13 @@ export default {
               this.allDataLoaded = true;
             } else {
               //If user not in geoloaction and now active geo mode. we set data on map for it and center for map
-              var newPlaceData = response.data.list
-                .filter((obj) => obj.lat !== undefined && obj.lng !== undefined) // Filter out objects with undefined lat or lng
-                .map((obj) => ({
-                  latLng: [obj.lat, obj.lng],
-                }));
+
               this.schoolList.push(...response.data.list);
-              if (newPlaceData.length) {
-                this.map.markers.push(...newPlaceData);
-              }
             }
 
-            if (response.data.list.length < this.perPage)
+            if (response.data.list.length < this.perPage) {
               this.allDataLoaded = true;
+            }
           })
           .catch((err) => {
             console.error(err);
