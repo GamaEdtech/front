@@ -198,6 +198,41 @@
                   </validation-provider>
                 </v-col>
 
+                <v-col cols="12" md="2">
+                  <validation-provider
+                    v-slot="{ errors }"
+                    name="edu_year"
+                    rules="required"
+                  >
+                    <v-autocomplete
+                      dense
+                      :items="year_list"
+                      v-model="form.edu_year"
+                      :error-messages="errors"
+                      label="Year"
+                      outlined
+                    />
+                  </validation-provider>
+                </v-col>
+                <v-col cols="12" md="2">
+                  <validation-provider
+                    v-slot="{ errors }"
+                    name="edu_month"
+                    rules="required"
+                  >
+                    <v-autocomplete
+                      dense
+                      :items="month_list"
+                      v-model="form.edu_month"
+                      item-text="title"
+                      item-value="id"
+                      :error-messages="errors"
+                      label="Month"
+                      outlined
+                    />
+                  </validation-provider>
+                </v-col>
+
                 <!--                <v-col cols="12" md="4">-->
                 <!--                  <v-file-input-->
                 <!--                    dense-->
@@ -1171,8 +1206,28 @@ export default {
         paperID: "",
         negative_point: false,
         file_original: "",
+        edu_year: "",
+        edu_month: "",
       },
       file_original: "",
+      year_list: [
+        2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014,
+        2013,
+      ],
+      month_list: [
+        { id: 1, title: "January" },
+        { id: 2, title: "February" },
+        { id: 3, title: "March" },
+        { id: 4, title: "April" },
+        { id: 5, title: "May" },
+        { id: 6, title: "June" },
+        { id: 7, title: "July" },
+        { id: 8, title: "August" },
+        { id: 9, title: "September" },
+        { id: 10, title: "October" },
+        { id: 11, title: "November" },
+        { id: 12, title: "December" },
+      ],
       filter: {
         section: "",
         base: "",
@@ -1424,6 +1479,9 @@ export default {
           this.form.paperID = response.data.paperID;
           this.form.duration = response.data.azmoon_time;
           this.form.file_original = response.data.file_original;
+          this.form.edu_year = parseInt(response.data.edu_year);
+          this.form.edu_month = parseInt(response.data.edu_month);
+
           setTimeout(() => {
             this.form.title = response.data.title;
           }, 2000);
