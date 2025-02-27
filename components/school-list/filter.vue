@@ -17,19 +17,7 @@
                     v-model="filterForm.keyword"
                     rounded
                     autocomplete="off"
-                  >
-                    <template v-slot:append>
-                      <v-btn
-                        large
-                        class="primary"
-                        :loading="searchLoading"
-                        id="search-btn"
-                        rounded
-                      >
-                        Search
-                      </v-btn>
-                    </template>
-                  </v-text-field>
+                  />
                 </div>
               </div>
             </v-col>
@@ -156,7 +144,7 @@
                 <div class="vertical-line"></div>
 
                 <v-btn class="gtext-t4 font-weight-regular text-capitalize">
-                  <span class="gray--text">Search result</span> &nbsp;
+                  <span class="gray--text">Results</span> &nbsp;
                   <span class="white--text">
                     {{ resultCount | numberFormat }}
                   </span>
@@ -290,18 +278,7 @@
                 dense
                 rounded
                 autocomplete="off"
-              >
-                <template v-slot:append>
-                  <v-btn
-                    class="primary"
-                    :loading="searchLoading"
-                    id="search-btn"
-                    rounded
-                  >
-                    Search
-                  </v-btn>
-                </template>
-              </v-text-field>
+              />
             </div>
 
             <div class="float-right" id="filterSection">
@@ -312,7 +289,7 @@
                 fab
                 color="#F2F4F7"
                 elevation="0"
-                class="mr-2"
+                class="mr-2 ml-1"
               >
                 <v-icon> mdi-filter </v-icon>
               </v-btn>

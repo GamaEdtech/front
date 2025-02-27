@@ -14,21 +14,23 @@
             <div class="item-info">
               <div class="main-data d-flex">
                 <div>
-                  <h2 class="gtext-t4 font-weight-semibold mb-4">
-                    {{ item.name }}
-                  </h2>
+                  <div class="d-flex">
+                    <h2 class="gtext-t4 font-weight-semibold mb-4">
+                      {{ item.name }}
+                    </h2>
+                  </div>
 
                   <div class="mb-2">
                     <v-chip
                       v-show="item.countryTitle"
-                      class="blue-grey darken-1 white--text"
+                      class="blue-grey darken-1 white--text mb-1"
                       small
                     >
                       {{ item.countryTitle }}
                     </v-chip>
                     <v-chip
                       v-show="item.stateTitle"
-                      class="blue-grey darken-1 white--text"
+                      class="blue-grey darken-1 white--text mb-1"
                       :x-small="$vuetify.breakpoint.xs"
                       small
                     >
@@ -36,7 +38,7 @@
                     </v-chip>
                     <v-chip
                       v-show="item.cityTitle"
-                      class="blue-grey darken-1 white--text"
+                      class="blue-grey darken-1 white--text mb-1"
                       small
                     >
                       {{ item.cityTitle }}

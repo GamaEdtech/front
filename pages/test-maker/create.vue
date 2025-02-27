@@ -2,7 +2,6 @@
   <v-container class="test-maker">
     <v-row class="mt-4">
       <v-col cols="6">
-        <span class="icon icong-azmoon text-h3 teal--text"></span>
         <span class="text-h4 teal--text"> New Exam </span>
       </v-col>
       <v-col cols="6" id="tool-box" class="text-right">
@@ -1314,7 +1313,7 @@ export default {
       previewTestList: [],
       topicTitleArr: [],
 
-      testListSwitch: true,
+      testListSwitch: false,
       lastCreatedTest: "",
 
       //Delete exam test section
@@ -1354,7 +1353,7 @@ export default {
       this.testListSwitch = false;
     } else {
       this.test_step = 1;
-      this.testListSwitch = true;
+      this.testListSwitch = false;
     }
   },
 

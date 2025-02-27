@@ -219,7 +219,7 @@
                 <v-row>
                   <v-col cols="12" class="pb-0">
                     <i class="fa-solid fa-folder mr-1 icon"></i>
-                    File type: {{ contentData.test_type_title }}
+                    Classification: {{ contentData.test_type_title }}
                   </v-col>
                   <v-col cols="12" class="pb-0">
                     <i class="fa-solid fa-book-open-reader mr-1 icon"></i>
@@ -335,11 +335,11 @@
                     <div v-if="contentData.files.pdf.exist == true">
                       <v-btn
                         @click="startDownload('q_pdf')"
-                        class="mb-2"
+                        class="mb-2 white--text font-weight-bold"
                         block
-                        color="error"
+                        color="#E60012"
                       >
-                        Download Question
+                        Question Paper
                         {{
                           contentData.files.word.price > 0
                             ? "| $" + contentData.files.word.price
@@ -350,12 +350,12 @@
                     <div v-if="contentData.files.answer.exist == true">
                       <v-btn
                         v-show="contentData.files.answer.ext == 'pdf'"
-                        class="mb-2"
+                        class="mb-2 font-weight-bold"
                         @click="startDownload('a_file')"
                         block
-                        color="error"
+                        color="teal accent-3"
                       >
-                        Download Answer
+                        Mark Sheme
                         {{
                           contentData.files.word.price > 0
                             ? "| $" + contentData.files.word.price
@@ -384,7 +384,7 @@
                       :to="`/exam/${contentData?.exams[0].id}`"
                       block
                       color="#5600e8"
-                      class="mb-2 white--text"
+                      class="mb-2 white--text font-weight-bold"
                     >
                       Begin Quiz
                     </v-btn>
@@ -394,7 +394,7 @@
                       block
                       outlined
                       color="primary"
-                      class="mb-2 white--text"
+                      class="mb-2 white--text font-weight-bold"
                     >
                       Create Quiz
                     </v-btn>
@@ -438,11 +438,11 @@
             <div v-if="contentData.files.pdf.exist == true">
               <v-btn
                 @click="startDownload('q_pdf')"
-                class="mb-2"
+                class="mb-2 white--text font-weight-bold"
                 block
-                color="error"
+                color="#E60012"
               >
-                Download Question
+                Question Paper
                 {{
                   contentData.files.word.price > 0
                     ? "| $" + contentData.files.word.price
@@ -453,12 +453,12 @@
             <div v-if="contentData.files.answer.exist == true">
               <v-btn
                 v-show="contentData.files.answer.ext == 'pdf'"
-                class="mb-2"
+                class="mb-2 font-weight-bold"
                 @click="startDownload('a_file')"
                 block
-                color="error"
+                color="teal accent-3"
               >
-                Download Answer
+                Mark Sheme
                 {{
                   contentData.files.word.price > 0
                     ? "| $" + contentData.files.word.price
@@ -1093,6 +1093,8 @@ export default {
   position: fixed !important;
   bottom: 0 !important;
   z-index: 2 !important;
+  padding-top: 16px !important;
+  background: #f6f8fa !important;
   border-top: 0.1rem solid #e1e2e3;
   width: 100%;
 }
