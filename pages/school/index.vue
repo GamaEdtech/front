@@ -76,9 +76,7 @@
                       <v-row v-if="mobileDataSheetConfig.sheetHeight >= 15">
                         <v-col cols="12" class="text-right">
                           <div id="result-stat " class="mr-4">
-                            <span class="gama-text-overline">
-                              Search result
-                            </span>
+                            <span class="gama-text-overline"> Results </span>
                             <span class="gama-text-button">
                               {{ resultCount | numberFormat }}
                             </span>
@@ -1046,7 +1044,7 @@ export default {
         .list-item {
           display: flex;
           margin-bottom: 0.8rem;
-          height: 14.9rem;
+          min-height: 14.9rem;
 
           .item-info {
             float: left;
@@ -1062,12 +1060,6 @@ export default {
                 background: var(--primary-warning-50, #fffaeb) !important;
                 color: var(--primary-yellow-gama-500, #ffb600) !important;
               }
-            }
-            .main-data h2 {
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              max-width: 20.6rem;
             }
 
             .item-footer .v-icon {

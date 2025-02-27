@@ -60,7 +60,7 @@
                       :error-messages="errors"
                       item-text="title"
                       item-value="id"
-                      label="Curriculum"
+                      label="Board"
                       outlined
                     />
                   </validation-provider>
@@ -446,7 +446,7 @@
                 item-text="title"
                 clearable
                 item-value="id"
-                label="Curriculum"
+                label="Board"
                 outlined
               />
             </v-col>
@@ -1306,7 +1306,7 @@ export default {
       previewTestList: [],
       topicTitleArr: [],
 
-      testListSwitch: true,
+      testListSwitch: false,
       lastCreatedTest: "",
 
       //Delete exam test section

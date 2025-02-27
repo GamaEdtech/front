@@ -18,7 +18,7 @@
                   :error-messages="errors"
                   item-text="title"
                   item-value="id"
-                  label="Curriculum"
+                  label="Board"
                   outlined
                 />
               </validation-provider>
