@@ -203,7 +203,7 @@
         </v-expansion-panel>
 
         <!--File type filter-->
-        <v-expansion-panel v-show="filter.file_type_list.length > 0">
+        <v-expansion-panel :disabled="!board_val">
           <v-expansion-panel-header
             color="#f5f5f5"
             class="px-0 font-size-16 font-weight-bold"
@@ -523,10 +523,14 @@ export default {
       this.lesson_val = 0;
       this.topic_val = 0;
 
+      if (val == "") this.panel = 0;
+      else this.panel = 1;
+
       this.filter.base_list = [];
       this.filter.lesson_list = [];
       this.filter.topic_list = [];
       this.filter.city_list = [];
+      this.filter.file_type_list = [];
 
       //Reset related tags
       this.applied_filter.select_section_title = "";
@@ -667,6 +671,8 @@ export default {
           } else if (type === "lesson") {
             this.filter.lesson_list = res.data;
 
+            if (this.filter.lesson_list.length > 0) this.panel = 2;
+
             //Get lesson data
             if (this.$route.query.lesson > 0) {
               data = {
@@ -689,6 +695,8 @@ export default {
             }
           } else if (type === "topic") {
             this.filter.topic_list = res.data;
+
+            if (this.filter.topic_list.length > 0) this.panel = 3;
 
             //Enable tag
             if (this.$route.query.topic > 0)

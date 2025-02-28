@@ -61,6 +61,7 @@
                       lg="3"
                       cols="5"
                       class="d-flex align-center py-2 px-0"
+                      v-if="item.start_date"
                     >
                       <i class="fa-solid fa-circle-play fa-xl"></i>
                       <p class="mx-2 gama-text-caption">
@@ -76,7 +77,7 @@
                         class="fa-solid fa-temperature-three-quarters fa-xl"
                       ></i>
                       <p class="mx-2 gama-text-caption">
-                        Level: {{ $testLevel.show(item.level) }}
+                        Difficulty: {{ $testLevel.show(item.level) }}
                       </p>
                     </v-col>
 
@@ -84,6 +85,7 @@
                       lg="3"
                       cols="5"
                       class="d-flex align-center py-2 px-0"
+                      v-if="item.end_date"
                     >
                       <i class="fa-solid fa-circle-stop fa-xl"></i>
                       <p class="mx-2 gama-text-caption">
@@ -95,7 +97,7 @@
 
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
@@ -104,7 +106,7 @@
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
                   >
@@ -113,7 +115,7 @@
                   <v-chip
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}

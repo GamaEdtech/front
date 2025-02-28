@@ -2,6 +2,7 @@
   <div class="test-details-content">
     <!-- Start : Category -->
     <category />
+
     <!-- End:Category -->
 
     <!--  Start: breadcrumb  -->
@@ -111,7 +112,7 @@
                   <div class="label-holder">
                     <v-chip
                       link
-                      class="mr-1"
+                      class="mr-1 blue-grey darken-1 white--text"
                       :small="$vuetify.breakpoint.mdAndDown"
                     >
                       <nuxt-link
@@ -122,7 +123,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="mr-1"
+                      class="mr-1 blue-grey darken-1 white--text"
                       :small="$vuetify.breakpoint.mdAndDown"
                     >
                       <nuxt-link
@@ -133,7 +134,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="ma-1"
+                      class="ma-1 blue-grey darken-1 white--text"
                       :small="$vuetify.breakpoint.mdAndDown"
                     >
                       <nuxt-link
@@ -142,13 +143,16 @@
                         {{ contentData.lesson_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip class="ma-1" :small="$vuetify.breakpoint.mdAndDown">
+                    <v-chip
+                      class="ma-1 blue-grey darken-1 white--text"
+                      :small="$vuetify.breakpoint.mdAndDown"
+                    >
                       {{ contentData.edu_month_title }}
                     </v-chip>
                     <v-chip
                       :small="$vuetify.breakpoint.mdAndDown"
                       :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&edu_year=${contentData.edu_year}`"
-                      class="ma-1"
+                      class="ma-1 blue-grey darken-1 white--text"
                     >
                       {{ contentData.edu_year }}
                     </v-chip>
@@ -339,7 +343,7 @@
                         block
                         color="#E60012"
                       >
-                        Question Paper
+                        {{ contentData.test_type_title }}
                         {{
                           contentData.files.word.price > 0
                             ? "| $" + contentData.files.word.price

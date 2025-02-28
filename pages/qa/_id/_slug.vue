@@ -231,7 +231,7 @@
                                         small
                                         :to="`/search?type=question&section=${contentData.section}`"
                                         link
-                                        class="mr-1"
+                                        class="mr-1 blue-grey darken-1 white--text"
                                       >
                                         {{ contentData.section_title }}
                                       </v-chip>
@@ -239,14 +239,14 @@
                                         small
                                         link
                                         :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}`"
-                                        class="mr-1"
+                                        class="mr-1 blue-grey darken-1 white--text"
                                       >
                                         {{ contentData.base_title }}
                                       </v-chip>
                                       <v-chip
                                         small
                                         link
-                                        class="ma-1"
+                                        class="ma-1 blue-grey darken-1 white--text"
                                         :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
                                       >
                                         {{ contentData.lesson_title }}

@@ -8,23 +8,27 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Side section-->
-          <v-col cols="12" class="mt-3 mt-md-0 pb-0 d-flex">
+          <v-col
+            cols="12"
+            class="mt-3 mt-md-0 pb-0 d-flex justify-center align-center"
+          >
             <v-btn
               icon
+              large
               :small="$vuetify.breakpoint.xs"
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon mr-1"
+              class="blue-grey darken-2 mx-3"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :style="`font-size:${$vuetify.breakpoint.xs ? '' : '20px'}`"
-                    :class="`icon icon-${item.icon} pt-1 grey--text text--darken-1`"
+                    style="font-size: 26px"
+                    :class="`white--text text--lighten-1 icon icon-${item.icon} pt-1 `"
                   />
                 </template>
                 <span>{{ item.text }}</span>

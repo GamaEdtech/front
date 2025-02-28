@@ -73,7 +73,11 @@
                 <template slot="label">
                   <div class="answer">
                     <span>1)</span>
-                    <span ref="mathJaxEl" v-html="item.answer_a"></span>
+                    <span
+                      style="font-size: 14px"
+                      ref="mathJaxEl"
+                      v-html="item.answer_a"
+                    ></span>
                   </div>
                 </template>
               </v-radio>

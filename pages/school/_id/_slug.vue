@@ -206,28 +206,28 @@
               <v-sheet class="chips-container" v-scroll-x>
                 <v-chip
                   v-if="contentData.countryTitle"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.countryTitle }}
                 </v-chip>
                 <v-chip
                   v-if="contentData.stateTitle"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.stateTitle }}
                 </v-chip>
                 <v-chip
                   v-if="contentData.cityTitle"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.cityTitle }}
                 </v-chip>
                 <v-chip
                   v-if="contentData.schoolType && contentData.schoolType.name"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData?.schoolType?.name }}
@@ -235,7 +235,7 @@
                 <v-chip
                   :to="`/school?school_type=${contentData.school_type}`"
                   v-if="contentData.school_type_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.school_type_title }}
@@ -243,7 +243,7 @@
                 <v-chip
                   :to="`/school?section=${contentData.section}`"
                   v-if="contentData.section_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.section_title }}
@@ -251,7 +251,7 @@
                 <v-chip
                   :to="`/school?coed_status=${contentData.sex}`"
                   v-if="contentData.sex_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.sex_title }}
@@ -259,7 +259,7 @@
                 <v-chip
                   :to="`/school?country=${contentData.country}`"
                   v-if="contentData.country_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.country_title }}
@@ -267,7 +267,7 @@
                 <v-chip
                   :to="`/school?country=${contentData.country}&state=${contentData.state_}`"
                   v-if="contentData.state_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.state_title }}
@@ -275,7 +275,7 @@
                 <v-chip
                   :to="`/school?country=${contentData.country}&state=${contentData.state_}&city=${contentData.city_}`"
                   v-if="contentData.city_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.city_title }}
@@ -351,6 +351,7 @@
                   v-show="contentData.webSite"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
+                  class="blue--text"
                 >
                   {{ contentData.webSite }}
                 </a>
@@ -461,7 +462,7 @@
               <div class="info-sign">
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
                 }}</span>
@@ -1694,7 +1695,8 @@ export default {
 
     .info-data {
       width: 100%;
-      height: 5.6rem;
+      min-height: 5.6rem;
+      max-height: 5.6rem;
       border-radius: 0.6rem;
       border: 1px solid var(--Primary-Yellow-Gama-50, #fff8ed);
       background: var(--White, #fff);
@@ -1704,6 +1706,9 @@ export default {
       padding: 1.5rem 1.6rem 1.5rem 1.6rem;
       align-items: center;
       margin-left: 0.4rem;
+    }
+    .info-data-address {
+      max-height: 12rem;
     }
   }
 }
