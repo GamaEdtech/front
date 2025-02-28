@@ -98,7 +98,7 @@
                         item-value="id"
                         item-text="title"
                         v-model="form.answer_type"
-                        label="Answer status"
+                        label="Solution Availability"
                         outlined
                       />
                     </v-col>
@@ -457,9 +457,9 @@ export default {
       topic_list: [],
       test_type_list: [],
       answer_status_list: [
-        { id: 0, title: "No answer" },
-        { id: 1, title: "Has key answer" },
-        { id: 2, title: "Has descriptive answer" },
+        { id: 0, title: "No Solution" },
+        { id: 1, title: "Answer Key" },
+        { id: 2, title: "Complete Solution" },
       ],
       test_level_list: [
         {

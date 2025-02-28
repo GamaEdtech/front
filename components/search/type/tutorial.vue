@@ -55,7 +55,7 @@
                 </nuxt-link>
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
@@ -64,7 +64,7 @@
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
                   >
@@ -73,7 +73,7 @@
                   <v-chip
                     :x-small="$vuetify.breakpoint.xs"
                     :small="!$vuetify.breakpoint.xs"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}

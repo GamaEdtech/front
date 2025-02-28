@@ -15,7 +15,7 @@
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="grey lighten-5 mx-3"
+              class="blue-grey darken-2 mx-3"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
@@ -24,7 +24,7 @@
                     v-on="on"
                     style="font-size: 26px"
                     :class="
-                      'primary--text text--lighten-1 icon icon-' + item.icon
+                      'white--text text--lighten-1 icon icon-' + item.icon
                     "
                   />
                 </template>
@@ -36,25 +36,27 @@
 
           <!--Desktop side section-->
           <v-col cols="2" class="pr-0 d-none d-md-block">
-            <nuxt-link
+            <v-btn
+              icon
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon"
+              class="mb-3 blue-grey darken-2"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    style="font-size: 20px"
-                    :class="`icon icon-${item.icon} grey--text text--darken-1`"
+                    style="font-size: 26px"
+                    :class="`icon icon-${item.icon} white--text text--darken-1`"
                   />
                 </template>
                 <span>{{ item.text }}</span>
               </v-tooltip>
-            </nuxt-link>
+            </v-btn>
           </v-col>
           <!--End desktop side section-->
 

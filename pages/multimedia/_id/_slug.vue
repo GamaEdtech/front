@@ -160,7 +160,7 @@
                     <v-chip
                       :small="$vuetify.breakpoint.mdAndDown"
                       link
-                      class="mr-1"
+                      class="mr-1 blue-grey darken-1 white--text"
                     >
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData.section}`"
@@ -171,7 +171,7 @@
                     <v-chip
                       :small="$vuetify.breakpoint.mdAndDown"
                       link
-                      class="mr-1"
+                      class="mr-1 blue-grey darken-1 white--text"
                     >
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData.section}&base=${contentData.base}`"
@@ -182,7 +182,7 @@
                     <v-chip
                       :small="$vuetify.breakpoint.mdAndDown"
                       link
-                      class="ma-1"
+                      class="ma-1 blue-grey darken-1 white--text"
                     >
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
