@@ -146,6 +146,7 @@
 <script>
 import { ValidationProvider, ValidationObserver } from "vee-validate";
 import querystring from "querystring";
+import axios from "axios";
 
 export default {
   name: "login",
@@ -234,6 +235,15 @@ export default {
     switchToPassRecover() {
       this.$emit("update:switchToPassRecover", "pass_recover");
     },
+    /**
+     * Submits login credentials and handles authentication flow
+     * - Makes POST request to login endpoint
+     * - Handles OTP flow if required
+     * - Sets auth tokens and user data on successful login
+     * - Redirects to user page if on home page
+     * @async
+     * @returns {Promise<void>}
+     */
     async submit() {
       this.login_loading = true;
       const querystring = require("querystring");
@@ -252,25 +262,34 @@ export default {
             },
           }
         )
-        .then((response) => {
+        .then(async (response) => {
+          // Check if OTP login flow is required
           if (response.data.type && response.data.type == "loginByOTP") {
             this.$toast.success("Otp code sent");
             this.identity_holder = false;
             this.otp_holder = true;
           } else {
+            // Regular login flow
+            // Get v2 API token first
+            await this.submitLoginV2();
+
+            // Set auth data and user info
             this.$auth.setUserToken(response.data.jwtToken);
             this.$auth.setUser(response.data.info);
 
             this.$toast.success("Logged in successfully");
             this.login_dialog = false;
 
-            if (this.$route.path == "/")
+            // Redirect to user page if on home page
+            if (this.$route.path == "/") {
               this.$router.push({
                 path: "/user",
               });
+            }
           }
         })
         .catch((err) => {
+          // Handle login error
           if (err.response.status == 400)
             this.$toast.error(err.response.data.message);
         })
@@ -278,10 +297,33 @@ export default {
           this.login_loading = false;
         });
     },
+    /**
+     * Submits login credentials to v2 API endpoint and stores token
+     * @async
+     * @returns {Promise<void>}
+     */ async submitLoginV2() {
+      // Make POST request to v2 authentication endpoint
+      const result = await axios.post(
+        "https://api.gamaedtech.com/api/v1/identities/tokens",
+        {
+          username: this.identity,
+          password: this.password,
+        }
+      );
+
+      // Store authentication token in local storage for v2 API
+      localStorage.setItem("v2_token", result.data.data.token);
+    },
+    /**
+     * Handles completion of OTP code entry and submits login request
+     * @async
+     * @returns {Promise<void>}
+     */
     onFinish() {
-      //Finish enter otp code
+      // Import querystring for form data encoding
       const querystring = require("querystring");
 
+      // Submit login request with OTP code
       this.$axios
         .$post(
           "/api/v1/users/login",
@@ -294,29 +336,42 @@ export default {
           })
         )
         .then((response) => {
+          // Close login dialog and reset form state
           this.login_dialog = false;
           this.otp_holder = false;
           this.identity_holder = true;
+
+          // Set authentication data
           this.$auth.setUserToken(response.data.jwtToken);
           this.$auth.setUser(response.data.info);
 
+          // Show success message
           this.$toast.success("Logged in successfully");
 
+          // Redirect to user page if on home page
           if (this.$route.path == "/")
             this.$router.push({
               path: "/user",
             });
         })
         .catch((err) => {
+          // Handle login error
           if (err.response.status == 400)
             this.$toast.error(err.response.data.message);
         })
         .finally(() => {
+          // Reset loading state
           this.register_loading = false;
         });
     },
+    /**
+     * Resets the form to show identity input instead of OTP input
+     * by hiding OTP field and showing identity field
+     */
     recheckEnteredIdentity() {
+      // Hide OTP input section
       this.otp_holder = false;
+      // Show identity input section
       this.identity_holder = true;
     },
   },
