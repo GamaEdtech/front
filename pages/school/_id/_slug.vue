@@ -1518,9 +1518,14 @@ export default {
       this.loading.submitComment = true;
 
       this.$axios
-        .post(
+        .$post(
           `/api/v2/schools/${this.$route.params.id}/comments`,
-          this.commentForm
+          this.commentForm,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
         )
         .then((response) => {
           if (response.data.succeeded) {

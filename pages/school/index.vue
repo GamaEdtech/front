@@ -643,7 +643,7 @@ export default {
     },
     calcDistance(center, ne) {
       // Calculate the distance using Haversine formula
-      const R = 6371; // Earth radius in kilometers
+      const R = 6371000; // Earth radius in kilometers
       const lat1 = center.lat * (Math.PI / 180);
       const lon1 = center.lng * (Math.PI / 180);
       const lat2 = ne.lat * (Math.PI / 180);
@@ -657,7 +657,7 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber((R * c) / 1000); //retrun distance
+      this.filter.distance = this.formatNumber(R * c); //retrun distance
     },
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side

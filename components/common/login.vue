@@ -304,22 +304,18 @@ export default {
      */
     async submitLoginV2() {
       // Make POST request to v2 authentication endpoint
-      const result = await axios.post(
-        `${process.env.STORAGE_BASE_URL}/api/v2/identities/tokens`,
-        {
-          username: this.identity,
-          password: this.password,
-        }
-      );
-
-      if (
-        result.data.errors.length &&
-        result.data.errors[0].message === "UserNotFound"
-      ) {
-        await registerV2();
-      } else {
+      const result = await this.$axios.$post(`/api/v2/identities/tokens`, {
+        username: this.identity,
+        password: this.password,
+      });
+      if (result.succeeded) {
         // Store authentication token in local storage for v2 API
-        localStorage.setItem("v2_token", result.data.data.token);
+        localStorage.setItem("v2_token", result.data.token);
+      } else if (
+        result.errors.length &&
+        result.errors[0].message === "UserNotFound"
+      ) {
+        await this.registerV2();
       }
     },
 
@@ -330,14 +326,11 @@ export default {
      */
     async registerV2() {
       // Make POST request to v2 registration endpoint
-      const result = await axios.post(
-        `${process.env.STORAGE_BASE_URL}/api/v2/identities/register`,
-        {
-          email: this.identity,
-          password: this.password,
-          confirmPassword: this.password,
-        }
-      );
+      const result = await this.$axios.$post(`/api/v2/identities/register`, {
+        email: this.identity,
+        password: this.password,
+        confirmPassword: this.password,
+      });
 
       // If registration successful, attempt login
       if (result.data.succeeded) {
