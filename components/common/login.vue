@@ -301,19 +301,50 @@ export default {
      * Submits login credentials to v2 API endpoint and stores token
      * @async
      * @returns {Promise<void>}
-     */ async submitLoginV2() {
+     */
+    async submitLoginV2() {
       // Make POST request to v2 authentication endpoint
       const result = await axios.post(
-        "https://api.gamaedtech.com/api/v1/identities/tokens",
+        `${process.env.STORAGE_BASE_URL}/api/v1/identities/tokens`,
         {
           username: this.identity,
           password: this.password,
         }
       );
 
-      // Store authentication token in local storage for v2 API
-      localStorage.setItem("v2_token", result.data.data.token);
+      if (
+        result.data.errors.length &&
+        result.data.errors[0].message === "UserNotFound"
+      ) {
+        await registerV2();
+      } else {
+        // Store authentication token in local storage for v2 API
+        localStorage.setItem("v2_token", result.data.data.token);
+      }
     },
+
+    /**
+     * Registers a new user with the v2 API endpoint
+     * @async
+     * @returns {Promise<void>}
+     */
+    async registerV2() {
+      // Make POST request to v2 registration endpoint
+      const result = await axios.post(
+        `${process.env.STORAGE_BASE_URL}/api/v1/identities/register`,
+        {
+          email: this.identity,
+          password: this.password,
+          confirmPassword: this.password,
+        }
+      );
+
+      // If registration successful, attempt login
+      if (result.data.succeeded) {
+        await this.submitLoginV2();
+      }
+    },
+
     /**
      * Handles completion of OTP code entry and submits login request
      * @async
