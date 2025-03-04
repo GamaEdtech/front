@@ -32,7 +32,7 @@
           />
           <button
             class="px-4 py-2 del rounded-pill"
-            @click="deleteSelectedItems"
+            @click="openDeleteConfirmation('selected')"
           >
             🗑 Delete Selected
           </button>
@@ -78,7 +78,7 @@
               </button>
               <button
                 class="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-100"
-                @click="deleteItem(index)"
+                @click="openDeleteConfirmation(index)"
               >
                 🗑 Delete
               </button>
@@ -97,7 +97,7 @@
         <div class="flex space-x-2">
           <button
             class="px-4 py-2 bg-gray-200 rounded-lg del"
-            @click="deleteSelectedItems"
+            @click="openDeleteConfirmation('all')"
           >
             Delete All
           </button>
@@ -130,18 +130,26 @@
         </option>
       </select>
     </div>
+
+    <!-- Modals -->
     <addItemModalVue
       :isOpen.sync="isModalOpen"
       :itemType="value"
       @add="addNewItem"
+    />
+    <deleteItemModalVue
+      :isOpen.sync="isDeleteModalOpen"
+      :deleteType="deleteType"
+      @confirm="handleDelete"
     />
   </div>
 </template>
 
 <script>
 import addItemModalVue from "@/components/modals/addItemModal.vue";
+import deleteItemModalVue from "@/components/modals/deleteItemModal.vue";
 export default {
-  components: { addItemModalVue },
+  components: { addItemModalVue, deleteItemModalVue },
   data() {
     return {
       value: "Province",
@@ -156,6 +164,8 @@ export default {
       rowsPerPage: 10,
       currentPage: 1,
       isModalOpen: false,
+      isDeleteModalOpen: false,
+      deleteType: null,
     };
   },
   computed: {
@@ -175,7 +185,7 @@ export default {
   methods: {
     addNewItem(newItem) {
       this.items.unshift(newItem);
-      this.isModalOpen = false; 
+      this.isModalOpen = false;
     },
     toggleMenu(index, event) {
       event.stopPropagation();
@@ -183,9 +193,6 @@ export default {
     },
     closeMenu() {
       this.activeMenu = null;
-    },
-    addNewItem() {
-      console.log(`Adding a new ${this.value}...`);
     },
     toggleAll() {
       if (this.selectAll) {
@@ -204,18 +211,25 @@ export default {
         this.currentPage++;
       }
     },
-    deleteItem(index) {
-      const itemToDelete = this.paginatedItems[index];
-      this.items = this.items.filter((item) => item !== itemToDelete);
-      this.closeMenu();
+    openDeleteConfirmation(type) {
+      this.deleteType = type;
+      this.isDeleteModalOpen = true;
     },
-    deleteSelectedItems() {
-      if (this.selectedItems.length === 0) return;
-      this.items = this.items.filter(
-        (item) => !this.selectedItems.includes(item)
-      );
-      this.selectedItems = [];
-      this.selectAll = false;
+    handleDelete() {
+      if (this.deleteType === "all") {
+        this.items = [];
+      } else if (this.deleteType === "selected") {
+        this.items = this.items.filter(
+          (item) => !this.selectedItems.includes(item)
+        );
+        this.selectedItems = [];
+        this.selectAll = false;
+      } else {
+        const itemToDelete = this.paginatedItems[this.deleteType];
+        this.items = this.items.filter((item) => item !== itemToDelete);
+      }
+      this.isDeleteModalOpen = false;
+      this.deleteType = null;
     },
     async fetchAreas() {
       const response = await this.$axios.$get(
@@ -227,7 +241,6 @@ export default {
       }));
     },
   },
-
   watch: {
     value(newValue) {
       if (newValue === "Area") {
