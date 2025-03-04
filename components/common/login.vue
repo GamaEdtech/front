@@ -305,7 +305,7 @@ export default {
     async submitLoginV2() {
       // Make POST request to v2 authentication endpoint
       const result = await axios.post(
-        `${process.env.STORAGE_BASE_URL}/api/v1/identities/tokens`,
+        `${process.env.STORAGE_BASE_URL}/api/v2/identities/tokens`,
         {
           username: this.identity,
           password: this.password,
@@ -331,7 +331,7 @@ export default {
     async registerV2() {
       // Make POST request to v2 registration endpoint
       const result = await axios.post(
-        `${process.env.STORAGE_BASE_URL}/api/v1/identities/register`,
+        `${process.env.STORAGE_BASE_URL}/api/v2/identities/register`,
         {
           email: this.identity,
           password: this.password,
