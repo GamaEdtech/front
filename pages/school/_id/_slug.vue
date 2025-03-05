@@ -1101,13 +1101,24 @@
               </ul>
             </v-col>
             <v-col cols="12" md="6">
-              <v-textarea
-                placeholder="Type your comment"
-                v-model="commentForm.comment"
-                outlined
-                :rows="$vuetify.breakpoint.xs ? 10 : 22"
-              >
-              </v-textarea>
+              <div style="position: relative">
+                <v-textarea
+                  placeholder="Type your comment"
+                  v-model="commentForm.comment"
+                  outlined
+                  :rows="$vuetify.breakpoint.xs ? 10 : 22"
+                />
+                <v-btn
+                  fab
+                  x-small
+                  :loading="help_loading"
+                  @click="sendToAI()"
+                  class="white--text"
+                  color="blue-grey"
+                  style="position: absolute; right: 10px; bottom: 40px"
+                  ><v-icon small color="white">mdi-help</v-icon></v-btn
+                >
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -1379,6 +1390,7 @@ export default {
         map: "center-image",
         tour: "under-image-right",
       },
+      help_loading: false,
       leaveCommentDialog: false,
       galleryDialog: false,
       facilitiesDialog: false,
@@ -1544,6 +1556,79 @@ export default {
           this.loading.submitComment = false;
           this.leaveCommentDialog = false;
         });
+    },
+    async sendToAI() {
+      const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.
+
+### **School Information:**
+- **Name:** ${this.contentData.name}
+- **Location:** ${this.contentData.country_title}, ${this.contentData.state_title}, ${this.contentData.city_title}
+
+### **Evaluation Criteria:**
+Rate each of the following aspects on a scale of 1 to 5 stars (as numbers), then provide a brief description of the school.
+
+### **Response Format:**
+Return a structured JSON object with:
+- Category ratings as numbers (1-5) and it 8 items.
+- A short, engaging, fact-based description including emojis (max 130 char)
+
+Response Format: (Don't forget end of rating object close by })
+\`\`\`json
+{
+  "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",
+  "ratings": {
+    "classrooms_quality": 4,
+    "teachers_proficiency": 5,
+    "technology_access": 3,
+    "school_safety": 4,
+    "officials_behavior": 5,
+    "affordability": 3,
+    "sports_facilities": 4,
+    "art_counseling": 2
+  }
+}
+\`\`\`
+`;
+
+      if (!userComment) {
+        this.$toast.error("Sorry, insufficient data");
+        return;
+      }
+      this.help_loading = true;
+      try {
+        const apiResponse = await this.$axios.$post("/api/chatgpt", {
+          userComment,
+        });
+
+        // Remove the code block formatting (```json\n) and parse the JSON string
+        const cleanedResponse = apiResponse.response
+          .replace(/^\s*```json[\s\S]*?\n/, "") // Remove the opening markdown
+          .replace(/```$/, ""); // Remove the closing markdown
+
+        // Now parse the cleaned response as JSON
+        const parsedResponse = JSON.parse(cleanedResponse);
+
+        // Extract ratings and description
+        const ratings = parsedResponse.ratings;
+        this.commentForm.comment = parsedResponse.description;
+
+        // Example of how to use ratings in your code
+        this.commentForm.classesQualityRate = ratings.classrooms_quality; // 4
+        this.commentForm.educationRate = ratings.teachers_proficiency; // 5
+        this.commentForm.itTrainingRate = ratings.technology_access; // 3
+        this.commentForm.safetyAndHappinessRate = ratings.school_safety; // 4
+        this.commentForm.behaviorRate = ratings.officials_behavior; // 5
+        this.commentForm.tuitionRatioRate = ratings.affordability; // 3
+        this.commentForm.facilitiesRate = ratings.sports_facilities; // 4
+        this.commentForm.artisticActivitiesRate = ratings.art_counseling; // 2
+
+        // this.commentForm.safetyAndHappinessRate = ratings.sc;
+      } catch (error) {
+        console.error("Error:", error);
+        this.aiResponse = "Failed to get AI response.";
+      } finally {
+        this.help_loading = false;
+      }
     },
     loadComments() {
       this.$axios

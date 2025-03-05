@@ -6,7 +6,10 @@
       "src": "nuxt.config.js",
       "use": "@nuxtjs/vercel-builder",
       "config": {
-        "includeFiles": ["serverMiddleware/data-to-xml.js"],
+        "includeFiles": [
+          "serverMiddleware/data-to-xml.js",
+          "serverMiddleware/chatgpt.js"
+        ],
         "functions": {
           "serverMiddleware/data-to-xml.js": {
             "maxDuration": 300
