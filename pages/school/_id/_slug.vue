@@ -256,30 +256,6 @@
                 >
                   {{ contentData.sex_title }}
                 </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}`"
-                  v-if="contentData.country_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.country_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}&state=${contentData.state_}`"
-                  v-if="contentData.state_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.state_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}&state=${contentData.state_}&city=${contentData.city_}`"
-                  v-if="contentData.city_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.city_title }}
-                </v-chip>
               </v-sheet>
               <v-spacer />
 
@@ -1391,20 +1367,20 @@ export default {
         tour: "under-image-right",
       },
       help_loading: false,
-      leaveCommentDialog: false,
+      leaveCommentDialog: true,
       galleryDialog: false,
       facilitiesDialog: false,
 
       commentForm: {
         comment: "",
-        classesQualityRate: 4.1,
-        educationRate: 4.2,
+        classesQualityRate: 4.5,
+        educationRate: 4,
         itTrainingRate: 4,
-        safetyAndHappinessRate: 38,
+        safetyAndHappinessRate: 3.5,
         behaviorRate: 4,
-        tuitionRatioRate: 4.2,
-        facilitiesRate: 4.2,
-        artisticActivitiesRate: 4.1,
+        tuitionRatioRate: 4.5,
+        facilitiesRate: 4.5,
+        artisticActivitiesRate: 4,
       },
       selectLocationDialog: false,
       imgInput: null,
@@ -1540,21 +1516,19 @@ export default {
           }
         )
         .then((response) => {
-          if (response.data.succeeded) {
+          if (response.succeeded) {
             this.$toast.success("Your comment has been successfully submitted");
             this.loadComments();
+            this.leaveCommentDialog = false;
           } else {
-            console.log(response.data.errors);
-            this.$toast.error(response.data?.errors[0]?.message);
+            this.$toast.error(response?.errors[0]?.message);
           }
-          this.loadComments();
         })
         .catch((err) => {
-          console.log(err);
+          this.$toast.error("Something is wrong.");
         })
         .finally(() => {
           this.loading.submitComment = false;
-          this.leaveCommentDialog = false;
         });
     },
     async sendToAI() {
@@ -1562,15 +1536,18 @@ export default {
 
 ### **School Information:**
 - **Name:** ${this.contentData.name}
-- **Location:** ${this.contentData.country_title}, ${this.contentData.state_title}, ${this.contentData.city_title}
+- **Location:** ${this.contentData.countryTitle}, ${
+        this.contentData.stateTitle
+      }, ${this.contentData.cityTitle}
+${this.contentData.webSite ? `- **Website:** ${this.contentData.webSite}` : ""}
 
 ### **Evaluation Criteria:**
-Rate each of the following aspects on a scale of 1 to 5 stars (as numbers), then provide a brief description of the school.
+Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment for school (don't repeat school name and location in comment).
 
 ### **Response Format:**
 Return a structured JSON object with:
 - Category ratings as numbers (1-5) and it 8 items.
-- A short, engaging, fact-based description including emojis (max 130 char)
+- A short, engaging, fact-based description including emojis (min:350 char, max 400 char)
 
 Response Format: (Don't forget end of rating object close by })
 \`\`\`json
@@ -1589,6 +1566,12 @@ Response Format: (Don't forget end of rating object close by })
 }
 \`\`\`
 `;
+
+      console.log(userComment);
+      if (!localStorage.getItem("v2_token")) {
+        this.$toast.error("Login required to proceed.");
+        return;
+      }
 
       if (!userComment) {
         this.$toast.error("Sorry, insufficient data");
