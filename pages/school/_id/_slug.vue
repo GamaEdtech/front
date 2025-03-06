@@ -1367,7 +1367,7 @@ export default {
         tour: "under-image-right",
       },
       help_loading: false,
-      leaveCommentDialog: true,
+      leaveCommentDialog: false,
       galleryDialog: false,
       facilitiesDialog: false,
 
