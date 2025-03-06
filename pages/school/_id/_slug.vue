@@ -652,7 +652,7 @@
         <!-- End users score -->
 
         <!-- Recent comments -->
-        <v-row v-show="false">
+        <v-row>
           <v-col cols="12">
             <h3 class="gtext-h5 primary-gray-600">Comments</h3>
           </v-col>
@@ -1373,13 +1373,13 @@ export default {
 
       commentForm: {
         comment: "",
-        classesQualityRate: 4.5,
+        classesQualityRate: 4,
         educationRate: 4,
         itTrainingRate: 4,
-        safetyAndHappinessRate: 3.5,
+        safetyAndHappinessRate: 3,
         behaviorRate: 4,
-        tuitionRatioRate: 4.5,
-        facilitiesRate: 4.5,
+        tuitionRatioRate: 5,
+        facilitiesRate: 4,
         artisticActivitiesRate: 4,
       },
       selectLocationDialog: false,
