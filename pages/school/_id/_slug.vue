@@ -652,7 +652,7 @@
         <!-- End users score -->
 
         <!-- Recent comments -->
-        <v-row>
+        <v-row v-show="commentList.length">
           <v-col cols="12">
             <h3 class="gtext-h5 primary-gray-600">Comments</h3>
           </v-col>
@@ -667,20 +667,23 @@
                 <div class="comment-card-header">
                   <div class="d-flex float-left">
                     <v-avatar size="60">
-                      <img class="profile-avatar" :src="comment.avatar" />
+                      <img
+                        class="profile-avatar"
+                        :src="comment.creationUserAvatar"
+                      />
                     </v-avatar>
                     <div class="ml-2">
-                      <div class="gtext-t3 primary-gray-500">
+                      <!-- <div class="gtext-t3 primary-gray-500">
                         Teacher, Blackven
-                      </div>
+                      </div> -->
                       <div class="gtext-t2 primary-gray-900">
-                        {{ comment.first_name }} {{ comment.last_name }}
+                        {{ comment.creationUser }}
                       </div>
                     </div>
                   </div>
                   <div class="float-right">
                     <v-rating
-                      :value="comment.score"
+                      :value="comment.averageRate"
                       background-color="orange lighten-3"
                       color="orange"
                       half-increments
@@ -713,7 +716,9 @@
                       <v-icon size="14"> mdi-forum </v-icon>
                     </v-btn>
                   </div>
-                  <div class="float-right gtext-t5">2023/11/23</div>
+                  <div class="float-right gtext-t5">
+                    {{ comment.creationDate }}
+                  </div>
                 </div>
               </v-card-text>
             </v-card>
@@ -1373,13 +1378,13 @@ export default {
 
       commentForm: {
         comment: "",
-        classesQualityRate: 4,
+        classesQualityRate: 4.5,
         educationRate: 4,
         itTrainingRate: 4,
-        safetyAndHappinessRate: 3,
+        safetyAndHappinessRate: 3.5,
         behaviorRate: 4,
         tuitionRatioRate: 5,
-        facilitiesRate: 4,
+        facilitiesRate: 4.5,
         artisticActivitiesRate: 4,
       },
       selectLocationDialog: false,
@@ -1534,40 +1539,51 @@ export default {
     async sendToAI() {
       const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.
 
-### **School Information:**
-- **Name:** ${this.contentData.name}
-- **Location:** ${this.contentData.countryTitle}, ${
+          ### **School Information:**
+          - **Name:** ${this.contentData.name}
+          - **Location:** ${this.contentData.countryTitle}, ${
         this.contentData.stateTitle
       }, ${this.contentData.cityTitle}
-${this.contentData.webSite ? `- **Website:** ${this.contentData.webSite}` : ""}
+          ${
+            this.contentData.webSite
+              ? `- **Website:** ${this.contentData.webSite}`
+              : ""
+          }
 
-### **Evaluation Criteria:**
-Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment for school (don't repeat school name and location in comment).
+          ### **Evaluation Criteria:**
+          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
+          \n1. Quality of classrooms and educational facilities
+          \n2. Teachers' proficiency and teaching effectiveness
+          \n3. Access to and use of computers and technology
+          \n4. Safety and overall atmosphere of the school
+          \n5. Behavior of school officials towards students
+          \n6. Affordability relative to the services provided
+          \n7. Availability of suitable sports facilities
+          \n8. Presence of art classes or counseling programs\n\n
 
-### **Response Format:**
-Return a structured JSON object with:
-- Category ratings as numbers (1-5) and it 8 items.
-- A short, engaging, fact-based description including emojis (min:350 char, max 400 char)
+          ### **Response Format:**
+          Return a structured JSON object with:
+          - Category ratings as numbers (1-5) and it 8 items.
+          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school’s actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
 
-Response Format: (Don't forget end of rating object close by })
-\`\`\`json
-{
-  "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",
-  "ratings": {
-    "classrooms_quality": 4,
-    "teachers_proficiency": 5,
-    "technology_access": 3,
-    "school_safety": 4,
-    "officials_behavior": 5,
-    "affordability": 3,
-    "sports_facilities": 4,
-    "art_counseling": 2
-  }
-}
-\`\`\`
-`;
+          Response Format: (Don't forget end of rating object close by })
+          \`\`\`json
+          {
+            "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",
+            "ratings": {
+              "classrooms_quality": ai_rate as number,
+              "teachers_proficiency": ai_rate as number,
+              "technology_access": ai_rate as number,
+              "school_safety": ai_rate as number,
+              "officials_behavior": ai_rate as number,
+              "affordability": ai_rate as number,
+              "sports_facilities": ai_rate as number,
+              "art_counseling": ai_rate as number
+            }
+          }
+          \`\`\`
+          `;
 
-      console.log(userComment);
       if (!localStorage.getItem("v2_token")) {
         this.$toast.error("Login required to proceed.");
         return;

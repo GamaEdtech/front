@@ -1,5 +1,15 @@
 import axios from "axios";
+const ALLOWED_ORIGINS = [process.env.BASE_URL, process.env.BASE_URL_V2];
+
 export default async function (req, res) {
+  const origin = req.headers.origin;
+
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    res.statusCode = 403; // Forbidden
+    res.end(JSON.stringify({ error: "Access denied" }));
+    return;
+  }
+
   if (req.method !== "POST") {
     res.statusCode = 405; // Method Not Allowed
     res.end(JSON.stringify({ error: "Method not allowed" }));
