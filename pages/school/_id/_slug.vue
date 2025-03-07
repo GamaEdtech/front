@@ -1631,9 +1631,13 @@ export default {
     },
     loadComments() {
       this.$axios
-        .get(`/api/v2/schools/${this.$route.params.id}/comments`)
+        .$get(`/api/v2/schools/${this.$route.params.id}/comments`, {
+          params: {
+            "PagingDto.PageFilter.Size": 20,
+          },
+        })
         .then((response) => {
-          this.commentList = response.data.data.list;
+          this.commentList = response.data.list;
         })
         .catch((err) => {
           console.log(err);

@@ -24,7 +24,7 @@
           <v-col cols="12">
             <div v-show="identity_holder">
               <validation-observer ref="observer" v-slot="{ invalid }">
-                <form @submit.prevent="submitLoginV2()">
+                <form @submit.prevent="submit">
                   <v-row>
                     <v-col cols="12">
                       <validation-provider
