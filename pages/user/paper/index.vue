@@ -263,6 +263,9 @@ export default {
               base: this.filter.grade,
               lesson: this.filter.lesson,
             },
+            headers: {
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
           })
           .then((response) => {
             this.paper_list.push(...response.data.list);
@@ -388,7 +391,11 @@ export default {
     async deletePaper() {
       this.delete_loading = true;
       await this.$axios
-        .$delete(`/api/v1/tests/${this.delete_paper_id}`)
+        .$delete(`/api/v1/tests/${this.delete_paper_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.delete_paper_id = null;
           this.deleteConfirmDialog = false;

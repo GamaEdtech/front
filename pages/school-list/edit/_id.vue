@@ -107,10 +107,10 @@
 export default {
   layout: "admin",
   name: "edit_school",
-  head(){
-    return{
-      title:this.form.schoolTitle
-    } 
+  head() {
+    return {
+      title: this.form.schoolTitle,
+    };
   },
   data() {
     return {
@@ -1567,7 +1567,11 @@ export default {
       this.update_loading = true;
       this.form.user_id = this.$auth.user.id;
       await this.$axios
-        .$put("/test_api/school_update", this.form)
+        .$put("/test_api/school_update", this.form, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.$toast.success("Page updated successfully");
           if (response == -1) this.$router.replace(`/school-list`);
@@ -1589,7 +1593,6 @@ export default {
           `/test_api/school_destroy/${this.form.Id}/${this.form.regionTitle}/${this.$auth.user.id}`
         )
         .then((response) => {
-
           if (response == -1) this.$router.replace(`/school-list`);
           else this.$router.replace(`/school-list/edit/${response.Id}`);
         })
@@ -1610,10 +1613,10 @@ export default {
 }
 
 .v-footer {
-  display: none!important;;
+  display: none !important;
 }
 
 #footer-copy-right {
-  display: none!important;
+  display: none !important;
 }
 </style>

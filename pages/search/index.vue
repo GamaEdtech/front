@@ -186,6 +186,7 @@ export default {
     let subjectList = "";
     let paperTypeTitle = "";
     let paperTypeList = {};
+    let examTypeList = {};
     let topicList = {};
     let multimediaTypeList = {};
     let multimediaTypeTitle = "";
@@ -245,7 +246,7 @@ export default {
     }
 
     if (query.type === "learnfiles") {
-      params.type = "file_type";
+      params.type = "content_type";
       multimediaTypeList = await $axios.$get(`/api/v1/types/list`, {
         params,
       });
@@ -256,6 +257,11 @@ export default {
         multimediaTypeTitle =
           multimediaTypeList.data[multimediaTypeIndex].title;
       }
+    }
+
+    if (query.type == "azmoon") {
+      params.type = "test_type";
+      examTypeList = await $axios.$get(`/api/v1/types/list`, { params });
     }
 
     if (query.type === "test") {
@@ -297,6 +303,7 @@ export default {
       boardList,
       gradeList,
       paperTypeList,
+      examTypeList,
       multimediaTypeList,
       subjectList,
       topicList,
@@ -365,6 +372,8 @@ export default {
         this.$refs.side_filter.setFilter("topic", this.topicList?.data);
       if (this.$route.query.type == "test")
         this.$refs.side_filter.setFilter("file_type", this.paperTypeList?.data);
+      if (this.$route.query.type == "azmoon")
+        this.$refs.side_filter.setFilter("file_type", this.examTypeList?.data);
       if (this.$route.query.type == "learnfiles")
         this.$refs.side_filter.setFilter(
           "file_type",

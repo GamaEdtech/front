@@ -335,6 +335,7 @@ export default {
         .$post("/api/v1/questions", this.urlencodeFormData(formData), {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `${this.$auth.strategy.token.get()}`,
           },
         })
         .then((response) => {
@@ -397,6 +398,7 @@ export default {
             headers: {
               accept: "*/*",
               "Content-Type": "multipart/form-data",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           })
           .then((response) => {

@@ -846,7 +846,11 @@ export default {
       this.create_loading = true;
       const querystring = require("querystring");
       this.$axios
-        .$post("/api/v1/examTests", querystring.stringify(this.form))
+        .$post("/api/v1/examTests", querystring.stringify(this.form), {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           if (response.status == 1) {
             this.$toast.success("Created successfully");
@@ -917,7 +921,11 @@ export default {
       const querystring = require("querystring");
 
       this.$axios
-        .$post("/api/v1/upload", querystring.stringify({ file_base64: file }))
+        .$post("/api/v1/upload", querystring.stringify({ file_base64: file }), {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           let file = response.data[0].file.name;
           if (this.current_crop_file === "q_file") this.form.q_file = file;

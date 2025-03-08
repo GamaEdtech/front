@@ -1123,6 +1123,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           }
         )
@@ -1151,6 +1152,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           }
         )
@@ -1196,7 +1198,11 @@ export default {
     async deleteReply() {
       this.loading.delete_reply_form = true;
       await this.$axios
-        .$delete(`/api/v1/questionReplies/${this.delete_reply_id}`)
+        .$delete(`/api/v1/questionReplies/${this.delete_reply_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.delete_reply_id = null;
           this.dialog.delete_reply_form = false;
@@ -1221,7 +1227,11 @@ export default {
           api = `/api/v1/questionReplies/score/${id}/${type}`;
 
         await this.$axios
-          .$post(api)
+          .$post(api, {
+            headers: {
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
+          })
           .then((response) => {
             if (response.status == 1) {
               if (content_type == "question")
@@ -1242,7 +1252,11 @@ export default {
 
     selectCorrectAnswer(id) {
       this.$axios
-        .$post(`/api/v1/questionReplies/select/${id}`)
+        .$post(`/api/v1/questionReplies/select/${id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.$toast.success("Select successfully");
           window.scrollTo(0, 0);

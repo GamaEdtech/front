@@ -787,7 +787,12 @@ export default {
       this.$axios
         .$put(
           `/api/v1/examTests/${this.$route.params.id}`,
-          querystring.stringify(this.form)
+          querystring.stringify(this.form),
+          {
+            headers: {
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
+          }
         )
         .then((response) => {
           if (response.status == 1) {
@@ -827,7 +832,11 @@ export default {
       const querystring = require("querystring");
 
       this.$axios
-        .$post("/api/v1/upload", querystring.stringify({ file_base64: file }))
+        .$post("/api/v1/upload", querystring.stringify({ file_base64: file }), {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           let file = response.data[0].file.name;
           if (this.current_crop_file === "q_file") this.form.q_file = file;
@@ -963,7 +972,12 @@ export default {
       }
 
       this.$axios.$delete(
-        `/api/v1/examTests/${this.$route.params.id}/files/${file_name}`
+        `/api/v1/examTests/${this.$route.params.id}/files/${file_name}`,
+        {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        }
       );
     },
 
@@ -1069,6 +1083,7 @@ export default {
           headers: {
             accept: "*/*",
             "Content-Type": "multipart/form-data",
+            Authorization: `${this.$auth.strategy.token.get()}`,
           },
         })
         .finally(() => {

@@ -170,7 +170,7 @@ export default {
       local: {
         token: {
           property: "jwtToken",
-          global: true,
+          global: false,
         },
         user: {
           property: "data",

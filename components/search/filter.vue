@@ -203,13 +203,20 @@
         </v-expansion-panel>
 
         <!--File type filter-->
-        <v-expansion-panel :disabled="!board_val">
+        <v-expansion-panel
+          :disabled="!board_val && $route.query.type !== 'learnfiles'"
+          v-show="
+            $route.query.type === 'test' ||
+            $route.query.type === 'learnfiles' ||
+            $route.query.type === 'azmoon'
+          "
+        >
           <v-expansion-panel-header
             color="#f5f5f5"
             class="px-0 font-size-16 font-weight-bold"
           >
             {{
-              $route.query.type === "test"
+              $route.query.type === "test" || $route.query.type === "azmoon"
                 ? "Classification"
                 : "Multimedia Type"
             }}
@@ -513,6 +520,7 @@ export default {
       this.filter.file_type_list = [];
       if (
         this.$route.query.type === "test" ||
+        this.$route.query.type === "azmoon" ||
         this.$route.query.type == "learnfiles"
       )
         this.getFileType();
@@ -530,7 +538,6 @@ export default {
       this.filter.lesson_list = [];
       this.filter.topic_list = [];
       this.filter.city_list = [];
-      this.filter.file_type_list = [];
 
       //Reset related tags
       this.applied_filter.select_section_title = "";
@@ -553,9 +560,11 @@ export default {
         this.getFilterList(params, "base");
         if (
           this.$route.query.type === "test" ||
-          this.$route.query.type == "learnfiles"
-        )
+          this.$route.query.type == "azmoon"
+        ) {
+          this.filter.file_type_list = [];
           this.getFileType();
+        }
       } else {
         this.applied_filter.select_section_title = "";
         this.loadtime = false;
@@ -1018,8 +1027,16 @@ export default {
       this.$axios
         .$get("/api/v1/types/list", {
           params: {
-            type: this.$route.query.type == "test" ? "test_type" : "file_type",
-            section_id: this.$route.query.type == "test" ? this.board_val : "",
+            type:
+              this.$route.query.type == "test" ||
+              this.$route.query.type == "azmoon"
+                ? "test_type"
+                : "content_type",
+            section_id:
+              this.$route.query.type == "test" ||
+              this.$route.query.type == "azmoon"
+                ? this.board_val
+                : "",
           },
         })
         .then((res) => {

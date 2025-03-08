@@ -2,224 +2,254 @@
   <v-row>
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
-        <v-col cols="12" class="pl-5 ">
+        <v-col cols="12" class="pl-5">
           <p class="text-h4 teal--text">
-            <span class="fa-solid fa-envelope  "></span>
+            <span class="fa-solid fa-envelope"></span>
             <span>
-             {{ticketData.title}}
+              {{ ticketData.title }}
             </span>
           </p>
           <span>
-             {{$moment(ticketData.sub_date).format('MMM,DD YYYY h:mm A')}}
+            {{ $moment(ticketData.sub_date).format("MMM,DD YYYY h:mm A") }}
           </span>
         </v-col>
       </v-row>
 
+      <v-card class="mt-3">
+        <v-card-text>
+          <v-row align="center" justify="center">
+            <!--Start ticket-->
+            <v-col cols="12">
+              <p
+                class="text-h5"
+                v-html="ticketData.message.replace(/\n/g, '<br />')"
+              />
 
-      <v-card class="mt-3" >
-          <v-card-text>
-            <v-row
-              align="center"
-              justify="center"
-            >
-              <!--Start ticket-->
-              <v-col cols="12">
-                <p class="text-h5" v-html="ticketData.message.replace(/\n/g, '<br />')"/>
+              <v-divider class="my-3" />
+            </v-col>
+            <!--End start ticket-->
 
-                <v-divider class="my-3"/>
-              </v-col>
-              <!--End start ticket-->
+            <!--Start replies-->
+            <v-col cols="12" class="px-0 px-md-2">
+              <v-container class="fill-height">
+                <v-row class="fill-height pb-14" align="end">
+                  <v-col>
+                    <div
+                      v-for="(item, index) in ticketData.replies"
+                      :key="index"
+                      :class="[
+                        'd-flex flex-row  my-2',
+                        item.side == 'me' ? 'justify-end ' : null,
+                      ]"
+                    >
+                      <v-card
+                        v-if="item.side == 'me'"
+                        flat
+                        color="#ffd08a"
+                        class="mr-3 sent-message"
+                      >
+                        <v-card-text>
+                          <v-row>
+                            <v-col cols="12" class="font-size-20">
+                              {{ item.message }}
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              class="py-0 mt-2"
+                              v-if="item.file != 0"
+                            >
+                              <a
+                                class="v-btn--outlined pa-1 rounded font-size-16"
+                                :href="item.file"
+                                download
+                                target="_blank"
+                              >
+                                <v-icon small> mdi-download </v-icon>
+                                Download attach file
+                              </a>
+                            </v-col>
+                          </v-row>
+                        </v-card-text>
 
-              <!--Start replies-->
-              <v-col cols="12" class="px-0 px-md-2">
-                <v-container class="fill-height">
-                  <v-row class="fill-height pb-14" align="end">
-                    <v-col>
-                      <div v-for="(item, index) in ticketData.replies"
-                           :key="index"
-                           :class="['d-flex flex-row  my-2',
-                            item.side == 'me' ? 'justify-end ': null]">
-                        <v-card v-if="item.side == 'me'" flat
-                                color="#ffd08a"
-                              class="mr-3 sent-message">
-                          <v-card-text >
-                            <v-row>
-                              <v-col cols="12" class="font-size-20">
-                                {{ item.message }}
-                              </v-col>
-                              <v-col cols="12" class="py-0 mt-2" v-if="item.file!=0">
-                                <a  class="v-btn--outlined pa-1 rounded font-size-16"
-                                    :href="item.file"
-                                        download
-                                        target="_blank" >
-                                  <v-icon small>
-                                    mdi-download
-                                  </v-icon>
-                                  Download attach file
-                                </a>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
+                        <v-card-actions class="font-size-14 ml-2 mt-4">
+                          {{
+                            $moment(item.subdate).format("MMM,DD YYYY h:mm A")
+                          }}
+                        </v-card-actions>
+                      </v-card>
 
-                          <v-card-actions class="font-size-14 ml-2 mt-4">
-                            {{$moment(item.subdate).format('MMM,DD YYYY h:mm A')}}
-                          </v-card-actions>
-                        </v-card>
-
-                       <!--Chat avatar section-->
-                        <v-avatar v-if="item.side == 'me'"
-                                  size="36">
-                          <v-img v-if="ticketData.contact.me.avatar" :src="ticketData.contact.me.avatar"/>
-                          <span v-else class="white--text">
-                             {{item.first_name[0]}}
-                          </span>
-                        </v-avatar>
-                        <v-avatar v-else
-                                  size="36">
-                          <v-img  :src="ticketData.contact.that.avatar"/>
-                        </v-avatar>
-                        <!--End chat avatar section-->
-
-                        <v-card v-if="item.side == 'that'" flat
-                                color="#e1e2e3"
-                                class="ml-3 received-message">
-                          <v-card-text class="black--text">
-                            <v-row>
-                              <v-col cols="12" class="font-size-20">
-                                {{ item.message }}
-                              </v-col>
-                              <v-col cols="12" class="py-0 mt-2" v-if="item.file!=0">
-                                <a  class="v-btn--outlined pa-1 rounded font-size-16"
-                                    :href="item.file"
-                                    download
-                                    target="_blank" >
-                                  <v-icon small>
-                                    mdi-download
-                                  </v-icon>
-                                  Download attach file
-                                </a>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
-                          <v-card-actions class="font-size-14 ml-2 mt-4">
-                            {{$moment(item.subdate).format('MMM,DD YYYY h:mm A')}}
-                          </v-card-actions>
-                        </v-card>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-container>
-
-              </v-col>
-              <!--End replies-->
-
-            </v-row>
-            <v-divider class="mt-3"/>
-          </v-card-text>
-          <v-card-text  class="px-0 px-sm-8 px-md-4" v-if="ticketData.replyable">
-            <v-card flat class="mt-3">
-              <validation-observer ref="observer" v-slot="{invalid}">
-                <form @submit.prevent="submitContent">
-                  <v-row>
-                    <v-col cols="12" md="12">
-                      <validation-provider v-slot="{errors}" name="text" rules="required|min:10">
-                        <v-textarea
-                          dense
-                          v-model="form.message"
-                          :error-messages="errors"
-                          label="Message text"
-                          outlined
+                      <!--Chat avatar section-->
+                      <v-avatar v-if="item.side == 'me'" size="36">
+                        <v-img
+                          v-if="ticketData.contact.me.avatar"
+                          :src="ticketData.contact.me.avatar"
                         />
-                      </validation-provider>
-                      <nuxt-link to="/formula-help">
-                        <strong   class="pointer teal--text text-h6">
-                          <span class="fa-solid fa-link"/>
-                          Formula writing guide
-                        </strong>
-                      </nuxt-link>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <validation-provider v-slot="{validate,errors}"
-                                           rules="mimes:image/png,image/jpg,image/jpeg,image/gif,video/mp4,audio/mp3,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats,officedocument.presentationml.presentation"
-                                           ref="file_provider"
-                                           name="file">
-                        <v-file-input
-                          dense
-                          v-model="file"
-                          :error-messages="errors"
-                          label="Attach file"
-                          accept=".jpg,.jpeg,.png,.gif,.docx,.pptx,.pdf,.mp4,.mp3"
-                          @change="uploadFile('file',$event),validate"
-                          :prepend-icon="null"
-                          color="red"
-                          prepend-inner-icon="mdi-file"
-                          append-icon="mdi-folder-open"
-                          outlined
-                        />
-                      </validation-provider>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" md="6" class="pb-0">
-                      <v-btn type="submit" lg color="success" :loading="loading.form" :disabled="invalid" block>
-                        Send
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-btn lg outlined color="error" to="/user/ticket" block>
-                        Discard
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </form>
-              </validation-observer>
-            </v-card>
-          </v-card-text>
+                        <span v-else class="white--text">
+                          {{ item.first_name[0] }}
+                        </span>
+                      </v-avatar>
+                      <v-avatar v-else size="36">
+                        <v-img :src="ticketData.contact.that.avatar" />
+                      </v-avatar>
+                      <!--End chat avatar section-->
+
+                      <v-card
+                        v-if="item.side == 'that'"
+                        flat
+                        color="#e1e2e3"
+                        class="ml-3 received-message"
+                      >
+                        <v-card-text class="black--text">
+                          <v-row>
+                            <v-col cols="12" class="font-size-20">
+                              {{ item.message }}
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              class="py-0 mt-2"
+                              v-if="item.file != 0"
+                            >
+                              <a
+                                class="v-btn--outlined pa-1 rounded font-size-16"
+                                :href="item.file"
+                                download
+                                target="_blank"
+                              >
+                                <v-icon small> mdi-download </v-icon>
+                                Download attach file
+                              </a>
+                            </v-col>
+                          </v-row>
+                        </v-card-text>
+                        <v-card-actions class="font-size-14 ml-2 mt-4">
+                          {{
+                            $moment(item.subdate).format("MMM,DD YYYY h:mm A")
+                          }}
+                        </v-card-actions>
+                      </v-card>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-col>
+            <!--End replies-->
+          </v-row>
+          <v-divider class="mt-3" />
+        </v-card-text>
+        <v-card-text class="px-0 px-sm-8 px-md-4" v-if="ticketData.replyable">
+          <v-card flat class="mt-3">
+            <validation-observer ref="observer" v-slot="{ invalid }">
+              <form @submit.prevent="submitContent">
+                <v-row>
+                  <v-col cols="12" md="12">
+                    <validation-provider
+                      v-slot="{ errors }"
+                      name="text"
+                      rules="required|min:10"
+                    >
+                      <v-textarea
+                        dense
+                        v-model="form.message"
+                        :error-messages="errors"
+                        label="Message text"
+                        outlined
+                      />
+                    </validation-provider>
+                    <nuxt-link to="/formula-help">
+                      <strong class="pointer teal--text text-h6">
+                        <span class="fa-solid fa-link" />
+                        Formula writing guide
+                      </strong>
+                    </nuxt-link>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <validation-provider
+                      v-slot="{ validate, errors }"
+                      rules="mimes:image/png,image/jpg,image/jpeg,image/gif,video/mp4,audio/mp3,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats,officedocument.presentationml.presentation"
+                      ref="file_provider"
+                      name="file"
+                    >
+                      <v-file-input
+                        dense
+                        v-model="file"
+                        :error-messages="errors"
+                        label="Attach file"
+                        accept=".jpg,.jpeg,.png,.gif,.docx,.pptx,.pdf,.mp4,.mp3"
+                        @change="uploadFile('file', $event), validate"
+                        :prepend-icon="null"
+                        color="red"
+                        prepend-inner-icon="mdi-file"
+                        append-icon="mdi-folder-open"
+                        outlined
+                      />
+                    </validation-provider>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12" md="6" class="pb-0">
+                    <v-btn
+                      type="submit"
+                      lg
+                      color="success"
+                      :loading="loading.form"
+                      :disabled="invalid"
+                      block
+                    >
+                      Send
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-btn lg outlined color="error" to="/user/ticket" block>
+                      Discard
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </form>
+            </validation-observer>
+          </v-card>
+        </v-card-text>
       </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script>
-
-import {ValidationObserver, ValidationProvider} from "vee-validate";
+import { ValidationObserver, ValidationProvider } from "vee-validate";
 import TopicSelector from "~/components/form/topic-selector.vue";
 import ticket from "../index.vue";
 
 export default {
   computed: {
     ticket() {
-      return ticket
-    }
+      return ticket;
+    },
   },
-  layout: 'dashboard_layout',
+  layout: "dashboard_layout",
   name: "ticket-detail",
   data() {
     return {
       form: {
-        id:this.$route.params.id,
-        message: '',
-        file:''
+        id: this.$route.params.id,
+        message: "",
+        file: "",
       },
       file: null,
       subject_list: [],
 
-
       //Handle loading object
       loading: {
-        file: false,//Upload file
-        form: false,//Submit multimedia form
-      }
-
-    }
+        file: false, //Upload file
+        form: false, //Submit multimedia form
+      },
+    };
   },
   head() {
     return {
-      title: 'Ticket detail'
-    }
+      title: "Ticket detail",
+    };
   },
 
-  async asyncData({params, $axios}) {
+  async asyncData({ params, $axios }) {
     // This could also be an action dispatch
     const content = await $axios.$get(`/api/v1/tickets/${params.id}`);
     var ticketData = [];
@@ -229,30 +259,32 @@ export default {
       ticketData = content.data;
     }
 
-    return {ticketData};
+    return { ticketData };
   },
   components: {
     TopicSelector,
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
   },
   mounted() {
-    this.getTypeList('ticket_type');
+    this.getTypeList("ticket_type");
   },
   methods: {
-    getTypeList(type, parent = '') {
+    getTypeList(type, parent = "") {
       var params = {
-        type: type
-      }
+        type: type,
+      };
 
-      this.$axios.$get('/api/v1/types/list', {
-        params
-      }).then(res => {
-        this.subject_list=res.data;
-
-      }).catch(err => {
-        this.$toast.error(err);
-      })
+      this.$axios
+        .$get("/api/v1/types/list", {
+          params,
+        })
+        .then((res) => {
+          this.subject_list = res.data;
+        })
+        .catch((err) => {
+          this.$toast.error(err);
+        });
     },
 
     submitContent() {
@@ -263,55 +295,58 @@ export default {
         formData.append(key, this.form[key]);
       }
 
-
-      this.$axios.$post('/api/v1/ticketReplies',
-        this.urlencodeFormData(formData),
-        {
+      this.$axios
+        .$post("/api/v1/ticketReplies", this.urlencodeFormData(formData), {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        }).then(response => {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
+        .then((response) => {
           this.$toast.success("Submit successfully");
           this.refreshTickets();
-      }).catch(err => {
-        if (err.response.status == 403)
-          this.$router.push({query: {auth_form: 'login'}});
-        else if (err.response.status == 400)
-          this.$toast.error(err.response.data.message);
-      }).finally(() => {
-        this.loading.form = false;
-      });
+        })
+        .catch((err) => {
+          if (err.response.status == 403)
+            this.$router.push({ query: { auth_form: "login" } });
+          else if (err.response.status == 400)
+            this.$toast.error(err.response.data.message);
+        })
+        .finally(() => {
+          this.loading.form = false;
+        });
     },
 
-
     async uploadFile(file_name, value) {
-      if (!value)
-        return;
+      if (!value) return;
 
-      const {valid} = await this.$refs.file_provider.validate(value);
+      const { valid } = await this.$refs.file_provider.validate(value);
 
       if (valid) {
         this.loading.file = true;
-        if (!value)//Check empty request
+        if (!value)
+          //Check empty request
           return;
         let formData = new FormData();
-        formData.append('file', value);
+        formData.append("file", value);
 
-        this.$axios.$post('/api/v1/upload',
-          formData,
-          {
+        this.$axios
+          .$post("/api/v1/upload", formData, {
             headers: {
-              'accept': '*/*',
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-        ).then(response => {
-          this.form.file = response.data[0].file.name;
-        }).catch(err => {
-          this.$toast.error("An error occurred");
-        }).finally(() => {
-          this.loading.file = false;
-        })
+              accept: "*/*",
+              "Content-Type": "multipart/form-data",
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
+          })
+          .then((response) => {
+            this.form.file = response.data[0].file.name;
+          })
+          .catch((err) => {
+            this.$toast.error("An error occurred");
+          })
+          .finally(() => {
+            this.loading.file = false;
+          });
       }
 
       console.log("Pass4");
@@ -319,51 +354,48 @@ export default {
       // }
     },
 
-
     //Convert form data from multipart to urlencode
     urlencodeFormData(fd) {
-      var s = '';
+      var s = "";
 
       for (var pair of fd.entries()) {
-        if (typeof pair[1] == 'string') {
-          s += (s ? '&' : '') + this.encode(pair[0]) + '=' + this.encode(pair[1]);
+        if (typeof pair[1] == "string") {
+          s +=
+            (s ? "&" : "") + this.encode(pair[0]) + "=" + this.encode(pair[1]);
         }
       }
       return s;
     },
     encode(s) {
-      return encodeURIComponent(s).replace(/%20/g, '+');
+      return encodeURIComponent(s).replace(/%20/g, "+");
     },
     //End convert form data from multipart to urlencode
 
-
-    refreshTickets(){
-      this.$axios.$get(`/api/v1/tickets/${this.$route.params.id}`)
-      .then(response=>{
-        this.ticketData=response.data;
-        this.form.message='';
-        this.form.file='';
-      }).catch(err=>{
-
-      });
-
-    }
-  }
-
-}
+    refreshTickets() {
+      this.$axios
+        .$get(`/api/v1/tickets/${this.$route.params.id}`)
+        .then((response) => {
+          this.ticketData = response.data;
+          this.form.message = "";
+          this.form.file = "";
+        })
+        .catch((err) => {});
+    },
+  },
+};
 </script>
 
 <style>
 .submission-notice {
   line-height: 2rem;
-  background-color: #FFEFE5 !important;
+  background-color: #ffefe5 !important;
 }
 
 .submission-notice .v-alert__icon.v-icon {
   color: white !important;
   padding: 2rem;
   border-radius: 0.5rem;
-  background-color: #FF6600;
+  background-color: #ff6600;
 }
 
 .notice_item {
@@ -381,7 +413,7 @@ export default {
 .notice_item li:before {
   font-family: "Font Awesome 5 Free";
   font-size: 2rem;
-  color: #FFC700FF;
+  color: #ffc700ff;
   content: "\f0a4";
   font-weight: 900;
 }
@@ -392,7 +424,7 @@ export default {
 }
 
 .received-message::after {
-  content: ' ';
+  content: " ";
   position: absolute;
   width: 0;
   height: 0;
@@ -404,7 +436,7 @@ export default {
   border-color: #e1e2e3 transparent transparent transparent;
 }
 .sent-message::after {
-  content: ' ';
+  content: " ";
   position: absolute;
   width: 0;
   height: 0;

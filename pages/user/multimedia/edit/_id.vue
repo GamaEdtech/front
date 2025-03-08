@@ -452,6 +452,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           }
         )
@@ -515,6 +516,7 @@ export default {
             headers: {
               accept: "*/*",
               "Content-Type": "multipart/form-data",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           })
           .then((response) => {
