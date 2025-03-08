@@ -306,7 +306,7 @@
                     <v-btn
                       v-show="$auth.loggedIn"
                       :to="`/exam/start/${contentData.id}`"
-                      v-if="key === 'participation'"
+                      v-if="key === 'participation' && contentData.participable"
                       block
                       color="success"
                     >
@@ -374,7 +374,7 @@
             <v-btn
               v-show="$auth.loggedIn"
               :to="`/exam/start/${contentData.id}`"
-              v-if="key === 'participation'"
+              v-if="key === 'participation' && contentData.participable"
               block
               color="success"
             >
@@ -388,7 +388,12 @@
             <v-btn v-else-if="key === 'word'" block color="primary">
               Download WORD{{ item.price > 0 ? " | $" + item.price : "" }}
             </v-btn>
-            <v-btn v-else-if="key === 'pdf'" block color="error">
+            <v-btn
+              @click="startDownload()"
+              v-else-if="key === 'pdf'"
+              block
+              color="error"
+            >
               Download PDF{{ item.price > 0 ? " | $" + item.price : "" }}
             </v-btn>
           </v-col>
@@ -863,7 +868,11 @@ export default {
     startDownload() {
       this.download_loading = true;
       this.$axios
-        .$get(`/api/v1/exams/download/${this.$route.params.id}`)
+        .$get(`/api/v1/exams/download/${this.$route.params.id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           var FileSaver = require("file-saver");
           FileSaver.saveAs(response.data.url, response.data.name);

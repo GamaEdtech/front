@@ -189,6 +189,9 @@ export default {
               base: this.filter.grade,
               lesson: this.filter.lesson,
             },
+            headers: {
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
           })
           .then((response) => {
             this.question_list.push(...response.data.list);

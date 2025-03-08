@@ -982,7 +982,11 @@ export default {
       if (type === "a_file")
         apiUrl = `/api/v1/tests/download/${this.$route.params.id}/answer`;
       this.$axios
-        .$get(apiUrl)
+        .$get(apiUrl, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           var FileSaver = require("file-saver");
           FileSaver.saveAs(response.data.url, response.data.name);
@@ -1055,6 +1059,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           }
         )

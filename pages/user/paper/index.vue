@@ -263,6 +263,9 @@ export default {
               base: this.filter.grade,
               lesson: this.filter.lesson,
             },
+            headers: {
+              Authorization: `${this.$auth.strategy.token.get()}`,
+            },
           })
           .then((response) => {
             this.paper_list.push(...response.data.list);

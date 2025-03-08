@@ -934,7 +934,7 @@
       v-model="leaveCommentDialog"
       :fullscreen="$vuetify.breakpoint.xs"
       max-width="924"
-      style="z-index: 20001"
+      style="z-index: 1501"
     >
       <v-card>
         <v-card-text class="pt-6 pb-0 pt-md-8 pb-2 px-6 px-md-12">
@@ -1530,7 +1530,9 @@ export default {
           }
         })
         .catch((err) => {
-          this.$toast.error("Something is wrong.");
+          if (err.response.status == 401 || err.response.status == 403) {
+            this.openAuthDialog("login");
+          } else this.$toast.error("Something is wrong.");
         })
         .finally(() => {
           this.loading.submitComment = false;
@@ -1586,6 +1588,7 @@ export default {
 
       if (!localStorage.getItem("v2_token")) {
         this.$toast.error("Login required to proceed.");
+        this.openAuthDialog("login");
         return;
       }
 
@@ -1622,12 +1625,16 @@ export default {
         this.commentForm.artisticActivitiesRate = ratings.art_counseling; // 2
 
         // this.commentForm.safetyAndHappinessRate = ratings.sc;
-      } catch (error) {
-        console.error("Error:", error);
+      } catch {
+        this.$toast.error("Error: Failed to get AI response.");
         this.aiResponse = "Failed to get AI response.";
       } finally {
         this.help_loading = false;
       }
+    },
+
+    openAuthDialog(val) {
+      this.$router.push({ query: { auth_form: val } });
     },
     loadComments() {
       this.$axios
