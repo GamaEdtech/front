@@ -343,7 +343,7 @@ export default {
      * @async
      * @returns {Promise<void>}
      */
-    onFinish() {
+    async onFinish() {
       // Import querystring for form data encoding
       const querystring = require("querystring");
 
@@ -359,11 +359,14 @@ export default {
             type: "confirm",
           })
         )
-        .then((response) => {
+        .then(async (response) => {
           // Close login dialog and reset form state
           this.login_dialog = false;
           this.otp_holder = false;
           this.identity_holder = true;
+
+          // Get v2 API token first
+          await this.submitLoginV2();
 
           // Set authentication data
           this.$auth.setUserToken(response.data.jwtToken);
