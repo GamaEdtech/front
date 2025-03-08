@@ -313,6 +313,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `${this.$auth.strategy.token.get()}`,
             },
           }
         )

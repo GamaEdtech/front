@@ -358,7 +358,11 @@ export default {
     async deleteExam() {
       this.delete_loading = true;
       await this.$axios
-        .$delete(`/api/v1/exams/${this.delete_exam_id}`)
+        .$delete(`/api/v1/exams/${this.delete_exam_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.delete_exam_id = null;
           this.deleteConfirmDialog = false;

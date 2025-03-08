@@ -328,7 +328,11 @@ export default {
     async deleteItem() {
       this.delete_loading = true;
       await this.$axios
-        .$delete(`/api/v1/tickets/${this.delete_ticket_id}`)
+        .$delete(`/api/v1/tickets/${this.delete_ticket_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.delete_ticket_id = null;
           this.deleteConfirmDialog = false;

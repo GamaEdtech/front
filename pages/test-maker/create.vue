@@ -1595,6 +1595,7 @@ export default {
         .$post("/api/v1/exams", this.urlencodeFormData(formData), {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `${this.$auth.strategy.token.get()}`,
           },
         })
         .then((response) => {
@@ -1765,6 +1766,7 @@ export default {
               headers: {
                 "Content-Type":
                   "application/x-www-form-urlencoded; charset=UTF-8",
+                Authorization: `${this.$auth.strategy.token.get()}`,
               },
             }
           )
@@ -1808,7 +1810,11 @@ export default {
       this.publish_loading = true;
       var examId = this.exam_id;
       this.$axios
-        .$put(`/api/v1/exams/publish/${examId}`)
+        .$put(`/api/v1/exams/publish/${examId}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           if (response.data.message === "done") {
             this.test_share_link = `${process.env.BASE_URI}/exam/${examId}`;
@@ -1912,7 +1918,11 @@ export default {
     deleteOnlineExam() {
       this.deleteLoading = true;
       this.$axios
-        .$delete(`/api/v1/exams/${this.exam_id}`)
+        .$delete(`/api/v1/exams/${this.exam_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.exam_id = "";
           this.exam_code = "";
@@ -1956,7 +1966,11 @@ export default {
     async deleteExamTest() {
       this.delete_exam_test_loading = true;
       await this.$axios
-        .$delete(`/api/v1/examTests/${this.delete_exam_test_id}`)
+        .$delete(`/api/v1/examTests/${this.delete_exam_test_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
         .then((response) => {
           this.$toast.success("Deleted successfully");
           this.filter.page = 1;
@@ -1982,6 +1996,7 @@ export default {
           headers: {
             accept: "*/*",
             "Content-Type": "multipart/form-data",
+            Authorization: `${this.$auth.strategy.token.get()}`,
           },
         })
         .then((response) => {

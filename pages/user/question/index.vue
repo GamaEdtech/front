@@ -135,6 +135,32 @@
         </v-card-text>
       </v-card>
     </v-col>
+
+    <!--Delete dialog-->
+    <v-dialog v-model="deleteConfirmDialog" max-width="290">
+      <v-card>
+        <v-card-title class="text-h5"> Are you sure? </v-card-title>
+
+        <v-card-text>
+          <p>If you are sure to delete, click Yes.</p>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn text @click="deleteConfirmDialog = false"> No </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            :loading="delete_loading"
+            @click="deleteQA()"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -164,6 +190,11 @@ export default {
       page: 1,
       all_files_loaded: false,
       //End paginate section
+
+      //Delete section
+      deleteConfirmDialog: false,
+      delete_qa_id: null,
+      delete_loading: false,
     };
   },
   head() {
@@ -177,6 +208,10 @@ export default {
     this.scroll();
   },
   methods: {
+    openDeleteConfirmDialog(item_id) {
+      this.delete_qa_id = item_id;
+      this.deleteConfirmDialog = true;
+    },
     getQuestionList() {
       if (!this.all_files_loaded) {
         this.page_loading = true;
@@ -207,6 +242,33 @@ export default {
             this.page_loading = false;
           });
       }
+    },
+    async deleteQA() {
+      this.delete_loading = true;
+      await this.$axios
+        .$delete(`/api/v1/questions/${this.delete_qa_id}`, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
+        .then((response) => {
+          this.delete_qa_id = null;
+          this.deleteConfirmDialog = false;
+
+          this.$toast.success("Deleted successfully");
+          this.question_list = [];
+          this.getQuestionList();
+        })
+        .catch((e) => {
+          if (e.response.status == 400)
+            this.$toast.error(e.response.data.message);
+
+          this.delete_question_id = null;
+          this.deleteConfirmDialog = false;
+        })
+        .finally(() => {
+          this.delete_loading = false;
+        });
     },
     calcStatus(val) {
       let title = "";
