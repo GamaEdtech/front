@@ -1810,7 +1810,7 @@ export default {
       this.publish_loading = true;
       var examId = this.exam_id;
       this.$axios
-        .$put(`/api/v1/exams/publish/${examId}`, {
+        .$put(`/api/v1/exams/publish/${examId}`, null, {
           headers: {
             Authorization: `${this.$auth.strategy.token.get()}`,
           },

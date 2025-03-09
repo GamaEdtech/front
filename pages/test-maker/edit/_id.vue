@@ -1787,7 +1787,7 @@ export default {
     publishTest() {
       this.publish_loading = true;
       this.$axios
-        .$put(`/api/v1/exams/publish/${this.$route.params.id}`, {
+        .$put(`/api/v1/exams/publish/${this.$route.params.id}`, null, {
           headers: {
             Authorization: `${this.$auth.strategy.token.get()}`,
           },
