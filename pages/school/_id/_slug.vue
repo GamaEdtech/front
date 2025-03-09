@@ -979,7 +979,7 @@
                     color="orange"
                     half-increments
                     hover
-                    size="10"
+                    size="24"
                   ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
@@ -1428,8 +1428,8 @@ export default {
           type: "application/ld+json",
           json: {
             "@context": "https://schema.org",
-            "@type": "Product", // Change this based on your content type
-            name: "School",
+            "@type": "School", // Change this based on your content type
+            name: this.contentData.name,
             aggregateRating: {
               "@type": "AggregateRating",
               ratingValue: this.ratingData.averageRate
