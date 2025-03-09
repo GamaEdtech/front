@@ -23,6 +23,10 @@ export default async (req, res, next) => {
 
     const xmlData = await generateSitemapIndex(contentTypeMatch); // Pass content type to generate specific index
     res.end(xmlData);
+  } else if (url.startsWith("/sitemap/school")) {
+    let xmlData = await fetchPaginatedDataV2(); // Fetch and generate the correct sitemap
+    xmlData = convertDataToXMLV2(xmlData);
+    res.end(xmlData);
   } else if (url.startsWith("/sitemap")) {
     // Your existing logic for individual sitemaps
     const { pathname, query } = parse(url, true);
@@ -144,6 +148,17 @@ async function fetchPaginatedData(contentType, page) {
   return response.data.data.list || [];
 }
 
+async function fetchPaginatedDataV2(contentType, page) {
+  // const itemsPerPage = 1000; // Define items per page
+  let apiUrl;
+
+  apiUrl =
+    "https://api.gamaedtech.com/api/v1/schools?PagingDto.PageFilter.Size=1000&PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true";
+
+  const response = await axios.get(apiUrl);
+  return response.data.data.list || [];
+}
+
 function convertDataToXML(data, contentType) {
   let title = "";
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
@@ -159,6 +174,21 @@ function convertDataToXML(data, contentType) {
     xml += `<url>
             <loc>https://gamatrain.com/${contentType}/${item.id}/${title}</loc>
             <lastmod>${formatDate(item.up_date)}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+        </url>`;
+  });
+  xml += "\n</urlset>";
+  return xml;
+}
+
+function convertDataToXMLV2(data, contentType) {
+  let title = "";
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+  data.forEach((item) => {
+    xml += `<url>
+            <loc>https://gamatrain.com/school/${item.id}/${item.slug}</loc>
+            <lastmod>${formatDate(item.lastModifyDate)}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.8</priority>
         </url>`;

@@ -279,7 +279,7 @@
             </div>
             <div class="d-flex">
               <div class="gtext-h5 primary-gray-600">
-                <div class="mb-4">Facilities</div>
+                <div class="mb-4">Sports facilities</div>
                 <div>
                   <v-btn
                     class="bg-primary-gray-800 white--text"
@@ -489,11 +489,13 @@
               <div class="mt-10">
                 <div class="gtext-t6 primary-gray-400 mb-10">
                   Total comments
-                  <span class="primary-gray-800 font-weight-heavy">650</span>
+                  <span class="primary-gray-800 font-weight-heavy">
+                    {{ ratingData?.totalCount }}
+                  </span>
                 </div>
                 <div>
                   <v-rating
-                    v-model="rating"
+                    v-model="ratingData.averageRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -504,7 +506,12 @@
                 <div class="gtext-t6 primary-gray-400">
                   Average score &nbsp;<span
                     class="primary-gray-900 gtext-t4 font-weight-medium"
-                    >3.2</span
+                  >
+                    {{
+                      ratingData.averageRate
+                        ? ratingData.averageRate.toFixed(1)
+                        : "New"
+                    }} </span
                   ><span>&nbsp;/&nbsp;5</span>
                 </div>
               </div>
@@ -521,105 +528,113 @@
             </div>
           </v-col>
           <v-col cols="12" md="8">
-            <ul id="score-results">
+            <ul id="score-results pl-0 mr-4">
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Classes quality
+                  Classroom & facility quality
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="15"
+                  :value="(ratingData.facilitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Poor</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-1">
+                  {{ convertRateToString(ratingData.facilitiesRate) }}
+                </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Education
+                  Teachers’ expertise
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="70"
-                  height="8"
-                  class="mt-3"
-                ></v-progress-linear>
-
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
-              </li>
-              <li class="d-flex mb-4">
-                <div class="bullet"></div>
-                <div class="gtext-t4 font-weight-medium score-title">
-                  IT training
-                </div>
-                <v-progress-linear
-                  color="success"
-                  rounded
-                  value="48"
+                  :value="(ratingData.educationRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title">
-                  Average
+                  {{ convertRateToString(ratingData.educationRate) }}
                 </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Safe and happy
+                  Tech accessibility
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="50"
+                  :value="(ratingData.educationRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title">
-                  Average
+                  {{ convertRateToString(ratingData.itTrainingRate) }}
                 </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Behavior
-                </div>
-                <v-progress-linear
-                  color="success"
-                  rounded
-                  value="60"
-                  height="8"
-                  class="mt-3"
-                ></v-progress-linear>
-
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
-              </li>
-              <li class="d-flex mb-4">
-                <div class="bullet"></div>
-                <div class="gtext-t4 font-weight-medium score-title">
-                  Tuition ratio
+                  Safety & environment
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="80"
+                  :value="(ratingData.safetyAndHappinessRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
+                <div class="gtext-t4 font-weight-medium rate-title">
+                  {{ convertRateToString(ratingData.safetyAndHappinessRate) }}
+                </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Facilities
+                  Staff behavior
+                </div>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.behaviorRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
+
+                <div class="gtext-t4 font-weight-medium rate-title">
+                  {{ convertRateToString(ratingData.behaviorRate) }}
+                </div>
+              </li>
+              <li class="d-flex mb-4">
+                <div class="bullet"></div>
+                <div class="gtext-t4 font-weight-medium score-title">
+                  Value for tuition
+                </div>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.tuitionRatioRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
+
+                <div class="gtext-t4 font-weight-medium rate-title">
+                  {{ convertRateToString(ratingData.tuitionRatioRate) }}
+                </div>
+              </li>
+              <li class="d-flex mb-4">
+                <div class="bullet"></div>
+                <div class="gtext-t4 font-weight-medium score-title">
+                  Sports facilities
                 </div>
                 <v-progress-linear
                   color="success"
@@ -634,7 +649,7 @@
               <li class="d-flex">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Artistic activities
+                  Art & counseling programs
                 </div>
                 <v-progress-linear
                   color="success"
@@ -956,7 +971,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Classes quality
+                    Classroom & facility quality
                   </div>
                   <v-rating
                     v-model="commentForm.classesQualityRate"
@@ -964,7 +979,7 @@
                     color="orange"
                     half-increments
                     hover
-                    size="24"
+                    size="10"
                   ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
@@ -972,7 +987,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Education
+                    Teachers’ expertise
                   </div>
                   <v-rating
                     v-model="commentForm.educationRate"
@@ -988,7 +1003,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    IT training
+                    Tech accessibility
                   </div>
                   <v-rating
                     v-model="commentForm.itTrainingRate"
@@ -1004,7 +1019,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Safe and happy
+                    Safety & environment
                   </div>
                   <v-rating
                     v-model="commentForm.safetyAndHappinessRate"
@@ -1020,7 +1035,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Behavior
+                    Staff behavior
                   </div>
                   <v-rating
                     v-model="commentForm.behaviorRate"
@@ -1036,7 +1051,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Tuition ratio
+                    Value for tuition
                   </div>
                   <v-rating
                     v-model="commentForm.tuitionRatioRate"
@@ -1068,7 +1083,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Artistic activities
+                    Art & counseling programs
                   </div>
                   <v-rating
                     v-model="commentForm.artisticActivitiesRate"
@@ -1405,6 +1420,28 @@ export default {
       },
     };
   },
+  head() {
+    return {
+      title: this.contentData.name,
+      script: [
+        {
+          type: "application/ld+json",
+          json: {
+            "@context": "https://schema.org",
+            "@type": "Product", // Change this based on your content type
+            name: "School",
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: this.ratingData.averageRate
+                ? this.ratingData.averageRate.toFixed(1)
+                : 3,
+              reviewCount: this.ratingData.totalCount,
+            },
+          },
+        },
+      ],
+    };
+  },
   components: {
     locationSearch,
   },
@@ -1414,15 +1451,20 @@ export default {
       : "/api/v2/";
 
     const content = await $axios.$get(`${baseURL}schools/${params.id}`);
+    const rating = await $axios.$get(`${baseURL}schools/${params.id}/rate`);
 
     var contentData = [];
+    var ratingData = [];
 
     //Check data exist
     if (content.succeeded) {
       contentData = content.data;
     }
+    if (rating.succeeded) {
+      ratingData = rating.data;
+    }
 
-    return { contentData };
+    return { contentData, ratingData };
   },
   mounted() {
     this.map.schoolIcon = L.icon({
@@ -1438,6 +1480,12 @@ export default {
     this.loadComments();
   },
   methods: {
+    convertRateToString(value) {
+      if (value > 3.5) return "Good";
+      else if (value > 2) return "Average";
+      else if (value <= 2) return "Poor";
+      else return "Unknown";
+    },
     normalizeURL(url) {
       // Check if the URL starts with 'http://' or 'https://'
       if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
@@ -1819,8 +1867,7 @@ export default {
 }
 #score-results {
   .score-title {
-    width: 20rem;
-    margin-right: 1rem;
+    width: 35rem;
   }
   .rate-title {
     width: 14rem;
