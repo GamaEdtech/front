@@ -166,11 +166,6 @@ export default {
   head() {
     return {
       title: "Start online exam",
-      script: [
-        {
-          src: `${process.env.STORAGE_BASE_URL}/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
     };
   },
   async asyncData({ params, redirect, $axios }) {
@@ -237,7 +232,7 @@ export default {
     }
 
     this.countDownTimer();
-    this.renderMathJax();
+    this.loadMathJax();
   },
   watch: {
     "examStats.answerData"(val) {
@@ -260,35 +255,8 @@ export default {
       }
     },
 
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-          },
-        });
-        MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
+    loadMathJax() {
+      this.$renderMathJax(this.$refs.mathJaxEl);
     },
 
     endExam() {
