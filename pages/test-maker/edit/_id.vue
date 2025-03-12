@@ -1172,7 +1172,7 @@ export default {
       title: "Update online exam",
       script: [
         {
-          src: `${process.env.STORAGE_BASE_URL}/static/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+          src: `${process.env.STORAGE_BASE_URL}/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
           defer: true,
         },
       ],
