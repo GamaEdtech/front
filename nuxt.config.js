@@ -82,6 +82,7 @@ export default {
     { src: "plugins/vuedraggable", ssr: false },
     // { src: 'plugins/aframe.js', ssr: false, mode: 'client' },
     { src: "plugins/gtag.js", mode: "client" },
+    { src: "plugins/mathjax.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

@@ -269,11 +269,6 @@ export default {
 
   head() {
     return {
-      script: [
-        {
-          src: `${process.env.STORAGE_BASE_URL}/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
       title: this.tutorialInfo.title,
     };
   },
@@ -391,38 +386,7 @@ export default {
       this.input = null;
     },
     renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-            availableFonts: ["Asana Math"],
-            preferredFont: "Asana Math",
-            webFont: "Asana Math-Web",
-            imageFont: null,
-          },
-        });
-        window.MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
+      this.$renderMathJax(this.$refs.mathJaxEl);
     },
     handleScroll() {
       if (window.scrollY > 1000) this.expandListMenu = false;
