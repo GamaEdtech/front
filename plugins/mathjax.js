@@ -22,7 +22,10 @@ export default ({ app }, inject) => {
               tex2jax: {
                 inlineMath: [
                   ["$", "$"],
+                  ["(", ")"],
                   ["\\(", "\\)"],
+                  ["\\", "\\"],
+                  ["(\\(", "\\))"],
                 ],
                 displayMath: [
                   ["$$", "$$"],
