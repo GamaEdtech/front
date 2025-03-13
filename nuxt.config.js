@@ -75,12 +75,11 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     { src: "plugins/vee-validate.js", ssr: true },
-    { src: "plugins/axios.js" },
+    // { src: "plugins/axios.js" },
     { src: "plugins/helper.js" },
     { src: "plugins/vue-emoji-picker", ssr: false },
     { src: "plugins/img-cropper", ssr: false },
     { src: "plugins/vuedraggable", ssr: false },
-    // { src: 'plugins/aframe.js', ssr: false, mode: 'client' },
     { src: "plugins/gtag.js", mode: "client" },
     { src: "plugins/mathjax.js", mode: "client" },
   ],
@@ -244,13 +243,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [
-      "vee-validate",
-      "vue-chartjs",
-      "ofetch",
-      "node-fetch-native",
-      "defu",
-    ],
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu"],
   },
 
   pwa: {
