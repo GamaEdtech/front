@@ -1178,12 +1178,6 @@ export default {
   head() {
     return {
       title: "New Exam",
-      script: [
-        {
-          src: `${process.env.STORAGE_BASE_URL}/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-          defer: true,
-        },
-      ],
     };
   },
   components: {
@@ -1672,34 +1666,7 @@ export default {
     },
 
     renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-          },
-        });
-        MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
+      this.$renderMathJax(this.$refs.mathJaxEl);
     },
 
     onScroll() {
@@ -1793,7 +1760,7 @@ export default {
 
           if (this.previewTestList.length) {
             this.$nextTick(function () {
-              MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+              this.$renderMathJax(this.$refs.mathJaxEl);
             });
           }
         })

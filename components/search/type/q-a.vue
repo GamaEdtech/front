@@ -40,7 +40,10 @@
                 <div
                   class="item-content-title gama-text-button d-flex justify-space-between"
                 >
-                  <nuxt-link :to="`/qa/${item.id}/${item.title_url}`">
+                  <nuxt-link
+                    :to="`/qa/${item.id}/${item.title_url}`"
+                    ref="mathjaxEl"
+                  >
                     {{ item.title }}
                   </nuxt-link>
                 </div>
@@ -172,75 +175,12 @@ export default {
   name: "q-a-list",
   props: ["items"],
   data() {
-    return {
-      bookCarousel: {
-        carouselName: "List",
-        carouselImg: "carouselBook.png",
-      },
-
-      books: [
-        {
-          img: "poster1.jpg",
-          title: "Maths",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book2.png",
-          title: "History",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book3.png",
-          title: "Art",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book4.png",
-          title: "Geography",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "poster1.jpg",
-          title: "Maths",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book2.png",
-          title: "Maths",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "poster1.jpg",
-          title: "Maths",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book2.png",
-          title: "History",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book3.png",
-          title: "Art",
-          season: "14",
-          price: "3405",
-        },
-        {
-          img: "book4.png",
-          title: "Geography",
-          season: "14",
-          price: "3405",
-        },
-      ],
-    };
+    return {};
+  },
+  watch: {
+    items() {
+      this.$renderMathJax(this.$refs.mathJaxEl);
+    },
   },
   mounted() {},
   methods: {
@@ -250,5 +190,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

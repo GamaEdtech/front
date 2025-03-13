@@ -110,10 +110,11 @@
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3">
-                                <h1 class="gama-text-h6 mb-2">
-                                  {{ contentData?.title }}
-                                </h1>
-
+                                <h1
+                                  class="gama-text-h6 mb-2"
+                                  v-html="contentData?.title"
+                                  ref="mathJaxTitle"
+                                />
                                 <v-row>
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pb-sm-0 pb-md-3">
@@ -998,11 +999,6 @@ export default {
   },
   head() {
     return {
-      script: [
-        {
-          src: `${process.env.STORAGE_BASE_URL}/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
       title: this.contentData.title,
     };
   },
@@ -1022,9 +1018,7 @@ export default {
     this.reInit();
     this.getSimilarQuestions();
 
-    setTimeout(() => {
-      this.renderMathJax();
-    }, 2000);
+    this.renderMathJax();
   },
 
   data: () => ({
@@ -1179,6 +1173,9 @@ export default {
         })
         .then((response) => {
           this.answer_list = response.data.list;
+          this.$nextTick(() => {
+            this.$renderMathJax(this.$refs.mathJaxEl);
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -1268,41 +1265,7 @@ export default {
     },
 
     renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-              ["\\(", "\\)"],
-              ["\\", "\\"],
-              ["(\\(", "\\))"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-            availableFonts: ["Asana Math"],
-            preferredFont: "Asana Math",
-            webFont: "Asana Math-Web",
-            imageFont: null,
-          },
-        });
-        window.MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
+      this.$renderMathJax(this.$refs.mathJaxTitle);
     },
 
     //Crash report
