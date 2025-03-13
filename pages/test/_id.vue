@@ -1,5 +1,5 @@
 <template>
-  <div class="test-details-content">
+  <div id="test-details">
     <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
@@ -29,7 +29,7 @@
                       >
                         <v-radio
                           value="1"
-                          class="pl-2"
+                          class="answer"
                           :class="{
                             'true-answer': isCorrectAnswer(1),
                             'false-answer': isIncorrectAnswer(1),
@@ -38,7 +38,19 @@
                           <template slot="label">
                             <div class="answer">
                               <p>
-                                <span>1)&nbsp;</span>
+                                <v-icon
+                                  v-show="isCorrectAnswer(1)"
+                                  color="success"
+                                  class="mr-2"
+                                  >mdi-check-circle</v-icon
+                                >
+                                <v-btn
+                                  icon
+                                  v-show="!isCorrectAnswer(1)"
+                                  class="option-icon subtitle-1 mr-2"
+                                  x-small
+                                  >A</v-btn
+                                >
                                 <span
                                   ref="mathJaxEl"
                                   v-html="contentData.answer_a"
@@ -54,7 +66,7 @@
                         </v-radio>
                         <v-radio
                           value="2"
-                          class="pl-2"
+                          class="answer"
                           :class="{
                             'true-answer': isCorrectAnswer(2),
                             'false-answer': isIncorrectAnswer(2),
@@ -62,7 +74,19 @@
                         >
                           <template slot="label">
                             <div class="answer">
-                              <span>2)&nbsp;</span>
+                              <v-icon
+                                v-show="isCorrectAnswer(2)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                v-show="!isCorrectAnswer(2)"
+                                icon
+                                class="option-icon subtitle-1 mr-2"
+                                x-small
+                                >B</v-btn
+                              >
                               <span
                                 ref="mathJaxEl"
                                 v-html="contentData.answer_b"
@@ -78,7 +102,7 @@
                         <v-radio
                           value="3"
                           v-if="contentData.type == 'fourchoice'"
-                          class="pl-2"
+                          class="answer"
                           :class="{
                             'true-answer': isCorrectAnswer(3),
                             'false-answer': isIncorrectAnswer(3),
@@ -86,7 +110,19 @@
                         >
                           <template slot="label">
                             <div class="answer">
-                              <span>3)&nbsp;</span>
+                              <v-icon
+                                v-show="isCorrectAnswer(3)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                icon
+                                v-show="!isCorrectAnswer(4)"
+                                class="option-icon subtitle-1 mr-2"
+                                x-small
+                                >C</v-btn
+                              >
                               <span
                                 ref="mathJaxEl"
                                 v-html="contentData.answer_c"
@@ -102,7 +138,7 @@
                         <v-radio
                           value="4"
                           v-if="contentData.type == 'fourchoice'"
-                          class="pl-2"
+                          class="answer"
                           :class="{
                             'true-answer': isCorrectAnswer(4),
                             'false-answer': isIncorrectAnswer(4),
@@ -110,7 +146,19 @@
                         >
                           <template slot="label">
                             <div class="answer">
-                              <span>4)&nbsp;</span>
+                              <v-icon
+                                v-show="isCorrectAnswer(4)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                icon
+                                v-show="!isCorrectAnswer(4)"
+                                class="option-icon subtitle-1 mr-2"
+                                x-small
+                                >D</v-btn
+                              >
                               <span
                                 ref="mathJaxEl"
                                 v-html="contentData.answer_d"
@@ -168,43 +216,52 @@
                   </div>
 
                   <!--Helpful link-->
-                  <div class="label-holder">
-                    <v-chip
-                      v-if="contentData.topic"
-                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&topic=${contentData.topic}`"
-                      class="ma-1"
+                  <div class="d-flex justify-space-between">
+                    <div class="label-holder">
+                      <v-chip
+                        v-if="contentData.topic"
+                        :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&topic=${contentData.topic}`"
+                        class="ma-1"
+                      >
+                        {{ contentData.topic_title }}
+                      </v-chip>
+                      <v-chip
+                        :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
+                        class="ma-1"
+                      >
+                        {{ contentData.lesson_title }}
+                      </v-chip>
+                      <v-chip
+                        :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
+                        link
+                        class="mr-1"
+                      >
+                        {{ contentData.base_title }}
+                      </v-chip>
+                      <v-chip
+                        :to="`/search?type=azmoon&section=${contentData.section}`"
+                        link
+                        class="mr-1"
+                      >
+                        {{ contentData.section_title }}
+                      </v-chip>
+                      <v-chip
+                        v-if="contentData.tutorial_id"
+                        :to="`/tutorial/${contentData.tutorial_id}`"
+                        link
+                        class="mr-1 orange white--text"
+                      >
+                        Tutorial of this topic
+                      </v-chip>
+                    </div>
+                    <v-btn
+                      class="next-test"
+                      :to="`/test/${Number($route.params.id) + 1}`"
                     >
-                      {{ contentData.topic_title }}
-                    </v-chip>
-                    <v-chip
-                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
-                      class="ma-1"
-                    >
-                      {{ contentData.lesson_title }}
-                    </v-chip>
-                    <v-chip
-                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
-                      link
-                      class="mr-1"
-                    >
-                      {{ contentData.base_title }}
-                    </v-chip>
-                    <v-chip
-                      :to="`/search?type=azmoon&section=${contentData.section}`"
-                      link
-                      class="mr-1"
-                    >
-                      {{ contentData.section_title }}
-                    </v-chip>
-                    <v-chip
-                      v-if="contentData.tutorial_id"
-                      :to="`/tutorial/${contentData.tutorial_id}`"
-                      link
-                      class="mr-1 orange white--text"
-                    >
-                      Tutorial of this topic
-                    </v-chip>
+                      Next One
+                    </v-btn>
                   </div>
+
                   <!--End helpful link-->
                 </div>
               </div>
@@ -220,14 +277,6 @@
   </div>
 </template>
 <script>
-import Breadcrumb from "@/components/widgets/breadcrumb";
-import LastViews from "@/components/common/last-views";
-import Category from "@/components/common/category";
-import PreviewGallery from "@/components/details/preview-gallery";
-import RelatedContent from "@/components/details/related-content";
-import LatestTrainingContent from "@/components/details/latest-training-content";
-import RelatedQa from "@/components/details/related-qa";
-import RelatedOnlineExam from "@/components/details/related-online-exam";
 import CrashReport from "~/components/common/crash-report.vue";
 
 export default {
@@ -267,7 +316,9 @@ export default {
 
   mounted() {
     document.title = this.$refs["test-question"].innerText;
-    this.renderMathJax();
+    setTimeout(() => {
+      this.renderMathJax();
+    }, 2000);
   },
 
   data: () => ({
@@ -378,6 +429,30 @@ export default {
 </script>
 
 <style>
+#test-details {
+  .v-input--selection-controls__input {
+    display: none;
+  }
+
+  .option-icon {
+    border: 1px solid #e0e0e0;
+  }
+
+  .next-test.v-btn {
+    height: 3.6rem;
+    padding: 0rem 1.6rem;
+    border-radius: 3rem;
+    background: #ffb600;
+
+    .v-btn__content {
+      color: #24292f;
+      font-size: 1.4rem;
+      font-style: normal;
+      font-weight: 600;
+    }
+  }
+}
+
 .content_main_info {
   padding: 27px;
   background: #f5f5f5 !important;
@@ -410,18 +485,20 @@ p {
   font-size: 1.3rem !important;
 }
 
+.answer {
+  padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+}
+
 .true-answer {
-  background-color: #4caf50; /* Green background color */
+  border: 1px solid #4caf50; /* Green background color */
   color: white !important; /* White text color */
-  padding: 0.5rem 0.5rem 0.5rem 0;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .false-answer {
-  background-color: #f44336; /* Red background color */
+  border: 1px solid #f44336; /* Red background color */
   color: white !important; /* White text color */
-  padding: 0.5rem 0.5rem 0.5rem 0;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .answer {
