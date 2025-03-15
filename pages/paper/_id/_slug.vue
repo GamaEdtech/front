@@ -687,6 +687,19 @@ export default {
   head() {
     return {
       title: this.contentData.title,
+      script: [
+        {
+          innerHTML: JSON.stringify({
+            "@context": "http://schema.org",
+            "@type": "CreativeWork",
+            name: this.contentData.title,
+            image: this.contentData.thumb_pic
+              ? this.contentData?.thumb_pic
+              : this.contentData?.lesson_pic,
+          }),
+          type: "application/ld+json",
+        },
+      ],
     };
   },
   async asyncData({ params, $axios, redirect }) {
