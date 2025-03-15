@@ -428,9 +428,9 @@ export default {
     }
 
     this.map.schoolIcon = L.icon({
-      iconUrl: "/images/school-marker.png", // Replace with school marker icon
-      iconSize: [64, 64], // Adjust the size as needed
-      iconAnchor: [16, 32], // Adjust the anchor point as needed
+      iconUrl: "/images/school-marker.svg", // Replace with school marker icon
+      iconSize: [16, 16], // Adjust the size as needed
+      iconAnchor: [16, 16], // Adjust the anchor point as needed
     });
     // this.$nextTick(() => {
     //   setTimeout(() => {
@@ -657,7 +657,7 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber(R * c) / 1000; //retrun distance
+      this.filter.distance = this.formatNumber((R / 100) * c); //retrun distance
     },
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side
