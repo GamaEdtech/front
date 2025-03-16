@@ -540,7 +540,7 @@
                   :value="(ratingData.facilitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
-                ></v-progress-linear>
+                />
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-1">
                   {{ convertRateToString(ratingData.facilitiesRate) }}
@@ -1105,14 +1105,15 @@
                   :rows="$vuetify.breakpoint.xs ? 10 : 22"
                 />
                 <v-btn
-                  fab
                   x-small
+                  height="40"
+                  width="40"
                   :loading="help_loading"
                   @click="sendToAI()"
                   class="white--text"
-                  color="blue-grey"
+                  color="teal lighten-2"
                   style="position: absolute; right: 10px; bottom: 40px"
-                  ><v-icon small color="white">mdi-help</v-icon></v-btn
+                  ><v-icon small color="white">mdi-auto-fix</v-icon></v-btn
                 >
               </div>
             </v-col>
@@ -1865,10 +1866,10 @@ export default {
   width: 16rem;
   height: 16rem;
 }
+.score-title {
+  min-width: 22rem !important;
+}
 #score-results {
-  .score-title {
-    width: 35rem;
-  }
   .rate-title {
     width: 14rem;
     text-align: right;
