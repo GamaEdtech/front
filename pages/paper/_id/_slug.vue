@@ -688,8 +688,11 @@ export default {
     const schemaData = {
       "@context": "https://schema.org",
       "@type": "CreativeWork",
-      name: this.contentData?.title,
-      image: this.contentData?.thumb_pic || this.contentData?.lesson_pic || "", // Ensure it's a valid URL
+      name: this.contentData?.title || "GamaEdtech",
+      image:
+        this.contentData?.thumb_pic ||
+        this.contentData?.lesson_pic ||
+        "https://gamatrain.com/images/gamatrain-logo.svg", // Ensure it's a valid URL
       url: this.$route?.fullPath || "", // Optional: Add the page URL
       // author: {
       //   "@type": "Person",
@@ -703,13 +706,15 @@ export default {
       //     url: "https://gamatrain.com/logo.png", // Ensure it's a valid logo URL
       //   },
       // },
-      description: this.contentData?.description,
+      description: this.contentData?.description || "GamaEdtech",
     };
+
     return {
       title: this.contentData.title,
+      __dangerouslyDisableSanitizers: ["script"],
       script: [
         {
-          innerHTML: schemaData,
+          innerHTML: JSON.stringify(schemaData),
           type: "application/ld+json",
         },
       ],
