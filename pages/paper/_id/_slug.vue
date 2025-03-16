@@ -685,18 +685,31 @@ export default {
     RelatedCardBox,
   },
   head() {
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      name: this.contentData?.title,
+      image: this.contentData?.thumb_pic || this.contentData?.lesson_pic || "", // Ensure it's a valid URL
+      url: this.$route?.fullPath || "", // Optional: Add the page URL
+      // author: {
+      //   "@type": "Person",
+      //   name: this.contentData?.author || "Unknown Author", // Add author if available
+      // },
+      // publisher: {
+      //   "@type": "Organization",
+      //   name: "GamaEdtech", // Replace with actual site name
+      //   logo: {
+      //     "@type": "ImageObject",
+      //     url: "https://gamatrain.com/logo.png", // Ensure it's a valid logo URL
+      //   },
+      // },
+      description: this.contentData?.description,
+    };
     return {
       title: this.contentData.title,
       script: [
         {
-          innerHTML: JSON.stringify({
-            "@context": "http://schema.org",
-            "@type": "CreativeWork",
-            name: this.contentData.title,
-            image: this.contentData.thumb_pic
-              ? this.contentData?.thumb_pic
-              : this.contentData?.lesson_pic,
-          }),
+          innerHTML: schemaData,
           type: "application/ld+json",
         },
       ],
