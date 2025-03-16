@@ -711,13 +711,16 @@ export default {
 
     return {
       title: this.contentData.title,
-      __dangerouslyDisableSanitizers: ["script"],
       script: [
         {
+          hid: "json-ld-schema", // Helps avoid duplicate script tags
           innerHTML: JSON.stringify(schemaData),
           type: "application/ld+json",
         },
       ],
+      __dangerouslyDisableSanitizersByTagID: {
+        "json-ld-schema": ["innerHTML"],
+      },
     };
   },
   async asyncData({ params, $axios, redirect }) {
