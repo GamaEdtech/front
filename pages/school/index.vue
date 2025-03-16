@@ -332,7 +332,7 @@ export default {
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         zoom: 4,
         minZoom: 2,
-        center: [39.90063873634048, -83.44667778604482], // Initial map center coordinates
+        center: [39.90973623453719, -81.12304687500001], // Initial map center coordinates
         markers: [],
         object: null,
         boundingBox: {},
@@ -364,10 +364,10 @@ export default {
         religion: "",
         boarding_type: "",
         coed_status: "",
-        distance: 15,
+        distance: 56,
         center: [],
-        lat: 41,
-        lng: 91,
+        lat: 39.90973623453719,
+        lng: -81.12304687500001,
       },
       filterLoadedStatus: {
         stage: false,
