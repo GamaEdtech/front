@@ -687,7 +687,7 @@ export default {
   head() {
     const schemaData = {
       "@context": "https://schema.org",
-      "@type": "CreativeWork",
+      "@type": "LearningResource",
       name: this.contentData?.title || "GamaEdtech",
       image:
         this.contentData?.thumb_pic ||

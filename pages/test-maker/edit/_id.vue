@@ -973,6 +973,7 @@
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
+        style="z-index: 1000 !important"
       >
         <v-card class="test-list">
           <v-toolbar dark color="teal">
