@@ -583,7 +583,9 @@
 
                       <div
                         v-if="
-                          item.type == 'blank' || item.type == 'shortanswer'
+                          item.type == 'blank' ||
+                          item.type == 'shortanswer' ||
+                          item.type == 'descriptive'
                         "
                       >
                         <div ref="mathJaxEl" v-html="item.answer_full" />
@@ -806,7 +808,9 @@
 
                       <div
                         v-if="
-                          item.type == 'blank' || item.type == 'shortanswer'
+                          item.type == 'blank' ||
+                          item.type == 'shortanswer' ||
+                          item.type == 'descriptive'
                         "
                       >
                         <div ref="mathJaxEl" v-html="item.answer_full" />
