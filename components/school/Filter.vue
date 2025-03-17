@@ -878,7 +878,7 @@ export default {
     },
     "filterForm.city"(val) {
       document.removeEventListener("click", this.handleClickOutside);
-      this.updateQueryParams();
+      if (val) this.updateQueryParams();
 
       setTimeout(() => {
         if (this.desktopFilter) {

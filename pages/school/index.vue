@@ -91,15 +91,16 @@
                           mobileDataSheetConfig.sheetHeight - 18
                         }rem`"
                         ref="mobileSchoolListSection"
-                        @scroll="checkMobileSchoolScroll"
                       >
                         <!-- School list section -->
-                        <schoolDataList
-                          :schoolLoading="schoolLoading"
-                          :schoolList="schoolList"
-                          :resultCount="resultCount"
-                          :allDataLoaded="allDataLoaded"
-                        />
+                        <data-holder @updatePage="checkSchoolScroll"
+                          ><schoolDataList
+                            :schoolLoading="schoolLoading"
+                            :schoolList="schoolList"
+                            :resultCount="resultCount"
+                            :allDataLoaded="allDataLoaded"
+                        /></data-holder>
+
                         <!-- End school list section -->
                       </div>
                     </div>
@@ -119,7 +120,6 @@
       class="d-none d-lg-block"
       :class="{ expanded: isExpanded }"
       ref="schoolListSection"
-      @scroll="checkSchoolScroll"
     >
       <!-- Action section -->
       <v-container id="action-section">
@@ -264,12 +264,14 @@
       <!-- Action section -->
 
       <!-- Data list -->
-      <schoolDataList
-        :schoolLoading="schoolLoading"
-        :schoolList="schoolList"
-        :resultCount="resultCount"
-        :allDataLoaded="allDataLoaded"
-      />
+      <data-holder @updatePage="checkSchoolScroll">
+        <schoolDataList
+          :schoolLoading="schoolLoading"
+          :schoolList="schoolList"
+          :resultCount="resultCount"
+          :allDataLoaded="allDataLoaded"
+        />
+      </data-holder>
       <!-- End data list -->
     </div>
     <!-- End large screen section -->
@@ -279,6 +281,7 @@
 <script>
 import schoolListFilter from "@/components/school/Filter.vue";
 import schoolDataList from "@/components/school/List.vue";
+import DataHolder from "../DataHolder.vue";
 export default {
   auth: false,
   name: "school-list",
@@ -324,6 +327,7 @@ export default {
   components: {
     schoolListFilter,
     schoolDataList,
+    DataHolder,
   },
   data() {
     return {
@@ -367,7 +371,11 @@ export default {
         center: [],
         lat: 39.90973623453719,
         lng: -81.12304687500001,
-        page: this.$route.query.page ? this.$route.query.page : 1,
+        page: this.$route.query.page ? Number(this.$route.query.page) : 1,
+      },
+      scrollPage: {
+        top: null,
+        bottom: null,
       },
       filterLoadedStatus: {
         stage: false,
@@ -391,6 +399,7 @@ export default {
         dragSide: "top",
       },
       screenWidth: 0,
+      loadedPages: [],
 
       schoolList: [],
       currentZoom: 5,
@@ -439,6 +448,7 @@ export default {
     //   }, 1000);
     // });
 
+    this.loadedPages.push(Number(this.filter.page));
     this.getSchoolList();
 
     //Handle show/hide mobile sheet base on size
@@ -687,7 +697,7 @@ export default {
       }
     },
 
-    async getSchoolList() {
+    async getSchoolList(side) {
       this.schoolLoading = true;
       if (this.allDataLoaded == false)
         this.$axios
@@ -750,7 +760,9 @@ export default {
             } else {
               //If user not in geoloaction and now active geo mode. we set data on map for it and center for map
 
-              this.schoolList.push(...response.data.list);
+              if (side === "top")
+                this.schoolList.unshift(...response.data.list);
+              else this.schoolList.push(...response.data.list);
             }
 
             if (response.data.list.length < this.perPage) {
@@ -765,39 +777,41 @@ export default {
             this.$refs.schoolFilter.searchLoading = false;
           });
     },
-    async checkSchoolScroll() {
+    async checkSchoolScroll(value) {
       if (!this.geoSearch) {
-        const scrollableDiv = this.$refs.schoolListSection;
         if (
-          this.isScrollAtBottom(scrollableDiv) &&
           this.allDataLoaded == false &&
-          !this.loadingData
+          !this.loadingData &&
+          this.schoolList.length
         ) {
-          this.filter.page++;
-          this.$refs.schoolFilter.filterForm.page = this.filter.page;
-          this.$refs.schoolFilter.updateQueryParams();
-          this.loadingData = true; // Set loading flag
-          await this.getSchoolList();
+          if (value === "top" && this.filter.page > 1) {
+            this.filter.page = this.scrollPage.top
+              ? this.scrollPage.top - 1
+              : this.filter.page - 1;
+
+            this.scrollPage.top = this.filter.page;
+          } else if (value === "bottom") {
+            this.filter.page = this.scrollPage.bottom
+              ? this.scrollPage.bottom + 1
+              : this.filter.page + 1;
+            this.scrollPage.bottom =
+              this.filter.page > this.scrollPage.bottom
+                ? this.filter.page
+                : this.scrollPage.bottom;
+          }
+
+          if (!this.loadedPages.includes(this.filter.page)) {
+            //Prevent load repeat page
+            this.loadedPages.push(this.filter.page);
+            this.$refs.schoolFilter.filterForm.page = this.filter.page;
+            this.$refs.schoolFilter.updateQueryParams();
+            this.loadingData = true; // Set loading flag
+            await this.getSchoolList(value);
+          }
         }
       }
     },
-    async checkMobileSchoolScroll() {
-      const scrollableDiv = this.$refs.mobileSchoolListSection;
-      if (
-        this.isScrollAtBottom(scrollableDiv) &&
-        this.allDataLoaded == false &&
-        !this.loadingData
-      ) {
-        this.filter.page++;
-        this.loadingData = true; // Set loading flag
-        await this.getSchoolList();
-      }
-    },
-    isScrollAtBottom(element) {
-      return (
-        element.scrollHeight - element.scrollTop - 150 <= element.clientHeight
-      );
-    },
+
     closeFilter(filter_name, other_data = null) {
       if (filter_name == "keyword")
         this.$refs.schoolFilter.filterForm.keyword = "";
@@ -1042,7 +1056,6 @@ export default {
     position: relative;
     #data-list {
       #school-list-container {
-        padding-bottom: 14rem;
         max-width: 100% !important;
         .list-item {
           display: flex;
@@ -1144,7 +1157,6 @@ export default {
 
       #data-list {
         #school-list-container {
-          padding-bottom: 14rem;
           max-width: 100% !important;
           .list-item {
             display: flex;
