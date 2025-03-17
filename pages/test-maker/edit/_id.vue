@@ -1049,43 +1049,57 @@
                         v-html="item.question"
                       />
                       <img :src="item.q_file" />
-
-                      <div class="answer">
-                        <span>1)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_a"
-                          v-html="item.answer_a"
-                        ></span>
-                        <img v-show="item.a_file" :src="item.a_file" />
-                      </div>
-                      <div class="answer">
-                        <span>2)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_b"
-                          v-html="item.answer_b"
-                        ></span>
-                        <img v-show="item.b_file" :src="item.b_file" />
-                      </div>
-                      <div class="answer">
-                        <span>3)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_c"
-                          v-html="item.answer_c"
-                        ></span>
-                        <img v-show="item.c_file" :src="item.c_file" />
-                      </div>
-                      <p class="answer">
-                        <span>4)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_d"
-                          v-html="item.answer_d"
+                      <div
+                        v-if="
+                          item.type == 'blank' ||
+                          item.type == 'shortanswer' ||
+                          item.type == 'descriptive'
+                        "
+                      >
+                        <div ref="mathJaxEl" v-html="item.answer_full" />
+                        <img
+                          v-show="answer_full_file"
+                          :src="answer_full_file"
                         />
-                        <img v-show="item.d_file" :src="item.d_file" />
-                      </p>
+                      </div>
+                      <div v-else>
+                        <div class="answer">
+                          <span>1)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-show="item.answer_a"
+                            v-html="item.answer_a"
+                          ></span>
+                          <img v-show="item.a_file" :src="item.a_file" />
+                        </div>
+                        <div class="answer">
+                          <span>2)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-show="item.answer_b"
+                            v-html="item.answer_b"
+                          ></span>
+                          <img v-show="item.b_file" :src="item.b_file" />
+                        </div>
+                        <div class="answer">
+                          <span>3)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-show="item.answer_c"
+                            v-html="item.answer_c"
+                          ></span>
+                          <img v-show="item.c_file" :src="item.c_file" />
+                        </div>
+                        <p class="answer">
+                          <span>4)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-show="item.answer_d"
+                            v-html="item.answer_d"
+                          />
+                          <img v-show="item.d_file" :src="item.d_file" />
+                        </p>
+                      </div>
                       <v-row>
                         <v-col cols="6">
                           <v-btn icon fab color="blue">
