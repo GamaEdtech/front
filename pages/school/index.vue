@@ -277,8 +277,8 @@
 </template>
 
 <script>
-import schoolListFilter from "@/components/school-list/filter";
-import schoolDataList from "@/components/school-list/data-list";
+import schoolListFilter from "@/components/school/Filter.vue";
+import schoolDataList from "@/components/school/List.vue";
 export default {
   auth: false,
   name: "school-list",
@@ -339,7 +339,6 @@ export default {
         schoolIcon: null,
       },
       schoolLoading: true,
-      pageNum: 1,
       perPage: 20,
       allDataLoaded: false,
       resultCount: "--",
@@ -368,6 +367,7 @@ export default {
         center: [],
         lat: 39.90973623453719,
         lng: -81.12304687500001,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       },
       filterLoadedStatus: {
         stage: false,
@@ -469,7 +469,7 @@ export default {
       this.timer = setTimeout(() => {
         this.filter.keyword = val;
         this.$refs.schoolFilter.searchLoading = true;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -479,7 +479,7 @@ export default {
       this.filter.stage = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -494,7 +494,7 @@ export default {
 
       this.timer = setTimeout(() => {
         this.filter.tuition_fee = val;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -505,7 +505,7 @@ export default {
       this.filter.country = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -515,7 +515,7 @@ export default {
       this.filter.state = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -525,7 +525,7 @@ export default {
       this.filter.city = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -536,7 +536,7 @@ export default {
       else this.filter.school_type = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -547,7 +547,7 @@ export default {
       else this.filter.religion = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -558,7 +558,7 @@ export default {
       else this.filter.boarding_type = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -569,7 +569,7 @@ export default {
       else this.filter.coed_status = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -580,7 +580,7 @@ export default {
 
       if (!this.schoolLoading) {
         a;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -604,7 +604,7 @@ export default {
       }
       if (!this.schoolLoading) {
         this.allDataLoaded = false;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.getSchoolList();
       }
@@ -632,7 +632,7 @@ export default {
 
         if (!this.schoolLoading) {
           this.allDataLoaded = false;
-          this.pageNum = 1;
+          this.filter.page = 1;
           this.schoolList = [];
           this.getSchoolList();
         }
@@ -693,7 +693,8 @@ export default {
         this.$axios
           .$get("/api/v2/schools", {
             params: {
-              "PagingDto.PageFilter.Skip": (this.pageNum - 1) * this.perPage,
+              "PagingDto.PageFilter.Skip":
+                (this.filter.page - 1) * this.perPage,
               "PagingDto.PageFilter.Size": this.perPage,
               "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
               Name: this.$route.query.keyword,
@@ -772,7 +773,9 @@ export default {
           this.allDataLoaded == false &&
           !this.loadingData
         ) {
-          this.pageNum++;
+          this.filter.page++;
+          this.$refs.schoolFilter.filterForm.page = this.filter.page;
+          this.$refs.schoolFilter.updateQueryParams();
           this.loadingData = true; // Set loading flag
           await this.getSchoolList();
         }
@@ -785,7 +788,7 @@ export default {
         this.allDataLoaded == false &&
         !this.loadingData
       ) {
-        this.pageNum++;
+        this.filter.page++;
         this.loadingData = true; // Set loading flag
         await this.getSchoolList();
       }

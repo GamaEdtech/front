@@ -765,6 +765,7 @@ export default {
         religionList: [],
         center: [],
         distance: 10,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       },
 
       filterForm: {
@@ -1034,6 +1035,9 @@ export default {
       }
       if (this.filterForm.lng != "") {
         query.lng = this.filterForm.lng;
+      }
+      if (this.filterForm.page > 0) {
+        query.page = this.filterForm.page;
       }
 
       // Handle more query parameters here ...
