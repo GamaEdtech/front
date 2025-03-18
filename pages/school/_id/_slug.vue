@@ -542,7 +542,7 @@
                   class="mt-3"
                 />
 
-                <div class="gtext-t4 font-weight-medium rate-title ml-1">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.facilitiesRate) }}
                 </div>
               </li>
@@ -559,7 +559,7 @@
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.educationRate) }}
                 </div>
               </li>
@@ -576,7 +576,7 @@
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.itTrainingRate) }}
                 </div>
               </li>
@@ -593,7 +593,7 @@
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.safetyAndHappinessRate) }}
                 </div>
               </li>
@@ -610,7 +610,7 @@
                   class="mt-3"
                 />
 
-                <div class="gtext-t4 font-weight-medium rate-title">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.behaviorRate) }}
                 </div>
               </li>
@@ -627,7 +627,7 @@
                   class="mt-3"
                 />
 
-                <div class="gtext-t4 font-weight-medium rate-title">
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.tuitionRatioRate) }}
                 </div>
               </li>
@@ -639,12 +639,14 @@
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="90"
+                  :value="(ratingData.facilitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.facilitiesRate) }}
+                </div>
               </li>
               <li class="d-flex">
                 <div class="bullet"></div>
@@ -654,12 +656,14 @@
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="10"
+                  :value="(ratingData.artisticActivitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Poor</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.artisticActivitiesRate) }}
+                </div>
               </li>
             </ul>
           </v-col>
