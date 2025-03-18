@@ -15,47 +15,38 @@
                 size="20"
                 width="2"
                 indeterminate
-              >
-              </v-progress-circular>
+              />
               <span style="font-size: 1.2rem"> Loading google sign in</span>
             </div>
             <div v-show="!google_login_loading" ref="googleLoginBtn" />
           </v-col>
           <v-col cols="12">
             <div v-show="identity_holder">
-              <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
               <form @submit.prevent="submit">
                 <v-row>
                   <v-col cols="12">
-                    <!-- <validation-provider
-                      v-slot="{ errors }"
-                      name="Email"
-                      rules="required"
-                    > -->
                     <v-text-field
-                      v-model="identity"
+                      v-model="identity.value.value"
                       dense
                       label="Email"
-                      required
                       outlined
+                      required
+                      autocomplete="off"
+                      :error-messages="identity.errorMessage.value"
                     />
-                    <!-- </validation-provider> -->
                   </v-col>
                   <v-col cols="12">
-                    <!-- <validation-provider -->
-                    <!-- v-slot="{ errors }" name="Password" rules="required" > -->
                     <v-text-field
+                      v-model="password.value.value"
                       label="Password"
-                      v-model="password"
                       outlined
                       dense
-                      type="password"
                       :type="passVisible ? 'text' : 'password'"
                       :append-icon="passVisible ? 'mdi-eye' : 'mdi-eye-off'"
                       @click:append="passVisible = !passVisible"
                       required
+                      :error-messages="password.errorMessage.value"
                     />
-                    <!-- </validation-provider> -->
                     <p @click="switchToPassRecover" class="pointer">
                       Forget password
                     </p>
@@ -66,59 +57,53 @@
                       class="text-h6 text-center pointer"
                       @click="switchToRegister"
                     >
-                      Not registered? register now
+                      Not registered? Register now
                     </p>
                     <v-divider class="mt-3" />
                   </v-col>
                   <v-col cols="6">
-                    <v-btn outlined block @click="model = !model">
-                      Cancel
-                    </v-btn>
+                    <v-btn outlined block @click="model = !model">Cancel</v-btn>
                   </v-col>
                   <v-col cols="6">
                     <v-btn
                       color="primary"
                       type="submit"
-                      :disabled="invalid"
-                      block
                       :loading="login_loading"
+                      block
                     >
                       Login
                     </v-btn>
                   </v-col>
                 </v-row>
               </form>
-              <!-- </validation-observer> -->
             </div>
 
             <div v-show="otp_holder">
               <!--Otp holder-->
               <v-col cols="12">
                 <p class="text-h6">
-                  Please enter code received your email address?
+                  Please enter the code received on your email address:
                 </p>
                 <v-otp-input
                   v-model="otp"
                   :disabled="otp_loading"
                   length="5"
                   @finish="onFinish"
-                ></v-otp-input>
+                />
               </v-col>
-
               <v-col cols="12">
                 <v-divider class="mb-3" />
                 <p
                   class="text-h6 text-center pointer"
                   @click="recheckEnteredIdentity"
                 >
-                  Your email is incorrect? recheck it.
+                  Your email is incorrect? Recheck it.
                 </p>
-
                 <v-divider class="my-3 text-center" />
                 <v-btn
                   plain
                   class="text-none pointer"
-                  @click="sendOtpCodeAgain()"
+                  @click="sendOtpCodeAgain"
                   :disabled="sendOtpBtnStatus"
                 >
                   Send code again
@@ -135,11 +120,25 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
+import { useField, useForm } from "vee-validate";
+import * as yup from "yup";
+
 const model = defineModel(false);
 const passVisible = ref(false);
 const login_loading = ref(false);
-const identity = ref("");
-const password = ref("");
+const validationSchema = yup.object().shape({
+  identity: yup
+    .string()
+    .required("Email is required")
+    .email("Must be a valid email"),
+  password: yup.string().required().min(4),
+});
+const { handleSubmit, handleReset } = useForm({
+  validationSchema,
+});
+const identity = useField("identity");
+const password = useField("password");
 
 const otp = ref("");
 const otp_loading = ref(false);
@@ -149,153 +148,50 @@ const sendOtpBtnStatus = ref(true);
 const google_login_loading = ref(true);
 const identity_holder = ref(true);
 const otp_holder = ref(false);
-watch(
-  () => model,
-  (val) => {
-    alert("aa");
-    if (val === true) {
-      //Initialize google login
-      setTimeout(() => {
-        window.google.accounts.id.initialize({
-          client_id:
-            "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-          callback: this.handleCredentialResponse,
-          auto_select: true,
-        });
-        window.google.accounts.id.renderButton(this.$refs.googleLoginBtn, {
-          text: "Login",
-          size: "large",
-          width: "252",
-          theme: "outline", // option : filled_black | outline | filled_blue
-        });
-        this.google_login_loading = false;
-      }, 4000);
-    }
-  }
-);
 
-//Handle google login callback
-const handleCredentialResponse = async (response) => {
-  const querystring = require("querystring");
-
-  await $fetch
-    .post(
-      "/api/v1/users/googleAuth",
-      querystring.stringify({
-        id_token: response.credential,
-      })
-    )
-    .then((response) => {
-      this.$auth.setUserToken(response.data.data.jwtToken);
-      this.$auth.setUser(response.data.data.info);
-      this.model = false;
-      this.$toast.success("Logged in successfully");
-
-      this.$router.push({
-        path: "/user",
-      });
-    })
-    .catch(({ response }) => {
-      if (response.status == 401) {
-        this.$toast.error(this.$t(`LOGIN_WRONG_DATA`));
-      } else if (response.status == 500 || response.status == 504) {
-        this.$toast.error(this.$t(`REQUEST_FAILED`));
-      }
-    });
-};
-const openDialog = () => {
-  alert("step1");
-  this.model = true;
-  alert("step2");
-};
-
-const switchToRegister = () => {
-  this.$emit("update:switchToRegister", "register");
-};
-const switchToPassRecover = () => {
-  this.$emit("update:switchToPassRecover", "pass_recover");
-};
-const submit = async () => {
-  this.login_loading = true;
-  const querystring = require("querystring");
-  await this.$fetch
-    .$post(
-      "/api/v1/users/login",
-      querystring.stringify({
-        identity: this.identity,
-        pass: this.password,
+const submit = handleSubmit(async () => {
+  login_loading.value = true;
+  try {
+    const response = await fetch("/api/v1/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        identity: identity.value.value,
+        pass: password.value.value,
         type: "request",
       }),
-      {
-        responseType: "text",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    )
-    .then((response) => {
-      if (response.data.type && response.data.type == "loginByOTP") {
-        this.$toast.success("Otp code sent");
-        this.identity_holder = false;
-        this.otp_holder = true;
-      } else {
-        $auth.setUserToken(response.data.jwtToken);
-        $auth.setUser(response.data.info);
-
-        $toast.success("Logged in successfully");
-        model = false;
-
-        if (this.$route.path == "/")
-          this.$router.push({
-            path: "/user",
-          });
-      }
-    })
-    .catch((err) => {
-      if (err.response.status == 400)
-        this.$toast.error(err.response.data.message);
-    })
-    .finally(() => {
-      this.login_loading = false;
     });
+
+    if (!response.ok) throw await response.json();
+
+    const data = await response.json();
+
+    if (data.type === "loginByOTP") {
+      $toast.success("Otp code sent");
+      identity_holder.value = false;
+      otp_holder.value = true;
+    } else {
+      $auth.setUserToken(data.jwtToken);
+      $auth.setUser(data.info);
+      $toast.success("Logged in successfully");
+      model.value = false;
+      if ($route.path === "/") $router.push({ path: "/user" });
+    }
+  } catch (error) {
+    if (error.status === 400) $toast.error(error.message);
+  } finally {
+    login_loading.value = false;
+  }
+});
+
+const switchToRegister = () => {
+  emit("update:switchToRegister", "register");
 };
-const onFinish = () => {
-  //Finish enter otp code
-  const querystring = require("querystring");
 
-  this.$fetch
-    .$post(
-      "/api/v1/users/login",
-      querystring.stringify({
-        type: "confirm",
-        identity: this.identity,
-        pass: this.password,
-        code: this.otp,
-        type: "confirm",
-      })
-    )
-    .then((response) => {
-      this.model = false;
-      this.otp_holder = false;
-      this.identity_holder = true;
-      this.$auth.setUserToken(response.data.jwtToken);
-      this.$auth.setUser(response.data.info);
-
-      this.$toast.success("Logged in successfully");
-
-      if (this.$route.path == "/")
-        this.$router.push({
-          path: "/user",
-        });
-    })
-    .catch((err) => {
-      if (err.response.status == 400)
-        this.$toast.error(err.response.data.message);
-    })
-    .finally(() => {
-      this.register_loading = false;
-    });
+const switchToPassRecover = () => {
+  emit("update:switchToPassRecover", "pass_recover");
 };
+
 const recheckEnteredIdentity = () => {
   otp_holder.value = false;
   identity_holder.value = true;

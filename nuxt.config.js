@@ -83,10 +83,9 @@ export default defineNuxtConfig({
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    // { src: "plugins/vee-validate.js", ssr: true },
     { src: "plugins/helper.js" },
-    // { src: "plugins/vue-emoji-picker", ssr: false },
-    // { src: "plugins/img-cropper", ssr: false },
+    { src: "plugins/vue-emoji-picker", ssr: false },
+    { src: "plugins/img-cropper", ssr: false },
     { src: "plugins/vuedraggable", ssr: false },
   ],
 
@@ -122,7 +121,6 @@ export default defineNuxtConfig({
   modules: [
     "dayjs-nuxt",
     "nuxt-gtag",
-    "@vee-validate/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
