@@ -21,7 +21,7 @@
           <l-marker
             v-for="(marker, index) in map.markers"
             :key="index"
-            @click="$router.push(`/school/1`)"
+            @click="$router.push(`/school/${marker.id}/${marker.slug}`)"
             :lat-lng="marker.latLng"
             :icon="map.schoolIcon"
           ></l-marker>
@@ -76,11 +76,9 @@
                       <v-row v-if="mobileDataSheetConfig.sheetHeight >= 15">
                         <v-col cols="12" class="text-right">
                           <div id="result-stat " class="mr-4">
-                            <span class="gama-text-overline">
-                              Search result
-                            </span>
+                            <span class="gama-text-overline"> Results </span>
                             <span class="gama-text-button">
-                              {{ resultCount }}
+                              {{ resultCount | numberFormat }}
                             </span>
                           </div>
                         </v-col>
@@ -93,15 +91,16 @@
                           mobileDataSheetConfig.sheetHeight - 18
                         }rem`"
                         ref="mobileSchoolListSection"
-                        @scroll="checkMobileSchoolScroll"
                       >
                         <!-- School list section -->
-                        <schoolDataList
-                          :schoolLoading="schoolLoading"
-                          :schoolList="schoolList"
-                          :resultCount="resultCount"
-                          :allDataLoaded="allDataLoaded"
-                        />
+                        <list-holder @updatePage="checkSchoolScroll"
+                          ><schoolDataList
+                            :schoolLoading="schoolLoading"
+                            :schoolList="schoolList"
+                            :resultCount="resultCount"
+                            :allDataLoaded="allDataLoaded"
+                        /></list-holder>
+
                         <!-- End school list section -->
                       </div>
                     </div>
@@ -121,7 +120,6 @@
       class="d-none d-lg-block"
       :class="{ expanded: isExpanded }"
       ref="schoolListSection"
-      @scroll="checkSchoolScroll"
     >
       <!-- Action section -->
       <v-container id="action-section">
@@ -266,12 +264,14 @@
       <!-- Action section -->
 
       <!-- Data list -->
-      <schoolDataList
-        :schoolLoading="schoolLoading"
-        :schoolList="schoolList"
-        :resultCount="resultCount"
-        :allDataLoaded="allDataLoaded"
-      />
+      <list-holder @updatePage="checkSchoolScroll">
+        <schoolDataList
+          :schoolLoading="schoolLoading"
+          :schoolList="schoolList"
+          :resultCount="resultCount"
+          :allDataLoaded="allDataLoaded"
+        />
+      </list-holder>
       <!-- End data list -->
     </div>
     <!-- End large screen section -->
@@ -279,8 +279,9 @@
 </template>
 
 <script>
-import schoolListFilter from "@/components/school-list/filter";
-import schoolDataList from "@/components/school-list/data-list";
+import schoolListFilter from "@/components/school/Filter.vue";
+import schoolDataList from "@/components/school/List.vue";
+import ListHolder from "~/components/ListHolder.vue";
 export default {
   auth: false,
   name: "school-list",
@@ -326,6 +327,7 @@ export default {
   components: {
     schoolListFilter,
     schoolDataList,
+    ListHolder,
   },
   data() {
     return {
@@ -334,18 +336,15 @@ export default {
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         zoom: 4,
         minZoom: 2,
-        center: [39.90063873634048, -83.44667778604482], // Initial map center coordinates
+        center: [39.90973623453719, -81.12304687500001], // Initial map center coordinates
         markers: [],
         object: null,
         boundingBox: {},
         schoolIcon: null,
       },
       schoolLoading: true,
-      pageNum: 1,
-      perPage: 10,
+      perPage: 20,
       allDataLoaded: false,
-      resultCount: "--",
-      loadingData: false,
       timer: 0,
       gradeLevelList: [
         {
@@ -366,9 +365,13 @@ export default {
         religion: "",
         boarding_type: "",
         coed_status: "",
-        distance: 15,
+        distance: 56,
         center: [],
+        lat: 39.90973623453719,
+        lng: -81.12304687500001,
+        page: this.$route.query.page ? Number(this.$route.query.page) : 1,
       },
+
       filterLoadedStatus: {
         stage: false,
         country: false,
@@ -391,8 +394,8 @@ export default {
         dragSide: "top",
       },
       screenWidth: 0,
+      loadedPages: [],
 
-      schoolList: [],
       currentZoom: 5,
       geoSearch: false,
 
@@ -420,6 +423,37 @@ export default {
       ],
     };
   },
+  async asyncData({ $axios, query }) {
+    try {
+      const perPage = 20; // Change this to match `this.perPage`
+      const page = parseInt(query.page) || 1;
+      const baseURL = process.server
+        ? `https://api.gamaedtech.com/api/v1/schools`
+        : "/api/v2/schools";
+
+      const params = {
+        "PagingDto.PageFilter.Skip": (page - 1) * perPage,
+        "PagingDto.PageFilter.Size": perPage,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+        Name: query.keyword,
+        "Location.Radius": query.distance || null,
+        "Location.Latitude": query.lat || null,
+        "Location.Longitude": query.lng || null,
+      };
+
+      const response = await $axios.$get(baseURL, { params });
+
+      return {
+        schoolList: response.data.list || [],
+        resultCount: response.data.totalRecordsCount || 0,
+        loadingData: false,
+      };
+    } catch (error) {
+      console.error("Error fetching schools:", error);
+      return { schoolList: [], resultCount: 0, loadingData: false };
+    }
+  },
+
   mounted() {
     document.body.classList.add("disable-scroll");
 
@@ -428,9 +462,9 @@ export default {
     }
 
     this.map.schoolIcon = L.icon({
-      iconUrl: "/images/school-marker.png", // Replace with school marker icon
-      iconSize: [64, 64], // Adjust the size as needed
-      iconAnchor: [16, 32], // Adjust the anchor point as needed
+      iconUrl: "/images/school-marker.svg", // Replace with school marker icon
+      iconSize: [16, 16], // Adjust the size as needed
+      iconAnchor: [16, 16], // Adjust the anchor point as needed
     });
     // this.$nextTick(() => {
     //   setTimeout(() => {
@@ -439,7 +473,7 @@ export default {
     //   }, 1000);
     // });
 
-    this.getSchoolList();
+    // this.getSchoolList();
 
     //Handle show/hide mobile sheet base on size
     this.screenWidth = window.innerWidth;
@@ -464,10 +498,12 @@ export default {
         this.timer = null;
       }
 
+      if (val) this.isExpanded = true;
+
       this.timer = setTimeout(() => {
         this.filter.keyword = val;
         this.$refs.schoolFilter.searchLoading = true;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -477,7 +513,7 @@ export default {
       this.filter.stage = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -492,17 +528,18 @@ export default {
 
       this.timer = setTimeout(() => {
         this.filter.tuition_fee = val;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
       }, 800);
     },
     "$route.query.country"(val) {
+      this.isExpanded = true;
       this.filter.country = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -512,7 +549,7 @@ export default {
       this.filter.state = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -522,7 +559,7 @@ export default {
       this.filter.city = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -533,7 +570,7 @@ export default {
       else this.filter.school_type = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -544,7 +581,7 @@ export default {
       else this.filter.religion = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -555,7 +592,7 @@ export default {
       else this.filter.boarding_type = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -566,7 +603,7 @@ export default {
       else this.filter.coed_status = "";
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -576,7 +613,8 @@ export default {
       this.filter.sort = val;
 
       if (!this.schoolLoading) {
-        this.pageNum = 1;
+        a;
+        this.filter.page = 1;
         this.schoolList = [];
         this.allDataLoaded = false;
         this.getSchoolList();
@@ -585,15 +623,22 @@ export default {
     isExpanded(val) {
       if (val) {
         this.geoSearch = false;
+        this.filter.country = null;
+        this.filter.state = null;
+        this.filter.city = null;
+        this.filter.keyword = null;
         this.$refs.schoolFilter.filterForm.distance = "";
+
         this.$refs.schoolFilter.filterForm.center = [];
         this.$refs.schoolFilter.updateQueryParams();
       } else {
+        this.filter.keyword = null;
+        this.$refs.schoolFilter.filterForm.keyword = "";
         this.geoSearch = true;
       }
       if (!this.schoolLoading) {
         this.allDataLoaded = false;
-        this.pageNum = 1;
+        this.filter.page = 1;
         this.schoolList = [];
         this.getSchoolList();
       }
@@ -608,16 +653,20 @@ export default {
       if (!this.isExpanded) {
         const bounds = event.target.getBounds();
         const center = event.target.getCenter(); //Center of map
+        this.filter.lat = center.lat; //Update filter
+        this.filter.lng = center.lng; //Update filter
         this.filter.center = [center.lat, center.lng]; //Update filter
         const ne = bounds.getNorthEast(); //Corner of map
         this.calcDistance(center, ne);
-        this.$refs.schoolFilter.filterForm.center = this.filter.center;
+        this.$refs.schoolFilter.filterForm.lat = this.filter.lat;
+        this.$refs.schoolFilter.filterForm.lng = this.filter.lng;
+        // this.$refs.schoolFilter.filterForm.center = this.filter.center;
         this.$refs.schoolFilter.filterForm.distance = this.filter.distance;
         this.$refs.schoolFilter.updateQueryParams();
 
         if (!this.schoolLoading) {
           this.allDataLoaded = false;
-          this.pageNum = 1;
+          this.filter.page = 1;
           this.schoolList = [];
           this.getSchoolList();
         }
@@ -642,7 +691,7 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber(R * c); //retrun distance
+      this.filter.distance = this.formatNumber((R / 100) * c); //retrun distance
     },
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side
@@ -672,38 +721,46 @@ export default {
       }
     },
 
-    async getSchoolList() {
+    async getSchoolList(side) {
       this.schoolLoading = true;
       if (this.allDataLoaded == false)
-        this.$fetch
-          .$get("/api/v1/schools/search", {
+        this.$axios
+          .$get("/api/v2/schools", {
             params: {
-              page: this.pageNum,
-              name: this.$route.query.keyword,
+              "PagingDto.PageFilter.Skip":
+                (this.filter.page - 1) * this.perPage,
+              "PagingDto.PageFilter.Size": this.perPage,
+              "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+              Name: this.$route.query.keyword,
               section: this.$route.query.stage,
               tuition_fee: this.$route.query.tuition_fee,
-              country: this.$route.query.country,
-              state: this.$route.query.state,
-              city: this.$route.query.city,
+              CountryId: this.$route.query.country,
+              StateId: this.$route.query.state,
+              CityId: this.$route.query.city,
               school_type: this.$route.query.school_type,
               religion: this.$route.query.religion,
               boarding_type: this.$route.query.boarding_type,
               coed_status: this.$route.query.coed_status,
               sort: this.$route.query.sort,
-              distance: this.isExpanded
-                ? ""
+              "Location.Radius": this.isExpanded
+                ? null
                 : this.$route.query.distance
                 ? this.$route.query.distance
                 : this.filter.distance,
-              center: this.isExpanded
-                ? []
-                : this.$route.query.center
-                ? this.$route.query.center
-                : this.map.center.join(","),
+              "Location.Latitude": this.isExpanded
+                ? null
+                : this.$route.query.lat
+                ? this.$route.query.lat
+                : this.filter.lat,
+              "Location.Longitude": this.isExpanded
+                ? null
+                : this.$route.query.lng
+                ? this.$route.query.lng
+                : this.filter.lng,
             },
           })
           .then((response) => {
-            this.resultCount = response.data.num;
+            this.resultCount = response.data.totalRecordsCount;
             this.$refs.schoolFilter.resultCount = this.resultCount;
 
             this.loadingData = false;
@@ -711,9 +768,13 @@ export default {
             if (this.geoSearch) {
               this.schoolList = response.data.list;
               var newPlaceData = response.data.list
-                .filter((obj) => obj.lat !== undefined && obj.lng !== undefined) // Filter out objects with undefined lat or lng
+                .filter(
+                  (obj) => obj.lat !== undefined && obj.long !== undefined
+                ) // Filter out objects with undefined lat or lng
                 .map((obj) => ({
-                  latLng: [obj.lat, obj.lng],
+                  latLng: [obj.lat, obj.long],
+                  id: obj.id,
+                  slug: obj.slug,
                 }));
               if (newPlaceData.length) {
                 this.map.markers.push(...newPlaceData);
@@ -722,19 +783,15 @@ export default {
               this.allDataLoaded = true;
             } else {
               //If user not in geoloaction and now active geo mode. we set data on map for it and center for map
-              var newPlaceData = response.data.list
-                .filter((obj) => obj.lat !== undefined && obj.lng !== undefined) // Filter out objects with undefined lat or lng
-                .map((obj) => ({
-                  latLng: [obj.lat, obj.lng],
-                }));
-              this.schoolList.push(...response.data.list);
-              if (newPlaceData.length) {
-                this.map.markers.push(...newPlaceData);
-              }
+
+              if (side === "top")
+                this.schoolList.unshift(...response.data.list);
+              else this.schoolList.push(...response.data.list);
             }
 
-            if (response.data.list.length < this.perPage)
+            if (response.data.list.length < this.perPage) {
               this.allDataLoaded = true;
+            }
           })
           .catch((err) => {
             console.error(err);
@@ -744,37 +801,18 @@ export default {
             this.$refs.schoolFilter.searchLoading = false;
           });
     },
-    async checkSchoolScroll() {
+    async checkSchoolScroll(side, page) {
       if (!this.geoSearch) {
-        const scrollableDiv = this.$refs.schoolListSection;
-        if (
-          this.isScrollAtBottom(scrollableDiv) &&
-          this.allDataLoaded == false &&
-          !this.loadingData
-        ) {
-          this.pageNum++;
+        if (this.allDataLoaded == false && !this.loadingData) {
+          this.filter.page = page;
+          this.$refs.schoolFilter.filterForm.page = this.filter.page;
+          this.$refs.schoolFilter.updateQueryParams();
           this.loadingData = true; // Set loading flag
-          await this.getSchoolList();
+          await this.getSchoolList(side);
         }
       }
     },
-    async checkMobileSchoolScroll() {
-      const scrollableDiv = this.$refs.mobileSchoolListSection;
-      if (
-        this.isScrollAtBottom(scrollableDiv) &&
-        this.allDataLoaded == false &&
-        !this.loadingData
-      ) {
-        this.pageNum++;
-        this.loadingData = true; // Set loading flag
-        await this.getSchoolList();
-      }
-    },
-    isScrollAtBottom(element) {
-      return (
-        element.scrollHeight - element.scrollTop - 150 <= element.clientHeight
-      );
-    },
+
     closeFilter(filter_name, other_data = null) {
       if (filter_name == "keyword")
         this.$refs.schoolFilter.filterForm.keyword = "";
@@ -829,11 +867,11 @@ export default {
         ).title;
       if (type == "sort") {
         title = this.sortList.find((x) => x.value == id).title;
-      } else if (type == "country")
+      } else if (type == "country") {
         title = this.$refs.schoolFilter.filter.countryList.find(
           (x) => x.id == id
-        ).name;
-      else if (type == "state")
+        ).title;
+      } else if (type == "state")
         title = this.$refs.schoolFilter.filter.stateList.find(
           (x) => x.id == id
         ).title;
@@ -897,7 +935,7 @@ export default {
       this.isExpanded = true;
     },
     grabLocation(type, title) {
-      this.$fetch
+      this.$axios
         .$get("https://nominatim.openstreetmap.org/search", {
           params: {
             q: title,
@@ -1019,12 +1057,11 @@ export default {
     position: relative;
     #data-list {
       #school-list-container {
-        padding-bottom: 14rem;
         max-width: 100% !important;
         .list-item {
           display: flex;
           margin-bottom: 0.8rem;
-          height: 14.9rem;
+          min-height: 14.9rem;
 
           .item-info {
             float: left;
@@ -1040,12 +1077,6 @@ export default {
                 background: var(--primary-warning-50, #fffaeb) !important;
                 color: var(--primary-yellow-gama-500, #ffb600) !important;
               }
-            }
-            .main-data h2 {
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              max-width: 20.6rem;
             }
 
             .item-footer .v-icon {
@@ -1127,7 +1158,6 @@ export default {
 
       #data-list {
         #school-list-container {
-          padding-bottom: 14rem;
           max-width: 100% !important;
           .list-item {
             display: flex;
@@ -1195,8 +1225,8 @@ export default {
 
             .item-info {
               float: left;
-              width: 85.5%;
-              min-width: 85.5%;
+              width: 100%;
+              min-width: 100%;
 
               .main-data {
                 min-height: 8rem;

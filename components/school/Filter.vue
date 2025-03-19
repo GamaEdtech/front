@@ -17,19 +17,7 @@
                     v-model="filterForm.keyword"
                     rounded
                     autocomplete="off"
-                  >
-                    <template v-slot:append>
-                      <v-btn
-                        large
-                        class="primary"
-                        :loading="searchLoading"
-                        id="search-btn"
-                        rounded
-                      >
-                        Search
-                      </v-btn>
-                    </template>
-                  </v-text-field>
+                  />
                 </div>
               </div>
             </v-col>
@@ -39,12 +27,14 @@
                 <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
+                      disabled
                       :class="{ 'menu-opened': menuOpened }"
                       class="text-capitalize gtext-t4 font-weight-medium menu-btn"
                       @click="desktopFilter = false"
                       v-bind="attrs"
                       v-on="on"
-                      >Stage
+                    >
+                      <span class="grey--text">Board</span>
                       <v-icon right dark color="primary" large>
                         mdi-chevron-down
                       </v-icon>
@@ -73,9 +63,11 @@
                       class="text-transform-none gtext-t4 font-weight-medium"
                       @click="desktopFilter = false"
                       v-bind="attrs"
+                      disabled
                       v-on="on"
                     >
-                      Tuition fee
+                      <span class="grey--text"> Tuition fee</span>
+
                       <!-- &nbsp;<span style="color: #667085; text-transform: none"
                         >to</span
                       >&nbsp;${{ filterForm.tuition_fee | numberFormat }} -->
@@ -114,7 +106,7 @@
                   @click="openDesktopFilter"
                 >
                   <v-icon right dark size="24"> mdi-filter </v-icon>
-                  &nbsp;&nbsp;&nbsp; Filter
+                  &nbsp;&nbsp;&nbsp; Region
                   <v-icon right dark color="primary" large>
                     mdi-chevron-down
                   </v-icon>
@@ -127,10 +119,11 @@
                       class="text-capitalize gtext-t4 font-weight-medium"
                       @click="desktopFilter = false"
                       v-bind="attrs"
+                      disabled
                       v-on="on"
                     >
                       <v-icon right dark size="24"> mdi-filter-variant </v-icon>
-                      &nbsp;&nbsp;&nbsp; Sort
+                      &nbsp;&nbsp;&nbsp; <span class="grey--text">Sort</span>
                       <v-icon size="24" right dark color="primary">
                         mdi-chevron-down
                       </v-icon>
@@ -151,9 +144,9 @@
                 <div class="vertical-line"></div>
 
                 <v-btn class="gtext-t4 font-weight-regular text-capitalize">
-                  <span class="gray--text">Search result</span> &nbsp;
+                  <span class="gray--text">Results</span> &nbsp;
                   <span class="white--text">
-                    {{ resultCount }}
+                    {{ resultCount | numberFormat }}
                   </span>
                 </v-btn>
               </div>
@@ -175,14 +168,15 @@
                 <v-autocomplete
                   v-model="filterForm.country"
                   :items="filter.countryList"
-                  item-text="name"
+                  item-text="title"
                   item-value="id"
                   label="Country"
                   outlined
                   clearable
+                  autocomplete="new-password"
                   rounded
                   @change="countryChange()"
-                ></v-autocomplete>
+                />
               </v-col>
               <v-col cols="4">
                 <v-autocomplete
@@ -192,6 +186,7 @@
                   item-value="id"
                   label="State"
                   outlined
+                  autocomplete="new-password"
                   rounded
                   clearable
                   @change="stateChange()"
@@ -204,13 +199,14 @@
                   item-text="title"
                   item-value="id"
                   label="City"
+                  autocomplete="new-password"
                   outlined
                   rounded
                   clearable
                 ></v-autocomplete>
               </v-col>
             </v-row>
-            <v-row>
+            <!-- <v-row>
               <v-col cols="3">
                 <p class="gtext-t4 font-weight-medium">School type</p>
                 <div class="pl-8">
@@ -259,7 +255,7 @@
                   ></v-checkbox>
                 </div>
               </v-col>
-            </v-row>
+            </v-row> -->
           </v-container>
         </v-card>
       </v-container>
@@ -282,18 +278,7 @@
                 dense
                 rounded
                 autocomplete="off"
-              >
-                <template v-slot:append>
-                  <v-btn
-                    class="primary"
-                    :loading="searchLoading"
-                    id="search-btn"
-                    rounded
-                  >
-                    Search
-                  </v-btn>
-                </template>
-              </v-text-field>
+              />
             </div>
 
             <div class="float-right" id="filterSection">
@@ -304,7 +289,7 @@
                 fab
                 color="#F2F4F7"
                 elevation="0"
-                class="mr-2"
+                class="mr-2 ml-1"
               >
                 <v-icon> mdi-filter </v-icon>
               </v-btn>
@@ -312,7 +297,7 @@
                 <v-card id="filter-card">
                   <v-toolbar color="#fff">
                     <v-toolbar-title class="gtext-h5 primary-gray-600"
-                      >Filter</v-toolbar-title
+                      >Region</v-toolbar-title
                     >
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
@@ -354,7 +339,7 @@
                           @click:close="closeFilter('tuition_fee')"
                         >
                           Tuition fee above: ${{
-                            numberFormat($route.query.tuition_fee)
+                            $route.query.tuition_fee | numberFormat
                           }}
                         </v-chip>
                         <v-chip
@@ -430,7 +415,7 @@
                           close
                           outlined
                           class="mb-1 mr-1"
-                          v-if="
+                          v-show="
                             $route.query.boarding_type &&
                             filterLoadedStatus.boarding_type
                           "
@@ -445,7 +430,7 @@
                           close
                           outlined
                           class="mb-1 mr-1"
-                          v-if="
+                          v-show="
                             $route.query.coed_status &&
                             filterLoadedStatus.coed_status
                           "
@@ -473,7 +458,7 @@
                           label="Country"
                           @change="countryChange()"
                           :items="filter.countryList"
-                          itemTitle="name"
+                          itemTitle="title"
                           v-model="filterForm.country"
                         />
                       </v-col>
@@ -495,9 +480,9 @@
                         />
                       </v-col>
 
-                      <v-col cols="12" sm="4">
+                      <!-- <v-col cols="12" sm="4">
                         <p class="gtext-t4 font-weight-medium primary-gray-900">
-                          Stage
+                          Board
                         </p>
                         <div class="pl-8">
                           <v-radio-group v-model="filterForm.stage">
@@ -605,11 +590,11 @@
                             thumb-label="always"
                           >
                             <template #thumb-label="{ value }">
-                              ${{ $numberFormat(value) }}
+                              ${{ value | numberFormat }}
                             </template>
                           </v-slider>
                         </div>
-                      </v-col>
+                      </v-col> -->
                     </v-row>
                   </v-card-text>
 
@@ -699,7 +684,7 @@
               label="Country"
               @change="countryChange()"
               :items="filter.countryList"
-              itemTitle="name"
+              itemTitle="title"
               v-model="filterForm.country"
             />
           </v-col>
@@ -780,6 +765,7 @@ export default {
         religionList: [],
         center: [],
         distance: 10,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       },
 
       filterForm: {
@@ -817,7 +803,13 @@ export default {
     var params = {
       type: "section",
     };
-    this.getFilterList({ type: "countries" }, "countries");
+
+    this.getFilterList(
+      {
+        "PagingDto.PageFilter.Size": 250,
+      },
+      "countries"
+    );
     this.getFilterList(params, "section");
     this.getFilterList({ type: "school_type" }, "school_type");
     this.getFilterList({ type: "boarding_type" }, "boarding_type");
@@ -834,7 +826,9 @@ export default {
     if (this.$route.query.country) {
       this.filterForm.country = this.$route.query.country;
       this.getFilterList(
-        { type: "states", country_id: this.filterForm.country },
+        {
+          "PagingDto.PageFilter.Size": 1000,
+        },
         "states"
       );
     }
@@ -842,9 +836,7 @@ export default {
       this.filterForm.state = this.$route.query.state;
       this.getFilterList(
         {
-          type: "cities",
-          country_id: this.filterForm.country,
-          state_id: this.filterForm.state,
+          "PagingDto.PageFilter.Size": 1000,
         },
         "cities"
       );
@@ -886,7 +878,7 @@ export default {
     },
     "filterForm.city"(val) {
       document.removeEventListener("click", this.handleClickOutside);
-      this.updateQueryParams();
+      if (val) this.updateQueryParams();
 
       setTimeout(() => {
         if (this.desktopFilter) {
@@ -919,20 +911,26 @@ export default {
   },
   methods: {
     getFilterList(params, type) {
-      this.$fetch
-        .$get("/api/v1/types/list", {
+      let endpoint = "/api/v1/types/list";
+      if (type == "countries") endpoint = "/api/v2/locations/countries";
+      if (type == "states")
+        endpoint = `/api/v2/locations/states/${this.filterForm.country}`;
+      if (type == "cities")
+        endpoint = `/api/v2/locations/cities/${this.filterForm.state}`;
+      this.$axios
+        .$get(endpoint, {
           params,
         })
         .then((res) => {
           var data = {};
           if (type == "countries") {
-            this.filter.countryList = res.data;
+            this.filter.countryList = res.data.list;
             this.filterLoadedStatus.country = true;
           } else if (type == "states") {
-            this.filter.stateList = res.data;
+            this.filter.stateList = res.data.list;
             this.filterLoadedStatus.state = true;
           } else if (type == "cities") {
-            this.filter.cityList = res.data;
+            this.filter.cityList = res.data.list;
             this.filterLoadedStatus.city = true;
           } else if (type == "school_type") {
             this.filter.schoolTypeList = res.data;
@@ -1032,6 +1030,15 @@ export default {
       ) {
         query.center = this.filterForm.center.join(",");
       }
+      if (this.filterForm.lat != "") {
+        query.lat = this.filterForm.lat;
+      }
+      if (this.filterForm.lng != "") {
+        query.lng = this.filterForm.lng;
+      }
+      if (this.filterForm.page > 0) {
+        query.page = this.filterForm.page;
+      }
 
       // Handle more query parameters here ...
       this.$router.replace({ query: query }).catch((err) => {
@@ -1053,7 +1060,9 @@ export default {
       this.updateQueryParams();
       if (this.filterForm.country) {
         this.getFilterList(
-          { type: "states", country_id: this.filterForm.country },
+          {
+            "PagingDto.PageFilter.Size": 10000,
+          },
           "states"
         );
       }
@@ -1138,9 +1147,7 @@ export default {
       if (this.filterForm.state) {
         this.getFilterList(
           {
-            type: "cities",
-            country_id: this.filterForm.country,
-            state_id: this.filterForm.state,
+            "PagingDto.PageFilter.Size": 10000,
           },
           "cities"
         );

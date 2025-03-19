@@ -1,11 +1,12 @@
+<!-- in refactor proccess -->
 <template>
   <v-container id="content-stats-container">
-    <v-card flat v-if="stats.length">
+    <v-card flat>
       <v-card-text>
         <v-row>
           <v-col cols="2" sm="2" class="px-0">
             <v-sheet
-              v-if="stats.length <= 16"
+              v-if="stats.length <= 16 && gradeSizes.length"
               class="text-right"
               id="stats-handler"
               ref="statsHandler"
@@ -21,8 +22,6 @@
                 @mouseup="handleMouseUp(index)"
                 :ref="`handler${index}`"
               >
-                <!-- :ref="`handler${index}`" -->
-
                 <v-btn
                   @click="handleBtnClick(index)"
                   class="my-0 white--text grade-btn"
@@ -32,8 +31,11 @@
                   ]"
                   v-if="shouldDisplayButton(index)"
                   :color="gradeColors[index]"
-                  :style="`font-weight:600;font-size:${gradeSizes[index].fontSize}px;width:${gradeSizes[index].width}px!important;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             min-width:${gradeSizes[index].width}px!important;height:${gradeSizes[index].height}px`"
+                  :style="`font-weight:600;
+                           font-size:${gradeSizes[index].fontSize}px;
+                           width:${gradeSizes[index].width}px!important;
+                           min-width:${gradeSizes[index].width}px!important;
+                           height:${gradeSizes[index].height}px`"
                 >
                   {{
                     truncateGradeTitle(
@@ -65,7 +67,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].tests) }}</div>
+                    <div class="stat">+{{ stats[7].tests | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -78,7 +80,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].files) }}</div>
+                    <div class="stat">+{{ stats[7].files | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -91,7 +93,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].exams) }}</div>
+                    <div class="stat">+{{ stats[7].exams | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -105,7 +107,7 @@
                       >
                     </nuxt-link>
                     <div class="stat">
-                      +{{ $numberFormat(stats[7].questions) }}
+                      +{{ stats[7].questions | numberFormat }}
                     </div>
                   </v-col>
                 </v-row>
@@ -125,7 +127,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ $numberFormat(stats[7].tests) }}</span
+                          >+{{ stats[7].tests | numberFormat }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -148,7 +150,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ $numberFormat(stats[7].files) }}</span
+                          >+{{ stats[7].files | numberFormat }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -171,7 +173,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ $numberFormat(stats[7].exams) }}</span
+                          >+{{ stats[7].exams | numberFormat }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -195,7 +197,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ $numberFormat(stats[7].questions) }}</span
+                          >+{{ stats[7].questions | numberFormat }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -224,53 +226,52 @@
                         </v-col>
                       </v-row>
                     </div>
-                    <div v-else>
-                      <v-card
-                        class="latest-card"
-                        flat
-                        v-for="item in questions.slice(0, 3)"
-                        :key="item.id"
-                      >
-                        <v-row>
-                          <v-col cols="1">
-                            <v-avatar class="my-3" size="32" rounded="0">
-                              <v-img :src="item.avatar"></v-img>
-                            </v-avatar>
-                          </v-col>
-                          <v-col cols="11">
-                            <v-card-title>
-                              <nuxt-link
-                                class="gama-text-caption"
-                                :to="`/qa/${item.id}`"
-                              >
-                                <span v-html="item.title"></span>
-                              </nuxt-link>
-                            </v-card-title>
+                    <v-card
+                      class="latest-card"
+                      v-else
+                      flat
+                      v-for="item in questions.slice(0, 3)"
+                      :key="item.id"
+                    >
+                      <v-row>
+                        <v-col cols="1">
+                          <v-avatar class="my-3" size="32" rounded="0">
+                            <v-img :src="item.avatar"></v-img>
+                          </v-avatar>
+                        </v-col>
+                        <v-col cols="11">
+                          <v-card-title>
+                            <nuxt-link
+                              class="gama-text-caption"
+                              :to="`/qa/${item.id}`"
+                            >
+                              <span v-html="item.title"></span>
+                            </nuxt-link>
+                          </v-card-title>
 
-                            <v-card-subtitle>
-                              <v-row>
-                                <v-col
-                                  cols="8"
-                                  class="owner-container gama-text-overline"
-                                >
-                                  By:
-                                  {{
-                                    getFullName(item.first_name, item.last_name)
-                                  }}
-                                </v-col>
-                                <v-col
-                                  cols="4"
-                                  class="subdate-container gama-text-overline"
-                                >
-                                  <v-icon size="12">mdi-calendar</v-icon>
-                                  {{ dayjs(item.subdate).format("MMM DD") }}
-                                </v-col>
-                              </v-row>
-                            </v-card-subtitle>
-                          </v-col>
-                        </v-row>
-                      </v-card>
-                    </div>
+                          <v-card-subtitle>
+                            <v-row>
+                              <v-col
+                                cols="8"
+                                class="owner-container gama-text-overline"
+                              >
+                                By:
+                                {{
+                                  getFullName(item.first_name, item.last_name)
+                                }}
+                              </v-col>
+                              <v-col
+                                cols="4"
+                                class="subdate-container gama-text-overline"
+                              >
+                                <v-icon size="12">mdi-calendar</v-icon>
+                                {{ $dayjs(item.subdate).format("MMM DD") }}
+                              </v-col>
+                            </v-row>
+                          </v-card-subtitle>
+                        </v-col>
+                      </v-row>
+                    </v-card>
                   </v-col>
                   <v-col cols="6" md="6">
                     <h4 class="section-title gama-text-h5">
@@ -285,53 +286,52 @@
                         </v-col>
                       </v-row>
                     </div>
-                    <div v-else>
-                      <v-card
-                        class="latest-card"
-                        flat
-                        v-for="item in papers.slice(0, 3)"
-                        :key="item.id"
-                      >
-                        <v-row>
-                          <v-col cols="1">
-                            <v-avatar class="my-3" size="32" rounded="0">
-                              <v-img :src="item.avatar"></v-img>
-                            </v-avatar>
-                          </v-col>
-                          <v-col cols="11">
-                            <v-card-title>
-                              <nuxt-link
-                                class="gama-text-caption"
-                                :to="`paper/${item.id}`"
-                              >
-                                <span v-html="item.title"></span>
-                              </nuxt-link>
-                            </v-card-title>
+                    <v-card
+                      v-else
+                      class="latest-card"
+                      flat
+                      v-for="item in papers.slice(0, 3)"
+                      :key="item.id"
+                    >
+                      <v-row>
+                        <v-col cols="1">
+                          <v-avatar class="my-3" size="32" rounded="0">
+                            <v-img :src="item.avatar"></v-img>
+                          </v-avatar>
+                        </v-col>
+                        <v-col cols="11">
+                          <v-card-title>
+                            <nuxt-link
+                              class="gama-text-caption"
+                              :to="`paper/${item.id}`"
+                            >
+                              <span v-html="item.title"></span>
+                            </nuxt-link>
+                          </v-card-title>
 
-                            <v-card-subtitle>
-                              <v-row>
-                                <v-col
-                                  cols="8"
-                                  class="owner-container gama-text-overline"
-                                >
-                                  By:
-                                  {{
-                                    getFullName(item.first_name, item.last_name)
-                                  }}
-                                </v-col>
-                                <v-col
-                                  cols="4"
-                                  class="subdate-container gama-text-overline"
-                                >
-                                  <v-icon size="12">mdi-calendar</v-icon>
-                                  {{ dayjs(item.subdate).format("MMM DD") }}
-                                </v-col>
-                              </v-row>
-                            </v-card-subtitle>
-                          </v-col>
-                        </v-row>
-                      </v-card>
-                    </div>
+                          <v-card-subtitle>
+                            <v-row>
+                              <v-col
+                                cols="8"
+                                class="owner-container gama-text-overline"
+                              >
+                                By:
+                                {{
+                                  getFullName(item.first_name, item.last_name)
+                                }}
+                              </v-col>
+                              <v-col
+                                cols="4"
+                                class="subdate-container gama-text-overline"
+                              >
+                                <v-icon size="12">mdi-calendar</v-icon>
+                                {{ $dayjs(item.subdate).format("MMM DD") }}
+                              </v-col>
+                            </v-row>
+                          </v-card-subtitle>
+                        </v-col>
+                      </v-row>
+                    </v-card>
                   </v-col>
                 </v-row>
               </div>
@@ -343,708 +343,701 @@
   </v-container>
 </template>
 
-<script setup>
-import { useDisplay } from "vuetify";
-const { xs, md, sm, name } = useDisplay();
+<script>
+export default {
+  name: "grade-explorer-component",
+  props: {
+    stats: {
+      default: [],
+    },
+  },
+  data() {
+    return {
+      statsSlideVal: 6,
+      gradeColors: [
+        "#FF6498",
+        "#FD7DD2",
+        "#FF4DFF",
+        "#C24DFF",
+        "#8649FF",
+        "#4C4AFF",
+        "#4A87FF",
+        "#4AC2FF",
+        "#42EDEE",
+        "#49F182",
+        "#43E343",
+        "#76E43D",
+        "#E9E90A",
+        "#EEB23A",
+        "#F8864B",
+        "#FC4F4E",
+      ],
+      gradeSizesArr: {
+        xs: [
+          {
+            width: 32,
+            height: 32,
+            fontSize: 10,
+          },
+          {
+            width: 32,
+            height: 32,
+            fontSize: 10,
+          },
+          {
+            width: 41,
+            height: 20,
+            fontSize: 10,
+          },
+          {
+            width: 46,
+            height: 23,
+            fontSize: 12,
+          },
 
-const dayjs = useDayjs();
-const props = defineProps({
-  stats: {
-    type: Array,
-    default: () => [],
-  },
-});
+          {
+            width: 50,
+            height: 25,
+            fontSize: 14,
+          },
+          {
+            width: 55,
+            height: 31,
+            fontSize: 16,
+          },
+          {
+            width: 60,
+            height: 34,
+            fontSize: 22,
+          },
+          {
+            width: 101,
+            height: 46,
+            fontSize: 22,
+          },
+          {
+            width: 64,
+            height: 38,
+            fontSize: 20,
+          },
+          {
+            width: 60,
+            height: 34,
+            fontSize: 18,
+          },
+          {
+            width: 55,
+            height: 32,
+            fontSize: 16,
+          },
+          {
+            width: 50,
+            height: 25,
+            fontSize: 14,
+          },
+          {
+            width: 46,
+            height: 23,
+            fontSize: 12,
+          },
+          {
+            width: 41,
+            height: 19,
+            fontSize: 10,
+          },
+          {
+            width: 52,
+            height: 18,
+            fontSize: 8,
+          },
+          {
+            width: 52,
+            height: 18,
+            fontSize: 8,
+          },
+        ],
+        sm: [
+          {
+            width: 35,
+            height: 17,
+            fontSize: 8,
+          },
+          {
+            width: 35,
+            height: 17,
+            fontSize: 8,
+          },
+          {
+            width: 40,
+            height: 19,
+            fontSize: 10,
+          },
+          {
+            width: 44,
+            height: 22,
+            fontSize: 12,
+          },
+          {
+            width: 49,
+            height: 26,
+            fontSize: 14,
+          },
+          {
+            width: 54,
+            height: 30,
+            fontSize: 16,
+          },
+          {
+            width: 59,
+            height: 33,
+            fontSize: 18,
+          },
+          {
+            width: 107,
+            height: 46,
+            fontSize: 22,
+          },
+          {
+            width: 62,
+            height: 37,
+            fontSize: 20,
+          },
+          {
+            width: 59,
+            height: 33,
+            fontSize: 18,
+          },
+          {
+            width: 54,
+            height: 31,
+            fontSize: 16,
+          },
+          {
+            width: 49,
+            height: 26,
+            fontSize: 14,
+          },
+          {
+            width: 44,
+            height: 22,
+            fontSize: 12,
+          },
+          {
+            width: 40,
+            height: 18,
+            fontSize: 10,
+          },
+          {
+            width: 35,
+            height: 17,
+            fontSize: 8,
+          },
+          {
+            width: 52,
+            height: 18,
+            fontSize: 8,
+          },
+        ],
+        md: [
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 14,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 180,
+            height: 64,
+            fontSize: 24,
+          },
+          {
+            width: 140,
+            height: 51.865,
+            fontSize: 22,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 16,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+        ],
+        lg: [
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 14,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 180,
+            height: 64,
+            fontSize: 24,
+          },
+          {
+            width: 140,
+            height: 51.865,
+            fontSize: 22,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 16,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+        ],
+        xl: [
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 14,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 180,
+            height: 64,
+            fontSize: 24,
+          },
+          {
+            width: 140,
+            height: 51.865,
+            fontSize: 22,
+          },
+          {
+            width: 130,
+            height: 47.355,
+            fontSize: 20,
+          },
+          {
+            width: 120,
+            height: 42.845,
+            fontSize: 18,
+          },
+          {
+            width: 110,
+            height: 36.08,
+            fontSize: 16,
+          },
+          {
+            width: 100,
+            height: 31.57,
+            fontSize: 16,
+          },
+          {
+            width: 90,
+            height: 27.06,
+            fontSize: 12,
+          },
+          {
+            width: 80,
+            height: 22.55,
+            fontSize: 10,
+          },
+          {
+            width: 70,
+            height: 18.04,
+            fontSize: 8,
+          },
+        ],
+      },
 
-const statsSlideVal = ref(6);
-const gradeColors = ref([
-  "#FF6498",
-  "#FD7DD2",
-  "#FF4DFF",
-  "#C24DFF",
-  "#8649FF",
-  "#4C4AFF",
-  "#4A87FF",
-  "#4AC2FF",
-  "#42EDEE",
-  "#49F182",
-  "#43E343",
-  "#76E43D",
-  "#E9E90A",
-  "#EEB23A",
-  "#F8864B",
-  "#FC4F4E",
-]);
+      questions: [],
+      questionLoading: true,
+      papers: [],
+      paperLoading: true,
+      intervalId: null,
 
-const gradeSizesXs = [
-  {
-    width: 32,
-    height: 32,
-    fontSize: 10,
-  },
-  {
-    width: 32,
-    height: 32,
-    fontSize: 10,
-  },
-  {
-    width: 41,
-    height: 20,
-    fontSize: 10,
-  },
-  {
-    width: 46,
-    height: 23,
-    fontSize: 12,
-  },
-
-  {
-    width: 50,
-    height: 25,
-    fontSize: 14,
-  },
-  {
-    width: 55,
-    height: 31,
-    fontSize: 16,
-  },
-  {
-    width: 60,
-    height: 34,
-    fontSize: 22,
-  },
-  {
-    width: 101,
-    height: 46,
-    fontSize: 22,
-  },
-  {
-    width: 64,
-    height: 38,
-    fontSize: 20,
-  },
-  {
-    width: 60,
-    height: 34,
-    fontSize: 18,
-  },
-  {
-    width: 55,
-    height: 32,
-    fontSize: 16,
-  },
-  {
-    width: 50,
-    height: 25,
-    fontSize: 14,
-  },
-  {
-    width: 46,
-    height: 23,
-    fontSize: 12,
-  },
-  {
-    width: 41,
-    height: 19,
-    fontSize: 10,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-];
-const gradeSizesSm = [
-  {
-    width: 35,
-    height: 17,
-    fontSize: 8,
-  },
-  {
-    width: 35,
-    height: 17,
-    fontSize: 8,
-  },
-  {
-    width: 40,
-    height: 19,
-    fontSize: 10,
-  },
-  {
-    width: 44,
-    height: 22,
-    fontSize: 12,
-  },
-  {
-    width: 49,
-    height: 26,
-    fontSize: 14,
-  },
-  {
-    width: 54,
-    height: 30,
-    fontSize: 16,
-  },
-  {
-    width: 59,
-    height: 33,
-    fontSize: 18,
-  },
-  {
-    width: 107,
-    height: 46,
-    fontSize: 22,
-  },
-  {
-    width: 62,
-    height: 37,
-    fontSize: 20,
-  },
-  {
-    width: 59,
-    height: 33,
-    fontSize: 18,
-  },
-  {
-    width: 54,
-    height: 31,
-    fontSize: 16,
-  },
-  {
-    width: 49,
-    height: 26,
-    fontSize: 14,
-  },
-  {
-    width: 44,
-    height: 22,
-    fontSize: 12,
-  },
-  {
-    width: 40,
-    height: 18,
-    fontSize: 10,
-  },
-  {
-    width: 35,
-    height: 17,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-];
-const gradeSizesMd = [
-  {
-    width: 70,
-    height: 18.04,
-    fontSize: 8,
-  },
-  {
-    width: 80,
-    height: 22.55,
-    fontSize: 10,
-  },
-  {
-    width: 90,
-    height: 27.06,
-    fontSize: 12,
-  },
-  {
-    width: 100,
-    height: 31.57,
-    fontSize: 14,
-  },
-  {
-    width: 110,
-    height: 36.08,
-    fontSize: 16,
-  },
-  {
-    width: 120,
-    height: 42.845,
-    fontSize: 18,
-  },
-  {
-    width: 130,
-    height: 47.355,
-    fontSize: 20,
-  },
-  {
-    width: 180,
-    height: 64,
-    fontSize: 24,
-  },
-  {
-    width: 140,
-    height: 51.865,
-    fontSize: 22,
-  },
-  {
-    width: 130,
-    height: 47.355,
-    fontSize: 20,
-  },
-  {
-    width: 120,
-    height: 42.845,
-    fontSize: 18,
-  },
-  {
-    width: 110,
-    height: 36.08,
-    fontSize: 16,
-  },
-  {
-    width: 100,
-    height: 31.57,
-    fontSize: 16,
-  },
-  {
-    width: 90,
-    height: 27.06,
-    fontSize: 12,
-  },
-  {
-    width: 80,
-    height: 22.55,
-    fontSize: 10,
-  },
-  {
-    width: 70,
-    height: 18.04,
-    fontSize: 8,
-  },
-];
-const gradeSizesLg = [
-  {
-    width: 60,
-    height: 28,
-    fontSize: 10,
-  },
-  {
-    width: 68,
-    height: 38,
-    fontSize: 12,
-  },
-  {
-    width: 76,
-    height: 48,
-    fontSize: 14,
-  },
-  {
-    width: 84,
-    height: 56.6,
-    fontSize: 16,
-  },
-  {
-    width: 92,
-    height: 66,
-    fontSize: 18,
-  },
-  {
-    width: 161,
-    height: 75,
-    fontSize: 28,
-  },
-  {
-    width: 92,
-    height: 66,
-    fontSize: 18,
-  },
-  {
-    width: 84,
-    height: 56.6,
-    fontSize: 16,
-  },
-  {
-    width: 76,
-    height: 48,
-    fontSize: 14,
-  },
-  {
-    width: 68,
-    height: 38,
-    fontSize: 12,
-  },
-  {
-    width: 60,
-    height: 28,
-    fontSize: 10,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-];
-const gradeSizesXl = [
-  {
-    width: 60,
-    height: 28,
-    fontSize: 10,
-  },
-  {
-    width: 68,
-    height: 38,
-    fontSize: 12,
-  },
-  {
-    width: 76,
-    height: 48,
-    fontSize: 14,
-  },
-  {
-    width: 84,
-    height: 56.6,
-    fontSize: 16,
-  },
-  {
-    width: 92,
-    height: 66,
-    fontSize: 18,
-  },
-  {
-    width: 161,
-    height: 75,
-    fontSize: 28,
-  },
-  {
-    width: 92,
-    height: 66,
-    fontSize: 18,
-  },
-  {
-    width: 84,
-    height: 56.6,
-    fontSize: 16,
-  },
-  {
-    width: 76,
-    height: 48,
-    fontSize: 14,
-  },
-  {
-    width: 68,
-    height: 38,
-    fontSize: 12,
-  },
-  {
-    width: 60,
-    height: 28,
-    fontSize: 10,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-  {
-    width: 52,
-    height: 18,
-    fontSize: 8,
-  },
-];
-
-const gradeSizes = computed(() => {
-  const breakpoints = {
-    xs: gradeSizesXs,
-    sm: gradeSizesSm,
-    md: gradeSizesMd,
-    lg: gradeSizesMd,
-    xl: gradeSizesMd,
-  };
-
-  return breakpoints[name.value];
-});
-const questions = ref([]);
-const questionLoading = ref(true);
-const papers = ref([]);
-const paperLoading = ref(true);
-const intervalId = ref(null);
-
-const startIndex = ref(-1);
-const currentIndex = ref(-1);
-const isMouseDown = ref(false);
-const easeSlide = ref("");
-
-const showDate = () => {
-  return dayjs(props.stats[7].last_update).format("MMM,DD YYYY");
-};
-const shouldDisplayButton = (index) => {
-  //Determine whether to display the button based on screen size and specific indexes
-  if (xs) return ![0, 1, 14, 15].includes(index);
-  else if (sm) return ![0, 15].includes(index);
-  else return true;
-};
-const handleBtnClick = (index) => {
-  stopInterval(); // Clear the interval using the interval ID
-
-  const deltaIndex = 7 - index;
-  if (deltaIndex > 0) {
-    for (let i = 0; i < deltaIndex; i++) {
-      setTimeout(() => {
-        currentIndex = index + i + 1;
-        var pop_color = gradeColors.pop();
-        var pop_data = props.stats.pop();
-        gradeColors.unshift(pop_color);
-        props.stats.unshift(pop_data);
-      }, 200 * i + 1);
-    }
-  } else if (deltaIndex < 0) {
-    for (let i = 0; i > deltaIndex; i--) {
-      setTimeout(() => {
-        currentIndex = index + i - 1;
-        var splice_color = gradeColors.splice(0, 1);
-
-        var splice_data = props.stats.splice(0, 1);
-
-        gradeColors.push(...splice_color);
-        props.stats.push(...splice_data);
-      }, 200 * Math.abs(i) + 1);
-    }
-  }
-};
-
-const handleMouseDown = (index) => {
-  isMouseDown.value = true;
-  startIndex.value = index;
-
-  // event.preventDefault();
-  // stopInterval(); // Clear the interval using the interval ID
-};
-const handleMouseUp = (event) => {
-  isMouseDown.value = false;
-  startIndex.value = -1;
-  currentIndex.value = -1;
-};
-
-const buttonRefs = ref([]); // To hold an array of refs
-
-const handleMouseMove = (event) => {
-  if (isMouseDown.value) {
-    // stopInterval();
-    event.preventDefault();
-
-    // Get the touch coordinates
-    const touchX = event.clientX;
-    const touchY = event.clientY;
-
-    // Loop through the buttons and check if the touch is over a button
-    for (let index = 0; index < props.stats.length; index++) {
-      const buttonRef = buttonRefs.value[index];
-
-      // const buttonRef = $refs[`handler${index}`][0];
-      const rect = buttonRef.getBoundingClientRect();
-
+      startIndex: -1,
+      currentIndex: -1,
+      isMouseDown: false,
+      easeSlide: "",
+    };
+  },
+  methods: {
+    showDate() {
       if (
-        touchX >= rect.left &&
-        touchX <= rect.right &&
-        touchY >= rect.top &&
-        touchY <= rect.bottom
-      ) {
-        currentIndex = index;
+        this.$dayjs(this.stats[7].last_update).format("MMM,DD YYYY") !==
+        "Invalid date"
+      )
+        return this.$dayjs(this.stats[7].last_update).format("MMM,DD YYYY");
+    },
+    shouldDisplayButton(index) {
+      // Determine whether to display the button based on screen size and specific indexes
+      if (this.display.xs) return ![0, 1, 14, 15].includes(index);
+      else if (this.display.sm) return ![0, 15].includes(index);
+      else return true;
+    },
+    handleBtnClick(index) {
+      this.stopInterval(); // Clear the interval using the interval ID
 
-        // Set the index of the touched button
-        if (index > startIndex) {
-          var pop_color = gradeColors.pop();
-          var pop_data = props.stats.pop();
-          gradeColors.unshift(pop_color);
-          props.stats.unshift(pop_data);
-        } else if (index < startIndex) {
-          var splice_color = gradeColors.splice(0, 1);
+      const deltaIndex = 7 - index;
+      if (deltaIndex > 0) {
+        for (let i = 0; i < deltaIndex; i++) {
+          setTimeout(() => {
+            this.currentIndex = index + i + 1;
+            var pop_color = this.gradeColors.pop();
+            var pop_data = this.stats.pop();
+            this.gradeColors.unshift(pop_color);
+            this.stats.unshift(pop_data);
+          }, 200 * i + 1);
+        }
+      } else if (deltaIndex < 0) {
+        for (let i = 0; i > deltaIndex; i--) {
+          setTimeout(() => {
+            this.currentIndex = index + i - 1;
+            var splice_color = this.gradeColors.splice(0, 1);
 
-          var splice_data = props.stats.splice(0, 1);
+            var splice_data = this.stats.splice(0, 1);
 
-          gradeColors.push(...splice_color);
-          props.stats.push(...splice_data);
+            this.gradeColors.push(...splice_color);
+            this.stats.push(...splice_data);
+          }, 200 * Math.abs(i) + 1);
+        }
+      }
+    },
+
+    handleMouseDown(index) {
+      this.isMouseDown = true;
+      this.startIndex = index;
+      // event.preventDefault();
+      // this.stopInterval(); // Clear the interval using the interval ID
+    },
+    handleMouseUp(event) {
+      this.isMouseDown = false;
+      this.startIndex = -1;
+      this.currentIndex = -1;
+    },
+    handleMouseMove(event) {
+      if (this.isMouseDown) {
+        this.stopInterval();
+        event.preventDefault();
+
+        // Get the touch coordinates
+        const touchX = event.clientX;
+        const touchY = event.clientY;
+
+        // Loop through the buttons and check if the touch is over a button
+        for (let index = 0; index < this.stats.length; index++) {
+          const buttonRef = this.$refs[`handler${index}`][0];
+          const rect = buttonRef.getBoundingClientRect();
+
+          if (
+            touchX >= rect.left &&
+            touchX <= rect.right &&
+            touchY >= rect.top &&
+            touchY <= rect.bottom
+          ) {
+            this.currentIndex = index;
+
+            // Set the index of the touched button
+            if (index > this.startIndex) {
+              var pop_color = this.gradeColors.pop();
+              var pop_data = this.stats.pop();
+              this.gradeColors.unshift(pop_color);
+              this.stats.unshift(pop_data);
+            } else if (index < this.startIndex) {
+              var splice_color = this.gradeColors.splice(0, 1);
+
+              var splice_data = this.stats.splice(0, 1);
+
+              this.gradeColors.push(...splice_color);
+              this.stats.push(...splice_data);
+            }
+
+            this.startIndex = index;
+            return; // Stop checking once a button is found
+          }
         }
 
-        startIndex = index;
-        return; // Stop checking once a button is found
+        // Reset the touchIndex if the touch is not over any button
+        this.startIndex = -1;
       }
-    }
+    },
 
-    // Reset the touchIndex if the touch is not over any button
-    startIndex = -1;
-  }
-};
+    handleTouchStart(index) {
+      this.startIndex = index;
+      // this.stopInterval(); // Clear the interval using the interval ID
+      // this.touchStartY = event.touches[0].clientY;
+    },
 
-const handleTouchStart = (index) => {
-  startIndex = index;
-  stopInterval(); // Clear the interval using the interval ID
-  touchStartY = event.touches[0].clientY;
-};
+    handleTouchEnd(event) {
+      this.startIndex = -1;
+      this.currentIndex = -1;
+      // this.touchStartY = 0;
+    },
 
-const handleTouchEnd = (event) => {
-  startIndex = -1;
-  currentIndex = -1;
-  // touchStartY = 0;
-};
+    handleTouchMove(event) {
+      this.stopInterval();
+      event.preventDefault();
 
-const handleTouchMove = (event) => {
-  stopInterval();
-  event.preventDefault();
+      // Get the touch coordinates
+      const touchX = event.touches[0].clientX;
+      const touchY = event.touches[0].clientY;
 
-  // Get the touch coordinates
-  const touchX = event.touches[0].clientX;
-  const touchY = event.touches[0].clientY;
+      // Loop through the buttons and check if the touch is over a button
+      for (let index = 0; index < this.stats.length; index++) {
+        const buttonRef = this.$refs[`handler${index}`][0];
+        const rect = buttonRef.getBoundingClientRect();
 
-  // Loop through the buttons and check if the touch is over a button
-  for (let index = 0; index < props.stats.length; index++) {
-    const buttonRef = $refs[`handler${index}`][0];
-    const rect = buttonRef.getBoundingClientRect();
+        if (
+          touchX >= rect.left &&
+          touchX <= rect.right &&
+          touchY >= rect.top &&
+          touchY <= rect.bottom
+        ) {
+          this.currentIndex = index;
 
-    if (
-      touchX >= rect.left &&
-      touchX <= rect.right &&
-      touchY >= rect.top &&
-      touchY <= rect.bottom
-    ) {
-      currentIndex = index;
+          // Set the index of the touched button
+          if (index > this.startIndex) {
+            var pop_color = this.gradeColors.pop();
+            var pop_data = this.stats.pop();
+            this.gradeColors.unshift(pop_color);
+            this.stats.unshift(pop_data);
+          } else if (index < this.startIndex) {
+            console.log(index);
+            var splice_color = this.gradeColors.splice(0, 1);
 
-      // Set the index of the touched button
-      if (index > startIndex) {
-        var pop_color = gradeColors.pop();
-        var pop_data = props.stats.pop();
-        gradeColors.unshift(pop_color);
-        props.stats.unshift(pop_data);
-      } else if (index < startIndex) {
-        var splice_color = gradeColors.splice(0, 1);
+            var splice_data = this.stats.splice(0, 1);
 
-        var splice_data = props.stats.splice(0, 1);
+            this.gradeColors.push(...splice_color);
+            this.stats.push(...splice_data);
+          }
 
-        gradeColors.push(...splice_color);
-        props.stats.push(...splice_data);
+          this.startIndex = index;
+          return; // Stop checking once a button is found
+        }
       }
 
-      startIndex = index;
-      return; // Stop checking once a button is found
-    }
-  }
+      // Reset the touchIndex if the touch is not over any button
+      this.startIndex = -1;
+    },
 
-  // Reset the touchIndex if the touch is not over any button
-  startIndex = -1;
+    handleAutoCycle() {
+      this.intervalId = setInterval(() => {
+        var splice_color = this.gradeColors.splice(0, 1);
+
+        var splice_data = this.stats.splice(0, 1);
+
+        this.gradeColors.push(...splice_color);
+        this.stats.push(...splice_data);
+      }, 6000);
+    },
+
+    stopInterval() {
+      clearInterval(this.intervalId); // Clear the interval using the interval ID
+    },
+
+    async getQuestions() {
+      try {
+        const res = await $fetch("/api/v1/home/questions");
+        this.questions = res.data;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.questionLoading = false;
+      }
+    },
+
+    async getPapers() {
+      try {
+        const res = await $fetch("/api/v1/home/tests");
+        this.papers = res.data;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.paperLoading = false;
+      }
+    },
+
+    truncateGradeTitle(title, index) {
+      var cutLength = 3;
+      if (this.display.xs) cutLength = 3;
+      else if (this.display.sm) cutLength = 3;
+      else if (this.display.md) cutLength = 3;
+      else cutLength = 9;
+      if (index == 7) cutLength = cutLength + 2;
+      return title.length > cutLength
+        ? title.slice(0, cutLength) + "..."
+        : title;
+    },
+    getFullName(firstName, lastName) {
+      return `${firstName} ${lastName}`;
+    },
+    gradeHandlerTitle(title) {
+      if (this.display.xs || this.display.sm || this.display.md)
+        return title.replace(" Grade", "");
+      else return title;
+    },
+  },
+  computed: {
+    display() {
+      return useGlobalDisplay(); // Call the composable
+    },
+    gradeSizes() {
+      return this.gradeSizesArr[this.display.name.value];
+    },
+  },
+
+  mounted() {
+    //this.handleAutoCycle();
+
+    //tmp to shift until any group have content
+    var splice_data = this.stats.splice(0, 5);
+    this.stats.push(...splice_data);
+    //end tmp
+
+    this.getQuestions();
+    this.getPapers();
+  },
+  beforeDestroy() {
+    this.stopInterval(); // Stop the interval when the component is about to be unmounted
+  },
 };
-
-const handleAutoCycle = () => {
-  intervalId = setInterval(() => {
-    var splice_color = gradeColors.splice(0, 1);
-
-    var splice_data = props.stats.splice(0, 1);
-
-    gradeColors.push(...splice_color);
-    props.stats.push(...splice_data);
-  }, 6000);
-};
-const stopInterval = () => {
-  clearInterval(intervalId); // Clear the interval using the interval ID
-};
-
-const getQuestions = async () => {
-  questionLoading.value = true;
-  try {
-    const response = await $fetch("/api/v1/home/questions");
-    questions.value = response.data;
-  } catch (error) {
-    console.log(error);
-  } finally {
-    questionLoading.value = false;
-  }
-};
-
-const getPapers = async () => {
-  try {
-    const response = await $fetch("/api/v1/home/tests");
-    papers.value = response?.data;
-  } catch (error) {
-    console.log(error);
-  } finally {
-    paperLoading.value = false;
-  }
-};
-
-const truncateGradeTitle = (title, index) => {
-  var cutLength = 3;
-  if (xs) cutLength = 3;
-  else if (sm) cutLength = 3;
-  else if (md) cutLength = 3;
-  else cutLength = 9;
-  if (index == 7) cutLength = cutLength + 2;
-  return title.length > cutLength ? title.slice(0, cutLength) + "..." : title;
-};
-const getFullName = (firstName, lastName) => {
-  return `${firstName} ${lastName}`;
-};
-const gradeHandlerTitle = (title) => {
-  if (xs || sm || md) return title.replace(" Grade", "");
-  else return title;
-};
-
-//handleAutoCycle();
-
-//tmp to shift until any group have content
-var splice_data = props.stats.splice(0, 5);
-props.stats.push(...splice_data);
-//end tmp
-
-await getQuestions();
-await getPapers();
-
-onUnmounted(() => {
-  stopInterval(); // Stop the interval when the component is about to be unmounted
-});
 </script>
 
 <style>

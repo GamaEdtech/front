@@ -2,7 +2,7 @@
   <v-container fluid class="px-0 py-0 mt-md-0">
     <home-main-slider />
 
-    <home-grade-explorer v-if="stats?.length" :stats="stats" />
+    <lazy-home-grade-explorer v-if="stats?.length" :stats="stats" />
 
     <home-level-guid-banner :slide-arr="slideArr" />
 
