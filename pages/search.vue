@@ -1,8 +1,12 @@
 <!-- in refactor proccess -->
+<script setup>
+definePageMeta({
+  layout: "search",
+});
+</script>
 <script>
 export default {
   name: "searchPage",
-  layout: "search_layout",
 
   async asyncData({ query }) {
     var page_title = "";

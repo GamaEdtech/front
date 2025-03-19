@@ -1,28 +1,16 @@
 <template>
   <v-app>
-    <main_header />
+    <common-header />
     <div>
-      <NuxtPage />
+      <slot />
     </div>
-    <main_footer />
+    <common-footer />
   </v-app>
 </template>
 
 <script>
-import main_header from "../components/common/header.vue";
-import category from "../components/common/category";
-import main_footer from "../components/common/footer";
-
 export default {
   name: "default_layout",
-  components: {
-    main_header,
-    category,
-    main_footer,
-  },
-  data() {
-    return {};
-  },
   mounted() {
     this.setFavicon();
   },
