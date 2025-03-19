@@ -1,14 +1,15 @@
+<!-- in refactor proccess -->
+
 <template>
   <div class="content-items">
     <v-card
-      rounded
-      class="mb-1 content-item"
+      class="mb-1 content-item rounded-sm"
       v-for="(item, key) in items"
       :key="item.id"
     >
       <v-card-text class="pb-0">
         <div class="d-flex">
-          <div class="py-4 img-holder">
+          <div class="pb-4 py-sm-4 img-holder">
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
@@ -31,7 +32,7 @@
               </v-card>
             </div>
           </div>
-          <div class="content-holder">
+          <div class="content-holder py-sm-4">
             <v-card
               flat
               class="tutorial-content d-flex flex-column pl-3 justify-space-between"
@@ -61,6 +62,7 @@
                       lg="3"
                       cols="5"
                       class="d-flex align-center py-2 px-0"
+                      v-if="item.start_date"
                     >
                       <i class="fa-solid fa-circle-play fa-xl"></i>
                       <p class="mx-2 gama-text-caption">
@@ -76,7 +78,8 @@
                         class="fa-solid fa-temperature-three-quarters fa-xl"
                       ></i>
                       <p class="mx-2 gama-text-caption">
-                        Level: {{ $testLevel.show(item.level) }}
+                        Difficulty:
+                        <!-- {{ $testLevel.show(item.level) }} -->
                       </p>
                     </v-col>
 
@@ -84,6 +87,7 @@
                       lg="3"
                       cols="5"
                       class="d-flex align-center py-2 px-0"
+                      v-if="item.end_date"
                     >
                       <i class="fa-solid fa-circle-stop fa-xl"></i>
                       <p class="mx-2 gama-text-caption">
@@ -95,25 +99,25 @@
 
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
+                    :x-small="display.xs"
+                    :small="!display.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
                   >
                     {{ item.lesson_title }}
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
+                    :x-small="display.xs"
+                    :small="!display.xs"
                   >
                     {{ item.base_title }}
                   </v-chip>
                   <v-chip
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
-                    class="mr-1 mb-1"
+                    :x-small="display.xs"
+                    :small="!display.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}
@@ -128,18 +132,7 @@
                   <v-col cols="9" class="px-0">
                     <div class="d-flex pt-3 pt-md-0">
                       <div
-                        class="item-content-user gama-text-overline d-flex align-center"
-                      >
-                        <v-avatar size="2em">
-                          <img :src="item.avatar" alt="Avatar" />
-                        </v-avatar>
-                        <span class="mx-2"
-                          >{{ item.first_name }} {{ item.last_name }}</span
-                        >
-                      </div>
-
-                      <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                        class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
                       >
                         <i class="fa-solid fa-calendar-days fa-xl"></i>
                         <span class="mx-2">
@@ -187,18 +180,7 @@
           <v-col cols="12" class="py-0">
             <div class="d-flex pt-2">
               <div
-                class="item-content-user gama-text-overline d-flex align-center"
-              >
-                <v-avatar size="1.28em">
-                  <img :src="item.avatar" alt="Avatar" />
-                </v-avatar>
-                <span class="mx-2"
-                  >{{ item.first_name }} {{ item.last_name }}</span
-                >
-              </div>
-
-              <div
-                class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
               >
                 <i class="fa-solid fa-calendar-days"></i>
                 <span class="mx-2">
@@ -224,8 +206,11 @@ export default {
   components: { OnlineExamCardFooter, OnlineExamCarousel },
   props: ["items"],
   name: "exam-list",
-  data() {
-    return {};
+
+  computed: {
+    display() {
+      return useGlobalDisplay(); // Call the composable
+    },
   },
   methods: {
     imgErrorHandler(item, key) {

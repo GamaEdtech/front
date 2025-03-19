@@ -1,4 +1,5 @@
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -133,7 +134,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/search": { prerender: true }, // Ensures it's treated as a static page
+    // "/search": { prerender: true }, // Ensures it's treated as a static page
     "/api/v1/**": {
       proxy: "https://core.gamatrain.com/api/v1/**",
     },
@@ -235,7 +236,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    prerender: { routes: ["/search"] },
+    // prerender: { routes: ["/search"] },
   },
 
   server: {

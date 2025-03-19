@@ -1,13 +1,15 @@
+<!-- in refactor proccess -->
+
 <template>
   <div class="content-items">
     <v-card
-      class="mb-1 content-item rounded"
+      class="mb-1 content-item rounded-sm"
       v-for="(item, key) in items"
       :key="item.id"
     >
       <v-card-text class="pb-0">
         <div class="d-flex">
-          <div class="py-4 img-holder">
+          <div class="pb-4 py-sm-4 img-holder">
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
@@ -30,7 +32,7 @@
               </v-card>
             </div>
           </div>
-          <div class="content-holder py-4">
+          <div class="content-holder pb-4 py-sm-4">
             <v-card
               flat
               class="tutorial-content d-flex flex-column pl-3 justify-space-between"
@@ -51,7 +53,7 @@
                 </nuxt-link>
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
@@ -60,7 +62,7 @@
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
                   >
@@ -69,7 +71,7 @@
                   <v-chip
                     :x-small="display.xs"
                     :small="!display.xs"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}
@@ -84,18 +86,7 @@
                   <v-col cols="9" class="px-0">
                     <div class="d-flex pt-3 pt-md-0">
                       <div
-                        class="item-content-user gama-text-overline d-flex align-center"
-                      >
-                        <v-avatar size="2em">
-                          <img :src="item.avatar" alt="Avatar" />
-                        </v-avatar>
-                        <span class="mx-2"
-                          >{{ item.first_name }} {{ item.last_name }}</span
-                        >
-                      </div>
-
-                      <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                        class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
                       >
                         <i class="fa-solid fa-sticky-note fa-xl"></i>
                         <span class="mx-2">
@@ -165,18 +156,7 @@
           <v-col cols="10" class="py-0">
             <div class="d-flex pt-2">
               <div
-                class="item-content-user gama-text-overline d-flex align-center"
-              >
-                <v-avatar size="1.28em">
-                  <img :src="item.avatar" alt="Avatar" />
-                </v-avatar>
-                <span class="mx-2"
-                  >{{ item.first_name }} {{ item.last_name }}</span
-                >
-              </div>
-
-              <div
-                class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                class="item-content-last-update gama-text-overline d-flex align-center mr-auto ml-1 mt-1"
               >
                 <i class="fa-solid fa-eye"></i>
                 <span class="mx-2">
@@ -221,15 +201,28 @@
   </div>
 </template>
 
-<script setup>
-import { useDisplay } from "vuetify/lib/framework.mjs";
+<script>
+import TrainingContentCarousel from "~/components/search/training-content-carousel.vue";
 
-const display = useDisplay();
-const props = defineProps({
-  items: Array,
-});
-
-const imgErrorHandler = (key) => {
-  props.items[key].lesson_pic = "";
+export default {
+  name: "multimedia-list",
+  components: { TrainingContentCarousel },
+  props: ["items"],
+  data() {
+    return {};
+  },
+  mounted() {},
+  methods: {
+    imgErrorHandler(item, key) {
+      this.items[key].lesson_pic = "";
+    },
+  },
+  computed: {
+    display() {
+      return useGlobalDisplay(); // Call the composable
+    },
+  },
 };
 </script>
+
+<style scoped></style>

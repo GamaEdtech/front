@@ -1,68 +1,76 @@
+<!-- in refactor proccess -->
+
 <template>
   <div class="book-carousel my-3">
     <v-container class="mx-0">
       <v-row>
         <v-col lg="2" cols="4" class="pa-0">
-          <div class="
-                          book-carousel-sub
-                          d-flex
-                          flex-column
-                          align-center
-                        ">
-            <div class="
-                            book-carousel-title
-                            d-flex
-                            flex-column
-                            align-center
-                            my-3
-                          ">
+          <div class="book-carousel-sub d-flex flex-column align-center">
+            <div
+              class="book-carousel-title d-flex flex-column align-center my-3"
+            >
               <h4 class="text-center">With Album test</h4>
               <p>{{ bookCarousel.carouselName }}</p>
             </div>
-            <div class="carousel-img  my-3 d-flex justify-center">
-              <v-img lazy-src="https://picsum.photos/id/11/10/6" max-height="115"
-                     max-width="90%" :src="
-                                                            require('@/assets/images/' +
-                                                                bookCarousel.carouselImg)
-                                                        " class="books-image"></v-img>
+            <div class="carousel-img my-3 d-flex justify-center">
+              <v-img
+                lazy-src="https://picsum.photos/id/11/10/6"
+                max-height="115"
+                max-width="90%"
+                :src="require('@/assets/images/' + bookCarousel.carouselImg)"
+                class="books-image"
+              ></v-img>
             </div>
-            <div class="book-carousel-q  my-3">
+            <div class="book-carousel-q my-3">
               <p>Lets Create Test</p>
             </div>
           </div>
         </v-col>
         <v-col lg="10" cols="8" class="pa-0">
-          <v-sheet class="mx-auto book-carousel-books" elevation="8" max-width="900">
-            <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
-              <v-slide-item v-for="book in books" :key="book.value"
-                            class="mx-2 slide-item mt-6">
+          <v-sheet
+            class="mx-auto book-carousel-books"
+            elevation="8"
+            max-width="900"
+          >
+            <v-slide-group
+              v-model="model"
+              class="pa-4"
+              center-active
+              show-arrows
+            >
+              <v-slide-item
+                v-for="book in books"
+                :key="book.value"
+                class="mx-2 slide-item mt-6"
+              >
                 <div>
                   <div class="book-body pa-5">
-                    <img :src="require('@/assets/images/' + book.img)"
-                         alt="" class="book-body-image">
+                    <img
+                      :src="require('@/assets/images/' + book.img)"
+                      alt=""
+                      class="book-body-image"
+                    />
                     <nuxt-link to="">
-                      <h3 class="book-title text-center">{{ book.title }}
-                      </h3>
+                      <h3 class="book-title text-center">{{ book.title }}</h3>
                     </nuxt-link>
                     <nuxt-link to="">
                       <div
-                        class="book-test px-2 py-1 my-2 d-flex justify-space-between align-center">
+                        class="book-test px-2 py-1 my-2 d-flex justify-space-between align-center"
+                      >
                         <p class="test-number">{{ book.test }}</p>
                         <p>test</p>
                       </div>
                     </nuxt-link>
                     <nuxt-link to="">
                       <div
-                        class="book-price  px-2 py-1  my-2 d-flex justify-space-between align-center">
+                        class="book-price px-2 py-1 my-2 d-flex justify-space-between align-center"
+                      >
                         <p class="price-number">{{ book.price }}</p>
                         <p>Dollar</p>
                       </div>
                     </nuxt-link>
-
                   </div>
-
                 </div>
-
               </v-slide-item>
             </v-slide-group>
           </v-sheet>
@@ -75,8 +83,8 @@
 <script>
 export default {
   name: "online-exam-carousel",
-  data(){
-    return{
+  data() {
+    return {
       model: null,
 
       books: [
@@ -140,17 +148,14 @@ export default {
           test: "3405",
           price: "3405",
         },
-
       ],
       bookCarousel: {
         carouselName: "Create Test",
         carouselImg: "test.png",
       },
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

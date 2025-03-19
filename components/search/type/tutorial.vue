@@ -1,14 +1,15 @@
+<!-- in refactor proccess -->
+
 <template>
   <div class="content-items">
     <v-card
-      rounded
-      class="mb-1 content-item"
+      class="mb-1 content-item rounded-sm"
       v-for="(item, key) in items"
       :key="item.id"
     >
       <v-card-text class="pb-0">
         <div class="d-flex">
-          <div class="py-4 img-holder">
+          <div class="pb-4 py-sm-4 img-holder">
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
@@ -31,7 +32,7 @@
               </v-card>
             </div>
           </div>
-          <div class="content-holder py-4">
+          <div class="content-holder pb-4 py-sm-4">
             <v-card
               flat
               class="tutorial-content d-flex flex-column pl-3 justify-space-between"
@@ -55,25 +56,25 @@
                 </nuxt-link>
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
+                    :x-small="display.xs"
+                    :small="!display.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
                   >
                     {{ item.lesson_title }}
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
+                    :x-small="display.xs"
+                    :small="!display.xs"
                   >
                     {{ item.base_title }}
                   </v-chip>
                   <v-chip
-                    :x-small="$vuetify.breakpoint.xs"
-                    :small="!$vuetify.breakpoint.xs"
-                    class="mr-1 mb-1"
+                    :x-small="display.xs"
+                    :small="!display.xs"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}
@@ -95,9 +96,9 @@
                       <!--                          <p class="mx-2">{{ item.first_name }} {{ item.last_name }}</p>-->
                       <!--                        </div>-->
                       <div
-                        class="item-content-last-update gama-text-overline d-flex ml-3"
+                        class="item-content-last-update gama-text-overline d-flex mr-auto ml-3"
                       >
-                        <i class="fa-solid fa-eye fa-xl"></i>
+                        <i class="fa-solid fa-eye fa-xl pt-1"></i>
                         <span class="mx-2">
                           <span class="d-none d-sm-inline"> Views: </span>
                           <span class="date_string d-inline-block">
@@ -106,7 +107,7 @@
                         </span>
                       </div>
                       <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                        class="item-content-last-update gama-text-overline d-flex align-center m-auto"
                       >
                         <i class="fa-solid fa-calendar-days fa-xl"></i>
                         <span class="mx-2">
@@ -161,7 +162,7 @@
               <!--                  <p class="mx-2">{{ item.first_name }} {{ item.last_name }}</p>-->
               <!--                </div>-->
               <div
-                class="item-content-last-update gama-text-overline d-flex mx-auto"
+                class="item-content-last-update gama-text-overline d-flex mr-auto ml-1"
               >
                 <i class="fa-solid fa-eye"></i>
                 <span class="mx-2">
@@ -172,7 +173,7 @@
                 </span>
               </div>
               <div
-                class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
               >
                 <i class="fa-solid fa-calendar-days"></i>
                 <span class="mx-2">
@@ -190,11 +191,29 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  items: Array,
-});
-const imgErrorHandler = (item, key) => {
-  this.items[key].lesson_pic = "";
+<script>
+import TabsContentFooter from "~/components/common/tabs-content-footer.vue";
+
+export default {
+  name: "tutorial-list",
+  components: { TabsContentFooter },
+  props: ["items"],
+  data() {
+    return {};
+  },
+  mounted() {},
+  watch: {},
+  methods: {
+    imgErrorHandler(item, key) {
+      this.items[key].lesson_pic = "";
+    },
+  },
+  computed: {
+    display() {
+      return useGlobalDisplay(); // Call the composable
+    },
+  },
 };
 </script>
+
+<style scoped></style>
