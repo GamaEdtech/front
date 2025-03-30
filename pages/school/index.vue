@@ -365,7 +365,7 @@ export default {
         religion: "",
         boarding_type: "",
         coed_status: "",
-        distance: 56,
+        distance: 5598568,
         center: [],
         lat: 39.90973623453719,
         lng: -81.12304687500001,
@@ -664,12 +664,12 @@ export default {
         this.$refs.schoolFilter.filterForm.distance = this.filter.distance;
         this.$refs.schoolFilter.updateQueryParams();
 
-        if (!this.schoolLoading) {
-          this.allDataLoaded = false;
-          this.filter.page = 1;
-          this.schoolList = [];
-          this.getSchoolList();
-        }
+        // if (!this.schoolLoading) {
+        this.allDataLoaded = false;
+        this.filter.page = 1;
+        this.schoolList = [];
+        this.getSchoolList();
+        // }
       }
     },
     onZoomChange(newZoom) {
@@ -677,7 +677,7 @@ export default {
     },
     calcDistance(center, ne) {
       // Calculate the distance using Haversine formula
-      const R = 6371; // Earth radius in kilometers
+      const R = 6371000; // Earth radius in meters
       const lat1 = center.lat * (Math.PI / 180);
       const lon1 = center.lng * (Math.PI / 180);
       const lat2 = ne.lat * (Math.PI / 180);
@@ -691,8 +691,10 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber((R / 100) * c); //retrun distance
+      this.filter.distance = this.formatNumber(R * c); // Return distance in meters
+      console.log(this.filter.distance);
     },
+
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side
       const roundedNumber = parseFloat(number.toFixed(6));
