@@ -93,13 +93,13 @@
                         ref="mobileSchoolListSection"
                       >
                         <!-- School list section -->
-                        <data-holder @updatePage="checkSchoolScroll"
+                        <list-holder @updatePage="checkSchoolScroll"
                           ><schoolDataList
                             :schoolLoading="schoolLoading"
                             :schoolList="schoolList"
                             :resultCount="resultCount"
                             :allDataLoaded="allDataLoaded"
-                        /></data-holder>
+                        /></list-holder>
 
                         <!-- End school list section -->
                       </div>
@@ -264,14 +264,14 @@
       <!-- Action section -->
 
       <!-- Data list -->
-      <data-holder @updatePage="checkSchoolScroll">
+      <list-holder @updatePage="checkSchoolScroll">
         <schoolDataList
           :schoolLoading="schoolLoading"
           :schoolList="schoolList"
           :resultCount="resultCount"
           :allDataLoaded="allDataLoaded"
         />
-      </data-holder>
+      </list-holder>
       <!-- End data list -->
     </div>
     <!-- End large screen section -->
@@ -281,7 +281,7 @@
 <script>
 import schoolListFilter from "@/components/school/Filter.vue";
 import schoolDataList from "@/components/school/List.vue";
-import DataHolder from "../DataHolder.vue";
+import ListHolder from "~/components/ListHolder.vue";
 export default {
   auth: false,
   name: "school-list",
@@ -327,7 +327,7 @@ export default {
   components: {
     schoolListFilter,
     schoolDataList,
-    DataHolder,
+    ListHolder,
   },
   data() {
     return {
@@ -345,8 +345,6 @@ export default {
       schoolLoading: true,
       perPage: 20,
       allDataLoaded: false,
-      resultCount: "--",
-      loadingData: false,
       timer: 0,
       gradeLevelList: [
         {
@@ -367,16 +365,13 @@ export default {
         religion: "",
         boarding_type: "",
         coed_status: "",
-        distance: 56,
+        distance: 5598568,
         center: [],
         lat: 39.90973623453719,
         lng: -81.12304687500001,
         page: this.$route.query.page ? Number(this.$route.query.page) : 1,
       },
-      scrollPage: {
-        top: null,
-        bottom: null,
-      },
+
       filterLoadedStatus: {
         stage: false,
         country: false,
@@ -401,7 +396,6 @@ export default {
       screenWidth: 0,
       loadedPages: [],
 
-      schoolList: [],
       currentZoom: 5,
       geoSearch: false,
 
@@ -429,6 +423,37 @@ export default {
       ],
     };
   },
+  async asyncData({ $axios, query }) {
+    try {
+      const perPage = 20; // Change this to match `this.perPage`
+      const page = parseInt(query.page) || 1;
+      const baseURL = process.server
+        ? `https://api.gamaedtech.com/api/v1/schools`
+        : "/api/v2/schools";
+
+      const params = {
+        "PagingDto.PageFilter.Skip": (page - 1) * perPage,
+        "PagingDto.PageFilter.Size": perPage,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+        Name: query.keyword,
+        "Location.Radius": query.distance || null,
+        "Location.Latitude": query.lat || null,
+        "Location.Longitude": query.lng || null,
+      };
+
+      const response = await $axios.$get(baseURL, { params });
+
+      return {
+        schoolList: response.data.list || [],
+        resultCount: response.data.totalRecordsCount || 0,
+        loadingData: false,
+      };
+    } catch (error) {
+      console.error("Error fetching schools:", error);
+      return { schoolList: [], resultCount: 0, loadingData: false };
+    }
+  },
+
   mounted() {
     document.body.classList.add("disable-scroll");
 
@@ -448,8 +473,7 @@ export default {
     //   }, 1000);
     // });
 
-    this.loadedPages.push(Number(this.filter.page));
-    this.getSchoolList();
+    // this.getSchoolList();
 
     //Handle show/hide mobile sheet base on size
     this.screenWidth = window.innerWidth;
@@ -640,12 +664,12 @@ export default {
         this.$refs.schoolFilter.filterForm.distance = this.filter.distance;
         this.$refs.schoolFilter.updateQueryParams();
 
-        if (!this.schoolLoading) {
-          this.allDataLoaded = false;
-          this.filter.page = 1;
-          this.schoolList = [];
-          this.getSchoolList();
-        }
+        // if (!this.schoolLoading) {
+        this.allDataLoaded = false;
+        this.filter.page = 1;
+        this.schoolList = [];
+        this.getSchoolList();
+        // }
       }
     },
     onZoomChange(newZoom) {
@@ -653,7 +677,7 @@ export default {
     },
     calcDistance(center, ne) {
       // Calculate the distance using Haversine formula
-      const R = 6371; // Earth radius in kilometers
+      const R = 6371000; // Earth radius in meters
       const lat1 = center.lat * (Math.PI / 180);
       const lon1 = center.lng * (Math.PI / 180);
       const lat2 = ne.lat * (Math.PI / 180);
@@ -667,8 +691,10 @@ export default {
         Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      this.filter.distance = this.formatNumber((R / 100) * c); //retrun distance
+      this.filter.distance = this.formatNumber(R * c); // Return distance in meters
+      console.log(this.filter.distance);
     },
+
     formatNumber(number) {
       //Remove latest zero from number to avoid error from api side
       const roundedNumber = parseFloat(number.toFixed(6));
@@ -777,37 +803,14 @@ export default {
             this.$refs.schoolFilter.searchLoading = false;
           });
     },
-    async checkSchoolScroll(value) {
+    async checkSchoolScroll(side, page) {
       if (!this.geoSearch) {
-        if (
-          this.allDataLoaded == false &&
-          !this.loadingData &&
-          this.schoolList.length
-        ) {
-          if (value === "top" && this.filter.page > 1) {
-            this.filter.page = this.scrollPage.top
-              ? this.scrollPage.top - 1
-              : this.filter.page - 1;
-
-            this.scrollPage.top = this.filter.page;
-          } else if (value === "bottom") {
-            this.filter.page = this.scrollPage.bottom
-              ? this.scrollPage.bottom + 1
-              : this.filter.page + 1;
-            this.scrollPage.bottom =
-              this.filter.page > this.scrollPage.bottom
-                ? this.filter.page
-                : this.scrollPage.bottom;
-          }
-
-          if (!this.loadedPages.includes(this.filter.page)) {
-            //Prevent load repeat page
-            this.loadedPages.push(this.filter.page);
-            this.$refs.schoolFilter.filterForm.page = this.filter.page;
-            this.$refs.schoolFilter.updateQueryParams();
-            this.loadingData = true; // Set loading flag
-            await this.getSchoolList(value);
-          }
+        if (this.allDataLoaded == false && !this.loadingData) {
+          this.filter.page = page;
+          this.$refs.schoolFilter.filterForm.page = this.filter.page;
+          this.$refs.schoolFilter.updateQueryParams();
+          this.loadingData = true; // Set loading flag
+          await this.getSchoolList(side);
         }
       }
     },
