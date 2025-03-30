@@ -138,6 +138,9 @@ export default defineNuxtConfig({
     "/api/v1/**": {
       proxy: "https://core.gamatrain.com/api/v1/**",
     },
+    "/api/v2/**": {
+      proxy: "https://api.gamaedtech.com/api/v1/**",
+    },
     "/uploads/**": {
       proxy: "https://core.gamatrain.com/uploads/**",
     },

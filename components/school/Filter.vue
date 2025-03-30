@@ -1,3 +1,473 @@
+<script setup>
+defineExpose({
+  updateQueryParams,
+});
+</script>
+
+<script>
+import gomboBox from "../common/gombo-box.vue";
+export default {
+  props: {
+    sortList: [],
+    boardingTypeArray: [],
+    coedStatusArray: [],
+  },
+  name: "schoolListFilter",
+  data() {
+    return {
+      locationPickerDialog: false,
+      desktopFilter: false,
+      resultCount: "--",
+      filter: {
+        stageList: [],
+        countryList: [],
+        stateList: [],
+        cityList: [],
+        schoolTypeList: [],
+        boardingTypeList: [],
+        coedStatusList: [],
+        religionList: [],
+        center: [],
+        distance: 10,
+        page: this.$route.query.page ? this.$route.query.page : 1,
+      },
+
+      filterForm: {
+        keyword: "",
+        stage: "",
+        tuition_fee: 0,
+        country: "",
+        state: "",
+        city: 0,
+        school_type: [],
+        religion: [],
+        boarding_type: [],
+        coed_status: [],
+      },
+      menuOpened: false,
+      searchLoading: false,
+
+      // Mobile section
+      sortSheet: false,
+      filterDialog: false,
+      filterLoadedStatus: {
+        stage: false,
+        country: false,
+        state: false,
+        city: false,
+        school_type: false,
+        religion: false,
+        boarding_type: false,
+        coed_status: false,
+        sort: false,
+      },
+    };
+  },
+  created() {
+    var params = {
+      type: "section",
+    };
+
+    this.getFilterList(
+      {
+        "PagingDto.PageFilter.Size": 250,
+      },
+      "countries"
+    );
+    this.getFilterList(params, "section");
+    this.getFilterList({ type: "school_type" }, "school_type");
+    this.getFilterList({ type: "boarding_type" }, "boarding_type");
+    this.getFilterList({ type: "coed_status" }, "coed_status");
+    this.getFilterList({ type: "religion" }, "religion");
+
+    //Init filter value
+    if (this.$route.query.keyword)
+      this.filterForm.keyword = this.$route.query.keyword;
+    if (this.$route.query.stage)
+      this.filterForm.stage = this.$route.query.stage;
+    if (this.$route.query.tuition_fee)
+      this.filterForm.tuition_fee = this.$route.query.tuition_fee;
+    if (this.$route.query.country) {
+      this.filterForm.country = this.$route.query.country;
+      this.getFilterList(
+        {
+          "PagingDto.PageFilter.Size": 1000,
+        },
+        "states"
+      );
+    }
+    if (this.$route.query.state) {
+      this.filterForm.state = this.$route.query.state;
+      this.getFilterList(
+        {
+          "PagingDto.PageFilter.Size": 1000,
+        },
+        "cities"
+      );
+    }
+    if (this.$route.query.city) this.filterForm.city = this.$route.query.city;
+
+    if (this.$route.query.school_type)
+      this.filterForm.school_type = Array.isArray(this.$route.query.school_type)
+        ? this.$route.query.school_type
+        : [this.$route.query.school_type];
+
+    this.filterForm.city = this.$route.query.city;
+
+    if (this.$route.query.religion)
+      this.filterForm.religion = Array.isArray(this.$route.query.religion)
+        ? this.$route.query.religion
+        : [this.$route.query.religion];
+
+    if (this.$route.query.boarding_type)
+      this.filterForm.boarding_type = Array.isArray(
+        this.$route.query.boarding_type
+      )
+        ? this.$route.query.boarding_type
+        : [this.$route.query.boarding_type];
+    if (this.$route.query.coed_status)
+      this.filterForm.coed_status = Array.isArray(this.$route.query.coed_status)
+        ? this.$route.query.coed_status
+        : [this.$route.query.coed_status];
+
+    if (this.$route.query.sort) this.filterForm.sort = this.$route.query.sort;
+    //End init filter value
+  },
+  watch: {
+    "filterForm.keyword"(val) {
+      this.updateQueryParams();
+    },
+    "filterForm.tuition_fee"(val) {
+      this.updateQueryParams();
+    },
+    "filterForm.city"(val) {
+      document.removeEventListener("click", this.handleClickOutside);
+      if (val) this.updateQueryParams();
+
+      setTimeout(() => {
+        if (this.desktopFilter) {
+          // Add click event listener to close the div when clicking outside
+          document.addEventListener("click", this.handleClickOutside);
+        } else {
+          // Remove click event listener when the div is closed
+          document.removeEventListener("click", this.handleClickOutside);
+        }
+      }, 100);
+    },
+    "filterForm.school_type"(val) {
+      this.updateQueryParams();
+    },
+    "filterForm.religion"(val) {
+      this.updateQueryParams();
+    },
+    "filterForm.boarding_type"(val) {
+      this.updateQueryParams();
+    },
+    "filterForm.coed_status"(val) {
+      this.updateQueryParams();
+    },
+    "$route.query.distance"(val) {
+      this.locationPickerDialog = false;
+    },
+  },
+  components: {
+    gomboBox,
+  },
+  methods: {
+    getFilterList(params, type) {
+      let endpoint = "/api/v1/types/list";
+      if (type == "countries") endpoint = "/api/v2/locations/countries";
+      if (type == "states")
+        endpoint = `/api/v2/locations/states/${this.filterForm.country}`;
+      if (type == "cities")
+        endpoint = `/api/v2/locations/cities/${this.filterForm.state}`;
+      $fetch(endpoint, {
+        params,
+      })
+        .then((res) => {
+          var data = {};
+          if (type == "countries") {
+            this.filter.countryList = res.data.list;
+            this.filterLoadedStatus.country = true;
+          } else if (type == "states") {
+            this.filter.stateList = res.data.list;
+            this.filterLoadedStatus.state = true;
+          } else if (type == "cities") {
+            this.filter.cityList = res.data.list;
+            this.filterLoadedStatus.city = true;
+          } else if (type == "school_type") {
+            this.filter.schoolTypeList = res.data;
+            this.filterLoadedStatus.school_type = true;
+          } else if (type == "boarding_type") {
+            this.filter.boardingTypeList = res.data;
+            this.filterLoadedStatus.boarding_type = true;
+          } else if (type == "coed_status") {
+            this.filter.coedStatusList = res.data;
+            this.filterLoadedStatus.coed_status = true;
+          } else if (type == "religion") {
+            this.filter.religionList = res.data;
+            this.filterLoadedStatus.religion = true;
+          } else if (type == "section") {
+            this.filter.stageList = res.data;
+            this.filterLoadedStatus.stage = true;
+          }
+          this.$emit("loadedStatus", this.filterLoadedStatus);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+
+    updateFilter(type, value) {
+      if (type == "stage") this.filterForm.stage = value;
+      if (type == "sort") {
+        this.sortSheet = false;
+        this.filterForm.sort = value;
+      }
+
+      this.updateQueryParams();
+    },
+
+    //Update router query params
+    updateQueryParams() {
+      alert("here");
+      const query = {};
+      if (this.filterForm.keyword != "")
+        query.keyword = this.filterForm.keyword;
+
+      if (this.filterForm.stage != "") {
+        query.stage = this.filterForm.stage;
+      }
+
+      if (this.filterForm.sort != "") {
+        query.sort = this.filterForm.sort;
+      }
+
+      if (this.filterForm.tuition_fee > 0) {
+        query.tuition_fee = this.filterForm.tuition_fee;
+      }
+
+      if (this.filterForm.country > 0) {
+        query.country = this.filterForm.country;
+      }
+
+      if (this.filterForm.state > 0) {
+        query.state = this.filterForm.state;
+      }
+
+      if (this.filterForm.city > 0) {
+        query.city = this.filterForm.city;
+      }
+
+      if (
+        this.filterForm.school_type &&
+        this.filterForm.school_type.length > 0
+      ) {
+        query.school_type = this.filterForm.school_type;
+      }
+
+      if (this.filterForm.religion && this.filterForm.religion.length > 0) {
+        query.religion = this.filterForm.religion;
+      }
+
+      if (
+        this.filterForm.boarding_type &&
+        this.filterForm.boarding_type.length > 0
+      ) {
+        query.boarding_type = this.filterForm.boarding_type;
+      }
+
+      if (
+        this.filterForm.coed_status &&
+        this.filterForm.coed_status.length > 0
+      ) {
+        query.coed_status = this.filterForm.coed_status;
+      }
+
+      if (this.filterForm.distance != "") {
+        query.distance = this.filterForm.distance;
+      }
+
+      if (
+        this.filterForm.center != undefined &&
+        this.filterForm.center.length
+      ) {
+        query.center = this.filterForm.center.join(",");
+      }
+      if (this.filterForm.lat != "") {
+        query.lat = this.filterForm.lat;
+      }
+      if (this.filterForm.lng != "") {
+        query.lng = this.filterForm.lng;
+      }
+      if (this.filterForm.page > 0) {
+        query.page = this.filterForm.page;
+      }
+
+      // Handle more query parameters here ...
+      this.$router.replace({ query: query }).catch((err) => {
+        console.log(err);
+      });
+    },
+
+    toggleActiveClass() {
+      this.menuOpened = !this.menuOpened;
+    },
+
+    countryChange() {
+      document.removeEventListener("click", this.handleClickOutside);
+
+      this.filter.stateList = [];
+      this.filter.cityList = [];
+      this.filterForm.state = "";
+      this.filterForm.city = "";
+      this.updateQueryParams();
+      if (this.filterForm.country) {
+        this.getFilterList(
+          {
+            "PagingDto.PageFilter.Size": 10000,
+          },
+          "states"
+        );
+      }
+
+      setTimeout(() => {
+        if (this.desktopFilter) {
+          // Add click event listener to close the div when clicking outside
+          document.addEventListener("click", this.handleClickOutside);
+        } else {
+          // Remove click event listener when the div is closed
+          document.removeEventListener("click", this.handleClickOutside);
+        }
+      }, 100);
+    },
+    findTitle(type, id) {
+      var title = "";
+      if (type == "stage")
+        title = this.filter.stageList.find((x) => x.id == id).title;
+      if (type == "sort") {
+        title = this.sortList.find((x) => x.value == id).title;
+      } else if (type == "country")
+        title = this.filter.countryList.find((x) => x.id == id).name;
+      else if (type == "state")
+        title = this.filter.stateList.find((x) => x.id == id).title;
+      else if (type == "city")
+        title = this.filter.cityList.find((x) => x.id == id).title;
+      else if (type == "school_type")
+        title = this.filter.schoolTypeList.find((x) => x.id == id).title;
+      else if (type == "religion" && this.filter.religionList)
+        title = this.filter.religionList.find((x) => x.id == id).title;
+      else if (type == "boarding_type")
+        title = this.filter.boardingTypeList.find((x) => x.id == id).title;
+      else if (type == "coed_status")
+        title = this.filter.coedStatusList.find((x) => x.id == id).title;
+
+      return title;
+    },
+    closeFilter(filter_name, other_data = null) {
+      if (filter_name == "keyword") this.filterForm.keyword = "";
+      else if (filter_name == "stage") this.updateFilter("stage", "");
+      else if (filter_name == "sort") this.updateFilter("sort", "");
+      else if (filter_name == "tuition_fee") this.filterForm.tuition_fee = 0;
+      else if (filter_name == "country") {
+        this.filterForm.country = 0;
+        this.filterForm.state = 0;
+        this.filterForm.city = 0;
+        this.filter.stateList = [];
+        this.filter.cityList = [];
+        this.updateQueryParams();
+      } else if (filter_name == "state") {
+        this.filterForm.state = 0;
+        this.filterForm.city = 0;
+        this.filter.cityList = [];
+        this.updateQueryParams();
+      } else if (filter_name == "city") {
+        this.filterForm.city = 0;
+        this.updateQueryParams();
+      } else if (filter_name == "school_type") {
+        var index = this.school_type.findIndex((x) => x == other_data);
+        this.filterForm.school_type.splice(index, 1);
+      } else if (filter_name == "religion") {
+        var index = this.filterForm.religion.findIndex((x) => x == other_data);
+        this.filterForm.religion.splice(index, 1);
+      } else if (filter_name == "boarding_type") {
+        var index = this.filterForm.boarding_type.findIndex(
+          (x) => x == other_data
+        );
+        this.filterForm.boarding_type.splice(index, 1);
+      } else if (filter_name == "coed_status") {
+        var index = this.filterForm.coed_status.findIndex(
+          (x) => x == other_data
+        );
+        this.filterForm.coed_status.splice(index, 1);
+      }
+    },
+    stateChange() {
+      document.removeEventListener("click", this.handleClickOutside);
+
+      this.filter.cityList = [];
+      this.filterForm.city = "";
+      this.updateQueryParams();
+      if (this.filterForm.state) {
+        this.getFilterList(
+          {
+            "PagingDto.PageFilter.Size": 10000,
+          },
+          "cities"
+        );
+      }
+
+      setTimeout(() => {
+        if (this.desktopFilter) {
+          // Add click event listener to close the div when clicking outside
+          document.addEventListener("click", this.handleClickOutside);
+        } else {
+          // Remove click event listener when the div is closed
+          document.removeEventListener("click", this.handleClickOutside);
+        }
+      }, 100);
+    },
+
+    openDesktopFilter() {
+      this.desktopFilter = !this.desktopFilter;
+
+      setTimeout(() => {
+        if (this.desktopFilter) {
+          // Add click event listener to close the div when clicking outside
+          document.addEventListener("click", this.handleClickOutside);
+        } else {
+          // Remove click event listener when the div is closed
+          document.removeEventListener("click", this.handleClickOutside);
+        }
+      }, 100);
+    },
+    handleClickOutside(event) {
+      // Close the div if the click is outside of the div
+      const div = this.$refs.desktopFilter;
+      if (div && !div.contains(event.target)) {
+        this.desktopFilter = false;
+        document.removeEventListener("click", this.handleClickOutside);
+      }
+    },
+    requestUserLoaction() {
+      this.$emit("requestUserLoaction");
+    },
+    checkDisabledStatus(field_name) {
+      if (field_name == "state")
+        if (this.filterForm.country == "") return true;
+        else return false;
+      else if (field_name == "city")
+        if (this.filterForm.state == "") return true;
+        else return false;
+    },
+  },
+  beforeDestroy() {
+    // Remove the click event listener when the component is destroyed
+    document.removeEventListener("click", this.handleClickOutside);
+  },
+};
+</script>
+
 <template>
   <div>
     <!-- Desktop section -->
@@ -739,470 +1209,6 @@
     <!-- End location picker dialog -->
   </div>
 </template>
-
-<script>
-import gomboBox from "../common/gombo-box.vue";
-export default {
-  props: {
-    sortList: [],
-    boardingTypeArray: [],
-    coedStatusArray: [],
-  },
-  name: "schoolListFilter",
-  data() {
-    return {
-      locationPickerDialog: false,
-      desktopFilter: false,
-      resultCount: "--",
-      filter: {
-        stageList: [],
-        countryList: [],
-        stateList: [],
-        cityList: [],
-        schoolTypeList: [],
-        boardingTypeList: [],
-        coedStatusList: [],
-        religionList: [],
-        center: [],
-        distance: 10,
-        page: this.$route.query.page ? this.$route.query.page : 1,
-      },
-
-      filterForm: {
-        keyword: "",
-        stage: "",
-        tuition_fee: 0,
-        country: "",
-        state: "",
-        city: 0,
-        school_type: [],
-        religion: [],
-        boarding_type: [],
-        coed_status: [],
-      },
-      menuOpened: false,
-      searchLoading: false,
-
-      // Mobile section
-      sortSheet: false,
-      filterDialog: false,
-      filterLoadedStatus: {
-        stage: false,
-        country: false,
-        state: false,
-        city: false,
-        school_type: false,
-        religion: false,
-        boarding_type: false,
-        coed_status: false,
-        sort: false,
-      },
-    };
-  },
-  created() {
-    var params = {
-      type: "section",
-    };
-
-    this.getFilterList(
-      {
-        "PagingDto.PageFilter.Size": 250,
-      },
-      "countries"
-    );
-    this.getFilterList(params, "section");
-    this.getFilterList({ type: "school_type" }, "school_type");
-    this.getFilterList({ type: "boarding_type" }, "boarding_type");
-    this.getFilterList({ type: "coed_status" }, "coed_status");
-    this.getFilterList({ type: "religion" }, "religion");
-
-    //Init filter value
-    if (this.$route.query.keyword)
-      this.filterForm.keyword = this.$route.query.keyword;
-    if (this.$route.query.stage)
-      this.filterForm.stage = this.$route.query.stage;
-    if (this.$route.query.tuition_fee)
-      this.filterForm.tuition_fee = this.$route.query.tuition_fee;
-    if (this.$route.query.country) {
-      this.filterForm.country = this.$route.query.country;
-      this.getFilterList(
-        {
-          "PagingDto.PageFilter.Size": 1000,
-        },
-        "states"
-      );
-    }
-    if (this.$route.query.state) {
-      this.filterForm.state = this.$route.query.state;
-      this.getFilterList(
-        {
-          "PagingDto.PageFilter.Size": 1000,
-        },
-        "cities"
-      );
-    }
-    if (this.$route.query.city) this.filterForm.city = this.$route.query.city;
-
-    if (this.$route.query.school_type)
-      this.filterForm.school_type = Array.isArray(this.$route.query.school_type)
-        ? this.$route.query.school_type
-        : [this.$route.query.school_type];
-
-    this.filterForm.city = this.$route.query.city;
-
-    if (this.$route.query.religion)
-      this.filterForm.religion = Array.isArray(this.$route.query.religion)
-        ? this.$route.query.religion
-        : [this.$route.query.religion];
-
-    if (this.$route.query.boarding_type)
-      this.filterForm.boarding_type = Array.isArray(
-        this.$route.query.boarding_type
-      )
-        ? this.$route.query.boarding_type
-        : [this.$route.query.boarding_type];
-    if (this.$route.query.coed_status)
-      this.filterForm.coed_status = Array.isArray(this.$route.query.coed_status)
-        ? this.$route.query.coed_status
-        : [this.$route.query.coed_status];
-
-    if (this.$route.query.sort) this.filterForm.sort = this.$route.query.sort;
-    //End init filter value
-  },
-  watch: {
-    "filterForm.keyword"(val) {
-      this.updateQueryParams();
-    },
-    "filterForm.tuition_fee"(val) {
-      this.updateQueryParams();
-    },
-    "filterForm.city"(val) {
-      document.removeEventListener("click", this.handleClickOutside);
-      if (val) this.updateQueryParams();
-
-      setTimeout(() => {
-        if (this.desktopFilter) {
-          // Add click event listener to close the div when clicking outside
-          document.addEventListener("click", this.handleClickOutside);
-        } else {
-          // Remove click event listener when the div is closed
-          document.removeEventListener("click", this.handleClickOutside);
-        }
-      }, 100);
-    },
-    "filterForm.school_type"(val) {
-      this.updateQueryParams();
-    },
-    "filterForm.religion"(val) {
-      this.updateQueryParams();
-    },
-    "filterForm.boarding_type"(val) {
-      this.updateQueryParams();
-    },
-    "filterForm.coed_status"(val) {
-      this.updateQueryParams();
-    },
-    "$route.query.distance"(val) {
-      this.locationPickerDialog = false;
-    },
-  },
-  components: {
-    gomboBox,
-  },
-  methods: {
-    getFilterList(params, type) {
-      let endpoint = "/api/v1/types/list";
-      if (type == "countries") endpoint = "/api/v2/locations/countries";
-      if (type == "states")
-        endpoint = `/api/v2/locations/states/${this.filterForm.country}`;
-      if (type == "cities")
-        endpoint = `/api/v2/locations/cities/${this.filterForm.state}`;
-      this.$axios
-        .$get(endpoint, {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type == "countries") {
-            this.filter.countryList = res.data.list;
-            this.filterLoadedStatus.country = true;
-          } else if (type == "states") {
-            this.filter.stateList = res.data.list;
-            this.filterLoadedStatus.state = true;
-          } else if (type == "cities") {
-            this.filter.cityList = res.data.list;
-            this.filterLoadedStatus.city = true;
-          } else if (type == "school_type") {
-            this.filter.schoolTypeList = res.data;
-            this.filterLoadedStatus.school_type = true;
-          } else if (type == "boarding_type") {
-            this.filter.boardingTypeList = res.data;
-            this.filterLoadedStatus.boarding_type = true;
-          } else if (type == "coed_status") {
-            this.filter.coedStatusList = res.data;
-            this.filterLoadedStatus.coed_status = true;
-          } else if (type == "religion") {
-            this.filter.religionList = res.data;
-            this.filterLoadedStatus.religion = true;
-          } else if (type == "section") {
-            this.filter.stageList = res.data;
-            this.filterLoadedStatus.stage = true;
-          }
-          this.$emit("loadedStatus", this.filterLoadedStatus);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-
-    updateFilter(type, value) {
-      if (type == "stage") this.filterForm.stage = value;
-      if (type == "sort") {
-        this.sortSheet = false;
-        this.filterForm.sort = value;
-      }
-
-      this.updateQueryParams();
-    },
-
-    //Update router query params
-    updateQueryParams() {
-      const query = {};
-      if (this.filterForm.keyword != "")
-        query.keyword = this.filterForm.keyword;
-
-      if (this.filterForm.stage != "") {
-        query.stage = this.filterForm.stage;
-      }
-
-      if (this.filterForm.sort != "") {
-        query.sort = this.filterForm.sort;
-      }
-
-      if (this.filterForm.tuition_fee > 0) {
-        query.tuition_fee = this.filterForm.tuition_fee;
-      }
-
-      if (this.filterForm.country > 0) {
-        query.country = this.filterForm.country;
-      }
-
-      if (this.filterForm.state > 0) {
-        query.state = this.filterForm.state;
-      }
-
-      if (this.filterForm.city > 0) {
-        query.city = this.filterForm.city;
-      }
-
-      if (
-        this.filterForm.school_type &&
-        this.filterForm.school_type.length > 0
-      ) {
-        query.school_type = this.filterForm.school_type;
-      }
-
-      if (this.filterForm.religion && this.filterForm.religion.length > 0) {
-        query.religion = this.filterForm.religion;
-      }
-
-      if (
-        this.filterForm.boarding_type &&
-        this.filterForm.boarding_type.length > 0
-      ) {
-        query.boarding_type = this.filterForm.boarding_type;
-      }
-
-      if (
-        this.filterForm.coed_status &&
-        this.filterForm.coed_status.length > 0
-      ) {
-        query.coed_status = this.filterForm.coed_status;
-      }
-
-      if (this.filterForm.distance != "") {
-        query.distance = this.filterForm.distance;
-      }
-
-      if (
-        this.filterForm.center != undefined &&
-        this.filterForm.center.length
-      ) {
-        query.center = this.filterForm.center.join(",");
-      }
-      if (this.filterForm.lat != "") {
-        query.lat = this.filterForm.lat;
-      }
-      if (this.filterForm.lng != "") {
-        query.lng = this.filterForm.lng;
-      }
-      if (this.filterForm.page > 0) {
-        query.page = this.filterForm.page;
-      }
-
-      // Handle more query parameters here ...
-      this.$router.replace({ query: query }).catch((err) => {
-        console.log(err);
-      });
-    },
-
-    toggleActiveClass() {
-      this.menuOpened = !this.menuOpened;
-    },
-
-    countryChange() {
-      document.removeEventListener("click", this.handleClickOutside);
-
-      this.filter.stateList = [];
-      this.filter.cityList = [];
-      this.filterForm.state = "";
-      this.filterForm.city = "";
-      this.updateQueryParams();
-      if (this.filterForm.country) {
-        this.getFilterList(
-          {
-            "PagingDto.PageFilter.Size": 10000,
-          },
-          "states"
-        );
-      }
-
-      setTimeout(() => {
-        if (this.desktopFilter) {
-          // Add click event listener to close the div when clicking outside
-          document.addEventListener("click", this.handleClickOutside);
-        } else {
-          // Remove click event listener when the div is closed
-          document.removeEventListener("click", this.handleClickOutside);
-        }
-      }, 100);
-    },
-    findTitle(type, id) {
-      var title = "";
-      if (type == "stage")
-        title = this.filter.stageList.find((x) => x.id == id).title;
-      if (type == "sort") {
-        title = this.sortList.find((x) => x.value == id).title;
-      } else if (type == "country")
-        title = this.filter.countryList.find((x) => x.id == id).name;
-      else if (type == "state")
-        title = this.filter.stateList.find((x) => x.id == id).title;
-      else if (type == "city")
-        title = this.filter.cityList.find((x) => x.id == id).title;
-      else if (type == "school_type")
-        title = this.filter.schoolTypeList.find((x) => x.id == id).title;
-      else if (type == "religion" && this.filter.religionList)
-        title = this.filter.religionList.find((x) => x.id == id).title;
-      else if (type == "boarding_type")
-        title = this.filter.boardingTypeList.find((x) => x.id == id).title;
-      else if (type == "coed_status")
-        title = this.filter.coedStatusList.find((x) => x.id == id).title;
-
-      return title;
-    },
-    closeFilter(filter_name, other_data = null) {
-      if (filter_name == "keyword") this.filterForm.keyword = "";
-      else if (filter_name == "stage") this.updateFilter("stage", "");
-      else if (filter_name == "sort") this.updateFilter("sort", "");
-      else if (filter_name == "tuition_fee") this.filterForm.tuition_fee = 0;
-      else if (filter_name == "country") {
-        this.filterForm.country = 0;
-        this.filterForm.state = 0;
-        this.filterForm.city = 0;
-        this.filter.stateList = [];
-        this.filter.cityList = [];
-        this.updateQueryParams();
-      } else if (filter_name == "state") {
-        this.filterForm.state = 0;
-        this.filterForm.city = 0;
-        this.filter.cityList = [];
-        this.updateQueryParams();
-      } else if (filter_name == "city") {
-        this.filterForm.city = 0;
-        this.updateQueryParams();
-      } else if (filter_name == "school_type") {
-        var index = this.school_type.findIndex((x) => x == other_data);
-        this.filterForm.school_type.splice(index, 1);
-      } else if (filter_name == "religion") {
-        var index = this.filterForm.religion.findIndex((x) => x == other_data);
-        this.filterForm.religion.splice(index, 1);
-      } else if (filter_name == "boarding_type") {
-        var index = this.filterForm.boarding_type.findIndex(
-          (x) => x == other_data
-        );
-        this.filterForm.boarding_type.splice(index, 1);
-      } else if (filter_name == "coed_status") {
-        var index = this.filterForm.coed_status.findIndex(
-          (x) => x == other_data
-        );
-        this.filterForm.coed_status.splice(index, 1);
-      }
-    },
-    stateChange() {
-      document.removeEventListener("click", this.handleClickOutside);
-
-      this.filter.cityList = [];
-      this.filterForm.city = "";
-      this.updateQueryParams();
-      if (this.filterForm.state) {
-        this.getFilterList(
-          {
-            "PagingDto.PageFilter.Size": 10000,
-          },
-          "cities"
-        );
-      }
-
-      setTimeout(() => {
-        if (this.desktopFilter) {
-          // Add click event listener to close the div when clicking outside
-          document.addEventListener("click", this.handleClickOutside);
-        } else {
-          // Remove click event listener when the div is closed
-          document.removeEventListener("click", this.handleClickOutside);
-        }
-      }, 100);
-    },
-
-    openDesktopFilter() {
-      this.desktopFilter = !this.desktopFilter;
-
-      setTimeout(() => {
-        if (this.desktopFilter) {
-          // Add click event listener to close the div when clicking outside
-          document.addEventListener("click", this.handleClickOutside);
-        } else {
-          // Remove click event listener when the div is closed
-          document.removeEventListener("click", this.handleClickOutside);
-        }
-      }, 100);
-    },
-    handleClickOutside(event) {
-      // Close the div if the click is outside of the div
-      const div = this.$refs.desktopFilter;
-      if (div && !div.contains(event.target)) {
-        this.desktopFilter = false;
-        document.removeEventListener("click", this.handleClickOutside);
-      }
-    },
-    requestUserLoaction() {
-      this.$emit("requestUserLoaction");
-    },
-    checkDisabledStatus(field_name) {
-      if (field_name == "state")
-        if (this.filterForm.country == "") return true;
-        else return false;
-      else if (field_name == "city")
-        if (this.filterForm.state == "") return true;
-        else return false;
-    },
-  },
-  beforeDestroy() {
-    // Remove the click event listener when the component is destroyed
-    document.removeEventListener("click", this.handleClickOutside);
-  },
-};
-</script>
 
 <style>
 #mobile-school-filter {

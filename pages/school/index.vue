@@ -1,11 +1,657 @@
+<script setup>
+const route = useRoute();
+const perPage = 20;
+const loadingData = ref(false);
+const filter = ref({
+  keyword: "",
+  stage: "",
+  tuition_fee: "",
+  country: "",
+  state: "",
+  city: "",
+  school_type: "",
+  religion: "",
+  boarding_type: "",
+  coed_status: "",
+  distance: 5598568,
+  center: [],
+  lat: 39.90973623453719,
+  lng: -81.12304687500001,
+  page: route.query.page ? Number(route.query.page) : 1,
+});
+const schoolFilter = ref(null);
+
+const params = {
+  "PagingDto.PageFilter.Skip": (filter.page - 1) * perPage,
+  "PagingDto.PageFilter.Size": perPage,
+  "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+  Name: route.query.keyword,
+  //   "Location.Radius": route.query.distance || null,
+  //   "Location.Latitude": route.query.lat || null,
+  //   "Location.Longitude": route.query.lng || null,
+};
+
+const { data, pending, error } = await $fetch("/api/v2/schools", { params });
+const schoolList = computed(() => data?.list || []);
+const resultCount = computed(() => data?.totalRecordsCount || 0);
+
+useHead({
+  titleTemplate: "%s",
+  title:
+    "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+
+  meta: [
+    {
+      hid: "apple-mobile-web-app-title",
+      name: "apple-mobile-web-app-title",
+      content:
+        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+    },
+    {
+      hid: "og:title",
+      name: "og:title",
+      content:
+        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+    },
+    {
+      hid: "og:site_name",
+      name: "og:site_name",
+      content: "GamaTrain",
+    },
+    {
+      hid: "description",
+      name: "description",
+      content:
+        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+    },
+    {
+      hid: "og:description",
+      name: "og:description",
+      content:
+        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+    },
+  ],
+});
+
+const isExpanded = ref(true);
+const map = ref({
+  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  zoom: 4,
+  minZoom: 2,
+  center: [39.90973623453719, -81.12304687500001], // Initial map center coordinates
+  markers: [],
+  object: null,
+  boundingBox: {},
+  schoolIcon: null,
+});
+const schoolLoading = ref(true);
+const allDataLoaded = ref(false);
+const timer = ref(0);
+
+const filterLoadedStatus = ref({
+  stage: false,
+  country: false,
+  state: false,
+  city: false,
+  school_type: false,
+  religion: false,
+  boarding_type: false,
+  coed_status: false,
+  sort: false,
+});
+
+//Md, sm, xs config
+const schoolSheet = ref(false);
+const mobileDataSheetConfig = ref({
+  isDragging: false,
+  startDragY: 0,
+  sheetHeight: 20,
+  expanded: true,
+  dragSide: "top",
+});
+const screenWidth = ref(0);
+const loadedPages = ref([]);
+
+const currentZoom = ref(5);
+const geoSearch = ref(false);
+
+const sortList = ref([
+  {
+    value: "scoreDesc",
+    title: "Highest score",
+  },
+  {
+    value: "viewsDesc",
+    title: "Most active",
+  },
+  {
+    value: "updateDesc",
+    title: "Update date",
+  },
+  {
+    value: "tuitionAsc",
+    title: "Tuition Fee (Highest First)",
+  },
+  {
+    value: "tuitionDesc",
+    title: "Tuition Fee (Lowest First)",
+  },
+]);
+
+onMounted(async () => {
+  document.body.classList.add("disable-scroll");
+
+  if (process.client) {
+    mobileDataSheetConfig.value.sheetHeight = window.innerHeight / 10 - 4.6; //4.6 is distance from top
+    const L = (await import("leaflet")).default;
+
+    map.value.schoolIcon = L.icon({
+      iconUrl: "/images/school-marker.svg", // Replace with school marker icon
+      iconSize: [16, 16], // Adjust the size as needed
+      iconAnchor: [16, 16], // Adjust the anchor point as needed
+    });
+    nextTick(() => {
+      setTimeout(() => {
+        map.value.center = [51.505, -0.09];
+        getUserLocation();
+      }, 1000);
+    });
+
+    // this.getSchoolList();
+
+    //Handle show/hide mobile sheet base on size
+    screenWidth.value = window.innerWidth;
+    if (screenWidth.value < 1264) schoolSheet.value = true;
+    window.addEventListener("resize", handleResize); //
+    //End handle show/hide mobile sheet base on size
+  }
+
+  // this.grabLocation("town", "semirom");
+});
+onBeforeUnmount(() => {
+  document.body.classList.remove("disable-scroll");
+  if ([proccess.client]) window.removeEventListener("resize", handleResize); //Remove listen resize
+});
+watch(screenWidth, (val) => {
+  if (screenWidth.value < 1264) schoolSheet.value = true;
+  else schoolSheet.value = false;
+});
+watch(route.query.keyword, (val) => {
+  if (timer.value) {
+    clearTimeout(timer.value);
+    timer.value = null;
+  }
+
+  if (val) isExpanded.value = true;
+
+  timer.value = setTimeout(() => {
+    filter.value.keyword = val;
+    schoolFilter.value.searchLoading = true;
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }, 800);
+});
+watch(route.query.stage, (val) => {
+  filter.value.stage = val;
+
+  if (!schoolLoading.value) {
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }
+});
+
+watch(route.query.tuition_fee, (val) => {
+  if (this.timer) {
+    clearTimeout(this.timer);
+    this.timer = null;
+  }
+
+  this.timer = setTimeout(() => {
+    filter.value.tuition_fee = val;
+    filter.value.page = 1;
+    schoolList.value = [];
+    this.allDataLoaded = false;
+    this.getSchoolList();
+  }, 800);
+});
+watch(route.query.country, (val) => {
+  isExpanded.value = true;
+  this.filter.country = val;
+
+  if (!this.schoolLoading) {
+    filter.value.page = 1;
+    this.schoolList = [];
+    this.allDataLoaded = false;
+    this.getSchoolList();
+  }
+});
+watch(route.query.state, (val) => {
+  this.filter.state = val;
+
+  if (!schoolLoading.value) {
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }
+});
+watch(route.query.city, (val) => {
+  this.filter.city = val;
+
+  if (!this.schoolLoading) {
+    this.filter.page = 1;
+    this.schoolList = [];
+    this.allDataLoaded = false;
+    this.getSchoolList();
+  }
+});
+watch(route.query.school_type, (val) => {
+  if (val) this.filter.school_type = val.toString();
+  else this.filter.school_type = "";
+
+  if (!this.schoolLoading) {
+    this.filter.page = 1;
+    this.schoolList = [];
+    this.allDataLoaded = false;
+    this.getSchoolList();
+  }
+});
+watch(route.query.religion, (val) => {
+  if (val) this.filter.religion = val.toString();
+  else this.filter.religion = "";
+
+  if (!this.schoolLoading) {
+    this.filter.page = 1;
+    this.schoolList = [];
+    this.allDataLoaded = false;
+    this.getSchoolList();
+  }
+});
+watch(route.query.boarding_type, (val) => {
+  if (val) this.filter.boarding_type = val.toString();
+  else this.filter.boarding_type = "";
+
+  if (!this.schoolLoading) {
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }
+});
+watch(route.query.coed_status, (val) => {
+  if (val) filter.value.coed_status = val.toString();
+  else filter.value.coed_status = "";
+
+  if (!schoolLoading.value) {
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }
+});
+watch(route.query.sort, (val) => {
+  this.filter.sort = val;
+
+  if (!schoolLoading.value) {
+    filter.value.page = 1;
+    schoolList.value = [];
+    allDataLoaded.value = false;
+    getSchoolList();
+  }
+});
+watch(isExpanded, (val) => {
+  if (val) {
+    geoSearch.value = false;
+    filter.value.country = null;
+    filter.value.state = null;
+    filter.value.city = null;
+    filter.value.keyword = null;
+    schoolFilter.value.filterForm.distance = "";
+
+    schoolFilter.value.filterForm.center = [];
+    schoolFilter.value.updateQueryParams();
+  } else {
+    filter.value.keyword = null;
+    schoolFilter.value.filterForm.keyword = "";
+    geoSearch.value = true;
+  }
+  if (!schoolLoading.value) {
+    allDataLoaded.value = false;
+    filter.value.page = 1;
+    schoolList.value = [];
+    getSchoolList();
+  }
+});
+
+const handleResize = () => {
+  screenWidth.value = window.innerWidth;
+};
+const onMoveEnd = (event) => {
+  if (!isExpanded.value) {
+    const bounds = event.target.getBounds();
+    const center = event.target.getCenter(); //Center of map
+    this.filter.lat = center.lat; //Update filter
+    this.filter.lng = center.lng; //Update filter
+    this.filter.center = [center.lat, center.lng]; //Update filter
+    const ne = bounds.getNorthEast(); //Corner of map
+    this.calcDistance(center, ne);
+    schoolFilter.value.filterForm.lat = this.filter.lat;
+    schoolFilter.value.filterForm.lng = this.filter.lng;
+    // schoolFilter.filterForm.center = this.filter.center;
+    schoolFilter.value.filterForm.distance = this.filter.distance;
+    schoolFilter.value.updateQueryParams();
+
+    // if (!this.schoolLoading) {
+    allDataLoaded.value = false;
+    filter.value.page = 1;
+    schoolList.value = [];
+    getSchoolList();
+    // }
+  }
+};
+const onZoomChange = (newZoom) => {
+  // console.log(newZoom);
+};
+const calcDistance = (center, ne) => {
+  // Calculate the distance using Haversine formula
+  const R = 6371000; // Earth radius in meters
+  const lat1 = center.lat * (Math.PI / 180);
+  const lon1 = center.lng * (Math.PI / 180);
+  const lat2 = ne.lat * (Math.PI / 180);
+  const lon2 = ne.lng * (Math.PI / 180);
+
+  const dlat = lat2 - lat1;
+  const dlon = lon2 - lon1;
+
+  const a =
+    Math.sin(dlat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  this.filter.distance = this.formatNumber(R * c); // Return distance in meters
+  console.log(this.filter.distance);
+};
+
+const formatNumber = (number) => {
+  //Remove latest zero from number to avoid error from api side
+  const roundedNumber = parseFloat(number.toFixed(6));
+  const formattedString = roundedNumber.toString();
+  const trimmedString = formattedString.replace(/\.?0+$/, ""); // Remove trailing zeros
+  return parseFloat(trimmedString);
+};
+const getUserLocation = () => {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // Get the user's coordinates
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Update the map's center with the user's location
+        this.map.center = [userLat, userLng];
+        this.isExpanded = false;
+      },
+      (error) => {
+        console.error("Error getting user location:", error);
+      }
+    );
+  } else {
+    console.error("Geolocation is not supported in this browser.");
+  }
+};
+
+const getSchoolList = async (side) => {
+  schoolLoading.value = true;
+  if (allDataLoaded.value == false)
+    $fetch("/api/v2/schools", {
+      params: {
+        "PagingDto.PageFilter.Skip": (filter.value.page - 1) * perPage,
+        "PagingDto.PageFilter.Size": perPage,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+        Name: route.query.keyword,
+        section: route.query.stage,
+        tuition_fee: route.query.tuition_fee,
+        CountryId: route.query.country,
+        StateId: route.query.state,
+        CityId: route.query.city,
+        school_type: route.query.school_type,
+        religion: route.query.religion,
+        boarding_type: route.query.boarding_type,
+        coed_status: route.query.coed_status,
+        sort: route.query.sort,
+        "Location.Radius": this.isExpanded
+          ? null
+          : route.query.distance
+          ? route.query.distance
+          : filter.value.distance,
+        "Location.Latitude": this.isExpanded
+          ? null
+          : route.query.lat
+          ? route.query.lat
+          : filter.value.lat,
+        "Location.Longitude": this.isExpanded
+          ? null
+          : route.query.lng
+          ? route.query.lng
+          : filter.value.lng,
+      },
+    })
+      .then((response) => {
+        resultCount.value = response.data.totalRecordsCount;
+        schoolFilter.value.resultCount = resultCount;
+
+        loadingData.value = false;
+
+        if (geoSearch.value) {
+          schoolList.value = response.data.list;
+          var newPlaceData = response.data.list
+            .filter((obj) => obj.lat !== undefined && obj.long !== undefined) // Filter out objects with undefined lat or lng
+            .map((obj) => ({
+              latLng: [obj.lat, obj.long],
+              id: obj.id,
+              slug: obj.slug,
+            }));
+          if (newPlaceData.length) {
+            map.value.markers.push(...newPlaceData);
+          }
+
+          allDataLoaded.value = true;
+        } else {
+          //If user not in geoloaction and now active geo mode. we set data on map for it and center for map
+
+          if (side === "top") this.schoolList.unshift(...response.data.list);
+          else this.schoolList.push(...response.data.list);
+        }
+
+        if (response.data.list.length < this.perPage) {
+          allDataLoaded.value = true;
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        schoolLoading.value = false;
+        schoolFilter.value.searchLoading = false;
+      });
+};
+const checkSchoolScroll = async (side, page) => {
+  if (!geoSearch.value) {
+    if (allDataLoaded.value == false && !loadingData.value) {
+      filter.value.page = page;
+      console.log("abcd");
+      alert(filter.value.page);
+      // schoolFilter.value.filterForm.value.page = filter.value.page;
+      alert("level3");
+      alert(schoolFilter.value.filterForm.page);
+
+      schoolFilter.value.updateQueryParams();
+      alert("level 4");
+
+      loadingData.value = true; // Set loading flag
+      await getSchoolList(side);
+    }
+  }
+};
+
+const closeFilter = (filter_name, other_data = null) => {
+  if (filter_name == "keyword") schoolFilter.value.filterForm.keyword = "";
+  else if (filter_name == "stage") schoolFilter.value.updateFilter("stage", "");
+  else if (filter_name == "sort") schoolFilter.value.updateFilter("sort", "");
+  else if (filter_name == "tuition_fee")
+    schoolFilter.value.filterForm.tuition_fee = 0;
+  else if (filter_name == "country") {
+    schoolFilter.value.filterForm.country = 0;
+    schoolFilter.value.filterForm.state = 0;
+    schoolFilter.value.filterForm.city = 0;
+    schoolFilter.filter.stateList = [];
+    schoolFilter.filter.cityList = [];
+    schoolFilter.updateQueryParams();
+  } else if (filter_name == "state") {
+    schoolFilter.filterForm.state = 0;
+    schoolFilter.filterForm.city = 0;
+    schoolFilter.filter.cityList = [];
+    schoolFilter.updateQueryParams();
+  } else if (filter_name == "city") {
+    schoolFilter.filterForm.city = 0;
+    schoolFilter.updateQueryParams();
+  } else if (filter_name == "school_type") {
+    var index = schoolFilter.filterForm.school_type.findIndex(
+      (x) => x == other_data
+    );
+    schoolFilter.filterForm.school_type.splice(index, 1);
+  } else if (filter_name == "religion") {
+    var index = schoolFilter.filterForm.religion.findIndex(
+      (x) => x == other_data
+    );
+    schoolFilter.filterForm.religion.splice(index, 1);
+  } else if (filter_name == "boarding_type") {
+    var index = schoolFilter.filterForm.boarding_type.findIndex(
+      (x) => x == other_data
+    );
+    schoolFilter.filterForm.boarding_type.splice(index, 1);
+  } else if (filter_name == "coed_status") {
+    var index = schoolFilter.filterForm.coed_status.findIndex(
+      (x) => x == other_data
+    );
+    schoolFilter.filterForm.coed_status.splice(index, 1);
+  }
+};
+const findTitle = (type, id) => {
+  var title = "";
+  if (type == "stage")
+    title = schoolFilter.filter.stageList.find((x) => x.id == id).title;
+  if (type == "sort") {
+    title = sortList.value.find((x) => x.value == id).title;
+  } else if (type == "country") {
+    title = schoolFilter.filter.countryList.find((x) => x.id == id).title;
+  } else if (type == "state")
+    title = schoolFilter.filter.stateList.find((x) => x.id == id).title;
+  else if (type == "city")
+    title = schoolFilter.filter.cityList.find((x) => x.id == id).title;
+  else if (type == "school_type")
+    title = schoolFilter.filter.schoolTypeList.find((x) => x.id == id).title;
+  else if (type == "religion" && schoolFilter.filter.religionList)
+    title = schoolFilter.filter.religionList.find((x) => x.id == id).title;
+  else if (type == "boarding_type")
+    title = schoolFilter.filter.boardingTypeList.find((x) => x.id == id).title;
+  else if (type == "coed_status")
+    title = schoolFilter.filter.coedStatusList.find((x) => x.id == id).title;
+
+  return title;
+};
+const startDrag = (e) => {
+  e.preventDefault();
+  mobileDataSheetConfig.value.isDragging = true;
+  mobileDataSheetConfig.value.startDragY = e.touches[0].clientY;
+};
+const handleDrag = (e) => {
+  if (mobileDataSheetConfig.value.isDragging) {
+    e.preventDefault();
+
+    const currentY = e.touches[0].clientY;
+    const dragDistance = mobileDataSheetConfig.value.startDragY - currentY;
+
+    const currentHeight = mobileDataSheetConfig.value.sheetHeight;
+    const newHeight = currentHeight + dragDistance / 10;
+
+    if (newHeight > currentHeight) mobileDataSheetConfig.value.dragSide = "top";
+    else mobileDataSheetConfig.value.dragSide = "bottom";
+
+    mobileDataSheetConfig.value.sheetHeight = newHeight;
+    mobileDataSheetConfig.value.startDragY = currentY;
+  }
+};
+const endDrag = (e) => {
+  mobileDataSheetConfig.value.isDragging = false;
+  if (mobileDataSheetConfig.value.dragSide == "bottom") {
+    //10 is for rem and 4 is for divide 1
+    mobileDataSheetConfig.value.sheetHeight = 15;
+    isExpanded.value = false;
+  } else if (mobileDataSheetConfig.value.dragSide == "top")
+    mobileDataSheetConfig.value.sheetHeight = window.innerHeight / 10 - 4.6;
+  isExpanded.value = true;
+};
+const grabLocation = (type, title) => {
+  $fetch("https://nominatim.openstreetmap.org/search", {
+    params: {
+      q: title,
+      format: "json",
+    },
+  })
+    .then((response) => {
+      if (response) {
+        var itm = response.find((x) => x.addresstype == type);
+        console.log([itm.lat, itm.lon]);
+      }
+      console.log("-1");
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+const updateFilterLoadedStatus = (value) => {
+  filterLoadedStatus.value = value;
+};
+
+const display = useGlobalDisplay(); // Call the composable
+
+const boardingTypeArray = computed(() => {
+  const boardingType = route.query.boarding_type;
+
+  if (Array.isArray(boardingType)) {
+    return boardingType; // If it's already an array, return it as is
+  } else if (typeof boardingType === "string") {
+    return [boardingType]; // If it's a string, convert it to an array
+  } else {
+    return []; // If it's neither a string nor an array, return an empty array
+  }
+});
+const coedStatusArray = computed(() => {
+  const coedStatus = route.query.coed_status;
+
+  if (Array.isArray(coedStatus)) {
+    return coedStatus; // If it's already an array, return it as is
+  } else if (typeof coedStatus === "string") {
+    return [coedStatus]; // If it's a string, convert it to an array
+  } else {
+    return []; // If it's neither a string nor an array, return an empty array
+  }
+});
+</script>
+
 <template>
   <div id="school-list">
-    <schoolListFilter
+    <school-filter
       ref="schoolFilter"
       @loadedStatus="updateFilterLoadedStatus"
       :sort-list="sortList"
       @requestUserLoaction="getUserLocation()"
-      v-if="$vuetify.breakpoint.lgAndUp"
+      v-if="display.lgAndUp"
     />
     <div id="map-wrap">
       <client-only>
@@ -21,7 +667,7 @@
           <l-marker
             v-for="(marker, index) in map.markers"
             :key="index"
-            @click="$router.push(`/school/${marker.id}/${marker.slug}`)"
+            @click="router.push(`/school/${marker.id}/${marker.slug}`)"
             :lat-lng="marker.latLng"
             :icon="map.schoolIcon"
           ></l-marker>
@@ -44,7 +690,7 @@
       <!-- Sm and md screen section -->
       <div
         id="mobile-school-list-container"
-        v-if="$vuetify.breakpoint.mdAndDown"
+        v-if="display.mdAndDown"
         class="d-block d-lg-none"
         :style="`height:${mobileDataSheetConfig.sheetHeight}rem`"
       >
@@ -64,7 +710,7 @@
                 <v-row>
                   <v-col cols="12" class="pt-0">
                     <div id="mobile-search-result-container" class="px-2">
-                      <schoolListFilter
+                      <school-filter
                         ref="schoolFilter"
                         @loadedStatus="updateFilterLoadedStatus"
                         :sort-list="sortList"
@@ -94,7 +740,7 @@
                       >
                         <!-- School list section -->
                         <list-holder @updatePage="checkSchoolScroll"
-                          ><schoolDataList
+                          ><school-list
                             :schoolLoading="schoolLoading"
                             :schoolList="schoolList"
                             :resultCount="resultCount"
@@ -129,11 +775,11 @@
               small
               close
               outlined
-              v-if="$route.query.keyword"
+              v-if="route.query.keyword"
               @click:close="closeFilter('keyword')"
               class="mb-1"
             >
-              {{ $route.query.keyword }}
+              {{ route.query.keyword }}
             </v-chip>
             <v-chip
               small
@@ -265,7 +911,7 @@
 
       <!-- Data list -->
       <list-holder @updatePage="checkSchoolScroll">
-        <schoolDataList
+        <school-list
           :schoolLoading="schoolLoading"
           :schoolList="schoolList"
           :resultCount="resultCount"
@@ -277,712 +923,6 @@
     <!-- End large screen section -->
   </div>
 </template>
-
-<script>
-import schoolListFilter from "@/components/school/Filter.vue";
-import schoolDataList from "@/components/school/List.vue";
-import ListHolder from "~/components/ListHolder.vue";
-export default {
-  auth: false,
-  name: "school-list",
-  head() {
-    return {
-      titleTemplate: "%s",
-      title:
-        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-
-      meta: [
-        {
-          hid: "apple-mobile-web-app-title",
-          name: "apple-mobile-web-app-title",
-          content:
-            "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-        },
-        {
-          hid: "og:title",
-          name: "og:title",
-          content:
-            "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-        },
-        {
-          hid: "og:site_name",
-          name: "og:site_name",
-          content: "GamaTrain",
-        },
-        {
-          hid: "description",
-          name: "description",
-          content:
-            "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
-        },
-        {
-          hid: "og:description",
-          name: "og:description",
-          content:
-            "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
-        },
-      ],
-    };
-  },
-  components: {
-    schoolListFilter,
-    schoolDataList,
-    ListHolder,
-  },
-  data() {
-    return {
-      isExpanded: true,
-      map: {
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        zoom: 4,
-        minZoom: 2,
-        center: [39.90973623453719, -81.12304687500001], // Initial map center coordinates
-        markers: [],
-        object: null,
-        boundingBox: {},
-        schoolIcon: null,
-      },
-      schoolLoading: true,
-      perPage: 20,
-      allDataLoaded: false,
-      timer: 0,
-      gradeLevelList: [
-        {
-          title: "test",
-        },
-        {
-          title: "test2",
-        },
-      ],
-      filter: {
-        keyword: "",
-        stage: "",
-        tuition_fee: "",
-        country: "",
-        state: "",
-        city: "",
-        school_type: "",
-        religion: "",
-        boarding_type: "",
-        coed_status: "",
-        distance: 56,
-        center: [],
-        lat: 39.90973623453719,
-        lng: -81.12304687500001,
-        page: this.$route.query.page ? Number(this.$route.query.page) : 1,
-      },
-
-      filterLoadedStatus: {
-        stage: false,
-        country: false,
-        state: false,
-        city: false,
-        school_type: false,
-        religion: false,
-        boarding_type: false,
-        coed_status: false,
-        sort: false,
-      },
-
-      //Md, sm, xs config
-      schoolSheet: false,
-      mobileDataSheetConfig: {
-        isDragging: false,
-        startDragY: 0,
-        sheetHeight: 20,
-        expanded: true,
-        dragSide: "top",
-      },
-      screenWidth: 0,
-      loadedPages: [],
-
-      currentZoom: 5,
-      geoSearch: false,
-
-      sortList: [
-        {
-          value: "scoreDesc",
-          title: "Highest score",
-        },
-        {
-          value: "viewsDesc",
-          title: "Most active",
-        },
-        {
-          value: "updateDesc",
-          title: "Update date",
-        },
-        {
-          value: "tuitionAsc",
-          title: "Tuition Fee (Highest First)",
-        },
-        {
-          value: "tuitionDesc",
-          title: "Tuition Fee (Lowest First)",
-        },
-      ],
-    };
-  },
-  async asyncData({ $axios, query }) {
-    try {
-      const perPage = 20; // Change this to match `this.perPage`
-      const page = parseInt(query.page) || 1;
-      const baseURL = process.server
-        ? `https://api.gamaedtech.com/api/v1/schools`
-        : "/api/v2/schools";
-
-      const params = {
-        "PagingDto.PageFilter.Skip": (page - 1) * perPage,
-        "PagingDto.PageFilter.Size": perPage,
-        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-        Name: query.keyword,
-        "Location.Radius": query.distance || null,
-        "Location.Latitude": query.lat || null,
-        "Location.Longitude": query.lng || null,
-      };
-
-      const response = await $axios.$get(baseURL, { params });
-
-      return {
-        schoolList: response.data.list || [],
-        resultCount: response.data.totalRecordsCount || 0,
-        loadingData: false,
-      };
-    } catch (error) {
-      console.error("Error fetching schools:", error);
-      return { schoolList: [], resultCount: 0, loadingData: false };
-    }
-  },
-
-  mounted() {
-    document.body.classList.add("disable-scroll");
-
-    if (process.client) {
-      this.mobileDataSheetConfig.sheetHeight = window.innerHeight / 10 - 4.6; //4.6 is distance from top
-    }
-
-    this.map.schoolIcon = L.icon({
-      iconUrl: "/images/school-marker.svg", // Replace with school marker icon
-      iconSize: [16, 16], // Adjust the size as needed
-      iconAnchor: [16, 16], // Adjust the anchor point as needed
-    });
-    // this.$nextTick(() => {
-    //   setTimeout(() => {
-    //     this.map.center = [51.505, -0.09];
-    //     this.getUserLocation();
-    //   }, 1000);
-    // });
-
-    // this.getSchoolList();
-
-    //Handle show/hide mobile sheet base on size
-    this.screenWidth = window.innerWidth;
-    if (this.screenWidth < 1264) this.schoolSheet = true;
-    window.addEventListener("resize", this.handleResize); //
-    //End handle show/hide mobile sheet base on size
-
-    // this.grabLocation("town", "semirom");
-  },
-  beforeDestroy() {
-    document.body.classList.remove("disable-scroll");
-    window.removeEventListener("resize", this.handleResize); //Remove listen resize
-  },
-  watch: {
-    screenWidth(val) {
-      if (this.screenWidth < 1264) this.schoolSheet = true;
-      else this.schoolSheet = false;
-    },
-    "$route.query.keyword"(val) {
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
-      if (val) this.isExpanded = true;
-
-      this.timer = setTimeout(() => {
-        this.filter.keyword = val;
-        this.$refs.schoolFilter.searchLoading = true;
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }, 800);
-    },
-    "$route.query.stage"(val) {
-      this.filter.stage = val;
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-
-    "$route.query.tuition_fee"(val) {
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
-      this.timer = setTimeout(() => {
-        this.filter.tuition_fee = val;
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }, 800);
-    },
-    "$route.query.country"(val) {
-      this.isExpanded = true;
-      this.filter.country = val;
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.state"(val) {
-      this.filter.state = val;
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.city"(val) {
-      this.filter.city = val;
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.school_type"(val) {
-      if (val) this.filter.school_type = val.toString();
-      else this.filter.school_type = "";
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.religion"(val) {
-      if (val) this.filter.religion = val.toString();
-      else this.filter.religion = "";
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.boarding_type"(val) {
-      if (val) this.filter.boarding_type = val.toString();
-      else this.filter.boarding_type = "";
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.coed_status"(val) {
-      if (val) this.filter.coed_status = val.toString();
-      else this.filter.coed_status = "";
-
-      if (!this.schoolLoading) {
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    "$route.query.sort"(val) {
-      this.filter.sort = val;
-
-      if (!this.schoolLoading) {
-        a;
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.allDataLoaded = false;
-        this.getSchoolList();
-      }
-    },
-    isExpanded(val) {
-      if (val) {
-        this.geoSearch = false;
-        this.filter.country = null;
-        this.filter.state = null;
-        this.filter.city = null;
-        this.filter.keyword = null;
-        this.$refs.schoolFilter.filterForm.distance = "";
-
-        this.$refs.schoolFilter.filterForm.center = [];
-        this.$refs.schoolFilter.updateQueryParams();
-      } else {
-        this.filter.keyword = null;
-        this.$refs.schoolFilter.filterForm.keyword = "";
-        this.geoSearch = true;
-      }
-      if (!this.schoolLoading) {
-        this.allDataLoaded = false;
-        this.filter.page = 1;
-        this.schoolList = [];
-        this.getSchoolList();
-      }
-    },
-  },
-
-  methods: {
-    handleResize() {
-      this.screenWidth = window.innerWidth;
-    },
-    onMoveEnd(event) {
-      if (!this.isExpanded) {
-        const bounds = event.target.getBounds();
-        const center = event.target.getCenter(); //Center of map
-        this.filter.lat = center.lat; //Update filter
-        this.filter.lng = center.lng; //Update filter
-        this.filter.center = [center.lat, center.lng]; //Update filter
-        const ne = bounds.getNorthEast(); //Corner of map
-        this.calcDistance(center, ne);
-        this.$refs.schoolFilter.filterForm.lat = this.filter.lat;
-        this.$refs.schoolFilter.filterForm.lng = this.filter.lng;
-        // this.$refs.schoolFilter.filterForm.center = this.filter.center;
-        this.$refs.schoolFilter.filterForm.distance = this.filter.distance;
-        this.$refs.schoolFilter.updateQueryParams();
-
-        if (!this.schoolLoading) {
-          this.allDataLoaded = false;
-          this.filter.page = 1;
-          this.schoolList = [];
-          this.getSchoolList();
-        }
-      }
-    },
-    onZoomChange(newZoom) {
-      // console.log(newZoom);
-    },
-    calcDistance(center, ne) {
-      // Calculate the distance using Haversine formula
-      const R = 6371; // Earth radius in kilometers
-      const lat1 = center.lat * (Math.PI / 180);
-      const lon1 = center.lng * (Math.PI / 180);
-      const lat2 = ne.lat * (Math.PI / 180);
-      const lon2 = ne.lng * (Math.PI / 180);
-
-      const dlat = lat2 - lat1;
-      const dlon = lon2 - lon1;
-
-      const a =
-        Math.sin(dlat / 2) ** 2 +
-        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-      this.filter.distance = this.formatNumber((R / 100) * c); //retrun distance
-    },
-    formatNumber(number) {
-      //Remove latest zero from number to avoid error from api side
-      const roundedNumber = parseFloat(number.toFixed(6));
-      const formattedString = roundedNumber.toString();
-      const trimmedString = formattedString.replace(/\.?0+$/, ""); // Remove trailing zeros
-      return parseFloat(trimmedString);
-    },
-    getUserLocation() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            // Get the user's coordinates
-            const userLat = position.coords.latitude;
-            const userLng = position.coords.longitude;
-
-            // Update the map's center with the user's location
-            this.map.center = [userLat, userLng];
-            this.isExpanded = false;
-          },
-          (error) => {
-            console.error("Error getting user location:", error);
-          }
-        );
-      } else {
-        console.error("Geolocation is not supported in this browser.");
-      }
-    },
-
-    async getSchoolList(side) {
-      this.schoolLoading = true;
-      if (this.allDataLoaded == false)
-        this.$axios
-          .$get("/api/v2/schools", {
-            params: {
-              "PagingDto.PageFilter.Skip":
-                (this.filter.page - 1) * this.perPage,
-              "PagingDto.PageFilter.Size": this.perPage,
-              "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-              Name: this.$route.query.keyword,
-              section: this.$route.query.stage,
-              tuition_fee: this.$route.query.tuition_fee,
-              CountryId: this.$route.query.country,
-              StateId: this.$route.query.state,
-              CityId: this.$route.query.city,
-              school_type: this.$route.query.school_type,
-              religion: this.$route.query.religion,
-              boarding_type: this.$route.query.boarding_type,
-              coed_status: this.$route.query.coed_status,
-              sort: this.$route.query.sort,
-              "Location.Radius": this.isExpanded
-                ? null
-                : this.$route.query.distance
-                ? this.$route.query.distance
-                : this.filter.distance,
-              "Location.Latitude": this.isExpanded
-                ? null
-                : this.$route.query.lat
-                ? this.$route.query.lat
-                : this.filter.lat,
-              "Location.Longitude": this.isExpanded
-                ? null
-                : this.$route.query.lng
-                ? this.$route.query.lng
-                : this.filter.lng,
-            },
-          })
-          .then((response) => {
-            this.resultCount = response.data.totalRecordsCount;
-            this.$refs.schoolFilter.resultCount = this.resultCount;
-
-            this.loadingData = false;
-
-            if (this.geoSearch) {
-              this.schoolList = response.data.list;
-              var newPlaceData = response.data.list
-                .filter(
-                  (obj) => obj.lat !== undefined && obj.long !== undefined
-                ) // Filter out objects with undefined lat or lng
-                .map((obj) => ({
-                  latLng: [obj.lat, obj.long],
-                  id: obj.id,
-                  slug: obj.slug,
-                }));
-              if (newPlaceData.length) {
-                this.map.markers.push(...newPlaceData);
-              }
-
-              this.allDataLoaded = true;
-            } else {
-              //If user not in geoloaction and now active geo mode. we set data on map for it and center for map
-
-              if (side === "top")
-                this.schoolList.unshift(...response.data.list);
-              else this.schoolList.push(...response.data.list);
-            }
-
-            if (response.data.list.length < this.perPage) {
-              this.allDataLoaded = true;
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            this.schoolLoading = false;
-            this.$refs.schoolFilter.searchLoading = false;
-          });
-    },
-    async checkSchoolScroll(side, page) {
-      if (!this.geoSearch) {
-        if (this.allDataLoaded == false && !this.loadingData) {
-          this.filter.page = page;
-          this.$refs.schoolFilter.filterForm.page = this.filter.page;
-          this.$refs.schoolFilter.updateQueryParams();
-          this.loadingData = true; // Set loading flag
-          await this.getSchoolList(side);
-        }
-      }
-    },
-
-    closeFilter(filter_name, other_data = null) {
-      if (filter_name == "keyword")
-        this.$refs.schoolFilter.filterForm.keyword = "";
-      else if (filter_name == "stage")
-        this.$refs.schoolFilter.updateFilter("stage", "");
-      else if (filter_name == "sort")
-        this.$refs.schoolFilter.updateFilter("sort", "");
-      else if (filter_name == "tuition_fee")
-        this.$refs.schoolFilter.filterForm.tuition_fee = 0;
-      else if (filter_name == "country") {
-        this.$refs.schoolFilter.filterForm.country = 0;
-        this.$refs.schoolFilter.filterForm.state = 0;
-        this.$refs.schoolFilter.filterForm.city = 0;
-        this.$refs.schoolFilter.filter.stateList = [];
-        this.$refs.schoolFilter.filter.cityList = [];
-        this.$refs.schoolFilter.updateQueryParams();
-      } else if (filter_name == "state") {
-        this.$refs.schoolFilter.filterForm.state = 0;
-        this.$refs.schoolFilter.filterForm.city = 0;
-        this.$refs.schoolFilter.filter.cityList = [];
-        this.$refs.schoolFilter.updateQueryParams();
-      } else if (filter_name == "city") {
-        this.$refs.schoolFilter.filterForm.city = 0;
-        this.$refs.schoolFilter.updateQueryParams();
-      } else if (filter_name == "school_type") {
-        var index = this.$refs.schoolFilter.filterForm.school_type.findIndex(
-          (x) => x == other_data
-        );
-        this.$refs.schoolFilter.filterForm.school_type.splice(index, 1);
-      } else if (filter_name == "religion") {
-        var index = this.$refs.schoolFilter.filterForm.religion.findIndex(
-          (x) => x == other_data
-        );
-        this.$refs.schoolFilter.filterForm.religion.splice(index, 1);
-      } else if (filter_name == "boarding_type") {
-        var index = this.$refs.schoolFilter.filterForm.boarding_type.findIndex(
-          (x) => x == other_data
-        );
-        this.$refs.schoolFilter.filterForm.boarding_type.splice(index, 1);
-      } else if (filter_name == "coed_status") {
-        var index = this.$refs.schoolFilter.filterForm.coed_status.findIndex(
-          (x) => x == other_data
-        );
-        this.$refs.schoolFilter.filterForm.coed_status.splice(index, 1);
-      }
-    },
-    findTitle(type, id) {
-      var title = "";
-      if (type == "stage")
-        title = this.$refs.schoolFilter.filter.stageList.find(
-          (x) => x.id == id
-        ).title;
-      if (type == "sort") {
-        title = this.sortList.find((x) => x.value == id).title;
-      } else if (type == "country") {
-        title = this.$refs.schoolFilter.filter.countryList.find(
-          (x) => x.id == id
-        ).title;
-      } else if (type == "state")
-        title = this.$refs.schoolFilter.filter.stateList.find(
-          (x) => x.id == id
-        ).title;
-      else if (type == "city")
-        title = this.$refs.schoolFilter.filter.cityList.find(
-          (x) => x.id == id
-        ).title;
-      else if (type == "school_type")
-        title = this.$refs.schoolFilter.filter.schoolTypeList.find(
-          (x) => x.id == id
-        ).title;
-      else if (
-        type == "religion" &&
-        this.$refs.schoolFilter.filter.religionList
-      )
-        title = this.$refs.schoolFilter.filter.religionList.find(
-          (x) => x.id == id
-        ).title;
-      else if (type == "boarding_type")
-        title = this.$refs.schoolFilter.filter.boardingTypeList.find(
-          (x) => x.id == id
-        ).title;
-      else if (type == "coed_status")
-        title = this.$refs.schoolFilter.filter.coedStatusList.find(
-          (x) => x.id == id
-        ).title;
-
-      return title;
-    },
-    startDrag(e) {
-      e.preventDefault();
-      this.mobileDataSheetConfig.isDragging = true;
-      this.mobileDataSheetConfig.startDragY = e.touches[0].clientY;
-    },
-    handleDrag(e) {
-      if (this.mobileDataSheetConfig.isDragging) {
-        e.preventDefault();
-
-        const currentY = e.touches[0].clientY;
-        const dragDistance = this.mobileDataSheetConfig.startDragY - currentY;
-
-        const currentHeight = this.mobileDataSheetConfig.sheetHeight;
-        const newHeight = currentHeight + dragDistance / 10;
-
-        if (newHeight > currentHeight)
-          this.mobileDataSheetConfig.dragSide = "top";
-        else this.mobileDataSheetConfig.dragSide = "bottom";
-
-        this.mobileDataSheetConfig.sheetHeight = newHeight;
-        this.mobileDataSheetConfig.startDragY = currentY;
-      }
-    },
-    endDrag(e) {
-      this.mobileDataSheetConfig.isDragging = false;
-      if (this.mobileDataSheetConfig.dragSide == "bottom") {
-        //10 is for rem and 4 is for divide 1
-        this.mobileDataSheetConfig.sheetHeight = 15;
-        this.isExpanded = false;
-      } else if (this.mobileDataSheetConfig.dragSide == "top")
-        this.mobileDataSheetConfig.sheetHeight = window.innerHeight / 10 - 4.6;
-      this.isExpanded = true;
-    },
-    grabLocation(type, title) {
-      this.$axios
-        .$get("https://nominatim.openstreetmap.org/search", {
-          params: {
-            q: title,
-            format: "json",
-          },
-        })
-        .then((response) => {
-          if (response) {
-            var itm = response.find((x) => x.addresstype == type);
-            console.log([itm.lat, itm.lon]);
-          }
-          console.log("-1");
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-    updateFilterLoadedStatus(value) {
-      this.filterLoadedStatus = value;
-    },
-  },
-  computed: {
-    boardingTypeArray() {
-      const boardingType = this.$route.query.boarding_type;
-
-      if (Array.isArray(boardingType)) {
-        return boardingType; // If it's already an array, return it as is
-      } else if (typeof boardingType === "string") {
-        return [boardingType]; // If it's a string, convert it to an array
-      } else {
-        return []; // If it's neither a string nor an array, return an empty array
-      }
-    },
-    coedStatusArray() {
-      const coedStatus = this.$route.query.coed_status;
-
-      if (Array.isArray(coedStatus)) {
-        return coedStatus; // If it's already an array, return it as is
-      } else if (typeof coedStatus === "string") {
-        return [coedStatus]; // If it's a string, convert it to an array
-      } else {
-        return []; // If it's neither a string nor an array, return an empty array
-      }
-    },
-  },
-};
-</script>
 
 <style>
 .leaflet-control-zoom {
