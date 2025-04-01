@@ -1140,98 +1140,7 @@
     </v-dialog>
     <!-- End leave comment dialog -->
 
-    <!-- Gallery dialog -->
-    <v-dialog
-      transition="dialog-bottom-transition"
-      v-model="galleryDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
-      style="z-index: 20001"
-    >
-      <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-8">
-          <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">School images</div>
-            <v-spacer></v-spacer>
-            <v-btn icon
-              ><v-icon size="20" @click="galleryDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
-          </div>
-          <v-divider class="mb-12 mt-4" />
-          <v-row>
-            <v-col cols="12" md="7">
-              <img
-                v-if="contentData.pic"
-                class="schoolDetailsImg"
-                src="/images/school-default.png"
-                alt="School image"
-              />
-              <div
-                v-else
-                class="enter-img-holder pointer"
-                @click="galleryDialog = true"
-              >
-                <div class="text-center">
-                  <v-icon size="48" class="primary-gray-300 mb-10"
-                    >mdi-panorama-outline</v-icon
-                  >
-                  <p class="gtext-t4 primary-blue-500">No image</p>
-                </div>
-              </div>
-              <div class="text-center gtext-t5 font-weight-heavy mt-6">
-                0/<span class="gray--text">0</span>
-              </div>
-            </v-col>
-            <v-col cols="12" md="5">
-              <v-row>
-                <v-col
-                  v-if="contentData.pic"
-                  cols="4"
-                  class="pl-0"
-                  v-for="item in 5"
-                  :key="item"
-                >
-                  <img
-                    class="schoolThumbImg"
-                    src="/images/school-default.png"
-                    alt="School image"
-                  />
-                </v-col>
-                <v-col
-                  cols="4"
-                  align="center"
-                  justify="center"
-                  class="fill-height"
-                >
-                  <v-btn color="primary" fab depressed @click="openImgInput">
-                    <v-icon size="48"> mdi-plus </v-icon>
-                  </v-btn>
-                  <v-file-input
-                    class="d-none"
-                    v-model="imgInput"
-                    ref="imgInputRef"
-                    hide-details
-                  ></v-file-input>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions class="justify-center pb-13">
-          <v-btn
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            x-large
-            >Save</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End gallery dialog -->
+    <gallery-dialog v-model="galleryDialog" :contentData="contentData" />
 
     <!-- Select Location dialog -->
     <v-dialog
@@ -1367,12 +1276,14 @@
 
 <script>
 import locationSearch from "@/components/Form/LocationSearch";
+import GalleryDialog from "@/components/school/GalleryDialog.vue";
 
 export default {
   name: "school-details",
   auth: false,
   data() {
     return {
+      cropperDialog: false,
       map: {
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         zoom: 10,
@@ -1408,7 +1319,6 @@ export default {
         artisticActivitiesRate: 4,
       },
       selectLocationDialog: false,
-      imgInput: null,
       tourImg: null,
 
       loading: {
@@ -1449,6 +1359,7 @@ export default {
   },
   components: {
     locationSearch,
+    GalleryDialog,
   },
   async asyncData({ params, $axios }) {
     const baseURL = process.server
@@ -1557,9 +1468,7 @@ export default {
     openTourImgInput() {
       this.$refs.tourImgRef.$el.querySelector("input").click();
     },
-    openImgInput() {
-      this.$refs.imgInputRef.$el.querySelector("input").click();
-    },
+
     submitComment() {
       this.loading.submitComment = true;
 
@@ -1574,13 +1483,7 @@ export default {
           }
         )
         .then((response) => {
-          if (response.succeeded) {
-            this.$toast.success("Your comment has been successfully submitted");
-            this.loadComments();
-            this.leaveCommentDialog = false;
-          } else {
-            this.$toast.error(response?.errors[0]?.message);
-          }
+          console.log(response);
         })
         .catch((err) => {
           if (err.response.status == 401 || err.response.status == 403) {
@@ -1783,23 +1686,6 @@ export default {
 
 .under-image-right.enter-img-holder p {
   max-width: 2rem;
-}
-
-.schoolDetailsImg {
-  height: 28.1rem;
-  max-height: 28.1rem;
-  width: 100%;
-  border-radius: 0.6rem;
-}
-
-.enter-img-holder {
-  background: #f2f4f7;
-  height: 28.1rem;
-  width: 100%;
-  border-radius: 0.6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .schoolThumbImg {
@@ -2009,5 +1895,21 @@ export default {
     white-space: normal;
     width: 80%;
   }
+}
+.schoolDetailsImg {
+  height: 28.1rem;
+  max-height: 28.1rem;
+  width: 100%;
+  border-radius: 0.6rem;
+}
+
+.enter-img-holder {
+  background: #f2f4f7;
+  height: 28.1rem;
+  width: 100%;
+  border-radius: 0.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
