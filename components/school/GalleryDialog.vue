@@ -142,7 +142,7 @@ export default {
       this.crop_confirm_loading = true;
       let formData = new FormData();
       formData.append("File", data);
-      formData.append("fileType", "SimpleImage");
+      formData.append("FileType", "SimpleImage");
       this.$axios
         .$post(`/api/v2/schools/${this.$route.params.id}/images`, formData, {
           headers: {
