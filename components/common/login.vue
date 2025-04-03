@@ -218,9 +218,11 @@ export default {
           this.login_dialog = false;
           this.$toast.success("Logged in successfully");
 
-          this.$router.push({
-            path: "/user",
-          });
+          if (this.$route.path == "/") {
+            this.$router.push({
+              path: "/user",
+            });
+          }
         })
         .catch(({ response }) => {
           if (response.status == 401) {
@@ -314,10 +316,12 @@ export default {
         localStorage.setItem("v2_token", result.data.token);
       } else if (
         result.errors.length &&
-        result.errors[0].message === "UserNotFound"
+        (result.errors[0].message === "UserNotFound" ||
+          result.errors[0].message === "Invalid Token")
       ) {
         let pass = this.password ? this.password : this.generatePassword();
-        await this.registerV2(this.identity, pass);
+        let identity = this.identity ? this.identity : this.$auth.user.email;
+        await this.registerV2(identity, pass);
       }
     },
 
