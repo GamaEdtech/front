@@ -8,7 +8,7 @@
         id="main-menu"
         :class="menuSetting.class"
         class="d-none d-lg-block"
-         v-if="!isPageToHideHeader"
+        v-if="!isPageToHideHeader"
       >
         <v-container class="px-0">
           <v-row>
@@ -83,7 +83,7 @@
                         {{ item.title }}
                       </v-list-item-title>
                     </v-list-item>
-                    <v-list-item class="pointer" @click="$auth.logout()">
+                    <v-list-item class="pointer" @click="logout()">
                       <v-list-item-icon class="mr-0">
                         <v-icon small> mdi-logout </v-icon>
                       </v-list-item-icon>
@@ -638,7 +638,7 @@ export default {
       dialog: false,
       logo: "mainlogo-gamatrain.png",
       avatar: "dexter-morse.png",
-      isPageToHideHeader: this.$route.name === 'admin',
+      isPageToHideHeader: this.$route.name === "admin",
       menuItems: [
         {
           title: "About us",
@@ -858,6 +858,11 @@ export default {
     },
     openRegisterDialog() {
       this.$refs.register_modal.register_dialog = true;
+    },
+
+    logout() {
+      localStorage.removeItem("v2_token"); // Token for new back
+      this.$auth.logout();
     },
 
     handleScroll() {

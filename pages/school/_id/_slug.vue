@@ -1483,7 +1483,13 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response);
+          if (response.succeeded) {
+            this.$toast.success("Your comment has been successfully submitted");
+            this.loadComments();
+            this.leaveCommentDialog = false;
+          } else {
+            this.$toast.error(response?.errors[0]?.message);
+          }
         })
         .catch((err) => {
           if (err.response.status == 401 || err.response.status == 403) {

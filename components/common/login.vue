@@ -213,12 +213,16 @@ export default {
         .then((response) => {
           this.$auth.setUserToken(response.data.data.jwtToken);
           this.$auth.setUser(response.data.data.info);
+          this.submitLoginV2(response.data.data.jwtToken);
+
           this.login_dialog = false;
           this.$toast.success("Logged in successfully");
 
-          this.$router.push({
-            path: "/user",
-          });
+          if (this.$route.path == "/") {
+            this.$router.push({
+              path: "/user",
+            });
+          }
         })
         .catch(({ response }) => {
           if (response.status == 401) {
@@ -271,7 +275,7 @@ export default {
           } else {
             // Regular login flow
             // Get v2 API token first
-            await this.submitLoginV2();
+            await this.submitLoginV2(response.data.jwtToken);
 
             // Set auth data and user info
             this.$auth.setUserToken(response.data.jwtToken);
@@ -302,20 +306,22 @@ export default {
      * @async
      * @returns {Promise<void>}
      */
-    async submitLoginV2() {
+    async submitLoginV2(old_token) {
       // Make POST request to v2 authentication endpoint
-      const result = await this.$axios.$post(`/api/v2/identities/tokens`, {
-        username: this.identity,
-        password: this.password,
+      const result = await this.$axios.$post(`/api/v2/identities/tokens/old`, {
+        token: old_token,
       });
       if (result.succeeded) {
         // Store authentication token in local storage for v2 API
         localStorage.setItem("v2_token", result.data.token);
       } else if (
         result.errors.length &&
-        result.errors[0].message === "UserNotFound"
+        (result.errors[0].message === "UserNotFound" ||
+          result.errors[0].message === "Invalid Token")
       ) {
-        await this.registerV2();
+        let pass = this.password ? this.password : this.generatePassword();
+        let identity = this.identity ? this.identity : this.$auth.user.email;
+        await this.registerV2(identity, pass);
       }
     },
 
@@ -324,17 +330,17 @@ export default {
      * @async
      * @returns {Promise<void>}
      */
-    async registerV2() {
+    async registerV2(email, pass) {
       // Make POST request to v2 registration endpoint
       const result = await this.$axios.$post(`/api/v2/identities/register`, {
-        email: this.identity,
-        password: this.password,
-        confirmPassword: this.password,
+        email: email,
+        password: pass,
+        confirmPassword: pass,
       });
 
       // If registration successful, attempt login
       if (result.data.succeeded) {
-        await this.submitLoginV2();
+        await this.submitLoginV2(this.$auth.strategy.token.get());
       }
     },
 
@@ -366,7 +372,7 @@ export default {
           this.identity_holder = true;
 
           // Get v2 API token first
-          await this.submitLoginV2();
+          await this.submitLoginV2(this.$auth.strategy.token.get());
 
           // Set authentication data
           this.$auth.setUserToken(response.data.jwtToken);
@@ -400,6 +406,14 @@ export default {
       this.otp_holder = false;
       // Show identity input section
       this.identity_holder = true;
+    },
+
+    generatePassword(length = 12) {
+      const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+      return Array.from(crypto.getRandomValues(new Uint8Array(length)))
+        .map((x) => chars[x % chars.length])
+        .join("");
     },
   },
 };
