@@ -372,7 +372,7 @@ export default {
           this.identity_holder = true;
 
           // Get v2 API token first
-          await this.submitLoginV2(this.$auth.strategy.token.get());
+          await this.submitLoginV2(response.data.jwtToken);
 
           // Set authentication data
           this.$auth.setUserToken(response.data.jwtToken);
