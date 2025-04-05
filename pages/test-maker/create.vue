@@ -590,8 +590,8 @@
                       >
                         <div ref="mathJaxEl" v-html="item.answer_full" />
                         <img
-                          v-show="answer_full_file"
-                          :src="answer_full_file"
+                          v-show="item.answer_full_file"
+                          :src="item.answer_full_file"
                         />
                       </div>
                       <div v-else>
@@ -815,8 +815,8 @@
                       >
                         <div ref="mathJaxEl" v-html="item.answer_full" />
                         <img
-                          v-show="answer_full_file"
-                          :src="answer_full_file"
+                          v-show="item.answer_full_file"
+                          :src="item.answer_full_file"
                         />
                       </div>
                       <div v-else>
@@ -1063,8 +1063,8 @@
                       >
                         <div ref="mathJaxEl" v-html="item.answer_full" />
                         <img
-                          v-show="answer_full_file"
-                          :src="answer_full_file"
+                          v-show="item.answer_full_file"
+                          :src="item.answer_full_file"
                         />
                       </div>
                       <div v-else>

@@ -114,10 +114,30 @@ export default {
 
         if (progress < 1) {
           requestAnimationFrame(animate);
+        } else {
+          // After animation is complete, check the rolled number
+          this.checkRollResult();
         }
       };
 
       requestAnimationFrame(animate);
+    },
+
+    checkRollResult() {
+      // Get the rolled number (this is just a rough example)
+      // In reality, you would use your 3D object's final state
+      const rolledNumber = Math.floor(Math.random() * 6) + 1; // This is for testing; replace with actual dice result
+
+      console.log("Rolled number:", rolledNumber);
+
+      // Check if the rolled number is 6
+      if (rolledNumber === 6) {
+        // Call your API when the result is a six
+        // this.$axios
+        //   .post("/api/log-six", { userId: this.userId })
+        //   .then(() => console.log("Six rolled! API called."))
+        //   .catch((err) => console.error("API call failed:", err));
+      }
     },
   },
 };
