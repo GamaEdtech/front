@@ -7,15 +7,43 @@
           v-for="item in schoolList"
           :key="item.id"
           class="list-item"
-          :to="`/school/${item.id}/${$slugGenerator.convert(item.name)}`"
+          v-show="item.name"
+          :to="`/school/${item.id}/${item.slug}`"
         >
           <v-card-text>
             <div class="item-info">
               <div class="main-data d-flex">
                 <div>
-                  <h2 class="gtext-t4 font-weight-semibold mb-4">
-                    {{ item.name }}
-                  </h2>
+                  <div class="d-flex">
+                    <h2 class="gtext-t4 font-weight-semibold mb-4">
+                      {{ item.name }}
+                    </h2>
+                  </div>
+
+                  <div class="mb-2">
+                    <v-chip
+                      v-show="item.countryTitle"
+                      class="blue-grey darken-1 white--text mb-1"
+                      small
+                    >
+                      {{ item.countryTitle }}
+                    </v-chip>
+                    <v-chip
+                      v-show="item.stateTitle"
+                      class="blue-grey darken-1 white--text mb-1"
+                      :x-small="$vuetify.breakpoint.xs"
+                      small
+                    >
+                      {{ item.stateTitle }}
+                    </v-chip>
+                    <v-chip
+                      v-show="item.cityTitle"
+                      class="blue-grey darken-1 white--text mb-1"
+                      small
+                    >
+                      {{ item.cityTitle }}
+                    </v-chip>
+                  </div>
 
                   <!-- <v-chip class="primary">
 
@@ -37,48 +65,48 @@
 
              </v-chip> -->
                 </div>
-                <div class="item-img" v-if="!$parent.isExpanded">
+                <!-- <div class="item-img" v-if="!$parent.isExpanded">
                   <img :src="require('assets/images/default-school.png')" />
-                </div>
+                </div> -->
               </div>
               <v-divider class="mb-3" />
               <div class="item-footer">
                 <div class="float-left">
-                  <v-btn :disabled="!item.location" icon>
+                  <v-btn :disabled="!item.hasLocation" icon>
                     <v-icon> mdi-map-marker </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.phone1" icon>
+                  <v-btn :disabled="!item.hasPhone" icon>
                     <v-icon> mdi-phone </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.address" icon>
+                  <v-btn :disabled="!item.hasEmail" icon>
                     <v-icon> mdi-email </v-icon>
                   </v-btn>
-                  <v-btn :disabled="!item.site" icon>
+                  <v-btn :disabled="!item.hasWebsite" icon>
                     <v-icon> mdi-web </v-icon>
                   </v-btn>
                 </div>
 
                 <div class="float-right d-flex mt-1">
-                  <div class="rate-section gtext-t6 font-weight-semibold mr-1">
-                    {{ item.score }}
+                  <div class="rate-section gtext-t6 font-weight-semibold mr-4">
                     <v-icon color="primary"> mdi-star </v-icon>
+                    {{ item.score ? item.score.toFixed(1) : "New" }}
                   </div>
                   <div class="gtext-t6 primary-gray-300">
-                    Update:
+                    <v-icon>mdi-update</v-icon>
                     <span class="primary-gray-600">{{
-                      $dayjs(item.up_date).format("YYYY-MM-DD")
+                      $moment(item.lastModifyDate).format("YYYY-MM-DD")
                     }}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="item-img" v-if="$parent.isExpanded">
+            <!-- <div class="item-img" v-if="$parent.isExpanded">
               <img
                 class="float-right"
                 :src="require('assets/images/default-school.png')"
               />
-            </div>
+            </div> -->
           </v-card-text>
         </v-card>
 
@@ -96,8 +124,8 @@
       <div v-else-if="resultCount == 0 && schoolLoading == false">
         <span class="gtext-t4"> Opps! no data found </span>
       </div>
-      <div v-else>
-        <v-card class="list-item" v-for="i in 5" :key="i">
+      <!-- <div v-else>
+        <v-card class="list-item" v-for="i in 4" :key="i">
           <div class="item-info">
             <div class="main-data">
               <v-skeleton-loader
@@ -107,7 +135,7 @@
             <div></div>
           </div>
         </v-card>
-      </div>
+      </div> -->
     </v-container>
   </div>
 </template>

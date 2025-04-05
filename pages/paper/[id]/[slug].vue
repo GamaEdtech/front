@@ -1,7 +1,9 @@
+<!-- in refactor proccess -->
 <template>
   <div class="test-details-content">
     <!-- Start : Category -->
     <common-category />
+
     <!-- End:Category -->
 
     <!--  Start: breadcrumb  -->
@@ -17,14 +19,9 @@
     <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
-        <div class="detail mt-md-8">
+        <div class="detail mt-6 mt-md-8">
           <v-row>
-            <v-col cols="12" lg="3">
-              <!--Show gallery of preview and book first page-->
-              <details-preview-gallery ref="preview_gallery" />
-              <!--Show gallery of preview and book first page-->
-            </v-col>
-            <v-col cols="12" md="8" lg="6">
+            <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
               <!--  Description   -->
               <div class="d-flex mb-4">
                 <div class="w-100">
@@ -67,7 +64,9 @@
                     <!--Description-->
                     <span
                       v-show="editMode.describe == false"
-                      class="gama-text-body2"
+                      :class="
+                        display.xs ? 'gama-text-body1' : 'gama-text-body2'
+                      "
                       v-html="
                         contentData.description
                           ? contentData.description.replace(/\n/g, '<br />')
@@ -110,33 +109,49 @@
                   </div>
 
                   <div class="label-holder">
-                    <v-chip link class="mr-1">
+                    <v-chip
+                      link
+                      class="mr-1 blue-grey darken-1 white--text"
+                      :small="display.mdAndDown"
+                    >
                       <nuxt-link
                         :to="`/search?type=test&section=${contentData.section}`"
                       >
                         {{ contentData.section_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip link class="mr-1">
+                    <v-chip
+                      link
+                      class="mr-1 blue-grey darken-1 white--text"
+                      :small="display.mdAndDown"
+                    >
                       <nuxt-link
                         :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}`"
                       >
                         {{ contentData.base_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip link class="ma-1">
+                    <v-chip
+                      link
+                      class="ma-1 blue-grey darken-1 white--text"
+                      :small="display.mdAndDown"
+                    >
                       <nuxt-link
                         :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
                       >
                         {{ contentData.lesson_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip class="ma-1">
+                    <v-chip
+                      class="ma-1 blue-grey darken-1 white--text"
+                      :small="display.mdAndDown"
+                    >
                       {{ contentData.edu_month_title }}
                     </v-chip>
                     <v-chip
+                      :small="display.mdAndDown"
                       :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&edu_year=${contentData.edu_year}`"
-                      class="ma-1"
+                      class="ma-1 blue-grey darken-1 white--text"
                     >
                       {{ contentData.edu_year }}
                     </v-chip>
@@ -144,8 +159,8 @@
                 </div>
               </div>
               <!--   Download Btn and Description  -->
-              <div class="text-center download-sec">
-                <div class="d-none d-md-block mb-4" v-if="isFree == false">
+              <!-- <div class="text-center download-sec"> -->
+              <!-- <div class="d-none d-md-block mb-4" v-show="isFree == false">
                   <p v-if="!$auth.loggedIn" class="gama-text-body2">
                     <span class="mdi mdi-bell icon"></span>
                     <span @click="openAuthDialog('login')" class="login"
@@ -165,12 +180,12 @@
                     to="/user/charge-wallet"
                     >(Top Up Wallet)</nuxt-link
                   >
-                </div>
-                <!-- <div class="font-weight-bold answer gama-text-body2">
+                </div> -->
+              <!-- <div class="font-weight-bold answer gama-text-body2">
                   <span class="mdi mdi-checkbox-marked icon"></span>
                   <span> The key answer sheet is at the end of the exam file.</span>
                 </div> -->
-              </div>
+              <!-- </div> -->
               <!--   fileCopyRight  -->
               <!-- <div class="d-none d-md-block text-center">
                 <p class="gama-text-body2 file-copy-right">
@@ -178,7 +193,16 @@
                 </p>
               </div> -->
             </v-col>
-            <v-col md="4" lg="3">
+            <v-col cols="12" sm="5" lg="3" order-lg="first">
+              <!--Show gallery of preview and book first page-->
+              <details-preview-gallery
+                :images="previewImages"
+                ref="preview_gallery"
+              />
+              <!--Show gallery of preview and book first page-->
+            </v-col>
+
+            <v-col sm="7" md="4" lg="3">
               <v-card flat class="content_main_info">
                 <v-row class="align-center">
                   <v-col cols="3">
@@ -201,7 +225,7 @@
                 <v-row>
                   <v-col cols="12" class="pb-0">
                     <i class="fa-solid fa-folder mr-1 icon"></i>
-                    File type: {{ contentData.test_type_title }}
+                    Classification: {{ contentData.test_type_title }}
                   </v-col>
                   <v-col cols="12" class="pb-0">
                     <i class="fa-solid fa-book-open-reader mr-1 icon"></i>
@@ -299,7 +323,7 @@
 
                 <v-row class="mt-1 d-none d-md-block">
                   <v-col cols="12" class="pb-0">
-                    <div v-if="contentData.files.word.exist == true">
+                    <div v-if="contentData.files?.word.exist == true">
                       <v-btn
                         @click="startDownload('q_word')"
                         block
@@ -308,8 +332,8 @@
                       >
                         Download Question Doc
                         {{
-                          contentData.files.word.price > 0
-                            ? "| $" + contentData.files.word.price
+                          contentData.files?.word.price > 0
+                            ? "| $" + contentData.files?.word.price
                             : ""
                         }}
                       </v-btn>
@@ -317,14 +341,14 @@
                     <div v-if="contentData.files.pdf.exist == true">
                       <v-btn
                         @click="startDownload('q_pdf')"
-                        class="mb-2"
+                        class="mb-2 white--text font-weight-bold"
                         block
-                        color="error"
+                        color="#E60012"
                       >
-                        Download Question
+                        {{ contentData.test_type_title }}
                         {{
-                          contentData.files.word.price > 0
-                            ? "| $" + contentData.files.word.price
+                          contentData.files?.word.price > 0
+                            ? "| $" + contentData.files?.word.price
                             : ""
                         }}
                       </v-btn>
@@ -332,15 +356,15 @@
                     <div v-if="contentData.files.answer.exist == true">
                       <v-btn
                         v-show="contentData.files.answer.ext == 'pdf'"
-                        class="mb-2"
+                        class="mb-2 font-weight-bold"
                         @click="startDownload('a_file')"
                         block
-                        color="error"
+                        color="teal accent-3"
                       >
-                        Download Answer
+                        Mark Sheme
                         {{
-                          contentData.files.word.price > 0
-                            ? "| $" + contentData.files.word.price
+                          contentData.files?.word.price > 0
+                            ? "| $" + contentData.files?.word.price
                             : ""
                         }}
                       </v-btn>
@@ -353,12 +377,33 @@
                       >
                         Download Answer Doc
                         {{
-                          contentData.files.word.price > 0
-                            ? "| $" + contentData.files.word.price
+                          contentData.files?.word.price > 0
+                            ? "| $" + contentData.files?.word.price
                             : ""
                         }}
                       </v-btn>
                     </div>
+                    <v-btn
+                      v-if="
+                        contentData.exams && contentData.exams[0].status != 7
+                      "
+                      :to="`/exam/${contentData?.exams[0].id}`"
+                      block
+                      color="#5600e8"
+                      class="mb-2 white--text font-weight-bold"
+                    >
+                      Begin Quiz
+                    </v-btn>
+                    <v-btn
+                      v-else
+                      :to="`/test-maker/create?board=${contentData.section}&grade=${contentData.base}&subject=${contentData.lesson}&paperId=${contentData.id}`"
+                      block
+                      outlined
+                      color="primary"
+                      class="mb-2 white--text font-weight-bold"
+                    >
+                      Create Quiz
+                    </v-btn>
                   </v-col>
                 </v-row>
               </v-card>
@@ -381,7 +426,7 @@
       <v-card-text class="pb-0">
         <v-row class="px-10 text-center">
           <v-col cols="12" class="pb-1 pt-0">
-            <div v-if="contentData.files.word.exist == true">
+            <div v-if="contentData.files?.word.exist == true">
               <v-btn
                 @click="startDownload('q_word')"
                 block
@@ -390,8 +435,8 @@
               >
                 Download Question Doc
                 {{
-                  contentData.files.word.price > 0
-                    ? "| $" + contentData.files.word.price
+                  contentData.files?.word.price > 0
+                    ? "| $" + contentData.files?.word.price
                     : ""
                 }}
               </v-btn>
@@ -399,14 +444,14 @@
             <div v-if="contentData.files.pdf.exist == true">
               <v-btn
                 @click="startDownload('q_pdf')"
-                class="mb-2"
+                class="mb-2 white--text font-weight-bold"
                 block
-                color="error"
+                color="#E60012"
               >
-                Download Question
+                Question Paper
                 {{
-                  contentData.files.word.price > 0
-                    ? "| $" + contentData.files.word.price
+                  contentData.files?.word.price > 0
+                    ? "| $" + contentData.files?.word.price
                     : ""
                 }}
               </v-btn>
@@ -414,15 +459,15 @@
             <div v-if="contentData.files.answer.exist == true">
               <v-btn
                 v-show="contentData.files.answer.ext == 'pdf'"
-                class="mb-2"
+                class="mb-2 font-weight-bold"
                 @click="startDownload('a_file')"
                 block
-                color="error"
+                color="teal accent-3"
               >
-                Download Answer
+                Mark Sheme
                 {{
-                  contentData.files.word.price > 0
-                    ? "| $" + contentData.files.word.price
+                  contentData.files?.word.price > 0
+                    ? "| $" + contentData.files?.word.price
                     : ""
                 }}
               </v-btn>
@@ -435,8 +480,8 @@
               >
                 Download Answer Doc
                 {{
-                  contentData.files.word.price > 0
-                    ? "| $" + contentData.files.word.price
+                  contentData.files?.word.price > 0
+                    ? "| $" + contentData.files?.word.price
                     : ""
                 }}
               </v-btn>
@@ -580,13 +625,13 @@
     </v-container>
 
     <!-- Start : Past Papers -->
-    <details-related-content
+    <!-- <details-related-content
       class="mt-8"
       :board="contentData.section"
       :grade="contentData.base"
       :subject="contentData.lesson"
       :test_type="contentData.test_type"
-    />
+    /> -->
 
     <!-- End : Past Papers -->
     <!-- Start: Feed -->
@@ -610,15 +655,12 @@
       </v-container> -->
     </section>
     <!-- End: Feed -->
-
-    <common-crash-report ref="crash_report" />
   </div>
 </template>
 <script setup>
 const route = useRoute();
 const router = useRouter();
 const { data: contentData, error } = await useAsyncData(async () => {
-  console.log("start fetching");
   try {
     const response = await $fetch(`/api/v1/tests/${route.params.id}`);
     return response.data;
@@ -630,18 +672,42 @@ const { data: contentData, error } = await useAsyncData(async () => {
   }
 });
 
+const schemaData = computed(() => ({
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  name: contentData.value?.title || "GamaEdtech",
+  image:
+    contentData.value?.thumb_pic ||
+    contentData.value?.lesson_pic ||
+    "https://gamatrain.com/images/gamatrain-logo.svg", // Ensure it's a valid URL
+  url: route.fullPath || "", // Optional: Add the page URL
+  description: contentData.value?.description || "GamaEdtech",
+}));
+
 useHead({
   title: contentData.value.title,
+  script: [
+    {
+      hid: "json-ld-schema",
+      innerHTML: JSON.stringify(schemaData.value),
+      type: "application/ld+json",
+    },
+  ],
+  __dangerouslyDisableSanitizersByTagID: {
+    "json-ld-schema": ["innerHTML"],
+  },
 });
+
+const preview_gallery = ref(null);
+const previewImages = ref([]);
 
 //Init gallery image
 if (contentData.value) {
-  preview_gallery.value.images.push(contentData.value.thumb_pic);
-  preview_gallery.value.images.images.push(contentData.value.lesson_pic);
-  preview_gallery.value.images.carouselVal = 0;
-
+  previewImages.value.push(contentData.value.thumb_pic);
+  previewImages.value.push(contentData.value.lesson_pic);
+  previewImages.value.carouselVal = 0;
   //Update help link data
-  preview_gallery.value.images.help_link_data = {
+  previewImages.value.help_link_data = {
     state: contentData.value.state,
     section: contentData.value.section,
     base: contentData.value.base,
@@ -650,8 +716,6 @@ if (contentData.value) {
   };
 }
 
-initBreadCrumb();
-const preview_gallery = ref(null);
 const sell_btn = ref(true);
 const rating = ref(4.5);
 const breads = ref([
@@ -689,9 +753,10 @@ const model = ref(null);
 
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
+const display = useGlobalDisplay(); // Assuming you are using this composable
 
 const initBreadCrumb = () => {
-  this.breads.push(
+  breads.value.push(
     {
       text: contentData.value.section_title,
       disabled: false,
@@ -709,6 +774,9 @@ const initBreadCrumb = () => {
     }
   );
 };
+
+initBreadCrumb();
+
 const openAuthDialog = (val) => {
   router.push({ query: { auth_form: val } });
 };
@@ -851,6 +919,8 @@ const updateDetails = () => {
   position: fixed !important;
   bottom: 0 !important;
   z-index: 2 !important;
+  padding-top: 16px !important;
+  background: #f6f8fa !important;
   border-top: 0.1rem solid #e1e2e3;
   width: 100%;
 }

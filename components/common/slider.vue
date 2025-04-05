@@ -1,30 +1,28 @@
 <template>
   <div ref="slider" class="px-0 pb-0">
     <v-card outlined flat class="py-8" color="rgba(0,0,0,1)">
-      <v-container class="white--text ">
+      <v-container class="white--text">
         <p class="text-left text-md-h4 text-h5 font-weight-bold">
-          Stats and Achievements
-          (GAMA Experience in Iran’s EdTech Market)
+          Stats and Achievements (GAMA Experience in Iran’s EdTech Market)
         </p>
         <v-row class="stat-sec mx-auto">
-          <v-col cols="2"
-                 v-for="(item, index) in statList"
-                 :key="index"
-                 class="d-flex justify-center align-center stat-holder mt-5">
-                  <div
-                    class="
-                    d-flex
-                    flex-column
-                    justify-center
-                    align-center
-                    stat-item
-                 ">
+          <v-col
+            cols="2"
+            v-for="(item, index) in statList"
+            :key="index"
+            class="d-flex justify-center align-center stat-holder mt-5"
+          >
+            <div
+              class="d-flex flex-column justify-center align-center stat-item"
+            >
               <span class="stat-icon d-flex align-center justify-center">
                 <i :class="' icon-g icon icong-' + item.icon"> </i>
               </span>
-                    <span class="stat-label white--text">{{ item.label }}</span>
-                    <span class="stat-value" :id="'stat' + index + 1">{{ item.counter | numberFormat }} +</span>
-                  </div>
+              <span class="stat-label white--text">{{ item.label }}</span>
+              <span class="stat-value" :id="'stat' + index + 1"
+                >{{ $numberFormat(item.counter) }} +</span
+              >
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -36,21 +34,21 @@
 export default {
   data: () => ({
     statList: [
-      {label: "School", value: 130000, counter: 130000, icon: "school"},
-      {label: "Tutor", value: 500000, counter: 500000, icon: "teacher"},
-      {label: "Student", value: 3000000, counter: 3000000, icon: "student"},
-      {label: "Paper", value: 60000, counter: 60000, icon: "test"},
-      {label: "Multimedia", value: 37000, counter: 37000, icon: "learnfiles"},
-      {label: "Exam", value: 7000, counter: 7000, icon: "azmoon"},
+      { label: "School", value: 130000, counter: 130000, icon: "school" },
+      { label: "Tutor", value: 500000, counter: 500000, icon: "teacher" },
+      { label: "Student", value: 3000000, counter: 3000000, icon: "student" },
+      { label: "Paper", value: 60000, counter: 60000, icon: "test" },
+      { label: "Multimedia", value: 37000, counter: 37000, icon: "learnfiles" },
+      { label: "Exam", value: 7000, counter: 7000, icon: "azmoon" },
     ],
     countsInterval: null,
     countsIntervalCompleted: 0,
-    bottomOfElement: false
+    bottomOfElement: false,
   }),
   watch: {
     bottomOfElement: function (val) {
       this.countsInterval = setInterval(this.updated);
-    }
+    },
   },
   mounted() {
     this.scroll();
@@ -79,18 +77,20 @@ export default {
         _y += el.offsetTop - el.scrollTop;
         el = el.offsetParent;
       }
-      return {top: _y, left: _x};
+      return { top: _y, left: _x };
     },
     scroll() {
       window.onscroll = () => {
         let offset = this.getOffsetOfElement(this.$refs.slider);
         let spaceSize = 0;
-        let bottomOfElement = (window.innerHeight + window.scrollY) >= (offset.top + this.$refs.slider.clientHeight - spaceSize);
+        let bottomOfElement =
+          window.innerHeight + window.scrollY >=
+          offset.top + this.$refs.slider.clientHeight - spaceSize;
 
         if (bottomOfElement) {
-          this.bottomOfElement = true
+          this.bottomOfElement = true;
         }
-      }
+      };
     },
   },
 };

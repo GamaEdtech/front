@@ -1,3 +1,5 @@
+<!-- in refactor proccess -->
+
 <template>
   <div>
     <div>
@@ -42,7 +44,7 @@
           <p class="mx-2">
             <span class="d-none d-md-inline"> Updated: </span>
             <span class="date_string d-inline-block">
-              {{ $dayjs(contentData.up_date).fromNow() }}
+              {{ $moment(contentData.up_date).fromNow() }}
             </span>
           </p>
         </div>

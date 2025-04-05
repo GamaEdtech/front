@@ -232,7 +232,7 @@
                 <v-chip label class="test-count-label">
                   <span class="label-text">Test count:&nbsp; </span>
                   <span class="label-val">{{
-                    album.tests_num | numberFormat
+                    $numberFormat(album.tests_num)
                   }}</span>
                 </v-chip>
               </v-card-actions>

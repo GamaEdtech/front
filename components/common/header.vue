@@ -118,8 +118,8 @@
         <!--Login component-->
         <common-login
           v-model="login_modal"
-          :switchToRegister.sync="currentOpenDialog"
-          :switchToPassRecover.sync="currentOpenDialog"
+          v-model:switchToRegister="currentOpenDialog"
+          v-model:switchToPassRecover="currentOpenDialog"
         />
         <!--End login component-->
 
@@ -143,107 +143,90 @@
       <v-navigation-drawer
         v-model="sidebar"
         app
-        class="hidden-lg-and-up main-sidebar"
+        class="d-none d-lg-flex main-sidebar"
       >
-        <!-- Start:  Menu items -->
-        <v-list dense shaped>
-          <!--Profile info-->
+        <v-list density="compact">
+          <!-- Profile Info -->
           <v-list-group v-if="$auth.loggedIn" active-class="menu_group_active">
-            <template v-slot:activator>
-              <v-icon icon="mdi-account-outline" />
-              <v-list-item-title>
-                <span v-if="$auth.user?.first_name">{{
-                  $auth.user?.first_name
-                }}</span>
-                <span v-else-if="$auth.user?.last_name">{{
-                  $auth.user.last_name
-                }}</span>
-                <span v-else>No name</span>
-              </v-list-item-title>
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props">
+                <v-icon icon="mdi-account-outline" />
+                <v-list-item-title>
+                  {{
+                    $auth.user?.first_name || $auth.user?.last_name || "No name"
+                  }}
+                </v-list-item-title>
+              </v-list-item>
             </template>
 
-            <v-list-item
-              class="pl-7"
-              v-for="(item, i) in user_profile_items"
-              :key="i"
-              link
-            >
+            <v-list-item v-for="(item, i) in user_profile_items" :key="i" link>
               <template v-slot:prepend>
-                <v-icon :icon="item.icon"></v-icon>
+                <v-icon :icon="item.icon" />
               </template>
-              <v-list-item-title v-text="item.title"></v-list-item-title>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
 
-            <v-list-item class="pl-7" @click="$auth.logout()">
+            <v-list-item @click="$auth.logout()">
               <template v-slot:prepend>
-                <v-icon :icon="'mdi-exit-to-app'"></v-icon>
+                <v-icon icon="mdi-exit-to-app" />
               </template>
-              <v-list-item-title v-text="'Logout'"></v-list-item-title>
+              <v-list-item-title>Logout</v-list-item-title>
             </v-list-item>
           </v-list-group>
+
+          <!-- Notifications -->
           <v-list-item
             v-if="$auth.loggedIn"
             @click="notificationListDialog = true"
           >
             <template v-slot:prepend>
               <v-badge overlap content="3">
-                <v-icon :icon="'mdi-bell-outline'"></v-icon>
+                <v-icon icon="mdi-bell-outline" />
               </v-badge>
             </template>
             <v-list-item-title> Notification </v-list-item-title>
           </v-list-item>
+
+          <!-- Login Button -->
           <v-list-item @click="openLoginDialog()" v-if="!$auth.loggedIn">
             <template v-slot:prepend>
-              <v-icon :icon="'mdi-account-outline'"></v-icon>
+              <v-icon icon="mdi-account-outline" />
             </template>
             <v-list-item-title>
-              <span class="primary--text">Sign in</span>
-              / Sign up
+              <span class="primary--text">Sign in</span> / Sign up
             </v-list-item-title>
           </v-list-item>
-          <!--End Profile info-->
 
-          <!--Mobile menu items-->
-          <div v-for="(item, side) in menuItems" :key="side">
-            <v-list-item
-              class="py-2"
-              active-class="menu_active"
-              v-if="!item.subMenuList"
-              :to="item.link"
-            >
+          <!-- Menu Items -->
+          <div v-for="(item, index) in menuItems" :key="index">
+            <!-- Normal Items -->
+            <v-list-item v-if="!item.subMenuList" :to="item.link">
               <template v-slot:prepend>
-                <v-icon :icon="item.icon" :color="item.icon_color"></v-icon>
+                <v-icon :icon="item.icon" :color="item.icon_color" />
               </template>
-              <v-list-item-title v-text="item.title" class="menu-title" />
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
 
-            <v-list-group
-              v-else
-              active-class="menu_group_active"
-              :key="item.title"
-              no-action
-              :value="false"
-            >
-              <template v-slot:activator>
-                <v-list-item-title
-                  v-text="item.title"
-                  class="py-2"
-                ></v-list-item-title>
+            <!-- Submenu Items -->
+            <v-list-group v-else active-class="menu_group_active" no-action>
+              <template v-slot:activator="{ props }">
+                <v-list-item v-bind="props">
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
               </template>
 
               <v-list-item
-                class="pl-7"
-                active-class="menu_active"
-                v-for="(subMenuItem, side) in item.subMenuList"
+                v-for="(subMenuItem, subIndex) in item.subMenuList"
+                :key="subIndex"
                 :to="subMenuItem.link"
-                :title="subMenuItem.title"
-                :key="side.title"
-              />
+              >
+                <v-list-item-title>{{ subMenuItem.title }}</v-list-item-title>
+              </v-list-item>
             </v-list-group>
           </div>
         </v-list>
-        <!-- End:  Menu items -->
       </v-navigation-drawer>
+
       <!-- End:  show sidebar menu in mobile -->
 
       <!--   Start: navbar   main-container -->
@@ -331,7 +314,7 @@
                           v-model="searchKey"
                           label="Ex: Paper Summer Session"
                         >
-                          <template slot="append">
+                          <template v-slot:append>
                             <v-icon
                               v-if="searchResultsSection"
                               @click="closeSearch()"
@@ -339,7 +322,7 @@
                               mdi-close-circle
                             </v-icon>
                           </template>
-                          <template slot="append-outer">
+                          <template v-slot:append-outer>
                             <v-btn dense color="#FFB300" class="white--text">
                               <v-icon>mdi-magnify</v-icon>
                             </v-btn>
@@ -593,14 +576,11 @@
 
                 <v-list-item>
                   <div class="date">{{ item.date }}</div>
-                  <v-list-item-title
-                    class="title"
-                    v-html="item.title"
-                  ></v-list-item-title>
+                  <v-list-item-title class="title" :title="item.title" />
                   <v-list-item-subtitle
                     class="describe"
-                    v-html="item.describe"
-                  ></v-list-item-subtitle>
+                    :title="item.describe"
+                  />
                 </v-list-item>
               </v-list-item>
             </template>
@@ -615,6 +595,7 @@ const sidebar = ref(false);
 const dialog = ref(false);
 const logo = ref("mainlogo-gamatrain.png");
 const avatar = ref("dexter-morse.png");
+const notificationComponent = ref(null);
 const menuItems = [
   {
     title: "About us",
@@ -860,9 +841,10 @@ const setActiveFilter = (val) => {
 };
 
 //Search section
+const mobileSearchResult = ref(null);
 const checkSearchScroll = () => {
-  const scrollableDiv = this.$refs.mobileSearchResult;
-  if (this.isScrollAtBottom(scrollableDiv) && this.allDataLoaded == false) {
+  const scrollableDiv = mobileSearchResult.value;
+  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
     pageNum.value++;
     search();
   }
@@ -899,6 +881,7 @@ const search = () => {
         });
   }, 800);
 };
+
 const closeSearch = () => {
   searchResultsSection.value = false;
   searchKey.value = "";

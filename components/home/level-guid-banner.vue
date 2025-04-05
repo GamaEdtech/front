@@ -1,303 +1,254 @@
 <template>
-    <v-container fluid id="level-guid-banner">
-        <v-container>
-            <v-row>
-                <v-col cols="12" class="text-center">
-                    <h2 class="gama-text-h4 black--text">
-                        Earn Money with GamaTrain
-                    </h2>
-                </v-col>
-                <v-col cols="12" class="text-center">
-                    <h2 class="gama-text-h4">{{ slideArr[slideIndex].caption }}</h2>
-                </v-col>
-                <v-col cols="12">
-                    <p class="gama-text-body1">{{ slideArr[slideIndex].describe }}</p>
-                    <div class="img-holder">
-                        <v-slide-x-transition>
-                            <img :alt="slideArr[slideIndex].caption" v-if="expand"
-                                :src="`/images/${slideArr[slideIndex].img}`" />
-                        </v-slide-x-transition>
-                    </div>
+  <v-container fluid id="level-guid-banner">
+    <v-container>
+      <v-row>
+        <v-col cols="12" class="text-center">
+          <h2 class="gama-text-h4 black--text">Earn Money with GamaTrain</h2>
+        </v-col>
+        <v-col cols="12" class="text-center">
+          <h2 class="gama-text-h4">{{ slideArr[slideIndex].caption }}</h2>
+        </v-col>
+        <v-col cols="12">
+          <p class="gama-text-body1">{{ slideArr[slideIndex].describe }}</p>
+          <div class="img-holder">
+            <v-slide-x-transition>
+              <img
+                :alt="slideArr[slideIndex].caption"
+                v-if="expand"
+                :src="`/images/${slideArr[slideIndex].img}`"
+              />
+            </v-slide-x-transition>
+          </div>
 
-
-                    <v-item-group v-model="slideIndex" class="paginate d-flex justify-space-between ">
-                        <v-item v-for="n in slideArr.length" :key="n">
-                            <template>
-                                <v-btn icon variant="text" @click="slideIndex = n - 1">
-                                    {{ n }}
-                                </v-btn>
-                            </template>
-                        </v-item>
-                    </v-item-group>
-                </v-col>
-
-            </v-row>
-        </v-container>
+          <v-item-group
+            v-model="slideIndex"
+            class="paginate d-flex justify-space-between"
+          >
+            <v-item v-for="n in slideArr.length" :key="n">
+              <v-btn icon variant="text" @click="slideIndex = n - 1">
+                {{ n }}
+              </v-btn>
+            </v-item>
+          </v-item-group>
+        </v-col>
+      </v-row>
     </v-container>
+  </v-container>
 </template>
 <script>
 export default {
-    name: 'level-guid-banner',
-    props: {
-        slideArr: {
-            default: []
-        }
-
+  name: "level-guid-banner",
+  props: {
+    slideArr: {
+      default: [],
     },
-    data() {
-        return {
-            slideIndex: 0,
-            expand: true,
-            intervalId: null // Store the interval ID
-        }
+  },
+  data() {
+    return {
+      slideIndex: 0,
+      expand: true,
+      intervalId: null, // Store the interval ID
+    };
+  },
+  methods: {
+    handleAutoCycle() {
+      this.intervalId = setInterval(() => {
+        if (this.slideIndex == this.slideArr.length - 1) this.slideIndex = 0;
+        else this.slideIndex++;
+      }, 8000);
     },
-    methods: {
-        handleAutoCycle() {
-            this.intervalId = setInterval(() => {
-                if (this.slideIndex == (this.slideArr.length - 1))
-                    this.slideIndex = 0;
-                else
-                    this.slideIndex++;
-
-            }, 8000);
-        },
-        stopInterval() {
-            clearInterval(this.intervalId); // Clear the interval using the interval ID
-        }
-
+    stopInterval() {
+      clearInterval(this.intervalId); // Clear the interval using the interval ID
     },
-    watch: {
-        slideIndex(val) {
-            this.expand = false;
+  },
+  watch: {
+    slideIndex(val) {
+      this.expand = false;
 
-            setTimeout(() => {
-                this.expand = true;
-            }, 500)
-        }
+      setTimeout(() => {
+        this.expand = true;
+      }, 500);
     },
-    mounted() {
-        this.handleAutoCycle();
-    },
-    beforeDestroy() {
-        this.stopInterval();
-    }
-}
-
-
+  },
+  mounted() {
+    this.handleAutoCycle();
+  },
+  beforeDestroy() {
+    this.stopInterval();
+  },
+};
 </script>
 
-<style >
+<style>
 #level-guid-banner {
-    padding-top: 2.4rem;
-    padding-bottom: 2.4rem;
-    height: 46.3rem;
-    background: #F6F8FA;
+  padding-top: 2.4rem;
+  padding-bottom: 2.4rem;
+  height: 46.3rem;
+  background: #f6f8fa;
 
+  .black--text {
+    color: #24292f !important;
+    margin-bottom: 0.4rem;
+  }
 
-    .black--text {
-        color: #24292F !important;
-        margin-bottom: 0.4rem;
+  .gama-text-h4 {
+    color: #ffb600;
+    text-align: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .gama-text-body1 {
+    text-align: center;
+    color: #6e7781;
+    margin-bottom: 0.4rem;
+  }
+
+  .img-holder {
+    width: 19.3rem !important;
+    height: 14.4rem !important;
+    text-align: center;
+    margin: 1.6rem auto 5.8rem auto;
+
+    & > img {
+      width: 19.3rem !important;
+      height: 14.4rem !important;
+      margin: 0 auto 0 auto;
+    }
+  }
+
+  .paginate {
+    width: 22.7rem;
+    height: 5.1rem;
+    border-radius: 3rem;
+    background: #eaeef2;
+    padding: 0 0.4rem 0 0.4rem;
+    margin: 0 auto 0 auto;
+
+    .v-btn {
+      width: 4.4rem;
+      height: 4.4rem;
+      justify-content: center;
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: bold;
+      margin: auto 0;
     }
 
-    .gama-text-h4 {
-        color: #FFB600;
-        text-align: center;
-        margin-bottom: 0.4rem;
+    .v-item--active {
+      color: #ffffff;
+      background-color: #ffb300;
+    }
+  }
+}
 
+@media (min-width: 600px) {
+  #level-guid-banner {
+    padding-top: 3.6rem;
+    padding-bottom: 2.4rem;
+    height: 51.8rem;
+    background: #f6f8fa;
+
+    .gama-text-h4 {
+      color: #ffb600;
+      text-align: center;
     }
 
     .gama-text-body1 {
-        text-align: center;
-        color: #6E7781;
-        margin-bottom: 0.4rem;
-
+      text-align: center;
+      color: #6e7781;
     }
-
-
-
-
 
     .img-holder {
+      width: 19.3rem !important;
+      height: 14.4rem !important;
+      margin: 1.6rem auto 5.8rem auto;
+
+      & > img {
         width: 19.3rem !important;
         height: 14.4rem !important;
-        text-align: center;
-        margin: 1.6rem auto 5.8rem auto;
-
-        &>img {
-            width: 19.3rem !important;
-            height: 14.4rem !important;
-            margin: 0 auto 0 auto;
-        }
+        margin: 0 auto 0 auto;
+      }
     }
-
-
 
     .paginate {
-        width: 22.7rem;
-        height: 5.1rem;
-        border-radius: 3rem;
-        background: #EAEEF2;
-        padding: 0 0.4rem 0 0.4rem;
+      width: 22.7rem;
+      height: 5.1rem;
+      border-radius: 3rem;
+      background: #eaeef2;
+      padding: 0 0.4rem 0 0.4rem;
+      margin: 0 auto 0 auto;
+
+      .v-btn {
+        width: 4.4rem;
+        height: 4.4rem;
+        justify-content: center;
+        background-color: #ffffff;
+        color: #000000;
+        font-weight: bold;
+        margin: auto 0;
+      }
+
+      .v-item--active {
+        color: #ffffff;
+        background-color: #ffb300;
+      }
+    }
+  }
+}
+
+@media (min-width: 1264px) {
+  #level-guid-banner {
+    height: 64.2rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+
+    .black--text {
+      margin-bottom: 3.2rem;
+    }
+
+    .gama-text-h4 {
+      margin-bottom: 3.2rem;
+    }
+
+    .gama-text-body1 {
+      margin-bottom: 3.2rem;
+    }
+
+    .img-holder {
+      width: 26rem !important;
+      height: 20rem !important;
+      margin: 1.6rem auto 2.6rem auto;
+
+      & > img {
+        width: 26rem !important;
+        height: 20rem !important;
         margin: 0 auto 0 auto;
-
-
-        .v-btn {
-            width: 4.4rem;
-            height: 4.4rem;
-            justify-content: center;
-            background-color: #FFFFFF;
-            color: #000000;
-            font-weight: bold;
-            margin: auto 0;
-
-
-
-        }
-
-
-        .v-item--active {
-            color: #FFFFFF;
-            background-color: #FFB300;
-        }
+      }
     }
-}
 
-@media(min-width: 600px) {
+    .paginate {
+      width: 22.7rem;
+      height: 5.1rem;
+      border-radius: 3rem;
+      background: #eaeef2;
+      padding: 0 0.4rem 0 0.4rem;
+      margin: 0 auto 0 auto;
 
-    #level-guid-banner {
-        padding-top: 3.6rem;
-        padding-bottom: 2.4rem;
-        height: 51.8rem;
-        background: #F6F8FA;
+      .v-btn {
+        width: 4.4rem;
+        height: 4.4rem;
+        justify-content: center;
+        background-color: #ffffff;
+        color: #000000;
+        font-weight: bold;
+        margin: auto 0;
+      }
 
-
-        .gama-text-h4 {
-            color: #FFB600;
-            text-align: center;
-
-        }
-
-        .gama-text-body1 {
-            text-align: center;
-            color: #6E7781;
-
-        }
-
-
-
-
-
-        .img-holder {
-            width: 19.3rem !important;
-            height: 14.4rem !important;
-            margin: 1.6rem auto 5.8rem auto;
-
-            &>img {
-                width: 19.3rem !important;
-                height: 14.4rem !important;
-                margin: 0 auto 0 auto;
-            }
-        }
-
-
-
-        .paginate {
-            width: 22.7rem;
-            height: 5.1rem;
-            border-radius: 3rem;
-            background: #EAEEF2;
-            padding: 0 0.4rem 0 0.4rem;
-            margin: 0 auto 0 auto;
-
-
-            .v-btn {
-                width: 4.4rem;
-                height: 4.4rem;
-                justify-content: center;
-                background-color: #FFFFFF;
-                color: #000000;
-                font-weight: bold;
-                margin: auto 0;
-
-
-
-            }
-
-
-            .v-item--active {
-                color: #FFFFFF;
-                background-color: #FFB300;
-            }
-        }
+      .v-item--active {
+        color: #ffffff;
+        background-color: #ffb300;
+      }
     }
-}
-
-
-@media(min-width: 1264px) {
-    #level-guid-banner {
-        height: 64.2rem;
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-
-
-
-        .black--text {
-            margin-bottom: 3.2rem;
-        }
-
-        .gama-text-h4 {
-            margin-bottom: 3.2rem;
-        }
-
-        .gama-text-body1 {
-            margin-bottom: 3.2rem;
-        }
-
-
-
-        .img-holder {
-            width: 26rem !important;
-            height: 20rem !important;
-            margin: 1.6rem auto 2.6rem auto;
-
-            &>img {
-                width: 26rem !important;
-                height: 20rem !important;
-                margin: 0 auto 0 auto;
-
-            }
-        }
-
-
-
-        .paginate {
-            width: 22.7rem;
-            height: 5.1rem;
-            border-radius: 3rem;
-            background: #EAEEF2;
-            padding: 0 0.4rem 0 0.4rem;
-            margin: 0 auto 0 auto;
-
-
-            .v-btn {
-                width: 4.4rem;
-                height: 4.4rem;
-                justify-content: center;
-                background-color: #FFFFFF;
-                color: #000000;
-                font-weight: bold;
-                margin: auto 0;
-
-
-
-            }
-
-
-            .v-item--active {
-                color: #FFFFFF;
-                background-color: #FFB300;
-            }
-        }
-    }
+  }
 }
 </style>

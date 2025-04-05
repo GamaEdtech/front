@@ -1,36 +1,45 @@
+<!-- in refactor proccess -->
+
 <template>
   <div class="content-items">
     <v-card
-      class="mb-1 content-item rounded"
-      v-for="(item, index) in items"
-      :key="index"
+      class="mb-1 content-item rounded-sm"
+      v-for="item in items"
+      :key="item.value"
     >
       <v-card-text class="pb-0">
         <div class="d-flex">
-          <div class="py-4 img-holder">
+          <div class="pb-4 py-sm-4 img-holder">
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
-                @error="imgErrorHandler(item, key)"
                 :src="item.lesson_pic"
                 :alt="item.lesson_title"
                 class="item-image"
               >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
               </v-img>
               <v-card
                 v-else
-                class="book-no-img mx-auto fill-height align-center justify-center"
+                class="book-no-img mx-autofill-height align-center justify-center"
               >
-                <v-card-text class="pa-0">
-                  <p class="font-weight-bold mb-3 mt-5">
-                    {{ item.lesson_title }}
-                  </p>
-                  <a href="https://gamatrain.com">Gamatrain.com</a>
-                </v-card-text>
+                <p class="font-weight-bold mb-2">{{ item.lesson_title }}</p>
+                <a href="https://gamatrain.com">Gamatrain.com</a>
               </v-card>
             </div>
           </div>
-          <div class="content-holder py-4">
+          <div class="content-holder pb-4 py-sm-4">
             <v-card
               flat
               class="fill-height tutorial-content d-flex flex-column pl-3 justify-space-between"
@@ -50,7 +59,7 @@
                 ></nuxt-link>
                 <div class="mt-3">
                   <v-chip
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
@@ -59,7 +68,7 @@
                   </v-chip>
                   <v-chip
                     :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
                   >
@@ -68,7 +77,7 @@
                   <v-chip
                     :x-small="display.xs"
                     :small="!display.xs"
-                    class="mr-1 mb-1"
+                    class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :to="`/search?type=${$route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}
@@ -83,22 +92,13 @@
                   <v-col cols="10" sm="10" md="10" lg="11" class="px-0">
                     <div class="d-flex pt-3 pt-md-0">
                       <div
-                        class="item-content-user gama-text-overline d-flex align-center"
-                      >
-                        <v-avatar size="2em">
-                          <img :src="item.avatar" alt="Avatar" />
-                        </v-avatar>
-                        <span class="mx-2"
-                          >{{ item.first_name }} {{ item.last_name }}</span
-                        >
-                      </div>
-
-                      <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                        class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
                       >
                         <i class="fa-solid fa-sticky-note fa-xl"></i>
                         <span class="mx-2">
-                          <span class="d-none d-lg-inline"> Paper type: </span>
+                          <span class="d-none d-lg-inline">
+                            Classification:
+                          </span>
                           <span class="date_string d-inline-block">
                             {{ item.test_type_title }}
                           </span>
@@ -164,22 +164,11 @@
           <v-col cols="10" class="py-0">
             <div class="d-flex pt-3">
               <div
-                class="item-content-user gama-text-overline d-flex align-center"
-              >
-                <v-avatar size="1.28em">
-                  <img :src="item.avatar" alt="Avatar" />
-                </v-avatar>
-                <span class="mx-2"
-                  >{{ item.first_name }} {{ item.last_name }}</span
-                >
-              </div>
-
-              <div
-                class="item-content-last-update gama-text-overline d-flex align-center mx-auto"
+                class="item-content-last-update gama-text-overline d-flex align-center mr-auto ml-1"
               >
                 <i class="fa-solid fa-sticky-note"></i>
                 <span class="mx-2">
-                  <span class="d-none d-sm-inline"> Paper type: </span>
+                  <span class="d-none d-sm-inline"> Classification: </span>
                   <span class="date_string d-inline-block">
                     {{ item.test_type_title }}
                   </span>
@@ -231,16 +220,18 @@
   </div>
 </template>
 
-<script setup>
-import { useDisplay } from "vuetify/lib/framework.mjs";
-
-const display = useDisplay();
-const props = defineProps({
-  items: Array,
-});
-
-const imgErrorHandler = (key) => {
-  props.items[key].lesson_pic = "";
+<script>
+export default {
+  name: "paper-list",
+  props: ["items"],
+  data() {
+    return {};
+  },
+  computed: {
+    display() {
+      return useGlobalDisplay(); // Call the composable
+    },
+  },
 };
 </script>
 

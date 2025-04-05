@@ -2,7 +2,7 @@
   <v-container fluid class="px-0 py-0 mt-md-0">
     <home-main-slider />
 
-    <home-grade-explorer :stats="stats" />
+    <lazy-home-grade-explorer v-if="stats?.length" :stats="stats" />
 
     <home-level-guid-banner :slide-arr="slideArr" />
 
@@ -18,7 +18,7 @@
             </p>
             <v-btn
               :large="display.mdAndUp"
-              :small="xs"
+              :small="display.xs"
               to="/smart-learning"
               rounded
               class="primary gama-btn"
@@ -98,7 +98,7 @@
           </p>
           <v-btn
             :large="display.mdAndUp"
-            :small="xs"
+            :small="display.xs"
             rounded
             class="primary gama-btn"
             to="/school-service"
@@ -106,7 +106,7 @@
           >
           <v-btn
             :large="display.mdAndUp"
-            :small="xs"
+            :small="display.xs"
             rounded
             class="primary gama-btn"
             to="/school"
@@ -138,7 +138,7 @@
             <v-btn
               rounded
               :large="display.mdAndUp"
-              :small="xs"
+              :small="display.xs"
               to="/earn-money"
               class="primary gama-btn"
               >Earn money</v-btn

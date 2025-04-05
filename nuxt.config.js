@@ -1,4 +1,5 @@
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -83,10 +84,9 @@ export default defineNuxtConfig({
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    // { src: "plugins/vee-validate.js", ssr: true },
     { src: "plugins/helper.js" },
-    // { src: "plugins/vue-emoji-picker", ssr: false },
-    // { src: "plugins/img-cropper", ssr: false },
+    { src: "plugins/vue-emoji-picker", ssr: false },
+    { src: "plugins/img-cropper", ssr: false },
     { src: "plugins/vuedraggable", ssr: false },
   ],
 
@@ -122,7 +122,6 @@ export default defineNuxtConfig({
   modules: [
     "dayjs-nuxt",
     "nuxt-gtag",
-    "@vee-validate/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
@@ -135,9 +134,12 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/search": { prerender: true }, // Ensures it's treated as a static page
+    // "/search": { prerender: true }, // Ensures it's treated as a static page
     "/api/v1/**": {
       proxy: "https://core.gamatrain.com/api/v1/**",
+    },
+    "/api/v2/**": {
+      proxy: "https://api.gamaedtech.com/api/v1/**",
     },
     "/uploads/**": {
       proxy: "https://core.gamatrain.com/uploads/**",
@@ -237,7 +239,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    prerender: { routes: ["/search"] },
+    // prerender: { routes: ["/search"] },
   },
 
   server: {

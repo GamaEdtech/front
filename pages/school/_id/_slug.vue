@@ -22,7 +22,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
         <client-only>
@@ -63,7 +63,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
       </v-col>
@@ -119,7 +119,7 @@
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t4 primary-blue-500">You enter</p>
+            <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
         <v-file-input
@@ -137,9 +137,9 @@
         <v-row class="mt-6 d-flex d-md-none">
           <v-col cols="3" class="text-left d-block d-md-none">
             <div class="text-center">
-              <div class="gtext-t6 primary-gray-400">Update:</div>
-              <div class="gtext-t6 primary-gray-500">
-                {{ $dayjs(contentData.up_date).format("YYYY/MM/DD") }}
+              <div class="gama-text-body2 primary-gray-500 pt-1">
+                <v-icon small>mdi-update</v-icon>
+                {{ $moment(contentData.up_date).format("YY/MM/DD") }}
               </div>
             </div>
           </v-col>
@@ -163,8 +163,8 @@
             </v-btn-toggle>
           </v-col>
           <v-col cols="3" class="text-right d-block d-md-none">
-            <div class="rate-section gtext-t4 font-weight-semibold ml-4">
-              {{ contentData.score }}
+            <div class="rate-section gtext-t4 font-weight-semibold ml-1">
+              {{ contentData.score ? contentData.score : "New" }}
               <v-icon size="20" color="primary"> mdi-star </v-icon>
             </div>
           </v-col>
@@ -193,7 +193,7 @@
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                {{ contentData.score }}
+                {{ contentData.score ? contentData.score : "New" }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
             </div>
@@ -205,9 +205,37 @@
             <div class="d-flex">
               <v-sheet class="chips-container" v-scroll-x>
                 <v-chip
+                  v-if="contentData.countryTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
+                  {{ contentData.countryTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.stateTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
+                  {{ contentData.stateTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.cityTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
+                  {{ contentData.cityTitle }}
+                </v-chip>
+                <v-chip
+                  v-if="contentData.schoolType && contentData.schoolType.name"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
+                  {{ contentData?.schoolType?.name }}
+                </v-chip>
+                <v-chip
                   :to="`/school?school_type=${contentData.school_type}`"
                   v-if="contentData.school_type_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.school_type_title }}
@@ -215,7 +243,7 @@
                 <v-chip
                   :to="`/school?section=${contentData.section}`"
                   v-if="contentData.section_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.section_title }}
@@ -223,39 +251,15 @@
                 <v-chip
                   :to="`/school?coed_status=${contentData.sex}`"
                   v-if="contentData.sex_title"
-                  class="list-chip gtext-t5 font-weight-medium"
+                  class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.sex_title }}
                 </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}`"
-                  v-if="contentData.country_title"
-                  class="list-chip gtext-t5 font-weight-medium"
-                  small
-                >
-                  {{ contentData.country_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}&state=${contentData.state_}`"
-                  v-if="contentData.state_title"
-                  class="list-chip gtext-t5 font-weight-medium"
-                  small
-                >
-                  {{ contentData.state_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?country=${contentData.country}&state=${contentData.state_}&city=${contentData.city_}`"
-                  v-if="contentData.city_title"
-                  class="list-chip gtext-t5 font-weight-medium"
-                  small
-                >
-                  {{ contentData.city_title }}
-                </v-chip>
               </v-sheet>
               <v-spacer />
 
-              <div class="gtext-t4 primary-blue-500">You enter</div>
+              <div class="gtext-t4 primary-blue-500">Contribute</div>
             </div>
 
             <div class="d-flex mt-11 mb-9">
@@ -263,16 +267,19 @@
                 Tuition fee
               </div>
               <v-spacer />
-              <!-- <div class="gtext-t4 primary-blue-500">You enter</div> -->
+              <!-- <div class="gtext-t4 primary-blue-500">Contribute</div> -->
 
               <div class="gtext-t2 font-weight-heavy primary-gray-800">
-                <span class="gtext-t6">$</span>
-                {{ contentData.tuition_fee | numberFormat }}
+                <span v-show="contentData.tuition_fee"
+                  ><span class="gtext-t6">$</span>
+                  {{ contentData.tuition_fee | numberFormat }}</span
+                >
+                <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
             </div>
             <div class="d-flex">
               <div class="gtext-h5 primary-gray-600">
-                <div class="mb-4">Facilities</div>
+                <div class="mb-4">Sports facilities</div>
                 <div>
                   <v-btn
                     class="bg-primary-gray-800 white--text"
@@ -306,7 +313,7 @@
                 @click="facilitiesDialog = true"
                 class="gtext-t4 primary-blue-500 align-self-center pointer"
               >
-                You enter
+                Contribute
               </div>
             </div>
           </v-col>
@@ -317,18 +324,19 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.site"
-                  :href="normalizeURL(contentData.site)"
+                  v-show="contentData.webSite"
+                  :href="normalizeURL(contentData.webSite)"
                   target="_blank"
+                  class="blue--text"
                 >
-                  {{ contentData.site }}
+                  {{ contentData.webSite }}
                 </a>
                 <span
-                  v-show="!(contentData.site || generalDataEditMode.website)"
+                  v-show="!(contentData.webSite || generalDataEditMode.website)"
                   @click="editGeneralInfo('website')"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
 
                 <v-text-field
@@ -366,7 +374,7 @@
                   @click="editGeneralInfo('email')"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
                 <v-text-field
                   v-if="generalDataEditMode.email"
@@ -393,17 +401,19 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phone1"
-                  :href="`tel: ${contentData.phone1}`"
+                  v-show="contentData.phoneNumber"
+                  :href="`tel: ${contentData.phoneNumber}`"
                 >
-                  {{ contentData.phone1 }}
+                  {{ contentData.phoneNumber }}
                 </a>
                 <span
                   @click="editGeneralInfo('phone')"
-                  v-show="!(contentData.phone1 || generalDataEditMode.phone1)"
+                  v-show="
+                    !(contentData.phoneNumber || generalDataEditMode.phone1)
+                  "
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
                 <v-text-field
                   v-if="generalDataEditMode.phone1"
@@ -428,7 +438,7 @@
               <div class="info-sign">
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
                 }}</span>
@@ -437,7 +447,7 @@
                   v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer"
                 >
-                  You enter
+                  Contribute
                 </span>
 
                 <v-text-field
@@ -466,7 +476,9 @@
         <!-- Users score -->
         <v-row class="mt-16">
           <v-col cols="12" md="4">
-            <h3 class="gtext-h5 primary-gray-600 mb-15">Users score</h3>
+            <h3 class="gtext-h5 primary-gray-600 mb-15 font-weight-bold">
+              Score
+            </h3>
             <div class="d-flex">
               <img
                 src="/images/score.png"
@@ -477,11 +489,13 @@
               <div class="mt-10">
                 <div class="gtext-t6 primary-gray-400 mb-10">
                   Total comments
-                  <span class="primary-gray-800 font-weight-heavy">650</span>
+                  <span class="primary-gray-800 font-weight-heavy">
+                    {{ ratingData?.totalCount }}
+                  </span>
                 </div>
                 <div>
                   <v-rating
-                    v-model="rating"
+                    v-model="ratingData.averageRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -492,7 +506,12 @@
                 <div class="gtext-t6 primary-gray-400">
                   Average score &nbsp;<span
                     class="primary-gray-900 gtext-t4 font-weight-medium"
-                    >3.2</span
+                  >
+                    {{
+                      ratingData.averageRate
+                        ? ratingData.averageRate.toFixed(1)
+                        : "New"
+                    }} </span
                   ><span>&nbsp;/&nbsp;5</span>
                 </div>
               </div>
@@ -504,135 +523,147 @@
                 rounded
                 x-large
                 @click="leaveCommentDialog = true"
-                >Leave comment</v-btn
+                >Leave a Comment</v-btn
               >
             </div>
           </v-col>
           <v-col cols="12" md="8">
-            <ul id="score-results">
+            <ul id="score-results pl-0 mr-4">
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Classes quality
+                  Classroom & facility quality
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="15"
+                  :value="(ratingData.facilitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
-                ></v-progress-linear>
+                />
 
-                <div class="gtext-t4 font-weight-medium rate-title">Poor</div>
-              </li>
-              <li class="d-flex mb-4">
-                <div class="bullet"></div>
-                <div class="gtext-t4 font-weight-medium score-title">
-                  Education
-                </div>
-                <v-progress-linear
-                  color="success"
-                  rounded
-                  value="70"
-                  height="8"
-                  class="mt-3"
-                ></v-progress-linear>
-
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
-              </li>
-              <li class="d-flex mb-4">
-                <div class="bullet"></div>
-                <div class="gtext-t4 font-weight-medium score-title">
-                  IT training
-                </div>
-                <v-progress-linear
-                  color="success"
-                  rounded
-                  value="48"
-                  height="8"
-                  class="mt-3"
-                ></v-progress-linear>
-
-                <div class="gtext-t4 font-weight-medium rate-title">
-                  Average
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.facilitiesRate) }}
                 </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Safe and happy
+                  Teachers’ expertise
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="50"
+                  :value="(ratingData.educationRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">
-                  Average
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.educationRate) }}
                 </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Behavior
+                  Tech accessibility
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="60"
+                  :value="(ratingData.educationRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.itTrainingRate) }}
+                </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Tuition ratio
+                  Safety & environment
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="80"
+                  :value="(ratingData.safetyAndHappinessRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.safetyAndHappinessRate) }}
+                </div>
               </li>
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Facilities
+                  Staff behavior
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="90"
+                  :value="(ratingData.behaviorRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
+
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.behaviorRate) }}
+                </div>
+              </li>
+              <li class="d-flex mb-4">
+                <div class="bullet"></div>
+                <div class="gtext-t4 font-weight-medium score-title">
+                  Value for tuition
+                </div>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.tuitionRatioRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
+
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.tuitionRatioRate) }}
+                </div>
+              </li>
+              <li class="d-flex mb-4">
+                <div class="bullet"></div>
+                <div class="gtext-t4 font-weight-medium score-title">
+                  Sports facilities
+                </div>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.facilitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Good</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.facilitiesRate) }}
+                </div>
               </li>
               <li class="d-flex">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Artistic activities
+                  Art & counseling programs
                 </div>
                 <v-progress-linear
                   color="success"
                   rounded
-                  value="10"
+                  :value="(ratingData.artisticActivitiesRate * 100) / 5"
                   height="8"
                   class="mt-3"
                 ></v-progress-linear>
 
-                <div class="gtext-t4 font-weight-medium rate-title">Poor</div>
+                <div class="gtext-t4 font-weight-medium rate-title ml-2">
+                  {{ convertRateToString(ratingData.artisticActivitiesRate) }}
+                </div>
               </li>
             </ul>
           </v-col>
@@ -640,11 +671,11 @@
         <!-- End users score -->
 
         <!-- Recent comments -->
-        <v-row>
+        <v-row v-show="commentList.length">
           <v-col cols="12">
-            <h3 class="gtext-h5 primary-gray-600">Recent comments</h3>
+            <h3 class="gtext-h5 primary-gray-600">Comments</h3>
           </v-col>
-          <v-col cols="12" md="9">
+          <v-col cols="12" md="12">
             <v-card
               v-for="comment in commentList"
               :key="comment.id"
@@ -655,20 +686,23 @@
                 <div class="comment-card-header">
                   <div class="d-flex float-left">
                     <v-avatar size="60">
-                      <img class="profile-avatar" :src="comment.avatar" />
+                      <img
+                        class="profile-avatar"
+                        :src="comment.creationUserAvatar"
+                      />
                     </v-avatar>
                     <div class="ml-2">
-                      <div class="gtext-t3 primary-gray-500">
+                      <!-- <div class="gtext-t3 primary-gray-500">
                         Teacher, Blackven
-                      </div>
+                      </div> -->
                       <div class="gtext-t2 primary-gray-900">
-                        {{ comment.first_name }} {{ comment.last_name }}
+                        {{ comment.creationUser }}
                       </div>
                     </div>
                   </div>
                   <div class="float-right">
                     <v-rating
-                      :value="comment.score"
+                      :value="comment.averageRate"
                       background-color="orange lighten-3"
                       color="orange"
                       half-increments
@@ -701,7 +735,9 @@
                       <v-icon size="14"> mdi-forum </v-icon>
                     </v-btn>
                   </div>
-                  <div class="float-right gtext-t5">2023/11/23</div>
+                  <div class="float-right gtext-t5">
+                    {{ comment.creationDate }}
+                  </div>
                 </div>
               </v-card-text>
             </v-card>
@@ -716,16 +752,16 @@
               >
             </div>
           </v-col>
-          <v-col cols="12" md="3" class="d-none d-md-block pl-15">
+          <!-- <v-col cols="12" md="3" class="d-none d-md-block pl-15">
             <div id="advert-section">
               <div class="vertical-text">Advertising</div>
             </div>
-          </v-col>
+          </v-col> -->
         </v-row>
         <!-- End recent comments -->
 
         <!-- Similar schools -->
-        <v-row id="similar-schools">
+        <v-row id="similar-schools" v-show="false">
           <v-col cols="12">
             <h3 class="gtext-h5 primary-gray-600">Similar schools</h3>
           </v-col>
@@ -811,7 +847,9 @@
                             Update:
                             <span class="primary-gray-600">
                               {{
-                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
+                                $moment(contentData.up_date).format(
+                                  "YYYY/MM/DD"
+                                )
                               }}
                             </span>
                           </div>
@@ -889,7 +927,9 @@
                             Update:
                             <span class="primary-gray-600">
                               {{
-                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
+                                $moment(contentData.up_date).format(
+                                  "YYYY/MM/DD"
+                                )
                               }}
                             </span>
                           </div>
@@ -913,12 +953,12 @@
       v-model="leaveCommentDialog"
       :fullscreen="$vuetify.breakpoint.xs"
       max-width="924"
-      style="z-index: 20001"
+      style="z-index: 1501"
     >
       <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-12">
+        <v-card-text class="pt-6 pb-0 pt-md-8 pb-2 px-6 px-md-12">
           <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">Leave a comment</div>
+            <div class="gtext-h5 priamry-gray-700">Leave a Comment</div>
             <v-spacer></v-spacer>
             <v-btn icon
               ><v-icon size="20" @click="leaveCommentDialog = false"
@@ -935,10 +975,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Classes quality
+                    Classroom & facility quality
                   </div>
                   <v-rating
-                    v-model="commentForm.classes_quality"
+                    v-model="commentForm.classesQualityRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -951,10 +991,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Education
+                    Teachers’ expertise
                   </div>
                   <v-rating
-                    v-model="commentForm.education"
+                    v-model="commentForm.educationRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -967,10 +1007,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    IT training
+                    Tech accessibility
                   </div>
                   <v-rating
-                    v-model="commentForm.it_training"
+                    v-model="commentForm.itTrainingRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -983,10 +1023,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Safe and happy
+                    Safety & environment
                   </div>
                   <v-rating
-                    v-model="commentForm.safe_and_happy"
+                    v-model="commentForm.safetyAndHappinessRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -999,10 +1039,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Behavior
+                    Staff behavior
                   </div>
                   <v-rating
-                    v-model="commentForm.behavior"
+                    v-model="commentForm.behaviorRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1015,10 +1055,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Tuition ratio
+                    Value for tuition
                   </div>
                   <v-rating
-                    v-model="commentForm.tuition_ratio"
+                    v-model="commentForm.tuitionRatioRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1034,7 +1074,7 @@
                     Facilities
                   </div>
                   <v-rating
-                    v-model="commentForm.facilities"
+                    v-model="commentForm.tuitionRatioRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1047,10 +1087,10 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Artistic activities
+                    Art & counseling programs
                   </div>
                   <v-rating
-                    v-model="commentForm.artistic_activities"
+                    v-model="commentForm.artisticActivitiesRate"
                     background-color="orange lighten-3"
                     color="orange"
                     half-increments
@@ -1061,13 +1101,25 @@
               </ul>
             </v-col>
             <v-col cols="12" md="6">
-              <v-textarea
-                placeholder="Type your comment"
-                v-model="commentForm.comment"
-                outlined
-                :rows="$vuetify.breakpoint.xs ? 10 : 22"
-              >
-              </v-textarea>
+              <div style="position: relative">
+                <v-textarea
+                  placeholder="Type your comment"
+                  v-model="commentForm.comment"
+                  outlined
+                  :rows="$vuetify.breakpoint.xs ? 10 : 22"
+                />
+                <v-btn
+                  x-small
+                  height="40"
+                  width="40"
+                  :loading="help_loading"
+                  @click="sendToAI()"
+                  class="white--text"
+                  color="teal lighten-2"
+                  style="position: absolute; right: 10px; bottom: 40px"
+                  ><v-icon small color="white">mdi-auto-fix</v-icon></v-btn
+                >
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -1335,17 +1387,25 @@ export default {
       rating: 3.5,
       slideToggler: "map",
       topSlideClass: {
-        image: "center-image",
-        map: "under-image-left",
+        image: "under-image-left",
+        map: "center-image",
         tour: "under-image-right",
       },
+      help_loading: false,
       leaveCommentDialog: false,
       galleryDialog: false,
       facilitiesDialog: false,
 
       commentForm: {
         comment: "",
-        classes_quality: 0,
+        classesQualityRate: 4.5,
+        educationRate: 4,
+        itTrainingRate: 4,
+        safetyAndHappinessRate: 3.5,
+        behaviorRate: 4,
+        tuitionRatioRate: 5,
+        facilitiesRate: 4.5,
+        artisticActivitiesRate: 4,
       },
       selectLocationDialog: false,
       imgInput: null,
@@ -1365,19 +1425,51 @@ export default {
       },
     };
   },
+  head() {
+    return {
+      title: this.contentData.name,
+      script: [
+        {
+          type: "application/ld+json",
+          json: {
+            "@context": "https://schema.org",
+            "@type": "School", // Change this based on your content type
+            name: this.contentData.name,
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: this.ratingData.averageRate
+                ? this.ratingData.averageRate.toFixed(1)
+                : 3,
+              reviewCount: this.ratingData.totalCount,
+            },
+          },
+        },
+      ],
+    };
+  },
   components: {
     locationSearch,
   },
   async asyncData({ params, $axios }) {
-    const content = await $axios.$get(`/api/v1/schools/${params.id}`);
+    const baseURL = process.server
+      ? `https://api.gamaedtech.com/api/v1/`
+      : "/api/v2/";
+
+    const content = await $axios.$get(`${baseURL}schools/${params.id}`);
+    const rating = await $axios.$get(`${baseURL}schools/${params.id}/rate`);
+
     var contentData = [];
+    var ratingData = [];
 
     //Check data exist
-    if (content.status === 1) {
+    if (content.succeeded) {
       contentData = content.data;
     }
+    if (rating.succeeded) {
+      ratingData = rating.data;
+    }
 
-    return { contentData };
+    return { contentData, ratingData };
   },
   mounted() {
     this.map.schoolIcon = L.icon({
@@ -1386,16 +1478,22 @@ export default {
       iconAnchor: [16, 32], // Adjust the anchor point as needed
     });
 
-    this.map.center = [this.contentData.lat, this.contentData.lng];
-    this.map.latLng = [this.contentData.lat, this.contentData.lng];
+    this.map.center = [this.contentData.latitude, this.contentData.longitude];
+    this.map.latLng = [this.contentData.latitude, this.contentData.longitude];
 
     //Load comments
     this.loadComments();
   },
   methods: {
+    convertRateToString(value) {
+      if (value > 3.5) return "Good";
+      else if (value > 2) return "Average";
+      else if (value <= 2) return "Poor";
+      else return "Unknown";
+    },
     normalizeURL(url) {
       // Check if the URL starts with 'http://' or 'https://'
-      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
         // If not, assume it's 'http://'
         return "http://" + url;
       }
@@ -1464,29 +1562,142 @@ export default {
     },
     submitComment() {
       this.loading.submitComment = true;
-      const querystring = require("querystring");
 
-      this.$fetch
-        .post(
-          `/api/v1/schools/${this.$route.params.id}/comments`,
-          querystring.stringify(this.commentForm)
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/comments`,
+          this.commentForm,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
         )
         .then((response) => {
-          this.$toast.success("Your comment has been successfully submitted");
+          if (response.succeeded) {
+            this.$toast.success("Your comment has been successfully submitted");
+            this.loadComments();
+            this.leaveCommentDialog = false;
+          } else {
+            this.$toast.error(response?.errors[0]?.message);
+          }
         })
         .catch((err) => {
-          console.log(err);
+          if (err.response.status == 401 || err.response.status == 403) {
+            this.openAuthDialog("login");
+          } else this.$toast.error("Something is wrong.");
         })
         .finally(() => {
           this.loading.submitComment = false;
-          this.leaveCommentDialog = false;
         });
     },
+    async sendToAI() {
+      const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.
+
+          ### **School Information:**
+          - **Name:** ${this.contentData.name}
+          - **Location:** ${this.contentData.countryTitle}, ${
+        this.contentData.stateTitle
+      }, ${this.contentData.cityTitle}
+          ${
+            this.contentData.webSite
+              ? `- **Website:** ${this.contentData.webSite}`
+              : ""
+          }
+
+          ### **Evaluation Criteria:**
+          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
+          \n1. Quality of classrooms and educational facilities
+          \n2. Teachers' proficiency and teaching effectiveness
+          \n3. Access to and use of computers and technology
+          \n4. Safety and overall atmosphere of the school
+          \n5. Behavior of school officials towards students
+          \n6. Affordability relative to the services provided
+          \n7. Availability of suitable sports facilities
+          \n8. Presence of art classes or counseling programs\n\n
+
+          ### **Response Format:**
+          Return a structured JSON object with:
+          - Category ratings as numbers (1-5) and it 8 items.
+          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school’s actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
+
+          Response Format: (Don't forget end of rating object close by })
+          \`\`\`json
+          {
+            "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",
+            "ratings": {
+              "classrooms_quality": ai_rate as number,
+              "teachers_proficiency": ai_rate as number,
+              "technology_access": ai_rate as number,
+              "school_safety": ai_rate as number,
+              "officials_behavior": ai_rate as number,
+              "affordability": ai_rate as number,
+              "sports_facilities": ai_rate as number,
+              "art_counseling": ai_rate as number
+            }
+          }
+          \`\`\`
+          `;
+
+      if (!localStorage.getItem("v2_token")) {
+        this.$toast.error("Login required to proceed.");
+        this.openAuthDialog("login");
+        return;
+      }
+
+      if (!userComment) {
+        this.$toast.error("Sorry, insufficient data");
+        return;
+      }
+      this.help_loading = true;
+      try {
+        const apiResponse = await this.$axios.$post("/api/chatgpt", {
+          userComment,
+        });
+
+        // Remove the code block formatting (```json\n) and parse the JSON string
+        const cleanedResponse = apiResponse.response
+          .replace(/^\s*```json[\s\S]*?\n/, "") // Remove the opening markdown
+          .replace(/```$/, ""); // Remove the closing markdown
+
+        // Now parse the cleaned response as JSON
+        const parsedResponse = JSON.parse(cleanedResponse);
+
+        // Extract ratings and description
+        const ratings = parsedResponse.ratings;
+        this.commentForm.comment = parsedResponse.description;
+
+        // Example of how to use ratings in your code
+        this.commentForm.classesQualityRate = ratings.classrooms_quality; // 4
+        this.commentForm.educationRate = ratings.teachers_proficiency; // 5
+        this.commentForm.itTrainingRate = ratings.technology_access; // 3
+        this.commentForm.safetyAndHappinessRate = ratings.school_safety; // 4
+        this.commentForm.behaviorRate = ratings.officials_behavior; // 5
+        this.commentForm.tuitionRatioRate = ratings.affordability; // 3
+        this.commentForm.facilitiesRate = ratings.sports_facilities; // 4
+        this.commentForm.artisticActivitiesRate = ratings.art_counseling; // 2
+
+        // this.commentForm.safetyAndHappinessRate = ratings.sc;
+      } catch {
+        this.$toast.error("Error: Failed to get AI response.");
+        this.aiResponse = "Failed to get AI response.";
+      } finally {
+        this.help_loading = false;
+      }
+    },
+
+    openAuthDialog(val) {
+      this.$router.push({ query: { auth_form: val } });
+    },
     loadComments() {
-      this.$fetch
-        .get(`/api/v1/schools/${this.$route.params.id}/comments`)
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/comments`, {
+          params: {
+            "PagingDto.PageFilter.Size": 20,
+          },
+        })
         .then((response) => {
-          this.commentList = response.data.data.list;
+          this.commentList = response.data.list;
         })
         .catch((err) => {
           console.log(err);
@@ -1637,7 +1848,8 @@ export default {
 
     .info-data {
       width: 100%;
-      height: 5.6rem;
+      min-height: 5.6rem;
+      max-height: 5.6rem;
       border-radius: 0.6rem;
       border: 1px solid var(--Primary-Yellow-Gama-50, #fff8ed);
       background: var(--White, #fff);
@@ -1648,6 +1860,9 @@ export default {
       align-items: center;
       margin-left: 0.4rem;
     }
+    .info-data-address {
+      max-height: 12rem;
+    }
   }
 }
 
@@ -1655,11 +1870,10 @@ export default {
   width: 16rem;
   height: 16rem;
 }
+.score-title {
+  min-width: 22rem !important;
+}
 #score-results {
-  .score-title {
-    width: 20rem;
-    margin-right: 1rem;
-  }
   .rate-title {
     width: 14rem;
     text-align: right;

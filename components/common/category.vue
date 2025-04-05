@@ -1,5 +1,5 @@
 <template>
-  <div id="main-category ">
+  <div id="main-category " class="mt-md-16">
     <!--   Start: category  main-container Desktop -->
     <v-container id="main-category-container">
       <v-row>

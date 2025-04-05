@@ -17,7 +17,7 @@
                 <div class="stat-container">
                   <span :class="item.icon" class="item-icon"></span>
                   <div class="item-stat gama-text-h6">
-                    +{{ item.stat | numberFormat }}
+                    +{{ $numberFormat(item.stat) }}
                   </div>
                   <div class="item-title gama-text-caption">
                     {{ item.title }}
@@ -235,7 +235,7 @@ export default {
                         :key="index" class="text-center">
                             <span :class="item.icon" class="item-icon" ></span>
                             <div class="item-stat">
-                                +{{ item.stat | numberFormat }}
+                                +{{ $numberFormat(item.stat) }}
                             </div>
                             <div class="item-title">
                                 {{ item.title }}

@@ -3,13 +3,12 @@
     <v-row class="mt-4">
       <v-col cols="6">
         <span class="icon icong-azmoon text-h3 teal--text"></span>
-        <span class="text-h4 teal--text"> New Exam </span>
+        <span class="text-h4 teal--text"> Update online exam </span>
       </v-col>
       <v-col cols="6" id="tool-box" class="text-right">
         <v-btn
           outlined
           color="error"
-          :disabled="!exam_id"
           fab
           small
           @click="confirmDeleteDialog = true"
@@ -46,7 +45,7 @@
       <v-stepper-content step="1">
         <v-card flat class="mt-3 pb-10">
           <validation-observer ref="observer" v-slot="{ invalid }">
-            <form @submit.prevent="submitQuestion">
+            <form @submit.prevent="updateQuestion">
               <v-row>
                 <v-col cols="12" md="4">
                   <validation-provider
@@ -122,6 +121,7 @@
                   >
                     <topic-selector
                       ref="topic-selector"
+                      :selectedTopics="selected_topics"
                       :topic-list="topic_list"
                       @selectTopic="selectTopic"
                     />
@@ -139,7 +139,7 @@
                       :items="test_type_list"
                       item-value="id"
                       item-text="title"
-                      v-model="form.type"
+                      v-model="form.exam_type"
                       :error-messages="errors"
                       label="Test type"
                       outlined
@@ -197,16 +197,17 @@
                     />
                   </validation-provider>
                 </v-col>
-                <v-col cols="12" md="4">
-                  <v-file-input
-                    dense
-                    v-model="file_original"
-                    @change="uploadFile('file_original')"
-                    accept="application/pdf"
-                    label="Source file"
-                    outlined
-                  />
-                </v-col>
+
+                <!--                <v-col cols="12" md="4">-->
+                <!--                  <v-file-input-->
+                <!--                    dense-->
+                <!--                    v-model="file_original"-->
+                <!--                    @change="uploadFile('file_original')"-->
+                <!--                    accept="application/pdf"-->
+                <!--                    label="Source file"-->
+                <!--                    outlined-->
+                <!--                  />-->
+                <!--                </v-col>-->
 
                 <v-col
                   cols="12"
@@ -259,7 +260,7 @@
                   />
                 </v-col>
 
-                <v-col cols="12" md="12">
+                <v-col cols="12" md="8">
                   <validation-provider
                     v-slot="{ errors }"
                     name="title"
@@ -273,6 +274,14 @@
                       outlined
                     />
                   </validation-provider>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-text-field
+                    dense
+                    label="Past Paper Id"
+                    v-model="form.paperID"
+                    outlined
+                  />
                 </v-col>
 
                 <!--                <v-col cols="12" md="4">-->
@@ -348,11 +357,11 @@
                         class="white--text"
                         block
                       >
-                        Next step
+                        Update & Next step
                       </v-btn>
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-btn lg outlined color="error" to="/user" block>
+                      <v-btn lg outlined color="error" to="/user/exam" block>
                         Discard
                       </v-btn>
                     </v-col>
@@ -448,7 +457,6 @@
                 :items="topic_list"
                 item-value="id"
                 item-text="title"
-                clearable
                 v-model="filter.topic"
                 label="Topic"
                 outlined
@@ -469,7 +477,6 @@
                 dense
                 :items="video_analysis_options"
                 item-value="value"
-                clearable
                 item-text="title"
                 v-model="filter.testsHasVideo"
                 label="Video analysis"
@@ -694,7 +701,7 @@
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-btn lg outlined color="error" to="/user" block>
+                  <v-btn lg outlined color="error" to="/user/exam" block>
                     Discard
                   </v-btn>
                 </v-col>
@@ -738,7 +745,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" v-show="previewTestList.length">
+              <v-col cols="12" v-if="previewTestList.length">
                 <draggable v-model="previewTestList" @end="previewDragEnd">
                   <v-row v-for="(item, index) in previewTestList" :key="index">
                     <v-col cols="12">
@@ -776,7 +783,7 @@
                         ></span>
                         <img v-show="item.c_file" :src="item.c_file" />
                       </div>
-                      <p class="answer">
+                      <div class="answer">
                         <span>4)</span>
                         <span
                           ref="mathJaxEl"
@@ -784,7 +791,7 @@
                           v-html="item.answer_d"
                         />
                         <img v-show="item.d_file" :src="item.d_file" />
-                      </p>
+                      </div>
                       <v-row>
                         <v-col cols="6">
                           <v-btn icon fab color="blue">
@@ -827,11 +834,7 @@
                   </v-row>
                 </draggable>
               </v-col>
-              <v-col
-                v-show="!previewTestList.length"
-                cols="12"
-                class="text-center"
-              >
+              <v-col v-else cols="12" class="text-center">
                 <p>Oops! no data found</p>
               </v-col>
             </v-row>
@@ -857,7 +860,7 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-btn lg outlined color="error" to="/user" block>
+                    <v-btn lg outlined color="error" to="/user/exam" block>
                       Discard
                     </v-btn>
                   </v-col>
@@ -952,7 +955,7 @@
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+              <!--              <v-col cols="4">Question's num: {{ tests.length }}</v-col>-->
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
@@ -970,7 +973,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" v-show="previewTestList.length">
+              <v-col cols="12" v-if="previewTestList.length">
                 <draggable v-model="previewTestList" @end="previewDragEnd">
                   <v-row v-for="(item, index) in previewTestList" :key="index">
                     <v-col cols="12">
@@ -1051,11 +1054,7 @@
                   </v-row>
                 </draggable>
               </v-col>
-              <v-col
-                v-show="!previewTestList.length"
-                cols="12"
-                class="text-center"
-              >
+              <v-col v-else cols="12" class="text-center">
                 <p>Oops! no data found</p>
               </v-col>
             </v-row>
@@ -1127,14 +1126,15 @@
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import TopicSelector from "@/components/form/topic-selector";
+import { min } from "vee-validate/dist/rules";
 import CreateTestForm from "@/components/test-maker/create-test-form";
 
 export default {
   layout: "test-maker-layout",
-  name: "test-maker",
+  name: "test-maker-edit",
   head() {
     return {
-      title: "New Exam",
+      title: "Update online exam",
       script: [
         {
           src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
@@ -1151,7 +1151,7 @@ export default {
   },
   data() {
     return {
-      test_step: 1,
+      test_step: 2,
       exam_id: "",
       exam_code: "",
       form: {
@@ -1159,18 +1159,20 @@ export default {
         base: "",
         lesson: "",
         topics: "",
-        type: "",
+        exam_type: "",
         level: "2",
         holding_time: false,
         state: "",
         area: "",
         school: "",
         duration: 3,
-        // start_date: parseInt(this.$dayjs().format('x') / 1000),
+        // start_date: parseInt(this.$moment().format('x') / 1000),
         title: "",
+        paperID: "",
         negative_point: false,
         file_original: "",
       },
+      file_original: "",
       filter: {
         section: "",
         base: "",
@@ -1242,7 +1244,7 @@ export default {
       test_loading: false,
       all_tests_loaded: false,
       tests: [],
-      test_share_link: "",
+      test_share_link: `https://gamatrain.com/exam/${this.$route.params.id}`,
       printPreviewDialog: false,
       confirmDeleteDialog: false,
       deleteLoading: false,
@@ -1258,33 +1260,23 @@ export default {
       delete_exam_test_loading: false,
       //End Delete exam test section
 
-      file_original: null,
-      file_original_path: "",
+      selected_topics: [],
     };
   },
   mounted() {
-    this.getCurrentExamInfo();
     this.getTypeList("section");
     this.getTypeList("exam_type");
     this.getTypeList("state");
 
-    this.renderMathJax();
+    this.getCurrentExamInfo();
 
     this.getExamTests();
 
-    if (this.exam_id) this.getExamCurrentTests();
+    this.getExamCurrentTests();
 
-    //Check active tab from route and enable it
-    if (this.$route.query && this.$route.query.active == "test_list") {
-      this.test_step = 2;
-      this.testListSwitch = true;
-    } else if (this.$route.query && this.$route.query.active == "add_test") {
-      this.test_step = 2;
-      this.testListSwitch = false;
-    } else {
-      this.test_step = 1;
-      this.testListSwitch = true;
-    }
+    this.renderMathJax();
+
+    this.$refs["create-form"].examEditMode = true; //Enable edit mode in create test form
   },
 
   watch: {
@@ -1292,18 +1284,12 @@ export default {
       if (val && val.active === "test_list") {
         this.test_step = 2;
         this.testListSwitch = true;
-      } else if (this.$route.query && this.$route.query.active == "add_test") {
-        this.test_step = 2;
-        this.testListSwitch = false;
-      } else {
-        this.test_step = 1;
-        this.testListSwitch = true;
       }
     },
 
-    // "teaching_date"(val) {//Convert date to seconds
+    // "teaching_date"(val) {//Convert date to secounds
     //   this.form.start_date = this.teaching_time_seconds;
-    //   this.teaching_date_time = (this.$dayjs(val).format('x') / 1000);
+    //   this.teaching_date_time = (this.$moment(val).format('x') / 1000);
     //   this.form.start_date = parseInt(this.teaching_date_time + this.teaching_time_seconds);
     // },
     // "teaching_time"(val) {//Convert hour and minute to seconds
@@ -1347,7 +1333,6 @@ export default {
 
       this.generateTitle();
     },
-
     "filter.base"(val) {
       if (val) {
         this.getTypeList("lesson", val, "filter");
@@ -1366,8 +1351,6 @@ export default {
         this.getTypeList("topic", val);
         this.$refs["topic-selector"].lesson_selected = true;
       } else {
-        this.form.topic = [];
-        this.topic_list = [];
         this.$refs["topic-selector"].lesson_selected = false;
       }
 
@@ -1420,6 +1403,36 @@ export default {
     },
   },
   methods: {
+    //Load exam info for edit
+    getCurrentExamInfo() {
+      this.exam_id = this.$route.params.id;
+      this.$axios
+        .$get(`/api/v1/exams/info/${this.$route.params.id}`)
+        .then((response) => {
+          console.log(response);
+          this.tests = response.data.tests.length ? response.data.tests : [];
+          this.exam_code = response.data.code;
+          this.test_share_link = `https://gamatrain.com/exam/${this.$route.params.id}`;
+          this.form.section = response.data.section;
+          this.form.base = response.data.base;
+          this.form.lesson = response.data.lesson;
+
+          this.selected_topics = response.data.topics; //Pass to topic selector when form load
+          this.form.topics = response.data.topics;
+
+          this.form.exam_type = response.data.azmoon_type;
+          this.form.paperID = response.data.paperID;
+          this.form.duration = response.data.azmoon_time;
+          this.form.file_original = response.data.file_original;
+          setTimeout(() => {
+            this.form.title = response.data.title;
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     getTypeList(type, parent = "", trigger = "") {
       var params = {
         type: type,
@@ -1440,7 +1453,7 @@ export default {
         params.area_id = this.form.area;
       }
 
-      this.$fetch
+      this.$axios
         .$get("/api/v1/types/list", {
           params,
         })
@@ -1504,7 +1517,7 @@ export default {
       }
     },
 
-    submitQuestion() {
+    updateQuestion() {
       this.submit_loading = true;
 
       //Arrange to form data
@@ -1519,21 +1532,18 @@ export default {
 
       //End arrange to form data
 
-      this.$fetch
-        .$post("/api/v1/exams", this.urlencodeFormData(formData), {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        })
+      this.$axios
+        .$put(
+          `/api/v1/exams/${this.$route.params.id}`,
+          this.urlencodeFormData(formData),
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        )
         .then((response) => {
-          this.$toast.success("Created successfully");
-          this.exam_id = response.data.id;
-          this.exam_code = response.data.code;
-          // this.test_share_link = `gamatrain.com/online-test/${response.data.code}`
-
-          this.$store.commit("user/setCurrentExamId", this.exam_id);
-          this.$store.commit("user/setCurrentExamCode", this.exam_code);
-          this.$refs["create-form"].getCurrentExamInfo(); //Load original file
+          this.$toast.success("Updated successfully");
           this.test_step = 2;
         })
         .catch((error) => {
@@ -1561,7 +1571,7 @@ export default {
 
     getExamTests() {
       this.test_loading = true;
-      this.$fetch
+      this.$axios
         .$get("/api/v1/examTests", {
           params: {
             lesson: this.filter.lesson,
@@ -1580,7 +1590,6 @@ export default {
               MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             });
           }
-
           this.$refs["create-form"].examTestListLenght = this.tests.length;
 
           if (response.data.list.length === 0)
@@ -1594,6 +1603,29 @@ export default {
         .finally(() => {
           this.test_loading = false;
         });
+    },
+    getExamCurrentTests() {
+      this.test_loading = true;
+      this.$axios
+        .$get("/api/v1/examTests", {
+          params: {
+            exam_id: this.$route.params.id,
+          },
+        })
+        .then((response) => {
+          this.previewTestList = response.data.list;
+          this.$refs["create-form"].examTestListLenght = this.tests.length;
+
+          if (this.previewTestList.length) {
+            this.$nextTick(function () {
+              MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {});
     },
 
     renderMathJax() {
@@ -1629,9 +1661,7 @@ export default {
 
     onScroll() {
       var scrollPosition = this.$refs.testList.$el.scrollTop;
-      let contentHeight = 0;
-      if (this.$refs.testListContent)
-        contentHeight = this.$refs.testListContent.clientHeight;
+      let contentHeight = this.$refs.testListContent.clientHeight;
 
       //Avoid the number of requests
       if (this.timer) {
@@ -1646,7 +1676,7 @@ export default {
         this.timer = setTimeout(() => {
           this.test_loading = true;
           this.filter.page++;
-          this.getExamTests();
+          // this.getExamTests();
         }, 800);
     },
 
@@ -1654,23 +1684,11 @@ export default {
       if (this.tests.find((x) => x == item.id) && type === "remove") {
         this.tests.splice(this.tests.indexOf(item.id), 1);
 
-        //Remove from preview
-        // this.$store.commit('user/removePreviewTestList', item.id);
-
         this.submitTest();
       }
 
       if (!this.tests.find((x) => x == item.id) && type === "add") {
         this.tests.push(item.id);
-
-        //Add to preview list
-        // this.$store.commit('user/addPreviewTestList', item)
-
-        // if (this.$store.getters["user/getPreviewTestListLength"]) {
-        //   this.$nextTick(function () {
-        //     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        //   });
-        // }
 
         this.submitTest();
       }
@@ -1683,9 +1701,9 @@ export default {
       }
 
       if (this.tests.length) {
-        this.$fetch
+        this.$axios
           .$put(
-            `/api/v1/exams/tests/${this.exam_id}`,
+            `/api/v1/exams/tests/${this.$route.params.id}`,
             this.urlencodeFormData(formData),
             {
               headers: {
@@ -1703,66 +1721,16 @@ export default {
       }
     },
 
-    getExamCurrentTests() {
-      this.test_loading = true;
-      this.$fetch
-        .$get("/api/v1/examTests", {
-          params: {
-            exam_id: this.exam_id,
-          },
-        })
-        .then((response) => {
-          this.previewTestList = response.data.list;
-          this.$refs["create-form"].examTestListLenght = this.tests.length;
-
-          if (this.previewTestList.length) {
-            this.$nextTick(function () {
-              MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {});
-    },
-
     /**
      * @brief publish test
      */
     publishTest() {
       this.publish_loading = true;
-      var examId = this.exam_id;
-      this.$fetch
-        .$put(`/api/v1/exams/publish/${examId}`)
+      this.$axios
+        .$put(`/api/v1/exams/publish/${this.$route.params.id}`)
         .then((response) => {
           if (response.data.message === "done") {
-            this.test_share_link = `${process.env.BASE_URI}/exam/${examId}`;
-
-            this.exam_id = "";
-
-            this.exam_code = "";
-            this.$store.commit("user/setCurrentExamId", this.exam_id);
-            this.$store.commit("user/setCurrentExamCode", this.exam_code);
-
-            this.previewTestList = [];
-            this.$store.commit("user/setCurrentExamId", "");
-            this.tests = [];
-            //Reset form
-            this.form.section = "";
-            this.grade_list = [];
-            this.lesson_list = [];
-            this.topic_list = [];
-
-            this.form.type = "";
-            this.form.duration = 3;
-            this.form.title = "";
-            this.form.file_original = "";
-
-            //End reset form
-
             this.test_step = 4;
-            this.$store.commit("user/setCurrentExamId", "");
           }
         })
         .catch((err) => {
@@ -1771,28 +1739,6 @@ export default {
         .finally(() => {
           this.publish_loading = false;
         });
-    },
-
-    getCurrentExamInfo() {
-      if (this.$store.state.user.examId) {
-        this.exam_id = this.$store.state.user.examId;
-        this.exam_code = this.$store.state.user.examCode;
-        this.test_step = 2;
-        this.$fetch
-          .$get(`/api/v1/exams/info/${this.exam_id}`)
-          .then((response) => {
-            this.tests = response.data.tests.length ? response.data.tests : [];
-
-            this.form.section = response.data.section;
-            this.form.base = response.data.base;
-            this.form.lesson = response.data.lesson;
-            this.file_original_path = response.data.file_original;
-            console.log(response);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
     },
 
     //Convert form data from multipart to urlencode
@@ -1837,33 +1783,13 @@ export default {
 
     deleteOnlineExam() {
       this.deleteLoading = true;
-      this.$fetch
+      this.$axios
         .$delete(`/api/v1/exams/${this.exam_id}`)
         .then((response) => {
-          this.exam_id = "";
-          this.exam_code = "";
-          this.$store.commit("user/setCurrentExamId", this.exam_id);
-          this.$store.commit("user/setCurrentExamCode", this.exam_code);
-
-          this.previewTestList = [];
-          this.$refs["create-form"].file_original_path = "";
-          this.$store.commit("user/setCurrentExamId", "");
-          // this.$store.commit('user/setPreviewTestList', []);
-          this.tests = [];
-
-          //Reset form
-          this.form.section = "";
-          this.grade_list = [];
-          this.lesson_list = [];
-          this.topic_list = [];
-
-          this.form.type = "";
-          this.form.duration = 3;
-          this.form.title = "";
-          //End reset form
-
-          this.test_step = 1;
           this.$toast.success("Deleted successfully");
+          this.$router.push({
+            path: "/user/exam",
+          });
         })
         .catch((err) => {
           this.$toast.error("An error occurred");
@@ -1881,13 +1807,13 @@ export default {
     },
     async deleteExamTest() {
       this.delete_exam_test_loading = true;
-      await this.$fetch
+      await this.$axios
         .$delete(`/api/v1/examTests/${this.delete_exam_test_id}`)
         .then((response) => {
           this.$toast.success("Deleted successfully");
           this.filter.page = 1;
           this.test_list = [];
-          this.getExamTests();
+          // this.getExamTests();
         })
         .catch((err) => {
           console.log(err);
@@ -1898,12 +1824,13 @@ export default {
           this.deleteTestConfirmDialog = false;
         });
     },
+
     //End delete exam test
 
     uploadFile(file_name) {
       let formData = new FormData();
       formData.append("file", this.file_original);
-      this.$fetch
+      this.$axios
         .$post("/api/v1/upload", formData, {
           headers: {
             accept: "*/*",

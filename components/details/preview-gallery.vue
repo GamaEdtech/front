@@ -93,10 +93,15 @@
 <script>
 export default {
   name: "preview-gallery",
+  props: {
+    images: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
     return {
       carouselVal: null,
-      images: [],
       help_link_data: {
         state: "",
         section: "",
