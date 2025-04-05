@@ -24,6 +24,7 @@
     "node-fetch-native": "^1.6.4",
     "nuxt": "^2.18.1",
     "nuxt-leaflet": "^0.0.27",
+    "three": "^0.175.0",
     "v-emoji-picker": "^2.3.3",
     "vee-validate": "^3.4.14",
     "vue-advanced-cropper": "^1.11.5",
