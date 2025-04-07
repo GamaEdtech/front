@@ -519,6 +519,13 @@
 
     <!--  End: detail  -->
 
+    <!-- Test Section -->
+    <div v-if="randomTestContent">
+      <v-divider class="mt-4 mx-auto" style="width: 80%" />
+      <test-details :content-data="randomTestContent" />
+      <v-divider class="mt-1 mx-auto" style="width: 80%" />
+    </div>
+    <!-- End Test Section -->
     <v-container>
       <v-row>
         <v-col cols="12" md="6">
@@ -668,6 +675,7 @@ import LatestTrainingContent from "@/components/details/latest-training-content"
 import RelatedQa from "@/components/details/related-qa";
 import RelatedOnlineExam from "@/components/details/related-online-exam";
 import CrashReport from "~/components/common/crash-report.vue";
+import TestDetails from "~/components/TestDetails.vue";
 
 export default {
   name: "paper-details",
@@ -683,6 +691,7 @@ export default {
     Breadcrumb,
     LastViews,
     RelatedCardBox,
+    TestDetails,
   },
   head() {
     const schemaData = {
@@ -735,6 +744,7 @@ export default {
     }
   },
   mounted() {
+    this.grabRandomTestCode();
     //Init gallery image
     if (this.contentData) {
       if (this.contentData.thumb_pic)
@@ -793,6 +803,8 @@ export default {
         "2019",
       ],
     },
+    randomTestContent: null,
+
     model: null,
     sampleTestList: [
       {
@@ -986,6 +998,34 @@ export default {
     },
     openAuthDialog(val) {
       this.$router.push({ query: { auth_form: val } });
+    },
+    grabRandomTestCode() {
+      if (
+        this.contentData &&
+        this.contentData.exams &&
+        this.contentData.exams[0].id
+      ) {
+        this.$axios
+          .$get(
+            `/api/v1/examTests/randomByExamId/${this.contentData.exams[0].id}`
+          )
+          .then((response) => {
+            this.retriveRandomTest(response.data.code);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    retriveRandomTest(code) {
+      this.$axios
+        .$get(`/api/v1/examTests/${code}`)
+        .then((response) => {
+          this.randomTestContent = response.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     //Social section
