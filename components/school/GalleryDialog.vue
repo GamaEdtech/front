@@ -144,12 +144,16 @@ export default {
       formData.append("File", data);
       formData.append("FileType", "SimpleImage");
       this.$axios
-        .$post(`/api/v2/schools/${this.$route.params.id}/images`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-          },
-        })
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/images/SimpleImage`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
         .then((response) => {
           let file = response.data[0].file.name;
           //push to image array here
