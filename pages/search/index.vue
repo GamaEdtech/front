@@ -177,6 +177,8 @@ export default {
     var page_describe = "";
     var params = {
       type: "section",
+      edu_year: query.edu_year,
+      edu_month: query.edu_month,
     };
     let boardTitle = "";
     let boardList = {};
@@ -491,6 +493,20 @@ export default {
 
       this.getContentList();
     },
+    "$route.query.edu_year"(val) {
+      this.page = 1;
+      this.items = [];
+      this.all_files_loaded = false;
+
+      this.getContentList();
+    },
+    "$route.query.edu_month"(val) {
+      this.page = 1;
+      this.items = [];
+      this.all_files_loaded = false;
+
+      this.getContentList();
+    },
     "$route.query.test_type"(val) {
       this.page = 1;
       this.items = [];
@@ -582,6 +598,8 @@ export default {
           word: this.$route.query.word,
           free: this.$route.query.free,
           a_file: this.$route.query.a_file,
+          edu_year: this.$route.query.edu_year,
+          edu_month: this.$route.query.edu_month,
         };
 
         if (this.$route.query.type == "tutor") {

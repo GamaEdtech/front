@@ -1,5 +1,9 @@
 <template>
   <v-container fluid class="px-0 py-0 mt-md-0">
+    <h1 class="d-none">
+      Free Past Papers, Quiz, Powerpoint and Study Guid | GsamaTrain
+    </h1>
+
     <main-slider />
 
     <grade-explorer :stats="stats" />

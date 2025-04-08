@@ -77,6 +77,29 @@
             {{ applied_filter.select_test_level_title }}
           </span>
         </v-chip>
+        <v-chip
+          v-show="year_val"
+          class="mt-1"
+          close
+          label
+          outlined
+          @click:close="year_val = 0"
+        >
+          {{ year_val }}
+        </v-chip>
+
+        <v-chip
+          v-if="month_val"
+          class="mt-1"
+          close
+          label
+          outlined
+          @click:close="month_val = 0"
+        >
+          <span>
+            {{ applied_filter.select_month_title }}
+          </span>
+        </v-chip>
 
         <v-divider class="my-3" />
       </div>
@@ -244,6 +267,74 @@
             </v-row>
           </v-expansion-panel-content>
         </v-expansion-panel>
+
+        <!-- Edu year -->
+        <!--Grade filter-->
+        <v-expansion-panel v-show="$route.query.type === 'test'">
+          <v-expansion-panel-header
+            color="#f5f5f5"
+            class="px-0 font-weight-bold font-size-16"
+            >Year</v-expansion-panel-header
+          >
+          <v-expansion-panel-content color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-radio-group
+                  v-model="year_val"
+                  @change="changeYearVal()"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio label="All" color="red" :value="0"> </v-radio>
+                  <v-radio
+                    v-for="(item, key) in filter.year_list"
+                    :key="key"
+                    :label="item"
+                    color="red"
+                    :value="item"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+
+        <!-- End edu year -->
+
+        <!-- Edu month -->
+        <v-expansion-panel v-show="$route.query.type === 'test'">
+          <v-expansion-panel-header
+            color="#f5f5f5"
+            class="px-0 font-size-16 font-weight-bold"
+          >
+            Month
+          </v-expansion-panel-header>
+          <v-expansion-panel-content color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-radio-group
+                  @change="changeMonthVal()"
+                  v-model="month_val"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio label="All" color="red" :value="0"> </v-radio>
+                  <v-radio
+                    v-for="item in filter.month_list"
+                    :key="item.id"
+                    :label="item.title"
+                    color="red"
+                    :value="item.id"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+
+        <!-- End edu month -->
 
         <!--Test level filter-->
         <!--      <v-expansion-panel v-show="filter.test_level_list.length>0 && $route.query.type==='test'">-->
@@ -437,6 +528,10 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
+      year_val: this.$route.query.edu_year ? this.$route.query.edu_year : 0,
+      month_val: this.$route.query.edu_month
+        ? Number(this.$route.query.edu_month)
+        : 0,
       state_val: 0,
       city_val: 0,
       word_checkbox_val: false,
@@ -454,6 +549,7 @@ export default {
         select_test_level_title: "",
         select_state_title: "",
         select_city_title: "",
+        select_month_title: "",
       },
 
       filter: {
@@ -498,6 +594,25 @@ export default {
             value: "a_file",
           },
         ],
+
+        year_list: [
+          2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+          2014, 2013,
+        ],
+        month_list: [
+          { id: 1, title: "January" },
+          { id: 2, title: "February" },
+          { id: 3, title: "March" },
+          { id: 4, title: "April" },
+          { id: 5, title: "May" },
+          { id: 6, title: "June" },
+          { id: 7, title: "July" },
+          { id: 8, title: "August" },
+          { id: 9, title: "September" },
+          { id: 10, title: "October" },
+          { id: 11, title: "November" },
+          { id: 12, title: "December" },
+        ],
         state_list: [],
         city_list: [],
       },
@@ -508,6 +623,13 @@ export default {
   created() {
     if (this.$route.query.type === "tutor")
       this.getFilterList({ type: "state" }, "state");
+
+    this.$nextTick(() => {
+      if (this.month_val && this.filter.month_list)
+        this.applied_filter.select_month_title = this.filter.month_list.find(
+          (x) => x.id == this.month_val
+        ).title;
+    });
 
     // this.setBreadcrumbInfo();
 
@@ -853,6 +975,22 @@ export default {
 
       this.setBreadcrumbInfo();
     },
+    changeYearVal() {
+      this.updateQueryParams();
+    },
+    changeMonthVal() {
+      this.updateQueryParams();
+
+      //Enable topic title tag
+
+      if (this.month_val > 0)
+        this.applied_filter.select_month_title = this.filter.month_list.find(
+          (x) => x.id === this.month_val
+        ).title;
+      else this.applied_filter.select_month_title = "";
+
+      this.setBreadcrumbInfo();
+    },
 
     changeStateVal() {
       this.city_val = 0;
@@ -918,6 +1056,12 @@ export default {
       }
       if (this.city_val !== 0 && query.type === "tutor") {
         query.city = this.city_val;
+      }
+      if (this.year_val !== 0) {
+        query.edu_year = this.year_val;
+      }
+      if (this.month_val !== 0) {
+        query.edu_month = this.month_val;
       }
       // Handle more query parameters here ...
       this.$router.replace({ query: query }).catch((err) => {
