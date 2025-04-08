@@ -283,7 +283,7 @@
               <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
-                }}</span>
+                  }}</span>
                 <span @click="editGeneralInfo('address')" v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
@@ -1036,9 +1036,6 @@ export default {
 
       // Update the marker position to the new center
       marker.setLatLng(newCenter);
-      console.log("newCenter", newCenter);
-      console.log("marker", marker);
-      console.log("mao", this.map);
       this.mapMarkerData = newCenter
     },
     goToSearchLocation(val) {
@@ -1200,7 +1197,6 @@ export default {
           this.commentList = response.data.list;
         })
         .catch((err) => {
-          console.log(err);
         });
     },
     editGeneralInfo(value) {
