@@ -224,7 +224,8 @@
 
                 <v-text-field v-model="form.web" v-if="generalDataEditMode.website" placeholder="Website">
                   <template slot="append-outer">
-                    <v-btn color="success" @click="updateGeneralInfo('website')" fab depressed x-small>
+                    <v-btn :loading="webSubmitLoader" color="success" @click="updateGeneralInfo('website')" fab
+                      depressed x-small>
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -246,7 +247,8 @@
                 </span>
                 <v-text-field v-model="form.email" v-if="generalDataEditMode.email" placeholder="Email">
                   <template slot="append-outer">
-                    <v-btn color="success" @click="updateGeneralInfo('email')" fab depressed x-small>
+                    <v-btn :loading="emailSubmitLoader" color="success" @click="updateGeneralInfo('email')" fab
+                      depressed x-small>
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -268,7 +270,8 @@
                 </span>
                 <v-text-field v-model="form.phone" v-if="generalDataEditMode.phone1" placeholder="Phone">
                   <template slot="append-outer">
-                    <v-btn color="success" @click="updateGeneralInfo('phone')" fab depressed x-small>
+                    <v-btn :loading="phoneSubmitLoader" color="success" @click="updateGeneralInfo('phone')" fab
+                      depressed x-small>
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -283,7 +286,7 @@
               <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
-                  }}</span>
+                }}</span>
                 <span @click="editGeneralInfo('address')" v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
@@ -291,7 +294,8 @@
 
                 <v-text-field v-model="form.address" v-if="generalDataEditMode.address" placeholder="Enter address">
                   <template slot="append-outer">
-                    <v-btn color="success" @click="updateGeneralInfo('address')" fab depressed x-small>
+                    <v-btn :loading="addressSubmitLoader" color="success" @click="updateGeneralInfo('address')" fab
+                      depressed x-small>
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -912,6 +916,11 @@ export default {
       },
 
       mapSubmitLoader: false,
+      addressSubmitLoader: false,
+      webSubmitLoader: false,
+      emailSubmitLoader: false,
+      phoneSubmitLoader: false,
+
 
       commentList: [],
 
@@ -1216,22 +1225,27 @@ export default {
       var formData = {}
 
       switch (value) {
+
         case "website":
+          this.webSubmitLoader = true
           formData = {
             webSite: this.form.web ?? null,
           }
           break;
         case "email":
+          this.emailSubmitLoader = true
           formData = {
             email: this.form.email ?? null,
           }
           break;
         case "phone":
+          this.phoneSubmitLoader = true
           formData = {
             phoneNumber: this.form.phone ?? null,
           }
           break;
         case "address":
+          this.addressSubmitLoader = true
           formData = {
             address: this.form.address ?? null,
           }
@@ -1271,6 +1285,10 @@ export default {
         .finally(() => {
           this.mapSubmitLoader = false
           this.selectLocationDialog = false
+          this.webSubmitLoader = false
+          this.emailSubmitLoader = false
+          this.phoneSubmitLoader = false
+          this.addressSubmitLoader = false
         });
     },
   },
