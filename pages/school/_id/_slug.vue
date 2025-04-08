@@ -137,7 +137,7 @@
         <v-row>
           <v-col cols="12" md="8">
             <div class="d-flex">
-              <v-sheet class="chips-container" v-scroll-x>
+              <v-sheet class="chips-container">
                 <v-chip v-if="contentData.countryTitle" class="blue-grey darken-1 white--text" small>
                   {{ contentData.countryTitle }}
                 </v-chip>
@@ -222,7 +222,8 @@
                   Contribute
                 </span>
 
-                <v-text-field v-model="form.web" v-if="generalDataEditMode.website" placeholder="Website">
+                <v-text-field v-model="form.web" v-if="generalDataEditMode.website" placeholder="Website"
+                  :rules="webUrlRule">
                   <template slot="append-outer">
                     <v-btn :loading="webSubmitLoader" color="success" @click="updateGeneralInfo('website')" fab
                       depressed x-small>
@@ -358,7 +359,7 @@
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Teachers’ expertise
+                  Teachers' expertise
                 </div>
                 <v-progress-linear color="success" rounded :value="(ratingData.educationRate * 100) / 5" height="8"
                   class="mt-3"></v-progress-linear>
@@ -474,7 +475,7 @@
                 </div>
                 <v-divider class="mb-5" />
                 <div class="gtext-t2 primary-gray-700 mb-6">
-                  “{{ comment.comment }}”
+                  "{{ comment.comment }}"
                 </div>
                 <div class="pb-8">
                   <div class="float-left">
@@ -703,7 +704,7 @@
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
                   <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
-                    Teachers’ expertise
+                    Teachers' expertise
                   </div>
                   <v-rating v-model="commentForm.educationRate" background-color="orange lighten-3" color="orange"
                     half-increments hover size="24"></v-rating>
@@ -931,6 +932,11 @@ export default {
         address: false,
         map: false,
       },
+
+      webUrlRule: [
+        v => !v || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(v) || 'Please enter a valid URL',
+        v => !v || v.length <= 255 || 'URL must be less than 255 characters'
+      ],
     };
   },
   head() {
@@ -1001,8 +1007,10 @@ export default {
       else return "Unknown";
     },
     normalizeURL(url) {
+      if (!url) return '';
+
       // Check if the URL starts with 'http://' or 'https://'
-      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
         // If not, assume it's 'http://'
         return "http://" + url;
       }
@@ -1068,6 +1076,17 @@ export default {
       this.$refs.tourImgRef.$el.querySelector("input").click();
     },
 
+    isValidUrl(url) {
+      try {
+        // Try to create a URL object - this will validate basic URL structure
+        new URL(url);
+        // Check if it starts with http:// or https://
+        return /^https?:\/\//.test(url);
+      } catch (e) {
+        return false;
+      }
+    },
+
     submitComment() {
       this.loading.submitComment = true;
 
@@ -1112,7 +1131,7 @@ export default {
         }
 
           ### **Evaluation Criteria:**
-          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
+          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
           \n1. Quality of classrooms and educational facilities
           \n2. Teachers' proficiency and teaching effectiveness
           \n3. Access to and use of computers and technology
@@ -1125,7 +1144,7 @@ export default {
           ### **Response Format:**
           Return a structured JSON object with:
           - Category ratings as numbers (1-5) and it 8 items.
-          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school’s actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
+          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school's actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
 
           Response Format: (Don't forget end of rating object close by })
           \`\`\`json
@@ -1209,15 +1228,33 @@ export default {
         });
     },
     editGeneralInfo(value) {
-      if (value == "website") this.generalDataEditMode.website = true;
-      else if (value == "email") this.generalDataEditMode.email = true;
-      else if (value == "phone") this.generalDataEditMode.phone1 = true;
-      else if (value == "address") this.generalDataEditMode.address = true;
+      if (value == "website") {
+        this.form.web = this.contentData.webSite || '';
+        this.generalDataEditMode.website = true;
+      }
+      else if (value == "email") {
+        this.form.email = this.contentData.email || '';
+        this.generalDataEditMode.email = true;
+      }
+      else if (value == "phone") {
+        this.form.phone = this.contentData.phoneNumber || '';
+        this.generalDataEditMode.phone1 = true;
+      }
+      else if (value == "address") {
+        this.form.address = this.contentData.address || '';
+        this.generalDataEditMode.address = true;
+      }
       else if (value == "map") this.generalDataEditMode.map = true;
     },
     updateGeneralInfo(value) {
 
-      if (value == "website") this.generalDataEditMode.website = false;
+      if (value == "website") {
+        if (!this.isValidUrl(this.form.web)) {
+          this.$toast.error("Please enter a valid website URL");
+          return;
+        }
+        this.generalDataEditMode.website = false;
+      }
       else if (value == "email") this.generalDataEditMode.email = false;
       else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
