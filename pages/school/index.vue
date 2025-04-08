@@ -435,13 +435,24 @@ export default {
         "PagingDto.PageFilter.Skip": (page - 1) * perPage,
         "PagingDto.PageFilter.Size": perPage,
         "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-        Name: query.keyword,
-        "Location.Radius": query.distance || null,
-        "Location.Latitude": query.lat || null,
-        "Location.Longitude": query.lng || null,
+        // "PagingDto.SortFilter[0].sortType": "Desc",
+        // "PagingDto.SortFilter[0].column": "score",
+        Name: query.keyword ? query.keyword : null,
+        // "Location.Radius": query.distance || null,
+        // "Location.Latitude": query.lat || null,
+        // "Location.Longitude": query.lng || null,
       };
 
-      const response = await $axios.$get(baseURL, { params });
+      const qs = require("qs");
+      const response = await $axios.$get(baseURL, {
+        params,
+        paramsSerializer: (params) =>
+          qs.stringify(params, {
+            arrayFormat: "indices",
+            encode: true,
+            encodeValuesOnly: true,
+          }),
+      });
 
       return {
         schoolList: response.data.list || [],
@@ -692,7 +703,6 @@ export default {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
       this.filter.distance = this.formatNumber(R * c); // Return distance in meters
-      console.log(this.filter.distance);
     },
 
     formatNumber(number) {
@@ -724,42 +734,56 @@ export default {
     },
 
     async getSchoolList(side) {
+      const qs = require("qs");
+
+      let params = {
+        PagingDto: {
+          PageFilter: {
+            Skip: (this.filter.page - 1) * this.perPage,
+            Size: this.perPage,
+            ReturnTotalRecordsCount: true,
+          },
+          // "SortFilter[0].sortType": "Desc",
+          // "SortFilter[0].column": "score",
+        },
+        Name: this.$route.query.keyword,
+        section: this.$route.query.stage,
+        tuition_fee: this.$route.query.tuition_fee,
+        CountryId: this.$route.query.country,
+        StateId: this.$route.query.state,
+        CityId: this.$route.query.city,
+        school_type: this.$route.query.school_type,
+        religion: this.$route.query.religion,
+        boarding_type: this.$route.query.boarding_type,
+        coed_status: this.$route.query.coed_status,
+        sort: this.$route.query.sort,
+      };
+
+      if (!this.isExpanded)
+        params.Location = {
+          Radius: this.$route.query.distance
+            ? this.$route.query.distance
+            : this.filter.distance,
+          Latitude: this.$route.query.lat
+            ? this.$route.query.lat
+            : this.filter.lat,
+          Longitude: this.$route.query.lng
+            ? this.$route.query.lng
+            : this.filter.lng,
+        };
+
       this.schoolLoading = true;
       if (this.allDataLoaded == false)
         this.$axios
           .$get("/api/v2/schools", {
-            params: {
-              "PagingDto.PageFilter.Skip":
-                (this.filter.page - 1) * this.perPage,
-              "PagingDto.PageFilter.Size": this.perPage,
-              "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-              Name: this.$route.query.keyword,
-              section: this.$route.query.stage,
-              tuition_fee: this.$route.query.tuition_fee,
-              CountryId: this.$route.query.country,
-              StateId: this.$route.query.state,
-              CityId: this.$route.query.city,
-              school_type: this.$route.query.school_type,
-              religion: this.$route.query.religion,
-              boarding_type: this.$route.query.boarding_type,
-              coed_status: this.$route.query.coed_status,
-              sort: this.$route.query.sort,
-              "Location.Radius": this.isExpanded
-                ? null
-                : this.$route.query.distance
-                ? this.$route.query.distance
-                : this.filter.distance,
-              "Location.Latitude": this.isExpanded
-                ? null
-                : this.$route.query.lat
-                ? this.$route.query.lat
-                : this.filter.lat,
-              "Location.Longitude": this.isExpanded
-                ? null
-                : this.$route.query.lng
-                ? this.$route.query.lng
-                : this.filter.lng,
-            },
+            params,
+            paramsSerializer: (params) =>
+              qs.stringify(params, {
+                arrayFormat: "indices",
+                encode: true,
+                encodeValuesOnly: true,
+                allowDots: true,
+              }),
           })
           .then((response) => {
             this.resultCount = response.data.totalRecordsCount;

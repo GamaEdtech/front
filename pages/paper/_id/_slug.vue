@@ -145,6 +145,7 @@
                     </v-chip>
                     <v-chip
                       class="ma-1 blue-grey darken-1 white--text"
+                      :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&edu_month=1`"
                       :small="$vuetify.breakpoint.mdAndDown"
                     >
                       {{ contentData.edu_month_title }}
