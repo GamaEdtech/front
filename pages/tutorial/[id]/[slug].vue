@@ -167,6 +167,7 @@
                 <TutorialTree
                   v-if="filteredTree.length"
                   :items="filteredTree"
+                  :is-root-level="true"
                 />
               </div>
             </div>
@@ -179,7 +180,6 @@
                 class="sidebar-nav pa-5"
                 width="320"
               >
-                <TutorialMenu :lessonTree="lessonTree" />
               </v-navigation-drawer>
               <div class="book-content">
                 <div
@@ -233,14 +233,15 @@ const config = useRuntimeConfig();
 
 const route = useRoute();
 
+
 // Fetch tutorial data
-const { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialInfo', async () => {
+let { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialInfo', async () => {
   try {
     const response = await $fetch(`/api/v1/tutorials/${route.params.id}`);
     return response.data;
   } catch (e) {
     throw e;
-  }
+  } 
 });
 
 // Fetch lesson tree
@@ -278,10 +279,10 @@ useHead({
 
 let expandListMenu = ref(true)
 let drawer = ref(false)
-
+let activeMenu = ref(null)
 onMounted(() => {
+  activeMenu.value = route.params.id
   renderMathJax();
-
   if (process.client) {
     window.addEventListener('scroll', handleScroll);
   }
