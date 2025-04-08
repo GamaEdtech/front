@@ -872,10 +872,10 @@ export default {
       },
 
       form: {
-        web: '',
-        email: '',
-        phone: '',
-        address: '',
+        web: null,
+        email: null,
+        phone: null,
+        address: null,
       },
 
       rating: 3.5,
@@ -1204,6 +1204,58 @@ export default {
       else if (value == "email") this.generalDataEditMode.email = false;
       else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
+
+      var formData = {}
+
+      switch (value) {
+        case "website":
+          formData = {
+            webSite: this.form.web ?? null,
+          }
+          break;
+        case "email":
+          formData = {
+            email: this.form.email ?? null,
+          }
+          break;
+        case "phone":
+          formData = {
+            phoneNumber: this.form.phone ?? null,
+          }
+          break;
+        case "address":
+          formData = {
+            address: this.form.address ?? null,
+          }
+          break;
+        default:
+          break;
+      }
+
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/contributions`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          if (response.succeeded) {
+            this.$toast.success("Your contribution has been successfully submitted");
+          } else {
+            this.$toast.error(response?.errors[0]?.message);
+          }
+        })
+        .catch((err) => {
+          if (err.response.status == 401 || err.response.status == 403) {
+          } else this.$toast.error(err.response.data.message);
+        })
+        .finally(() => {
+
+        });
     },
   },
 };
