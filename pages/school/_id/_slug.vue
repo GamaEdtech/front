@@ -270,7 +270,8 @@
                   " class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
                 </span>
-                <v-text-field v-model="form.phone" v-if="generalDataEditMode.phone1" placeholder="Phone">
+                <v-text-field type="number" :rules="phoneRule" v-model="form.phone" v-if="generalDataEditMode.phone1"
+                  placeholder="Phone">
                   <template slot="append-outer">
                     <v-btn :loading="phoneSubmitLoader" color="success" @click="updateGeneralInfo('phone')" fab
                       depressed x-small>
@@ -941,6 +942,9 @@ export default {
       emailRule: [
         v => !!v || 'Email is required',
         v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Please enter a valid email address'
+      ],
+      phoneRule: [
+        v => !!v || 'Phone number is required'
       ]
     };
   },
@@ -1096,6 +1100,23 @@ export default {
         // Basic format check using a regular expression
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+      } catch (e) {
+        return false;
+      }
+    },
+    isValidPhone(email) {
+      try {
+        // Basic format check using a regular expression
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      } catch (e) {
+        return false;
+      }
+    },
+
+    isRequired(value) {
+      try {
+        return !!value.trim();
       } catch (e) {
         return false;
       }
@@ -1277,8 +1298,15 @@ export default {
         }
         this.generalDataEditMode.email = false;
       }
+      if (value == "phone") {
+        if (!this.isRequired(this.form.phone)) {
+          this.$toast.error("Please enter a valid Phone Number");
+          return;
+        }
+        this.generalDataEditMode.phone1 = false;
+      }
       // else if (value == "email") this.generalDataEditMode.email = false;
-      else if (value == "phone") this.generalDataEditMode.phone1 = false;
+      // else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
 
       var formData = {}
