@@ -246,7 +246,8 @@
                   class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
                 </span>
-                <v-text-field v-model="form.email" v-if="generalDataEditMode.email" placeholder="Email">
+                <v-text-field :rules="emailRule" v-model="form.email" v-if="generalDataEditMode.email"
+                  placeholder="Email">
                   <template slot="append-outer">
                     <v-btn :loading="emailSubmitLoader" color="success" @click="updateGeneralInfo('email')" fab
                       depressed x-small>
@@ -287,7 +288,7 @@
               <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
-                }}</span>
+                  }}</span>
                 <span @click="editGeneralInfo('address')" v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
@@ -937,6 +938,10 @@ export default {
         v => !v || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(v) || 'Please enter a valid URL',
         v => !v || v.length <= 255 || 'URL must be less than 255 characters'
       ],
+      emailRule: [
+        v => !!v || 'Email is required',
+        v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Please enter a valid email address'
+      ]
     };
   },
   head() {
@@ -1082,6 +1087,15 @@ export default {
         new URL(url);
         // Check if it starts with http:// or https://
         return /^https?:\/\//.test(url);
+      } catch (e) {
+        return false;
+      }
+    },
+    isValidEmail(email) {
+      try {
+        // Basic format check using a regular expression
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
       } catch (e) {
         return false;
       }
@@ -1255,7 +1269,15 @@ export default {
         }
         this.generalDataEditMode.website = false;
       }
-      else if (value == "email") this.generalDataEditMode.email = false;
+
+      if (value == "email") {
+        if (!this.isValidEmail(this.form.email)) {
+          this.$toast.error("Please enter a valid Email");
+          return;
+        }
+        this.generalDataEditMode.email = false;
+      }
+      // else if (value == "email") this.generalDataEditMode.email = false;
       else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
 
