@@ -283,7 +283,7 @@
               <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
-                  }}</span>
+                }}</span>
                 <span @click="editGeneralInfo('address')" v-show="!(contentData.address || generalDataEditMode.address)"
                   class="gtext-t4 primary-blue-500 align-self-center pointer">
                   Contribute
@@ -798,7 +798,8 @@
           <locationSearch id="searchSection" @locationSelected="goToSearchLocation" rounded label="Search anything" />
         </div>
         <v-card-actions class="justify-center pb-13">
-          <v-btn class="primary black--text text-transform-none gtext-t4 font-weight-medium" rounded width="100%"
+          <v-btn :loading="mapSubmitLoader" @click="updateGeneralInfo('map')"
+            class="primary black--text text-transform-none gtext-t4 font-weight-medium" rounded width="100%"
             max-width="400" x-large>Save</v-btn>
         </v-card-actions>
       </v-card>
@@ -878,6 +879,8 @@ export default {
         address: null,
       },
 
+      mapMarkerData: {},
+
       rating: 3.5,
       slideToggler: "map",
       topSlideClass: {
@@ -908,6 +911,8 @@ export default {
         submitComment: false,
       },
 
+      mapSubmitLoader: false,
+
       commentList: [],
 
       generalDataEditMode: {
@@ -915,6 +920,7 @@ export default {
         email: false,
         phone1: false,
         address: false,
+        map: false,
       },
     };
   },
@@ -1030,6 +1036,10 @@ export default {
 
       // Update the marker position to the new center
       marker.setLatLng(newCenter);
+      console.log("newCenter", newCenter);
+      console.log("marker", marker);
+      console.log("mao", this.map);
+      this.mapMarkerData = newCenter
     },
     goToSearchLocation(val) {
       const map = this.$refs.editSchoolMap.mapObject;
@@ -1198,8 +1208,10 @@ export default {
       else if (value == "email") this.generalDataEditMode.email = true;
       else if (value == "phone") this.generalDataEditMode.phone1 = true;
       else if (value == "address") this.generalDataEditMode.address = true;
+      else if (value == "map") this.generalDataEditMode.map = true;
     },
     updateGeneralInfo(value) {
+
       if (value == "website") this.generalDataEditMode.website = false;
       else if (value == "email") this.generalDataEditMode.email = false;
       else if (value == "phone") this.generalDataEditMode.phone1 = false;
@@ -1228,6 +1240,13 @@ export default {
             address: this.form.address ?? null,
           }
           break;
+        case "map":
+          this.mapSubmitLoader = true
+          formData = {
+            "latitude": this.mapMarkerData.lat,
+            "longitude": this.mapMarkerData.lng,
+          }
+          break;
         default:
           break;
       }
@@ -1254,7 +1273,8 @@ export default {
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
-
+          this.mapSubmitLoader = false
+          this.selectLocationDialog = false
         });
     },
   },
