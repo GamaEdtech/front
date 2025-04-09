@@ -2,11 +2,9 @@
   <div>
     <!--Start: menu button-->
     <v-btn
-      class="d-block d-md-none"
-      fixed
-      bottom
-      right
-      style="z-index: 10"
+      class="d-block d-md-none px-5"
+      style="z-index: 10 ; bottom: 16px; right: 16px; height: 52px;
+      position: fixed; font-weight: 500;"
       min-width="40"
       x-large
       color="teal"
@@ -14,15 +12,15 @@
       rounded
       @click.stop="drawer = !drawer"
     >
-      <v-icon> mdi-format-list-numbered </v-icon>
+      <v-icon style="font-size: 24px;"> mdi-format-list-numbered </v-icon>
       <v-slide-x-reverse-transition>
-        <span v-show="expandListMenu" class="text-h6">&nbsp;List</span>
+        <span v-show="expandListMenu" style="font-size: 1.5rem;" class="text-h6">&nbsp;List</span>
       </v-slide-x-reverse-transition>
     </v-btn>
     <!--End: menu button-->
 
     <!-- Start : Category -->
-    <category />
+    <common-category />
     <!-- End:Category -->
 
     <!-- Start:Lesson title -->
@@ -164,7 +162,7 @@
           <v-col md="3" class="d-none d-md-block">
             <div class="cataloge pa-2">
               <div class="cataloge-content">
-                <TutorialTree
+                <common-TutorialTree
                   v-if="filteredTree.length"
                   :items="filteredTree"
                   :is-root-level="true"
@@ -176,10 +174,14 @@
             <div class="book-contents pa-3 pa-md-6">
               <v-navigation-drawer
                 v-model="drawer"
-                style="z-index: 10"
                 class="sidebar-nav pa-5"
                 width="320"
               >
+              <common-TutorialTree
+                  v-if="filteredTree.length"
+                  :items="filteredTree"
+                  :is-root-level="true"
+                />
               </v-navigation-drawer>
               <div class="book-content">
                 <div
@@ -219,13 +221,10 @@
 
     <!-- Sidebar -->
 
-    <crash-report ref="crashReportRef" />
+    <common-crash-report ref="crashReportRef" />
   </div>
 </template>
 <script setup>
-import category from "@/components/common/category.vue";
-import CrashReport from "~/components/common/crash-report.vue";
-import TutorialTree from '~/components/common/TutorialTree.vue';
 import { useRuntimeConfig } from 'nuxt/app';
 
 const config = useRuntimeConfig();
