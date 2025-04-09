@@ -2,17 +2,15 @@
   <div class="breadcrumbs-container">
     <v-breadcrumbs :items="breads" >
       <template v-slot:divider>
-        <v-icon>mdi-chevron-right</v-icon>
+        <v-icon icon="mdi-chevron-right" />
       </template>
     </v-breadcrumbs>
   </div>
 </template>
-<script>
-export default {
-  props: {
-    breads: Array
-  }
-}
+<script setup>
+defineProps({
+  breads: Array
+})
 </script>
 
 
