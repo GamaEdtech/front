@@ -2,11 +2,9 @@
   <div>
     <!--Start: menu button-->
     <v-btn
-      class="d-block d-md-none"
-      fixed
-      bottom
-      right
-      style="z-index: 10"
+      class="d-block d-md-none px-5"
+      style="z-index: 10 ; bottom: 16px; right: 16px; height: 52px;
+      position: fixed; font-weight: 500;"
       min-width="40"
       x-large
       color="teal"
@@ -14,15 +12,15 @@
       rounded
       @click.stop="drawer = !drawer"
     >
-      <v-icon> mdi-format-list-numbered </v-icon>
+      <v-icon style="font-size: 24px;"> mdi-format-list-numbered </v-icon>
       <v-slide-x-reverse-transition>
-        <span v-show="expandListMenu" class="text-h6">&nbsp;List</span>
+        <span v-show="expandListMenu" style="font-size: 1.5rem;" class="text-h6">&nbsp;List</span>
       </v-slide-x-reverse-transition>
     </v-btn>
     <!--End: menu button-->
 
     <!-- Start : Category -->
-    <category />
+    <common-category />
     <!-- End:Category -->
 
     <!-- Start:Lesson title -->
@@ -164,7 +162,11 @@
           <v-col md="3" class="d-none d-md-block">
             <div class="cataloge pa-2">
               <div class="cataloge-content">
-                <TutorialMenu :lessonTree="lessonTree" />
+                <common-TutorialTree
+                  v-if="filteredTree.length"
+                  :items="filteredTree"
+                  :is-root-level="true"
+                />
               </div>
             </div>
           </v-col>
@@ -172,11 +174,14 @@
             <div class="book-contents pa-3 pa-md-6">
               <v-navigation-drawer
                 v-model="drawer"
-                style="z-index: 10"
                 class="sidebar-nav pa-5"
                 width="320"
               >
-                <TutorialMenu :lessonTree="lessonTree" />
+              <common-TutorialTree
+                  v-if="filteredTree.length"
+                  :items="filteredTree"
+                  :is-root-level="true"
+                />
               </v-navigation-drawer>
               <div class="book-content">
                 <div
@@ -216,224 +221,123 @@
 
     <!-- Sidebar -->
 
-    <crash-report ref="crash_report" />
+    <common-crash-report ref="crashReportRef" />
   </div>
 </template>
-<script>
-import category from "@/components/common/category.vue";
-import TutorialMenu from "@/components/common/tutorial-menu";
-import RelatedContent from "@/components/details/related-content";
-import LatestTrainingContent from "@/components/details/latest-training-content";
-import RelatedQa from "@/components/details/related-qa";
-import RelatedOnlineExam from "@/components/details/related-online-exam";
-import CrashReport from "~/components/common/crash-report.vue";
+<script setup>
+import { useRuntimeConfig } from 'nuxt/app';
 
-export default {
-  name: "tutorial-details",
-  auth: false,
-  components: {
-    CrashReport,
-    RelatedOnlineExam,
-    RelatedQa,
-    LatestTrainingContent,
-    RelatedContent,
-    category,
-    TutorialMenu,
-  },
+const config = useRuntimeConfig();
 
-  async asyncData({ params, $axios, redirect }) {
-    try {
-      // This could also be an action dispatch
-      const tutorialData = await $axios.$get(`/api/v1/tutorials/${params.id}`);
 
-      //Tutorial data
-      var tutorialInfo = tutorialData.data;
+const route = useRoute();
 
-      //Get lesson tree
-      const tutorialLessonTree = await $axios.$get(
-        `/api/v1/tutorials/lessonTree/${tutorialInfo.lesson}`
-      );
-      var lessonTree = tutorialLessonTree.data;
 
-      //Get and order title to display
-      var lessonInfo = tutorialInfo.title.split("|");
-      var lesson = { title: lessonInfo[0], topic_title: lessonInfo[1] };
+// Fetch tutorial data
+let { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialInfo', async () => {
+  try {
+    const response = await $fetch(`/api/v1/tutorials/${route.params.id}`);
+    return response.data;
+  } catch (e) {
+    throw e;
+  } 
+});
 
-      return { tutorialInfo, lessonTree, lesson };
-    } catch (e) {
-      if (e.response && e.response.status === 404) {
-        redirect("/search?type=dars");
-      }
-    }
-  },
+// Fetch lesson tree
+const { data: lessonTree, error: lessonTreeError } = await useAsyncData('lessonTree', async () => {
+  try {
+    if (!tutorialInfo.value?.lesson) return null;
+    const response = await $fetch(`/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`);
+    return response.data;
+  } catch (e) {
+    throw e;
+  }
+});
 
-  head() {
-    return {
-      script: [
-        {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
-      title: this.tutorialInfo.title,
-    };
-  },
+const filteredTree = computed(() =>
+  lessonTree.value?.list?.filter(
+    x => (x.tutorials?.length > 0) || (x.chapters?.length > 0)
+  ) || []
+);
 
-  data() {
-    return {
-      e6: 1,
-      expandListMenu: true,
-      timelines: [
-        {
-          lessonName: " Speech 1 :Nerve tissue cells",
-        },
-        {
-          lessonName: "Speech 2 : Nervous system structure",
-        },
-      ],
-      bookmark: "bookmark.png",
-      drawer: false,
-      // model: null,
-      testNumber: "20 Test",
-      askCard: {
-        icon: "qa",
+// Process lesson title
+const lessonInfo = tutorialInfo.value?.title?.split('|') || [];
+const lesson = {
+  title: lessonInfo[0] || '',
+  topic_title: lessonInfo[1] || ''
+};
+
+useHead({
+  script: [
+    {
+      src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+    },
+  ],
+  title: tutorialInfo.value?.title || '',
+});
+
+let expandListMenu = ref(true)
+let drawer = ref(false)
+let activeMenu = ref(null)
+onMounted(() => {
+  activeMenu.value = route.params.id
+  renderMathJax();
+  if (process.client) {
+    window.addEventListener('scroll', handleScroll);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (process.client) {
+    window.removeEventListener('scroll', handleScroll);
+  }
+});
+
+const renderMathJax = () => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [
+          ["$", "$"],
+          ["\(", "\)"],
+        ],
+        displayMath: [
+          ["$$", "$$"],
+          ["\[", "\]"],
+        ],
+        processEscapes: true,
+        processEnvironments: true,
       },
-
-      rating: 4,
-      items1: ["All", "دبستان", "متوسطه"],
-      items2: ["All", "دبستان", "متوسطه"],
-      items3: ["All", "دبستان", "متوسطه"],
-      values1: ["All"],
-      values2: ["All"],
-      values3: ["All"],
-      value1: null,
-      value2: null,
-      value3: null,
-      lastUpdate: "27 Jun",
-      visit: "15383",
-
-      card: {
-        img: "dexter-morse1.png",
-        img2: "book.png",
-        videoTitle:
-          "Video of the complete educational course, the seventh mathematics of the first year of high school",
-        bookTitle: "Exam test bank album, Math 7th first period of high school",
-        testNumber: "2717",
-        videoTeacher: "Arian Etemdi",
-        durition: " 8 Hour (26 File)",
-        easy: "Easy",
-        medium: "Medium",
-        hard: "Difficult",
+      displayAlign: "center",
+      "HTML-CSS": {
+        styles: { ".MathJax_Display": { margin: 0 } },
+        linebreaks: { automatic: true },
+        availableFonts: ["Asana Math"],
+        preferredFont: "Asana Math",
+        webFont: "Asana Math-Web",
+        imageFont: null,
       },
-      book: {
-        catalogeTitle: "Biology (2)",
-        learnmoreText:
-          "Inflammation of the meninges is called meningitis and its symptoms are headache, fever and dry neck. Meningitis is caused by viral or bacterial infections.",
-      },
-      bookContent: [
-        {
-          bookText:
-            "In the past, you learned that the nervous system has two central and peripheral parts (Figure 11). Why do you think this device is called central and peripheral?",
-          bookPic: "9_1.png",
-          picSub:
-            "Figure 11- Central nervous system (yellow color) and peripheral (blue color)",
-        },
-        {
-          bookTitle: "Central nervous system",
-          bookText:
-            "The central nervous system includes the brain and the spinal cord, which are the centers for monitoring the body's activities. This device interprets the information received from the environment and inside the body and responds to them. Brain and spinal cord from two parts ",
-          bookPic: "9_2.png",
-          picSub: "Figure 12- Transverse section of the brain and spinal cord",
-        },
-      ],
-      model: null,
+    });
 
-      events: [],
-      input: null,
-      nonce: 0,
-    };
-  },
+    window.MathJax.Hub.Queue([
+      "Typeset",
+      window.MathJax.Hub,
+      mathJaxEl.value,
+    ]);
+  }
+};
 
-  computed: {
-    timeline() {
-      return this.events.slice().reverse();
-    },
-  },
-  mounted() {
-    this.renderMathJax();
-  },
-  created() {
-    if (process.client) {
-      window.addEventListener("scroll", this.handleScroll);
-    }
-  },
-  destroyed() {
-    if (process.client) {
-      window.removeEventListener("scroll", this.handleScroll);
-    }
-  },
-  methods: {
-    comment() {
-      const time = new Date().toTimeString();
-      this.events.push({
-        id: this.nonce++,
-        text: this.input,
-        time: time.replace(
-          /:\d{2}\sGMT-\d{4}\s\((.*)\)/,
-          (match, contents, offset) => {
-            return ` ${contents
-              .split(" ")
-              .map((v) => v.charAt(0))
-              .join("")}`;
-          }
-        ),
-      });
 
-      this.input = null;
-    },
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-            availableFonts: ["Asana Math"],
-            preferredFont: "Asana Math",
-            webFont: "Asana Math-Web",
-            imageFont: null,
-          },
-        });
-        window.MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
-    },
-    handleScroll() {
-      if (window.scrollY > 1000) this.expandListMenu = false;
-      else this.expandListMenu = true;
-    },
+const handleScroll = () => {
+  if (window.scrollY > 1000) expandListMenu.value = false;
+  else expandListMenu.value = true;
+};
 
-    openCrashReportDialog() {
-      this.$refs.crash_report.dialog = true;
-      this.$refs.crash_report.form.type = "tutorial";
-    },
-  },
+
+const crashReportRef = ref(null);
+const openCrashReportDialog = () => {
+    crashReportRef.value.dialog = true;
+    crashReportRef.value.form.type = "tutorial";
 };
 </script>
 
