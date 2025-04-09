@@ -1251,13 +1251,7 @@ function renderMathJax() {
         imageFont: null,
       },
     });
-    if (mathJaxEl.value) {
-      window.MathJax.Hub.Queue([
-        "Typeset",
-        window.MathJax.Hub,
-        mathJaxEl.value,
-      ]);
-    }
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
   }
 }
 
