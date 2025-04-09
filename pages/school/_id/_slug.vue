@@ -2,20 +2,45 @@
   <v-container id="school-details">
     <v-row class="d-flex d-md-none">
       <div class="top-slide-container">
-        <img v-if="contentData.pic" class="schoolDetailsImg" :class="topSlideClass.image" @click="galleryDialog = true"
-          src="/images/school-default.png" alt="School image" />
-        <div v-else class="enter-img-holder pointer" :class="topSlideClass.image" @click="galleryDialog = true">
+        <img
+          v-if="contentData.pic"
+          class="schoolDetailsImg"
+          :class="topSlideClass.image"
+          @click="galleryDialog = true"
+          src="/images/school-default.png"
+          alt="School image"
+        />
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.image"
+          @click="galleryDialog = true"
+        >
           <div class="text-center">
-            <v-icon :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
-              class="primary-gray-300 mb-2 mb-md-10">mdi-panorama-outline</v-icon>
+            <v-icon
+              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-panorama-outline</v-icon
+            >
             <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
         <client-only>
-          <l-map ref="schoolMap" :zoom="map.zoom" :min-zoom="map.minZoom" :center="map.center"
-            :class="topSlideClass.map" @click="selectLocationDialog = true" id="schoolDetailsMap">
+          <l-map
+            ref="schoolMap"
+            :zoom="map.zoom"
+            :min-zoom="map.minZoom"
+            :center="map.center"
+            :class="topSlideClass.map"
+            @click="selectLocationDialog = true"
+            id="schoolDetailsMap"
+          >
             <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker @click="$router.push(`/school/1`)" :lat-lng="map.latLng" :icon="map.schoolIcon"></l-marker>
+            <l-marker
+              @click="$router.push(`/school/1`)"
+              :lat-lng="map.latLng"
+              :icon="map.schoolIcon"
+            ></l-marker>
           </l-map>
         </client-only>
 
@@ -26,10 +51,18 @@
             </a-scene>
           </client-only>
         </div>
-        <div v-else class="enter-img-holder pointer" :class="topSlideClass.tour" @click="openTourImgInput">
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.tour"
+          @click="openTourImgInput"
+        >
           <div class="text-center">
-            <v-icon :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
-              class="primary-gray-300 mb-2 mb-md-10">mdi-rotate-360</v-icon>
+            <v-icon
+              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-rotate-360</v-icon
+            >
             <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
@@ -38,19 +71,36 @@
 
     <v-row class="d-none d-md-flex">
       <v-col cols="12" md="4">
-        <img v-if="contentData.pic" @click="galleryDialog = true" class="pointer schoolDetailsImg"
-          src="/images/school-default.png" alt="School image" />
-        <div v-else class="enter-img-holder pointer" @click="galleryDialog = true">
+        <img
+          v-if="contentData.pic"
+          @click="galleryDialog = true"
+          class="pointer schoolDetailsImg"
+          src="/images/school-default.png"
+          alt="School image"
+        />
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          @click="galleryDialog = true"
+        >
           <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10">mdi-panorama-outline</v-icon>
+            <v-icon size="48" class="primary-gray-300 mb-10"
+              >mdi-panorama-outline</v-icon
+            >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
       </v-col>
       <v-col cols="12" md="4">
         <client-only>
-          <l-map ref="schoolMap" :zoom="map.zoom" :min-zoom="map.minZoom" :center="map.center" id="schoolDetailsMap"
-            @click="openLocationDialog">
+          <l-map
+            ref="schoolMap"
+            :zoom="map.zoom"
+            :min-zoom="map.minZoom"
+            :center="map.center"
+            id="schoolDetailsMap"
+            @click="openLocationDialog"
+          >
             <l-tile-layer :url="map.url"></l-tile-layer>
             <l-marker :lat-lng="map.latLng" :icon="map.schoolIcon"></l-marker>
           </l-map>
@@ -66,11 +116,18 @@
         </div>
         <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
           <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10">mdi-rotate-360</v-icon>
+            <v-icon size="48" class="primary-gray-300 mb-10"
+              >mdi-rotate-360</v-icon
+            >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
           </div>
         </div>
-        <v-file-input class="d-none" v-model="tourImg" ref="tourImgRef" hide-details></v-file-input>
+        <v-file-input
+          class="d-none"
+          v-model="tourImg"
+          ref="tourImgRef"
+          hide-details
+        ></v-file-input>
       </v-col>
     </v-row>
 
@@ -87,7 +144,13 @@
             </div>
           </v-col>
           <v-col cols="6" class="text-center d-block d-md-none">
-            <v-btn-toggle style="order: 2" v-model="slideToggler" rounded active-class="bg-white" @change="changeSlide">
+            <v-btn-toggle
+              style="order: 2"
+              v-model="slideToggler"
+              rounded
+              active-class="bg-white"
+              @change="changeSlide"
+            >
               <v-btn small class="text-transform-none gtext-t5" value="image">
                 Image
               </v-btn>
@@ -112,7 +175,8 @@
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
               {{ contentData.name }}
-              <span v-show="contentData.school_type_title">,
+              <span v-show="contentData.school_type_title"
+                >,
                 {{ contentData.school_type_title }}
               </span>
               <span v-show="contentData.section_title">
@@ -126,7 +190,9 @@
           <v-col cols="1" md="4">
             <div class="float-right d-flex mt-1">
               <v-icon size="20" class="primary-gray-300">mdi-heart</v-icon>
-              <div class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4">
+              <div
+                class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
+              >
                 {{ contentData.score ? contentData.score : "New" }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
@@ -138,29 +204,56 @@
           <v-col cols="12" md="8">
             <div class="d-flex">
               <v-sheet class="chips-container">
-                <v-chip v-if="contentData.countryTitle" class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  v-if="contentData.countryTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.countryTitle }}
                 </v-chip>
-                <v-chip v-if="contentData.stateTitle" class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  v-if="contentData.stateTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.stateTitle }}
                 </v-chip>
-                <v-chip v-if="contentData.cityTitle" class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  v-if="contentData.cityTitle"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.cityTitle }}
                 </v-chip>
-                <v-chip v-if="contentData.schoolType && contentData.schoolType.name"
-                  class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  v-if="contentData.schoolType && contentData.schoolType.name"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData?.schoolType?.name }}
                 </v-chip>
-                <v-chip :to="`/school?school_type=${contentData.school_type}`" v-if="contentData.school_type_title"
-                  class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  :to="`/school?school_type=${contentData.school_type}`"
+                  v-if="contentData.school_type_title"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.school_type_title }}
                 </v-chip>
-                <v-chip :to="`/school?section=${contentData.section}`" v-if="contentData.section_title"
-                  class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  :to="`/school?section=${contentData.section}`"
+                  v-if="contentData.section_title"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.section_title }}
                 </v-chip>
-                <v-chip :to="`/school?coed_status=${contentData.sex}`" v-if="contentData.sex_title"
-                  class="blue-grey darken-1 white--text" small>
+                <v-chip
+                  :to="`/school?coed_status=${contentData.sex}`"
+                  v-if="contentData.sex_title"
+                  class="blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.sex_title }}
                 </v-chip>
               </v-sheet>
@@ -177,8 +270,10 @@
               <!-- <div class="gtext-t4 primary-blue-500">Contribute</div> -->
 
               <div class="gtext-t2 font-weight-heavy primary-gray-800">
-                <span v-show="contentData.tuition_fee"><span class="gtext-t6">$</span>
-                  {{ contentData.tuition_fee | numberFormat }}</span>
+                <span v-show="contentData.tuition_fee"
+                  ><span class="gtext-t6">$</span>
+                  {{ contentData.tuition_fee | numberFormat }}</span
+                >
                 <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
             </div>
@@ -186,23 +281,38 @@
               <div class="gtext-h5 primary-gray-600">
                 <div class="mb-4">Sports facilities</div>
                 <div>
-                  <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.sport_hall == '0'" height="56"
-                    width="56">
+                  <v-btn
+                    class="bg-primary-gray-800 white--text"
+                    :disabled="contentData.sport_hall == '0'"
+                    height="56"
+                    width="56"
+                  >
                     <v-icon size="24"> mdi-basketball </v-icon>
                   </v-btn>
-                  <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.dorm == '0'" height="56"
-                    width="56">
+                  <v-btn
+                    class="bg-primary-gray-800 white--text"
+                    :disabled="contentData.dorm == '0'"
+                    height="56"
+                    width="56"
+                  >
                     <v-icon size="24"> mdi-bed </v-icon>
                   </v-btn>
 
-                  <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.smart_class == '0'" height="56"
-                    width="56">
+                  <v-btn
+                    class="bg-primary-gray-800 white--text"
+                    :disabled="contentData.smart_class == '0'"
+                    height="56"
+                    width="56"
+                  >
                     <v-icon size="24"> mdi-tablet-cellphone </v-icon>
                   </v-btn>
                 </div>
               </div>
               <v-spacer />
-              <div @click="facilitiesDialog = true" class="gtext-t4 primary-blue-500 align-self-center pointer">
+              <div
+                @click="facilitiesDialog = true"
+                class="gtext-t4 primary-blue-500 align-self-center pointer"
+              >
                 Contribute
               </div>
             </div>
@@ -213,20 +323,37 @@
                 <v-icon color="primary"> mdi-web </v-icon>
               </div>
               <div class="info-data">
-                <a v-show="contentData.webSite" :href="normalizeURL(contentData.webSite)" target="_blank"
-                  class="blue--text">
+                <a
+                  v-show="contentData.webSite"
+                  :href="normalizeURL(contentData.webSite)"
+                  target="_blank"
+                  class="blue--text"
+                >
                   {{ contentData.webSite }}
                 </a>
-                <span v-show="!(contentData.webSite || generalDataEditMode.website)" @click="editGeneralInfo('website')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer">
+                <span
+                  v-show="!(contentData.webSite || generalDataEditMode.website)"
+                  @click="editGeneralInfo('website')"
+                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                >
                   Contribute
                 </span>
 
-                <v-text-field v-model="form.web" v-if="generalDataEditMode.website" placeholder="Website"
-                  :rules="webUrlRule">
+                <v-text-field
+                  v-model="form.web"
+                  v-if="generalDataEditMode.website"
+                  placeholder="Website"
+                  :rules="webUrlRule"
+                >
                   <template slot="append-outer">
-                    <v-btn :loading="webSubmitLoader" color="success" @click="updateGeneralInfo('website')" fab
-                      depressed x-small>
+                    <v-btn
+                      :loading="webSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('website')"
+                      fab
+                      depressed
+                      x-small
+                    >
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -239,18 +366,34 @@
                 <v-icon color="primary"> mdi-email </v-icon>
               </div>
               <div class="info-data">
-                <a v-show="contentData.email" :href="`mailto:${contentData.email}`">
+                <a
+                  v-show="contentData.email"
+                  :href="`mailto:${contentData.email}`"
+                >
                   {{ contentData.email }}
                 </a>
-                <span v-show="!(contentData.email || generalDataEditMode.email)" @click="editGeneralInfo('email')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer">
+                <span
+                  v-show="!(contentData.email || generalDataEditMode.email)"
+                  @click="editGeneralInfo('email')"
+                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                >
                   Contribute
                 </span>
-                <v-text-field :rules="emailRule" v-model="form.email" v-if="generalDataEditMode.email"
-                  placeholder="Email">
+                <v-text-field
+                  :rules="emailRule"
+                  v-model="form.email"
+                  v-if="generalDataEditMode.email"
+                  placeholder="Email"
+                >
                   <template slot="append-outer">
-                    <v-btn :loading="emailSubmitLoader" color="success" @click="updateGeneralInfo('email')" fab
-                      depressed x-small>
+                    <v-btn
+                      :loading="emailSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('email')"
+                      fab
+                      depressed
+                      x-small
+                    >
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -263,18 +406,37 @@
                 <v-icon color="primary"> mdi-phone </v-icon>
               </div>
               <div class="info-data">
-                <a v-show="contentData.phoneNumber" :href="`tel: ${contentData.phoneNumber}`">
+                <a
+                  v-show="contentData.phoneNumber"
+                  :href="`tel: ${contentData.phoneNumber}`"
+                >
                   {{ contentData.phoneNumber }}
                 </a>
-                <span @click="editGeneralInfo('phone')" v-show="!(contentData.phoneNumber || generalDataEditMode.phone1)
-                  " class="gtext-t4 primary-blue-500 align-self-center pointer">
+                <span
+                  @click="editGeneralInfo('phone')"
+                  v-show="
+                    !(contentData.phoneNumber || generalDataEditMode.phone1)
+                  "
+                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                >
                   Contribute
                 </span>
-                <v-text-field type="number" :rules="phoneRule" v-model="form.phone" v-if="generalDataEditMode.phone1"
-                  placeholder="Phone">
+                <v-text-field
+                  type="number"
+                  :rules="phoneRule"
+                  v-model="form.phone"
+                  v-if="generalDataEditMode.phone1"
+                  placeholder="Phone"
+                >
                   <template slot="append-outer">
-                    <v-btn :loading="phoneSubmitLoader" color="success" @click="updateGeneralInfo('phone')" fab
-                      depressed x-small>
+                    <v-btn
+                      :loading="phoneSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('phone')"
+                      fab
+                      depressed
+                      x-small
+                    >
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -289,16 +451,29 @@
               <div class="info-data info-data-address">
                 <span v-show="contentData.address">{{
                   contentData.address
-                  }}</span>
-                <span @click="editGeneralInfo('address')" v-show="!(contentData.address || generalDataEditMode.address)"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer">
+                }}</span>
+                <span
+                  @click="editGeneralInfo('address')"
+                  v-show="!(contentData.address || generalDataEditMode.address)"
+                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                >
                   Contribute
                 </span>
 
-                <v-text-field v-model="form.address" v-if="generalDataEditMode.address" placeholder="Enter address">
+                <v-text-field
+                  v-model="form.address"
+                  v-if="generalDataEditMode.address"
+                  placeholder="Enter address"
+                >
                   <template slot="append-outer">
-                    <v-btn :loading="addressSubmitLoader" color="success" @click="updateGeneralInfo('address')" fab
-                      depressed x-small>
+                    <v-btn
+                      :loading="addressSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('address')"
+                      fab
+                      depressed
+                      x-small
+                    >
                       <v-icon> mdi-check </v-icon>
                     </v-btn>
                   </template>
@@ -317,7 +492,12 @@
               Score
             </h3>
             <div class="d-flex">
-              <img src="/images/score.png" id="score-img" alt="Users score" class="mr-8" />
+              <img
+                src="/images/score.png"
+                id="score-img"
+                alt="Users score"
+                class="mr-8"
+              />
               <div class="mt-10">
                 <div class="gtext-t6 primary-gray-400 mb-10">
                   Total comments
@@ -326,22 +506,37 @@
                   </span>
                 </div>
                 <div>
-                  <v-rating v-model="ratingData.averageRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="ratingData.averageRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </div>
                 <div class="gtext-t6 primary-gray-400">
-                  Average score &nbsp;<span class="primary-gray-900 gtext-t4 font-weight-medium">
+                  Average score &nbsp;<span
+                    class="primary-gray-900 gtext-t4 font-weight-medium"
+                  >
                     {{
                       ratingData.averageRate
                         ? ratingData.averageRate.toFixed(1)
                         : "New"
-                    }} </span><span>&nbsp;/&nbsp;5</span>
+                    }} </span
+                  ><span>&nbsp;/&nbsp;5</span>
                 </div>
               </div>
             </div>
             <div class="mt-10 mb-12">
-              <v-btn block class="bg-primary-gray-800 white--text text-transform-none gtext-t4 font-weight-medium"
-                rounded x-large @click="leaveCommentDialog = true">Leave a Comment</v-btn>
+              <v-btn
+                block
+                class="bg-primary-gray-800 white--text text-transform-none gtext-t4 font-weight-medium"
+                rounded
+                x-large
+                @click="leaveCommentDialog = true"
+                >Leave a Comment</v-btn
+              >
             </div>
           </v-col>
           <v-col cols="12" md="8">
@@ -351,8 +546,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Classroom & facility quality
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.facilitiesRate * 100) / 5" height="8"
-                  class="mt-3" />
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.facilitiesRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.facilitiesRate) }}
@@ -363,8 +563,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Teachers' expertise
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.educationRate * 100) / 5" height="8"
-                  class="mt-3"></v-progress-linear>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.educationRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.educationRate) }}
@@ -375,8 +580,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Tech accessibility
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.educationRate * 100) / 5" height="8"
-                  class="mt-3"></v-progress-linear>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.educationRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.itTrainingRate) }}
@@ -387,8 +597,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Safety & environment
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.safetyAndHappinessRate * 100) / 5"
-                  height="8" class="mt-3"></v-progress-linear>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.safetyAndHappinessRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.safetyAndHappinessRate) }}
@@ -399,8 +614,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Staff behavior
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.behaviorRate * 100) / 5" height="8"
-                  class="mt-3" />
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.behaviorRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.behaviorRate) }}
@@ -411,8 +631,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Value for tuition
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.tuitionRatioRate * 100) / 5" height="8"
-                  class="mt-3" />
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.tuitionRatioRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                />
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.tuitionRatioRate) }}
@@ -423,8 +648,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Sports facilities
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.facilitiesRate * 100) / 5" height="8"
-                  class="mt-3"></v-progress-linear>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.facilitiesRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.facilitiesRate) }}
@@ -435,8 +665,13 @@
                 <div class="gtext-t4 font-weight-medium score-title">
                   Art & counseling programs
                 </div>
-                <v-progress-linear color="success" rounded :value="(ratingData.artisticActivitiesRate * 100) / 5"
-                  height="8" class="mt-3"></v-progress-linear>
+                <v-progress-linear
+                  color="success"
+                  rounded
+                  :value="(ratingData.artisticActivitiesRate * 100) / 5"
+                  height="8"
+                  class="mt-3"
+                ></v-progress-linear>
 
                 <div class="gtext-t4 font-weight-medium rate-title ml-2">
                   {{ convertRateToString(ratingData.artisticActivitiesRate) }}
@@ -453,13 +688,20 @@
             <h3 class="gtext-h5 primary-gray-600">Comments</h3>
           </v-col>
           <v-col cols="12" md="12">
-            <v-card v-for="comment in commentList" :key="comment.id" class="comment-card primary-gray-100 pt-4 mb-3"
-              elevation="1">
+            <v-card
+              v-for="comment in commentList"
+              :key="comment.id"
+              class="comment-card primary-gray-100 pt-4 mb-3"
+              elevation="1"
+            >
               <v-card-text>
                 <div class="comment-card-header">
                   <div class="d-flex float-left">
                     <v-avatar size="60">
-                      <img class="profile-avatar" :src="comment.creationUserAvatar" />
+                      <img
+                        class="profile-avatar"
+                        :src="comment.creationUserAvatar"
+                      />
                     </v-avatar>
                     <div class="ml-2">
                       <!-- <div class="gtext-t3 primary-gray-500">
@@ -471,8 +713,14 @@
                     </div>
                   </div>
                   <div class="float-right">
-                    <v-rating :value="comment.averageRate" background-color="orange lighten-3" color="orange"
-                      half-increments size="24" readonly></v-rating>
+                    <v-rating
+                      :value="comment.averageRate"
+                      background-color="orange lighten-3"
+                      color="orange"
+                      half-increments
+                      size="24"
+                      readonly
+                    ></v-rating>
                   </div>
                 </div>
                 <v-divider class="mb-5" />
@@ -481,10 +729,18 @@
                 </div>
                 <div class="pb-8">
                   <div class="float-left">
-                    <v-btn class="bg-primary-gray-700 white--text mr-6" fab x-small>
+                    <v-btn
+                      class="bg-primary-gray-700 white--text mr-6"
+                      fab
+                      x-small
+                    >
                       <v-icon size="14"> mdi-thumb-down </v-icon>
                     </v-btn>
-                    <v-btn class="bg-primary-gray-700 white--text mr-6" fab x-small>
+                    <v-btn
+                      class="bg-primary-gray-700 white--text mr-6"
+                      fab
+                      x-small
+                    >
                       <v-icon size="14"> mdi-thumb-up </v-icon>
                     </v-btn>
                     <v-btn class="bg-primary-blue-500 white--text" fab x-small>
@@ -499,8 +755,13 @@
             </v-card>
 
             <div class="text-center mt-14">
-              <v-btn rounded class="text-transform-none gtext-t4 font-weight-medium" color="white" x-large>Load
-                more</v-btn>
+              <v-btn
+                rounded
+                class="text-transform-none gtext-t4 font-weight-medium"
+                color="white"
+                x-large
+                >Load more</v-btn
+              >
             </div>
           </v-col>
           <!-- <v-col cols="12" md="3" class="d-none d-md-block pl-15">
@@ -517,7 +778,10 @@
             <h3 class="gtext-h5 primary-gray-600">Similar schools</h3>
           </v-col>
           <v-col cols="12">
-            <v-slide-group class="slider py-sm-4" :show-arrows="$vuetify.breakpoint.lgAndUp">
+            <v-slide-group
+              class="slider py-sm-4"
+              :show-arrows="$vuetify.breakpoint.lgAndUp"
+            >
               <!-- <div class="d-flex" v-if="isLoading">
                 <v-slide-item v-for="i in 10" :key="i">
                   <v-skeleton-loader
@@ -541,7 +805,10 @@
 
              </v-chip> -->
 
-                          <v-chip class="list-chip gtext-t5 font-weight-medium" small>
+                          <v-chip
+                            class="list-chip gtext-t5 font-weight-medium"
+                            small
+                          >
                             Pre-K
                           </v-chip>
 
@@ -554,7 +821,9 @@
              </v-chip> -->
                         </div>
                         <div class="item-img float-right">
-                          <img :src="require('assets/images/default-school.png')" />
+                          <img
+                            :src="require('assets/images/default-school.png')"
+                          />
                         </div>
                       </div>
                       <v-divider class="mb-3" />
@@ -579,7 +848,9 @@
                         </div>
 
                         <div class="float-right d-flex mt-1">
-                          <div class="rate-section gtext-t6 font-weight-semibold mr-1">
+                          <div
+                            class="rate-section gtext-t6 font-weight-semibold mr-1"
+                          >
                             <!-- {{ item.score }} -->
                             4
                             <v-icon color="primary"> mdi-star </v-icon>
@@ -614,7 +885,10 @@
 
              </v-chip> -->
 
-                          <v-chip class="list-chip gtext-t5 font-weight-medium" small>
+                          <v-chip
+                            class="list-chip gtext-t5 font-weight-medium"
+                            small
+                          >
                             Pre-K
                           </v-chip>
 
@@ -627,7 +901,9 @@
              </v-chip> -->
                         </div>
                         <div class="item-img float-right">
-                          <img :src="require('assets/images/default-school.png')" />
+                          <img
+                            :src="require('assets/images/default-school.png')"
+                          />
                         </div>
                       </div>
                       <v-divider class="mb-3" />
@@ -652,7 +928,9 @@
                         </div>
 
                         <div class="float-right d-flex mt-1">
-                          <div class="rate-section gtext-t6 font-weight-semibold mr-1">
+                          <div
+                            class="rate-section gtext-t6 font-weight-semibold mr-1"
+                          >
                             <!-- {{ item.score }} -->
                             4
                             <v-icon color="primary"> mdi-star </v-icon>
@@ -682,14 +960,23 @@
     <!-- End data container -->
 
     <!-- Leave comment dialog -->
-    <v-dialog transition="dialog-bottom-transition" v-model="leaveCommentDialog" :fullscreen="$vuetify.breakpoint.xs"
-      max-width="924" style="z-index: 1501">
+    <v-dialog
+      transition="dialog-bottom-transition"
+      v-model="leaveCommentDialog"
+      :fullscreen="$vuetify.breakpoint.xs"
+      max-width="924"
+      style="z-index: 1501"
+    >
       <v-card>
         <v-card-text class="pt-6 pb-0 pt-md-8 pb-2 px-6 px-md-12">
           <div class="d-flex">
             <div class="gtext-h5 priamry-gray-700">Leave a Comment</div>
             <v-spacer></v-spacer>
-            <v-btn icon><v-icon size="20" @click="leaveCommentDialog = false">mdi-close</v-icon></v-btn>
+            <v-btn icon
+              ><v-icon size="20" @click="leaveCommentDialog = false"
+                >mdi-close</v-icon
+              ></v-btn
+            >
           </div>
           <v-divider class="mb-12 mt-4" />
           <v-row>
@@ -697,85 +984,169 @@
               <ul id="score-form">
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Classroom & facility quality
                   </div>
-                  <v-rating v-model="commentForm.classesQualityRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.classesQualityRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Teachers' expertise
                   </div>
-                  <v-rating v-model="commentForm.educationRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.educationRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Tech accessibility
                   </div>
-                  <v-rating v-model="commentForm.itTrainingRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.itTrainingRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Safety & environment
                   </div>
-                  <v-rating v-model="commentForm.safetyAndHappinessRate" background-color="orange lighten-3"
-                    color="orange" half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.safetyAndHappinessRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Staff behavior
                   </div>
-                  <v-rating v-model="commentForm.behaviorRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.behaviorRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Value for tuition
                   </div>
-                  <v-rating v-model="commentForm.tuitionRatioRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.tuitionRatioRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex mb-4">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Facilities
                   </div>
-                  <v-rating v-model="commentForm.tuitionRatioRate" background-color="orange lighten-3" color="orange"
-                    half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.tuitionRatioRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
                 <li class="d-flex">
                   <div class="bullet"></div>
-                  <div class="gtext-t4 font-weight-medium primary-gray-700 score-title">
+                  <div
+                    class="gtext-t4 font-weight-medium primary-gray-700 score-title"
+                  >
                     Art & counseling programs
                   </div>
-                  <v-rating v-model="commentForm.artisticActivitiesRate" background-color="orange lighten-3"
-                    color="orange" half-increments hover size="24"></v-rating>
+                  <v-rating
+                    v-model="commentForm.artisticActivitiesRate"
+                    background-color="orange lighten-3"
+                    color="orange"
+                    half-increments
+                    hover
+                    size="24"
+                  ></v-rating>
                 </li>
               </ul>
             </v-col>
             <v-col cols="12" md="6">
               <div style="position: relative">
-                <v-textarea placeholder="Type your comment" v-model="commentForm.comment" outlined
-                  :rows="$vuetify.breakpoint.xs ? 10 : 22" />
-                <v-btn x-small height="40" width="40" :loading="help_loading" @click="sendToAI()" class="white--text"
-                  color="teal lighten-2" style="position: absolute; right: 10px; bottom: 40px"><v-icon small
-                    color="white">mdi-auto-fix</v-icon></v-btn>
+                <v-textarea
+                  placeholder="Type your comment"
+                  v-model="commentForm.comment"
+                  outlined
+                  :rows="$vuetify.breakpoint.xs ? 10 : 22"
+                />
+                <v-btn
+                  x-small
+                  height="40"
+                  width="40"
+                  :loading="help_loading"
+                  @click="sendToAI()"
+                  class="white--text"
+                  color="teal lighten-2"
+                  style="position: absolute; right: 10px; bottom: 40px"
+                  ><v-icon small color="white">mdi-auto-fix</v-icon></v-btn
+                >
               </div>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions class="justify-center pb-13">
-          <v-btn class="primary black--text text-transform-none gtext-t4 font-weight-medium" rounded width="100%"
-            max-width="400" x-large :disabled="!commentForm.comment" :loading="loading.submitComment"
-            @click="submitComment">Submit</v-btn>
+          <v-btn
+            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+            rounded
+            width="100%"
+            max-width="400"
+            x-large
+            :disabled="!commentForm.comment"
+            :loading="loading.submitComment"
+            @click="submitComment"
+            >Submit</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -784,63 +1155,116 @@
     <gallery-dialog v-model="galleryDialog" :contentData="contentData" />
 
     <!-- Select Location dialog -->
-    <v-dialog transition="dialog-bottom-transition" v-model="selectLocationDialog" :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720" style="z-index: 20001">
+    <v-dialog
+      transition="dialog-bottom-transition"
+      v-model="selectLocationDialog"
+      :fullscreen="$vuetify.breakpoint.xs"
+      max-width="720"
+      style="z-index: 20001"
+    >
       <v-card>
         <v-card-text class="pt-6 pt-md-8 px-6 px-md-8">
           <div class="d-flex">
             <div class="gtext-h5 priamry-gray-700">Location</div>
             <v-spacer></v-spacer>
-            <v-btn icon><v-icon size="20" @click="selectLocationDialog = false">mdi-close</v-icon></v-btn>
+            <v-btn icon
+              ><v-icon size="20" @click="selectLocationDialog = false"
+                >mdi-close</v-icon
+              ></v-btn
+            >
           </div>
         </v-card-text>
 
         <div id="locationPickerMapContainer">
           <client-only>
-            <l-map ref="editSchoolMap" :zoom="2" :center="map.center" id="mapSection" @move="updateMarkerPosition">
+            <l-map
+              ref="editSchoolMap"
+              :zoom="2"
+              :center="map.center"
+              id="mapSection"
+              @move="updateMarkerPosition"
+            >
               <l-tile-layer :url="map.url"></l-tile-layer>
-              <l-marker ref="editMapMarker" :lat-lng="map.center" :icon="map.schoolIcon"></l-marker>
+              <l-marker
+                ref="editMapMarker"
+                :lat-lng="map.center"
+                :icon="map.schoolIcon"
+              ></l-marker>
             </l-map>
           </client-only>
-          <locationSearch id="searchSection" @locationSelected="goToSearchLocation" rounded label="Search anything" />
+          <locationSearch
+            id="searchSection"
+            @locationSelected="goToSearchLocation"
+            rounded
+            label="Search anything"
+          />
         </div>
         <v-card-actions class="justify-center pb-13">
-          <v-btn :loading="mapSubmitLoader" @click="updateGeneralInfo('map')"
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium" rounded width="100%"
-            max-width="400" x-large>Save</v-btn>
+          <v-btn
+            :loading="mapSubmitLoader"
+            @click="updateGeneralInfo('map')"
+            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+            rounded
+            width="100%"
+            max-width="400"
+            x-large
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- End select location dialog -->
 
     <!-- Select facilites dialog -->
-    <v-dialog transition="dialog-bottom-transition" v-model="facilitiesDialog" :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720" style="z-index: 20001">
+    <v-dialog
+      transition="dialog-bottom-transition"
+      v-model="facilitiesDialog"
+      :fullscreen="$vuetify.breakpoint.xs"
+      max-width="720"
+      style="z-index: 20001"
+    >
       <v-card>
         <v-card-text class="py-6 py-md-8 px-6 px-md-8">
           <div class="d-flex">
             <div class="gtext-h5 priamry-gray-700">Facilities</div>
             <v-spacer></v-spacer>
-            <v-btn icon><v-icon size="20" @click="facilitiesDialog = false">mdi-close</v-icon></v-btn>
+            <v-btn icon
+              ><v-icon size="20" @click="facilitiesDialog = false"
+                >mdi-close</v-icon
+              ></v-btn
+            >
           </div>
           <v-divider class="mb-12 mt-4" />
           <v-row>
             <v-col cols="12" md="6">
-              <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.sport_hall == '0'" height="56"
-                width="56">
+              <v-btn
+                class="bg-primary-gray-800 white--text"
+                :disabled="contentData.sport_hall == '0'"
+                height="56"
+                width="56"
+              >
                 <v-icon size="24"> mdi-basketball </v-icon>
               </v-btn>
               <span class="gtext-t4 ml-4 font-weight-medium">Sport hall</span>
             </v-col>
             <v-col cols="12" md="6">
-              <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.dorm == '0'" height="56" width="56">
+              <v-btn
+                class="bg-primary-gray-800 white--text"
+                :disabled="contentData.dorm == '0'"
+                height="56"
+                width="56"
+              >
                 <v-icon size="24"> mdi-bed </v-icon>
               </v-btn>
               <span class="gtext-t4 ml-4 font-weight-medium">Dorm</span>
             </v-col>
             <v-col cols="12" md="6">
-              <v-btn class="bg-primary-gray-800 white--text" :disabled="contentData.smart_class == '0'" height="56"
-                width="56">
+              <v-btn
+                class="bg-primary-gray-800 white--text"
+                :disabled="contentData.smart_class == '0'"
+                height="56"
+                width="56"
+              >
                 <v-icon size="24"> mdi-tablet-cellphone </v-icon>
               </v-btn>
               <span class="gtext-t4 ml-4 font-weight-medium">Smart class</span>
@@ -849,8 +1273,14 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="justify-center pb-13">
-          <v-btn class="primary black--text text-transform-none gtext-t4 font-weight-medium" rounded width="100%"
-            max-width="400" x-large>Save</v-btn>
+          <v-btn
+            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+            rounded
+            width="100%"
+            max-width="400"
+            x-large
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -924,7 +1354,6 @@ export default {
       emailSubmitLoader: false,
       phoneSubmitLoader: false,
 
-
       commentList: [],
 
       generalDataEditMode: {
@@ -936,16 +1365,21 @@ export default {
       },
 
       webUrlRule: [
-        v => !v || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(v) || 'Please enter a valid URL',
-        v => !v || v.length <= 255 || 'URL must be less than 255 characters'
+        (v) =>
+          !v ||
+          /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+            v
+          ) ||
+          "Please enter a valid URL",
+        (v) => !v || v.length <= 255 || "URL must be less than 255 characters",
       ],
       emailRule: [
-        v => !!v || 'Email is required',
-        v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Please enter a valid email address'
+        (v) => !!v || "Email is required",
+        (v) =>
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
+          "Please enter a valid email address",
       ],
-      phoneRule: [
-        v => !!v || 'Phone number is required'
-      ]
+      phoneRule: [(v) => !!v || "Phone number is required"],
     };
   },
   head() {
@@ -1016,7 +1450,7 @@ export default {
       else return "Unknown";
     },
     normalizeURL(url) {
-      if (!url) return '';
+      if (!url) return "";
 
       // Check if the URL starts with 'http://' or 'https://'
       if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -1062,7 +1496,7 @@ export default {
 
       // Update the marker position to the new center
       marker.setLatLng(newCenter);
-      this.mapMarkerData = newCenter
+      this.mapMarkerData = newCenter;
     },
     goToSearchLocation(val) {
       const map = this.$refs.editSchoolMap.mapObject;
@@ -1158,12 +1592,14 @@ export default {
 
           ### **School Information:**
           - **Name:** ${this.contentData.name}
-          - **Location:** ${this.contentData.countryTitle}, ${this.contentData.stateTitle
-        }, ${this.contentData.cityTitle}
-          ${this.contentData.webSite
-          ? `- **Website:** ${this.contentData.webSite}`
-          : ""
-        }
+          - **Location:** ${this.contentData.countryTitle}, ${
+        this.contentData.stateTitle
+      }, ${this.contentData.cityTitle}
+          ${
+            this.contentData.webSite
+              ? `- **Website:** ${this.contentData.webSite}`
+              : ""
+          }
 
           ### **Evaluation Criteria:**
           Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
@@ -1259,30 +1695,24 @@ export default {
         .then((response) => {
           this.commentList = response.data.list;
         })
-        .catch((err) => {
-        });
+        .catch((err) => {});
     },
     editGeneralInfo(value) {
       if (value == "website") {
-        this.form.web = this.contentData.webSite || '';
+        this.form.web = this.contentData.webSite || "";
         this.generalDataEditMode.website = true;
-      }
-      else if (value == "email") {
-        this.form.email = this.contentData.email || '';
+      } else if (value == "email") {
+        this.form.email = this.contentData.email || "";
         this.generalDataEditMode.email = true;
-      }
-      else if (value == "phone") {
-        this.form.phone = this.contentData.phoneNumber || '';
+      } else if (value == "phone") {
+        this.form.phone = this.contentData.phoneNumber || "";
         this.generalDataEditMode.phone1 = true;
-      }
-      else if (value == "address") {
-        this.form.address = this.contentData.address || '';
+      } else if (value == "address") {
+        this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
-      }
-      else if (value == "map") this.generalDataEditMode.map = true;
+      } else if (value == "map") this.generalDataEditMode.map = true;
     },
     updateGeneralInfo(value) {
-
       if (value == "website") {
         if (!this.isValidUrl(this.form.web)) {
           this.$toast.error("Please enter a valid website URL");
@@ -1309,40 +1739,39 @@ export default {
       // else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
 
-      var formData = {}
+      var formData = {};
 
       switch (value) {
-
         case "website":
-          this.webSubmitLoader = true
+          this.webSubmitLoader = true;
           formData = {
             webSite: this.form.web ?? null,
-          }
+          };
           break;
         case "email":
-          this.emailSubmitLoader = true
+          this.emailSubmitLoader = true;
           formData = {
             email: this.form.email ?? null,
-          }
+          };
           break;
         case "phone":
-          this.phoneSubmitLoader = true
+          this.phoneSubmitLoader = true;
           formData = {
             phoneNumber: this.form.phone ?? null,
-          }
+          };
           break;
         case "address":
-          this.addressSubmitLoader = true
+          this.addressSubmitLoader = true;
           formData = {
             address: this.form.address ?? null,
-          }
+          };
           break;
         case "map":
-          this.mapSubmitLoader = true
+          this.mapSubmitLoader = true;
           formData = {
-            "latitude": this.mapMarkerData.lat,
-            "longitude": this.mapMarkerData.lng,
-          }
+            latitude: this.mapMarkerData.lat,
+            longitude: this.mapMarkerData.lng,
+          };
           break;
         default:
           break;
@@ -1360,7 +1789,9 @@ export default {
         )
         .then((response) => {
           if (response.succeeded) {
-            this.$toast.success("Your contribution has been successfully submitted");
+            this.$toast.success(
+              "Your contribution has been successfully submitted"
+            );
           } else {
             this.$toast.error(response?.errors[0]?.message);
           }
@@ -1370,12 +1801,12 @@ export default {
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
-          this.mapSubmitLoader = false
-          this.selectLocationDialog = false
-          this.webSubmitLoader = false
-          this.emailSubmitLoader = false
-          this.phoneSubmitLoader = false
-          this.addressSubmitLoader = false
+          this.mapSubmitLoader = false;
+          this.selectLocationDialog = false;
+          this.webSubmitLoader = false;
+          this.emailSubmitLoader = false;
+          this.phoneSubmitLoader = false;
+          this.addressSubmitLoader = false;
         });
     },
   },
