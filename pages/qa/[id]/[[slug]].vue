@@ -967,9 +967,7 @@ const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
 const { data: contentData, error } = await useAsyncData(async () => {
   try {
-    const content = await $fetch(
-      `/api/v1/questions/${route.params.questionId}`
-    );
+    const content = await $fetch(`/api/v1/questions/${route.params.id}`);
     // Check if data exists
     return content.status === 1 ? content.data : {};
   } catch (e) {
@@ -1084,7 +1082,7 @@ async function submitReply(values, { resetForm }) {
   loading.reply_form = true;
   const payload = {
     ...values,
-    id: route.params.questionId,
+    id: route.params.id,
   };
 
   try {
@@ -1139,7 +1137,7 @@ const {
   refresh: refreshReplies,
   error: repliesError,
 } = useAsyncData("questionReplies", () =>
-  $fetch(`/api/v1/questionReplies?question=${route.params.questionId}`)
+  $fetch(`/api/v1/questionReplies?question=${route.params.id}`)
 );
 
 async function reInit() {
@@ -1272,13 +1270,13 @@ function openCrashReportDialog(id, type) {
     if (type === "questionReply") {
       crashReport.value.form.id = id;
     } else {
-      crashReport.value.form.id = route.params.questionId;
+      crashReport.value.form.id = route.params.id;
     }
   }
 }
 
 function getSimilarQuestions() {
-  $fetch(`/api/v1/questions/related/${route.params.questionId}`)
+  $fetch(`/api/v1/questions/related/${route.params.id}`)
     .then((response) => {
       similarQuestions.value = response.data.list;
     })
