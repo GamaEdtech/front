@@ -203,7 +203,7 @@
         <v-row>
           <v-col cols="12" md="8">
             <div class="d-flex">
-              <v-sheet class="chips-container" v-scroll-x>
+              <v-sheet class="chips-container">
                 <v-chip
                   v-if="contentData.countryTitle"
                   class="blue-grey darken-1 white--text"
@@ -340,11 +340,14 @@
                 </span>
 
                 <v-text-field
+                  v-model="form.web"
                   v-if="generalDataEditMode.website"
                   placeholder="Website"
+                  :rules="webUrlRule"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="webSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('website')"
                       fab
@@ -377,11 +380,14 @@
                   Contribute
                 </span>
                 <v-text-field
+                  :rules="emailRule"
+                  v-model="form.email"
                   v-if="generalDataEditMode.email"
                   placeholder="Email"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="emailSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('email')"
                       fab
@@ -416,11 +422,15 @@
                   Contribute
                 </span>
                 <v-text-field
+                  type="number"
+                  :rules="phoneRule"
+                  v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
                   placeholder="Phone"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="phoneSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('phone')"
                       fab
@@ -451,11 +461,13 @@
                 </span>
 
                 <v-text-field
+                  v-model="form.address"
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="addressSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('address')"
                       fab
@@ -549,7 +561,7 @@
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Teachers’ expertise
+                  Teachers' expertise
                 </div>
                 <v-progress-linear
                   color="success"
@@ -713,7 +725,7 @@
                 </div>
                 <v-divider class="mb-5" />
                 <div class="gtext-t2 primary-gray-700 mb-6">
-                  “{{ comment.comment }}”
+                  "{{ comment.comment }}"
                 </div>
                 <div class="pb-8">
                   <div class="float-left">
@@ -991,7 +1003,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Teachers’ expertise
+                    Teachers' expertise
                   </div>
                   <v-rating
                     v-model="commentForm.educationRate"
@@ -1189,6 +1201,8 @@
         </div>
         <v-card-actions class="justify-center pb-13">
           <v-btn
+            :loading="mapSubmitLoader"
+            @click="updateGeneralInfo('map')"
             class="primary black--text text-transform-none gtext-t4 font-weight-medium"
             rounded
             width="100%"
@@ -1295,6 +1309,15 @@ export default {
         schoolIcon: null,
       },
 
+      form: {
+        web: null,
+        email: null,
+        phone: null,
+        address: null,
+      },
+
+      mapMarkerData: {},
+
       rating: 3.5,
       slideToggler: "map",
       topSlideClass: {
@@ -1325,6 +1348,12 @@ export default {
         submitComment: false,
       },
 
+      mapSubmitLoader: false,
+      addressSubmitLoader: false,
+      webSubmitLoader: false,
+      emailSubmitLoader: false,
+      phoneSubmitLoader: false,
+
       commentList: [],
 
       generalDataEditMode: {
@@ -1332,7 +1361,25 @@ export default {
         email: false,
         phone1: false,
         address: false,
+        map: false,
       },
+
+      webUrlRule: [
+        (v) =>
+          !v ||
+          /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+            v
+          ) ||
+          "Please enter a valid URL",
+        (v) => !v || v.length <= 255 || "URL must be less than 255 characters",
+      ],
+      emailRule: [
+        (v) => !!v || "Email is required",
+        (v) =>
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
+          "Please enter a valid email address",
+      ],
+      phoneRule: [(v) => !!v || "Phone number is required"],
     };
   },
   head() {
@@ -1403,8 +1450,10 @@ export default {
       else return "Unknown";
     },
     normalizeURL(url) {
+      if (!url) return "";
+
       // Check if the URL starts with 'http://' or 'https://'
-      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
         // If not, assume it's 'http://'
         return "http://" + url;
       }
@@ -1447,6 +1496,7 @@ export default {
 
       // Update the marker position to the new center
       marker.setLatLng(newCenter);
+      this.mapMarkerData = newCenter;
     },
     goToSearchLocation(val) {
       const map = this.$refs.editSchoolMap.mapObject;
@@ -1467,6 +1517,43 @@ export default {
     },
     openTourImgInput() {
       this.$refs.tourImgRef.$el.querySelector("input").click();
+    },
+
+    isValidUrl(url) {
+      try {
+        // Try to create a URL object - this will validate basic URL structure
+        new URL(url);
+        // Check if it starts with http:// or https://
+        return /^https?:\/\//.test(url);
+      } catch (e) {
+        return false;
+      }
+    },
+    isValidEmail(email) {
+      try {
+        // Basic format check using a regular expression
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      } catch (e) {
+        return false;
+      }
+    },
+    isValidPhone(email) {
+      try {
+        // Basic format check using a regular expression
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      } catch (e) {
+        return false;
+      }
+    },
+
+    isRequired(value) {
+      try {
+        return !!value.trim();
+      } catch (e) {
+        return false;
+      }
     },
 
     submitComment() {
@@ -1515,7 +1602,7 @@ export default {
           }
 
           ### **Evaluation Criteria:**
-          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
+          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
           \n1. Quality of classrooms and educational facilities
           \n2. Teachers' proficiency and teaching effectiveness
           \n3. Access to and use of computers and technology
@@ -1528,7 +1615,7 @@ export default {
           ### **Response Format:**
           Return a structured JSON object with:
           - Category ratings as numbers (1-5) and it 8 items.
-          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school’s actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
+          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school's actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
 
           Response Format: (Don't forget end of rating object close by })
           \`\`\`json
@@ -1608,21 +1695,119 @@ export default {
         .then((response) => {
           this.commentList = response.data.list;
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
     },
     editGeneralInfo(value) {
-      if (value == "website") this.generalDataEditMode.website = true;
-      else if (value == "email") this.generalDataEditMode.email = true;
-      else if (value == "phone") this.generalDataEditMode.phone1 = true;
-      else if (value == "address") this.generalDataEditMode.address = true;
+      if (value == "website") {
+        this.form.web = this.contentData.webSite || "";
+        this.generalDataEditMode.website = true;
+      } else if (value == "email") {
+        this.form.email = this.contentData.email || "";
+        this.generalDataEditMode.email = true;
+      } else if (value == "phone") {
+        this.form.phone = this.contentData.phoneNumber || "";
+        this.generalDataEditMode.phone1 = true;
+      } else if (value == "address") {
+        this.form.address = this.contentData.address || "";
+        this.generalDataEditMode.address = true;
+      } else if (value == "map") this.generalDataEditMode.map = true;
     },
     updateGeneralInfo(value) {
-      if (value == "website") this.generalDataEditMode.website = false;
-      else if (value == "email") this.generalDataEditMode.email = false;
-      else if (value == "phone") this.generalDataEditMode.phone1 = false;
+      if (value == "website") {
+        if (!this.isValidUrl(this.form.web)) {
+          this.$toast.error("Please enter a valid website URL");
+          return;
+        }
+        this.generalDataEditMode.website = false;
+      }
+
+      if (value == "email") {
+        if (!this.isValidEmail(this.form.email)) {
+          this.$toast.error("Please enter a valid Email");
+          return;
+        }
+        this.generalDataEditMode.email = false;
+      }
+      if (value == "phone") {
+        if (!this.isRequired(this.form.phone)) {
+          this.$toast.error("Please enter a valid Phone Number");
+          return;
+        }
+        this.generalDataEditMode.phone1 = false;
+      }
+      // else if (value == "email") this.generalDataEditMode.email = false;
+      // else if (value == "phone") this.generalDataEditMode.phone1 = false;
       else if (value == "address") this.generalDataEditMode.address = false;
+
+      var formData = {};
+
+      switch (value) {
+        case "website":
+          this.webSubmitLoader = true;
+          formData = {
+            webSite: this.form.web ?? null,
+          };
+          break;
+        case "email":
+          this.emailSubmitLoader = true;
+          formData = {
+            email: this.form.email ?? null,
+          };
+          break;
+        case "phone":
+          this.phoneSubmitLoader = true;
+          formData = {
+            phoneNumber: this.form.phone ?? null,
+          };
+          break;
+        case "address":
+          this.addressSubmitLoader = true;
+          formData = {
+            address: this.form.address ?? null,
+          };
+          break;
+        case "map":
+          this.mapSubmitLoader = true;
+          formData = {
+            latitude: this.mapMarkerData.lat,
+            longitude: this.mapMarkerData.lng,
+          };
+          break;
+        default:
+          break;
+      }
+
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/contributions`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          if (response.succeeded) {
+            this.$toast.success(
+              "Your contribution has been successfully submitted"
+            );
+          } else {
+            this.$toast.error(response?.errors[0]?.message);
+          }
+        })
+        .catch((err) => {
+          if (err.response.status == 401 || err.response.status == 403) {
+          } else this.$toast.error(err.response.data.message);
+        })
+        .finally(() => {
+          this.mapSubmitLoader = false;
+          this.selectLocationDialog = false;
+          this.webSubmitLoader = false;
+          this.emailSubmitLoader = false;
+          this.phoneSubmitLoader = false;
+          this.addressSubmitLoader = false;
+        });
     },
   },
 };
@@ -1710,6 +1895,7 @@ export default {
 #schoolDetailsVr .a-canvas {
   border-radius: 0.6rem !important;
 }
+
 #schoolDetailsMap {
   border-radius: 0.6rem;
   height: 28.1rem;
@@ -1725,6 +1911,7 @@ export default {
 #main-info-section {
   .info-itm {
     margin-bottom: 0.8rem;
+
     .info-sign {
       width: 5.6rem;
       min-width: 5.6rem;
@@ -1752,6 +1939,7 @@ export default {
       align-items: center;
       margin-left: 0.4rem;
     }
+
     .info-data-address {
       max-height: 12rem;
     }
@@ -1762,9 +1950,11 @@ export default {
   width: 16rem;
   height: 16rem;
 }
+
 .score-title {
   min-width: 22rem !important;
 }
+
 #score-results {
   .rate-title {
     width: 14rem;
@@ -1783,6 +1973,7 @@ export default {
 
 #score-form {
   padding: 0;
+
   .score-title {
     width: 15rem;
     margin-right: 1rem;
@@ -1824,7 +2015,8 @@ export default {
   font-size: 5rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 9.6rem; /* 192% */
+  line-height: 9.6rem;
+  /* 192% */
   letter-spacing: 1.95rem;
 }
 
@@ -1834,6 +2026,7 @@ export default {
     margin-bottom: 2rem;
     margin-left: 0.8rem;
     margin-right: 0.8rem;
+
     .item-info {
       .main-data {
         height: 8rem;
@@ -1875,13 +2068,16 @@ export default {
   overflow-x: auto;
   width: 75%;
   padding-top: 0.4rem;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: transparent transparent; /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: transparent transparent;
+  /* Firefox */
 }
 
 /* Webkit (Chrome, Safari) */
 .chips-container::-webkit-scrollbar {
-  width: 5px; /* Adjust width as needed */
+  width: 5px;
+  /* Adjust width as needed */
 }
 
 .chips-container::-webkit-scrollbar-thumb {
@@ -1902,6 +2098,7 @@ export default {
     width: 80%;
   }
 }
+
 .schoolDetailsImg {
   height: 28.1rem;
   max-height: 28.1rem;
