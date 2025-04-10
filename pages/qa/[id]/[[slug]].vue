@@ -1,9 +1,9 @@
 <template>
   <div>
     <div id="qa-details-content">
-      <!-- Start : Category -->
-      <category />
-      <!-- End:Category -->
+      <!-- Start: Category (Need to be Refactor - commented)-->
+      <!-- <category /> -->
+      <!-- End: Category -->
 
       <!--  Start: breadcrumb  -->
       <section>
@@ -25,9 +25,16 @@
           <div class="detail my-md-8">
             <v-row>
               <v-col cols="12" md="9" class="pt-0 px-sm-3 pt-sm-3">
-                <!-- Ask question button -->
+                <!-- 
+                Ask question button 
+                (All $vuetify plugin
+                replaced with display ) 
+                -->
                 <div class="text-left d-block d-md-none">
                   <v-btn
+                    :density="
+                      display.mdAndUp == true ? 'default' : 'comfortable'
+                    "
                     rounded
                     outlined
                     small
@@ -54,7 +61,8 @@
                             <v-col cols="12">
                               <v-btn
                                 icon
-                                x-large
+                                variant="plain"
+                                class="mb-4 mt-0"
                                 @click="
                                   submitScore(
                                     'question',
@@ -70,7 +78,8 @@
                               </p>
                               <v-btn
                                 icon
-                                x-large
+                                variant="plain"
+                                class="mb-4 mt-0"
                                 @click="
                                   submitScore(
                                     'question',
@@ -81,11 +90,12 @@
                               >
                                 <v-icon size="88"> mdi-menu-down </v-icon>
                               </v-btn>
-                              <v-btn icon width="100%">
-                                <v-icon> mdi-bookmark </v-icon>
+                              <v-btn icon variant="plain" width="100%">
+                                <v-icon size="22"> mdi-bookmark </v-icon>
                               </v-btn>
                               <v-btn
                                 icon
+                                variant="plain"
                                 width="100%"
                                 @click="
                                   openCrashReportDialog(
@@ -94,10 +104,19 @@
                                   )
                                 "
                               >
-                                <v-icon> mdi-alert-octagon-outline </v-icon>
+                                <v-icon size="22">
+                                  mdi-alert-octagon-outline
+                                </v-icon>
                               </v-btn>
-                              <v-btn class="mb-4" icon width="100%">
-                                <v-icon> mdi-share-variant-outline </v-icon>
+                              <v-btn
+                                variant="plain"
+                                icon
+                                class="mb-4"
+                                width="100%"
+                              >
+                                <v-icon size="22">
+                                  mdi-share-variant-outline
+                                </v-icon>
                               </v-btn>
                             </v-col>
                           </v-row>
@@ -113,11 +132,10 @@
                                 <h1 class="gama-text-h6 mb-2">
                                   {{ contentData?.title }}
                                 </h1>
-
                                 <v-row>
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pb-sm-0 pb-md-3">
-                                      <nuxt-link to="/user/edit-profile">
+                                      <NuxtLink to="/user/edit-profile">
                                         <img
                                           width="40"
                                           height="40"
@@ -135,7 +153,7 @@
                                         >
                                           <v-icon> mdi-account-outline </v-icon>
                                         </v-btn>
-                                      </nuxt-link>
+                                      </NuxtLink>
                                       <div class="pa-3 pt-0">
                                         <p class="gama-text-h6">
                                           <span v-if="contentData.name">
@@ -143,11 +161,11 @@
                                           </span>
                                           <span v-else> No name </span>
                                         </p>
-                                        <p class="text-h6">
+                                        <p class="text-h6 text-warning">
                                           <span
                                             v-show="contentData.stats?.qNum > 0"
                                           >
-                                            <span class="orange--text">
+                                            <span class="text-warning">
                                               {{ contentData.stats?.qNum }}
                                               Qn
                                             </span>
@@ -155,7 +173,7 @@
                                           </span>
 
                                           <span
-                                            class="green--text"
+                                            class="text-success"
                                             v-show="contentData.stats?.aNum > 0"
                                           >
                                             {{ contentData.stats?.aNum }}
@@ -174,7 +192,7 @@
                                               contentData.stats?.score > 0
                                             "
                                           >
-                                            <span class="blue--text">
+                                            <span class="text-info">
                                               {{ contentData.stats?.score }}
                                               Score
                                             </span>
@@ -186,14 +204,19 @@
 
                                   <v-col cols="2" class="text-right">
                                     <v-btn
-                                      :outlined="$vuetify.breakpoint.mdAndUp"
-                                      :icon="$vuetify.breakpoint.xs"
+                                      rounded
+                                      density="comfortable"
+                                      width="100"
+                                      :variant="
+                                        display.mdAndUp ? 'outlined' : 'flat'
+                                      "
+                                      :icon="display.xs"
                                       color="success"
                                       :to="`/direct/${contentData.ownerIdentity}`"
                                     >
-                                      <v-icon class="mr-1">
-                                        mdi-message-reply-text
-                                      </v-icon>
+                                      <v-icon class="mr-1" size="22"
+                                        >mdi-message-reply-text</v-icon
+                                      >
                                       <span class="d-none d-md-inline"
                                         >Chat</span
                                       >
@@ -229,14 +252,16 @@
                                     <div class="d-none d-md-block">
                                       <v-chip
                                         small
-                                        :to="`/search?type=question&section=${contentData.section}`"
+                                        density="comfortable"
                                         link
+                                        :to="`/search?type=question&section=${contentData.section}`"
                                         class="mr-1"
                                       >
                                         {{ contentData.section_title }}
                                       </v-chip>
                                       <v-chip
                                         small
+                                        density="comfortable"
                                         link
                                         :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}`"
                                         class="mr-1"
@@ -245,6 +270,7 @@
                                       </v-chip>
                                       <v-chip
                                         small
+                                        density="comfortable"
                                         link
                                         class="ma-1"
                                         :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
@@ -256,6 +282,7 @@
                                     <div class="d-flex d-md-none">
                                       <!--Score action sm and xs-->
                                       <v-btn
+                                        variant="plain"
                                         icon
                                         @click="
                                           submitScore(
@@ -271,6 +298,7 @@
                                         {{ contentData?.score }}
                                       </p>
                                       <v-btn
+                                        variant="plain"
                                         icon
                                         @click="
                                           submitScore(
@@ -287,10 +315,10 @@
                                       <!--End score action sm and xs-->
 
                                       <p class="pt-3">|</p>
-                                      <v-btn icon>
+                                      <v-btn variant="plain" icon>
                                         <v-icon size="20"> mdi-reply </v-icon>
                                       </v-btn>
-                                      <v-btn icon>
+                                      <v-btn variant="plain" icon>
                                         <v-icon size="20">
                                           mdi-comment-plus
                                         </v-icon>
@@ -305,16 +333,32 @@
                                   >
                                     <div class="d-none d-md-block">
                                       <v-spacer />
-                                      <v-btn text class="simple-btn">
-                                        <v-icon class="mr-1">
+                                      <v-btn
+                                        style="
+                                          color: #000;
+                                          font-size: 11px;
+                                          opacity: unset;
+                                        "
+                                        variant="plain"
+                                        class="simple-btn text-dark"
+                                      >
+                                        <v-icon class="mr-1" size="22">
                                           mdi-calendar-month
                                         </v-icon>
                                         {{
                                           $dayjs(contentData.subdate).fromNow()
                                         }}
                                       </v-btn>
-                                      <v-btn text class="simple-btn">
-                                        <v-icon class="mr-1">
+                                      <v-btn
+                                        style="
+                                          color: #000;
+                                          font-size: 11px;
+                                          opacity: unset;
+                                        "
+                                        variant="plain"
+                                        class="simple-btn text-dark"
+                                      >
+                                        <v-icon class="mr-1" size="22">
                                           mdi-clock-time-five-outline
                                         </v-icon>
                                         {{
@@ -326,12 +370,13 @@
                                     </div>
 
                                     <div class="d-inline d-md-none px-sm-0">
-                                      <v-btn icon>
+                                      <v-btn variant="plain" icon>
                                         <v-icon size="20">
                                           mdi-bookmark
                                         </v-icon>
                                       </v-btn>
                                       <v-btn
+                                        variant="plain"
                                         icon
                                         @click="
                                           openCrashReportDialog(
@@ -344,7 +389,7 @@
                                           mdi-alert-octagon-outline
                                         </v-icon>
                                       </v-btn>
-                                      <v-btn icon>
+                                      <v-btn variant="plain" icon>
                                         <v-icon size="20">
                                           mdi-share-variant-outline
                                         </v-icon>
@@ -385,93 +430,67 @@
                         <v-card
                           flat
                           color="#FAFAFA"
-                          class="mb-4 d-flex fill-height text-center"
+                          class="d-flex fill-height text-center"
                           min-height="200"
                         >
                           <v-row>
                             <v-col cols="12">
                               <v-btn
                                 icon
-                                x-large
-                                @click="submitScore('reply', answer.id, 'plus')"
-                              >
-                                <v-icon size="88"> mdi-menu-up </v-icon>
-                              </v-btn>
-                              <p class="text-h4">
-                                {{ answer?.score }}
-                              </p>
-                              <v-btn
-                                icon
-                                x-large
+                                variant="plain"
+                                class="mb-4 mt-0"
                                 @click="
-                                  submitScore('reply', answer.id, 'minus')
-                                "
-                              >
-                                <v-icon size="88"> mdi-menu-down </v-icon>
-                              </v-btn>
-                              <v-btn icon width="100%">
-                                <v-icon> mdi-bookmark </v-icon>
-                              </v-btn>
-
-                              <!--Select correct answer-->
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    icon
-                                    width="100%"
-                                    x-large
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    @click="selectCorrectAnswer(answer.id)"
-                                    v-if="
-                                      contentData.owner == true &&
-                                      answer.selected == 0
-                                    "
-                                  >
-                                    <v-icon size="38" color="green">
-                                      mdi-check
-                                    </v-icon>
-                                  </v-btn>
-                                </template>
-                                <span>Select correct answer</span>
-                              </v-tooltip>
-
-                              <!--Edit button-->
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="
-                                  openEditReplyDialog(answer.id, answer.answer)
-                                "
-                                v-if="answer.owner == true"
-                              >
-                                <v-icon> mdi-pencil </v-icon>
-                              </v-btn>
-
-                              <!--Delete button -->
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="openDeleteReplyConfirmDialog(answer.id)"
-                                v-if="answer.owner == true"
-                              >
-                                <v-icon> mdi-delete </v-icon>
-                              </v-btn>
-
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="
-                                  openCrashReportDialog(
-                                    answer.id,
-                                    'questionReply'
+                                  submitScore(
+                                    'question',
+                                    contentData.id,
+                                    'plus'
                                   )
                                 "
                               >
-                                <v-icon> mdi-alert-octagon-outline </v-icon>
+                                <template #default>
+                                  <v-icon size="88"> mdi-menu-up </v-icon>
+                                </template>
                               </v-btn>
-                              <v-btn icon width="100%">
-                                <v-icon> mdi-share-variant-outline </v-icon>
+                              <p class="text-h4">
+                                {{ contentData?.score }}
+                              </p>
+                              <v-btn
+                                icon
+                                variant="plain"
+                                class="mb-4"
+                                @click="
+                                  submitScore(
+                                    'question',
+                                    contentData.id,
+                                    'minus'
+                                  )
+                                "
+                              >
+                                <template #default>
+                                  <v-icon size="88"> mdi-menu-down </v-icon>
+                                </template>
+                              </v-btn>
+                              <v-btn variant="plain" icon>
+                                <v-icon size="22"> mdi-bookmark </v-icon>
+                              </v-btn>
+                              <v-btn
+                                variant="plain"
+                                icon
+                                @click="
+                                  openCrashReportDialog(
+                                    contentData.id,
+                                    'question'
+                                  )
+                                "
+                              >
+                                <v-icon size="22">
+                                  mdi-alert-octagon-outline
+                                </v-icon>
+                              </v-btn>
+                              <v-btn variant="plain" icon>
+                                <v-icon size="22">
+                                  mdi-share-variant-outline
+                                </v-icon>
                               </v-btn>
                             </v-col>
                           </v-row>
@@ -521,14 +540,14 @@
                                         </p>
                                         <p class="text-h6">
                                           <span v-show="answer.stats?.qNum > 0">
-                                            <span class="orange--text">
+                                            <span class="text-warning">
                                               {{ answer.stats?.qNum }} Qn
                                             </span>
                                             |
                                           </span>
 
                                           <span
-                                            class="green--text"
+                                            class="text-success"
                                             v-show="answer.stats?.aNum > 0"
                                           >
                                             {{ answer.stats?.aNum }} Ans
@@ -542,7 +561,7 @@
                                             |
                                           </span>
                                           <span
-                                            class="blue--text"
+                                            class="text-info"
                                             v-show="answer.stats?.score"
                                           >
                                             {{ answer.stats?.score }} Score
@@ -553,12 +572,16 @@
                                   </v-col>
                                   <v-col cols="2" class="text-right">
                                     <v-btn
-                                      :outlined="$vuetify.breakpoint.mdAndUp"
-                                      :icon="$vuetify.breakpoint.xs"
+                                      rounded
+                                      density="comfortable"
+                                      width="100"
+                                      variant="outlined"
+                                      :outlined="display.mdAndUp"
+                                      :icon="display.xs"
                                       :to="`/direct/${answer.ownerIdentity}`"
                                       color="success"
                                     >
-                                      <v-icon class="mr-1">
+                                      <v-icon class="mr-1" size="22">
                                         mdi-message-reply-text
                                       </v-icon>
                                       <span class="d-none d-md-inline"
@@ -592,12 +615,13 @@
                                     class="px-sm-3 pb-sm-3"
                                   >
                                     <v-btn
+                                      variant="text"
                                       text
                                       disabled
                                       plain
                                       class="pl-0 simple-btn d-none d-md-block"
                                     >
-                                      <v-icon class="mr-1">
+                                      <v-icon class="mr-1" size="22">
                                         mdi-comment-plus
                                       </v-icon>
                                       Add comment
@@ -605,6 +629,8 @@
                                     <div class="d-flex d-md-none">
                                       <!--Score action sm and xs-->
                                       <v-btn
+                                        variant="plain"
+                                        plain
                                         icon
                                         @click="
                                           submitScore(
@@ -620,6 +646,8 @@
                                         {{ answer.score }}
                                       </p>
                                       <v-btn
+                                        variant="plain"
+                                        plain
                                         icon
                                         @click="
                                           submitScore(
@@ -647,12 +675,19 @@
                                       >
                                         <v-icon size="20"> mdi-check </v-icon>
                                       </v-btn>
-                                      <v-btn icon disabled>
+                                      <v-btn
+                                        variant="plain"
+                                        plain
+                                        icon
+                                        disabled
+                                      >
                                         <v-icon size="20">
                                           mdi-comment-plus
                                         </v-icon>
                                       </v-btn>
                                       <v-btn
+                                        variant="plain"
+                                        plain
                                         icon
                                         @click="
                                           openEditReplyDialog(
@@ -690,14 +725,30 @@
 
                                     <div class="d-none d-md-block">
                                       <v-spacer />
-                                      <v-btn text class="simple-btn">
-                                        <v-icon class="mr-1">
+                                      <v-btn
+                                        style="
+                                          color: #000;
+                                          font-size: 11px;
+                                          opacity: unset;
+                                        "
+                                        variant="plain"
+                                        class="simple-btn text-dark"
+                                      >
+                                        <v-icon class="mr-1" size="22">
                                           mdi-calendar-month
                                         </v-icon>
                                         {{ $dayjs(answer.subdate).fromNow() }}
                                       </v-btn>
-                                      <v-btn text class="simple-btn">
-                                        <v-icon class="mr-1">
+                                      <v-btn
+                                        style="
+                                          color: #000;
+                                          font-size: 11px;
+                                          opacity: unset;
+                                        "
+                                        variant="plain"
+                                        class="simple-btn text-dark"
+                                      >
+                                        <v-icon class="mr-1" size="22">
                                           mdi-clock-time-five-outline
                                         </v-icon>
                                         {{
@@ -708,6 +759,8 @@
 
                                     <div class="d-inline d-md-none px-sm-0">
                                       <v-btn
+                                        variant="plain"
+                                        plain
                                         icon
                                         @click="
                                           openCrashReportDialog(
@@ -744,63 +797,76 @@
                 </v-row>
                 <v-card color="#FFF" flat>
                   <v-card-text>
-                    <validation-observer ref="observer" v-slot="{ invalid }">
-                      <form @submit.prevent="submitReply">
-                        <v-row>
-                          <v-col cols="12" class="px-sm-3">
-                            <validation-provider
-                              v-slot="{ errors }"
-                              name="your_answer"
-                              rules="required|min:25"
+                    <Form
+                      :validation-schema="replySchema"
+                      @submit="
+                        (values, actions) => submitReply(values, actions)
+                      "
+                    >
+                      <v-row>
+                        <v-col cols="12">
+                          <Field
+                            name="answer"
+                            v-model="answer_form.answer"
+                            v-slot="{ meta: fieldMeta, errors }"
+                          >
+                            <v-textarea
+                              variant="outlined"
+                              v-model="answer_form.answer"
+                              row-height="25"
+                              rows="3"
+                              :height="textAreaHeight"
+                              @click="increaseTextAreaHeight"
+                              :error-messages="errors"
+                              background-color="#ffffff"
+                              label="Your answer"
                             >
-                              <v-textarea
-                                v-model="answer_form.answer"
-                                outlined
-                                :height="textAreaHeight"
-                                @click="increaseTextAreaHeight"
-                                :error-messages="errors"
-                                background-color="#ffffff"
-                                label="Your answer"
-                              >
-                                <template slot="append-outer">
-                                  <v-btn
-                                    icon
-                                    large
-                                    type="submit"
-                                    :disabled="invalid"
-                                    :loading="loading.reply_form"
-                                    v-if="answer_form.answer"
+                              <template #append>
+                                <v-btn
+                                  :color="
+                                    !errors.entries.length && fieldMeta.valid
+                                      ? '#000'
+                                      : '#999'
+                                  "
+                                  variant="text"
+                                  icon
+                                  type="submit"
+                                  :disabled="!fieldMeta.valid"
+                                  v-if="answer_form.answer"
+                                >
+                                  <v-icon size="28">mdi-send</v-icon>
+                                </v-btn>
+                                <v-btn variant="text" icon disabled v-else>
+                                  <v-icon size="28">mdi-microphone</v-icon>
+                                </v-btn>
+                              </template>
+                              <template #prepend>
+                                <v-btn
+                                  variant="text"
+                                  icon
+                                  @click="emoji_box = !emoji_box"
+                                >
+                                  <v-icon color="#999" size="28"
+                                    >mdi-emoticon-excited-outline</v-icon
                                   >
-                                    <v-icon> mdi-send </v-icon>
-                                  </v-btn>
-                                  <v-btn icon large disabled v-else>
-                                    <v-icon> mdi-microphone </v-icon>
-                                  </v-btn>
-                                </template>
-                                <template slot="prepend">
-                                  <v-btn
-                                    large
-                                    icon
-                                    @click="emoji_box = !emoji_box"
-                                  >
-                                    <v-icon>
-                                      mdi-emoticon-excited-outline
-                                    </v-icon>
-                                  </v-btn>
-                                  <v-btn large icon disabled>
-                                    <v-icon> mdi-paperclip </v-icon>
-                                  </v-btn>
-                                </template>
-                              </v-textarea>
-                            </validation-provider>
-                            <v-emoji-picker
-                              v-show="emoji_box"
-                              @select="selectEmoji"
-                            ></v-emoji-picker>
-                          </v-col>
-                        </v-row>
-                      </form>
-                    </validation-observer>
+                                </v-btn>
+                                <v-btn variant="text" icon disabled>
+                                  <v-icon size="28">mdi-paperclip</v-icon>
+                                </v-btn>
+                              </template>
+                            </v-textarea>
+                          </Field>
+                          <EmojiPicker
+                            disable-skin-tones
+                            display-recent
+                            style="margin: 0 0"
+                            v-show="emoji_box"
+                            :native="true"
+                            @select="selectEmoji"
+                          ></EmojiPicker>
+                        </v-col>
+                      </v-row>
+                    </Form>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -811,9 +877,10 @@
                 <div class="text-right">
                   <v-btn
                     rounded
+                    flat
                     outlined
                     large
-                    :small="$vuetify.breakpoint.xs"
+                    :small="display.xs"
                     @click="openQuestionForm()"
                     class="primary gama-text-body2 mb-2 mx-auto text-transform-none mx-auto"
                   >
@@ -822,7 +889,9 @@
                 </div>
                 <v-card color="#F5F5F5" flat>
                   <v-card-text>
-                    <h2 class="text-h4 text-center">Related questions</h2>
+                    <h2 class="text-h4 text-center text-gray">
+                      Related questions
+                    </h2>
                     <v-divider style="width: 80%" class="my-3 mx-auto" />
                     <div v-if="loading.similar_questions">
                       <v-skeleton-loader
@@ -841,17 +910,15 @@
                       <li
                         v-for="question in similarQuestions.slice(0, 10)"
                         :key="question.id"
-                        class="question-item blue--text gama-text-body2"
+                        class="question-item pointer text-info gama-text-body2"
                       >
-                        <nuxt-link
-                          :to="`/qa/${question.id}/${$slugGenerator.convert(
+                        <NuxtLink
+                          :to="`/qa/${question.id}/${convertSlug(
                             question.title
                           )}`"
                         >
-                          <span>
-                            {{ question.title }}
-                          </span>
-                        </nuxt-link>
+                          <span>{{ question.title }}</span>
+                        </NuxtLink>
                       </li>
 
                       <li
@@ -869,461 +936,373 @@
           </div>
         </v-container>
       </section>
-      <!--  End: detail  -->
+
+      <!-- Need to be Refactor - Commented -->
+      <!-- <CrashReport ref="crash_report" /> -->
     </div>
-
-    <!--Edit dialog-->
-    <v-dialog v-model="dialog.edit_reply_form" max-width="480">
-      <v-card>
-        <v-card-title class="text-h5"> Edit your reply </v-card-title>
-
-        <v-card-text>
-          <validation-observer ref="reply_observer" v-slot="{ invalid }">
-            <form @submit.prevent="updateReply">
-              <v-row>
-                <v-col cols="12">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="your_answer"
-                    rules="required|min:25"
-                  >
-                    <v-text-field
-                      v-model="edit_answer_form.answer"
-                      outlined
-                      :error-messages="errors"
-                      background-color="#ffffff"
-                      label="Your answer"
-                    >
-                      <template slot="append-outer">
-                        <v-btn
-                          icon
-                          large
-                          type="submit"
-                          :disabled="invalid"
-                          :loading="loading.edit_answer_form"
-                          v-if="edit_answer_form.answer"
-                        >
-                          <v-icon> mdi-send </v-icon>
-                        </v-btn>
-                        <v-btn icon large disabled v-else>
-                          <v-icon> mdi-microphone </v-icon>
-                        </v-btn>
-                      </template>
-                      <template slot="prepend">
-                        <v-btn
-                          large
-                          icon
-                          @click="edit_emoji_box = !edit_emoji_box"
-                        >
-                          <v-icon> mdi-emoticon-excited-outline </v-icon>
-                        </v-btn>
-                        <v-btn large icon disabled>
-                          <v-icon> mdi-paperclip </v-icon>
-                        </v-btn>
-                      </template>
-                    </v-text-field>
-                  </validation-provider>
-                  <v-emoji-picker
-                    v-show="edit_emoji_box"
-                    @select="selectEmoji"
-                  />
-                </v-col>
-              </v-row>
-            </form>
-          </validation-observer>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-    <!--End edit dialog-->
-
-    <!--Reply dialog-->
-    <v-dialog v-model="dialog.delete_reply_form" max-width="290">
-      <v-card>
-        <v-card-title class="text-h5"> Are you sure? </v-card-title>
-
-        <v-card-text>
-          <p class="text-h6">If you are sure to delete, click Yes.</p>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text @click="dialog.delete_reply_form = false"> No </v-btn>
-
-          <v-btn
-            color="red darken-1"
-            text
-            :loading="loading.delete_reply_form"
-            @click="deleteReply()"
-          >
-            Yes
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!--End Reply dialog-->
-
-    <crash-report ref="crash_report" />
   </div>
 </template>
-<script>
-import Breadcrumb from "../../../components/widgets/breadcrumb";
-import LastViews from "@/components/common/last-views";
-import Category from "@/components/common/category";
-import PreviewGallery from "@/components/details/preview-gallery";
-import RelatedContent from "@/components/details/related-content";
-import LatestTrainingContent from "@/components/details/latest-training-content";
-import RelatedQa from "@/components/details/related-qa";
-import RelatedOnlineExam from "@/components/details/related-online-exam";
-import { ValidationProvider, ValidationObserver } from "vee-validate";
-import CrashReport from "~/components/common/crash-report.vue";
 
-export default {
-  name: "qa-details",
-  auth: false,
-  components: {
-    CrashReport,
-    RelatedOnlineExam,
-    RelatedQa,
-    LatestTrainingContent,
-    RelatedContent,
-    PreviewGallery,
-    Category,
-    Breadcrumb,
-    LastViews,
-    ValidationProvider,
-    ValidationObserver,
-  },
-  head() {
-    return {
-      script: [
-        {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
-      title: this.contentData.title,
-    };
-  },
-  async asyncData({ params, $axios }) {
-    // Fetch the data from the API
-    const content = await $axios.$get(`/api/v1/questions/${params.id}`);
-    var contentData = [];
-    //Check data exist
-    if (content.status === 1) {
-      contentData = content.data;
+<script setup>
+import * as yup from "yup";
+import querystring from "querystring";
+import { Form, Field, ErrorMessage } from "vee-validate";
+import breadcrumb from "~/components/widgets/breadcrumb.vue";
+// import CrashReport from "~/components/common/crash-report.vue";
+import EmojiPicker from "vue3-emoji-picker";
+import "vue3-emoji-picker/css";
+
+const replySchema = yup.object({
+  answer: yup
+    .string()
+    .required("This field is required")
+    .min(25, "This field must be at least 25 characters"),
+});
+
+const route = useRoute();
+const router = useRouter();
+const config = useRuntimeConfig();
+
+const display = useGlobalDisplay();
+// use useAsyncData to getting Major Questions - SSR-friendly
+const { data: contentData, error } = await useAsyncData(async () => {
+  try {
+    const content = await $fetch(`/api/v1/questions/${route.params.id}`);
+    // Check if data exists
+    return content.status === 1 ? content.data : {};
+  } catch (e) {
+    if (e?.status === 404) {
+      // router.push("/search?type=question");
     }
+    throw e;
+  }
+});
 
-    return { contentData };
+useHead({
+  // script: [
+  //   {
+  //     src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+  //   },
+  // ],
+  title: contentData.value?.title || "Gama Train",
+});
+
+// Reactive States
+const textAreaHeight = ref(10);
+const emoji_box = ref(false);
+const breads = ref([
+  {
+    title: "Forum",
+    disabled: false,
+    href: "/search?type=question",
   },
-  mounted() {
-    this.initBreadCrumb();
-    this.reInit();
-    this.getSimilarQuestions();
+]);
 
-    setTimeout(() => {
-      this.renderMathJax();
-    }, 2000);
-  },
+const similarQuestions = ref([]);
+const answer_form = reactive({
+  answer: "",
+});
+const edit_answer_form = reactive({
+  answer: "",
+});
 
-  data: () => ({
-    textAreaHeight: 10,
-    rating: 4.5,
-    contentData: [],
-    breads: [
+const answer_list = ref([]);
+const edit_reply_id = ref(null);
+const delete_reply_id = ref(null);
+const dialog = reactive({
+  delete_reply_form: false,
+  edit_reply_form: false,
+});
+
+const loading = reactive({
+  reply_form: false,
+  edit_reply_form: false,
+  edit_answer_form: false,
+  delete_reply_form: false,
+  similar_questions: true,
+});
+
+const mathJaxEl = ref([]);
+const crashReport = ref(null);
+
+function increaseTextAreaHeight() {
+  textAreaHeight.value = 100;
+}
+
+function initBreadCrumb() {
+  if (contentData.value && Object.keys(contentData.value).length > 0) {
+    breads.value.push(
       {
-        text: "Q & A",
+        title: contentData.value.section_title,
         disabled: false,
-        href: "/search?type=question",
+        href: `/search?type=question&section=${contentData.value.section_title}`,
       },
-    ],
-    answer_form: {
-      answer: "",
-    },
-    edit_answer_form: {
-      answer: "",
-    },
-    emoji_box: false,
-    edit_emoji_box: false,
+      {
+        title: contentData.value.base_title,
+        disabled: false,
+        href: `/search?type=question&section=${contentData.value.section_title}&base=${contentData.value.base_title}`,
+      },
+      {
+        title: contentData.value.lesson_title,
+        disabled: false,
+        href: `/search?type=question&section=${contentData.value.section_title}&base=${contentData.value.base_title}&lesson=${contentData.value.lesson_title}`,
+      }
+    );
+  }
+}
 
-    loading: {
-      reply_form: false,
-      edit_reply_form: false,
-      edit_answer_form: false,
-      delete_reply_form: false,
-      similar_questions: true,
-    },
+function openAuthDialog(val) {
+  router.push({ query: { auth_form: val } });
+}
 
-    dialog: {
-      delete_reply_form: false,
-      edit_reply_form: false,
-    },
+// Using local slug convertor (Can be added to helpers too)
+function convertSlug(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
+}
 
-    //Delete section
-    delete_reply_id: null,
-    //End delete section
+function openQuestionForm() {
+  if (auth.loggedIn) {
+    router.push({ path: "/user/question/create" });
+  } else {
+    openAuthDialog("login");
+  }
+}
 
-    answer_list: [],
-    similarQuestions: [],
-  }),
-  methods: {
-    increaseTextAreaHeight() {
-      this.textAreaHeight = 100;
-    },
-    initBreadCrumb() {
-      this.breads.push(
-        {
-          text: this.contentData.section_title,
-          disabled: false,
-          href: `/search?type=question&section=${this.contentData.section}`,
+function selectEmoji(emoji) {
+  answer_form.answer += emoji.i;
+}
+
+async function submitReply(values, { resetForm }) {
+  loading.reply_form = true;
+  const payload = {
+    ...values,
+    id: route.params.id,
+  };
+
+  try {
+    await $fetch.$post(
+      "/api/v1/questionReplies",
+      querystring.stringify(payload),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        {
-          text: this.contentData.base_title,
-          disabled: false,
-          href: `/search?type=question&section=${this.contentData.section}&base=${this.contentData.base}`,
-        },
-        {
-          text: this.contentData.lesson_title,
-          disabled: false,
-          href: `/search?type=question&section=${this.contentData.section}&base=${this.contentData.base}&lesson=${this.contentData.lesson}`,
-        }
-      );
-    },
-    openAuthDialog(val) {
-      this.$router.push({ query: { auth_form: val } });
-    },
+      }
+    );
+    await reInit();
 
-    openQuestionForm() {
-      if (this.$auth.loggedIn)
-        this.$router.push({ path: "/user/question/create" });
-      else this.openAuthDialog("login");
-    },
+    resetForm();
+    // $toast.success("Reply submit successfully");
+  } catch (err) {
+    $toast.error(err.response.data.message);
+    if (err.response.status === 403) {
+      router.push({ query: { auth_form: "login" } });
+    }
+  } finally {
+    loading.reply_form = false;
+  }
+}
 
-    selectEmoji(emoji) {
-      this.answer_form.answer = this.answer_form.answer + emoji.data;
-    },
-    findStatic(user_id) {
-      if (this.contentData.scores) return this.contentData.scores[user_id];
-      else return { aNum: 0, qNum: 0, score: 0 };
-    },
-    calcPluralNoun(num) {
-      if (num > 1) return "s";
-    },
+// async function updateReply() {
+//   loading.edit_reply_form = true;
+//   try {
+//     await $fetch.$put(
+//       `/api/v1/questionReplies/${edit_reply_id.value}`,
+//       querystring.stringify(edit_answer_form),
+//       {
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//       }
+//     );
+//     await reInit();
+//     dialog.edit_reply_form = false;
+//     edit_answer_form.answer = "";
+//     // $toast.success("Reply updated successfully");
+//   } catch (err) {
+//     console.error(err);
+//   } finally {
+//     loading.edit_reply_form = false;
+//   }
+// }
 
-    submitReply() {
-      this.loading.reply_form = true;
-      const querystring = require("querystring");
-      this.answer_form.id = this.$route.params.id;
+const {
+  data: repliesData,
+  refresh: refreshReplies,
+  error: repliesError,
+} = useAsyncData("questionReplies", () =>
+  $fetch(`/api/v1/questionReplies?question=${route.params.id}`)
+);
 
-      this.$fetch
-        .$post(
-          "/api/v1/questionReplies",
-          querystring.stringify(this.answer_form),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        )
-        .then((response) => {
-          this.reInit();
-          this.answer_form.answer = "";
-          this.$toast.success("Reply submit successfully");
-        })
-        .catch((err) => {
-          this.$toast.error(err.response.data.message);
-          if (err.response.status == 403)
-            this.$router.push({ query: { auth_form: "login" } });
-        })
-        .finally(() => {
-          this.loading.reply_form = false;
-        });
-    },
-    updateReply() {
-      this.loading.edit_reply_form = true;
-      const querystring = require("querystring");
+async function reInit() {
+  try {
+    // Refresh the async data to fetch the latest replies
+    await refreshReplies();
+    // Update answer_list with the fetched data
+    answer_list.value = repliesData.value.data.list;
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-      this.$fetch
-        .$put(
-          `/api/v1/questionReplies/${this.edit_reply_id}`,
-          querystring.stringify(this.edit_answer_form),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        )
-        .then((response) => {
-          this.reInit();
-          this.dialog.edit_reply_form = false;
-          this.edit_answer_form.answer = "";
-          this.$toast.success("Reply updated successfully");
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.loading.reply_form = false;
-        });
-    },
-    reInit() {
-      //When form submit (answer, vote and etc)
-      this.$fetch
-        .$get(`/api/v1/questionReplies`, {
-          params: {
-            question: this.$route.params.id,
-          },
-        })
-        .then((response) => {
-          this.answer_list = response.data.list;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+function openEditReplyDialog(item_id, answer) {
+  edit_reply_id.value = item_id;
+  edit_answer_form.answer = answer;
+  dialog.edit_reply_form = true;
+}
 
-    openEditReplyDialog(item_id, answer) {
-      this.edit_reply_id = item_id;
-      this.edit_answer_form.answer = answer;
-      this.dialog.edit_reply_form = true;
-    },
-    openDeleteReplyConfirmDialog(item_id) {
-      this.delete_reply_id = item_id;
-      this.dialog.delete_reply_form = true;
-    },
+function openDeleteReplyConfirmDialog(item_id) {
+  delete_reply_id.value = item_id;
+  dialog.delete_reply_form = true;
+}
 
-    async deleteReply() {
-      this.loading.delete_reply_form = true;
-      await this.$fetch
-        .$delete(`/api/v1/questionReplies/${this.delete_reply_id}`)
-        .then((response) => {
-          this.delete_reply_id = null;
-          this.dialog.delete_reply_form = false;
+// async function deleteReply() {
+//   loading.delete_reply_form = true;
+//   await $fetch
+//     .$delete(`/api/v1/questionReplies/${delete_reply_id.value}`)
+//     .then((response) => {
+//       delete_reply_id.value = null;
+//       dialog.delete_reply_form = false;
+//       $toast.success("Deleted successfully");
+//       reInit();
+//     })
+//     .catch((e) => {
+//       delete_reply_id.value = null;
+//       dialog.delete_reply_form = false;
+//     })
+//     .finally(() => {
+//       loading.delete_reply_form = false;
+//     });
+// }
 
-          this.$toast.success("Deleted successfully");
+async function submitScore(content_type, id, type) {
+  // const auth = useAuth();
+  if (auth.loggedIn) {
+    let api = `/api/v1/questions/score/${id}/${type}`;
+    if (content_type === "reply")
+      api = `/api/v1/questionReplies/score/${id}/${type}`;
 
-          this.reInit();
-        })
-        .catch((e) => {
-          this.delete_reply_id = null;
-          this.deleteConfirmDialog = false;
-        })
-        .finally(() => {
-          this.loading.delete_reply_form = false;
-        });
-    },
-
-    async submitScore(content_type, id, type) {
-      if (this.$auth.loggedIn) {
-        var api = `/api/v1/questions/score/${id}/${type}`;
-        if (content_type == "reply")
-          api = `/api/v1/questionReplies/score/${id}/${type}`;
-
-        await this.$fetch
-          .$post(api)
-          .then((response) => {
-            if (response.status == 1) {
-              if (content_type == "question")
-                this.contentData.score = response.data.score;
-              else {
-                var index = this.answer_list.findIndex((x) => x.id == id);
-                this.answer_list[index].score = response.data.score;
-              }
+    await $fetch
+      .$post(api)
+      .then((response) => {
+        if (response.status === 1) {
+          if (content_type === "question")
+            contentData.value.score = response.data.score;
+          else {
+            const index = answer_list.value.findIndex((x) => x.id === id);
+            if (index !== -1) {
+              answer_list.value[index].score = response.data.score;
             }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        this.openAuthDialog("login");
-      }
-    },
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    openAuthDialog("login");
+  }
+}
 
-    selectCorrectAnswer(id) {
-      this.$fetch
-        .$post(`/api/v1/questionReplies/select/${id}`)
-        .then((response) => {
-          this.$toast.success("Select successfully");
-          window.scrollTo(0, 0);
-          this.reInit();
-        })
-        .catch((err) => {
-          this.$toast.error("An error occured");
-        });
-    },
+function selectCorrectAnswer(id) {
+  $fetch
+    .$post(`/api/v1/questionReplies/select/${id}`)
+    .then((response) => {
+      $toast.success("Select successfully");
+      window.scrollTo(0, 0);
+      reInit();
+    })
+    .catch((err) => {
+      $toast.error("An error occured");
+    });
+}
 
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-              ["\\(", "\\)"],
-              ["\\", "\\"],
-              ["(\\(", "\\))"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-            availableFonts: ["Asana Math"],
-            preferredFont: "Asana Math",
-            webFont: "Asana Math-Web",
-            imageFont: null,
-          },
-        });
-        window.MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
-    },
+function renderMathJax() {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [
+          ["$", "$"],
+          ["\\(", "\\)"],
+          ["\\(", "\\)"],
+          ["\\", "\\"],
+          ["(\\(", "\\))"],
+        ],
+        displayMath: [
+          ["$$", "$$"],
+          ["\\[", "\\]"],
+        ],
+        processEscapes: true,
+        processEnvironments: true,
+      },
+      displayAlign: "center",
+      "HTML-CSS": {
+        styles: { ".MathJax_Display": { margin: 0 } },
+        linebreaks: { automatic: true },
+        availableFonts: ["Asana Math"],
+        preferredFont: "Asana Math",
+        webFont: "Asana Math-Web",
+        imageFont: null,
+      },
+    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+  }
+}
 
-    //Crash report
-    openCrashReportDialog(id, type) {
-      this.$refs.crash_report.dialog = true;
-      this.$refs.crash_report.form.type = type;
+// CrashReport component need to be refactor
+function openCrashReportDialog(id, type) {
+  if (crashReport.value) {
+    crashReport.value.dialog = true;
+    crashReport.value.form.type = type;
 
-      if (type == "questionReply") this.$refs.crash_report.form.id = id;
-      else this.$refs.crash_report.form.id = this.$route.params.id;
-    },
-    //End crash report
+    if (type === "questionReply") {
+      crashReport.value.form.id = id;
+    } else {
+      crashReport.value.form.id = route.params.id;
+    }
+  }
+}
 
-    getSimilarQuestions() {
-      this.$fetch
-        .$get(`/api/v1/questions/related/${this.$route.params.id}`)
-        .then((response) => {
-          this.similarQuestions = response.data.list;
-        })
-        .catch((err) => {
-          console.err(err);
-        })
-        .finally(() => {
-          this.loading.similar_questions = false;
-        });
-    },
-  },
-};
+function getSimilarQuestions() {
+  $fetch(`/api/v1/questions/related/${route.params.id}`)
+    .then((response) => {
+      similarQuestions.value = response.data.list;
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      loading.similar_questions = false;
+    });
+}
+
+onMounted(() => {
+  initBreadCrumb();
+  reInit();
+  getSimilarQuestions();
+  setTimeout(() => {
+    renderMathJax();
+  }, 2000);
+});
 </script>
 
-<style>
+<style lang="scss">
+// Manipulate some Vuetify & bootstrap styles
 #qa-details-content .v-text-field--outlined .v-input__prepend-outer,
 .v-text-field--outlined .v-input__append-outer {
   margin-top: 6px !important;
 }
 
 #qa-details-content {
+  margin-top: calc(10rem + 4rem);
   margin-bottom: 2rem;
+
   #similar-question {
     .question-item {
       list-style-type: none;
@@ -1340,6 +1319,26 @@ export default {
 
   #similar-question ul {
     padding-left: 1rem;
+  }
+
+  .v3-emoji-picker .v3-footer {
+    display: none;
+  }
+
+  .v-label.v-field-label {
+    font-size: 1.5rem;
+  }
+  .v-chip.v-chip--link.v-theme--light.v-chip--density-comfortable.v-chip--size-default {
+    background-color: #4e636b;
+    opacity: 100%;
+    color: #fff;
+    font-size: 1.1rem;
+  }
+
+  @media screen and (max-width: 600px) {
+    .v-btn.v-btn--icon.v-theme--light.text-success.v-btn--density-comfortable.v-btn--rounded.v-btn--size-default.v-btn--variant-outlined {
+      border: 0px !important;
+    }
   }
 }
 </style>

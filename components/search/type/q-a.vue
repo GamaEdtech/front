@@ -180,11 +180,20 @@ export default {
   },
   watch: {
     items() {
-      this.$renderMathJax(this.$refs.mathJaxEl);
+      this.renderMathJax();
     },
   },
   mounted() {},
   methods: {
+    renderMathJax() {
+      if (window.MathJax) {
+        window.MathJax.Hub.Queue([
+          "Typeset",
+          window.MathJax.Hub,
+          this.$refs.mathJaxEl,
+        ]);
+      }
+    },
     imgErrorHandler(item, key) {
       this.items[key].lesson_pic = "";
     },
