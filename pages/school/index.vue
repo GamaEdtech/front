@@ -93,13 +93,14 @@
                         ref="mobileSchoolListSection"
                       >
                         <!-- School list section -->
-                        <list-holder @updatePage="checkSchoolScroll"
-                          ><schoolDataList
+                        <list-holder @updatePage="checkSchoolScroll">
+                          <schoolDataList
                             :schoolLoading="schoolLoading"
                             :schoolList="schoolList"
                             :resultCount="resultCount"
                             :allDataLoaded="allDataLoaded"
-                        /></list-holder>
+                          />
+                        </list-holder>
 
                         <!-- End school list section -->
                       </div>
@@ -435,8 +436,8 @@ export default {
         "PagingDto.PageFilter.Skip": (page - 1) * perPage,
         "PagingDto.PageFilter.Size": perPage,
         "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-        // "PagingDto.SortFilter[0].sortType": "Desc",
-        // "PagingDto.SortFilter[0].column": "score",
+        "PagingDto.SortFilter[0].sortType": "Desc",
+        "PagingDto.SortFilter[0].column": "score",
         Name: query.keyword ? query.keyword : null,
         // "Location.Radius": query.distance || null,
         // "Location.Latitude": query.lat || null,
@@ -743,8 +744,8 @@ export default {
             Size: this.perPage,
             ReturnTotalRecordsCount: true,
           },
-          // "SortFilter[0].sortType": "Desc",
-          // "SortFilter[0].column": "score",
+          "SortFilter[0].sortType": "Desc",
+          "SortFilter[0].column": "score",
         },
         Name: this.$route.query.keyword,
         section: this.$route.query.stage,
@@ -1012,8 +1013,10 @@ export default {
 
 <style>
 .leaflet-control-zoom {
-  display: none !important; /* Hide the zoom control */
+  display: none !important;
+  /* Hide the zoom control */
 }
+
 #school-list-sheet {
   border-radius: 3rem 3rem 0 0;
   justify-content: center;
@@ -1021,6 +1024,7 @@ export default {
   background: #ffffff;
   position: relative;
   padding-top: 5.6rem;
+
   #mobile-school-handler-holder {
     position: absolute;
     width: 100%;
@@ -1032,6 +1036,7 @@ export default {
     right: 0;
     background: #fff;
     margin: auto;
+
     #mobile-school-handler {
       position: absolute;
       width: 4.2rem;
@@ -1060,6 +1065,7 @@ export default {
 
   .container {
     padding-bottom: 0;
+
     #list-view-btn {
       position: absolute;
       z-index: 400;
@@ -1081,9 +1087,11 @@ export default {
     overflow-x: hidden;
     overflow-y: scroll;
     position: relative;
+
     #data-list {
       #school-list-container {
         max-width: 100% !important;
+
         .list-item {
           display: flex;
           margin-bottom: 0.8rem;
@@ -1138,8 +1146,10 @@ export default {
 
 @media (min-width: 1264px) {
   .leaflet-control-zoom {
-    display: block !important; /* Hide the zoom control */
+    display: block !important;
+    /* Hide the zoom control */
   }
+
   #school-list {
     position: relative;
     height: 100vh;
@@ -1152,6 +1162,7 @@ export default {
 
     .container {
       padding-bottom: 0;
+
       #list-view-btn {
         position: absolute;
         z-index: 400;
@@ -1185,6 +1196,7 @@ export default {
       #data-list {
         #school-list-container {
           max-width: 100% !important;
+
           .list-item {
             display: flex;
             margin-bottom: 0.8rem;
@@ -1205,6 +1217,7 @@ export default {
                   color: var(--primary-yellow-gama-500, #ffb600) !important;
                 }
               }
+
               .main-data h2 {
                 white-space: nowrap;
                 text-overflow: ellipsis;
@@ -1244,6 +1257,7 @@ export default {
       #data-list {
         #school-list-container {
           max-width: 80% !important;
+
           .list-item {
             display: flex;
             margin-bottom: 0.8rem;
