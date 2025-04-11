@@ -22,7 +22,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
         <client-only>
@@ -45,18 +45,45 @@
         </client-only>
 
         <div v-if="contentData.tour">
-          <!-- <client-only>
-            <a-scene embedded id="schoolDetailsVr" :class="topSlideClass.tour">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only> -->
           <img
             v-if="contentData.tour"
-            @click="openTourImgInput = true"
+            @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             src="/images/school-default.png"
             alt="School image"
           />
+        </div>
+        <div
+          v-else-if="tourImgPreview"
+          class="position-relative"
+          :class="topSlideClass.tour"
+        >
+          <img
+            class="pointer schoolDetailsImg"
+            :src="tourImgPreview"
+            alt="School image Preview"
+          />
+          <div class="upload-overlay">
+            <v-btn
+              color="primary"
+              small
+              fab
+              @click="uploadTourImage"
+              :loading="loading.uploadTour"
+              class="text-transform-none gtext-t6 font-weight-medium"
+            >
+              <v-icon small>mdi-cloud-upload</v-icon>
+            </v-btn>
+            <v-btn
+              color="error"
+              small
+              fab
+              @click="clearTourImage"
+              class="text-transform-none gtext-t6 font-weight-medium ml-sm-1"
+            >
+              <v-icon small>mdi-delete</v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else
@@ -70,7 +97,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
       </div>
@@ -117,7 +144,7 @@
         <template v-if="contentData.tour">
           <img
             v-if="contentData.tour"
-            @click="openTourImgInput = true"
+            @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             src="/images/school-default.png"
             alt="School image"
@@ -131,26 +158,28 @@
                 :src="tourImgPreview"
                 alt="School image Preview"
               />
-              <div class="upload-overlay">
-                <v-btn
-                  color="primary"
-                  rounded
-                  @click="uploadTourImage"
-                  :loading="loading.uploadTour"
-                  class="text-transform-none gtext-t4 font-weight-medium mr-3"
-                >
-                  <v-icon left>mdi-cloud-upload</v-icon>
-                  Upload Tour Image
-                </v-btn>
-                <v-btn
-                  color="error"
-                  rounded
-                  @click="clearTourImage"
-                  class="text-transform-none gtext-t4 font-weight-medium"
-                >
-                  <v-icon left>mdi-delete</v-icon>
-                  Delete
-                </v-btn>
+              <div class="upload-overlay px-3">
+                <div class="px-3 d-flex justify-center align-center">
+                  <v-btn
+                    color="primary"
+                    rounded
+                    @click="uploadTourImage"
+                    :loading="loading.uploadTour"
+                    class="text-transform-none gtext-t4 font-weight-medium mr-3"
+                  >
+                    <v-icon left>mdi-cloud-upload</v-icon>
+                    Upload Tour Image
+                  </v-btn>
+                  <v-btn
+                    color="error"
+                    rounded
+                    @click="clearTourImage"
+                    class="text-transform-none gtext-t4 font-weight-medium"
+                  >
+                    <v-icon left>mdi-delete</v-icon>
+                    Delete
+                  </v-btn>
+                </div>
               </div>
             </div>
           </template>
@@ -1582,7 +1611,10 @@ export default {
       }, 500);
     },
     openTourImgInput() {
-      this.$refs.tourImgRef.$el.querySelector("input").click();
+      // Make sure the mobile file input activates
+      if (this.$refs.tourImgRef) {
+        this.$refs.tourImgRef.$el.querySelector("input").click();
+      }
     },
 
     uploadTourImage() {
@@ -1816,8 +1848,8 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
           this.galleryImages = response.data;
-          this.contentData.pic =
-            this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
+          // this.contentData.pic =
+          //   this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
         })
         .catch((err) => {});
     },
@@ -1977,6 +2009,23 @@ export default {
   padding: 1rem;
 }
 
+@media (max-width: 600px) {
+  .upload-overlay {
+    flex-direction: column;
+  }
+
+  .upload-overlay .v-btn {
+    margin: 0.25rem 0;
+    height: auto !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .upload-overlay .v-icon {
+    font-size: 1.2rem !important;
+  }
+}
+
 .data-container {
   position: relative;
   z-index: 1;
@@ -1993,14 +2042,15 @@ export default {
   margin: auto;
   z-index: 3;
   right: 0 !important;
-  width: 80% !important;
+  width: 70% !important;
   max-height: 26.4rem;
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
 
-.center-image.enter-img-holder {
+.center-image.enter-img-holder,
+.center-image.position-relative {
   border-right: 1px solid white;
   border-left: 1px solid white;
 }
@@ -2014,20 +2064,22 @@ export default {
 }
 
 .under-image-left {
-  left: -35%;
+  left: -32%;
   z-index: 1;
 }
 
-.under-image-left.enter-img-holder p {
+.under-image-left.enter-img-holder p,
+.under-image-left.position-relative p {
   max-width: 2rem;
 }
 
 .under-image-right {
-  right: -35%;
+  right: -32%;
   z-index: 2;
 }
 
-.under-image-right.enter-img-holder p {
+.under-image-right.enter-img-holder p,
+.under-image-right.position-relative p {
   max-width: 2rem;
 }
 
