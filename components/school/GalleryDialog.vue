@@ -130,7 +130,7 @@ export default {
       crop_file_url: "",
       cropperDialog: false,
       mainImage: null,
-      selectedImageIndex: 1,
+      selectedImageIndex: 0,
     };
   },
   methods: {
@@ -194,7 +194,10 @@ export default {
   },
   watch: {
     images(newValue) {
-      this.mainImage = newValue.length >= 1 ? newValue[0] : null;
+      if (newValue.length >= 1) {
+        this.mainImage = newValue[0];
+        this.selectedImageIndex = 1;
+      }
     },
   },
   mounted() {},
