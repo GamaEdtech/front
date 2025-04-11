@@ -141,10 +141,9 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <template v-if="contentData.tour">
+        <template v-if="contentData?.tour">
           <img
-            v-if="contentData.tour"
-            @click="openTourImgInput"
+            v-if="contentData?.tour"
             class="pointer schoolDetailsImg"
             src="/images/school-default.png"
             alt="School image"
@@ -161,23 +160,25 @@
               <div class="upload-overlay px-3">
                 <div class="px-3 d-flex justify-center align-center">
                   <v-btn
+                    small
+                    fab
                     color="primary"
-                    rounded
                     @click="uploadTourImage"
                     :loading="loading.uploadTour"
                     class="text-transform-none gtext-t4 font-weight-medium mr-3"
                   >
-                    <v-icon left>mdi-cloud-upload</v-icon>
-                    Upload Tour Image
+                    <v-icon small>mdi-cloud-upload</v-icon>
+                    <!-- Upload Tour Image -->
                   </v-btn>
                   <v-btn
+                    small
+                    fab
                     color="error"
-                    rounded
                     @click="clearTourImage"
                     class="text-transform-none gtext-t4 font-weight-medium"
                   >
-                    <v-icon left>mdi-delete</v-icon>
-                    Delete
+                    <v-icon small>mdi-delete</v-icon>
+                    <!-- Delete -->
                   </v-btn>
                 </div>
               </div>
@@ -1848,8 +1849,8 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
           this.galleryImages = response.data;
-          // this.contentData.pic =
-          //   this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
+          this.contentData.pic =
+            this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
         })
         .catch((err) => {});
     },
@@ -1858,8 +1859,8 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
         .then((response) => {
           this.tourPanoramas = response.data;
-          // this.contentData.tour =
-          //   this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
+          this.contentData.tour =
+            this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
         })
         .catch((err) => {});
     },
