@@ -45,11 +45,18 @@
         </client-only>
 
         <div v-if="contentData.tour">
-          <client-only>
+          <!-- <client-only>
             <a-scene embedded id="schoolDetailsVr" :class="topSlideClass.tour">
               <a-sky src="/images/school-vr.png"></a-sky>
             </a-scene>
-          </client-only>
+          </client-only> -->
+          <img
+            v-if="contentData.tour"
+            @click="openTourImgInput = true"
+            class="pointer schoolDetailsImg"
+            src="/images/school-default.png"
+            alt="School image"
+          />
         </div>
         <div
           v-else
@@ -107,13 +114,20 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <div v-if="contentData.tour">
+        <!-- <div v-if="contentData.tour">
           <client-only>
             <a-scene embedded id="schoolDetailsVr">
               <a-sky src="/images/school-vr.png"></a-sky>
             </a-scene>
           </client-only>
-        </div>
+        </div> -->
+        <img
+          v-if="contentData.tour"
+          @click="openTourImgInput = true"
+          class="pointer schoolDetailsImg"
+          src="/images/school-default.png"
+          alt="School image"
+        />
         <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
           <div class="text-center">
             <v-icon size="48" class="primary-gray-300 mb-10"
@@ -1152,7 +1166,11 @@
     </v-dialog>
     <!-- End leave comment dialog -->
 
-    <gallery-dialog v-model="galleryDialog" :contentData="contentData" />
+    <gallery-dialog
+      v-model="galleryDialog"
+      :contentData="contentData"
+      :images="galleryImages"
+    />
 
     <!-- Select Location dialog -->
     <v-dialog
@@ -1309,6 +1327,8 @@ export default {
         schoolIcon: null,
       },
 
+      galleryImages: [],
+      tourPanoramas: [],
       form: {
         web: null,
         email: null,
@@ -1441,6 +1461,8 @@ export default {
 
     //Load comments
     this.loadComments();
+    this.loadGalleryImages();
+    this.loadTourPanorama();
   },
   methods: {
     convertRateToString(value) {
@@ -1694,6 +1716,26 @@ export default {
         })
         .then((response) => {
           this.commentList = response.data.list;
+        })
+        .catch((err) => {});
+    },
+    loadGalleryImages() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
+        .then((response) => {
+          this.galleryImages = response.data;
+          this.contentData.pic =
+            this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
+        })
+        .catch((err) => {});
+    },
+    loadTourPanorama() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
+        .then((response) => {
+          this.tourPanoramas = response.data;
+          this.contentData.tour =
+            this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
         })
         .catch((err) => {});
     },

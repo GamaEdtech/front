@@ -24,9 +24,9 @@
           <v-row>
             <v-col cols="12" md="7">
               <img
-                v-if="contentData.pic"
+                v-if="mainImage"
                 class="schoolDetailsImg"
-                src="/images/school-default.png"
+                :src="mainImage"
                 alt="School image"
               />
               <div
@@ -42,7 +42,9 @@
                 </div>
               </div>
               <div class="text-center gtext-t5 font-weight-heavy mt-6">
-                0/<span class="gray--text">0</span>
+                {{ selectedImageIndex }}/<span class="gray--text">{{
+                  images.length
+                }}</span>
               </div>
             </v-col>
             <v-col cols="12" md="5">
@@ -50,13 +52,14 @@
                 <v-col
                   v-if="contentData.pic"
                   cols="4"
-                  class="pl-0"
-                  v-for="item in 5"
+                  class="pl-0 cursor-pointer"
+                  v-for="(item, index) in images"
                   :key="item"
+                  @click="handleSelectedImage(item, index)"
                 >
                   <img
-                    class="schoolThumbImg"
-                    src="/images/school-default.png"
+                    class="schoolThumbImg w-100 w-full rounded cursor-pointer"
+                    :src="item"
                     alt="School image"
                   />
                 </v-col>
@@ -64,7 +67,7 @@
                   cols="4"
                   align="center"
                   justify="center"
-                  class="fill-height"
+                  class="fill-height pl-0"
                 >
                   <v-btn color="primary" fab depressed @click="openImgInput">
                     <v-icon size="48"> mdi-plus </v-icon>
@@ -83,6 +86,7 @@
         </v-card-text>
         <v-card-actions class="justify-center pb-13">
           <v-btn
+            @click="handleCloseDialog"
             class="primary black--text text-transform-none gtext-t4 font-weight-medium"
             rounded
             width="100%"
@@ -114,6 +118,7 @@ export default {
       default: false,
     },
     contentData: Object,
+    images: {},
   },
   components: {
     CropperDialog,
@@ -124,9 +129,18 @@ export default {
       crop_confirm_loading: false,
       crop_file_url: "",
       cropperDialog: false,
+      mainImage: null,
+      selectedImageIndex: 1,
     };
   },
   methods: {
+    handleSelectedImage(row, index) {
+      this.mainImage = row;
+      this.selectedImageIndex = index + 1;
+    },
+    handleCloseDialog() {
+      this.$emit("input", false);
+    },
     openImgInput() {
       this.$refs.imgInputRef.$el.querySelector("input").click();
     },
@@ -155,20 +169,35 @@ export default {
           }
         )
         .then((response) => {
-          let file = response.data[0].file.name;
+          // let file = response.data[0].file.name;
           //push to image array here
-          this.cropper_dialog = false;
+          this.$toast.success(
+            "Your contribution has been successfully submitted",
+            {
+              containerClass: "toast-dialog-notif",
+            }
+          );
+          this.cropperDialog = false;
         })
         .catch((err) => {
-          if (err.response.status == 401 || err.response.status == 403) {
+          if (err.response?.status == 401 || err.response?.status == 403) {
             this.openAuthDialog("login");
-          } else this.$toast.error(err.response.data.message);
+          } else
+            this.$toast.error(err.response.data.message, {
+              containerClass: "toast-dialog-notif",
+            });
         })
         .finally(() => {
           this.crop_confirm_loading = false;
         });
     },
   },
+  watch: {
+    images(newValue) {
+      this.mainImage = newValue.length >= 1 ? newValue[0] : null;
+    },
+  },
+  mounted() {},
 };
 </script>
 
