@@ -114,28 +114,35 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <!-- <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
-        </div> -->
-        <img
-          v-if="contentData.tour"
-          @click="openTourImgInput = true"
-          class="pointer schoolDetailsImg"
-          src="/images/school-default.png"
-          alt="School image"
-        />
-        <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
-          <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10"
-              >mdi-rotate-360</v-icon
-            >
-            <p class="gtext-t4 primary-blue-500">Contribute</p>
-          </div>
-        </div>
+        <template v-if="contentData.tour">
+          <img
+            v-if="contentData.tour"
+            @click="openTourImgInput = true"
+            class="pointer schoolDetailsImg"
+            src="/images/school-default.png"
+            alt="School image"
+          />
+        </template>
+        <template v-else>
+          <template v-if="tourImgPreview">
+            <img
+              class="pointer schoolDetailsImg"
+              :src="tourImgPreview"
+              alt="School image Preview"
+            />
+          </template>
+          <template v-else>
+            <div class="enter-img-holder pointer" @click="openTourImgInput">
+              <div class="text-center">
+                <v-icon size="48" class="primary-gray-300 mb-10"
+                  >mdi-rotate-360</v-icon
+                >
+                <p class="gtext-t4 primary-blue-500">Contribute</p>
+              </div>
+            </div>
+          </template>
+        </template>
+
         <v-file-input
           class="d-none"
           v-model="tourImg"
@@ -1326,7 +1333,7 @@ export default {
         boundingBox: {},
         schoolIcon: null,
       },
-
+      tourImgPreview: null,
       galleryImages: [],
       tourPanoramas: [],
       form: {
@@ -1463,6 +1470,19 @@ export default {
     this.loadComments();
     this.loadGalleryImages();
     this.loadTourPanorama();
+  },
+  watch: {
+    tourImg(newValue) {
+      if (newValue) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.tourImgPreview = e.target.result;
+        };
+        reader.readAsDataURL(newValue);
+      } else {
+        this.tourImgPreview = null;
+      }
+    },
   },
   methods: {
     convertRateToString(value) {
@@ -1734,8 +1754,8 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
         .then((response) => {
           this.tourPanoramas = response.data;
-          this.contentData.tour =
-            this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
+          // this.contentData.tour =
+          //   this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
         })
         .catch((err) => {});
     },
