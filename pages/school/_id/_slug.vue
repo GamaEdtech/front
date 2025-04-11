@@ -125,11 +125,24 @@
         </template>
         <template v-else>
           <template v-if="tourImgPreview">
-            <img
-              class="pointer schoolDetailsImg"
-              :src="tourImgPreview"
-              alt="School image Preview"
-            />
+            <div class="position-relative">
+              <img
+                class="pointer schoolDetailsImg"
+                :src="tourImgPreview"
+                alt="School image Preview"
+              />
+              <div class="upload-overlay">
+                <v-btn
+                  color="primary"
+                  rounded
+                  @click="uploadTourImage"
+                  :loading="loading.uploadTour"
+                  class="text-transform-none gtext-t4 font-weight-medium"
+                >
+                  Upload Tour Image
+                </v-btn>
+              </div>
+            </div>
           </template>
           <template v-else>
             <div class="enter-img-holder pointer" @click="openTourImgInput">
@@ -1373,6 +1386,7 @@ export default {
 
       loading: {
         submitComment: false,
+        uploadTour: false,
       },
 
       mapSubmitLoader: false,
@@ -1559,6 +1573,48 @@ export default {
     },
     openTourImgInput() {
       this.$refs.tourImgRef.$el.querySelector("input").click();
+    },
+
+    uploadTourImage() {
+      if (!this.tourImg) {
+        return;
+      }
+
+      this.loading.uploadTour = true;
+
+      // Create FormData to send the file
+      let formData = new FormData();
+      formData.append("File", this.tourImg);
+      formData.append("FileType", "Tour360");
+
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/images/Tour360`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          this.$toast.success(
+            "Your 360° tour image has been successfully uploaded"
+          );
+          this.loadTourPanorama();
+          this.tourImg = null;
+        })
+        .catch((err) => {
+          if (err.response?.status == 401 || err.response?.status == 403) {
+            this.openAuthDialog("login");
+          } else {
+            this.$toast.error(err.response?.data?.message || "Upload failed");
+          }
+        })
+        .finally(() => {
+          this.loading.uploadTour = false;
+        });
     },
 
     isValidUrl(url) {
@@ -1885,6 +1941,23 @@ export default {
   max-height: 26.4rem;
   overflow: hidden;
   z-index: 0;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 0.6rem;
 }
 
 .data-container {
