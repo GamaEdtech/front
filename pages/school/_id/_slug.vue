@@ -137,9 +137,19 @@
                   rounded
                   @click="uploadTourImage"
                   :loading="loading.uploadTour"
+                  class="text-transform-none gtext-t4 font-weight-medium mr-3"
+                >
+                  <v-icon left>mdi-cloud-upload</v-icon>
+                  Upload Tour Image
+                </v-btn>
+                <v-btn
+                  color="error"
+                  rounded
+                  @click="clearTourImage"
                   class="text-transform-none gtext-t4 font-weight-medium"
                 >
-                  Upload Tour Image
+                  <v-icon left>mdi-delete</v-icon>
+                  Delete
                 </v-btn>
               </div>
             </div>
@@ -1617,6 +1627,12 @@ export default {
         });
     },
 
+    clearTourImage() {
+      this.tourImg = null;
+      this.tourImgPreview = null;
+      this.$toast.info("Image removed");
+    },
+
     isValidUrl(url) {
       try {
         // Try to create a URL object - this will validate basic URL structure
@@ -1958,6 +1974,7 @@ export default {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 0.6rem;
+  padding: 1rem;
 }
 
 .data-container {
