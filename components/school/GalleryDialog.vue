@@ -39,6 +39,9 @@
                     >mdi-panorama-outline</v-icon
                   >
                   <p class="gtext-t4 primary-blue-500">No image</p>
+                  <div class="mt-2 gtext-t6 primary-gray-400">
+                    Accepted formats: JPG, PNG
+                  </div>
                 </div>
               </div>
               <div class="text-center gtext-t5 font-weight-heavy mt-6">
@@ -72,11 +75,15 @@
                   <v-btn color="primary" fab depressed @click="openImgInput">
                     <v-icon size="48"> mdi-plus </v-icon>
                   </v-btn>
+                  <div class="mt-2 gtext-t6 primary-gray-400 text-center">
+                    JPG, PNG
+                  </div>
                   <v-file-input
                     class="d-none"
                     v-model="imgInput"
-                    @change="openCropper()"
+                    @change="validateAndOpenCropper"
                     ref="imgInputRef"
+                    accept="image/jpeg, image/png, image/jpg"
                     hide-details
                   ></v-file-input>
                 </v-col>
@@ -143,6 +150,32 @@ export default {
     },
     openImgInput() {
       this.$refs.imgInputRef.$el.querySelector("input").click();
+    },
+    validateAndOpenCropper(file) {
+      if (!file) return;
+
+      // Check file type
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        this.$toast.error("Invalid file type. Please use JPG or PNG images.", {
+          containerClass: "toast-dialog-notif",
+        });
+        this.imgInput = null;
+        return;
+      }
+
+      // Check file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.$toast.error("File too large. Maximum size is 5MB.", {
+          containerClass: "toast-dialog-notif",
+        });
+        this.imgInput = null;
+        return;
+      }
+
+      // If validation passes, open the cropper
+      this.openCropper();
     },
     openCropper() {
       var file = this.imgInput;

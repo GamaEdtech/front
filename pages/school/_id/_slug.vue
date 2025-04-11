@@ -122,6 +122,9 @@
               >mdi-panorama-outline</v-icon
             >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
+            <div class="mt-2 gtext-t6 primary-gray-400">
+              Accepted formats: JPG, PNG
+            </div>
           </div>
         </div>
       </v-col>
