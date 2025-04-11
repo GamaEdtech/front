@@ -190,7 +190,10 @@
                 <v-icon size="48" class="primary-gray-300 mb-10"
                   >mdi-rotate-360</v-icon
                 >
-                <p class="gtext-t4 primary-blue-500">Contribute</p>
+                <div class="gtext-t4 primary-blue-500">Contribute</div>
+                <div class="mt-2 gtext-t6 primary-gray-400">
+                  Accepted formats: JPG, PNG
+                </div>
               </div>
             </div>
           </template>
@@ -200,7 +203,9 @@
           class="d-none"
           v-model="tourImg"
           ref="tourImgRef"
+          accept="image/jpeg, image/png, image/jpg"
           hide-details
+          @change="validateAndProcessImage"
         ></v-file-input>
       </v-col>
     </v-row>
@@ -1526,17 +1531,7 @@ export default {
     this.loadTourPanorama();
   },
   watch: {
-    tourImg(newValue) {
-      if (newValue) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.tourImgPreview = e.target.result;
-        };
-        reader.readAsDataURL(newValue);
-      } else {
-        this.tourImgPreview = null;
-      }
-    },
+    // Remove the tourImg watch as it's now handled in validateAndProcessImage
   },
   methods: {
     convertRateToString(value) {
@@ -1618,8 +1613,43 @@ export default {
       }
     },
 
+    validateAndProcessImage(file) {
+      if (!file) return;
+
+      // Check file type
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        this.$toast.error("Invalid file type. Please use JPG, PNG images.");
+        this.tourImg = null;
+        return;
+      }
+
+      // Check file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.$toast.error("File too large. Maximum size is 5MB.");
+        this.tourImg = null;
+        return;
+      }
+
+      // Create the preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.tourImgPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
     uploadTourImage() {
       if (!this.tourImg) {
+        this.$toast.error("Please select an image to upload");
+        return;
+      }
+
+      // Validate file type again before upload
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validTypes.includes(this.tourImg.type)) {
+        this.$toast.error("Invalid file type. Please use JPG, PNG images.");
         return;
       }
 
