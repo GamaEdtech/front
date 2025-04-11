@@ -1680,6 +1680,7 @@ export default {
           );
           this.loadTourPanorama();
           this.tourImg = null;
+          this.tourImgPreview = null;
         })
         .catch((err) => {
           if (err.response?.status == 401 || err.response?.status == 403) {
