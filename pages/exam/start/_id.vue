@@ -1,5 +1,5 @@
 <template>
-  <v-container class="test-maker">
+  <v-container v-if="contentData.startID" class="test-maker">
     <v-card id="participating-exam-header">
       <v-card-text>
         <v-row class="text-center">
@@ -20,12 +20,6 @@
               "
               @click="updateNextNotAnswer()"
               >Unanswered questions:
-              <v-chip label color="teal" dark>
-                {{
-                  contentData.tests.length -
-                  Object.keys(examStats.answerData).length
-                }}
-              </v-chip>
             </a>
           </v-col>
           <v-col cols="4">
@@ -33,7 +27,7 @@
               :href="examStats.nextPin ? `#item-${examStats.nextPin}` : '#'"
               @click="updateNextPin()"
               >Pined question:
-              <v-chip label color="teal" dark>
+              <v-chip label color="teal" dark v>
                 {{ examStats.pinQuestionsArr.length }}
               </v-chip>
             </a>
@@ -44,7 +38,7 @@
 
     <v-card class="test-list mb-4">
       <v-card-title class="text-h4 font-weight-bold py-6">
-        {{ contentData.exam.title }}
+        {{ contentData.exam?.title }}
       </v-card-title>
       <v-card-text>
         <v-divider class="mb-4" />
@@ -163,6 +157,7 @@
 <script>
 export default {
   name: "exam-start",
+  auth: false,
   head() {
     return {
       title: "Start online exam",
@@ -181,9 +176,12 @@ export default {
 
       return { contentData };
     } catch (error) {
-      if (error.response.status == 400)
+      if (error.response.status == 400) {
         if (error.response.data)
           redirect(`/exam/result/${error.response.data.data.id}`);
+      } else if (error.response.status == 401 || error.response.status == 403)
+        redirect(`/exam/${params.id}`);
+      else console.log(error.response.data);
     }
   },
   data() {
