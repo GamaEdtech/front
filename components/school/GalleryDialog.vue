@@ -40,7 +40,7 @@
                   >
                   <p class="gtext-t4 primary-blue-500">No image</p>
                   <div class="mt-2 gtext-t6 primary-gray-400">
-                    Accepted formats: JPG, PNG
+                    Accepted formats: JPG, PNG, WebP
                   </div>
                 </div>
               </div>
@@ -76,14 +76,14 @@
                     <v-icon size="48"> mdi-plus </v-icon>
                   </v-btn>
                   <div class="mt-2 gtext-t6 primary-gray-400 text-center">
-                    JPG, PNG
+                    JPG, PNG, WebP
                   </div>
                   <v-file-input
                     class="d-none"
                     v-model="imgInput"
                     @change="validateAndOpenCropper"
                     ref="imgInputRef"
-                    accept="image/jpeg, image/png, image/jpg"
+                    accept="image/jpeg, image/png, image/jpg, image/webp"
                     hide-details
                   ></v-file-input>
                 </v-col>
@@ -155,11 +155,14 @@ export default {
       if (!file) return;
 
       // Check file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        this.$toast.error("Invalid file type. Please use JPG or PNG images.", {
-          containerClass: "toast-dialog-notif",
-        });
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images.",
+          {
+            containerClass: "toast-dialog-notif",
+          }
+        );
         this.imgInput = null;
         return;
       }

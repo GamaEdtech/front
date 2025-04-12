@@ -123,7 +123,7 @@
             >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
             <div class="mt-2 gtext-t6 primary-gray-400">
-              Accepted formats: JPG, PNG
+              Accepted formats: JPG, PNG, WebP
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@
                 >
                 <div class="gtext-t4 primary-blue-500">Contribute</div>
                 <div class="mt-2 gtext-t6 primary-gray-400">
-                  Accepted formats: JPG, PNG
+                  Accepted formats: JPG, PNG, WebP
                 </div>
               </div>
             </div>
@@ -206,7 +206,7 @@
           class="d-none"
           v-model="tourImg"
           ref="tourImgRef"
-          accept="image/jpeg, image/png, image/jpg"
+          accept="image/jpeg, image/png, image/jpg, image/webp"
           hide-details
           @change="validateAndProcessImage"
         ></v-file-input>
@@ -1620,9 +1620,11 @@ export default {
       if (!file) return;
 
       // Check file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        this.$toast.error("Invalid file type. Please use JPG, PNG images.");
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
         this.tourImg = null;
         return;
       }
@@ -1650,9 +1652,11 @@ export default {
       }
 
       // Validate file type again before upload
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(this.tourImg.type)) {
-        this.$toast.error("Invalid file type. Please use JPG, PNG images.");
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
         return;
       }
 
