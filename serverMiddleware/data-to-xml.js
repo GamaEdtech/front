@@ -12,24 +12,21 @@ export default async (req, res, next) => {
     "exam",
     "tutorial",
     "blog",
+    "school",
   ];
 
   const contentTypeMatch = contentTypes.find((type) =>
     url.startsWith(`/sitemap/${type}-index`)
   );
+  const { pathname, query } = parse(url, true);
+
   if (contentTypeMatch) {
     // Generate sitemap index for the matched content type
     res.setHeader("Content-Type", "application/xml");
 
     const xmlData = await generateSitemapIndex(contentTypeMatch); // Pass content type to generate specific index
     res.end(xmlData);
-  } else if (url.startsWith("/sitemap/school")) {
-    let xmlData = await fetchPaginatedDataV2(); // Fetch and generate the correct sitemap
-    xmlData = convertDataToXMLV2(xmlData);
-    res.end(xmlData);
   } else if (url.startsWith("/sitemap")) {
-    // Your existing logic for individual sitemaps
-    const { pathname, query } = parse(url, true);
     const contentIdentity = pathname.split("/")[2]; // e.g., "paper" from "/sitemap/paper"
 
     if (!contentIdentity) {
@@ -56,7 +53,6 @@ export default async (req, res, next) => {
 // Generate the sitemap index for the given content type
 async function generateSitemapIndex(contentType) {
   let totalPages = await getTotalPages(contentType); // Fetch total pages for content type
-  if (totalPages > 160) totalPages = 160;
   let indexXml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
   // Loop through each page for the content type
@@ -98,12 +94,18 @@ async function getTotalPages(contentType) {
     case "blog":
       apiUrl = `${baseUrl}blogs/search?page=1&perpage=${itemsPerPage}`;
       break;
+    case "school":
+      apiUrl = `https://api.gamaedtech.com/api/v1/schools?PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true`;
+      break;
     default:
       return 0; // Return 0 if the content type is unknown
   }
 
   const response = await axios.get(apiUrl);
-  const totalItems = parseInt(response.data.data.num); // Get total count from the API response
+  const totalItems =
+    contentType == "school"
+      ? parseInt(response.data.data.totalRecordsCount)
+      : parseInt(response.data.data.num); // Get total count from the API response
   // Calculate total pages (rounding up)
   return Math.ceil(totalItems / itemsPerPage);
 }
@@ -113,24 +115,29 @@ async function fetchPaginatedData(contentType, page) {
   let apiUrl;
 
   // Determine the API URL based on the content type
+  const oldBaseUrl = "https://core.gamatrain.com/api/v1/";
+  const baseUrl = "https://api.gamaedtech.com/api/v1/";
   switch (contentType) {
     case "paper":
-      apiUrl = "https://core.gamatrain.com/api/v1/search?type=test";
+      apiUrl = `${oldBaseUrl}search?type=test`;
       break;
     case "qa":
-      apiUrl = "https://core.gamatrain.com/api/v1/search?type=question";
+      apiUrl = `${oldBaseUrl}search?type=question`;
       break;
     case "multimedia":
-      apiUrl = "https://core.gamatrain.com/api/v1/search?type=learnfiles";
+      apiUrl = `${oldBaseUrl}search?type=learnfiles`;
       break;
     case "exam":
-      apiUrl = "https://core.gamatrain.com/api/v1/search?type=azmoon";
+      apiUrl = `${oldBaseUrl}search?type=azmoon`;
       break;
     case "tutorial":
-      apiUrl = "https://core.gamatrain.com/api/v1/search?type=dars";
+      apiUrl = `${oldBaseUrl}search?type=dars`;
       break;
     case "blog":
-      apiUrl = "https://core.gamatrain.com/api/v1/blogs/search";
+      apiUrl = `${oldBaseUrl}blogs/search`;
+      break;
+    case "school":
+      apiUrl = `${baseUrl}schools`;
       break;
     default:
       // Return an empty array for unknown content types
@@ -144,6 +151,12 @@ async function fetchPaginatedData(contentType, page) {
     finalUrl = `${apiUrl}?page=${page}&perpage=${itemsPerPage}&ineedmore=1`;
   }
 
+  let pageNum = page > 0 ? page - 1 : 0;
+  if (contentType == "school")
+    finalUrl = `${apiUrl}?PagingDto.PageFilter.Size=${itemsPerPage}&PagingDto.PageFilter.Skip=${
+      pageNum * itemsPerPage
+    }&PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true`;
+
   const response = await axios.get(finalUrl);
   return response.data.data.list || [];
 }
@@ -156,39 +169,30 @@ async function fetchPaginatedDataV2(contentType, page) {
     "https://api.gamaedtech.com/api/v1/schools?PagingDto.PageFilter.Size=1000&PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true";
 
   const response = await axios.get(apiUrl);
+
   return response.data.data.list || [];
 }
 
 function convertDataToXML(data, contentType) {
   let title = "";
+  let modifyDate = "";
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
   data.forEach((item) => {
     title = item.title_url;
+    modifyDate = item.up_date;
     if (contentType === "blog") {
       title = item.title
         .trim()
         .replace(/ (?!$)/g, "-")
         .replace(/\//g, "-")
         .toLowerCase();
+    } else if (contentType === "school") {
+      title = item.slug;
+      modifyDate = item.lastModifyDate;
     }
     xml += `<url>
             <loc>https://gamatrain.com/${contentType}/${item.id}/${title}</loc>
-            <lastmod>${formatDate(item.up_date)}</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.8</priority>
-        </url>`;
-  });
-  xml += "\n</urlset>";
-  return xml;
-}
-
-function convertDataToXMLV2(data, contentType) {
-  let title = "";
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-  data.forEach((item) => {
-    xml += `<url>
-            <loc>https://gamatrain.com/school/${item.id}/${item.slug}</loc>
-            <lastmod>${formatDate(item.lastModifyDate)}</lastmod>
+            <lastmod>${formatDate(modifyDate)}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.8</priority>
         </url>`;
