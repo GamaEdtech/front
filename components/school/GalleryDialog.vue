@@ -48,12 +48,14 @@
                 {{ selectedImageIndex }}/<span class="gray--text">{{
                   images.length
                 }}</span>
+                <v-chip v-if="pendingUpload" small color="orange" class="ml-2"
+                  >Pending upload</v-chip
+                >
               </div>
             </v-col>
             <v-col cols="12" md="5">
               <v-row>
                 <v-col
-                  v-if="contentData.pic"
                   cols="4"
                   class="pl-0 cursor-pointer"
                   v-for="(item, index) in images"
@@ -72,7 +74,13 @@
                   justify="center"
                   class="fill-height pl-0"
                 >
-                  <v-btn color="primary" fab depressed @click="openImgInput">
+                  <v-btn
+                    color="primary"
+                    fab
+                    depressed
+                    @click="openImgInput"
+                    :class="{ 'pulse-animation': images.length === 0 }"
+                  >
                     <v-icon size="48"> mdi-plus </v-icon>
                   </v-btn>
                   <div class="mt-2 gtext-t6 primary-gray-400 text-center">
@@ -92,15 +100,19 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="justify-center pb-13">
-          <v-btn
-            @click="handleCloseDialog"
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            x-large
-            >Save</v-btn
-          >
+          <div class="d-flex flex-column align-center w-100">
+            <v-btn
+              @click="handleCloseDialog"
+              class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+              rounded
+              width="100%"
+              max-width="400"
+              x-large
+              :loading="saveLoading"
+              :disabled="!pendingUpload"
+              >{{ pendingUpload ? "Upload & Save" : "Save" }}</v-btn
+            >
+          </div>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -138,6 +150,8 @@ export default {
       cropperDialog: false,
       mainImage: null,
       selectedImageIndex: 0,
+      pendingUpload: null,
+      saveLoading: false,
     };
   },
   methods: {
@@ -146,7 +160,55 @@ export default {
       this.selectedImageIndex = index + 1;
     },
     handleCloseDialog() {
-      this.$emit("input", false);
+      // If disabled button was clicked, do nothing
+      if (!this.pendingUpload && this.images.length === 0) {
+        return;
+      }
+
+      if (this.pendingUpload) {
+        this.uploadImage();
+      } else {
+        this.$emit("input", false);
+      }
+    },
+    uploadImage() {
+      this.saveLoading = true;
+      let formData = new FormData();
+      formData.append("File", this.pendingUpload);
+      formData.append("FileType", "SimpleImage");
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/images/SimpleImage`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          // let file = response.data[0].file.name;
+          //push to image array here
+          this.$toast.success(
+            "Your contribution has been successfully submitted",
+            {
+              containerClass: "toast-dialog-notif",
+            }
+          );
+          this.pendingUpload = null;
+        })
+        .catch((err) => {
+          if (err.response?.status == 401 || err.response?.status == 403) {
+            this.openAuthDialog("login");
+          } else
+            this.$toast.error(err.response.data.message, {
+              containerClass: "toast-dialog-notif",
+            });
+        })
+        .finally(() => {
+          this.saveLoading = false;
+        });
     },
     openImgInput() {
       this.$refs.imgInputRef.$el.querySelector("input").click();
@@ -189,43 +251,15 @@ export default {
       this.$router.push({ query: { auth_form: val } });
     },
     croppedData(data) {
-      this.crop_confirm_loading = true;
-      let formData = new FormData();
-      formData.append("File", data);
-      formData.append("FileType", "SimpleImage");
-      this.$axios
-        .$post(
-          `/api/v2/schools/${this.$route.params.id}/images/SimpleImage`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-            },
-          }
-        )
-        .then((response) => {
-          // let file = response.data[0].file.name;
-          //push to image array here
-          this.$toast.success(
-            "Your contribution has been successfully submitted",
-            {
-              containerClass: "toast-dialog-notif",
-            }
-          );
-          this.cropperDialog = false;
-        })
-        .catch((err) => {
-          if (err.response?.status == 401 || err.response?.status == 403) {
-            this.openAuthDialog("login");
-          } else
-            this.$toast.error(err.response.data.message, {
-              containerClass: "toast-dialog-notif",
-            });
-        })
-        .finally(() => {
-          this.crop_confirm_loading = false;
-        });
+      // Store the cropped data for upload when Save is clicked
+      this.pendingUpload = data;
+      this.cropperDialog = false;
+      this.$toast.info(
+        "Image ready to upload. Click Save to complete the upload.",
+        {
+          containerClass: "toast-dialog-notif",
+        }
+      );
     },
   },
   watch: {
@@ -236,7 +270,13 @@ export default {
       }
     },
   },
-  mounted() {},
+  mounted() {
+    // Initialize selected image if images exist
+    if (this.images && this.images.length > 0) {
+      this.mainImage = this.images[0];
+      this.selectedImageIndex = 1;
+    }
+  },
 };
 </script>
 
@@ -256,5 +296,21 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.pulse-animation {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--v-primary-base), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--v-primary-base), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--v-primary-base), 0);
+  }
 }
 </style>
