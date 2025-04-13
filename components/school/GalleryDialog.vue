@@ -267,6 +267,7 @@ export default {
           // Reset state
           this.pendingUpload = null;
           this.pendingUploads = [];
+          this.pendingPreviews = [];
           this.currentCropIndex = 0;
 
           // Close dialog and refresh gallery

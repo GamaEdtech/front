@@ -1991,7 +1991,8 @@ export default {
       this.$axios
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
-          this.galleryImages = response.data;
+          // Reverse the order of the gallery images array so newest images appear first
+          this.galleryImages = [...response.data].reverse();
           if (this.galleryImages.length >= 1) {
             this.$set(this.contentData, "pic", this.galleryImages[0]);
           } else {
