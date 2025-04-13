@@ -46,7 +46,6 @@
 
         <div v-if="contentData.tour">
           <img
-            @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             :src="contentData.tour"
             alt="School image"
