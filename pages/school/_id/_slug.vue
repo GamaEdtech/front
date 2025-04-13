@@ -1238,6 +1238,7 @@
       v-model="galleryDialog"
       :contentData="contentData"
       :images="galleryImages"
+      @refresh-gallery="loadGalleryImages"
     />
 
     <!-- Select Location dialog -->
@@ -2122,12 +2123,7 @@ export default {
   max-width: 2rem;
 }
 
-.schoolThumbImg {
-  width: 100%;
-  height: 6.4247rem;
-  max-height: 6.4247rem;
-  border-radius: 0.4rem;
-}
+
 
 #schoolDetailsVr {
   height: 28.1rem;

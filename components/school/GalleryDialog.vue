@@ -203,6 +203,8 @@ export default {
           );
           this.pendingUpload = null;
           this.$emit("input", false);
+          // Emit event to parent to refresh the gallery images
+          this.$emit("refresh-gallery");
         })
         .catch((err) => {
           if (err.response?.status == 401 || err.response?.status == 403) {
@@ -294,6 +296,13 @@ export default {
   max-height: 28.1rem;
   width: 100%;
   border-radius: 0.6rem;
+}
+
+.schoolThumbImg {
+  width: 100%;
+  height: 6.4247rem;
+  max-height: 6.4247rem;
+  border-radius: 0.4rem;
 }
 
 .enter-img-holder {
