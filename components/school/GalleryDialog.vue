@@ -55,19 +55,47 @@
             </v-col>
             <v-col cols="12" md="5">
               <v-row>
+                <!-- Pending upload previews -->
                 <v-col
-                  cols="4"
-                  class="pl-0 cursor-pointer"
+                  v-for="(preview, index) in pendingPreviews"
+                  :key="`pending-${index}`"
+                  cols="3"
+                  class="pa-1"
+                  @click="handlePreviewSelected(preview, index)"
+                >
+                  <div class="position-relative">
+                    <v-img
+                      :src="preview"
+                      aspect-ratio="1"
+                      class="position-relative rounded pending-thumb"
+                      :class="mainImage === preview ? 'primary--border' : ''"
+                      cover
+                    ></v-img>
+                    <div class="pending-badge">
+                      <v-icon size="small" color="white"
+                        >mdi-cloud-upload-outline</v-icon
+                      >
+                    </div>
+                  </div>
+                </v-col>
+                <v-col
+                  cols="3"
+                  class="pa-1 cursor-pointer"
                   v-for="(item, index) in images"
-                  :key="item"
+                  :key="`gallery-${index}`"
                   @click="handleSelectedImage(item, index)"
                 >
-                  <img
-                    class="schoolThumbImg w-100 w-full rounded cursor-pointer"
-                    :src="item"
-                    alt="School image"
-                  />
+                  <div class="position-relative">
+                    <v-img
+                      :src="item"
+                      aspect-ratio="1"
+                      class="position-relative rounded"
+                      :class="mainImage === item ? 'primary--border' : ''"
+                      cover
+                    ></v-img>
+                  </div>
                 </v-col>
+
                 <v-col
                   cols="4"
                   align="center"
@@ -159,6 +187,7 @@ export default {
       selectedImageIndex: 0,
       pendingUpload: null,
       pendingUploads: [],
+      pendingPreviews: [],
       currentCropIndex: 0,
       saveLoading: false,
     };
@@ -167,6 +196,10 @@ export default {
     handleSelectedImage(row, index) {
       this.mainImage = row;
       this.selectedImageIndex = index + 1;
+    },
+    handlePreviewSelected(preview, index) {
+      this.mainImage = preview;
+      this.selectedImageIndex = this.images.length + index + 1;
     },
     handleCloseDialog() {
       // If disabled button was clicked, do nothing
@@ -215,8 +248,8 @@ export default {
             .map((response) => response.url);
 
           if (newImageUrls.length > 0) {
-            // Make a copy of the images array and add the new URLs
-            const updatedImages = [...this.images, ...newImageUrls];
+            // Make a copy of the images array and add the new URLs to the beginning
+            const updatedImages = [...newImageUrls, ...this.images];
             this.$emit("update:images", updatedImages);
           }
 
@@ -261,6 +294,7 @@ export default {
 
       // Reset the pending uploads array
       this.pendingUploads = [];
+      this.pendingPreviews = [];
       this.currentCropIndex = 0;
 
       // Check if we have multiple files
@@ -300,7 +334,16 @@ export default {
         }
 
         // If file passes validation, add it to pending uploads
-        this.pendingUploads.push(file);
+        this.pendingUploads.unshift(file);
+
+        // Create and add preview URL
+        const previewUrl = URL.createObjectURL(file);
+        this.pendingPreviews.unshift(previewUrl);
+      }
+
+      // Show the first file as the main preview
+      if (this.pendingPreviews.length > 0) {
+        this.mainImage = this.pendingPreviews[0];
       }
 
       // If we have valid files, start the cropping process with the first one
@@ -331,7 +374,7 @@ export default {
       }
 
       // Add the newly cropped file
-      this.pendingUpload.push(file);
+      this.pendingUpload.unshift(file);
 
       // Move to the next file if there are more files to crop
       this.currentCropIndex++;
@@ -399,6 +442,29 @@ export default {
 
 .pulse-animation {
   animation: pulse 1.5s infinite;
+}
+
+.pending-thumb {
+  filter: blur(1px);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.pending-thumb:hover {
+  filter: blur(0);
+  opacity: 1;
+}
+
+.pending-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes pulse {
