@@ -363,8 +363,32 @@ export default {
     },
     croppedData(data) {
       const timestamp = new Date().getTime();
-      const filename = `image_${timestamp}_${this.currentCropIndex}.jpg`;
-      const file = new File([data], filename, { type: "image/jpeg" });
+
+      // Determine file type from the cropped data - cropped image is usually in PNG format
+      // but we'll respect the original file type if possible
+      const originalFile = this.pendingUploads[this.currentCropIndex];
+      let fileType = "image/png";
+      let fileExt = "png";
+
+      if (originalFile) {
+        // Try to get the original file type
+        if (
+          originalFile.type.includes("jpeg") ||
+          originalFile.type.includes("jpg")
+        ) {
+          fileType = "image/jpeg";
+          fileExt = "jpg";
+        } else if (originalFile.type.includes("png")) {
+          fileType = "image/png";
+          fileExt = "png";
+        } else if (originalFile.type.includes("webp")) {
+          fileType = "image/webp";
+          fileExt = "webp";
+        }
+      }
+
+      const filename = `image_${timestamp}_${this.currentCropIndex}.${fileExt}`;
+      const file = new File([data], filename, { type: fileType });
 
       // Add the cropped file to a collection of files to upload
       if (!this.pendingUpload) {
