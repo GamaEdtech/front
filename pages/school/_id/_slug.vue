@@ -6,7 +6,7 @@
           v-if="contentData.pic"
           class="schoolDetailsImg"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
+          @click="openGalleryDialog"
           :src="contentData.pic"
           alt="School image"
         />
@@ -14,7 +14,7 @@
           v-else
           class="enter-img-holder pointer"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
+          @click="openGalleryDialog"
         >
           <div class="text-center">
             <v-icon
@@ -99,23 +99,91 @@
             <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
+
+        <div
+          v-if="galleryImages && galleryImages.length > 0"
+          :class="topSlideClass.image"
+        >
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="26.4rem"
+            class="gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.image"
+          @click="openGalleryDialog"
+        >
+          <div class="text-center">
+            <v-icon
+              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-panorama-outline</v-icon
+            >
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
+          </div>
+        </div>
       </div>
     </v-row>
 
     <v-row class="d-none d-md-flex">
       <v-col cols="12" md="4">
-        <img
-          v-if="contentData.pic"
-          @click="galleryDialog = true"
-          class="pointer schoolDetailsImg"
-          :src="contentData.pic"
-          alt="School image"
-        />
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          @click="galleryDialog = true"
-        >
+        <div v-if="galleryImages && galleryImages.length > 0">
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="28.1rem"
+            class="rounded-lg gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
           <div class="text-center">
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
@@ -1395,6 +1463,7 @@ export default {
       },
       tourImgPreview: null,
       galleryImages: [],
+      activeGalleryIndex: 0,
       tourPanoramas: [],
       form: {
         web: null,
@@ -1541,6 +1610,22 @@ export default {
       else if (value > 2) return "Average";
       else if (value <= 2) return "Poor";
       else return "Unknown";
+    },
+    openGalleryDialog() {
+      // Ensure the GalleryDialog shows the currently selected image
+      if (this.galleryImages && this.galleryImages.length > 0) {
+        const currentIndex = this.activeGalleryIndex;
+        if (currentIndex >= 0 && currentIndex < this.galleryImages.length) {
+          this.$set(this.contentData, "pic", this.galleryImages[currentIndex]);
+        }
+      }
+      this.galleryDialog = true;
+    },
+    updateMainGalleryImage(index) {
+      this.activeGalleryIndex = index;
+      if (this.galleryImages && this.galleryImages.length > index) {
+        this.$set(this.contentData, "pic", this.galleryImages[index]);
+      }
     },
     refreshTourContent() {
       // Force the tour image to refresh by setting it to null and back
@@ -1908,8 +1993,11 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
           this.galleryImages = response.data;
-          this.contentData.pic =
-            this.galleryImages.length >= 1 ? this.galleryImages[0] : null;
+          if (this.galleryImages.length >= 1) {
+            this.$set(this.contentData, "pic", this.galleryImages[0]);
+          } else {
+            this.$set(this.contentData, "pic", null);
+          }
         })
         .catch((err) => {});
     },
@@ -2376,5 +2464,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.gallery-carousel {
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+/* Target the carousel navigation arrows */
+.gallery-carousel .v-window__prev,
+.gallery-carousel .v-window__next {
+  z-index: 10;
 }
 </style>
