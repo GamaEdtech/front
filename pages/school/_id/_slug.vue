@@ -7,7 +7,7 @@
           class="schoolDetailsImg"
           :class="topSlideClass.image"
           @click="galleryDialog = true"
-          src="/images/school-default.png"
+          :src="contentData.pic"
           alt="School image"
         />
         <div
@@ -49,7 +49,7 @@
             v-if="contentData.tour"
             @click="openTourImgInput"
             class="pointer schoolDetailsImg"
-            src="/images/school-default.png"
+            :src="contentData.tour"
             alt="School image"
           />
         </div>
@@ -109,7 +109,7 @@
           v-if="contentData.pic"
           @click="galleryDialog = true"
           class="pointer schoolDetailsImg"
-          src="/images/school-default.png"
+          :src="contentData.pic"
           alt="School image"
         />
         <div
@@ -148,7 +148,7 @@
           <img
             v-if="contentData?.tour"
             class="pointer schoolDetailsImg"
-            src="/images/school-default.png"
+            :src="contentData.tour"
             alt="School image"
           />
         </template>

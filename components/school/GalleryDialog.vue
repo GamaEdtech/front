@@ -188,8 +188,13 @@ export default {
           }
         )
         .then((response) => {
-          // let file = response.data[0].file.name;
-          //push to image array here
+          // Add the uploaded image to local images array if response contains the URL
+          if (response && response.url) {
+            // Make a copy of the images array and add the new URL
+            const updatedImages = [...this.images, response.url];
+            this.$emit("update:images", updatedImages);
+          }
+
           this.$toast.success(
             "Your contribution has been successfully submitted",
             {
@@ -197,6 +202,7 @@ export default {
             }
           );
           this.pendingUpload = null;
+          this.$emit("input", false);
         })
         .catch((err) => {
           if (err.response?.status == 401 || err.response?.status == 403) {
@@ -251,8 +257,10 @@ export default {
       this.$router.push({ query: { auth_form: val } });
     },
     croppedData(data) {
-      // Store the cropped data for upload when Save is clicked
-      this.pendingUpload = data;
+      const timestamp = new Date().getTime();
+      const filename = `image_${timestamp}.jpg`;
+      const file = new File([data], filename, { type: "image/jpeg" });
+      this.pendingUpload = file;
       this.cropperDialog = false;
       this.$toast.info(
         "Image ready to upload. Click Save to complete the upload.",
