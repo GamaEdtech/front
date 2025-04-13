@@ -93,6 +93,7 @@
                     ref="imgInputRef"
                     accept="image/jpeg, image/png, image/jpg, image/webp"
                     hide-details
+                    multiple
                   ></v-file-input>
                 </v-col>
               </v-row>
@@ -110,7 +111,13 @@
               x-large
               :loading="saveLoading"
               :disabled="!pendingUpload"
-              >{{ pendingUpload ? "Upload & Save" : "Save" }}</v-btn
+              >{{
+                pendingUpload
+                  ? Array.isArray(pendingUpload)
+                    ? `Upload ${pendingUpload.length} Images & Save`
+                    : "Upload & Save"
+                  : "Save"
+              }}</v-btn
             >
           </div>
         </v-card-actions>
@@ -151,6 +158,8 @@ export default {
       mainImage: null,
       selectedImageIndex: 0,
       pendingUpload: null,
+      pendingUploads: [],
+      currentCropIndex: 0,
       saveLoading: false,
     };
   },
@@ -173,11 +182,19 @@ export default {
     },
     uploadImage() {
       this.saveLoading = true;
-      let formData = new FormData();
-      formData.append("File", this.pendingUpload);
-      formData.append("FileType", "SimpleImage");
-      this.$axios
-        .$post(
+
+      // Handle either single file or array of files
+      const filesToUpload = Array.isArray(this.pendingUpload)
+        ? this.pendingUpload
+        : [this.pendingUpload];
+
+      // Create an array of promises for each file upload
+      const uploadPromises = filesToUpload.map((file) => {
+        let formData = new FormData();
+        formData.append("File", file);
+        formData.append("FileType", "SimpleImage");
+
+        return this.$axios.$post(
           `/api/v2/schools/${this.$route.params.id}/images/SimpleImage`,
           formData,
           {
@@ -186,33 +203,51 @@ export default {
               Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
             },
           }
-        )
-        .then((response) => {
-          // Add the uploaded image to local images array if response contains the URL
-          if (response && response.url) {
-            // Make a copy of the images array and add the new URL
-            const updatedImages = [...this.images, response.url];
+        );
+      });
+
+      // Wait for all uploads to complete
+      Promise.all(uploadPromises)
+        .then((responses) => {
+          // Collect all new image URLs
+          const newImageUrls = responses
+            .filter((response) => response && response.url)
+            .map((response) => response.url);
+
+          if (newImageUrls.length > 0) {
+            // Make a copy of the images array and add the new URLs
+            const updatedImages = [...this.images, ...newImageUrls];
             this.$emit("update:images", updatedImages);
           }
 
+          // Show success message
+          const successCount = newImageUrls.length;
+          const totalCount = filesToUpload.length;
+
           this.$toast.success(
-            "Your contribution has been successfully submitted",
+            `Your images have been submitted but need to be reviewed by the community before being shown`,
             {
               containerClass: "toast-dialog-notif",
             }
           );
+
+          // Reset state
           this.pendingUpload = null;
+          this.pendingUploads = [];
+          this.currentCropIndex = 0;
+
+          // Close dialog and refresh gallery
           this.$emit("input", false);
-          // Emit event to parent to refresh the gallery images
           this.$emit("refresh-gallery");
         })
         .catch((err) => {
           if (err.response?.status == 401 || err.response?.status == 403) {
             this.openAuthDialog("login");
-          } else
-            this.$toast.error(err.response.data.message, {
+          } else {
+            this.$toast.error(err.response?.data?.message || "Upload failed", {
               containerClass: "toast-dialog-notif",
             });
+          }
         })
         .finally(() => {
           this.saveLoading = false;
@@ -221,37 +256,61 @@ export default {
     openImgInput() {
       this.$refs.imgInputRef.$el.querySelector("input").click();
     },
-    validateAndOpenCropper(file) {
-      if (!file) return;
+    validateAndOpenCropper(files) {
+      if (!files || files.length === 0) return;
 
-      // Check file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        this.$toast.error(
-          "Invalid file type. Please use JPG, PNG or WebP images.",
-          {
-            containerClass: "toast-dialog-notif",
-          }
-        );
-        this.imgInput = null;
-        return;
+      // Reset the pending uploads array
+      this.pendingUploads = [];
+      this.currentCropIndex = 0;
+
+      // Check if we have multiple files
+      const filesArray = Array.isArray(files) ? files : [files];
+
+      // Validate all files first
+      for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i];
+
+        // Check file type
+        const validTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/jpg",
+          "image/webp",
+        ];
+        if (!validTypes.includes(file.type)) {
+          this.$toast.error(
+            `File ${file.name}: Invalid file type. Please use JPG, PNG or WebP images.`,
+            {
+              containerClass: "toast-dialog-notif",
+            }
+          );
+          continue;
+        }
+
+        // Check file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+          this.$toast.error(
+            `File ${file.name}: Too large. Maximum size is 5MB.`,
+            {
+              containerClass: "toast-dialog-notif",
+            }
+          );
+          continue;
+        }
+
+        // If file passes validation, add it to pending uploads
+        this.pendingUploads.push(file);
       }
 
-      // Check file size (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      if (file.size > maxSize) {
-        this.$toast.error("File too large. Maximum size is 5MB.", {
-          containerClass: "toast-dialog-notif",
-        });
+      // If we have valid files, start the cropping process with the first one
+      if (this.pendingUploads.length > 0) {
+        this.openCropper(this.pendingUploads[0]);
+      } else {
         this.imgInput = null;
-        return;
       }
-
-      // If validation passes, open the cropper
-      this.openCropper();
     },
-    openCropper() {
-      var file = this.imgInput;
+    openCropper(file) {
       this.crop_file_url = URL.createObjectURL(file);
       if (this.crop_file_url) this.cropperDialog = true;
     },
@@ -260,16 +319,39 @@ export default {
     },
     croppedData(data) {
       const timestamp = new Date().getTime();
-      const filename = `image_${timestamp}.jpg`;
+      const filename = `image_${timestamp}_${this.currentCropIndex}.jpg`;
       const file = new File([data], filename, { type: "image/jpeg" });
-      this.pendingUpload = file;
-      this.cropperDialog = false;
-      this.$toast.info(
-        "Image ready to upload. Click Save to complete the upload.",
-        {
-          containerClass: "toast-dialog-notif",
-        }
-      );
+
+      // Add the cropped file to a collection of files to upload
+      if (!this.pendingUpload) {
+        this.pendingUpload = [];
+      } else if (!Array.isArray(this.pendingUpload)) {
+        // Convert to array if it's a single file
+        this.pendingUpload = [this.pendingUpload];
+      }
+
+      // Add the newly cropped file
+      this.pendingUpload.push(file);
+
+      // Move to the next file if there are more files to crop
+      this.currentCropIndex++;
+
+      if (this.currentCropIndex < this.pendingUploads.length) {
+        // Process the next file
+        this.openCropper(this.pendingUploads[this.currentCropIndex]);
+      } else {
+        // We're done cropping all files
+        this.cropperDialog = false;
+        const fileCount = this.pendingUpload.length;
+        this.$toast.info(
+          `${fileCount} ${
+            fileCount === 1 ? "image" : "images"
+          } ready to upload. Click Save to complete the upload.`,
+          {
+            containerClass: "toast-dialog-notif",
+          }
+        );
+      }
     },
   },
   watch: {
