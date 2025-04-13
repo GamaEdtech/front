@@ -46,7 +46,6 @@
 
         <div v-if="contentData.tour">
           <img
-            v-if="contentData.tour"
             @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             :src="contentData.tour"
@@ -144,9 +143,8 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <template v-if="contentData?.tour">
+        <template v-if="contentData.tour">
           <img
-            v-if="contentData?.tour"
             class="pointer schoolDetailsImg"
             :src="contentData.tour"
             alt="School image"
@@ -1544,6 +1542,14 @@ export default {
       else if (value <= 2) return "Poor";
       else return "Unknown";
     },
+    refreshTourContent() {
+      // Force the tour image to refresh by setting it to null and back
+      const currentTour = this.contentData.tour;
+      this.$set(this.contentData, "tour", null);
+      this.$nextTick(() => {
+        this.$set(this.contentData, "tour", currentTour);
+      });
+    },
     normalizeURL(url) {
       if (!url) return "";
 
@@ -1683,9 +1689,23 @@ export default {
           this.$toast.success(
             "Your 360° tour image has been successfully uploaded"
           );
+
+          // Load the new tour panorama data from the server
           this.loadTourPanorama();
+
+          // Clear preview and input
           this.tourImg = null;
           this.tourImgPreview = null;
+
+          // Force Vue to update the template after a short delay
+          setTimeout(() => {
+            this.refreshTourContent();
+            // Change the slide to 'tour' if on mobile view
+            if (this.$vuetify.breakpoint.smAndDown) {
+              this.slideToggler = "tour";
+              this.changeSlide();
+            }
+          }, 500);
         })
         .catch((err) => {
           if (err.response?.status == 401 || err.response?.status == 403) {
@@ -1898,8 +1918,13 @@ export default {
         .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
         .then((response) => {
           this.tourPanoramas = response.data;
-          this.contentData.tour =
-            this.tourPanoramas.length >= 1 ? this.tourPanoramas[0] : null;
+          if (this.tourPanoramas.length >= 1) {
+            // Use Vue's $set to ensure reactivity
+            this.$set(this.contentData, "tour", this.tourPanoramas[0]);
+          } else {
+            this.$set(this.contentData, "tour", null);
+          }
+          console.log("this.contentData.tour", this.contentData.tour);
         })
         .catch((err) => {});
     },
@@ -2122,8 +2147,6 @@ export default {
 .under-image-right.position-relative p {
   max-width: 2rem;
 }
-
-
 
 #schoolDetailsVr {
   height: 28.1rem;
