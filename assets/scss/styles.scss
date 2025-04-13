@@ -43,7 +43,11 @@ html {
 }
 
 .primary-blue-500 {
-  color: var(--Primary-Blue-500, #2e90fa);
+  color: var(--Primary-Blue-500, #2e90fa) ;
+}
+
+.primary-blue-700 {
+  color: var(--Primary-Blue-700, #1976D2);
 }
 
 //End colors class
