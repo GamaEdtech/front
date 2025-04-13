@@ -52,6 +52,7 @@ html {
 .bg-white {
   background: #fff !important;
 }
+
 .bg-Error {
   background: #f04438 !important;
 }
@@ -1694,7 +1695,6 @@ body {
         }
 
         .label-holder {
-
           .label {
             display: inline-block;
             font-size: 1.2rem;
@@ -4127,6 +4127,7 @@ body {
     .question_answer {
       .icon_btn {
         background: rgba(255, 152, 0, 0.15);
+
         .icon {
           color: $category-faq;
           font-size: 4rem;
@@ -4560,3 +4561,12 @@ body {
 }
 
 //End New Exam
+
+// Start Toast Dialog
+.toast-dialog-notif {
+  z-index: 30000 !important;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+// End Toast Dialog

@@ -6,15 +6,15 @@
           v-if="contentData.pic"
           class="schoolDetailsImg"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
-          src="/images/school-default.png"
+          @click="openGalleryDialog"
+          :src="contentData.pic"
           alt="School image"
         />
         <div
           v-else
           class="enter-img-holder pointer"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
+          @click="openGalleryDialog"
         >
           <div class="text-center">
             <v-icon
@@ -22,7 +22,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
         <client-only>
@@ -45,11 +45,43 @@
         </client-only>
 
         <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr" :class="topSlideClass.tour">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
+          <img
+            class="pointer schoolDetailsImg"
+            :src="contentData.tour"
+            alt="School image"
+          />
+        </div>
+        <div
+          v-else-if="tourImgPreview"
+          class="position-relative"
+          :class="topSlideClass.tour"
+        >
+          <img
+            class="pointer schoolDetailsImg"
+            :src="tourImgPreview"
+            alt="School image Preview"
+          />
+          <div class="upload-overlay">
+            <v-btn
+              color="primary"
+              small
+              fab
+              @click="uploadTourImage"
+              :loading="loading.uploadTour"
+              class="text-transform-none gtext-t6 font-weight-medium"
+            >
+              <v-icon small>mdi-cloud-upload</v-icon>
+            </v-btn>
+            <v-btn
+              color="error"
+              small
+              fab
+              @click="clearTourImage"
+              class="text-transform-none gtext-t6 font-weight-medium ml-sm-1"
+            >
+              <v-icon small>mdi-delete</v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else
@@ -63,7 +95,56 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
+          </div>
+        </div>
+
+        <div
+          v-if="galleryImages && galleryImages.length > 0"
+          :class="topSlideClass.image"
+        >
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="26.4rem"
+            class="gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.image"
+          @click="openGalleryDialog"
+        >
+          <div class="text-center">
+            <v-icon
+              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-panorama-outline</v-icon
+            >
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
       </div>
@@ -71,23 +152,45 @@
 
     <v-row class="d-none d-md-flex">
       <v-col cols="12" md="4">
-        <img
-          v-if="contentData.pic"
-          @click="galleryDialog = true"
-          class="pointer schoolDetailsImg"
-          src="/images/school-default.png"
-          alt="School image"
-        />
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          @click="galleryDialog = true"
-        >
+        <div v-if="galleryImages && galleryImages.length > 0">
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="28.1rem"
+            class="rounded-lg gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
           <div class="text-center">
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
             >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
+            <div class="mt-2 gtext-t6 primary-gray-400">
+              Accepted formats: JPG, PNG, WebP
+            </div>
           </div>
         </div>
       </v-col>
@@ -107,26 +210,70 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
-        </div>
-        <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
-          <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10"
-              >mdi-rotate-360</v-icon
-            >
-            <p class="gtext-t4 primary-blue-500">Contribute</p>
-          </div>
-        </div>
+        <template v-if="contentData.tour">
+          <img
+            class="pointer schoolDetailsImg"
+            :src="contentData.tour"
+            alt="School image"
+          />
+        </template>
+        <template v-else>
+          <template v-if="tourImgPreview">
+            <div class="position-relative">
+              <img
+                class="pointer schoolDetailsImg"
+                :src="tourImgPreview"
+                alt="School image Preview"
+              />
+              <div class="upload-overlay px-3">
+                <div class="px-3 d-flex justify-center align-center">
+                  <v-btn
+                    small
+                    fab
+                    color="primary"
+                    @click="uploadTourImage"
+                    :loading="loading.uploadTour"
+                    class="text-transform-none gtext-t4 font-weight-medium mr-3"
+                  >
+                    <v-icon small>mdi-cloud-upload</v-icon>
+                    <!-- Upload Tour Image -->
+                  </v-btn>
+                  <v-btn
+                    small
+                    fab
+                    color="error"
+                    @click="clearTourImage"
+                    class="text-transform-none gtext-t4 font-weight-medium"
+                  >
+                    <v-icon small>mdi-delete</v-icon>
+                    <!-- Delete -->
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="enter-img-holder pointer" @click="openTourImgInput">
+              <div class="text-center">
+                <v-icon size="48" class="primary-gray-300 mb-10"
+                  >mdi-rotate-360</v-icon
+                >
+                <div class="gtext-t4 primary-blue-500">Contribute</div>
+                <div class="mt-2 gtext-t6 primary-gray-400">
+                  Accepted formats: JPG, PNG, WebP
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+
         <v-file-input
           class="d-none"
           v-model="tourImg"
           ref="tourImgRef"
+          accept="image/jpeg, image/png, image/jpg, image/webp"
           hide-details
+          @change="validateAndProcessImage"
         ></v-file-input>
       </v-col>
     </v-row>
@@ -1152,7 +1299,12 @@
     </v-dialog>
     <!-- End leave comment dialog -->
 
-    <gallery-dialog v-model="galleryDialog" :contentData="contentData" />
+    <gallery-dialog
+      v-model="galleryDialog"
+      :contentData="contentData"
+      :images="galleryImages"
+      @refresh-gallery="loadGalleryImages"
+    />
 
     <!-- Select Location dialog -->
     <v-dialog
@@ -1308,7 +1460,10 @@ export default {
         boundingBox: {},
         schoolIcon: null,
       },
-
+      tourImgPreview: null,
+      galleryImages: [],
+      activeGalleryIndex: 0,
+      tourPanoramas: [],
       form: {
         web: null,
         email: null,
@@ -1346,6 +1501,7 @@ export default {
 
       loading: {
         submitComment: false,
+        uploadTour: false,
       },
 
       mapSubmitLoader: false,
@@ -1441,6 +1597,11 @@ export default {
 
     //Load comments
     this.loadComments();
+    this.loadGalleryImages();
+    this.loadTourPanorama();
+  },
+  watch: {
+    // Remove the tourImg watch as it's now handled in validateAndProcessImage
   },
   methods: {
     convertRateToString(value) {
@@ -1448,6 +1609,30 @@ export default {
       else if (value > 2) return "Average";
       else if (value <= 2) return "Poor";
       else return "Unknown";
+    },
+    openGalleryDialog() {
+      // Ensure the GalleryDialog shows the currently selected image
+      if (this.galleryImages && this.galleryImages.length > 0) {
+        const currentIndex = this.activeGalleryIndex;
+        if (currentIndex >= 0 && currentIndex < this.galleryImages.length) {
+          this.$set(this.contentData, "pic", this.galleryImages[currentIndex]);
+        }
+      }
+      this.galleryDialog = true;
+    },
+    updateMainGalleryImage(index) {
+      this.activeGalleryIndex = index;
+      if (this.galleryImages && this.galleryImages.length > index) {
+        this.$set(this.contentData, "pic", this.galleryImages[index]);
+      }
+    },
+    refreshTourContent() {
+      // Force the tour image to refresh by setting it to null and back
+      const currentTour = this.contentData.tour;
+      this.$set(this.contentData, "tour", null);
+      this.$nextTick(() => {
+        this.$set(this.contentData, "tour", currentTour);
+      });
     },
     normalizeURL(url) {
       if (!url) return "";
@@ -1516,7 +1701,112 @@ export default {
       }, 500);
     },
     openTourImgInput() {
-      this.$refs.tourImgRef.$el.querySelector("input").click();
+      // Make sure the mobile file input activates
+      if (this.$refs.tourImgRef) {
+        this.$refs.tourImgRef.$el.querySelector("input").click();
+      }
+    },
+
+    validateAndProcessImage(file) {
+      if (!file) return;
+
+      // Check file type
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
+        this.tourImg = null;
+        return;
+      }
+
+      // Check file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.$toast.error("File too large. Maximum size is 5MB.");
+        this.tourImg = null;
+        return;
+      }
+
+      // Create the preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.tourImgPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+    uploadTourImage() {
+      if (!this.tourImg) {
+        this.$toast.error("Please select an image to upload");
+        return;
+      }
+
+      // Validate file type again before upload
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!validTypes.includes(this.tourImg.type)) {
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
+        return;
+      }
+
+      this.loading.uploadTour = true;
+
+      // Create FormData to send the file
+      let formData = new FormData();
+      formData.append("File", this.tourImg);
+      formData.append("FileType", "Tour360");
+
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/images/Tour360`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          this.$toast.success(
+            "Your 360° tour image has been successfully uploaded"
+          );
+
+          // Load the new tour panorama data from the server
+          this.loadTourPanorama();
+
+          // Clear preview and input
+          this.tourImg = null;
+          this.tourImgPreview = null;
+
+          // Force Vue to update the template after a short delay
+          setTimeout(() => {
+            this.refreshTourContent();
+            // Change the slide to 'tour' if on mobile view
+            if (this.$vuetify.breakpoint.smAndDown) {
+              this.slideToggler = "tour";
+              this.changeSlide();
+            }
+          }, 500);
+        })
+        .catch((err) => {
+          if (err.response?.status == 401 || err.response?.status == 403) {
+            this.openAuthDialog("login");
+          } else {
+            this.$toast.error(err.response?.data?.message || "Upload failed");
+          }
+        })
+        .finally(() => {
+          this.loading.uploadTour = false;
+        });
+    },
+
+    clearTourImage() {
+      this.tourImg = null;
+      this.tourImgPreview = null;
+      this.$toast.info("Image removed");
     },
 
     isValidUrl(url) {
@@ -1697,6 +1987,35 @@ export default {
         })
         .catch((err) => {});
     },
+    loadGalleryImages() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
+        .then((response) => {
+          // Reverse the order of the gallery images array so newest images appear first
+          this.galleryImages = [...response.data].reverse();
+          if (this.galleryImages.length >= 1) {
+            this.$set(this.contentData, "pic", this.galleryImages[0]);
+          } else {
+            this.$set(this.contentData, "pic", null);
+          }
+        })
+        .catch((err) => {});
+    },
+    loadTourPanorama() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
+        .then((response) => {
+          this.tourPanoramas = response.data;
+          if (this.tourPanoramas.length >= 1) {
+            // Use Vue's $set to ensure reactivity
+            this.$set(this.contentData, "tour", this.tourPanoramas[0]);
+          } else {
+            this.$set(this.contentData, "tour", null);
+          }
+          console.log("this.contentData.tour", this.contentData.tour);
+        })
+        .catch((err) => {});
+    },
     editGeneralInfo(value) {
       if (value == "website") {
         this.form.web = this.contentData.webSite || "";
@@ -1825,6 +2144,41 @@ export default {
   z-index: 0;
 }
 
+.position-relative {
+  position: relative;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 0.6rem;
+  padding: 1rem;
+}
+
+@media (max-width: 600px) {
+  .upload-overlay {
+    flex-direction: column;
+  }
+
+  .upload-overlay .v-btn {
+    margin: 0.25rem 0;
+    height: auto !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .upload-overlay .v-icon {
+    font-size: 1.2rem !important;
+  }
+}
+
 .data-container {
   position: relative;
   z-index: 1;
@@ -1841,14 +2195,15 @@ export default {
   margin: auto;
   z-index: 3;
   right: 0 !important;
-  width: 80% !important;
+  width: 70% !important;
   max-height: 26.4rem;
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
 
-.center-image.enter-img-holder {
+.center-image.enter-img-holder,
+.center-image.position-relative {
   border-right: 1px solid white;
   border-left: 1px solid white;
 }
@@ -1862,28 +2217,23 @@ export default {
 }
 
 .under-image-left {
-  left: -35%;
+  left: -32%;
   z-index: 1;
 }
 
-.under-image-left.enter-img-holder p {
+.under-image-left.enter-img-holder p,
+.under-image-left.position-relative p {
   max-width: 2rem;
 }
 
 .under-image-right {
-  right: -35%;
+  right: -32%;
   z-index: 2;
 }
 
-.under-image-right.enter-img-holder p {
+.under-image-right.enter-img-holder p,
+.under-image-right.position-relative p {
   max-width: 2rem;
-}
-
-.schoolThumbImg {
-  width: 100%;
-  height: 6.4247rem;
-  max-height: 6.4247rem;
-  border-radius: 0.4rem;
 }
 
 #schoolDetailsVr {
@@ -2114,5 +2464,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.gallery-carousel {
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+/* Target the carousel navigation arrows */
+.gallery-carousel .v-window__prev,
+.gallery-carousel .v-window__next {
+  z-index: 10;
 }
 </style>
