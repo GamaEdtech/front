@@ -2,6 +2,7 @@ import * as THREE from "three"
 import Camera from "./Camera"
 import Sizes from "./utils/Sizes"
 import Time from "./utils/Time"
+import Debug from "./utils/Debug"
 import Renderer from "./Renderer"
 import World from "./world/World"
 
@@ -22,6 +23,7 @@ export default class Experience {
         this.canvas = canvas
 
         // Setup
+        this.debug = new Debug()
         this.sizes = new Sizes()
         this.time = new Time()
         this.scene = new THREE.Scene()
@@ -31,8 +33,10 @@ export default class Experience {
 
 
         // axes helper
-        // const axesHelper = new THREE.AxesHelper(20)
-        // this.scene.add(axesHelper)
+        const axesHelper = new THREE.AxesHelper(5)
+        this.scene.add(axesHelper)
+
+
         // Resize event
         this.sizes.on('resize', () => {
             this.resize()
@@ -52,6 +56,7 @@ export default class Experience {
     }
 
     update() {
+        this.debug.update()
         this.camera.update()
         this.world.update()
         this.renderer.update()

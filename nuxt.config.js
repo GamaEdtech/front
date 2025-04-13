@@ -243,7 +243,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "three"],
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "three", "lil-gui"],
   },
 
   pwa: {
@@ -266,4 +266,5 @@ export default {
     "~/serverMiddleware/data-to-xml.js",
     { path: "/api/chatgpt", handler: "~/serverMiddleware/chatgpt.js" },
   ],
+  ssr: false
 };

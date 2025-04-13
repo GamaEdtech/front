@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import Experience from '../Experience.js'
+import Ground from './Ground.js'
 
 export default class World {
     constructor() {
@@ -8,11 +9,8 @@ export default class World {
         this.time = this.experience.time
 
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(4, 4, 4),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        )
-        this.scene.add(mesh)
+        this.ground = new Ground()
+
     }
 
 

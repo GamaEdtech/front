@@ -8,9 +8,11 @@ export default class Renderer {
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
         this.camera = this.experience.camera.instance
+        this.debug = this.experience.debug
+        this.clearColor = "#58b9d6"
 
         this.setInstance()
-
+        this.setDebug()
     }
 
     setInstance() {
@@ -18,7 +20,7 @@ export default class Renderer {
             canvas: this.canvas,
             antialias: true
         })
-        this.instance.setClearColor("#000000")
+        this.instance.setClearColor(this.clearColor)
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
     }
@@ -30,5 +32,12 @@ export default class Renderer {
 
     update() {
         this.instance.render(this.scene, this.camera)
+    }
+
+    setDebug() {
+        const RendererFolder = this.debug.ui.addFolder("Renderer")
+        RendererFolder.addColor(this, "clearColor").name("clear Color").onChange((value) => {
+            this.instance.setClearColor(value)
+        })
     }
 }
