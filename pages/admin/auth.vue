@@ -37,7 +37,7 @@
             v-model="isFormValid"
           >
             <div class="mb-1">
-              <label class="primary-gray-700 font-size-xs"
+              <label class="primary-gray-700 font-size-xs font-weight-medium"
                 >User Name / Email</label
               >
             </div>
@@ -55,7 +55,9 @@
             ></v-text-field>
 
             <div class="mb-1">
-              <label class="primary-gray-700 font-size-xs">Password</label>
+              <label class="primary-gray-700 font-size-xs font-weight-medium"
+                >Password</label
+              >
             </div>
             <v-text-field
               v-model="form.password"
@@ -76,7 +78,7 @@
                 v-model="rememberMe"
                 label="Remember me"
                 hide-details
-                class="mt-0 pt-0 primary-gray-800"
+                class="mt-0 pt-0 primary-gray-800 font-weight-medium"
                 color="primary"
                 dense
               ></v-checkbox>
