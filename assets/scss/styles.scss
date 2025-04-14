@@ -4570,3 +4570,19 @@ body {
   cursor: pointer;
 }
 // End Toast Dialog
+
+.font-size-xs {
+  font-size: 12px !important;
+}
+.soft-form {
+  &__inputs-border {
+    .v-input__slot fieldset {
+      color: #e4e7ec !important;
+      border: 2px solid #e4e7ec !important;
+    }
+  }
+}
+
+.v-btn {
+  text-transform: none !important;
+}
