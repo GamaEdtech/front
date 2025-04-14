@@ -25,7 +25,7 @@
             dense
             text
             dismissible
-            class="mb-4"
+            class="mb-4 login-error-alert"
             @click="loginError = ''"
           >
             {{ loginError }}
@@ -92,9 +92,9 @@
               block
               x-large
               rounded
-              color="#FFC107"
-              class="primary-gray-800 font-weight-medium"
-              height="56"
+              color="#FFB600"
+              class="primary-gray-800 content-button-text"
+              height="40"
               :loading="loading"
               :disabled="loading"
               @click="login"
@@ -157,6 +157,7 @@ export default {
           username: this.form.email,
           password: this.form.password,
         };
+
         const result = await this.$axios.$post(
           `/api/v2/identities/tokens`,
           formData
@@ -166,8 +167,29 @@ export default {
           this.$auth.setUserToken(result.data.token);
           this.$auth.setUser({});
           this.$router.push("/admin");
+        } else {
+          // Handle unsuccessful authentication
+          if (result.errors && result.errors.length > 0) {
+            const errorMessage = result.errors[0].message;
+            if (errorMessage === "WrongUsernameOrPassword") {
+              this.loginError =
+                "Invalid username or password. Please try again.";
+            } else if (errorMessage == "UserLockedOut") {
+              this.loginError =
+                "Your account has been locked due to multiple failed login attempts. Please contact an administrator for assistance.";
+            } else {
+              this.loginError = errorMessage;
+            }
+          } else {
+            this.loginError = "Login failed. Please try again.";
+          }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Login error:", error);
+        this.loginError = "An error occurred during login. Please try again.";
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
@@ -176,5 +198,24 @@ export default {
 <style scoped>
 .v-text-field >>> .v-input__slot {
   min-height: 48px !important;
+}
+
+.content-button-text {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.login-error-alert {
+  border-radius: 8px;
+  padding: 10px !important;
+  word-break: break-word;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .login-error-alert {
+    padding: 8px !important;
+    font-size: 13px;
+  }
 }
 </style>
