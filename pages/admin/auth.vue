@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height my-14" fluid>
+  <v-container class="fill-height my-14 my-lg-5" fluid>
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-card class="pa-8" elevation="0" color="#f8f9fc" rounded="lg">
@@ -42,14 +42,14 @@
               >
             </div>
             <v-text-field
-              v-model="email"
+              v-model="form.email"
               placeholder="Enter User Name or Email"
               outlined
               dense
               :rules="emailRules"
               :error-messages="emailError"
               rounded
-              class="mb-6"
+              class=""
               background-color="white"
               @focus="emailError = ''"
             ></v-text-field>
@@ -58,7 +58,7 @@
               <label class="primary-gray-700 font-size-xs">Password</label>
             </div>
             <v-text-field
-              v-model="password"
+              v-model="form.password"
               placeholder="Enter Password"
               outlined
               dense
@@ -116,8 +116,10 @@ export default {
   data() {
     return {
       adminAuthIcon: "adminAuthIcon.png",
-      email: "",
-      password: "",
+      form: {
+        email: "",
+        password: "",
+      },
       rememberMe: false,
       loading: false,
       loginError: "",
@@ -130,50 +132,42 @@ export default {
   },
   methods: {
     validateForm() {
-      if (!this.email) {
+      if (!this.form.email) {
         this.emailError = "Email or username is required";
         return false;
       }
 
-      if (!this.password) {
+      if (!this.form.password) {
         this.passwordError = "Password is required";
         return false;
       }
 
       return true;
     },
-    login() {
-      // Reset errors
+    async login() {
       this.loginError = "";
 
-      // Validate form
       if (!this.$refs.form.validate() || !this.validateForm()) {
         return;
       }
 
-      this.loading = true;
-
-      this.$auth
-        .loginWith("local", {
-          data: {
-            email: this.email,
-            password: this.password,
-          },
-        })
-        .then(() => {
+      try {
+        this.loading = true;
+        const formData = {
+          username: this.form.email,
+          password: this.form.password,
+        };
+        const result = await this.$axios.$post(
+          `/api/v2/identities/tokens`,
+          formData
+        );
+        if (result.succeeded) {
+          localStorage.setItem("v2_token", result.data.token);
+          this.$auth.setUserToken(result.data.token);
+          this.$auth.setUser({});
           this.$router.push("/admin");
-        })
-        .catch((error) => {
-          console.error("Login error:", error);
-          if (error.response && error.response.status === 401) {
-            this.loginError = "Invalid email or password";
-          } else {
-            this.loginError = "Login failed. Please try again.";
-          }
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+        }
+      } catch (error) {}
     },
   },
 };
