@@ -9,9 +9,10 @@ export default class Ground {
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.debug = this.experience.debug
+        this.options = this.experience.options
 
         this.groundColor = "#70b449"
-        this.groundSize = 100
+        this.groundSize = this.options.groundSize
 
 
         this.setGeometry()

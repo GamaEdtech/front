@@ -22,6 +22,21 @@ export default class Experience {
         // Options
         this.canvas = canvas
 
+        this.options = {
+            groundSize: 100,
+            roadSize: 100,
+            roadWidth: 10,
+            roadAmplitudeX: 4.6,
+            roadFrequencyX: 0.14,
+            colorRoad: "#8a8a8a",
+            widthLineArround: 0.034,
+            widthLineSeperator: 0.02,
+            countLine: 4,
+            colorLineSeperator: "#fff480",
+            colorLineArround: "#bababa"
+        }
+
+
         // Setup
         this.debug = new Debug()
         this.sizes = new Sizes()

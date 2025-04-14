@@ -13,22 +13,28 @@ export default class Camera {
         this.scene = this.experience.scene
         this.canvas = this.experience.canvas
         this.time = this.experience.time
+        this.debug = this.experience.debug
+        this.options = this.experience.options
 
+        this.positionY = 5
 
         this.setInstance()
         this.setControls()
+        this.setDebug()
     }
 
     setInstance() {
         this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
-        this.instance.position.set(10, 10, 10)
+
+        this.instance.position.set(100, 100, 100)
+        // this.instance.position.set(this.options.groundSize, this.positionY, this.options.groundSize / 2)
+        // this.instance.lookAt(0, this.positionY, this.options.groundSize / 2)
         this.scene.add(this.instance)
     }
 
     setControls() {
         this.controls = new OrbitControls(this.instance, this.canvas)
         this.controls.enableDamping = true
-
     }
 
 
@@ -37,10 +43,21 @@ export default class Camera {
         this.instance.updateProjectionMatrix()
     }
 
+    setDebug() {
+        const CameraFolder = this.debug.ui.addFolder("Camera")
+        CameraFolder.add(this.instance.position, "x").name("x Camera").min(-100).max(200).step(1)
+        CameraFolder.add(this.instance.position, "y").name("y Camera").min(-100).max(200).step(1)
+        CameraFolder.add(this.instance.position, "z").name("z Camera").min(-100).max(200).step(1)
+
+    }
 
 
     update() {
         this.controls.update()
+
+        // this.instance.lookAt(0, this.positionY, this.options.groundSize / 2)
+
+
         this.instance.updateProjectionMatrix();
     }
 }
