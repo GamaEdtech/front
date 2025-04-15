@@ -31,7 +31,9 @@
     </div>
 
     <!-- Table & Timeline -->
-    <v-row class="d-flex flex-row align-start justify-space-between">
+    <v-row
+      class="d-flex flex-row align-start justify-space-around justify-lg-space-between"
+    >
       <v-col cols="12" md="8">
         <v-skeleton-loader
           v-if="isLoading"
