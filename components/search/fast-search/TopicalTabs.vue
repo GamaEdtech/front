@@ -15,7 +15,7 @@
             </v-list-item-icon>
             <v-list-item-content style="padding-block: 0; margin-block: 0">
               <v-list-item-title
-                class="d-flex flex-row align-center gama-text-h3 font-weight-bold"
+                class="d-flex flex-row align-center gama-text-h6 font-weight-bold"
                 >{{ papers.label }}</v-list-item-title
               >
             </v-list-item-content>
@@ -45,7 +45,7 @@
         <v-icon color="#667085" size="24" class="topical-icon"
           >mdi-book-open-variant</v-icon
         >
-        <span class="gama-text-h3 font-weight-bold">{{ papers.label }}</span>
+        <span class="gama-text-h6 font-weight-bold">{{ papers.label }}</span>
       </div>
 
       <div class="years-container">
@@ -110,10 +110,6 @@ export default {
   color: #ffb600 !important;
 }
 
-.gama-text-h3 {
-  color: #667085 !important;
-}
-
 .years-container {
   display: flex;
   flex-direction: column;
@@ -137,14 +133,16 @@ export default {
   border-radius: 1rem;
   font-weight: 500;
 }
-
-@media screen and (max-width: 600px) {
-  .gama-text-h3 {
-    font-size: 16px !important;
+@media only screen and (min-width: 960px) and (max-width: 1264px){
+  .gama-text-h6 {
+    font-style: normal;
+    font-size: 1rem  !important;
+    font-weight: 700 !important;
+    line-height: normal;
   }
-
-  .topical-header {
-    margin-bottom: 0.5rem;
-  }
+}
+.gama-text-h3,
+.gama-text-h6 {
+  color: #667085 !important;
 }
 </style> 
