@@ -11,7 +11,7 @@
             style="min-height: fit-content"
           >
             <v-list-item-icon style="padding-block: 0; margin-block: 0">
-              <img :src="require('@/assets/icons/' + papers.icon)" />
+              <v-icon color="#667085" size="24">mdi-book-open-variant</v-icon>
             </v-list-item-icon>
             <v-list-item-content style="padding-block: 0; margin-block: 0">
               <v-list-item-title
@@ -42,11 +42,9 @@
     <!-- Mobile Layout -->
     <div class="d-sm-none mb-4">
       <div class="d-flex align-center topical-header">
-        <img
-          class="topical-icon"
-          :src="require('@/assets/icons/' + papers.icon)"
-          alt="Topical"
-        />
+        <v-icon color="#667085" size="24" class="topical-icon"
+          >mdi-book-open-variant</v-icon
+        >
         <span class="gama-text-h3 font-weight-bold">{{ papers.label }}</span>
       </div>
 
@@ -106,6 +104,10 @@ export default {
 
 .topical-icon {
   margin-right: 12px;
+  color: #ffb600 !important;
+}
+.v-list-item__icon > i {
+  color: #ffb600 !important;
 }
 
 .gama-text-h3 {

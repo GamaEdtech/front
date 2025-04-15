@@ -8,7 +8,15 @@
         class="pa-0"
       >
         <v-list-item-icon>
-          <img :src="require('@/assets/icons/' + item.icon)" />
+          <v-icon
+            color="#667085"
+            size="24"
+            v-if="item.useCustomIcon"
+            :class="item.icon"
+          ></v-icon>
+          <v-icon color="#667085" size="24" v-else>{{
+            getMaterialIcon(item.icon)
+          }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title class="gama-text-h3 font-weight-bold">
@@ -30,10 +38,16 @@
         class="resource-mobile mb-4"
       >
         <div class="d-flex align-center mb-2">
-          <img
-            :src="require('@/assets/icons/' + item.icon)"
+          <v-icon
+            color="#667085"
+            size="24"
+            v-if="item.useCustomIcon"
+            :class="item.icon"
             class="resource-icon mr-2"
-          />
+          ></v-icon>
+          <v-icon color="#667085" size="24" v-else class="resource-icon mr-2">{{
+            getMaterialIcon(item.icon)
+          }}</v-icon>
           <span class="gama-text-h6 font-weight-bold">{{ item.title }}</span>
         </div>
         <div class="primary-subtitle-500 ml-8">
@@ -58,6 +72,23 @@ export default {
       required: true,
     },
   },
+  methods: {
+    getMaterialIcon(iconName) {
+      // Map your current icon names to Material Design icon names
+      const iconMap = {
+        "ExamHub.svg": "mdi-notebook-edit-outline",
+        "PaperIcon.svg": "mdi-file-document-outline",
+        "QA.svg": "mdi-forum",
+        "Guide.svg": "mdi-sign-direction",
+        "Tutorial.svg": "mdi-book-open-page-variant-outline",
+        // Add more mappings as needed
+        // Default icon if not found in mapping
+        default: "mdi-file-outline",
+      };
+
+      return iconMap[iconName] || iconMap.default;
+    },
+  },
 };
 </script>
 
@@ -75,8 +106,11 @@ export default {
 .v-application--is-ltr .v-list-item__icon:first-child {
   margin-right: 12px;
 }
-
+.v-list-item__icon > i {
+  color: #ffb600 !important;
+}
 .resource-mobile .resource-icon {
+  color: #ffb600 !important;
   width: 24px;
   height: 24px;
 }
@@ -94,5 +128,13 @@ export default {
 }
 .v-divider {
   border-color: #f2f4f7 !important;
+}
+
+/* Custom icon styles */
+.icon-q-a,
+.icon-exam,
+.icon-paper,
+.icon-tutorial {
+  font-size: 24px;
 }
 </style>

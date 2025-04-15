@@ -102,14 +102,9 @@
         link
         :disabled="item.disable"
       >
-        <img
-          :src="
-            require(item.theme == 'blackAndWhite'
-              ? '@/assets/icons/bw_ExamHub.svg'
-              : '@/assets/icons/ExamHub.svg')
-          "
-          alt="examHub icon"
-        />
+        <v-icon :color="item.theme === 'blackAndWhite' ? '#667085' : '#7F56D9'">
+          mdi-clipboard-text-outline
+        </v-icon>
       </v-chip>
     </template>
   </v-data-table>
@@ -233,18 +228,14 @@
                 x-small
                 :disabled="item.disable"
               >
-                <img
-                  :src="
-                    require(item.theme == 'blackAndWhite'
-                      ? '@/assets/icons/bw_ExamHub.svg'
-                      : '@/assets/icons/ExamHub.svg')
+                <v-icon
+                  x-small
+                  :color="
+                    item.theme === 'blackAndWhite' ? '#667085' : '#7F56D9'
                   "
-                  alt="examHub icon"
-                  :style="{
-                    width: '16px',
-                    height: '16px',
-                  }"
-                />
+                >
+                  mdi-clipboard-text-outline
+                </v-icon>
               </v-chip>
             </div>
             <div class="separator" v-if="index < items.length - 1"></div>

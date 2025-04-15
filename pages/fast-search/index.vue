@@ -65,22 +65,22 @@ export default {
         {
           title: "Text book",
           link: "Science Learner′s Book 3 , Primary Checkpoint , Mathematics Learner′s Book 1 , Primary Checkpoint ",
-          icon: "Text-Book.svg",
+          icon: "PaperIcon.svg",
         },
         {
           title: "Work book",
           link: "Mathematics Learner′s Book 1 , Primary Checkpoint ",
-          icon: "Work-Book.svg",
+          icon: "ExamHub.svg",
         },
         {
           title: "Book Answer",
           link: "Mathematics Learner′s Book 1 , Primary Checkpoint ",
-          icon: "Book-Answer.svg",
+          icon: "QA.svg",
         },
         {
           title: "Study Guide",
           link: "Mathematics Learner′s Book 1 , Primary Checkpoint ",
-          icon: "Study-Guide.svg",
+          icon: "Guide.svg",
         },
       ],
       papers: {
@@ -321,7 +321,7 @@ export default {
   computed: {
     tableItems() {
       return Object.entries(this.papersItemsTable.theme).map(
-        ([key, value]) => value
+        ([, value]) => value
       );
     },
     combinedPaperItems() {
