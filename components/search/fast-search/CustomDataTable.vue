@@ -1,7 +1,7 @@
 <template>
-  <!-- Desktop View -->
+  <!-- Desktop View (large screens) -->
   <v-data-table
-    v-if="!isMobile"
+    v-if="!isMobile && !isTablet"
     :headers="headers"
     :items="items"
     class="elevation-0 custom-table"
@@ -114,9 +114,13 @@
     </template>
   </v-data-table>
 
-  <!-- Mobile View -->
-  <div v-else class="mobile-data-table-wrapper">
-    <!-- Mobile Sticky Headers -->
+  <!-- Tablet & Mobile Views -->
+  <div
+    v-else
+    class="mobile-data-table-wrapper"
+    :class="{ 'tablet-view': isTablet }"
+  >
+    <!-- Mobile/Tablet Headers -->
     <div class="mobile-headers">
       <div
         class="mobile-header-item"
@@ -253,7 +257,6 @@
         <div class="timeline-line"></div>
         <div class="year-markers">
           <div class="year-marker" v-for="year in yearMarkers" :key="year.year">
-            <div class="year-dot"></div>
             <div class="year-label">
               <div class="year">{{ year.year }}</div>
               <div class="sub-label" v-if="year.subLabel">
@@ -283,6 +286,7 @@ export default {
   data() {
     return {
       isMobile: false,
+      isTablet: false,
       mobileHeaders: [
         { text: "Classification", value: "classification" },
         { text: "Year", value: "year" },
@@ -312,7 +316,9 @@ export default {
       return "";
     },
     checkScreenSize() {
-      this.isMobile = window.innerWidth < 768;
+      const width = window.innerWidth;
+      this.isMobile = width < 768;
+      this.isTablet = width >= 768 && width < 960;
     },
   },
 };
@@ -412,7 +418,7 @@ export default {
   cursor: pointer;
 }
 
-/* Mobile Styles */
+/* Mobile and Tablet Styles */
 .mobile-data-table-wrapper {
   display: flex;
   flex-direction: column;
@@ -421,16 +427,46 @@ export default {
   margin-block: 1rem;
 }
 
+/* Tablet-specific styles */
+.tablet-view {
+  font-size: 14px;
+}
+
+.tablet-view .mobile-headers {
+  width: calc(100% - 80px); /* Adjust for timeline width */
+}
+
+.tablet-view .mobile-card {
+  padding: 14px 18px;
+}
+
+.tablet-view .paper-info-part {
+  font-size: 15px;
+}
+
+.tablet-view .chip-pill {
+  min-width: 35px;
+  height: 28px;
+}
+
+.tablet-view .timeline-container {
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablet-view .year-marker {
+  height: auto;
+  margin-bottom: 160px; /* Adjust spacing for tablet view */
+}
+
+/* Mobile headers */
 .mobile-headers {
   display: flex;
-  gap: 1rem;
-  justify-content: space-between;
+  gap: 2rem;
   padding: 12px 12px;
   background-color: #f2f4f7;
-  position: sticky;
-  max-width: max-content;
-  top: 0;
-  z-index: 10;
+  width: calc(100% - 5em);
   border-bottom: 1px solid #eaecf0;
 }
 
@@ -447,11 +483,14 @@ export default {
 .mobile-content {
   display: flex;
   flex-direction: row;
+  position: relative;
+  width: 100%;
 }
 
 .mobile-table-cards {
   flex-grow: 1;
   background-color: white !important;
+  width: calc(100% - 80px); /* Adjust for the timeline width */
 }
 
 /* Styling the v-data-table for mobile card view */
@@ -536,13 +575,14 @@ export default {
   width: 2px;
   background-color: #f2f4f7;
 }
+
 .year-marker {
   position: relative;
   margin-bottom: 200px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  height: 0;
+  height: auto; /* Changed from 0 to auto to ensure visibility */
 }
 
 .year-marker:first-child {
@@ -552,19 +592,52 @@ export default {
 .year-label {
   position: absolute;
   right: 0;
-  bottom: 3.5rem;
+  bottom: 3rem;
   min-width: 60px;
   text-align: center;
-  font-weight: 500;
+  background-color: #f2f4f7;
+  border-radius: 5px;
+  padding: 0.5em;
+  min-width: 48px;
+  min-height: fit-content;
 }
 
 .year {
-  font-size: 16px;
   color: #344054;
+  font-family: Inter;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .sub-label {
   font-size: 12px;
   color: #667085;
+  line-height: 18px;
+}
+.year-markers {
+  z-index: 10;
+  position: relative;
+  right: 0.7em;
+}
+.year-marker:first-child > .year-label,
+.year-marker:last-child > .year-label {
+  background-color: transparent !important;
+  font-family: Inter;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
+}
+.year-marker:first-child > .year-label > .year,
+.year-marker:last-child > .year-label > .year {
+  font-family: Inter;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
 }
 </style> 
