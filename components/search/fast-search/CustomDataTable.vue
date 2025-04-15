@@ -1,5 +1,7 @@
 <template>
+  <!-- Desktop View -->
   <v-data-table
+    v-if="!isMobile"
     :headers="headers"
     :items="items"
     class="elevation-0 custom-table"
@@ -98,7 +100,6 @@
         class="d-flex align-center justify-center v-chip--link"
         :color="item.theme === 'blackAndWhite' ? '#F2F4F7' : '#F9F5FF'"
         link
-        small
         :disabled="item.disable"
       >
         <img
@@ -108,14 +109,162 @@
               : '@/assets/icons/ExamHub.svg')
           "
           alt="examHub icon"
-          :style="{
-            width: '18px',
-            height: '18px',
-          }"
         />
       </v-chip>
     </template>
   </v-data-table>
+
+  <!-- Mobile View -->
+  <div v-else class="mobile-data-table-wrapper">
+    <!-- Mobile Sticky Headers -->
+    <div class="mobile-headers">
+      <div
+        class="mobile-header-item"
+        v-for="(header, index) in mobileHeaders"
+        :key="index"
+      >
+        <div class="d-flex align-center">
+          {{ header.text }}
+          <v-icon small>mdi-menu-down</v-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-content">
+      <v-data-table
+        :items="items"
+        class="elevation-0 mobile-table-cards"
+        hide-default-header
+        hide-default-footer
+        disable-pagination
+      >
+        <template v-slot:item="{ item, index }">
+          <div class="mobile-card">
+            <div class="paper-info">
+              <!-- Display paper info directly -->
+              <span class="paper-info-part">{{ item.name }}</span>
+            </div>
+            <div class="paper-chips">
+              <!-- QP Chip -->
+              <v-chip
+                v-if="item.downloadFilesContains.qp"
+                x-small
+                class="chip-pill"
+                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FEF3F2'"
+                :text-color="
+                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F04438'
+                "
+                >qp</v-chip
+              >
+              <v-chip
+                v-else
+                x-small
+                class="chip-pill"
+                color="#F2F4F7"
+                text-color="#D0D5DD"
+                >qp</v-chip
+              >
+              <!-- MS Chip -->
+              <v-chip
+                v-if="item.downloadFilesContains.ms"
+                x-small
+                class="chip-pill"
+                :color="item.theme === 'blackAndWhite' ? '#344054' : '#ECFDF3'"
+                :text-color="
+                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#12B76A'
+                "
+                >ms</v-chip
+              >
+              <v-chip
+                v-else
+                x-small
+                class="chip-pill"
+                color="#F2F4F7"
+                text-color="#D0D5DD"
+                >ms</v-chip
+              >
+              <!-- SF Chip -->
+              <v-chip
+                v-if="item.downloadFilesContains.sf"
+                x-small
+                class="chip-pill"
+                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FFFAEB'"
+                :text-color="
+                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F79009'
+                "
+                >sf</v-chip
+              >
+              <v-chip
+                v-else
+                x-small
+                class="chip-pill"
+                color="#F2F4F7"
+                text-color="#D0D5DD"
+                >sf</v-chip
+              >
+              <!-- IN Chip -->
+              <v-chip
+                v-if="item.downloadFilesContains.in"
+                x-small
+                class="chip-pill"
+                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FCF6F3'"
+                :text-color="
+                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#8F4949'
+                "
+                >in</v-chip
+              >
+              <v-chip
+                v-else
+                x-small
+                class="chip-pill"
+                color="#F2F4F7"
+                text-color="#D0D5DD"
+                >in</v-chip
+              >
+              <!-- ExamHub Chip -->
+              <v-chip
+                class="exam-hub-chip"
+                :color="item.theme === 'blackAndWhite' ? '#F2F4F7' : '#F9F5FF'"
+                link
+                x-small
+                :disabled="item.disable"
+              >
+                <img
+                  :src="
+                    require(item.theme == 'blackAndWhite'
+                      ? '@/assets/icons/bw_ExamHub.svg'
+                      : '@/assets/icons/ExamHub.svg')
+                  "
+                  alt="examHub icon"
+                  :style="{
+                    width: '16px',
+                    height: '16px',
+                  }"
+                />
+              </v-chip>
+            </div>
+            <div class="separator" v-if="index < items.length - 1"></div>
+          </div>
+        </template>
+      </v-data-table>
+
+      <!-- Timeline -->
+      <div class="timeline-container">
+        <div class="timeline-line"></div>
+        <div class="year-markers">
+          <div class="year-marker" v-for="year in yearMarkers" :key="year.year">
+            <div class="year-dot"></div>
+            <div class="year-label">
+              <div class="year">{{ year.year }}</div>
+              <div class="sub-label" v-if="year.subLabel">
+                {{ year.subLabel }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -131,18 +280,46 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      isMobile: false,
+      mobileHeaders: [
+        { text: "Classification", value: "classification" },
+        { text: "Year", value: "year" },
+        { text: "Term", value: "term" },
+      ],
+      yearMarkers: [
+        { year: "2024", subLabel: null },
+        { year: "Oct", subLabel: "Nov" },
+        { year: "May", subLabel: "JUN" },
+        { year: "Mar", subLabel: null },
+        { year: "2023", subLabel: null },
+      ],
+    };
+  },
+  mounted() {
+    this.checkScreenSize();
+    window.addEventListener("resize", this.checkScreenSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.checkScreenSize);
+  },
   methods: {
-    rowClass(item, index) {
+    rowClass(_item, index) {
       if ((index + 1) % 3 === 0) {
         return "my-4";
       }
       return "";
+    },
+    checkScreenSize() {
+      this.isMobile = window.innerWidth < 768;
     },
   },
 };
 </script>
 
 <style scoped>
+/* Desktop Styles */
 .custom-table >>> .v-data-table {
   border-radius: 8px;
   font-size: 14px;
@@ -188,9 +365,15 @@ export default {
 }
 .custom-table >>> .v-data-table__wrapper > table > tbody > tr td:last-child {
   text-align: center !important;
-  display: flex;
-  justify-content: center;
-  height: revert;
+}
+.custom-table
+  >>> .v-data-table__wrapper
+  > table
+  > tbody
+  > tr
+  td:last-child
+  > span {
+  margin-inline: auto !important;
 }
 
 ::v-deep .v-data-table__wrapper > table > tbody > tr > td {
@@ -204,6 +387,7 @@ export default {
   line-height: 26px !important;
   letter-spacing: 0% !important;
 }
+
 ::v-deep .v-data-table__wrapper > table > tbody > tr:nth-child(3)::after {
   content: "";
   display: table-column;
@@ -212,18 +396,175 @@ export default {
 
 .v-chip--link {
   padding: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 100%;
   cursor: pointer;
+  width: 100%;
 }
 
 .chip-pill {
-  border-radius: 16px;
   min-width: 30px;
   height: 24px;
+  border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* Mobile Styles */
+.mobile-data-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #fff;
+  margin-block: 1rem;
+}
+
+.mobile-headers {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 12px 12px;
+  background-color: #f2f4f7;
+  position: sticky;
+  max-width: max-content;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.mobile-header-item {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #344054;
+  display: flex;
+  align-items: center;
+  font-family: Inter;
+}
+
+.mobile-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.mobile-table-cards {
+  flex-grow: 1;
+  background-color: white !important;
+}
+
+/* Styling the v-data-table for mobile card view */
+::v-deep .mobile-table-cards > .v-data-table__wrapper > table > tbody > tr {
+  display: block;
+  padding: 0;
+}
+
+::v-deep
+  .mobile-table-cards
+  > .v-data-table__wrapper
+  > table
+  > tbody
+  > tr:hover {
+  background-color: transparent !important;
+}
+
+::v-deep
+  .mobile-table-cards
+  > .v-data-table__wrapper
+  > table
+  > tbody
+  > tr
+  > td {
+  display: block;
+  height: auto !important;
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+
+.mobile-card {
+  padding: 12px 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.paper-info {
+  margin-bottom: 12px;
+}
+
+.paper-info-part {
+  font-size: 14px;
+  font-weight: 400;
+  color: #344054;
+  line-height: 1.5;
+}
+
+.paper-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exam-hub-chip {
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.separator {
+  height: 1px;
+  background-color: #f2f4f7;
+  margin-top: 12px;
+}
+
+/* Timeline Styles */
+.timeline-container {
+  position: relative;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 35px;
+  width: 2px;
+  background-color: #f2f4f7;
+}
+.year-marker {
+  position: relative;
+  margin-bottom: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 0;
+}
+
+.year-marker:first-child {
+  margin-top: 20px;
+}
+
+.year-label {
+  position: absolute;
+  right: 0;
+  bottom: 3.5rem;
+  min-width: 60px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.year {
+  font-size: 16px;
+  color: #344054;
+}
+
+.sub-label {
+  font-size: 12px;
+  color: #667085;
 }
 </style> 
