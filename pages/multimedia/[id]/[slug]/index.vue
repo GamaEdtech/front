@@ -127,10 +127,9 @@
                       {{ contentData?.title }}
                       <v-btn
                         @click="editMode.title = true"
-                        fab
+                        icon
                         v-if="user?.id == contentData?.user_"
-                        depressed
-                        x-small
+                        size="x-small"
                       >
                         <v-icon> mdi-pencil </v-icon>
                       </v-btn>
@@ -145,14 +144,13 @@
                       placeholder="Title"
                       v-model="contentData.title"
                     >
-                      <template slot="append-outer">
+                      <template v-slot:append-outer>
                         <v-btn
                           color="success"
                           @click="updateDetails()"
-                          fab
-                          depressed
+                          icon
                           :loading="editMode.title_loading"
-                          x-small
+                          size="x-small"
                         >
                           <v-icon> mdi-check </v-icon>
                         </v-btn>
@@ -163,21 +161,17 @@
                     <!--Description-->
                     <div class="description-tabs">
                       <v-tabs v-model="description_tab" color="teal">
-                        <v-tab key="tab-description"
-                          ><span class="gama-text-caption"
-                            >Description</span
-                          ></v-tab
-                        >
-                        <v-tab key="tab-chapters"
-                          ><span class="gama-text-caption"
-                            >Book chapters</span
-                          ></v-tab
-                        >
+                        <v-tab value="tab-description">
+                          <span class="gama-text-caption">Description</span>
+                        </v-tab>
+                        <v-tab value="tab-chapters">
+                          <span class="gama-text-caption">Book chapters</span>
+                        </v-tab>
                       </v-tabs>
                     </div>
                     <div class="description-tabs">
-                      <v-tabs-items v-model="description_tab">
-                        <v-tab-item key="tab-description">
+                      <v-window v-model="description_tab">
+                        <v-window-item value="tab-description">
                           <span
                             class="gama-text-body2"
                             v-show="!editMode.describe"
@@ -194,9 +188,8 @@
                             v-if="user?.id == contentData?.user_"
                             v-show="!editMode.describe"
                             @click="editMode.describe = true"
-                            fab
-                            depressed
-                            x-small
+                            icon
+                            size="x-small"
                           >
                             <v-icon> mdi-pencil </v-icon>
                           </v-btn>
@@ -208,22 +201,21 @@
                               placeholder="Title"
                               v-model="contentData.description"
                             >
-                              <template slot="append-outer">
+                              <template v-slot:append-outer>
                                 <v-btn
                                   color="success"
                                   @click="updateDetails()"
-                                  fab
-                                  depressed
+                                  icon
+                                  size="x-small"
                                   :loading="editMode.describe_loading"
-                                  x-small
                                 >
                                   <v-icon> mdi-check </v-icon>
                                 </v-btn>
                               </template>
                             </v-textarea>
                           </div>
-                        </v-tab-item>
-                        <v-tab-item key="tab-chapters" class="pa-0">
+                        </v-window-item>
+                        <v-window-item value="tab-chapters" class="pa-0">
                           <div
                             color="#F5F5F5"
                             flat
@@ -243,28 +235,28 @@
                               </li>
                             </ul>
                           </div>
-                        </v-tab-item>
-                      </v-tabs-items>
+                        </v-window-item>
+                      </v-window>
                     </div>
                     <!--End description-->
                   </div>
 
                   <div class="label-holder">
-                    <v-chip link class="mr-1">
+                    <v-chip link class="mr-1 bg-blue-grey-darken-2">
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData?.section}`"
                       >
                         {{ contentData?.section_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip link class="mr-1">
+                    <v-chip link class="mr-1 bg-blue-grey-darken-2">
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData?.section}&base=${contentData?.base}`"
                       >
                         {{ contentData?.base_title }}
                       </nuxt-link>
                     </v-chip>
-                    <v-chip link class="ma-1">
+                    <v-chip link class="ma-1 bg-blue-grey-darken-2">
                       <nuxt-link
                         :to="`/search?type=learnfiles&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}`"
                       >
@@ -352,13 +344,13 @@
                       class="share_dialog"
                       max-width="600"
                     >
-                      <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
+                      <template v-slot:activator="{ props }">
+                        <span v-bind="props">
                           <i class="fa-solid fa-share-alt mr-1 icon"></i>
                           Share
                         </span>
                       </template>
-                      <template v-slot:default="dialog">
+                      <template v-slot:default="{ isActive }">
                         <v-card>
                           <v-toolbar color="default"> Share </v-toolbar>
                           <v-card-text class="mt-5">
@@ -377,7 +369,7 @@
                                   target="_blank"
                                   block
                                   color="#25d366"
-                                  class="white--text"
+                                  class="text-white"
                                 >
                                   <i class="fab fa-whatsapp mr-1 icon"></i>
                                   WhatsApp
@@ -387,7 +379,7 @@
                                 <v-btn
                                   block
                                   color="#00acee"
-                                  class="white--text"
+                                  class="text-white"
                                   @click="shareSocial('telegram')"
                                 >
                                   <i
@@ -399,9 +391,9 @@
                             </v-row>
                           </v-card-text>
                           <v-card-actions class="justify-end">
-                            <v-btn text @click="dialog.value = false"
-                              >close
-                            </v-btn>
+                            <v-btn text @click="isActive.value = false"
+                              >close</v-btn
+                            >
                           </v-card-actions>
                         </v-card>
                       </template>

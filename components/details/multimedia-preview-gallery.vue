@@ -19,7 +19,7 @@
               :key="index"
               class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip :text="item.text" location="right">
+              <v-tooltip :text="item.text" location="top">
                 <template v-slot:activator="{ props }">
                   <span
                     v-bind="props"
