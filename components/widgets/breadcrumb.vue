@@ -1,6 +1,10 @@
 <template>
   <div class="breadcrumbs-container">
-    <v-breadcrumbs :items="breadItems" v-if="breadItems.length">
+    <v-breadcrumbs
+      class="flex-wrap"
+      :items="breadItems"
+      v-if="breadItems.length"
+    >
       <template v-slot:divider>
         <v-icon>mdi-chevron-right</v-icon>
       </template>
