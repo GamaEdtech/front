@@ -8,7 +8,7 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Side section-->
-          <v-col cols="12" class="pb-0 d-flex">
+          <v-col cols="12" class="d-flex overflow-x-auto pb-2">
             <v-btn
               icon
               large

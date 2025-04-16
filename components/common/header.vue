@@ -143,7 +143,7 @@
       <v-navigation-drawer
         v-model="sidebar"
         app
-        class="d-none d-lg-flex main-sidebar"
+        class="hidden-lg-and-up main-sidebar"
       >
         <v-list density="compact">
           <!-- Profile Info -->
