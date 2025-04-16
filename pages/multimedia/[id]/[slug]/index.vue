@@ -262,19 +262,13 @@
                 </v-row>
 
                 <div class="text-center mt-4">
-                  <!-- <v-rating
-                    v-model="rating"
-                    color="yellow darken-3"
-                    background-color="grey darken-1"
-                    empty-icon="$ratingFull"
-                    half-increments
-                    hover
-                  /> -->
                   <v-rating
                     v-model="rating"
                     hover
+                    background-color="grey-darken-1"
                     color="yellow-darken-3"
                     size="35"
+                    half-increments
                   ></v-rating>
                 </div>
                 <v-divider class="d-none d-md-block" />
