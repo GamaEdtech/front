@@ -55,8 +55,9 @@
                 <nuxt-link
                   class="item-content-subtitle gama-text-caption my-2 d-none d-sm-block"
                   :to="`/paper/${item.id}/${item.title_url}`"
-                  v-html="item.description"
-                ></nuxt-link>
+                >
+                  <span v-html="item.description"></span>
+                </nuxt-link>
                 <div class="mt-3">
                   <v-chip
                     class="mr-1 mb-1 blue-grey darken-1 white--text"
@@ -220,19 +221,25 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "paper-list",
-  props: ["items"],
-  data() {
-    return {};
-  },
-  computed: {
-    display() {
-      return useGlobalDisplay(); // Call the composable
-    },
-  },
-};
+<script setup>
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+// Define props
+const props = defineProps({
+  items: {
+    type: Array,
+    required: true
+  }
+});
+
+// Get the route
+const route = useRoute();
+
+// Get display settings
+const display = computed(() => {
+  return useGlobalDisplay();
+});
 </script>
 
 <style scoped></style>
