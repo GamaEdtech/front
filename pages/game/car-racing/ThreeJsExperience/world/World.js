@@ -5,6 +5,7 @@ import Road from "./Road.js"
 import Mountain from "./Mountain.js"
 import Lighting from "./Lighting.js"
 
+
 export default class World {
     constructor() {
         this.experience = new Experience()

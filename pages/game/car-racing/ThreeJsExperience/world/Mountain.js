@@ -69,7 +69,7 @@ export default class Mountain {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.position.set(
             this.options.mountainSize / 2,
-            0.1,
+            0,
             this.options.mountainWidth / 2
         )
 
@@ -85,8 +85,8 @@ export default class Mountain {
         this.meshLeftMesh = new THREE.Mesh(this.geometry, this.material)
         this.meshLeftMesh.position.set(
             this.options.mountainSize / 2,
-            0.1,
-            this.options.mountainWidth + this.options.groundWidth + (this.options.mountainWidth / 2) - 10
+            0,
+            this.options.mountainWidth + this.options.groundWidth + (this.options.mountainWidth / 2) - 1
         )
         this.meshLeftMesh.rotation.y = Math.PI
 

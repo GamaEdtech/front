@@ -36,7 +36,7 @@ export default class Ground {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.rotation.x = -Math.PI / 2
         this.mesh.position.x = this.options.groundSize / 2
-        this.mesh.position.z = 44
+        this.mesh.position.z = this.options.mountainWidth + (this.options.groundWidth / 2) - 0.1
         this.scene.add(this.mesh)
     }
 

@@ -24,11 +24,11 @@ export default class Experience {
 
         this.options = {
             //ground
-            groundSize: 100,
+            groundSize: 200,
             groundWidth: 30,
             groundColor: "#94dd4b",
             //road
-            roadSize: 100,
+            roadSize: 200,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
             roadFrequencyX: 0.14,
@@ -39,7 +39,7 @@ export default class Experience {
             colorLineSeperator: "#fff480",
             colorLineArround: "#bababa",
             // mountain
-            mountainSize: 100,
+            mountainSize: 200,
             mountainWidth: 30,
             positionFrequency: 0.041,
             strength: 36,

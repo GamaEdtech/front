@@ -48,7 +48,7 @@ export default class Road {
         this.mesh.position.set(
             this.options.roadSize / 2,
             0.5,
-            this.options.mountainWidth + ((this.options.groundWidth - this.options.roadWidth) / 2)
+            this.options.mountainWidth + ((this.options.groundWidth) / 2)
         )
         this.scene.add(this.mesh)
     }

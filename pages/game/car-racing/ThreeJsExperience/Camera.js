@@ -16,19 +16,39 @@ export default class Camera {
         this.debug = this.experience.debug
         this.options = this.experience.options
 
-        this.positionY = 5
+        this.positionY = 2
+        this.positionX = this.options.roadSize
+
+        window.addEventListener("keydown", (event) => {
+            if (event.key == "ArrowUp") {
+                this.positionX -= 0.1
+                const z = this.calculatePositionZ(this.positionX);
+                this.instance.position.set(this.positionX, this.positionY, z)
+            } else if (event.key == "ArrowDown") {
+                this.positionX += 0.1
+                const z = this.calculatePositionZ(this.positionX);
+                this.instance.position.set(this.positionX, this.positionY, z)
+            }
+        })
 
         this.setInstance()
         this.setControls()
         this.setDebug()
     }
 
+    calculatePositionZ(positionx) {
+        const z = Math.cos(positionx * this.options.roadFrequencyX) * this.options.roadAmplitudeX + this.options.mountainWidth + ((this.options.groundWidth) / 2);
+        return z
+    }
+
     setInstance() {
         this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
 
-        this.instance.position.set(100, 100, 100)
-        // this.instance.position.set(this.options.groundSize, this.positionY, this.options.groundSize / 2)
-        // this.instance.lookAt(0, this.positionY, this.options.groundSize / 2)
+        // this.instance.position.set(100, 100, 100)
+
+        const z = this.calculatePositionZ(this.positionX);
+        this.instance.position.set(this.positionX, this.positionY, z)
+
         this.scene.add(this.instance)
     }
 
@@ -55,8 +75,9 @@ export default class Camera {
     update() {
         this.controls.update()
 
-        // this.instance.lookAt(0, this.positionY, this.options.groundSize / 2)
 
+        const z = this.calculatePositionZ(this.positionX - 5);
+        this.instance.lookAt(this.positionX - 5, this.positionY, z)
 
         this.instance.updateProjectionMatrix();
     }
