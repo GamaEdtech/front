@@ -1,3 +1,214 @@
+<script setup>
+
+let pass_recover_dialog = ref(false)
+let google_register_loading =  ref(true)
+let show1 = ref(false)
+let password = ref("")
+let confirmPassword = ref("")
+let pass_recover_loading = ref(false)
+
+let otp = ref("")
+let identity = ref("")
+let otp_loading = ref(false)
+let countDown = ref(60)
+let sendOtpBtnStatus = ref(true)
+
+let identity_holder = ref(true)
+let otp_holder = ref(false)
+let select_pass_holder = ref(false)
+
+
+watch(countDown ,(val) => {
+      //When user wait 10 second
+      if (val === 0) sendOtpBtnStatus.value = false;
+
+      //When user request new otp code
+      if (val === 60) countDownTimer();
+    });
+
+watch(pass_recover_dialog , (val) => {
+      if (val === true) {
+        //Initialize google login
+        setTimeout(() => {
+          window.google.accounts.id.initialize({
+            client_id:
+              "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
+            callback: handleCredentialResponse.value,
+            auto_select: true,
+          });
+
+          window.google.accounts.id.renderButton(googleRegisterBtn.value, {
+            text: "Login",
+            size: "large",
+            width: "252",
+            theme: "outline", // option : filled_black | outline | filled_blue
+          });
+
+          google_register_loading.value = false;
+        }, 4000);
+      }
+    },)
+
+
+// Google login callback
+const handleCredentialResponse = async (response) => {
+
+  const { data, error } = await $fetch('/api/v1/users/googleAuth', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'id_token' : response.credential
+    }) 
+  });
+
+  if (error.value) {
+    if (error.value.status === 401) {
+      // Show error toast for wrong data
+      $toast.error('LOGIN_WRONG_DATA');
+    } else if ([500, 504].includes(error.value.status)) {
+      // Handle request failure
+      $toast.error('REQUEST_FAILED');
+    }
+  } else {
+    // Store user data in authentication
+    auth.setUserToken(data.value.data.jwtToken);
+    auth.setUser(data.value.data.info);
+    passRecoverDialog.value = false;
+    toast.success('Logged in successfully');
+    router.push('/user');
+  }
+};
+
+
+// Handle OTP request
+const requestPassRecover = () => {
+  passRecoverLoading.value = true;
+
+  const { data, error } = $fetch('/api/v1/users/recovery', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'type' : 'request',
+      'identity' : identity.value
+    }),
+  });
+
+  if (error.value) {
+    if (error.value.status === 400) {
+      toast.error(error.value.data.message);
+    }
+  } else {
+    toast.success('Otp code sent');
+    identityHolder.value = false;
+    otpHolder.value = true;
+    countDownTimer();
+  }
+  passRecoverLoading.value = false;
+};
+
+
+// Handle OTP confirmation
+const onFinish = () => {
+  const { data, error } = $fetch('/api/v1/users/recovery', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'type': 'confirm',
+    'identity': identity.value,
+    'code': otp.value,
+    }),
+  });
+
+  if (error.value) {
+    if (error.value.status === 400) {
+      toast.error(error.value.data.message);
+    }
+  } else {
+    otpHolder.value = false;
+    selectPassHolder.value = true;
+  }
+  passRecoverLoading.value = false;
+};
+
+// Resend OTP code
+const sendOtpCodeAgain = () => {
+
+  const { data, error } = $fetch('/api/v1/users/recovery', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'type' : 'resend_code',
+      'identity' : identity.value,
+    }),
+  });
+
+  if (error.value) {
+    if (error.value.status === 400) {
+      toast.error(error.value.data.message);
+    }
+  } else {
+    countDown.value = 60;
+    sendOtpBtnStatus.value = true;
+    toast.success('Otp code sent again');
+  }
+  passRecoverLoading.value = false;
+};
+
+
+// Timer for countdown
+const countDownTimer = () => {
+  if (countDown.value > 0) {
+    setTimeout(() => {
+      countDown.value -= 1;
+      countDownTimer();
+    }, 1000);
+  }
+};
+
+
+// Final password recovery
+const passRecover = () => {
+  passRecoverLoading.value = true;
+  const { data, error } = $fetch('/api/v1/users/recovery', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'type' : 'resetpass',
+      'identity' : identity.value,
+      'pass' : password.value
+    }),
+  });
+
+  if (error.value) {
+    if (error.value.status === 400) {
+      toast.error(error.value.data.message);
+    }
+  } else {
+    toast.success('Password reset successfully');
+    passRecoverDialog.value = false;
+    identityHolder.value = true;
+    otpHolder.value = false;
+    selectPassHolder.value = false;
+  }
+  passRecoverLoading.value = false;
+};
+
+// Cancel password recovery
+const cancelPassRecover = () => {
+  passRecoverDialog.value = false;
+  identityHolder.value = true;
+  otpHolder.value = false;
+  selectPassHolder.value = false;
+};
+
+// Switch to login page
+const switchToLogin = () => {
+  const emit = defineEmits(['update:switchToLogin'])
+  emit('update:switchToLogin', 'login');
+};
+
+// Switch to register page
+const switchToRegister = () => {
+  const emit = defineEmits(['update:switchToRegister'])
+  emit('update:switchToRegister', 'register');
+};
+
+</script>
 <template>
   <v-dialog
     v-model="pass_recover_dialog"
@@ -185,225 +396,7 @@
   </v-dialog>
 </template>
 
-<script>
-// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
-export default {
-  name: "pass-recover",
-  // components: {
-  //   ValidationObserver,
-  //   ValidationProvider,
-  // },
-  data() {
-    return {
-      pass_recover_dialog: false,
-      google_register_loading: true,
-      show1: false,
-      password: "",
-      confirmPassword: "",
-      pass_recover_loading: false,
-
-      otp: "",
-      identity: "",
-      otp_loading: false,
-      countDown: 60,
-      sendOtpBtnStatus: true,
-
-      identity_holder: true,
-      otp_holder: false,
-      select_pass_holder: false,
-    };
-  },
-  watch: {
-    pass_recover_dialog(val) {
-      if (val === true) {
-        //Initialize google login
-        setTimeout(() => {
-          window.google.accounts.id.initialize({
-            client_id:
-              "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-            callback: this.handleCredentialResponse,
-            auto_select: true,
-          });
-
-          window.google.accounts.id.renderButton(this.$refs.googleRegisterBtn, {
-            text: "Login",
-            size: "large",
-            width: "252",
-            theme: "outline", // option : filled_black | outline | filled_blue
-          });
-
-          this.google_register_loading = false;
-        }, 4000);
-      }
-    },
-    countDown(val) {
-      //When user wait 10 second
-      if (val === 0) this.sendOtpBtnStatus = false;
-
-      //When user request new otp code
-      if (val === 60) this.countDownTimer();
-    },
-  },
-  methods: {
-    //Handle google login callback
-    async handleCredentialResponse(response) {
-      const querystring = require("querystring");
-
-      await this.$fetch
-        .post(
-          "/api/v1/users/googleAuth",
-          querystring.stringify({
-            id_token: response.credential,
-          })
-        )
-        .then((response) => {
-          this.$auth.setUserToken(response.data.data.jwtToken);
-          this.$auth.setUser(response.data.data.info);
-          this.pass_recover_dialog = false;
-          this.$toast.success("Logged in successfully");
-
-          this.$router.push({
-            path: "/user",
-          });
-        })
-        .catch(({ response }) => {
-          if (response.status == 401) {
-            this.$toast.error(this.$t(`LOGIN_WRONG_DATA`));
-          } else if (response.status == 500 || response.status == 504) {
-            this.$toast.error(this.$t(`REQUEST_FAILED`));
-          }
-        });
-    },
-    switchToLogin() {
-      this.$emit("update:switchToLogin", "login");
-    },
-    switchToRegister() {
-      this.$emit("update:switchToRegister", "register");
-    },
-    cancelPassRecover() {
-      this.pass_recover_dialog = false;
-      this.identity_holder = true;
-      this.otp_holder = false;
-      this.select_pass_holder = false;
-    },
-    requestPassRecover() {
-      //First level
-      this.pass_recover_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "request",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Otp code sent");
-          this.identity_holder = false;
-          this.otp_holder = true;
-          this.countDownTimer();
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-    onFinish() {
-      //Finish enter otp code--->Second step
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "confirm",
-            identity: this.identity,
-            code: this.otp,
-          })
-        )
-        .then((response) => {
-          this.otp_holder = false;
-          this.select_pass_holder = true;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-    sendOtpCodeAgain() {
-      //Send otp code again
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "resend_code",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.countDown = 60;
-          this.sendOtpBtnStatus = true;
-          this.$toast.success("Otp code sent again");
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-    countDownTimer() {
-      if (this.countDown > 0) {
-        setTimeout(() => {
-          this.countDown -= 1;
-          this.countDownTimer();
-        }, 1000);
-      }
-    },
-    passRecover() {
-      //Final refister (level 3: receive password from user)
-      this.pass_recover_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "resetpass",
-            identity: this.identity,
-            pass: this.password,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Password reset successfully");
-          this.pass_recover_dialog = false;
-          this.identity_holder = true;
-          this.otp_holder = false;
-          this.select_pass_holder = false;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-  },
-};
-</script>
 
 <style scoped>
 .btn-google {

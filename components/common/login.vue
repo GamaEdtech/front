@@ -1,5 +1,86 @@
+<script setup>
+import { ref } from "vue";
+import { useField, useForm } from "vee-validate";
+import * as yup from "yup";
+
+const login_dialog = defineModel(false);
+const passVisible = ref(false);
+const login_loading = ref(false);
+const validationSchema = yup.object().shape({
+  identity: yup
+    .string()
+    .required("Email is required")
+    .email("Must be a valid email"),
+  password: yup.string().required().min(4),
+});
+const { handleSubmit, handleReset } = useForm({
+  validationSchema,
+});
+const identity = useField("identity");
+const password = useField("password");
+
+const otp = ref("");
+const otp_loading = ref(false);
+const countDown = ref(60);
+const sendOtpBtnStatus = ref(true);
+
+const google_login_loading = ref(true);
+const identity_holder = ref(true);
+const otp_holder = ref(false);
+
+const submit = handleSubmit(async () => {
+  login_loading.value = true;
+  try {
+    const response = await fetch("/api/v1/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        identity: identity.value.value,
+        pass: password.value.value,
+        type: "request",
+      }),
+    });
+
+    if (!response.ok) throw await response.json();
+
+    const data = await response.json();
+
+    if (data.type === "loginByOTP") {
+      $toast.success("Otp code sent");
+      identity_holder.value = false;
+      otp_holder.value = true;
+    } else {
+      $auth.setUserToken(data.jwtToken);
+      $auth.setUser(data.info);
+      $toast.success("Logged in successfully");
+      model.value = false;
+      if ($route.path === "/") $router.push({ path: "/user" });
+    }
+  } catch (error) {
+    if (error.status === 400) $toast.error(error.message);
+  } finally {
+    login_loading.value = false;
+  }
+});
+
+const switchToRegister = () => {
+  const emit = defineEmits(['update:switchToRegister'])
+  emit("update:switchToRegister", "register");
+};
+
+const switchToPassRecover = () => {
+  const emit = defineEmits(['update:switchToRegister'])
+  emit("update:switchToPassRecover", "pass_recover");
+};
+
+const recheckEnteredIdentity = () => {
+  otp_holder.value = false;
+  identity_holder.value = true;
+};
+</script>
+
 <template>
-  <v-dialog v-model="model" max-width="300px">
+  <v-dialog v-model="login_dialog" max-width="300px">
     <v-card>
       <v-card-title>
         <span class="text-h5">Login</span>
@@ -62,7 +143,7 @@
                     <v-divider class="mt-3" />
                   </v-col>
                   <v-col cols="6">
-                    <v-btn outlined block @click="model = !model">Cancel</v-btn>
+                    <v-btn outlined block @click="model = !login_dialog">Cancel</v-btn>
                   </v-col>
                   <v-col cols="6">
                     <v-btn
@@ -119,84 +200,7 @@
   </v-dialog>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { useField, useForm } from "vee-validate";
-import * as yup from "yup";
 
-const model = defineModel(false);
-const passVisible = ref(false);
-const login_loading = ref(false);
-const validationSchema = yup.object().shape({
-  identity: yup
-    .string()
-    .required("Email is required")
-    .email("Must be a valid email"),
-  password: yup.string().required().min(4),
-});
-const { handleSubmit, handleReset } = useForm({
-  validationSchema,
-});
-const identity = useField("identity");
-const password = useField("password");
-
-const otp = ref("");
-const otp_loading = ref(false);
-const countDown = ref(60);
-const sendOtpBtnStatus = ref(true);
-
-const google_login_loading = ref(true);
-const identity_holder = ref(true);
-const otp_holder = ref(false);
-
-const submit = handleSubmit(async () => {
-  login_loading.value = true;
-  try {
-    const response = await fetch("/api/v1/users/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        identity: identity.value.value,
-        pass: password.value.value,
-        type: "request",
-      }),
-    });
-
-    if (!response.ok) throw await response.json();
-
-    const data = await response.json();
-
-    if (data.type === "loginByOTP") {
-      $toast.success("Otp code sent");
-      identity_holder.value = false;
-      otp_holder.value = true;
-    } else {
-      $auth.setUserToken(data.jwtToken);
-      $auth.setUser(data.info);
-      $toast.success("Logged in successfully");
-      model.value = false;
-      if ($route.path === "/") $router.push({ path: "/user" });
-    }
-  } catch (error) {
-    if (error.status === 400) $toast.error(error.message);
-  } finally {
-    login_loading.value = false;
-  }
-});
-
-const switchToRegister = () => {
-  emit("update:switchToRegister", "register");
-};
-
-const switchToPassRecover = () => {
-  emit("update:switchToPassRecover", "pass_recover");
-};
-
-const recheckEnteredIdentity = () => {
-  otp_holder.value = false;
-  identity_holder.value = true;
-};
-</script>
 
 <style scoped>
 .btn-google {

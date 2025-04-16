@@ -1,3 +1,203 @@
+<script setup>
+// import { ValidationProvider, ValidationObserver } from "vee-validate";
+let register_dialog = ref(false)
+let google_register_loading = ref(true)
+let show1 = ref(false)
+let password = ref("")
+let confirmPassword = ref("")
+let register_loading = ref(false)
+
+let otp = ref("")
+let identity = ref("")
+let otp_loading = ref(false)
+let countDown = ref(60)
+let sendOtpBtnStatus= ref(true)
+let identity_holder = ref(true)
+let otp_holder = ref(false)
+let select_pass_holder = ref(false)
+
+
+watch(register_dialog, (val) => {
+  if (val === true) {
+    //Initialize google login
+    setTimeout(() => {
+      window.google.accounts.id.initialize({
+        client_id: "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
+        callback: handleCredentialResponse,
+        auto_select: true,
+      })
+
+      window.google.accounts.id.renderButton(
+        document.querySelector("#googleRegisterBtn"),
+        {
+          text: "Login",
+          size: "large",
+          width: "252",
+          theme: "outline",// option : filled_black | outline | filled_blue
+        }
+      )
+
+      google_register_loading.value = false
+    }, 4000)
+  }
+})
+
+watch(countDown, (val) => {
+  //When user wait 10 second
+  if (val === 0) sendOtpBtnStatus.value = false
+  //When user request new otp code
+  if (val === 60) countDownTimer()
+})
+
+const switchToLogin = () => {
+  const emit = defineEmits(['update:switchToLogin'])
+  emit('update:switchToLogin', 'login')
+}
+
+const recheckEnteredIdentity = () => {
+  otp_holder.value = false
+  identity_holder.value = true
+}
+
+const cancelRegister = () => {
+  register_dialog.value = false
+  identity_holder.value = true
+  otp_holder.value = false
+  select_pass_holder.value = false
+}
+
+const requestRegister = () => {
+  register_loading.value = true
+
+  $fetch('/api/v1/users/register', {
+    method: 'POST',
+    body: new URLSearchParams({
+      type: "request",
+      identity: identity.value,
+    })
+  })
+    .then(() => {
+      $toast.success("Otp code sent")
+      identity_holder.value = false
+      otp_holder.value = true
+      countDownTimer()
+    })
+    .catch((err) => {
+      $toast.error(err.response._data.message)
+    })
+    .finally(() => {
+      register_loading.value = false
+    })
+}
+
+
+const onFinish = () => {
+  $fetch('/api/v1/users/register', {
+    method: 'POST',
+    body: new URLSearchParams({
+      type: "confirm",
+      identity: identity.value,
+      code: otp.value,
+    })
+  })
+    .then(() => {
+      otp_holder.value = false
+      select_pass_holder.value = true
+    })
+    .catch((err) => {
+      if (err.response.status === 400) {
+        $toast.error(err.response._data.message)
+      }
+    })
+    .finally(() => {
+      register_loading.value = false
+    })
+}
+
+const sendOtpCodeAgain = () => {
+  $fetch('/api/v1/users/register', {
+    method: 'POST',
+    body: new URLSearchParams({
+      type: "resend_code",
+      identity: identity.value,
+    })
+  })
+    .then(() => {
+      countDown.value = 60
+      sendOtpBtnStatus.value = true
+      $toast.success("Otp code sent again")
+    })
+    .catch((err) => {
+      if (err.response.status === 400) {
+        $toast.error(err.response._data.message)
+      }
+    })
+    .finally(() => {
+      register_loading.value = false
+    })
+}
+
+const countDownTimer = () => {
+  if (countDown.value > 0) {
+    setTimeout(() => {
+      countDown.value -= 1
+      countDownTimer()
+    }, 1000)
+  }
+}
+
+const finalRegister = () => {
+  register_loading.value = true
+
+  $fetch('/api/v1/users/register', {
+    method: 'POST',
+    body: new URLSearchParams({
+      type: "register",
+      identity: identity.value,
+      pass: password.value,
+    })
+  })
+    .then(() => {
+      $toast.success("Registered successfully")
+      register_dialog.value = false
+      identity_holder.value = true
+      otp_holder.value = false
+      select_pass_holder.value = false
+    })
+    .catch((err) => {
+      if (err.response.status === 400) {
+        $toast.error(err.response._data.message)
+      }
+    })
+    .finally(() => {
+      register_loading.value = false
+    })
+}
+
+
+const handleCredentialResponse = async(response) => {
+  await $fetch('/api/v1/users/googleAuth', {
+    method: 'POST',
+    body: new URLSearchParams({
+      id_token: response.credential,
+    })
+  })
+    .then((res) => {
+      $auth.setUserToken(res.data.data.jwtToken)
+      $auth.setUser(res.data.data.info)
+      register_dialog.value = false
+      $toast.success("Logged in successfully")
+      router.push('/user')
+    })
+    .catch(({ response }) => {
+      if (response.status === 401) {
+        $toast.error("Wrong login credentials")
+      } else if (response.status === 500 || response.status === 504) {
+        $toast.error("Request failed")
+      }
+    })
+}
+</script>
 <template>
   <v-dialog v-model="register_dialog" max-width="300px" style="z-index: 20001">
     <v-card>
@@ -185,225 +385,7 @@
   </v-dialog>
 </template>
 
-<script>
-// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
-export default {
-  name: "register",
-  // components: {
-  //   ValidationObserver,
-  //   ValidationProvider,
-  // },
-  data() {
-    return {
-      register_dialog: false,
-      google_register_loading: true,
-      show1: false,
-      password: "",
-      confirmPassword: "",
-      register_loading: false,
-
-      otp: "",
-      identity: "",
-      otp_loading: false,
-      countDown: 60,
-      sendOtpBtnStatus: true,
-
-      identity_holder: true,
-      otp_holder: false,
-      select_pass_holder: false,
-    };
-  },
-  watch: {
-    register_dialog(val) {
-      if (val === true) {
-        //Initialize google login
-        setTimeout(() => {
-          window.google.accounts.id.initialize({
-            client_id:
-              "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-            callback: this.handleCredentialResponse,
-            auto_select: true,
-          });
-
-          window.google.accounts.id.renderButton(this.$refs.googleRegisterBtn, {
-            text: "Login",
-            size: "large",
-            width: "252",
-            theme: "outline", // option : filled_black | outline | filled_blue
-          });
-
-          this.google_register_loading = false;
-        }, 4000);
-      }
-    },
-    countDown(val) {
-      //When user wait 10 second
-      if (val === 0) this.sendOtpBtnStatus = false;
-
-      //When user request new otp code
-      if (val === 60) this.countDownTimer();
-    },
-  },
-  methods: {
-    //Handle google login callback
-    async handleCredentialResponse(response) {
-      const querystring = require("querystring");
-
-      await this.$fetch
-        .post(
-          "/api/v1/users/googleAuth",
-          querystring.stringify({
-            id_token: response.credential,
-          })
-        )
-        .then((response) => {
-          this.$auth.setUserToken(response.data.data.jwtToken);
-          this.$auth.setUser(response.data.data.info);
-          this.register_dialog = false;
-          this.$toast.success("Logged in successfully");
-
-          this.$router.push({
-            path: "/user",
-          });
-        })
-        .catch(({ response }) => {
-          if (response.status == 401) {
-            this.$toast.error(this.$t(`LOGIN_WRONG_DATA`));
-          } else if (response.status == 500 || response.status == 504) {
-            this.$toast.error(this.$t(`REQUEST_FAILED`));
-          }
-        });
-    },
-    switchToLogin() {
-      this.$emit("update:switchToLogin", "login");
-    },
-    recheckEnteredIdentity() {
-      this.otp_holder = false;
-      this.identity_holder = true;
-    },
-    cancelRegister() {
-      this.register_dialog = false;
-      this.identity_holder = true;
-      this.otp_holder = false;
-      this.select_pass_holder = false;
-    },
-    requestRegister() {
-      this.register_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/register",
-          querystring.stringify({
-            type: "request",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Otp code sent");
-          this.identity_holder = false;
-          this.otp_holder = true;
-          this.countDownTimer();
-        })
-        .catch((err) => {
-          // if (err.response.status == 400)
-          this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-    onFinish() {
-      //Finish enter otp code
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/register",
-          querystring.stringify({
-            type: "confirm",
-            identity: this.identity,
-            code: this.otp,
-          })
-        )
-        .then((response) => {
-          this.otp_holder = false;
-          this.select_pass_holder = true;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-    sendOtpCodeAgain() {
-      //Send otp code again
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/register",
-          querystring.stringify({
-            type: "resend_code",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.countDown = 60;
-          this.sendOtpBtnStatus = true;
-          this.$toast.success("Otp code sent again");
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-    countDownTimer() {
-      if (this.countDown > 0) {
-        setTimeout(() => {
-          this.countDown -= 1;
-          this.countDownTimer();
-        }, 1000);
-      }
-    },
-    finalRegister() {
-      //Final refister (level 3: receive password from user)
-      this.register_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/register",
-          querystring.stringify({
-            type: "register",
-            identity: this.identity,
-            pass: this.password,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Registered successfully");
-          this.register_dialog = false;
-          this.identity_holder = true;
-          this.otp_holder = false;
-          this.select_pass_holder = false;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-  },
-};
-</script>
 
 <style scoped>
 .btn-google {

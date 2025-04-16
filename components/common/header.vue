@@ -928,9 +928,7 @@ const endDrag = (e) => {
     mobileSearchSheet.value = false;
 };
 //End search section
-watch(
-  () => currentOpenDialog.value,
-  (val) => {
+watch(currentOpenDialog , (val) =>{
     if (val === "login") {
       register_modal.value.register_dialog = false;
       pass_recover_modal.value.pass_recover_dialog = false;
