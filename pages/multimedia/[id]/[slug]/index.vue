@@ -345,15 +345,15 @@
                       max-width="600"
                     >
                       <template v-slot:activator="{ props }">
-                        <span v-bind="props">
+                        <span v-bind="props" class="pointer">
                           <i class="fa-solid fa-share-alt mr-1 icon"></i>
                           Share
                         </span>
                       </template>
                       <template v-slot:default="{ isActive }">
                         <v-card>
-                          <v-toolbar color="default"> Share </v-toolbar>
-                          <v-card-text class="mt-5">
+                          <v-toolbar color="default" title="Share"> </v-toolbar>
+                          <v-card-text class="">
                             <p class="mb-3">Share this content:</p>
                             <v-row>
                               <v-col cols="12">
@@ -401,15 +401,21 @@
                   </v-col>
                 </v-row>
 
-                <div class="text-center mt-2">
-                  <v-rating
+                <div class="text-center mt-4">
+                  <!-- <v-rating
                     v-model="rating"
                     color="yellow darken-3"
                     background-color="grey darken-1"
                     empty-icon="$ratingFull"
                     half-increments
                     hover
-                  />
+                  /> -->
+                  <v-rating
+                    v-model="rating"
+                    hover
+                    color="yellow-darken-3"
+                    size="35"
+                  ></v-rating>
                 </div>
                 <v-divider class="d-none d-md-block" />
 
