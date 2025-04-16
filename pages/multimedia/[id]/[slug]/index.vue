@@ -7,7 +7,7 @@
     <!--  Start: breadcrumb  -->
     <section>
       <v-container class="py-0">
-        <v-row class="mt-0 py-0 header-path">
+        <v-row class="mt-0 py-0">
           <v-col cols="12">
             <!-- Skeleton loader for breadcrumb -->
             <v-skeleton-loader
