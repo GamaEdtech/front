@@ -572,13 +572,7 @@ const breads = ref([
 
 // Check if the breadcrumb component is being used correctly
 // Make sure to force reactivity update when breadcrumbs change
-watch(
-  breads,
-  (newBreads) => {
-    console.log("Breadcrumbs changed:", newBreads);
-  },
-  { deep: true }
-);
+watch(breads, () => {}, { deep: true });
 
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
@@ -623,7 +617,6 @@ useHead(() => ({
 async function fetchContentData() {
   try {
     const { id } = route.params;
-    console.log(`Fetching data for multimedia ID: ${id}`);
 
     // Use key to ensure proper caching and refresh behavior
     const { data: content } = await useFetch(`/api/v1/files/${id}`, {
@@ -634,7 +627,6 @@ async function fetchContentData() {
     });
 
     if (!content.value) {
-      console.error("API returned no data");
       throw new Error("Content not found - No data returned");
     }
 
@@ -649,18 +641,14 @@ async function fetchContentData() {
 
       // Verify the URL slug matches the content
       if (route.params.slug !== correctSlug) {
-        // If slugs don't match, log warning but continue
-        console.warn("Slug mismatch, but continuing with correct data");
+        // If slugs don't match, continue with correct data
       }
 
-      console.log("Data successfully fetched:", content.value.data.title);
       return content.value.data;
     } else {
-      console.error("API returned status != 1 or no data property");
       throw new Error("Content not found");
     }
   } catch (err) {
-    console.error("API error:", err);
     throw err;
   }
 }
@@ -674,7 +662,6 @@ const {
   `multimedia-details-${route.params.id}`,
   async () => {
     try {
-      console.log("useAsyncData is being called on load/refresh");
       const data = await fetchContentData();
 
       if (data) {
@@ -687,7 +674,6 @@ const {
 
       return data;
     } catch (err) {
-      console.error("Error loading data:", err);
       showError({
         statusCode: err.response?.status || 500,
         message:
@@ -708,26 +694,17 @@ const {
 
 // Initialize page elements
 onMounted(async () => {
-  console.log("Component mounted, checking for data");
-
   // If data is still loading, wait for it
   if (pending.value) {
-    console.log("Data is still loading, waiting...");
     await waitForAsyncData();
   }
 
   // Verify we have content data
   if (!contentData.value || Object.keys(contentData.value).length === 0) {
-    console.log("No content data found after waiting, trying to load again");
     if (asyncContentData.value) {
       contentData.value = asyncContentData.value;
       initBreadCrumb();
     }
-  } else {
-    console.log(
-      "Content data available in mounted:",
-      contentData.value?.title || "No title available"
-    );
   }
 });
 
@@ -759,7 +736,6 @@ watch(
   contentData,
   (newData) => {
     if (newData) {
-      console.log("Content data changed, updating breadcrumbs");
       initBreadCrumb();
     }
   },
@@ -769,7 +745,6 @@ watch(
 // Methods
 function initBreadCrumb() {
   if (!contentData.value || !contentData.value.section_title) {
-    console.log("contentData is empty or incomplete", contentData.value);
     return;
   }
 
@@ -781,8 +756,6 @@ function initBreadCrumb() {
       href: "/search?type=learnfiles",
     },
   ];
-
-  console.log("section_title", contentData.value.section_title);
 
   // Add new breadcrumbs
   if (contentData.value.section_title) {
@@ -808,8 +781,6 @@ function initBreadCrumb() {
       href: `/search?type=test&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
     });
   }
-
-  console.log("breads.value", breads.value);
 }
 
 function openAuthDialog(val) {
@@ -911,7 +882,6 @@ async function updateDetails() {
 
 // Additional methods for data handling
 async function refreshData() {
-  console.log("Manual data refresh triggered");
   try {
     // Clear current data
     contentData.value = {};
@@ -927,13 +897,11 @@ async function refreshData() {
 
     if (content.value?.status === 1 && content.value?.data) {
       contentData.value = content.value.data;
-      console.log("Data refreshed successfully");
       initBreadCrumb();
       return true;
     }
     return false;
   } catch (err) {
-    console.error("Error refreshing data:", err);
     return false;
   }
 }
