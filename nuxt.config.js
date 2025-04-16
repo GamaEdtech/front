@@ -5,8 +5,7 @@ export default {
 
   head: {
     titleTemplate: "%s | Gamatrain",
-    title:
-      "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+    title: "Free Past Papers, Quiz, Powerpoint and Study Guid",
     htmlAttrs: {
       lang: "en",
     },
@@ -28,14 +27,13 @@ export default {
       {
         hid: "apple-mobile-web-app-title",
         name: "apple-mobile-web-app-title",
-        content:
-          "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+        content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
       },
       {
         hid: "og:title",
         name: "og:title",
         content:
-          "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          "Free Past Papers, Quiz, Powerpoint and Study Guid | GamaTrain",
       },
       {
         hid: "og:site_name",
