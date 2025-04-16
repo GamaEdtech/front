@@ -2,13 +2,13 @@
 <template>
   <!--Crash report dialog-->
   <v-dialog v-model="dialog" max-width="800">
-    <v-card>
-      <v-card-title class="text-h5"> Crash report </v-card-title>
+    <v-card title="Crash report">
+      <!-- <v-card-title class="text-h5"> Crash report </v-card-title> -->
       <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
       <form @submit.prevent="sendReport">
         <v-card-text>
           <!-- <validation-provider -->
-          v-slot="{ errors }" name="report_type" rules="required" >
+          <!-- v-slot="{ errors }" name="report_type" rules="required" > -->
           <v-radio-group :error-messages="errors" v-model="form.report_type">
             <v-radio
               v-for="(type, index) in report_type_list"
@@ -20,12 +20,12 @@
           <!-- </validation-provider> -->
 
           <!-- <validation-provider -->
-          v-slot="{ errors }" name="description" rules="required|min:25" >
+          <!-- v-slot="{ errors }" name="description" rules="required|min:25" > -->
           <v-textarea
             label="Description"
             :error-messages="errors"
             v-model="form.message"
-            outlined
+            variant="outlined"
             hint="You must enter at least 25 characters"
             persistent-hint
           />
