@@ -517,35 +517,6 @@ async function updateDetails() {
     editMode.title_loading = false;
   }
 }
-
-async function refreshData() {
-  try {
-    // Clear current data
-    contentData.value = {};
-
-    // Refetch the data
-    const { id } = route.params;
-    const { data: content } = await useFetch(`/api/v1/files/${id}`, {
-      key: `file-${id}-${Date.now()}`, // Use a unique key to force refresh
-      server: false, // Client-side refresh
-      immediate: true,
-      fresh: true, // Force fresh data
-    });
-
-    if (content.value?.status === 1 && content.value?.data) {
-      contentData.value = content.value.data;
-      initBreadCrumb();
-      return true;
-    }
-    return false;
-  } catch (err) {
-    return false;
-  }
-}
-
-defineExpose({
-  refreshData,
-});
 </script>
 
 <style>
