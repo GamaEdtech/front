@@ -8,7 +8,15 @@
     <section>
       <v-row class="mt-0 py-0 header-path">
         <v-col cols="12">
-          <breadcrumb :breads="breads" />
+          <!-- Skeleton loader for breadcrumb -->
+          <v-skeleton-loader
+            v-if="pending"
+            class="mx-auto"
+            type="text"
+            width="60%"
+          ></v-skeleton-loader>
+          <!-- Actual breadcrumb when loaded -->
+          <breadcrumb v-else :breads="breads" />
         </v-col>
       </v-row>
     </section>
@@ -17,7 +25,83 @@
     <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
-        <div class="detail mt-md-8">
+        <!-- Skeleton loading state -->
+        <div v-if="pending" class="detail mt-md-8">
+          <v-row>
+            <!-- Skeleton for gallery -->
+            <v-col cols="12" md="4">
+              <v-skeleton-loader
+                class="mx-auto"
+                type="image"
+                height="296"
+              ></v-skeleton-loader>
+              <v-row class="mt-2">
+                <v-col cols="3" v-for="i in 4" :key="i">
+                  <v-skeleton-loader
+                    class="mx-auto"
+                    type="image"
+                    height="60"
+                    width="80"
+                  ></v-skeleton-loader>
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- Skeleton for description -->
+            <v-col cols="12" md="5">
+              <v-skeleton-loader
+                class="mx-auto mb-4"
+                type="heading"
+              ></v-skeleton-loader>
+
+              <v-skeleton-loader
+                class="mx-auto my-4"
+                type="card"
+                height="300"
+              ></v-skeleton-loader>
+
+              <div class="d-flex mt-4">
+                <v-skeleton-loader
+                  class="mx-1"
+                  type="chip"
+                  width="100"
+                ></v-skeleton-loader>
+                <v-skeleton-loader
+                  class="mx-1"
+                  type="chip"
+                  width="100"
+                ></v-skeleton-loader>
+                <v-skeleton-loader
+                  class="mx-1"
+                  type="chip"
+                  width="100"
+                ></v-skeleton-loader>
+              </div>
+            </v-col>
+
+            <!-- Skeleton for sidebar -->
+            <v-col md="3">
+              <v-skeleton-loader
+                class="mx-auto"
+                type="list-item-avatar"
+              ></v-skeleton-loader>
+
+              <v-skeleton-loader
+                class="mx-auto mt-2"
+                type="list-item-three-line"
+                repeat="4"
+              ></v-skeleton-loader>
+
+              <v-skeleton-loader
+                class="mx-auto mt-4"
+                type="button"
+              ></v-skeleton-loader>
+            </v-col>
+          </v-row>
+        </div>
+
+        <!-- Actual content when loaded -->
+        <div v-else class="detail mt-md-8">
           <v-row>
             <v-col cols="12" md="4">
               <!--Show gallery of preview and book first page-->
@@ -361,8 +445,33 @@
       </v-container>
     </section>
 
+    <!--Mobile order section skeleton-->
+    <v-card
+      v-if="pending"
+      class="order-btn-holder d-block d-md-none"
+      width="100%"
+    >
+      <v-card-text class="pb-0">
+        <v-row class="px-10 text-center">
+          <v-col cols="12" class="pb-1 pt-0">
+            <v-skeleton-loader
+              class="mx-auto"
+              type="button"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col cols="12">
+            <v-skeleton-loader
+              class="mx-auto"
+              type="text"
+              width="90%"
+            ></v-skeleton-loader>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+
     <!--Mobile order section-->
-    <v-card class="order-btn-holder d-block d-md-none" width="100%">
+    <v-card v-else class="order-btn-holder d-block d-md-none" width="100%">
       <v-card-text class="pb-0">
         <v-row class="px-10 text-center">
           <v-col cols="12" class="pb-1 pt-0">
@@ -416,7 +525,26 @@
 
     <!--  End: detail  -->
     <v-container>
-      <v-row>
+      <!-- Skeleton loader for bottom section -->
+      <v-row v-if="pending">
+        <v-col cols="12" md="6">
+          <v-skeleton-loader
+            class="mx-auto mb-4"
+            type="card"
+            height="200"
+          ></v-skeleton-loader>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-skeleton-loader
+            class="mx-auto mb-4"
+            type="card"
+            height="200"
+          ></v-skeleton-loader>
+        </v-col>
+      </v-row>
+
+      <!-- Actual content when loaded -->
+      <v-row v-else>
         <v-col cols="12" md="6">
           <!--  Start: Course Card  -->
         </v-col>
@@ -901,5 +1029,24 @@ p {
 
 .description-holder .v-tabs-bar__content {
   background: #f5f5f5 !important;
+}
+
+/* Skeleton loader styles */
+.v-skeleton-loader__image {
+  border-radius: 6px;
+}
+
+.v-skeleton-loader__card {
+  border-radius: 6px;
+}
+
+.v-skeleton-loader__button {
+  border-radius: 4px;
+}
+
+.v-skeleton-loader__chip {
+  min-width: 100px;
+  min-height: 32px;
+  border-radius: 16px;
 }
 </style>
