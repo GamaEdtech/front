@@ -13,8 +13,7 @@
             <v-skeleton-loader
               v-if="pending"
               class="mx-auto"
-              type="text"
-              width="60%"
+              height="60"
             ></v-skeleton-loader>
             <!-- Actual breadcrumb when loaded -->
             <breadcrumb v-else :breads="breads" />
@@ -34,51 +33,16 @@
             <v-col cols="12" md="4">
               <v-skeleton-loader
                 class="mx-auto"
-                type="image"
-                height="296"
+                height="300"
               ></v-skeleton-loader>
-              <v-row class="mt-2">
-                <v-col cols="3" v-for="i in 4" :key="i">
-                  <v-skeleton-loader
-                    class="mx-auto"
-                    type="image"
-                    height="60"
-                    width="80"
-                  ></v-skeleton-loader>
-                </v-col>
-              </v-row>
             </v-col>
 
             <!-- Skeleton for description -->
             <v-col cols="12" md="5">
               <v-skeleton-loader
-                class="mx-auto mb-4"
-                type="heading"
-              ></v-skeleton-loader>
-
-              <v-skeleton-loader
-                class="mx-auto my-4"
-                type="card"
+                class="mx-auto"
                 height="300"
               ></v-skeleton-loader>
-
-              <div class="d-flex mt-4">
-                <v-skeleton-loader
-                  class="mx-1"
-                  type="chip"
-                  width="100"
-                ></v-skeleton-loader>
-                <v-skeleton-loader
-                  class="mx-1"
-                  type="chip"
-                  width="100"
-                ></v-skeleton-loader>
-                <v-skeleton-loader
-                  class="mx-1"
-                  type="chip"
-                  width="100"
-                ></v-skeleton-loader>
-              </div>
             </v-col>
 
             <!-- Skeleton for sidebar -->
