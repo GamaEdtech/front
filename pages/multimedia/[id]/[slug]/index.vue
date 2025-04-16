@@ -177,82 +177,18 @@
       </v-container>
     </section>
 
-    <!--Mobile order section skeleton-->
-    <v-card
-      v-if="pending"
-      class="order-btn-holder d-block d-md-none"
-      width="100%"
-    >
-      <v-card-text class="pb-0">
-        <v-row class="px-10 text-center">
-          <v-col cols="12" class="pb-1 pt-0">
-            <v-skeleton-loader
-              class="mx-auto"
-              type="button"
-            ></v-skeleton-loader>
-          </v-col>
-          <v-col cols="12">
-            <v-skeleton-loader
-              class="mx-auto"
-              type="text"
-              width="90%"
-            ></v-skeleton-loader>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-
     <!--Mobile order section-->
-    <v-card v-else class="order-btn-holder d-block d-md-none" width="100%">
-      <v-card-text class="pb-0">
-        <v-row class="px-10 text-center">
-          <v-col cols="12" class="pb-1 pt-0">
-            <div v-if="contentData?.files?.ext == 'pptx'">
-              <v-btn
-                @click="startDownload('pptx')"
-                block
-                color="#bf360c"
-                dark
-                class="mb-2"
-              >
-                Download PPTX{{
-                  contentData?.files?.price > 0
-                    ? " | $" + contentData?.files?.price
-                    : ""
-                }}
-              </v-btn>
-            </div>
-          </v-col>
-
-          <v-col cols="12">
-            <div v-if="!checkIsFree" class="mb-4">
-              <p v-if="!isLoggedIn">
-                <span class="mdi mdi-bell icon"></span>
-                <span @click="openAuthDialog('login')" class="login blue--text"
-                  >Login</span
-                >
-                <span
-                  @click="openAuthDialog('register')"
-                  class="register blue--text"
-                >
-                  (register)
-                </span>
-                <span>to download and charge.</span>
-              </p>
-              <span v-else>
-                Your wallet charge is ${{ user?.credit }}
-                <nuxt-link
-                  class="blue--text"
-                  v-if="isLoggedIn"
-                  to="/user/charge-wallet"
-                  >(Top Up Wallet)</nuxt-link
-                >
-              </span>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+    <mobile-order-section
+      v-if="!pending"
+      :file-ext="contentData?.files?.ext || 'pptx'"
+      :price="contentData?.files?.price || 0"
+      :credit="user?.credit || 0"
+      :is-logged-in="isLoggedIn"
+      :download-loading="download_loading"
+      @download="startDownload"
+      @login="openAuthDialog('login')"
+      @register="openAuthDialog('register')"
+    />
     <!--End mobile order section-->
 
     <!--  End: detail  -->
@@ -297,9 +233,7 @@
 
 <script setup>
 import { useFetch, useAsyncData } from "#app";
-import dayjs from "dayjs";
 import FileSaver from "file-saver";
-
 import Breadcrumb from "@/components/widgets/breadcrumb";
 import Category from "@/components/common/category";
 import MultimediaPreviewGallery from "@/components/details/multimedia-preview-gallery.vue";
@@ -307,6 +241,7 @@ import DescriptionSection from "@/components/multimedia/detail/DescriptionSectio
 import TagSection from "@/components/multimedia/detail/TagSection.vue";
 import DownloadSection from "@/components/multimedia/detail/DownloadSection.vue";
 import DetailSidebar from "@/components/multimedia/detail/DetailSidebar.vue";
+import MobileOrderSection from "@/components/multimedia/detail/MobileOrderSection.vue";
 
 // Declare props, emits, and refs
 definePageMeta({
@@ -319,7 +254,6 @@ const router = useRouter();
 const { $auth, $toast } = useNuxtApp();
 
 // Reactive state
-const rating = ref(4.5);
 const contentData = ref({});
 const editMode = reactive({
   title: false,
@@ -335,21 +269,11 @@ const breads = ref([
   },
 ]);
 
-// Check if the breadcrumb component is being used correctly
-// Make sure to force reactivity update when breadcrumbs change
 watch(breads, () => {}, { deep: true });
 
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
 
-// Computed properties
-const checkIsFree = computed(() => {
-  return contentData.value?.files?.price
-    ? contentData.value.files.price <= 0
-    : true;
-});
-
-// Gallery computed properties
 const previewImages = computed(() => {
   return contentData.value?.previewData?.preview || [];
 });
@@ -364,7 +288,6 @@ const previewLinkData = computed(() => {
   };
 });
 
-// Authentication computed properties
 const isLoggedIn = computed(() => {
   return $auth?.loggedIn ?? false;
 });
@@ -373,12 +296,10 @@ const user = computed(() => {
   return $auth?.user ?? null;
 });
 
-// Set page head
 useHead(() => ({
   title: contentData.value?.title || "Multimedia Details",
 }));
 
-// Fetch content data
 async function fetchContentData() {
   try {
     const { id } = route.params;
@@ -418,7 +339,6 @@ async function fetchContentData() {
   }
 }
 
-// Fetch content data with proper key and options
 const {
   pending,
   error,
@@ -457,7 +377,6 @@ const {
   }
 );
 
-// Initialize page elements
 onMounted(async () => {
   // If data is still loading, wait for it
   if (pending.value) {
@@ -473,7 +392,6 @@ onMounted(async () => {
   }
 });
 
-// Helper function to wait for async data to load
 function waitForAsyncData() {
   return new Promise((resolve) => {
     if (!pending.value) {
@@ -496,7 +414,6 @@ function waitForAsyncData() {
   });
 }
 
-// Watch for changes to content data to update breadcrumbs
 watch(
   contentData,
   (newData) => {
@@ -507,7 +424,6 @@ watch(
   { deep: true }
 );
 
-// Methods
 function initBreadCrumb() {
   if (!contentData.value || !contentData.value.section_title) {
     return;
@@ -591,7 +507,6 @@ async function startDownload(type) {
   }
 }
 
-// Form data helpers
 function urlencodeFormData(fd) {
   let s = "";
   for (var pair of fd.entries()) {
@@ -643,7 +558,6 @@ async function updateDetails() {
   }
 }
 
-// Additional methods for data handling
 async function refreshData() {
   try {
     // Clear current data
@@ -669,7 +583,6 @@ async function refreshData() {
   }
 }
 
-// Expose refresh method for when needed
 defineExpose({
   refreshData,
 });
@@ -686,43 +599,7 @@ defineExpose({
   font-size: 18px;
 }
 
-.order-btn-holder {
-  /*position: -webkit-sticky!important;*/
-  position: fixed !important;
-  bottom: 0 !important;
-  z-index: 2 !important;
-  border-top: 0.1rem solid #e1e2e3;
-}
-
-.order-btn-holder .v-btn {
-  width: 40% !important;
-}
-
-.order-btn-holder span {
-  font-size: 1.3rem;
-}
-
 p {
   font-size: 1.3rem !important;
-}
-
-.description-holder .v-tab {
-  font-size: 1rem !important;
-}
-
-.description-holder .description-tabs {
-  background: #f5f5f5 !important;
-  padding: 0.8rem !important;
-  border-radius: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-.description-holder .description-tabs .theme--light.v-tabs-items {
-  background: #f5f5f5 !important;
-  padding: 1.5rem;
-}
-
-.description-holder .v-tabs-bar__content {
-  background: #f5f5f5 !important;
 }
 </style>
