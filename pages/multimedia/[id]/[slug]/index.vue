@@ -1,22 +1,5 @@
 <template>
   <div class="test-details-content">
-    <!-- Snackbar for notifications -->
-    <v-snackbar
-      v-model="snackbar.show"
-      :color="snackbar.color"
-      :timeout="snackbar.timeout"
-      location="top"
-    >
-      {{ snackbar.text }}
-      <template v-slot:actions>
-        <v-btn
-          variant="text"
-          icon="mdi-close"
-          @click="snackbar.show = false"
-        ></v-btn>
-      </template>
-    </v-snackbar>
-
     <!-- Start : Category -->
     <category />
     <!-- End:Category -->
@@ -267,36 +250,6 @@ const breads = ref([
 
 const download_loading = ref(false);
 
-// Snackbar state
-const snackbar = reactive({
-  show: false,
-  text: "",
-  color: "success",
-  timeout: 3000,
-});
-
-// Toast methods
-const toast = {
-  show(text, options = {}) {
-    snackbar.text = text;
-    snackbar.color = options.color || "primary";
-    snackbar.timeout = options.timeout || 3000;
-    snackbar.show = true;
-  },
-  success(text, options = {}) {
-    this.show(text, { color: "success", ...options });
-  },
-  error(text, options = {}) {
-    this.show(text, { color: "error", ...options });
-  },
-  info(text, options = {}) {
-    this.show(text, { color: "info", ...options });
-  },
-  warning(text, options = {}) {
-    this.show(text, { color: "warning", ...options });
-  },
-};
-
 const previewImages = computed(() => {
   return contentData.value?.previewData?.preview || [];
 });
@@ -504,7 +457,7 @@ async function startDownload(type) {
         err.response.data.status == 0 &&
         err.response.data.error == "creditNotEnough"
       ) {
-        toast.info("No enough credit");
+        $toast.info("No enough credit");
       }
     } else if (err.response?.status == 403) {
       router.push({ query: { auth_form: "login" } });
@@ -549,15 +502,15 @@ async function updateDetails() {
     });
 
     if (data.value?.id == 0 && data.value?.repeated) {
-      toast.info("The multimedia is duplicated");
+      $toast.info("The multimedia is duplicated");
     } else {
-      toast.success("Updated successfully");
+      $toast.success("Updated successfully");
     }
   } catch (err) {
     if (err.response?.status == 403) {
       router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status == 400) {
-      toast.error(err.response.data.message);
+      $toast.error(err.response.data.message);
     }
   } finally {
     editMode.title = false;
