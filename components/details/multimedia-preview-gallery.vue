@@ -11,19 +11,21 @@
           <v-col cols="12" class="pb-0 d-flex">
             <v-btn
               icon
+              large
               :small="display.xs.value"
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon mr-1"
+              class="bg-blue-grey-darken-2 mx-3"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="' icon icong-' + item.icon"
+                    style="font-size: 26px"
+                    :class="`text-white text--lighten-1 icon icon-${item.icon} pt-1 `"
                   />
                 </template>
                 <span>{{ item.text }}</span>
@@ -146,31 +148,31 @@ const items = [
   {
     class: "exam",
     text: "Related exam",
-    icon: "azmoon",
+    icon: "exam",
     link: "/search?type=azmoon",
   },
   {
-    class: "test",
+    class: "paper",
     text: "Related paper",
-    icon: "test",
+    icon: "paper",
     link: "/search?type=test",
   },
   {
     class: "content",
     text: "Related multimedia",
-    icon: "learnfiles",
+    icon: "multimedia",
     link: "/search?type=learnfiles",
   },
   {
     class: "faq",
     text: "Related Q & A",
-    icon: "qa",
+    icon: "q-a",
     link: "/search?type=question",
   },
   {
     class: "textbook ",
     text: "Related tutorial",
-    icon: "blog",
+    icon: "tutorial",
     link: "/search?type=dars",
   },
   // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
