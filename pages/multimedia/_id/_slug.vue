@@ -586,17 +586,45 @@ export default {
       title: this.contentData.title,
     };
   },
-  async asyncData({ params, $axios }) {
-    // This could also be an action dispatch
-    const content = await $axios.$get(`/api/v1/files/${params.id}`);
-    var contentData = [];
+  async asyncData({ params, $axios, error }) {
+    try {
+      // Fetch content data from API
+      const content = await $axios.$get(`/api/v1/files/${params.id}`);
 
-    //Check data exist
-    if (content.status === 1) {
-      contentData = content.data;
+      // If content exists
+      if (content.status === 1 && content.data) {
+        // Create a proper slug from the title
+        const correctSlug =
+          content.data.title_url ||
+          content.data.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/-$/, "");
+
+        // Verify the URL slug matches the content
+        if (params.slug !== correctSlug) {
+          // If slugs don't match, we'll still render the page but with the correct data
+          console.warn("Slug mismatch, but continuing with correct data");
+        }
+
+        return { contentData: content.data };
+      } else {
+        // No content found or API returned error
+        return error({
+          statusCode: 404,
+          message: `Page not found: /multimedia/${params.id}/${params.slug}`,
+        });
+      }
+    } catch (err) {
+      // Handle API errors
+      console.error("API error:", err);
+      return error({
+        statusCode: err.response?.status || 500,
+        message:
+          err.response?.data?.message ||
+          "Something went wrong loading the content",
+      });
     }
-
-    return { contentData };
   },
   mounted() {
     //Init gallery image
