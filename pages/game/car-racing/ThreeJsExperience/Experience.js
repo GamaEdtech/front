@@ -23,10 +23,18 @@ export default class Experience {
         this.canvas = canvas
 
         this.options = {
+            // rendered
+            clearColor: "#8ec3fb",
+
+            // fog
+            fogColor: "#8ec3fb",
+            near: 20,
+            far: 100,
+
             //ground
             groundSize: 200,
             groundWidth: 30,
-            groundColor: "#94dd4b",
+            groundColor: "#85d534",
             //road
             roadSize: 200,
             roadWidth: 10,

@@ -9,7 +9,7 @@ export default class Renderer {
         this.scene = this.experience.scene
         this.camera = this.experience.camera.instance
         this.debug = this.experience.debug
-        this.clearColor = "#58b9d6"
+        this.clearColor = this.experience.options.clearColor
 
         this.setInstance()
         this.setDebug()

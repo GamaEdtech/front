@@ -13,6 +13,7 @@ export default class Lighting {
 
 
         this.setDirectioanlLight()
+        this.setFog()
         this.setDebug()
     }
 
@@ -32,12 +33,33 @@ export default class Lighting {
         this.scene.add(this.helper);
     }
 
+    setFog() {
+        this.scene.fog = new THREE.Fog(
+            this.options.fogColor,
+            this.options.near,
+            this.options.far
+        );
+    }
+
     update() {
     }
     setDebug() {
-        const LightFolder = this.debug.ui.addFolder("Ligh")
+        const LightFolder = this.debug.ui.addFolder("Light")
         LightFolder.add(this.directionalLight.position, "x").min(-100).max(200).step(1).name("x light")
         LightFolder.add(this.directionalLight.position, "y").min(-100).max(400).step(1).name("y light")
         LightFolder.add(this.directionalLight.position, "z").min(-100).max(200).step(1).name("z light")
+
+        const FogFolder = this.debug.ui.addFolder("fog")
+        FogFolder.addColor(this.options, "fogColor").name("color fog").onChange(() => {
+            this.scene.fog.color = new THREE.Color(this.options.fogColor)
+        })
+
+        FogFolder.add(this.options, "near").min(0).max(200).step(0.1).name("near fog").onChange(() => {
+            this.scene.fog.near = this.options.near
+        })
+
+        FogFolder.add(this.options, "far").min(0).max(200).step(0.1).name("far fog").onChange(() => {
+            this.scene.fog.far = this.options.far
+        })
     }
 }

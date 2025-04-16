@@ -27,7 +27,7 @@ export default class Ground {
     }
 
     setMaterial() {
-        this.material = new THREE.MeshBasicMaterial({
+        this.material = new THREE.MeshStandardMaterial({
             color: this.groundColor
         })
     }
