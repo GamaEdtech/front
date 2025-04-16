@@ -121,92 +121,15 @@
                       </template>
                     </v-textarea>
                   </div>
-                  <div class="description-holder my-4">
-                    <!--Description-->
-                    <div class="description-tabs">
-                      <v-tabs v-model="description_tab" color="teal">
-                        <v-tab value="tab-description">
-                          <span class="gama-text-caption">Description</span>
-                        </v-tab>
-                        <v-tab value="tab-chapters">
-                          <span class="gama-text-caption">Book chapters</span>
-                        </v-tab>
-                      </v-tabs>
-                    </div>
-                    <div class="description-tabs">
-                      <v-window v-model="description_tab">
-                        <v-window-item
-                          value="tab-description"
-                          class="px-3 py-3"
-                        >
-                          <span
-                            class="gama-text-body2"
-                            v-show="!editMode.describe"
-                            v-html="
-                              contentData?.description
-                                ? contentData?.description.replace(
-                                    /\n/g,
-                                    '<br />'
-                                  )
-                                : ''
-                            "
-                          />
-                          <v-btn
-                            v-if="user?.id == contentData?.user_"
-                            v-show="!editMode.describe"
-                            @click="editMode.describe = true"
-                            icon
-                            size="x-small"
-                          >
-                            <v-icon> mdi-pencil </v-icon>
-                          </v-btn>
-                          <div>
-                            <v-textarea
-                              v-if="editMode.describe"
-                              width="100%"
-                              rows="18"
-                              placeholder="Title"
-                              v-model="contentData.description"
-                            >
-                              <template v-slot:append-outer>
-                                <v-btn
-                                  color="success"
-                                  @click="updateDetails()"
-                                  icon
-                                  size="x-small"
-                                  :loading="editMode.describe_loading"
-                                >
-                                  <v-icon> mdi-check </v-icon>
-                                </v-btn>
-                              </template>
-                            </v-textarea>
-                          </div>
-                        </v-window-item>
-                        <v-window-item value="tab-chapters" class="px-3 py-3">
-                          <div
-                            color="#F5F5F5"
-                            flat
-                            style="max-height: 25rem; overflow-y: auto"
-                          >
-                            <ul class="pl-0" style="list-style-type: none">
-                              <li v-for="item in contentData?.collectionList">
-                                <strong>{{ item.title }}</strong>
-                                <ul
-                                  style="list-style-type: none"
-                                  v-if="item.chapters"
-                                >
-                                  <li v-for="chapter in item.chapters">
-                                    {{ chapter.title }}
-                                  </li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </div>
-                        </v-window-item>
-                      </v-window>
-                    </div>
-                    <!--End description-->
-                  </div>
+
+                  <!-- Use the new description component -->
+                  <description-section
+                    :description="contentData?.description"
+                    :collection-list="contentData?.collectionList"
+                    :can-edit="user?.id == contentData?.user_"
+                    @update:description="contentData.description = $event"
+                    @save="updateDetails"
+                  />
 
                   <div class="label-holder">
                     <v-chip link class="mr-1 bg-blue-grey-darken-2">
@@ -541,6 +464,7 @@ import Breadcrumb from "@/components/widgets/breadcrumb";
 import Category from "@/components/common/category";
 import MultimediaPreviewGallery from "@/components/details/multimedia-preview-gallery.vue";
 import CrashReport from "~/components/common/crash-report.vue";
+import DescriptionSection from "@/components/multimedia/detail/DescriptionSection.vue";
 
 // Declare props, emits, and refs
 definePageMeta({
@@ -554,14 +478,11 @@ const router = useRouter();
 const { $auth, $toast } = useNuxtApp();
 
 // Reactive state
-const description_tab = ref(null);
 const rating = ref(4.5);
 const contentData = ref({});
 const editMode = reactive({
   title: false,
-  describe: false,
   title_loading: false,
-  describe_loading: false,
 });
 
 // Initialize breads with correct structure
@@ -851,7 +772,11 @@ function encode(s) {
 
 async function updateDetails() {
   //Arrange to form data
-  editMode.title_loading = true;
+  const isEditingTitle = editMode.title;
+  if (isEditingTitle) {
+    editMode.title_loading = true;
+  }
+
   let formData = new FormData();
   formData.append("title", contentData.value?.title);
   formData.append("description", contentData.value?.description);
@@ -878,7 +803,6 @@ async function updateDetails() {
     }
   } finally {
     editMode.title = false;
-    editMode.describe = false;
     editMode.title_loading = false;
   }
 }
