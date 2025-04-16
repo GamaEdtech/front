@@ -155,144 +155,22 @@
               </div>
             </v-col>
             <v-col md="3">
-              <v-card flat class="content_main_info">
-                <v-row class="align-center">
-                  <v-col cols="3">
-                    <v-img
-                      :src="contentData?.avatar"
-                      alt=""
-                      class="d-inline-block"
-                      cover
-                      height="48"
-                      width="48"
-                    />
-                  </v-col>
-                  <v-col cols="9" class="pl-0">
-                    <p class="creator_title">
-                      {{ contentData?.first_name }} {{ contentData?.last_name }}
-                    </p>
-                  </v-col>
-                </v-row>
-                <v-divider class="my-2" />
-                <v-row>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-folder mr-1 icon"></i>
-                    File type: {{ contentData?.content_type_title }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-book-open-reader mr-1 icon"></i>
-                    Page count: {{ contentData?.file_pages }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-eye mr-1 icon"></i>
-                    Viewed: {{ contentData?.views }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-calendar-alt mr-1 icon"></i>
-                    Last update: {{ dayjs(contentData?.up_date).fromNow() }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <div @click="openCrashReportDialog" class="pointer">
-                      <i class="fa-solid fa-bug mr-1 icon"></i>
-                      Crash report
-                    </div>
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <!--Dialog for share-->
-                    <v-dialog
-                      transition="dialog-top-transition"
-                      class="share_dialog"
-                      max-width="600"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <span v-bind="props" class="pointer">
-                          <i class="fa-solid fa-share-alt mr-1 icon"></i>
-                          Share
-                        </span>
-                      </template>
-                      <template v-slot:default="{ isActive }">
-                        <v-card>
-                          <v-toolbar color="default" title="Share"> </v-toolbar>
-                          <v-card-text class="">
-                            <p class="mb-3">Share this content:</p>
-                            <v-row>
-                              <v-col cols="12">
-                                <v-btn outlined block @click="copyUrl">
-                                  <i class="fa-solid fa-copy mr-1 icon"></i>
-                                  &nbsp;
-                                  {{ copy_btn }}
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  @click="shareSocial('whatsapp')"
-                                  target="_blank"
-                                  block
-                                  color="#25d366"
-                                  class="text-white"
-                                >
-                                  <i class="fab fa-whatsapp mr-1 icon"></i>
-                                  WhatsApp
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  block
-                                  color="#00acee"
-                                  class="text-white"
-                                  @click="shareSocial('telegram')"
-                                >
-                                  <i
-                                    class="fab fa-telegram-plane mr-1 icon"
-                                  ></i>
-                                  Telegram
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
-                          <v-card-actions class="justify-end">
-                            <v-btn text @click="isActive.value = false"
-                              >close</v-btn
-                            >
-                          </v-card-actions>
-                        </v-card>
-                      </template>
-                    </v-dialog>
-                  </v-col>
-                </v-row>
-
-                <div class="text-center mt-4">
-                  <v-rating
-                    v-model="rating"
-                    hover
-                    background-color="grey-darken-1"
-                    color="yellow-darken-3"
-                    size="35"
-                    half-increments
-                  ></v-rating>
-                </div>
-                <v-divider class="d-none d-md-block" />
-
-                <v-row class="mt-1 d-none d-md-block">
-                  <v-col cols="12" class="pb-0">
-                    <div>
-                      <v-btn
-                        @click="startDownload('pptx')"
-                        block
-                        dark
-                        color="#bf360c"
-                        class="mb-2"
-                      >
-                        Download PPTX{{
-                          contentData?.files?.price > 0
-                            ? " | $" + contentData?.files?.price
-                            : ""
-                        }}
-                      </v-btn>
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-card>
+              <detail-sidebar
+                :avatar="contentData?.avatar"
+                :first-name="contentData?.first_name"
+                :last-name="contentData?.last_name"
+                :content-type-title="contentData?.content_type_title"
+                :file-pages="contentData?.file_pages"
+                :views="contentData?.views"
+                :up-date="contentData?.up_date"
+                :file-ext="contentData?.files?.ext || 'pptx'"
+                :price="contentData?.files?.price || 0"
+                :title="contentData?.title"
+                :download-loading="download_loading"
+                @download="startDownload"
+                @copy-url="copyUrl"
+                @share-social="shareSocial"
+              />
             </v-col>
           </v-row>
         </div>
@@ -414,8 +292,6 @@
     <!-- Start: Feed -->
     <section class="feed"></section>
     <!-- End: Feed -->
-
-    <crash-report ref="crash_report" />
   </div>
 </template>
 
@@ -427,10 +303,10 @@ import FileSaver from "file-saver";
 import Breadcrumb from "@/components/widgets/breadcrumb";
 import Category from "@/components/common/category";
 import MultimediaPreviewGallery from "@/components/details/multimedia-preview-gallery.vue";
-import CrashReport from "~/components/common/crash-report.vue";
 import DescriptionSection from "@/components/multimedia/detail/DescriptionSection.vue";
 import TagSection from "@/components/multimedia/detail/TagSection.vue";
 import DownloadSection from "@/components/multimedia/detail/DownloadSection.vue";
+import DetailSidebar from "@/components/multimedia/detail/DetailSidebar.vue";
 
 // Declare props, emits, and refs
 definePageMeta({
@@ -438,7 +314,6 @@ definePageMeta({
 });
 
 const preview_gallery = ref(null);
-const crash_report = ref(null);
 const route = useRoute();
 const router = useRouter();
 const { $auth, $toast } = useNuxtApp();
@@ -716,11 +591,6 @@ async function startDownload(type) {
   }
 }
 
-function openCrashReportDialog() {
-  crash_report.value.dialog = true;
-  crash_report.value.form.type = "file";
-}
-
 // Form data helpers
 function urlencodeFormData(fd) {
   let s = "";
@@ -854,24 +724,5 @@ p {
 
 .description-holder .v-tabs-bar__content {
   background: #f5f5f5 !important;
-}
-
-/* Skeleton loader styles */
-.v-skeleton-loader__image {
-  border-radius: 6px;
-}
-
-.v-skeleton-loader__card {
-  border-radius: 6px;
-}
-
-.v-skeleton-loader__button {
-  border-radius: 4px;
-}
-
-.v-skeleton-loader__chip {
-  min-width: 100px;
-  min-height: 32px;
-  border-radius: 16px;
 }
 </style>
