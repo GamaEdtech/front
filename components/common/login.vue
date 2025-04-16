@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
 
-const login_dialog = defineModel(false);
+const login_dialog = ref(false);
 const passVisible = ref(false);
 const login_loading = ref(false);
 const validationSchema = yup.object().shape({
