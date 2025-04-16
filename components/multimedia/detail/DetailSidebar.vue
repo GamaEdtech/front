@@ -142,6 +142,7 @@ const emit = defineEmits(["download", "copy-url", "share-social"]);
 const rating = ref(4.5);
 const copyBtnText = ref("Copy");
 const crash_report = ref(null);
+const copy_btn = ref("Copy");
 
 // Computed properties
 const showPrice = computed(() => {
@@ -159,11 +160,17 @@ function openCrashReport() {
 }
 
 function handleCopyUrl() {
-  emit("copy-url");
+  navigator.clipboard.writeText(window.location.href);
+  copy_btn.value = "Copied";
 }
 
 function handleShareSocial(platform) {
-  emit("share-social", platform);
+  if (platform == "whatsapp")
+    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
+  else if (platform == "telegram")
+    window.open(
+      `https://telegram.me/share/url?url=${window.location.href}&text=${props.title}`
+    );
 }
 
 function startDownload() {

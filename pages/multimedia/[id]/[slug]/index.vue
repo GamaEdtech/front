@@ -168,8 +168,6 @@
                 :title="contentData?.title"
                 :download-loading="download_loading"
                 @download="startDownload"
-                @copy-url="copyUrl"
-                @share-social="shareSocial"
               />
             </v-col>
           </v-row>
@@ -177,7 +175,6 @@
       </v-container>
     </section>
 
-    <!--Mobile order section-->
     <mobile-order-section
       v-if="!pending"
       :file-ext="contentData?.files?.ext || 'pptx'"
@@ -189,11 +186,8 @@
       @login="openAuthDialog('login')"
       @register="openAuthDialog('register')"
     />
-    <!--End mobile order section-->
 
-    <!--  End: detail  -->
     <v-container>
-      <!-- Skeleton loader for bottom section -->
       <v-row v-if="pending">
         <v-col cols="12" md="6">
           <v-skeleton-loader
@@ -211,23 +205,12 @@
         </v-col>
       </v-row>
 
-      <!-- Actual content when loaded -->
       <v-row v-else>
-        <v-col cols="12" md="6">
-          <!--  Start: Course Card  -->
-        </v-col>
-
-        <v-col cols="12" md="6">
-          <!--  Start:  Azmoon test album card   -->
-        </v-col>
+        <v-col cols="12" md="6"> </v-col>
+        <v-col cols="12" md="6"> </v-col>
       </v-row>
     </v-container>
-
-    <!-- Start : Sample Test -->
-    <!-- End : Sample test -->
-    <!-- Start: Feed -->
     <section class="feed"></section>
-    <!-- End: Feed -->
   </div>
 </template>
 
@@ -243,7 +226,6 @@ import DownloadSection from "@/components/multimedia/detail/DownloadSection.vue"
 import DetailSidebar from "@/components/multimedia/detail/DetailSidebar.vue";
 import MobileOrderSection from "@/components/multimedia/detail/MobileOrderSection.vue";
 
-// Declare props, emits, and refs
 definePageMeta({
   auth: false,
 });
@@ -252,15 +234,12 @@ const preview_gallery = ref(null);
 const route = useRoute();
 const router = useRouter();
 const { $auth, $toast } = useNuxtApp();
-
-// Reactive state
 const contentData = ref({});
 const editMode = reactive({
   title: false,
   title_loading: false,
 });
 
-// Initialize breads with correct structure
 const breads = ref([
   {
     text: "Multimedia",
@@ -269,9 +248,6 @@ const breads = ref([
   },
 ]);
 
-watch(breads, () => {}, { deep: true });
-
-const copy_btn = ref("Copy");
 const download_loading = ref(false);
 
 const previewImages = computed(() => {
@@ -429,7 +405,6 @@ function initBreadCrumb() {
     return;
   }
 
-  // Clear existing breadcrumbs except the first one
   breads.value = [
     {
       text: "Multimedia",
@@ -438,7 +413,6 @@ function initBreadCrumb() {
     },
   ];
 
-  // Add new breadcrumbs
   if (contentData.value.section_title) {
     breads.value.push({
       text: contentData.value.section_title,
@@ -466,20 +440,6 @@ function initBreadCrumb() {
 
 function openAuthDialog(val) {
   router.push({ query: { auth_form: val } });
-}
-
-function copyUrl() {
-  navigator.clipboard.writeText(window.location.href);
-  copy_btn.value = "Copied";
-}
-
-function shareSocial(social_name) {
-  if (social_name == "whatsapp")
-    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
-  else if (social_name == "telegram")
-    window.open(
-      `https://telegram.me/share/url?url=${window.location.href}&text=${contentData.value?.title}`
-    );
 }
 
 async function startDownload(type) {
