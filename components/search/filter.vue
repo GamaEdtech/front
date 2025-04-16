@@ -1,20 +1,17 @@
-<!-- in refactor proccess -->
-
 <template>
   <div id="search-page-filter">
     <div class="content-search">
       <!--Selected filter, user can disable any filter from here-->
       <div v-show="enabledAppliedFilter()" id="chip-container">
-        <p class="my-2 mb-md-2 font-size-16 font-weight-bold black--text">
+        <p class="my-2 mb-md-2 text-body-1 font-weight-bold text-black">
           Applied filter
         </p>
         <v-divider class="mb-1" />
         <v-chip
           v-if="applied_filter.select_section_title"
           class="mt-1"
-          close
-          label
-          outlined
+          closable
+          variant="outlined"
           @click:close="board_val = 0"
         >
           <span>
@@ -24,9 +21,8 @@
         <v-chip
           v-if="applied_filter.select_base_title"
           class="mt-1"
-          close
-          label
-          outlined
+          closable
+          variant="outlined"
           @click:close="base_val = 0"
         >
           <span>
@@ -36,9 +32,8 @@
         <v-chip
           v-if="applied_filter.select_lesson_title"
           class="mt-1"
-          close
-          label
-          outlined
+          closable
+          variant="outlined"
           @click:close="lesson_val = 0"
         >
           <span>
@@ -48,9 +43,8 @@
         <v-chip
           v-if="applied_filter.select_topic_title"
           class="mt-1"
-          close
-          label
-          outlined
+          closable
+          variant="outlined"
           @click:close="topic_val = 0"
         >
           <span>
@@ -60,23 +54,36 @@
         <v-chip
           v-if="applied_filter.select_file_type_title"
           class="mt-1"
-          close
-          label
-          outlined
+          closable
+          variant="outlined"
           @click:close="file_type_val = 0"
         >
           <span> {{ applied_filter.select_file_type_title }}</span>
         </v-chip>
+        
+        <!-- Year chip -->
         <v-chip
-          v-if="applied_filter.select_test_level_title"
+          v-if="applied_filter.select_year_title"
           class="mt-1"
-          close
-          label
-          outlined
-          @click:close="test_level_val = 0"
+          closable
+          variant="outlined"
+          @click:close="year_val = 0"
         >
           <span>
-            {{ applied_filter.select_test_level_title }}
+            Year: {{ applied_filter.select_year_title }}
+          </span>
+        </v-chip>
+
+        <!-- Month chip -->
+        <v-chip
+          v-if="applied_filter.select_month_title"
+          class="mt-1"
+          closable
+          variant="outlined"
+          @click:close="month_val = 0"
+        >
+          <span>
+            Month: {{ applied_filter.select_month_title }}
           </span>
         </v-chip>
 
@@ -84,15 +91,15 @@
       </div>
       <!--End select filter  -->
 
-      <v-expansion-panels flat v-model="panel">
+      <v-expansion-panels variant="flat" v-model="panel">
         <v-expansion-panel>
-          <v-expansion-panel-header
+          <v-expansion-panel-title
             color="#f5f5f5"
-            class="px-0 font-size-16 font-weight-bold"
+            class="px-0 text-body-1 font-weight-bold"
           >
             Board
-          </v-expansion-panel-header>
-          <v-expansion-panel-content color="#f5f5f5">
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
             <v-row>
               <v-col cols="12" class="content-box">
                 <v-radio-group v-model="board_val" class="mt-0 pr-0" column>
@@ -108,17 +115,17 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!--Grade filter-->
         <v-expansion-panel :disabled="!filter.base_list.length">
-          <v-expansion-panel-header
+          <v-expansion-panel-title
             color="#f5f5f5"
-            class="px-0 font-weight-bold font-size-16"
-            >Grade</v-expansion-panel-header
+            class="px-0 font-weight-bold text-body-1"
+            >Grade</v-expansion-panel-title
           >
-          <v-expansion-panel-content color="#f5f5f5">
+          <v-expansion-panel-text color="#f5f5f5">
             <v-row align="center" justify="center">
               <v-col cols="12" class="content-box">
                 <v-radio-group
@@ -139,17 +146,17 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!--Lesson filter-->
         <v-expansion-panel :disabled="!filter.lesson_list.length">
-          <v-expansion-panel-header
+          <v-expansion-panel-title
             color="#f5f5f5"
             class="px-0 font-weight-bold font-size-16"
-            >Subject</v-expansion-panel-header
+            >Subject</v-expansion-panel-title
           >
-          <v-expansion-panel-content color="#f5f5f5">
+          <v-expansion-panel-text color="#f5f5f5">
             <v-row align="center" justify="center">
               <v-col cols="12" class="content-box">
                 <v-radio-group
@@ -170,17 +177,17 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!--Topic filter-->
         <v-expansion-panel :disabled="!filter.topic_list.length">
-          <v-expansion-panel-header
+          <v-expansion-panel-title
             color="#f5f5f5"
             class="px-0 font-weight-bold font-size-16"
-            >Topic</v-expansion-panel-header
+            >Topic</v-expansion-panel-title
           >
-          <v-expansion-panel-content color="#f5f5f5">
+          <v-expansion-panel-text color="#f5f5f5">
             <v-row align="center" justify="center">
               <v-col cols="12" class="content-box">
                 <v-radio-group
@@ -201,7 +208,7 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!--File type filter-->
@@ -213,7 +220,7 @@
             $route.query.type === 'azmoon'
           "
         >
-          <v-expansion-panel-header
+          <v-expansion-panel-title
             color="#f5f5f5"
             class="px-0 font-size-16 font-weight-bold"
           >
@@ -222,8 +229,8 @@
                 ? "Classification"
                 : "Multimedia Type"
             }}
-          </v-expansion-panel-header>
-          <v-expansion-panel-content color="#f5f5f5">
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
             <v-row align="center" justify="center">
               <v-col cols="12" class="content-box">
                 <v-radio-group
@@ -244,159 +251,214 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
 
+        <!-- Edu year -->
+        <v-expansion-panel v-show="$route.query.type === 'test'">
+          <v-expansion-panel-title
+            color="#f5f5f5"
+            class="px-0 font-weight-bold font-size-16"
+          >
+            Year
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-radio-group
+                  v-model="year_val"
+                  @change="changeYearVal()"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio label="All" color="red" :value="0"> </v-radio>
+                  <v-radio
+                    v-for="(item, key) in filter.year_list"
+                    :key="key"
+                    :label="item"
+                    color="red"
+                    :value="item"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+
+        <!-- End edu year -->
+
+        <!-- Edu month -->
+        <v-expansion-panel v-show="$route.query.type === 'test'">
+          <v-expansion-panel-title
+            color="#f5f5f5"
+            class="px-0 font-size-16 font-weight-bold"
+          >
+            Month
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-radio-group
+                  @change="changeMonthVal()"
+                  v-model="month_val"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio label="All" color="red" :value="0"> </v-radio>
+                  <v-radio
+                    v-for="item in filter.month_list"
+                    :key="item.id"
+                    :label="item.title"
+                    color="red"
+                    :value="item.id"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+
+        <!-- End edu month -->
+
         <!--Test level filter-->
-        <!--      <v-expansion-panel v-show="filter.test_level_list.length>0 && $route.query.type==='test'">-->
-        <!--        <v-expansion-panel-header-->
-        <!--          color="#f5f5f5"-->
-        <!--          class="font-weight-bold font-size-16">-->
-        <!--          Difficulty level-->
-        <!--        </v-expansion-panel-header>-->
-        <!--        <v-expansion-panel-content-->
-        <!--          color="#f5f5f5"-->
-        <!--        >-->
-        <!--          <v-row-->
-        <!--            align="center"-->
-        <!--            justify="center"-->
-        <!--          >-->
-        <!--            <v-col cols="12" class="pt-0 pr-0 m-0" style="height: 100%">-->
-        <!--              <v-radio-group-->
-        <!--                v-model="test_level_val"-->
-        <!--                class="mt-0 pr-0"-->
-        <!--                column-->
-        <!--              >-->
-        <!--                <v-radio-->
-        <!--                  label="All"-->
-        <!--                  color="red"-->
-        <!--                  :value="0"-->
-        <!--                >-->
-        <!--                </v-radio>-->
-        <!--                <v-radio-->
-        <!--                  v-for="item in filter.test_level_list"-->
-        <!--                  :label="item.title"-->
-        <!--                  color="red"-->
-        <!--                  :value="item.id"-->
-        <!--                >-->
-        <!--                </v-radio>-->
+        <!--<v-expansion-panel v-show="filter.test_level_list.length>0 && $route.query.type==='test'">
+          <v-expansion-panel-title
+            color="#f5f5f5"
+            class="px-0 font-weight-bold font-size-16"
+          >
+            Difficulty level
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-radio-group
+                  v-model="test_level_val"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio label="All" color="red" :value="0">
+                  </v-radio>
+                  <v-radio
+                    v-for="item in filter.test_level_list"
+                    :key="item.id"
+                    :label="item.title"
+                    color="red"
+                    :value="item.id"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-text>
+        </v-expansion-panel>-->
 
-        <!--              </v-radio-group>-->
-        <!--            </v-col>-->
-
-        <!--          </v-row>-->
-        <!--        </v-expansion-panel-content>-->
-        <!--      </v-expansion-panel>-->
-
-        <!--Test feature-->
-        <!--      <v-expansion-panel  v-show="$route.query.type==='test'">-->
-        <!--        <v-expansion-panel-header-->
-        <!--          color="#f5f5f5"-->
-        <!--          class="font-weight-bold font-size-16">-->
-        <!--          Test features-->
-        <!--        </v-expansion-panel-header>-->
-        <!--        <v-expansion-panel-content color="#f5f5f5">-->
-        <!--          <v-row-->
-        <!--            align="center"-->
-        <!--            justify="center"-->
-        <!--          >-->
-        <!--            <v-col cols="12" class="pt-0 pr-0 m-0" style="height: 100%">-->
-        <!--              <v-checkbox v-for="item in filter.test_feature_filter"-->
-        <!--                          class="my-0" style="height: 4rem"-->
-        <!--                          @change="changeTestFeature(item.value,item.checkbox)"-->
-        <!--                          :hide-details="true"-->
-        <!--                          color="red"-->
-        <!--                          v-model="item.checkbox"-->
-        <!--                          :label="item.label"-->
-        <!--              />-->
-        <!--            </v-col>-->
-
-        <!--          </v-row>-->
-        <!--        </v-expansion-panel-content>-->
-        <!--      </v-expansion-panel>-->
+        <!--Test features filter -->
+        <!--<v-expansion-panel v-show="$route.query.type==='test'">
+          <v-expansion-panel-title
+            color="#f5f5f5"
+            class="px-0 font-weight-bold font-size-16"
+          >
+            Test features
+          </v-expansion-panel-title>
+          <v-expansion-panel-text color="#f5f5f5">
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="content-box">
+                <v-checkbox 
+                  v-for="item in filter.test_feature_filter"
+                  :key="item.value"
+                  class="my-0" 
+                  style="height: 4rem"
+                  @change="changeTestFeature(item.value, item.checkbox)"
+                  hide-details
+                  color="red"
+                  v-model="item.checkbox"
+                  :label="item.label"
+                />
+              </v-col>
+            </v-row>
+          </v-expansion-panel-text>
+        </v-expansion-panel>-->
 
         <!--State-->
-        <!--      <v-expansion-panel v-show="$route.query.type==='tutor'">-->
-        <!--        <v-expansion-panel-header-->
-        <!--          color="#f5f5f5"-->
-        <!--          class="font-weight-bold font-size-16">-->
-        <!--          State-->
-        <!--        </v-expansion-panel-header>-->
-        <!--        <v-expansion-panel-content-->
-        <!--          color="#f5f5f5"-->
-        <!--        >-->
-        <!--          <v-row-->
-        <!--            align="center"-->
-        <!--            justify="center"-->
-        <!--          >-->
-        <!--            <v-col cols="12" class="pt-0 pr-0 m-0" style="height: 100%">-->
-        <!--              <v-radio-group-->
-        <!--                v-model="state_val"-->
-        <!--                @change="changeStateVal"-->
-        <!--                class="mt-0 pr-0"-->
-        <!--                column-->
-        <!--              >-->
-        <!--                <v-radio-->
-        <!--                  label="All"-->
-        <!--                  color="red"-->
-        <!--                  value="0"-->
-        <!--                >-->
-        <!--                </v-radio>-->
-        <!--                <v-radio-->
-        <!--                  v-for="item in filter.state_list"-->
-        <!--                  :label="item.title"-->
-        <!--                  color="red"-->
-        <!--                  :value="item.id"-->
-        <!--                >-->
-        <!--                </v-radio>-->
-
-        <!--              </v-radio-group>-->
-        <!--            </v-col>-->
-
-        <!--          </v-row>-->
-        <!--        </v-expansion-panel-content>-->
-        <!--      </v-expansion-panel>-->
+        <!--<v-expansion-panel v-show="$route.query.type==='tutor'">
+          <v-expansion-panel-header
+            color="#f5f5f5"
+            class="font-weight-bold font-size-16">
+            State
+          </v-expansion-panel-header>
+          <v-expansion-panel-content
+            color="#f5f5f5"
+          >
+            <v-row
+              align="center"
+              justify="center"
+            >
+              <v-col cols="12" class="pt-0 pr-0 m-0" style="height: 100%">
+                <v-radio-group
+                  v-model="state_val"
+                  @change="changeStateVal"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio
+                    label="All"
+                    color="red"
+                    value="0"
+                  >
+                  </v-radio>
+                  <v-radio
+                    v-for="item in filter.state_list"
+                    :label="item.title"
+                    color="red"
+                    :value="item.id"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>-->
 
         <!--City-->
-        <!--      <v-expansion-panel v-show="filter.city_list.length>0 && $route.query.type==='tutor'">-->
-        <!--        <v-expansion-panel-header-->
-        <!--          color="#f5f5f5"-->
-        <!--          class="font-size-16 font-weight-bold">-->
-        <!--          City-->
-        <!--        </v-expansion-panel-header>-->
-        <!--        <v-expansion-panel-content-->
-        <!--          color="#f5f5f5"-->
-        <!--        >-->
-        <!--          <v-row-->
-        <!--            align="center"-->
-        <!--            justify="center"-->
-        <!--          >-->
-        <!--            <v-col cols="12" class="pt-0 pr-0 m-0" >-->
-        <!--              <v-radio-group-->
-        <!--                v-model="city_val"-->
-        <!--                class="mt-0 pr-0"-->
-        <!--                column-->
-        <!--              >-->
-        <!--                <v-radio-->
-        <!--                  label="All"-->
-        <!--                  color="red"-->
-        <!--                  :value="0"-->
-        <!--                >-->
-        <!--                </v-radio>-->
-        <!--                <v-radio-->
-        <!--                  v-for="item in filter.city_list"-->
-        <!--                  :label="item.title"-->
-        <!--                  color="red"-->
-        <!--                  :value="item.id"-->
-        <!--                >-->
-        <!--                </v-radio>-->
-
-        <!--              </v-radio-group>-->
-        <!--            </v-col>-->
-
-        <!--          </v-row>-->
-        <!--        </v-expansion-panel-content>-->
-        <!--      </v-expansion-panel>-->
+        <!--<v-expansion-panel v-show="filter.city_list.length>0 && $route.query.type==='tutor'">
+          <v-expansion-panel-header
+            color="#f5f5f5"
+            class="font-size-16 font-weight-bold">
+            City
+          </v-expansion-panel-header>
+          <v-expansion-panel-content
+            color="#f5f5f5"
+          >
+            <v-row
+              align="center"
+              justify="center"
+            >
+              <v-col cols="12" class="pt-0 pr-0 m-0" >
+                <v-radio-group
+                  v-model="city_val"
+                  class="mt-0 pr-0"
+                  column
+                >
+                  <v-radio
+                    label="All"
+                    color="red"
+                    :value="0"
+                  >
+                  </v-radio>
+                  <v-radio
+                    v-for="item in filter.city_list"
+                    :label="item.title"
+                    color="red"
+                    :value="item.id"
+                  >
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>-->
       </v-expansion-panels>
     </div>
   </div>
@@ -415,7 +477,12 @@ export default {
       default: 0,
       type: Number,
     },
+    modelValue: {
+      type: Array,
+      default: () => []
+    }
   },
+  emits: ["update:modelValue", "setPageTitle"],
   data() {
     return {
       panel: 0,
@@ -439,12 +506,14 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
+      year_val: this.$route.query.year ? this.$route.query.year : 0,
+      month_val: this.$route.query.month ? this.$route.query.month : 0,
       state_val: 0,
       city_val: 0,
-      word_checkbox_val: false,
-      pdf_checkbox_val: false,
-      free_checkbox_val: false,
-      answer_checkbox_val: false,
+      word_checkbox_val: this.$route.query.word === "1" ? 1 : 0,
+      pdf_checkbox_val: this.$route.query.pdf === "1" ? 1 : 0,
+      free_checkbox_val: this.$route.query.free === "1" ? 1 : 0,
+      answer_checkbox_val: this.$route.query.a_file === "1" ? 1 : 0,
       loadtime: false,
 
       applied_filter: {
@@ -456,6 +525,8 @@ export default {
         select_test_level_title: "",
         select_state_title: "",
         select_city_title: "",
+        select_year_title: "",
+        select_month_title: "",
       },
 
       filter: {
@@ -464,6 +535,21 @@ export default {
         lesson_list: [],
         topic_list: [],
         file_type_list: [],
+        year_list: [2022, 2021, 2020, 2019, 2018, 2017, 2016],
+        month_list: [
+          { id: 1, title: "January" },
+          { id: 2, title: "February" },
+          { id: 3, title: "March" },
+          { id: 4, title: "April" },
+          { id: 5, title: "May" },
+          { id: 6, title: "June" },
+          { id: 7, title: "July" },
+          { id: 8, title: "August" },
+          { id: 9, title: "September" },
+          { id: 10, title: "October" },
+          { id: 11, title: "November" },
+          { id: 12, title: "December" },
+        ],
         test_level_list: [
           {
             id: "1",
@@ -754,7 +840,9 @@ export default {
         this.applied_filter.select_lesson_title ||
         this.applied_filter.select_topic_title ||
         this.applied_filter.select_file_type_title ||
-        this.applied_filter.select_test_level_title
+        this.applied_filter.select_test_level_title ||
+        this.applied_filter.select_year_title ||
+        this.applied_filter.select_month_title
       )
         return true;
       else return false;
@@ -838,7 +926,36 @@ export default {
         this.loadtime = false;
       }
     },
-    //Change topic val option
+    
+    //Change year val option
+    changeYearVal() {
+      this.updateQueryParams();
+      
+      //Enable year title tag
+      if (this.year_val > 0) {
+        this.applied_filter.select_year_title = this.year_val.toString();
+      } else {
+        this.applied_filter.select_year_title = "";
+      }
+      
+      this.setBreadcrumbInfo();
+    },
+
+    //Change month val option
+    changeMonthVal() {
+      this.updateQueryParams();
+      
+      //Enable month title tag
+      if (this.month_val > 0) {
+        this.applied_filter.select_month_title = this.filter.month_list.find(
+          (x) => x.id === this.month_val
+        ).title;
+      } else {
+        this.applied_filter.select_month_title = "";
+      }
+      
+      this.setBreadcrumbInfo();
+    },
 
     //Change file type option
     changeFileTypeVal() {
@@ -877,54 +994,29 @@ export default {
       }
     },
 
-    //Update router query params
-    updateQueryParams() {
-      if (this.loadtime) return;
+    //Test feature type
+    changeTestFeature(type, val) {
+      //Word option
+      if (type === "word")
+        if (val === true) this.word_checkbox_val = 1;
+        else this.word_checkbox_val = 0;
 
-      const query = { type: this.$route.query.type };
-      if (this.board_val !== 0) {
-        query.section = this.board_val;
-      }
-      if (this.base_val !== 0) {
-        query.base = this.base_val;
-      }
-      if (this.lesson_val !== 0) {
-        query.lesson = this.lesson_val;
-      }
-      if (this.topic_val !== 0) {
-        query.topic = this.topic_val;
-      }
-      if (this.file_type_val !== 0 && query.type === "test") {
-        query.test_type = this.file_type_val;
-      }
-      if (this.file_type_val !== 0 && query.type === "learnfiles") {
-        query.file_type = this.file_type_val;
-      }
-      if (this.test_level_val !== 0 && query.type === "test") {
-        query.level = this.test_level_val;
-      }
-      if (this.word_checkbox_val === 1 && query.type === "test") {
-        query.word = 1;
-      }
-      if (this.pdf_checkbox_val === 1 && query.type === "test") {
-        query.pdf = 1;
-      }
-      if (this.free_checkbox_val === 1 && query.type === "test") {
-        query.free = 1;
-      }
-      if (this.answer_checkbox_val === 1 && query.type === "test") {
-        query.a_file = 1;
-      }
-      if (this.state_val != 0 && query.type === "tutor") {
-        query.state = this.state_val;
-      }
-      if (this.city_val !== 0 && query.type === "tutor") {
-        query.city = this.city_val;
-      }
-      // Handle more query parameters here ...
-      this.$router.replace({ query: query }).catch((err) => {
-        //Do noting
-      });
+      //Pdf option
+      if (type === "pdf")
+        if (val === true) this.pdf_checkbox_val = 1;
+        else this.pdf_checkbox_val = 0;
+
+      //Free option
+      if (type === "free")
+        if (val === true) this.free_checkbox_val = 1;
+        else this.free_checkbox_val = 0;
+
+      //By answer option
+      if (type === "a_file")
+        if (val === true) this.answer_checkbox_val = 1;
+        else this.answer_checkbox_val = 0;
+
+      this.updateQueryParams();
     },
 
     //set breadcrumbs
@@ -1014,7 +1106,7 @@ export default {
         //Emit to parent
         this.$emit("setPageTitle", page_title);
       }
-      this.$emit("update:setBreadCrumbs", this.breadcrumbs);
+      this.$emit("update:modelValue", this.breadcrumbs);
     },
     setFilter(type, list) {
       if (type == "board") this.filter.section_list = list;
@@ -1025,9 +1117,9 @@ export default {
     },
 
     //Get file type
-    getFileType() {
-      this.$axios
-        .$get("/api/v1/types/list", {
+    async getFileType() {
+      try {
+        const res = await this.$axios.$get("/api/v1/types/list", {
           params: {
             type:
               this.$route.query.type == "test" ||
@@ -1040,46 +1132,76 @@ export default {
                 ? this.board_val
                 : "",
           },
-        })
-        .then((res) => {
-          this.filter.file_type_list = res.data;
-
-          if (this.$route.query.test_type > 0) {
-            this.file_type_val = this.$route.query.test_type;
-            this.applied_filter.select_file_type_title =
-              this.filter.file_type_list.find(
-                (x) => x.id === this.file_type_val
-              )?.title;
-          }
-        })
-        .catch((err) => {
-          console.error(err);
         });
+        
+        this.filter.file_type_list = res.data;
+
+        if (this.$route.query.test_type > 0) {
+          this.file_type_val = this.$route.query.test_type;
+          this.applied_filter.select_file_type_title =
+            this.filter.file_type_list.find(
+              (x) => x.id === this.file_type_val
+            )?.title;
+        }
+      } catch (err) {
+        console.error(err);
+      }
     },
 
-    //Test feature type
-    changeTestFeature(type, val) {
-      //Word option
-      if (type === "word")
-        if (val === true) this.word_checkbox_val = 1;
-        else this.word_checkbox_val = 0;
+    //Update router query params
+    updateQueryParams() {
+      if (this.loadtime) return;
 
-      //Pdf option
-      if (type === "pdf")
-        if (val === true) this.pdf_checkbox_val = 1;
-        else this.pdf_checkbox_val = 0;
-
-      //Free option
-      if (type === "free")
-        if (val === true) this.free_checkbox_val = 1;
-        else this.free_checkbox_val = 0;
-
-      //By answer option
-      if (type === "a_file")
-        if (val === true) this.answer_checkbox_val = 1;
-        else this.answer_checkbox_val = 0;
-
-      this.updateQueryParams();
+      const query = { type: this.$route.query.type };
+      if (this.board_val !== 0) {
+        query.section = this.board_val;
+      }
+      if (this.base_val !== 0) {
+        query.base = this.base_val;
+      }
+      if (this.lesson_val !== 0) {
+        query.lesson = this.lesson_val;
+      }
+      if (this.topic_val !== 0) {
+        query.topic = this.topic_val;
+      }
+      if (this.file_type_val !== 0 && query.type === "test") {
+        query.test_type = this.file_type_val;
+      }
+      if (this.file_type_val !== 0 && query.type === "learnfiles") {
+        query.file_type = this.file_type_val;
+      }
+      if (this.test_level_val !== 0 && query.type === "test") {
+        query.level = this.test_level_val;
+      }
+      if (this.year_val !== 0 && query.type === "test") {
+        query.year = this.year_val;
+      }
+      if (this.month_val !== 0 && query.type === "test") {
+        query.month = this.month_val;
+      }
+      if (this.word_checkbox_val === 1 && query.type === "test") {
+        query.word = 1;
+      }
+      if (this.pdf_checkbox_val === 1 && query.type === "test") {
+        query.pdf = 1;
+      }
+      if (this.free_checkbox_val === 1 && query.type === "test") {
+        query.free = 1;
+      }
+      if (this.answer_checkbox_val === 1 && query.type === "test") {
+        query.a_file = 1;
+      }
+      if (this.state_val != 0 && query.type === "tutor") {
+        query.state = this.state_val;
+      }
+      if (this.city_val !== 0 && query.type === "tutor") {
+        query.city = this.city_val;
+      }
+      // Handle more query parameters here ...
+      this.$router.replace({ query: query }).catch((err) => {
+        //Do noting
+      });
     },
   },
 };
@@ -1087,16 +1209,16 @@ export default {
 
 <style>
 @media screen and (max-width: 600px) {
-  .content-search .v-expansion-panel-header,
-  .v-expansion-panel-content {
+  .content-search .v-expansion-panel-title,
+  .v-expansion-panel-text {
     background: #fff !important;
   }
 }
 
-.content-search .v-expansion-panel-content__wrap {
+.content-search .v-expansion-panel-text__wrapper {
   padding: 0 0 0 0.6rem !important;
 }
-.content-search .v-expansion-panel-content__wrap .content-box {
+.content-search .v-expansion-panel-text__wrapper .content-box {
   max-height: 20rem;
   overflow-y: auto;
   margin: 0;
@@ -1105,17 +1227,11 @@ export default {
 }
 
 @media (min-width: 960px) {
-  #search-page-filter {
-    #chip-container {
-      .v-chip {
-        .v-chip__content span {
-          width: inherit;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-      }
-    }
+  #search-page-filter #chip-container .v-chip .v-chip__content span {
+    width: inherit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 </style>
