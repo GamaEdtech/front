@@ -144,30 +144,14 @@
               </div>
               <!--   Download Btn and Description  -->
               <div class="text-center download-sec">
-                <div
-                  v-if="!checkIsFree"
-                  class="d-none d-md-block mb-4 gama-text-body2"
-                >
-                  <span v-if="!isLoggedIn">
-                    <span class="mdi mdi-bell icon"></span>
-                    <span @click="openAuthDialog('login')" class="login"
-                      >Login</span
-                    >
-                    <span @click="openAuthDialog('register')" class="register">
-                      (register)
-                    </span>
-                    to download and charge your wallet.
-                  </span>
-                  <span v-else>
-                    Your wallet charge is ${{ user?.credit }}
-                  </span>
-                  <nuxt-link
-                    class="blue--text"
-                    v-if="isLoggedIn"
-                    to="/user/charge-wallet"
-                    >(Top Up Wallet)</nuxt-link
-                  >
-                </div>
+                <download-section
+                  :file-ext="contentData?.files?.ext || 'pptx'"
+                  :price="contentData?.files?.price || 0"
+                  :file-id="route.params.id"
+                  :credit="user?.credit || 0"
+                  @login="openAuthDialog('login')"
+                  @register="openAuthDialog('register')"
+                />
               </div>
             </v-col>
             <v-col md="3">
@@ -452,6 +436,7 @@ import MultimediaPreviewGallery from "@/components/details/multimedia-preview-ga
 import CrashReport from "~/components/common/crash-report.vue";
 import DescriptionSection from "@/components/multimedia/detail/DescriptionSection.vue";
 import TagSection from "@/components/multimedia/detail/TagSection.vue";
+import DownloadSection from "@/components/multimedia/detail/DownloadSection.vue";
 
 // Declare props, emits, and refs
 definePageMeta({
