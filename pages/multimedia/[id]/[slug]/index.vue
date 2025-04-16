@@ -131,29 +131,15 @@
                     @save="updateDetails"
                   />
 
-                  <div class="label-holder">
-                    <v-chip link class="mr-1 bg-blue-grey-darken-2">
-                      <nuxt-link
-                        :to="`/search?type=learnfiles&section=${contentData?.section}`"
-                      >
-                        {{ contentData?.section_title }}
-                      </nuxt-link>
-                    </v-chip>
-                    <v-chip link class="mr-1 bg-blue-grey-darken-2">
-                      <nuxt-link
-                        :to="`/search?type=learnfiles&section=${contentData?.section}&base=${contentData?.base}`"
-                      >
-                        {{ contentData?.base_title }}
-                      </nuxt-link>
-                    </v-chip>
-                    <v-chip link class="ma-1 bg-blue-grey-darken-2">
-                      <nuxt-link
-                        :to="`/search?type=learnfiles&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}`"
-                      >
-                        {{ contentData?.lesson_title }}
-                      </nuxt-link>
-                    </v-chip>
-                  </div>
+                  <!-- Use the new tag section component -->
+                  <tag-section
+                    :section-id="contentData?.section"
+                    :section-title="contentData?.section_title"
+                    :base-id="contentData?.base"
+                    :base-title="contentData?.base_title"
+                    :lesson-id="contentData?.lesson"
+                    :lesson-title="contentData?.lesson_title"
+                  />
                 </div>
               </div>
               <!--   Download Btn and Description  -->
@@ -465,6 +451,7 @@ import Category from "@/components/common/category";
 import MultimediaPreviewGallery from "@/components/details/multimedia-preview-gallery.vue";
 import CrashReport from "~/components/common/crash-report.vue";
 import DescriptionSection from "@/components/multimedia/detail/DescriptionSection.vue";
+import TagSection from "@/components/multimedia/detail/TagSection.vue";
 
 // Declare props, emits, and refs
 definePageMeta({
