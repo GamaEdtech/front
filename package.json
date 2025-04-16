@@ -28,7 +28,9 @@
     "vue-chartjs": "5.3.2",
     "vue3-emoji-picker": "^1.1.8",
     "vuedraggable": "4.1.0",
-    "yup": "^1.6.1"
+    "yup": "^1.6.1",
+    "@types/three": "^0.175.0",
+    "three": "^0.175.0"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
