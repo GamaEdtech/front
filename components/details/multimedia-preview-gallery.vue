@@ -34,18 +34,12 @@
 
           <v-col cols="12">
             <div>
-              <v-carousel
-                height="296"
-                show-arrows
-                cycle
-                :show-arrows-on-hover="!display.xs.value"
-                hide-delimiters
-                v-model="carouselVal"
-              >
+              <v-carousel height="296" hide-delimiters v-model="carouselVal">
                 <v-carousel-item
                   v-for="(image, index) in images"
                   :key="index"
                   :src="image"
+                  cover
                 />
               </v-carousel>
               <div class="thumbnails" v-if="images.length > 1">
@@ -53,18 +47,25 @@
                   center-active
                   class="pa-4"
                   active-class="success"
+                  show-arrows
                 >
-                  <v-slide-item
-                    class="mx-2 thumbnail_itm"
+                  <v-slide-group-item
                     v-for="(image, index) in images"
                     :key="index"
+                    v-slot="{ isSelected, toggle }"
                   >
                     <v-img
-                      :class="carouselVal == index ? 'active_slide' : ''"
+                      :class="{
+                        'mx-2 thumbnail_itm': true,
+                        active_slide: carouselVal === index,
+                      }"
                       @click="changeSlide(index)"
                       :src="image"
+                      height="60"
+                      width="80"
+                      cover
                     />
-                  </v-slide-item>
+                  </v-slide-group-item>
                 </v-slide-group>
               </div>
             </div>
@@ -75,71 +76,119 @@
   </v-row>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, watch } from "vue";
 import { useDisplay } from "vuetify";
 
-export default {
-  name: "multimedia-preview-gallery",
-  setup() {
-    const display = useDisplay();
-    return { display };
+// Define props
+const props = defineProps({
+  galleryImages: {
+    type: Array,
+    default: () => [],
   },
-  data() {
-    return {
-      carouselVal: null,
-      images: [],
-      help_link_data: {
-        state: "",
-        section: "",
-        base: "",
-        course: "",
-        lesson: "",
-      },
+  linkData: {
+    type: Object,
+    default: () => ({
+      state: "",
+      section: "",
+      base: "",
+      course: "",
+      lesson: "",
+    }),
+  },
+  initialSlide: {
+    type: Number,
+    default: 0,
+  },
+});
 
-      active_img: 1,
+// Setup Vuetify display composable
+const display = useDisplay();
 
-      items: [
-        {
-          class: "exam",
-          text: "Related exam",
-          icon: "azmoon",
-          link: "/search?type=azmoon",
-        },
-        {
-          class: "test",
-          text: "Related paper",
-          icon: "test",
-          link: "/search?type=test",
-        },
-        {
-          class: "content",
-          text: "Related multimedia",
-          icon: "learnfiles",
-          link: "/search?type=learnfiles",
-        },
-        {
-          class: "faq",
-          text: "Related Q & A",
-          icon: "qa",
-          link: "/search?type=question",
-        },
-        {
-          class: "textbook ",
-          text: "Related tutorial",
-          icon: "blog",
-          link: "/search?type=dars",
-        },
-        // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
-        // { class: "tutor", text: "Tutor", icon: "teacher" ,link:"/search?type=tutor" },
-      ],
-    };
+// Define refs and reactive state
+const carouselVal = ref(props.initialSlide);
+const images = ref(props.galleryImages || []);
+const help_link_data = reactive({ ...props.linkData });
+
+// Watch for prop changes
+watch(
+  () => props.galleryImages,
+  (newImages) => {
+    if (newImages && newImages.length) {
+      images.value = newImages;
+    }
   },
-  methods: {
-    changeSlide(index) {
-      this.carouselVal = index;
-    },
+  { immediate: true }
+);
+
+watch(
+  () => props.linkData,
+  (newData) => {
+    if (newData) {
+      Object.assign(help_link_data, newData);
+    }
   },
-};
+  { immediate: true, deep: true }
+);
+
+watch(
+  () => props.initialSlide,
+  (newSlide) => {
+    if (newSlide !== undefined) {
+      carouselVal.value = newSlide;
+    }
+  }
+);
+
+const active_img = ref(1);
+
+const items = [
+  {
+    class: "exam",
+    text: "Related exam",
+    icon: "azmoon",
+    link: "/search?type=azmoon",
+  },
+  {
+    class: "test",
+    text: "Related paper",
+    icon: "test",
+    link: "/search?type=test",
+  },
+  {
+    class: "content",
+    text: "Related multimedia",
+    icon: "learnfiles",
+    link: "/search?type=learnfiles",
+  },
+  {
+    class: "faq",
+    text: "Related Q & A",
+    icon: "qa",
+    link: "/search?type=question",
+  },
+  {
+    class: "textbook ",
+    text: "Related tutorial",
+    icon: "blog",
+    link: "/search?type=dars",
+  },
+  // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
+  // { class: "tutor", text: "Tutor", icon: "teacher" ,link:"/search?type=tutor" },
+];
+
+// Methods
+function changeSlide(index) {
+  carouselVal.value = index;
+}
+
+// Still expose refs for backward compatibility
+defineExpose({
+  carouselVal,
+  images,
+  help_link_data,
+  changeSlide,
+});
 </script>
 
 <style lang="scss" scoped>
@@ -154,9 +203,16 @@ export default {
   width: 100%;
 }
 
-.thumbnails .thumbnail_itm {
+.thumbnail_itm {
   max-width: 80px !important;
   max-height: 80px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -170,7 +226,7 @@ export default {
     width: 100%;
   }
 
-  .thumbnails .thumbnail_itm {
+  .thumbnail_itm {
     max-width: 50px !important;
     max-height: 40px !important;
   }

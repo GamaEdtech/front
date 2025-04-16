@@ -21,7 +21,12 @@
           <v-row>
             <v-col cols="12" md="4">
               <!--Show gallery of preview and book first page-->
-              <multimedia-preview-gallery ref="preview_gallery" />
+              <multimedia-preview-gallery
+                ref="preview_gallery"
+                :gallery-images="previewImages"
+                :link-data="previewLinkData"
+                :initial-slide="0"
+              />
               <!--Show gallery of preview and book first page-->
             </v-col>
             <v-col cols="12" md="5">
@@ -463,6 +468,8 @@ const editMode = reactive({
   title_loading: false,
   describe_loading: false,
 });
+
+// Initialize breads with correct structure
 const breads = ref([
   {
     text: "Multimedia",
@@ -470,6 +477,17 @@ const breads = ref([
     href: "/search?type=learnfiles",
   },
 ]);
+
+// Check if the breadcrumb component is being used correctly
+// Make sure to force reactivity update when breadcrumbs change
+watch(
+  breads,
+  (newBreads) => {
+    console.log("Breadcrumbs changed:", newBreads);
+  },
+  { deep: true }
+);
+
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
 
@@ -478,6 +496,21 @@ const checkIsFree = computed(() => {
   return contentData.value?.files?.price
     ? contentData.value.files.price <= 0
     : true;
+});
+
+// Gallery computed properties
+const previewImages = computed(() => {
+  return contentData.value?.previewData?.preview || [];
+});
+
+const previewLinkData = computed(() => {
+  return {
+    state: contentData.value?.state || "",
+    section: contentData.value?.section || "",
+    base: contentData.value?.base || "",
+    course: contentData.value?.course || "",
+    lesson: contentData.value?.lesson || "",
+  };
 });
 
 // Authentication computed properties
@@ -498,7 +531,20 @@ useHead(() => ({
 async function fetchContentData() {
   try {
     const { id } = route.params;
-    const { data: content } = await useFetch(`/api/v1/files/${id}`);
+    console.log(`Fetching data for multimedia ID: ${id}`);
+
+    // Use key to ensure proper caching and refresh behavior
+    const { data: content } = await useFetch(`/api/v1/files/${id}`, {
+      key: `file-${id}`,
+      dedupe: "cancel", // Cancel previous identical requests
+      server: true, // Ensure it runs on server
+      immediate: true, // Start fetching immediately
+    });
+
+    if (!content.value) {
+      console.error("API returned no data");
+      throw new Error("Content not found - No data returned");
+    }
 
     if (content.value?.status === 1 && content.value?.data) {
       // Create a proper slug from the title
@@ -515,9 +561,10 @@ async function fetchContentData() {
         console.warn("Slug mismatch, but continuing with correct data");
       }
 
-      contentData.value = content.value.data;
+      console.log("Data successfully fetched:", content.value.data.title);
       return content.value.data;
     } else {
+      console.error("API returned status != 1 or no data property");
       throw new Error("Content not found");
     }
   } catch (err) {
@@ -526,62 +573,151 @@ async function fetchContentData() {
   }
 }
 
-// Call asyncData on component creation
-useAsyncData("multimedia-details", async () => {
-  try {
-    await fetchContentData();
-  } catch (err) {
-    showError({
-      statusCode: err.response?.status || 500,
-      message:
-        err.response?.data?.message ||
-        "Something went wrong loading the content",
-    });
+// Fetch content data with proper key and options
+const {
+  pending,
+  error,
+  data: asyncContentData,
+} = useAsyncData(
+  `multimedia-details-${route.params.id}`,
+  async () => {
+    try {
+      console.log("useAsyncData is being called on load/refresh");
+      const data = await fetchContentData();
+
+      if (data) {
+        // Update the contentData ref with the fetched data
+        contentData.value = data;
+
+        // Initialize breadcrumbs after data is loaded
+        initBreadCrumb();
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Error loading data:", err);
+      showError({
+        statusCode: err.response?.status || 500,
+        message:
+          err.response?.data?.message ||
+          "Something went wrong loading the content",
+      });
+      return null;
+    }
+  },
+  {
+    // Add these options to ensure it re-executes on page refresh
+    server: true,
+    lazy: false,
+    immediate: true,
+    watch: [() => route.params.id],
   }
-});
+);
 
 // Initialize page elements
-onMounted(() => {
-  if (contentData.value) {
-    // Set gallery images and carousel position
-    preview_gallery.value.images =
-      contentData.value?.previewData?.preview || [];
-    preview_gallery.value.carouselVal = 0;
+onMounted(async () => {
+  console.log("Component mounted, checking for data");
 
-    // Update help link data
-    preview_gallery.value.help_link_data = {
-      state: contentData.value?.state || "",
-      section: contentData.value?.section || "",
-      base: contentData.value?.base || "",
-      course: contentData.value?.course || "",
-      lesson: contentData.value?.lesson || "",
-    };
-    initBreadCrumb();
+  // If data is still loading, wait for it
+  if (pending.value) {
+    console.log("Data is still loading, waiting...");
+    await waitForAsyncData();
+  }
+
+  // Verify we have content data
+  if (!contentData.value || Object.keys(contentData.value).length === 0) {
+    console.log("No content data found after waiting, trying to load again");
+    if (asyncContentData.value) {
+      contentData.value = asyncContentData.value;
+      initBreadCrumb();
+    }
+  } else {
+    console.log(
+      "Content data available in mounted:",
+      contentData.value?.title || "No title available"
+    );
   }
 });
+
+// Helper function to wait for async data to load
+function waitForAsyncData() {
+  return new Promise((resolve) => {
+    if (!pending.value) {
+      resolve();
+      return;
+    }
+
+    const checkInterval = setInterval(() => {
+      if (!pending.value) {
+        clearInterval(checkInterval);
+        resolve();
+      }
+    }, 100);
+
+    // Add a safety timeout after 5 seconds
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      resolve();
+    }, 5000);
+  });
+}
+
+// Watch for changes to content data to update breadcrumbs
+watch(
+  contentData,
+  (newData) => {
+    if (newData) {
+      console.log("Content data changed, updating breadcrumbs");
+      initBreadCrumb();
+    }
+  },
+  { deep: true }
+);
 
 // Methods
 function initBreadCrumb() {
-  if (!contentData.value) return;
-  console.log("contentData", contentData.value);
+  if (!contentData.value || !contentData.value.section_title) {
+    console.log("contentData is empty or incomplete", contentData.value);
+    return;
+  }
 
-  breads.value.push(
+  // Clear existing breadcrumbs except the first one
+  breads.value = [
     {
-      text: contentData.value?.section_title,
+      text: "Multimedia",
       disabled: false,
-      href: `/search?type=learnfiles&section=${contentData.value?.section}`,
+      href: "/search?type=learnfiles",
     },
-    {
-      text: contentData.value?.base_title,
+  ];
+
+  console.log("section_title", contentData.value.section_title);
+
+  // Add new breadcrumbs
+  if (contentData.value.section_title) {
+    breads.value.push({
+      text: contentData.value.section_title,
       disabled: false,
-      href: `/search?type=test&section=${contentData.value?.section}&base=${contentData.value?.base}`,
-    },
-    {
-      text: contentData.value?.lesson_title,
+      href: `/search?type=learnfiles&section=${contentData.value.section}`,
+    });
+  }
+
+  if (contentData.value.base_title) {
+    breads.value.push({
+      text: contentData.value.base_title,
       disabled: false,
-      href: `/search?type=test&section=${contentData.value?.section}&base=${contentData.value?.base}&lesson=${contentData.value?.lesson}`,
-    }
-  );
+      href: `/search?type=test&section=${contentData.value.section}&base=${contentData.value.base}`,
+    });
+  }
+
+  if (contentData.value.lesson_title) {
+    breads.value.push({
+      text: contentData.value.lesson_title,
+      disabled: false,
+      href: `/search?type=test&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
+    });
+  }
+
+  console.log("breads.value", breads.value);
 }
 
 function openAuthDialog(val) {
@@ -680,6 +816,40 @@ async function updateDetails() {
     editMode.title_loading = false;
   }
 }
+
+// Additional methods for data handling
+async function refreshData() {
+  console.log("Manual data refresh triggered");
+  try {
+    // Clear current data
+    contentData.value = {};
+
+    // Refetch the data
+    const { id } = route.params;
+    const { data: content } = await useFetch(`/api/v1/files/${id}`, {
+      key: `file-${id}-${Date.now()}`, // Use a unique key to force refresh
+      server: false, // Client-side refresh
+      immediate: true,
+      fresh: true, // Force fresh data
+    });
+
+    if (content.value?.status === 1 && content.value?.data) {
+      contentData.value = content.value.data;
+      console.log("Data refreshed successfully");
+      initBreadCrumb();
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("Error refreshing data:", err);
+    return false;
+  }
+}
+
+// Expose refresh method for when needed
+defineExpose({
+  refreshData,
+});
 </script>
 
 <style>
