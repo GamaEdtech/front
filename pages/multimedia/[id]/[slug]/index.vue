@@ -108,7 +108,7 @@
                       placeholder="Title"
                       v-model="contentData.title"
                     >
-                      <template v-slot:append-outer>
+                      <template v-slot:append-inner>
                         <v-btn
                           color="success"
                           @click="updateDetails()"

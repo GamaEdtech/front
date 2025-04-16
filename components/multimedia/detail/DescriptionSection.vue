@@ -36,7 +36,7 @@
               placeholder="Description"
               v-model="description"
             >
-              <template v-slot:append-outer>
+              <template v-slot:append-inner>
                 <v-btn
                   color="success"
                   @click="saveDescription"
