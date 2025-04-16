@@ -3,14 +3,13 @@
     <v-tabs v-model="active_tab">
       <v-tab @click="openLink('test')">
         <v-badge
-          bordered
           class="pa-1 mx-1 badge-sample"
-          color="#2962ff"
+          color="blue"
           :content="content_statistics.test"
         >
           <div class="nav-link sample-q-icon">
             <span class="icon icon-paper"></span>
-            Past Papers
+            Past Papers2
           </div>
         </v-badge>
       </v-tab>
@@ -78,95 +77,88 @@
     </v-tabs>
   </v-card>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      active_tab: 0,
-      content_statistics: {
-        azmoon: "--",
-        dars: "--",
-        learnfiles: "--",
-        question: "--",
-        test: "--",
-        tutor: "--",
-        tutorial: "--",
-      },
-    };
-  },
-  beforeMount() {
-    var active_route = this.$route.query.type;
-    if (active_route === "test") this.active_tab = 0;
-    else if (active_route === "learnfiles") this.active_tab = 1;
-    else if (active_route === "question") this.active_tab = 2;
-    else if (active_route === "azmoon") this.active_tab = 3;
-    else if (active_route === "dars") this.active_tab = 4;
-    else if (active_route === "tutor") this.active_tab = 5;
-  },
-  beforeDestroy() {
-    // window.removeEventListener('scroll', this.testHeader);
-  },
 
-  watch: {
-    "$route.query.type"(active_route) {
-      if (active_route === "test") this.active_tab = 0;
-      else if (active_route === "learnfiles") this.active_tab = 1;
-      else if (active_route === "question") this.active_tab = 2;
-      else if (active_route === "azmoon") this.active_tab = 3;
-      else if (active_route === "dars") this.active_tab = 4;
-      else if (active_route === "tutor") this.active_tab = 5;
-    },
-  },
-  methods: {
-    openLink(val) {
-      const query = { type: val };
-      if (this.$route.query.section) {
-        query.section = this.$route.query.section;
-      }
-      if (this.$route.query.base) {
-        query.base = this.$route.query.base;
-      }
-      if (this.$route.query.lesson) {
-        query.lesson = this.$route.query.lesson;
-      }
-      if (this.$route.query.topic) {
-        query.topic = this.$route.query.topic;
-      }
-      if (this.$route.query.test_type !== 0 && query.type === "test") {
-        query.test_type = this.$route.query.test_type;
-      }
-      if (this.$route.query.level !== 0 && query.type === "test") {
-        query.level = this.$route.query.level;
-      }
-      if (this.$route.query.word === 1 && query.type === "test") {
-        query.word = 1;
-      }
-      if (this.$route.query.pdf === 1 && query.type === "test") {
-        query.pdf = 1;
-      }
-      if (this.$route.query.free === 1 && query.type === "test") {
-        query.free = 1;
-      }
-      if (this.$route.query.a_file === 1 && query.type === "test") {
-        query.a_file = 1;
-      }
+<script setup>
+const route = useRoute();
+const router = useRouter();
 
-      this.$router.replace({ query: query });
-    },
+const active_tab = ref(0);
+const content_statistics = ref({
+  azmoon: "--",
+  dars: "--",
+  learnfiles: "--",
+  question: "--",
+  test: "--",
+  tutor: "--",
+  tutorial: "--",
+});
 
-    // testHeader() {
-    //     let header = document.querySelector(".sticky-scroll")
-    //     if (scrollY > 210) {
-    //         header.classList.add("scroll-header")
-    //     } else if (scrollY < 200) {
-    //         header.classList.remove("scroll-header")
-    //     }
-    // }
-  },
+// Set the active tab based on the route
+onBeforeMount(() => {
+  setActiveTabFromRoute(route.query.type);
+});
+
+// Watch for route changes
+watch(() => route.query.type, (newVal) => {
+  setActiveTabFromRoute(newVal);
+});
+
+// Helper function to set the active tab
+const setActiveTabFromRoute = (routeType) => {
+  if (routeType === "test") active_tab.value = 0;
+  else if (routeType === "learnfiles") active_tab.value = 1;
+  else if (routeType === "question") active_tab.value = 2;
+  else if (routeType === "azmoon") active_tab.value = 3;
+  else if (routeType === "dars") active_tab.value = 4;
+  else if (routeType === "tutor") active_tab.value = 5;
 };
-</script>
 
-<style>
+// Function to open a link
+const openLink = (val) => {
+  const query = { type: val };
+  if (route.query.section) {
+    query.section = route.query.section;
+  }
+  if (route.query.base) {
+    query.base = route.query.base;
+  }
+  if (route.query.lesson) {
+    query.lesson = route.query.lesson;
+  }
+  if (route.query.topic) {
+    query.topic = route.query.topic;
+  }
+  if (route.query.test_type !== 0 && query.type === "test") {
+    query.test_type = route.query.test_type;
+  }
+  if (route.query.level !== 0 && query.type === "test") {
+    query.level = route.query.level;
+  }
+  if (route.query.word === 1 && query.type === "test") {
+    query.word = 1;
+  }
+  if (route.query.pdf === 1 && query.type === "test") {
+    query.pdf = 1;
+  }
+  if (route.query.free === 1 && query.type === "test") {
+    query.free = 1;
+  }
+  if (route.query.a_file === 1 && query.type === "test") {
+    query.a_file = 1;
+  }
+
+  router.replace({ query: query });
+};
+
+// Expose content_statistics for parent components to set
+defineExpose({
+  content_statistics
+});
+</script>
+<style lang="scss" scoped>
+// .v-toolbar.v-toolbar--flat.v-toolbar--density-default.v-theme--light.v-locale--is-ltr.v-app-bar.d-block.d-lg-none .mobile_bar{
+//   display: none;
+// }
 #search-top-filter {
   .icon-paper,
   .icon-multimedia,
@@ -174,6 +166,9 @@ export default {
   .icon-exam {
     font-size: 3rem !important;
   }
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 /*Remove default style for vuetify tabs and apply new style*/
