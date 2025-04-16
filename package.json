@@ -27,6 +27,7 @@
     "nuxt-leaflet": "^0.0.27",
     "stats.js": "^0.17.0",
     "three": "^0.175.0",
+    "three-custom-shader-material": "^6.3.5",
     "v-emoji-picker": "^2.3.3",
     "vee-validate": "^3.4.14",
     "vue-advanced-cropper": "^1.11.5",

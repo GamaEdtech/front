@@ -11,8 +11,7 @@ export default class Ground {
         this.debug = this.experience.debug
         this.options = this.experience.options
 
-        this.groundColor = "#70b449"
-        this.groundSize = this.options.groundSize
+        this.groundColor = this.options.groundColor
 
 
         this.setGeometry()
@@ -24,7 +23,7 @@ export default class Ground {
     }
 
     setGeometry() {
-        this.geometry = new THREE.PlaneGeometry(this.groundSize, this.groundSize)
+        this.geometry = new THREE.PlaneGeometry(this.options.groundSize, this.options.groundWidth)
     }
 
     setMaterial() {
@@ -36,8 +35,8 @@ export default class Ground {
     setMesh() {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.rotation.x = -Math.PI / 2
-        this.mesh.position.x = this.groundSize / 2
-        this.mesh.position.z = this.groundSize / 2
+        this.mesh.position.x = this.options.groundSize / 2
+        this.mesh.position.z = 44
         this.scene.add(this.mesh)
     }
 

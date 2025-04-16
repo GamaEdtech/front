@@ -48,7 +48,7 @@ export default class Road {
         this.mesh.position.set(
             this.options.roadSize / 2,
             0.5,
-            (this.options.groundSize + this.options.roadWidth) / 2
+            this.options.mountainWidth + ((this.options.groundWidth - this.options.roadWidth) / 2)
         )
         this.scene.add(this.mesh)
     }
@@ -58,6 +58,7 @@ export default class Road {
     }
     setDebug() {
         const RoadFolder = this.debug.ui.addFolder("Road")
+        RoadFolder.close()
         RoadFolder.add(this.options, "roadAmplitudeX").min(-40).max(40).step(0.1).name("Road X Amplitude").onChange(() => {
             this.material.uniforms.uDistortionX.value.x = this.options.roadAmplitudeX
         })

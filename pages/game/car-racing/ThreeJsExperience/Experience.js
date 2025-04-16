@@ -23,7 +23,11 @@ export default class Experience {
         this.canvas = canvas
 
         this.options = {
+            //ground
             groundSize: 100,
+            groundWidth: 30,
+            groundColor: "#94dd4b",
+            //road
             roadSize: 100,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
@@ -33,7 +37,21 @@ export default class Experience {
             widthLineSeperator: 0.02,
             countLine: 4,
             colorLineSeperator: "#fff480",
-            colorLineArround: "#bababa"
+            colorLineArround: "#bababa",
+            // mountain
+            mountainSize: 100,
+            mountainWidth: 30,
+            positionFrequency: 0.041,
+            strength: 36,
+            warpFrequency: 0,
+            warpStrength: 0,
+            colorWaterDeep: "#02587e",
+            colorWaterSurface: "#83b7fb",
+            colorSand: "#f8d559",
+            colorGrass: "#85d534",
+            colorSnow: "#ffffff",
+            colorRock: "#613400"
+
         }
 
 
