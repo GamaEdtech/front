@@ -6,19 +6,21 @@
 
     <!--  Start: breadcrumb  -->
     <section>
-      <v-row class="mt-0 py-0 header-path">
-        <v-col cols="12">
-          <!-- Skeleton loader for breadcrumb -->
-          <v-skeleton-loader
-            v-if="pending"
-            class="mx-auto"
-            type="text"
-            width="60%"
-          ></v-skeleton-loader>
-          <!-- Actual breadcrumb when loaded -->
-          <breadcrumb v-else :breads="breads" />
-        </v-col>
-      </v-row>
+      <v-container class="py-0">
+        <v-row class="mt-0 py-0 header-path">
+          <v-col cols="12">
+            <!-- Skeleton loader for breadcrumb -->
+            <v-skeleton-loader
+              v-if="pending"
+              class="mx-auto"
+              type="text"
+              width="60%"
+            ></v-skeleton-loader>
+            <!-- Actual breadcrumb when loaded -->
+            <breadcrumb v-else :breads="breads" />
+          </v-col>
+        </v-row>
+      </v-container>
     </section>
     <!--  End: breadcrumb  -->
 
