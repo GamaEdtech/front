@@ -135,7 +135,10 @@
                     </div>
                     <div class="description-tabs">
                       <v-window v-model="description_tab">
-                        <v-window-item value="tab-description">
+                        <v-window-item
+                          value="tab-description"
+                          class="px-3 py-3"
+                        >
                           <span
                             class="gama-text-body2"
                             v-show="!editMode.describe"
@@ -179,7 +182,7 @@
                             </v-textarea>
                           </div>
                         </v-window-item>
-                        <v-window-item value="tab-chapters" class="pa-0">
+                        <v-window-item value="tab-chapters" class="px-3 py-3">
                           <div
                             color="#F5F5F5"
                             flat
