@@ -1,4 +1,4 @@
-@use "variables" as *;;
+@use "variables" as *;
 
 //General
 html {
@@ -7,28 +7,25 @@ html {
 
 //‌Base style
 
-
-
 //Colors class
 .gray--text {
   color: #98a2b3 !important;
 }
 
-
 .primary-gray-100 {
-  color: var(--primary-grey-100, #F2F4F7);
+  color: var(--primary-grey-100, #f2f4f7);
 }
 
 .primary-gray-200 {
-  color: #E4E7EC;
+  color: #e4e7ec;
 }
 
 .primary-gray-300 {
-  color: var(--primary-grey-300, #D0D5DD) !important;
+  color: var(--primary-grey-300, #d0d5dd) !important;
 }
 
 .primary-gray-400 {
-  color: var(--Primary-Grey-400, #98A2B3);
+  color: var(--Primary-Grey-400, #98a2b3);
 }
 
 .primary-gray-600 {
@@ -36,7 +33,7 @@ html {
 }
 
 .primary-gray-800 {
-  color: var(--primary-grey-800, #1D2939) !important;
+  color: var(--primary-grey-800, #1d2939) !important;
 }
 
 .primary-gray-700 {
@@ -47,13 +44,11 @@ html {
   color: var(--primary-grey-900, #101828) !important;
 }
 
-
 .primary-blue-500 {
-  color: var(--Primary-Blue-500, #2E90FA);
+  color: var(--Primary-Blue-500, #2e90fa);
 }
 
 //End colors class
-
 
 //Background color
 .bg-white {
@@ -61,11 +56,11 @@ html {
 }
 
 .bg-primary-gray-100 {
-  background: #F2F4F7 !important;
+  background: #f2f4f7 !important;
 }
 
 .bg-primary-gray-200 {
-  background: #E4E7EC !important;
+  background: #e4e7ec !important;
 }
 
 .bg-primary-gray-700 {
@@ -73,20 +68,19 @@ html {
 }
 
 .bg-primary-gray-800 {
-  background: var(--primary-grey-800, #1D2939) !important;
+  background: var(--primary-grey-800, #1d2939) !important;
 }
 
 .bg-primary-success-50 {
-  background: var(--Primary-Success-50, #ECFDF3) !important;
+  background: var(--Primary-Success-50, #ecfdf3) !important;
 }
 
 .bg-primary-success-500 {
-  background: var(--Primary-Success-500, #12B76A) !important;
+  background: var(--Primary-Success-500, #12b76a) !important;
 }
 
-
 .bg-primary-blue-500 {
-  background: var(--Primary-Blue-500, #2E90FA) !important;
+  background: var(--Primary-Blue-500, #2e90fa) !important;
 }
 
 //End background color
@@ -116,15 +110,13 @@ html {
   font-family: Inter;
 }
 
-
-
 .text-transform-none {
   text-transform: none !important;
 }
 
 .v-btn:not(.v-btn--round).v-size--large.gama-btn {
   .v-btn__content {
-    color: #24292F;
+    color: #24292f;
     font-family: Inter;
     font-size: 2rem !important;
     font-style: normal;
@@ -135,7 +127,7 @@ html {
 
 .v-btn:not(.v-btn--round).v-size--default.gama-btn {
   .v-btn__content {
-    color: #24292F;
+    color: #24292f;
     font-family: Inter;
     font-size: 1.8rem;
     font-style: normal;
@@ -147,7 +139,7 @@ html {
 
 .v-btn:not(.v-btn--round).v-size--small.gama-btn {
   .v-btn__content {
-    color: #24292F;
+    color: #24292f;
     font-family: Inter;
     font-size: 1.6rem;
     font-style: normal;
@@ -157,11 +149,9 @@ html {
   }
 }
 
-
-
 .v-btn:not(.v-btn--round).v-size--x-small.gama-btn {
   .v-btn__content {
-    color: #24292F;
+    color: #24292f;
     font-family: Inter;
     font-size: 1.2rem;
     font-style: normal;
@@ -171,11 +161,7 @@ html {
   }
 }
 
-
-
 //End customize vuetify button
-
-
 
 //xs size
 .gtext-t1 {
@@ -220,10 +206,8 @@ html {
   font-weight: 400;
 }
 
-
 .gtext-h4 {
   font-family: Inter, sans-serif !important;
-  ;
   font-size: 2.4rem !important;
   font-style: normal;
   font-weight: 400;
@@ -238,8 +222,6 @@ html {
   font-weight: 400;
 }
 
-
-
 .font-weight-medium {
   font-weight: 500 !important;
 }
@@ -251,7 +233,6 @@ html {
 .font-weight-heavy {
   font-weight: 800 !important;
 }
-
 
 .gama-text-h1 {
   font-family: Inter, sans-serif;
@@ -269,7 +250,6 @@ html {
   font-style: normal !important;
   font-weight: 700 !important;
   line-height: normal !important;
-
 }
 
 .gama-text-h3 {
@@ -280,7 +260,6 @@ html {
   font-weight: 500;
   line-height: normal;
 }
-
 
 .gama-text-h4 {
   font-family: Inter, sans-serif !important;
@@ -309,7 +288,6 @@ html {
   line-height: normal !important;
 }
 
-
 .gama-text-subtitle1 {
   font-family: Inter, sans-serif;
   color: #000;
@@ -318,7 +296,6 @@ html {
   font-weight: 400;
   line-height: normal;
 }
-
 
 .gama-text-subtitle2 {
   font-family: Inter, sans-serif;
@@ -356,7 +333,6 @@ html {
   line-height: normal;
 }
 
-
 .gama-text-caption {
   font-family: Inter, sans-serif !important;
   color: #000;
@@ -385,15 +361,14 @@ html {
   justify-content: center;
   align-items: center;
   border-radius: 3rem;
-  background: #FFB600;
-  color: #24292F;
+  background: #ffb600;
+  color: #24292f;
   font-family: Inter, sans-serif !important;
   font-size: 1.4rem;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
 }
-
 
 .gama-default-btn {
   display: inline-flex;
@@ -402,8 +377,8 @@ html {
   justify-content: center;
   align-items: center;
   border-radius: 3rem;
-  background: #FFB600;
-  color: #24292F;
+  background: #ffb600;
+  color: #24292f;
   font-family: Inter, sans-serif !important;
   font-size: 1.4rem;
   font-style: normal;
@@ -412,8 +387,6 @@ html {
 }
 
 //End button style
-
-
 
 /* width */
 ::-webkit-scrollbar {
@@ -446,7 +419,7 @@ body {
   transition: 0.5s ease-in-out;
 
   p {
-    font-size: 1.8rem
+    font-size: 1.8rem;
   }
 
   .font-size-10 {
@@ -518,17 +491,11 @@ body {
   }
 
   .v-application {
-    font-family: 'Inter', sans-serif !important;
+    font-family: "Inter", sans-serif !important;
 
     .v-carousel__controls__item {
       color: $gray4 !important;
     }
-
-
-
-
-
-
 
     .v-carousel__controls__item .v-icon {
       opacity: 1 !important;
@@ -570,7 +537,6 @@ body {
     //  .v-carousel__controls__item:focus {
     //   color: white !important;
     //  }
-
 
     .w-50 {
       width: 50%;
@@ -619,14 +585,10 @@ body {
       font-size: $fontsize2;
     }
 
-
-
-
     .v-btn.v-size--default {
       font-size: $fontsize2;
       letter-spacing: unset;
     }
-
 
     .v-window__next .theme--dark.v-btn.v-btn--icon {
       background: #ffffff !important;
@@ -644,7 +606,6 @@ body {
       width: 40px !important;
     }
 
-
     .pointer {
       cursor: pointer;
     }
@@ -657,7 +618,6 @@ body {
       left: 85.5%;
     }
 
-
     .v-carousel__controls__item {
       margin: 0 0 !important;
     }
@@ -665,8 +625,6 @@ body {
     .v-btn.v-btn--has-bg.search-btn {
       background-color: $search !important;
     }
-
-
 
     .box {
       position: relative;
@@ -698,19 +656,17 @@ body {
 
     //header
     .main-header {
-
-
       // border-bottom: 1px solid $gray1;
       .headermenu-item {
         font-weight: 400;
       }
 
-
-
-
       //navbar
       .navbar-items {
-        .v-list-group--active>.v-list-group__header>.v-list-group__header__append-icon .v-icon {
+        .v-list-group--active
+          > .v-list-group__header
+          > .v-list-group__header__append-icon
+          .v-icon {
           transform: rotate(-90deg);
         }
 
@@ -762,8 +718,6 @@ body {
           padding: 1rem;
         }
 
-
-
         .sidemenu-item {
           color: $gray4 !important;
         }
@@ -801,7 +755,6 @@ body {
         color: $gray4;
       }
 
-
       .header-search {
         &.desktop-search {
           border: 0.1rem solid rgba(34, 36, 38, 0.15);
@@ -813,10 +766,6 @@ body {
           display: flex;
           align-items: center;
           height: 3.5rem;
-
-
-
-
 
           .theme--light.v-btn:hover::before {
             opacity: 0;
@@ -856,9 +805,6 @@ body {
       height: 28rem !important;
     }
 
-
-
-
     //search
     .search-sec {
       .box {
@@ -881,15 +827,13 @@ body {
         background: $gray10;
         border: 1px solid $border;
 
-        .v-input__control>.v-input__slot {
+        .v-input__control > .v-input__slot {
           margin-bottom: 0;
         }
 
-        .v-text-field>.v-input__control>.v-input__slot {
+        .v-text-field > .v-input__control > .v-input__slot {
           background: blue !important;
         }
-
-
       }
 
       .search-item {
@@ -1513,7 +1457,8 @@ body {
         text-overflow: ellipsis;
       }
 
-      .v-list-item {}
+      .v-list-item {
+      }
 
       .v-list-item__subtitle.feed-subtitle {
         font-size: 1.3rem;
@@ -1654,7 +1599,6 @@ body {
       padding: 1rem 0;
     }
 
-
     .stat-item {
       min-width: 17rem;
 
@@ -1718,8 +1662,6 @@ body {
         }
       }
     }
-
-
 
     // Detail
     .test-details-content {
@@ -1917,8 +1859,6 @@ body {
       }
 
       .course-card {
-
-
         .icon {
           font-size: 1.2rem;
         }
@@ -2005,7 +1945,6 @@ body {
 
     //sample test Slider
     .sample-test-holder {
-
       .sample-test-title {
         font-size: 1.8rem;
       }
@@ -2158,7 +2097,9 @@ body {
         }
 
         .add-file {
-          .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+          .theme--light.v-list-item:not(.v-list-item--active):not(
+              .v-list-item--disabled
+            ) {
             color: $white;
           }
 
@@ -2168,7 +2109,8 @@ body {
           border-radius: 0.3rem;
           margin-left: 1.6rem;
 
-          .icon {}
+          .icon {
+          }
         }
 
         .footer-text.theme--light.v-icon {
@@ -2189,7 +2131,6 @@ body {
       }
     }
 
-
     //  close body and v-application
   }
 
@@ -2197,9 +2138,6 @@ body {
     text-transform: none !important;
   }
 }
-
-
-
 
 // .gama-d-none{
 //   display: none!important;
@@ -2222,7 +2160,6 @@ body {
 //   }
 // }
 
-
 // @media only screen and (min-width:1440px) {
 //   .container{
 //     max-width: 90.4rem!important;
@@ -2240,8 +2177,6 @@ body {
 .container--fluid {
   max-width: inherit !important;
 }
-
-
 
 //End new design system
 //
@@ -2270,7 +2205,6 @@ body {
     }
   }
 
-
   .album-card {
     .album-no-img {
       width: 100%;
@@ -2291,7 +2225,6 @@ body {
     }
 
     .price_label {
-
       span {
         font-size: 1.8rem;
       }
@@ -2301,18 +2234,12 @@ body {
         color: gray;
       }
     }
-
   }
-
-
-
 }
 
-@media only screen and (min-width:600px) {
-
+@media only screen and (min-width: 600px) {
   .container {
     max-width: 100% !important;
-
   }
 
   .container--fluid {
@@ -2352,7 +2279,6 @@ body {
     font-style: normal !important;
     font-weight: 700 !important;
     line-height: normal !important;
-
   }
 
   .gama-text-h3 {
@@ -2363,7 +2289,6 @@ body {
     font-weight: 500;
     line-height: normal;
   }
-
 
   .gama-text-h4 {
     color: #000;
@@ -2384,14 +2309,13 @@ body {
   }
 
   .gama-text-h6 {
-    font-family: 'Inter', sans-serif !important;
+    font-family: "Inter", sans-serif !important;
     color: #000;
     font-size: 1.8rem !important;
     font-style: normal;
     font-weight: 500 !important;
     line-height: normal;
   }
-
 
   .gama-text-subtitle1 {
     font-family: Inter, sans-serif !important;
@@ -2401,7 +2325,6 @@ body {
     font-weight: 400;
     line-height: normal;
   }
-
 
   .gama-text-subtitle2 {
     font-family: Inter, sans-serif !important;
@@ -2439,7 +2362,6 @@ body {
     line-height: normal;
   }
 
-
   .gama-text-caption {
     font-family: Inter, sans-serif !important;
     color: #000;
@@ -2458,7 +2380,6 @@ body {
     line-height: normal;
   }
 
-
   //Button style
   .gama-primary-btn {
     display: inline-flex;
@@ -2467,16 +2388,14 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 3rem;
-    background: #FFB600;
-    color: #24292F;
+    background: #ffb600;
+    color: #24292f;
     font-family: Inter, sans-serif !important;
     font-size: 1.4rem;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-
   }
-
 
   .gama-default-btn {
     display: inline-flex;
@@ -2485,21 +2404,19 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 3rem;
-    background: #FFFFFF;
-    color: #24292F;
+    background: #ffffff;
+    color: #24292f;
     font-family: Inter, sans-serif !important;
     font-size: 1.4rem;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-
   }
 
   //End button style
 }
 
-@media (min-width:600px) {
-
+@media (min-width: 600px) {
   //sm typegraphy
   .gtext-sm-h4 {
     font-family: Inter, sans-serif !important;
@@ -2515,16 +2432,13 @@ body {
     font-size: 2.3rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 3.2rem!important;
+    line-height: 3.2rem !important;
   }
 
   //End sm typography
 }
 
 @media only screen and (min-width: 600px) and (max-width: 960px) {
-
-
-
   .book-no-img {
     width: 12rem;
     height: 14rem;
@@ -2536,7 +2450,8 @@ body {
     background-color: #f9f3f3 !important;
     border-radius: 8px;
 
-    p {}
+    p {
+    }
 
     a {
       font-size: 1.2rem;
@@ -2564,12 +2479,9 @@ body {
       }
     }
   }
-
 }
 
-
 @media only screen and (min-width: 960px) {
-
   // md size
   .gama-text-h1 {
     color: #354053;
@@ -2598,7 +2510,6 @@ body {
     line-height: normal;
   }
 
-
   .gama-text-h4 {
     color: #354053;
     font-family: Inter, sans-serif !important;
@@ -2619,13 +2530,12 @@ body {
 
   .gama-text-h6 {
     color: #354053;
-    font-family: 'Inter', sans-serif !important;
+    font-family: "Inter", sans-serif !important;
     font-size: 2rem !important;
     font-style: normal;
     font-weight: 600 !important;
     line-height: normal;
   }
-
 
   .gama-text-subtitle1 {
     color: #354053;
@@ -2635,7 +2545,6 @@ body {
     font-weight: 400;
     line-height: normal;
   }
-
 
   .gama-text-subtitle2 {
     color: #000;
@@ -2673,7 +2582,6 @@ body {
     line-height: normal !important;
   }
 
-
   .gama-text-caption {
     color: #000;
     font-family: Inter, sans-serif !important;
@@ -2694,7 +2602,6 @@ body {
 
   //End md size
 
-
   //Button style
   .gama-primary-btn {
     display: inline-flex;
@@ -2703,16 +2610,14 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 3rem;
-    background: #FFB600;
-    color: #24292F;
+    background: #ffb600;
+    color: #24292f;
     font-family: Inter, sans-serif !important;
     font-size: 1.8rem;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-
   }
-
 
   .gama-default-btn {
     display: inline-flex;
@@ -2721,15 +2626,14 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 3rem;
-    background: #FFFFFF;
-    color: #24292F;
+    background: #ffffff;
+    color: #24292f;
     font-family: Inter, sans-serif !important;
     font-size: 1.8rem;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-    border: 1px solid #24292F;
-
+    border: 1px solid #24292f;
   }
 
   //End button style
@@ -2745,9 +2649,6 @@ body {
   .w-md-40 {
     width: 40% !important;
   }
-
-
-
 
   .content-item {
     min-height: 16rem !important;
@@ -2793,23 +2694,16 @@ body {
       }
     }
   }
-
-
-
 }
 
 @media only screen and (min-width: 1264px) {
-
-
   .container {
     max-width: 80% !important;
-
   }
 
   .container--fluid {
     max-width: inherit !important;
   }
-
 
   //lg typegraphy
   .gtext-lg-h4 {
@@ -2823,12 +2717,11 @@ body {
 
   .gtext-lg-h5 {
     font-family: Inter, sans-serif !important;
-    font-size: 2.5rem!important;
+    font-size: 2.5rem !important;
     font-style: normal;
     font-weight: 400;
-    line-height: 3.2rem!important;
+    line-height: 3.2rem !important;
   }
-
 
   .gtext-lg-t4 {
     font-family: Inter, sans-serif;
@@ -2838,15 +2731,7 @@ body {
   }
 
   //End lg typography
-
-
-
-
 }
-
-
-
-
 
 // Start : Lesson page
 .lesson {
@@ -2966,7 +2851,6 @@ body {
           content: "4";
         }
       }
-
     }
 
     .v-sheet.v-stepper:not(.v-sheet--outlined) {
@@ -2974,7 +2858,11 @@ body {
       background: $gray12;
     }
 
-    .theme--light.v-stepper .v-stepper__step:not(.v-stepper__step--active):not(.v-stepper__step--complete):not(.v-stepper__step--error) .v-stepper__step__step {
+    .theme--light.v-stepper
+      .v-stepper__step:not(.v-stepper__step--active):not(
+        .v-stepper__step--complete
+      ):not(.v-stepper__step--error)
+      .v-stepper__step__step {
       background: rgba(196, 196, 196, 0.2);
       color: $gray4;
     }
@@ -2984,7 +2872,6 @@ body {
       min-width: 35px;
       font-size: 1.5rem;
       margin-left: -0.5rem !important;
-
     }
   }
 
@@ -3018,7 +2905,11 @@ body {
         background: none;
       }
 
-      .theme--light.v-stepper .v-stepper__step:not(.v-stepper__step--active):not(.v-stepper__step--complete):not(.v-stepper__step--error) .v-stepper__step__step {
+      .theme--light.v-stepper
+        .v-stepper__step:not(.v-stepper__step--active):not(
+          .v-stepper__step--complete
+        ):not(.v-stepper__step--error)
+        .v-stepper__step__step {
         background: rgba(196, 196, 196, 0.2);
         color: $gray4;
       }
@@ -3028,7 +2919,6 @@ body {
         min-width: 35px;
         font-size: 1.5rem;
         margin-left: -0.5rem !important;
-
       }
     }
 
@@ -3074,8 +2964,8 @@ body {
       font-size: 1.4rem;
       font-weight: 500;
       border-radius: 1.8rem;
-      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.2);
-
+      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.14),
+        0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.2);
     }
   }
 }
@@ -3122,7 +3012,7 @@ body {
       background-color: unset;
     }
 
-    .v-slide-group.v-item-group>.v-slide-group__prev {
+    .v-slide-group.v-item-group > .v-slide-group__prev {
       visibility: hidden;
     }
 
@@ -3137,7 +3027,8 @@ body {
         border-radius: 50%;
         min-width: 4rem;
         background-color: $white;
-        box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.14), 0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.14),
+          0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.2);
       }
 
       .v-slide-group__prev {
@@ -3148,14 +3039,16 @@ body {
         border-radius: 50%;
         min-width: 4rem;
         background-color: $white;
-        box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.14), 0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.14),
+          0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.2);
       }
     }
 
     .book-sample {
       border-radius: 0.8rem;
       background-color: $white;
-      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.14),
+        0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.2);
 
       .sample-img {
         position: relative;
@@ -3191,7 +3084,6 @@ body {
         color: $gray8;
       }
     }
-
   }
 }
 
@@ -3202,7 +3094,8 @@ body {
 
   .last-files {
     border: 1px solid $border;
-    box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.1), 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.1),
+      0px 4px 6px -1px rgba(0, 0, 0, 0.1);
     border-radius: 0.4rem;
 
     .date-name {
@@ -3240,7 +3133,6 @@ body {
       // .owl-carousel .item-video {
       //   height: 300px !important;
       // }
-
     }
 
     .video-slider {
@@ -3251,7 +3143,7 @@ body {
 
         &:hover .buttons {
           //opacity: 1;
-          transition: .3s ease-in-out;
+          transition: 0.3s ease-in-out;
         }
 
         .buttons button {
@@ -3260,7 +3152,7 @@ body {
           left: 46%;
           width: 5rem;
           height: 5rem;
-          color: #FFFFFF;
+          color: #ffffff;
           z-index: 10;
           border-radius: 50%;
           background: $black;
@@ -3311,7 +3203,6 @@ body {
       .v-carousel {
         height: 340px !important;
 
-
         .v-btn--active .v-icon {
           background: $white;
           height: 10px;
@@ -3342,8 +3233,6 @@ body {
               }
             }
           }
-
-
         }
       }
 
@@ -3361,7 +3250,6 @@ body {
     .video-slide {
       border-radius: 0.4rem;
       position: relative;
-
 
       .rating {
         position: absolute;
@@ -3408,7 +3296,8 @@ body {
   .online-exam-card,
   .test-card {
     border: 1px solid $border;
-    box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.1), 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.1),
+      0px 4px 6px -1px rgba(0, 0, 0, 0.1);
     border-radius: 0.6rem;
   }
 
@@ -3432,13 +3321,11 @@ body {
       font-size: 1.4rem;
       color: $gray11;
       letter-spacing: 0.08px;
-
     }
 
     .ask-text-icon {
       color: $green;
     }
-
 
     .askcard-footer-btn {
       background-color: $green !important;
@@ -3456,7 +3343,6 @@ body {
       color: $category-faq;
     }
 
-
     .testtitle {
       font-size: 2rem;
       color: $gray45;
@@ -3471,7 +3357,6 @@ body {
       font-size: 1.4rem;
       color: $gray11;
       letter-spacing: 0.08px;
-
     }
 
     .test-text-icon {
@@ -3488,18 +3373,15 @@ body {
     }
   }
 
-
   .online-exam-card {
     .online-exam-icon {
       font-size: 4rem;
       color: $category-online-exam;
     }
 
-
     .online-text-icon {
       color: $green;
     }
-
 
     .online-exam-title {
       font-size: 2rem;
@@ -3515,9 +3397,7 @@ body {
       font-size: 1.4rem;
       color: $gray11;
       letter-spacing: 0.08px;
-
     }
-
 
     .online-exam-card-footer-link {
       color: $green;
@@ -3526,7 +3406,6 @@ body {
 }
 
 // End: Lesson page
-
 
 //Search page
 .search-page {
@@ -3563,7 +3442,6 @@ body {
             .v-slide-group__content {
               align-items: center;
 
-
               i {
                 color: $gray4;
               }
@@ -3578,12 +3456,8 @@ body {
       }
     }
 
-
-
-
     // Start:  Content
     .content-items {
-
       .content-item {
         box-shadow: 0px 2px 10px rgb(0 0 0 / 10%) !important;
         border-bottom: 0.1rem solid #e1e2e3;
@@ -3603,20 +3477,16 @@ body {
         }
 
         .item-content-footer {
-
-
           @media screen and (max-width: 600px) {
             // p {
             //   font-size: 1rem !important;
             // }
           }
-
         }
       }
     }
 
     // End: Content
-
   }
 
   .search-filter {
@@ -3674,11 +3544,6 @@ body {
 }
 
 //End search page
-
-
-
-
-
 
 // Start : Teachers
 .teachers {
@@ -3802,12 +3667,11 @@ body {
               position: absolute;
               height: 0.7rem;
               width: 0.7rem;
-              background-color: #F16D50;
+              background-color: #f16d50;
               color: red;
               border-radius: 50%;
               top: 85%;
             }
-
 
             .card-user-profile {
               filter: drop-shadow(0px 3.29412px 8.23529px rgba(0, 0, 0, 0.1));
@@ -3830,7 +3694,7 @@ body {
               position: absolute;
               height: 0.7rem;
               width: 0.7rem;
-              background-color: #F16D50;
+              background-color: #f16d50;
               border-radius: 50%;
               top: 85%;
             }
@@ -3871,13 +3735,11 @@ body {
               background-color: hsla(0, 0%, 0%, 0.082);
             }
 
-
             .card-user-profile {
               filter: drop-shadow(0px 3.29412px 8.23529px rgba(0, 0, 0, 0.1));
 
               .card-user-image {
                 border-radius: 50%;
-
               }
 
               .card-user-image1 {
@@ -3915,7 +3777,6 @@ body {
               .card-user-image9 {
                 outline: 3px solid $gray0;
               }
-
             }
 
             .card-user-name {
@@ -4042,13 +3903,11 @@ body {
               right: 3%;
               top: 13%;
             }
-
           }
 
           .card-user-profile-sub {
             color: $orange8;
           }
-
 
           .card-user-content {
             .card-user-major {
@@ -4112,10 +3971,7 @@ body {
                       top: 70%;
                       font-size: 1.2rem;
                     }
-
                   }
-
-
                 }
               }
 
@@ -4193,14 +4049,10 @@ body {
                   }
                 }
               }
-
-
             }
           }
         }
       }
-
-
     }
 
     .teachers-pagination {
@@ -4216,11 +4068,9 @@ body {
       }
     }
   }
-
 }
 
 // End : Teachers
-
 
 //User dashboard
 .dashboard {
@@ -4241,7 +4091,6 @@ body {
     }
 
     .sample_exam {
-
       .icon_btn {
         background: rgba(11, 161, 228, 0.15);
 
@@ -4251,16 +4100,12 @@ body {
         }
       }
 
-
       .icon_link {
         .icon {
-          color: #0BA1E4;
+          color: #0ba1e4;
         }
       }
-
-
     }
-
 
     .training_content {
       .icon_btn {
@@ -4277,16 +4122,11 @@ body {
           color: $category-content;
         }
       }
-
-
     }
-
 
     .question_answer {
       .icon_btn {
         background: rgba(255, 152, 0, 0.15);
-        ;
-
         .icon {
           color: $category-faq;
           font-size: 4rem;
@@ -4298,8 +4138,6 @@ body {
           color: $category-faq;
         }
       }
-
-
     }
 
     .online_exam {
@@ -4317,15 +4155,9 @@ body {
           color: $category-online-exam;
         }
       }
-
-
     }
-
-
   }
-
 }
-
 
 //Top Up Wallet
 #charge-wallet {
@@ -4345,7 +4177,6 @@ body {
     .active_radio .radio_card {
       border-bottom: 10px solid teal !important;
     }
-
   }
 
   #credit-notice li {
@@ -4363,27 +4194,23 @@ body {
     left: -20px;
     font-family: "Font Awesome 5 Free";
     content: "\f00c";
-    color: #00D2AE;
+    color: #00d2ae;
     font-size: 1.5rem;
   }
-
 
   #payment-logo-list {
     margin-right: auto;
     margin-left: auto;
 
-
     .v-input--selection-controls__input {
       display: none !important;
     }
-
 
     .theme--light.v-image {
       display: inline-block;
       max-width: 7.5rem;
       height: 5rem;
     }
-
 
     .active_radio {
       #logo_holder {
@@ -4398,7 +4225,6 @@ body {
 
 //End Top Up Wallet
 
-
 //Test maker
 .test-maker {
   span {
@@ -4409,7 +4235,6 @@ body {
   a {
     font-size: 1.7rem !important;
   }
-
 
   #share_link {
     cursor: pointer !important;
@@ -4427,10 +4252,8 @@ body {
 
 //End test maker
 
-
 //Mobile dashboard menu
 .mobile_dashboard_menu {
-
   .v-slide-group__prev,
   .v-slide-group__next {
     display: none !important;
@@ -4439,7 +4262,6 @@ body {
   .v-tabs-slider {
     display: none !important;
   }
-
 
   .fixed-tabs-bar {
     /*position: -webkit-sticky!important;*/
@@ -4458,15 +4280,12 @@ body {
   .tab_actived i {
     color: #21ba45 !important;
   }
-
 }
 
 //End mobile dashboard menu
 
-
 //Test maker menu
 #test_maker_menu {
-
   .v-slide-group__prev,
   .v-slide-group__next {
     display: none !important;
@@ -4475,7 +4294,6 @@ body {
   .v-tabs-slider {
     display: none !important;
   }
-
 
   //@media only screen and (min-width: 700px){
   .fixed-tabs-bar {
@@ -4489,7 +4307,6 @@ body {
     //}
   }
 
-
   .tab_actived {
     border-bottom: 4px solid white !important;
     background-color: rgba(33, 186, 69, 0.1);
@@ -4499,11 +4316,9 @@ body {
   .tab_actived i {
     color: #ffffff !important;
   }
-
 }
 
 //End test maker menu
-
 
 //Test album
 #test-album {
@@ -4528,7 +4343,7 @@ body {
     }
 
     .test-count-label {
-      background-color: rgba(0, 139, 139, .1) !important;
+      background-color: rgba(0, 139, 139, 0.1) !important;
       color: #008b8b !important;
       padding-left: 4rem;
       padding-right: 4rem;
@@ -4547,7 +4362,6 @@ body {
 }
 
 //End Test album
-
 
 //Create test
 #create-test {
@@ -4569,14 +4383,12 @@ body {
       max-height: 54.5rem !important;
     }
 
-
     @media only screen and (max-width: 960px) {
       .ck-editor__editable_inline {
         height: 20.5rem !important;
         max-height: 20.5rem !important;
       }
     }
-
 
     .image-input {
       position: absolute;
@@ -4588,7 +4400,7 @@ body {
 
       i {
         font-size: 9.2rem;
-        color: #A11333;
+        color: #a11333;
       }
     }
 
@@ -4599,7 +4411,6 @@ body {
       border-radius: 5px;
     }
   }
-
 
   #test-maker-answer-alternative {
     position: relative;
@@ -4609,14 +4420,12 @@ body {
       max-height: 54.5rem !important;
     }
 
-
     @media only screen and (max-width: 960px) {
       .ck-editor__editable_inline {
         height: 20.5rem !important;
         max-height: 20.5rem !important;
       }
     }
-
 
     .image-input {
       position: absolute;
@@ -4628,7 +4437,7 @@ body {
 
       i {
         font-size: 9.2rem;
-        color: #A11333;
+        color: #a11333;
       }
     }
 
@@ -4639,7 +4448,6 @@ body {
       border-radius: 5px;
     }
   }
-
 
   #test-maker-answer {
     position: relative;
@@ -4659,7 +4467,7 @@ body {
 
       i {
         font-size: 9.2rem;
-        color: #A11333;
+        color: #a11333;
       }
     }
 
@@ -4674,7 +4482,6 @@ body {
   #img-cropper-dialog {
     position: relative !important;
   }
-
 
   #test-image-options {
     .ck-editor__editable_inline {
@@ -4694,7 +4501,7 @@ body {
 
         i {
           font-size: 9.2rem;
-          color: #A11333;
+          color: #a11333;
         }
       }
 
@@ -4705,9 +4512,7 @@ body {
         border-radius: 5px;
       }
     }
-
   }
-
 }
 
 //End create test
@@ -4720,13 +4525,11 @@ body {
     line-height: 2.2rem;
     font-size: 1.8rem !important;
 
-
     p {
       font-size: 1.8rem !important;
       display: block !important;
     }
   }
-
 
   .answer {
     margin-bottom: 0.8rem;
@@ -4747,7 +4550,6 @@ body {
       color: green;
     }
 
-
     .false_answer {
       position: absolute;
       top: -1rem;
@@ -4758,3 +4560,7 @@ body {
 }
 
 //End New Exam
+
+.v-theme--light.v-app-bar.v-toolbar {
+  background-color: #f5f5f5;
+}
