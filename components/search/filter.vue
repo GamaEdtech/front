@@ -3,26 +3,39 @@
     <div class="content-search">
       <!--Selected filter, user can disable any filter from here-->
       <div v-show="enabledAppliedFilter()" id="chip-container">
-        <p class="my-2 mb-md-2 text-body-1 font-weight-bold text-black">
+        <p
+          class="my-2 mb-md-2 gama-text-body2"
+          style="font-weight: 700 !important"
+        >
           Applied filter
         </p>
         <v-divider class="mb-1" />
         <v-chip
           v-if="applied_filter.select_section_title"
-          class="mt-1"
+          class="ma-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="board_val = 0"
         >
-          <span>
+          <span class="text-body- font-weight text-black">
             {{ applied_filter.select_section_title }}
           </span>
         </v-chip>
         <v-chip
           v-if="applied_filter.select_base_title"
-          class="mt-1"
+          class="ma-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="base_val = 0"
         >
           <span>
@@ -31,9 +44,14 @@
         </v-chip>
         <v-chip
           v-if="applied_filter.select_lesson_title"
-          class="mt-1"
+          class="ma-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="lesson_val = 0"
         >
           <span>
@@ -45,6 +63,11 @@
           class="mt-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="topic_val = 0"
         >
           <span>
@@ -56,22 +79,30 @@
           class="mt-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="file_type_val = 0"
         >
           <span> {{ applied_filter.select_file_type_title }}</span>
         </v-chip>
-        
+
         <!-- Year chip -->
         <v-chip
           v-if="applied_filter.select_year_title"
           class="mt-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="year_val = 0"
         >
-          <span>
-            Year: {{ applied_filter.select_year_title }}
-          </span>
+          <span> Year: {{ applied_filter.select_year_title }} </span>
         </v-chip>
 
         <!-- Month chip -->
@@ -80,10 +111,15 @@
           class="mt-1"
           closable
           variant="outlined"
+          tile
+          style="
+            border-radius: 5px !important;
+            border: 1px solid #d7d7d7 !important;
+          "
           @click:close="month_val = 0"
         >
           <span>
-            Month: {{ applied_filter.select_month_title }}
+            {{ applied_filter.select_month_title }}
           </span>
         </v-chip>
 
@@ -92,10 +128,10 @@
       <!--End select filter  -->
 
       <!-- Simple flat expansion panels to match design -->
-      <v-expansion-panels 
-        v-model="panelModel" 
-        variant="accordion" 
-        flat 
+      <v-expansion-panels
+        v-model="panelModel"
+        variant="accordion"
+        flat
         bg-color="#f5f5f5"
         class="filter-panels"
       >
@@ -120,70 +156,91 @@
 
         <!-- Grade panel -->
         <v-expansion-panel>
-          <v-expansion-panel-title class="filter-title filter-inactive">
+          <v-expansion-panel-title
+          :style="{
+            color: !filter.base_list.length ? 'black' : 'transparent',
+            pointerEvents: !filter.base_list.length ? 'none' : 'auto',
+          }"
+            class="filter-title " 
+            :class="{ 'filter-inactive': !filter.base_list.length }"
+            >
             Grade
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-                <v-radio-group
-                  v-model="base_val"
-                  @change="changeBaseVal()"
+            <v-radio-group
+              v-model="base_val"
+              @change="changeBaseVal()"
               class="mt-0"
-                >
+            >
               <v-radio label="All" color="red" :value="0"></v-radio>
-                  <v-radio
-                    v-for="item in filter.base_list"
-                    :key="item.id"
-                    :label="item.title"
-                    color="red"
-                    :value="item.id"
+              <v-radio
+                v-for="item in filter.base_list"
+                :key="item.id"
+                :label="item.title"
+                color="red"
+                :value="item.id"
               ></v-radio>
-                </v-radio-group>
+            </v-radio-group>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!-- Subject panel -->
-        <v-expansion-panel :disabled="!filter.lesson_list.length">
-          <v-expansion-panel-title class="filter-title filter-inactive">
+        <v-expansion-panel>
+          <v-expansion-panel-title
+            :style="{
+              color: !filter.lesson_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.lesson_list.length ? 'none' : 'auto',
+            }"
+            class="filter-title"
+            :class="{ 'filter-inactive': !filter.lesson_list.length }"
+          >
             Subject
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-                <v-radio-group
-                  @change="changeLessonVal"
-                  v-model="lesson_val"
+            <v-radio-group
+              @change="changeLessonVal"
+              v-model="lesson_val"
               class="mt-0"
-                >
+            >
               <v-radio label="All" color="red" :value="0"></v-radio>
-                  <v-radio
-                    v-for="item in filter.lesson_list"
-                    :key="item.id"
-                    :label="item.title"
-                    color="red"
-                    :value="item.id"
+              <v-radio
+                v-for="item in filter.lesson_list"
+                :key="item.id"
+                :label="item.title"
+                color="red"
+                :value="item.id"
               ></v-radio>
-                </v-radio-group>
+            </v-radio-group>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!-- Topic panel -->
-        <v-expansion-panel :disabled="!filter.topic_list.length">
-          <v-expansion-panel-title class="filter-title filter-inactive">
+        <v-expansion-panel>
+          <v-expansion-panel-title
+            :style="{
+              color: !filter.topic_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.topic_list.length ? 'none' : 'auto',
+            }"
+            class="filter-title"
+            :class="{ 'filter-inactive': !filter.topic_list.length }"
+          >
             Topic
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-                <v-radio-group
-                  @change="changeTopicVal"
-                  v-model="topic_val"
+            <v-radio-group
+              @change="changeTopicVal"
+              v-model="topic_val"
               class="mt-0"
-                >
+            >
               <v-radio label="All" color="red" :value="0"></v-radio>
-                  <v-radio
-                    v-for="item in filter.topic_list"
-                    :key="item.id"
-                    :label="item.title"
-                    color="red"
-                    :value="item.id"
+              <v-radio
+                v-for="item in filter.topic_list"
+                :key="item.id"
+                :label="item.title"
+                color="red"
+                :value="item.id"
               ></v-radio>
-                </v-radio-group>
+            </v-radio-group>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
@@ -196,7 +253,13 @@
             $route.query.type === 'azmoon'
           "
         >
-          <v-expansion-panel-title class="filter-title filter-inactive">
+          <v-expansion-panel-title
+            :style="{
+              color: !filter.file_type_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.file_type_list.length ? 'none' : 'auto',
+            }"
+            class="filter-title filter-inactive"
+          >
             {{
               $route.query.type === "test" || $route.query.type === "azmoon"
                 ? "Classification"
@@ -204,18 +267,18 @@
             }}
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-                <v-radio-group
-                  @change="changeFileTypeVal"
-                  v-model="file_type_val"
+            <v-radio-group
+              @change="changeFileTypeVal"
+              v-model="file_type_val"
               class="mt-0"
-                >
+            >
               <v-radio label="All" color="red" :value="0"></v-radio>
-                  <v-radio
-                    v-for="item in filter.file_type_list"
-                    :key="item.id"
-                    :label="item.title"
-                    color="red"
-                    :value="item.id"
+              <v-radio
+                v-for="item in filter.file_type_list"
+                :key="item.id"
+                :label="item.title"
+                color="red"
+                :value="item.id"
               ></v-radio>
             </v-radio-group>
           </v-expansion-panel-text>
@@ -240,7 +303,7 @@
                 color="red"
                 :value="item"
               ></v-radio>
-                </v-radio-group>
+            </v-radio-group>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
@@ -286,8 +349,8 @@ export default {
     },
     modelValue: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   emits: ["update:modelValue", "setPageTitle"],
   data() {
@@ -405,33 +468,34 @@ export default {
     // Load the section list for the Board filter
     $fetch("/api/v1/types/list", {
       params: { type: "section" },
-      method: 'GET'
+      method: "GET",
     })
-    .then((res) => {
-      if (res && res.data) {
-        this.filter.section_list = res.data;
-        console.log("Board filter items loaded:", this.filter.section_list);
-        
-        // If section parameter exists in URL, load related data
-        if (this.$route.query.section > 0) {
-          this.getFilterList({
-            type: "base",
-            section_id: this.$route.query.section
-          }, "base");
-          
-          // Set section title in filters
-          const sectionItem = this.filter.section_list.find(
-            (x) => x.id === parseInt(this.$route.query.section)
-          );
-          if (sectionItem) {
-            this.applied_filter.select_section_title = sectionItem.title;
+      .then((res) => {
+        if (res && res.data) {
+          this.filter.section_list = res.data;
+          // If section parameter exists in URL, load related data
+          if (this.$route.query.section > 0) {
+            this.getFilterList(
+              {
+                type: "base",
+                section_id: this.$route.query.section,
+              },
+              "base"
+            );
+
+            // Set section title in filters
+            const sectionItem = this.filter.section_list.find(
+              (x) => x.id === parseInt(this.$route.query.section)
+            );
+            if (sectionItem) {
+              this.applied_filter.select_section_title = sectionItem.title;
+            }
           }
         }
-      }
-    })
-    .catch(err => {
-      console.error("Error loading board filter data:", err);
-    });
+      })
+      .catch((err) => {
+        console.error("Error loading board filter data:", err);
+      });
 
     // Load state data for tutor page
     if (this.$route.query.type === "tutor") {
@@ -442,7 +506,7 @@ export default {
     if (this.$route.query.level > 0) {
       this.test_level_val = this.$route.query.level;
     }
-    
+
     // Get file type data for specific content types
     if (
       this.$route.query.type === "test" ||
@@ -451,7 +515,7 @@ export default {
     ) {
       this.getFileType();
     }
-    
+
     // Initialize filter with Board panel expanded by default
     this.panelModel = [0]; // Board panel
   },
@@ -579,16 +643,16 @@ export default {
       // Use Nuxt 3's $fetch API which is globally available
       $fetch("/api/v1/types/list", {
         params,
-        method: 'GET'
+        method: "GET",
       })
-      .then((res) => {
-        this.handleFilterResponse(res, type);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch filter data:', err);
-      });
+        .then((res) => {
+          this.handleFilterResponse(res, type);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch filter data:", err);
+        });
     },
-    
+
     // Separated response handling to its own method for clarity
     handleFilterResponse(res, type) {
       var data = {};
@@ -607,9 +671,7 @@ export default {
           this.base_val = this.$route.query.base;
 
           this.applied_filter.select_section_title =
-            this.filter.section_list.find(
-              (x) => x.id === this.board_val
-            ).title;
+            this.filter.section_list.find((x) => x.id === this.board_val).title;
 
           //Set breadcrumbs info
           this.setBreadcrumbInfo();
@@ -630,8 +692,9 @@ export default {
           this.lesson_val = this.$route.query.lesson;
 
           //Enable tag
-          this.applied_filter.select_base_title =
-            this.filter.base_list.find((x) => x.id === this.base_val).title;
+          this.applied_filter.select_base_title = this.filter.base_list.find(
+            (x) => x.id === this.base_val
+          ).title;
 
           //Set breadcrumbs info
           this.setBreadcrumbInfo();
@@ -668,30 +731,28 @@ export default {
 
         //Enable tag
         if (this.$route.query.topic > 0)
-          this.applied_filter.select_topic_title =
-            this.filter.topic_list.find(
-              (x) => x.id === this.topic_val
-            ).title;
+          this.applied_filter.select_topic_title = this.filter.topic_list.find(
+            (x) => x.id === this.topic_val
+          ).title;
       } else if (type === "state") {
         this.filter.state_list = res.data;
 
         //Enable tag
         if (this.$route.query.state > 0) {
           this.state_val = this.$route.query.state;
-          this.applied_filter.select_state_title =
-            this.filter.state_list.find(
-              (x) => x.id === this.state_val
-            ).title;
+          this.applied_filter.select_state_title = this.filter.state_list.find(
+            (x) => x.id === this.state_val
+          ).title;
         }
-        if (this.$route.query.city > 0)
-          this.city_val = this.$route.query.city;
+        if (this.$route.query.city > 0) this.city_val = this.$route.query.city;
       } else if (type === "city") {
         this.filter.city_list = res.data;
 
         //Enable tag
         if (this.city_val > 0 && this.filter.city_list.length)
-          this.applied_filter.select_city_title =
-            this.filter.city_list.find((x) => x.id === this.city_val).title;
+          this.applied_filter.select_city_title = this.filter.city_list.find(
+            (x) => x.id === this.city_val
+          ).title;
       }
     },
     setAppliedFilter(filters) {
@@ -793,25 +854,25 @@ export default {
         this.loadtime = false;
       }
     },
-    
+
     //Change year val option
     changeYearVal() {
       this.updateQueryParams();
-      
+
       //Enable year title tag
       if (this.year_val > 0) {
         this.applied_filter.select_year_title = this.year_val.toString();
       } else {
         this.applied_filter.select_year_title = "";
       }
-      
+
       this.setBreadcrumbInfo();
     },
 
     //Change month val option
     changeMonthVal() {
       this.updateQueryParams();
-      
+
       //Enable month title tag
       if (this.month_val > 0) {
         this.applied_filter.select_month_title = this.filter.month_list.find(
@@ -820,7 +881,7 @@ export default {
       } else {
         this.applied_filter.select_month_title = "";
       }
-      
+
       this.setBreadcrumbInfo();
     },
 
@@ -999,16 +1060,16 @@ export default {
               ? this.board_val
               : "",
         };
-        
+
         // Use Nuxt 3's built-in $fetch
         const response = await $fetch("/api/v1/types/list", {
           params,
-          method: 'GET'
+          method: "GET",
         });
-        
+
         if (response && response.data) {
           this.filter.file_type_list = response.data;
-          
+
           if (this.$route.query.test_type > 0) {
             this.file_type_val = this.$route.query.test_type;
             this.applied_filter.select_file_type_title =
@@ -1018,7 +1079,7 @@ export default {
           }
         }
       } catch (err) {
-        console.error('Error fetching file type data:', err);
+        console.error("Error fetching file type data:", err);
       }
     },
 
@@ -1081,7 +1142,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 @media screen and (max-width: 600px) {
   .content-search .v-expansion-panel-title,
   .v-expansion-panel-text {
@@ -1112,18 +1173,22 @@ export default {
 
 /* Inactive filter styles */
 .filter-inactive {
-  color: rgba(0, 0, 0, 0.5) !important;
-  font-weight: 400 !important;
+  color: rgba(0, 0, 0, 0.38) !important;
+  font-size: .875rem;
+  font-weight: 600 !important;
+  letter-spacing: 0.0071428571em;
+  line-height: 1.375rem;
 }
 
 /* Panel styling */
 .v-expansion-panel {
-  background-color: #f5f5f5 !important;
   margin-bottom: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
-
+ .v-expansion-panel-title:hover ::v-deep .v-expansion-panel-title__overlay {
+    opacity: 0 !important;
+}
 /* Remove divider lines between panels */
 .v-expansion-panel:not(:first-child)::after {
   border-top: none !important;
@@ -1135,10 +1200,7 @@ export default {
   box-shadow: none !important;
 }
 
-/* Text content styling */
-.v-expansion-panel-text__wrapper {
-  padding: 0 16px 16px 32px !important;
-}
+
 
 /* Radio group styling */
 .v-radio-group {
@@ -1159,10 +1221,21 @@ export default {
 
 @media (min-width: 960px) {
   #search-page-filter #chip-container .v-chip .v-chip__content span {
-          width: inherit;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
+    width: inherit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
+}
+
+.v-chip {
+  border-radius: 16px !important;
+  font-size: 14px !important;
+  height: 32px !important;
+  font-weight: 400 !important;
+}
+
+.v-chip.v-size--default .v-chip__content {
+  padding: 0 12px;
 }
 </style>
