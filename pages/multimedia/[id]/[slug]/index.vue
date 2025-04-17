@@ -1,7 +1,7 @@
 <template>
   <div class="test-details-content">
     <!-- Start : Category -->
-    <category />
+    <common-category />
     <!-- End:Category -->
 
     <!--  Start: breadcrumb  -->
@@ -16,7 +16,7 @@
               height="60"
             ></v-skeleton-loader>
             <!-- Actual breadcrumb when loaded -->
-            <breadcrumb v-else :breads="breads" />
+            <widgets-breadcrumb v-else :breads="breads" />
           </v-col>
         </v-row>
       </v-container>
@@ -71,7 +71,7 @@
           <v-row>
             <v-col cols="12" md="4">
               <!--Show gallery of preview and book first page-->
-              <multimedia-preview-gallery
+              <details-multimedia-preview-gallery
                 ref="preview_gallery"
                 :gallery-images="previewImages"
                 :link-data="previewLinkData"
@@ -123,7 +123,7 @@
                   </div>
 
                   <!-- Use the new description component -->
-                  <description-section
+                  <multimedia-detail-description-section
                     :description="contentData?.description"
                     :collection-list="contentData?.collectionList"
                     :can-edit="user?.id == contentData?.user_"
@@ -132,7 +132,7 @@
                   />
 
                   <!-- Use the new tag section component -->
-                  <tag-section
+                  <multimedia-detail-tag-section
                     :section-id="contentData?.section"
                     :section-title="contentData?.section_title"
                     :base-id="contentData?.base"
@@ -144,7 +144,7 @@
               </div>
               <!--   Download Btn and Description  -->
               <div class="text-center download-sec">
-                <download-section
+                <multimedia-detail-download-section
                   :file-ext="contentData?.files?.ext || 'pptx'"
                   :price="contentData?.files?.price || 0"
                   :file-id="route.params.id"
@@ -155,7 +155,7 @@
               </div>
             </v-col>
             <v-col md="3">
-              <detail-sidebar
+              <multimedia-detail-sidebar
                 :avatar="contentData?.avatar"
                 :first-name="contentData?.first_name"
                 :last-name="contentData?.last_name"
@@ -175,7 +175,7 @@
       </v-container>
     </section>
 
-    <mobile-order-section
+    <multimedia-detail-mobile-order-section
       v-if="!pending"
       :file-ext="contentData?.files?.ext || 'pptx'"
       :price="contentData?.files?.price || 0"
@@ -217,14 +217,6 @@
 <script setup>
 import { useFetch, useAsyncData } from "#app";
 import FileSaver from "file-saver";
-import Breadcrumb from "@/components/widgets/breadcrumb";
-import Category from "@/components/common/category";
-import MultimediaPreviewGallery from "@/components/details/multimedia-preview-gallery.vue";
-import DescriptionSection from "@/components/multimedia/detail/DescriptionSection.vue";
-import TagSection from "@/components/multimedia/detail/TagSection.vue";
-import DownloadSection from "@/components/multimedia/detail/DownloadSection.vue";
-import DetailSidebar from "@/components/multimedia/detail/DetailSidebar.vue";
-import MobileOrderSection from "@/components/multimedia/detail/MobileOrderSection.vue";
 
 definePageMeta({
   auth: false,
