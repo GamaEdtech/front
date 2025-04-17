@@ -74,6 +74,7 @@
         </v-row>
       </v-container>
     </v-container>
+    <selection-modal />
 
     <!--School service banner-->
     <v-container id="school-service-container">
@@ -150,6 +151,7 @@ import GradeExplorer from "~/components/home/grade-explorer.vue";
 import LevelGuidBanner from "~/components/home/level-guid-banner.vue";
 import BlogContainer from "~/components/home/blog-container.vue";
 import StatsBanner from "~/components/home/stats-banner.vue";
+import SelectionModal from "~/components/home/SelectionModal.vue";
 
 export default {
   auth: false,
@@ -191,6 +193,7 @@ export default {
     LevelGuidBanner,
     BlogContainer,
     StatsBanner,
+    SelectionModal,
   },
 
   data() {
