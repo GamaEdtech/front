@@ -12,7 +12,6 @@ const container = ref<HTMLDivElement | null>(null)
 onMounted(() => {
     if (!container.value) return
 
-    // Initialize Three.js
     const {
         scene,
         camera,
@@ -23,36 +22,25 @@ onMounted(() => {
         modelLoaded
     } = useThreeJS()
 
-    // Setup the scene
+    // Setup the scene with container
     setupScene(container.value)
 
     // Load the castle model
     loadCastleModel()
 
-    // Initialize character controller with unwrapped values
     let characterController: ReturnType<typeof useCharacterController> | null = null
 
-    // Watch for model to load before creating character
+    // Initialize character controller when model is loaded
     watch(modelLoaded, (isLoaded) => {
-        if (isLoaded) {
-            // Initialize character controller now that Material2006 objects are identified
-            characterController = useCharacterController(scene.value, camera.value)
+        if (!isLoaded) return
 
-            // Create character
-            characterController.createCharacter()
+        // Initialize character controller
+        characterController = useCharacterController(scene.value, camera.value)
+        characterController.createCharacter()
+        characterController.setupControls()
 
-            // Setup controls
-            characterController.setupControls()
-
-            // Start the animation loop with character updates
-            const animateCharacter = () => {
-                if (characterController) {
-                    characterController.updateCharacter()
-                }
-                requestAnimationFrame(animateCharacter)
-            }
-            animateCharacter()
-        }
+        // Start character animation loop
+        startCharacterAnimationLoop(characterController)
     })
 
     // Start the main rendering loop
@@ -66,10 +54,19 @@ onMounted(() => {
         }
     })
 })
+
+// Extract character animation loop to a separate function
+function startCharacterAnimationLoop(controller: ReturnType<typeof useCharacterController>) {
+    const animateCharacter = () => {
+        controller.updateCharacter()
+        requestAnimationFrame(animateCharacter)
+    }
+    animateCharacter()
+}
 </script>
 
 <style>
-.container{
+.container {
     margin-top: 8rem;
 }
 </style>

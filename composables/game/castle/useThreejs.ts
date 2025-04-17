@@ -4,55 +4,162 @@ import { ref, shallowRef } from 'vue'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export function useThreeJS() {
+    // Scene elements
     const scene = shallowRef(new THREE.Scene())
     const camera = shallowRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000))
     const renderer = shallowRef<THREE.WebGLRenderer | null>(null)
+
+    // State
     const animationFrameId = ref<number | null>(null)
     const material2006Objects = shallowRef<THREE.Object3D[]>([])
     const modelLoaded = ref(false)
     const castle = shallowRef<THREE.Object3D | null>(null)
 
-    // Setup scene
+    /**
+     * Sets up the Three.js scene with renderer and lighting
+     */
     const setupScene = (container: HTMLDivElement) => {
-        scene.value.background = new THREE.Color(0x0d001a)
+        // Configure scene with a slightly somber atmosphere
+        scene.value.background = new THREE.Color(0x0b1220) // A bit brighter but still moody blue
+        scene.value.fog = new THREE.FogExp2(0x0c1323, 0.001) // Lighter fog, less dense
 
-        // Setup renderer
-        renderer.value = new THREE.WebGLRenderer({ antialias: true })
-        renderer.value.setPixelRatio(window.devicePixelRatio)
-        renderer.value.setSize(window.innerWidth, window.innerHeight)
-        renderer.value.outputColorSpace = THREE.SRGBColorSpace
-        container.appendChild(renderer.value.domElement)
+        // Initialize renderer
+        initializeRenderer(container)
 
-        // Add lights
+        // Add lighting to the scene
         addLights()
 
         // Handle window resize
         window.addEventListener('resize', onWindowResize)
     }
 
-    // Add lights to scene
-    const addLights = () => {
-        const ambientLight = new THREE.AmbientLight(0x909090, 1)
-        scene.value.add(ambientLight)
+    /**
+     * Initializes and configures the WebGL renderer
+     */
+    const initializeRenderer = (container: HTMLDivElement) => {
+        renderer.value = new THREE.WebGLRenderer({
+            antialias: true,
+            powerPreference: 'high-performance'
+        })
+        renderer.value.setPixelRatio(window.devicePixelRatio)
+        renderer.value.setSize(window.innerWidth, window.innerHeight)
+        renderer.value.outputColorSpace = THREE.SRGBColorSpace
 
-        const pointLight = new THREE.PointLight(0x3333ff, 1.2, 200)
-        pointLight.position.set(0, 15, 10)
-        scene.value.add(pointLight)
+        // Enable shadows for mood
+        renderer.value.shadowMap.enabled = true
+        renderer.value.shadowMap.type = THREE.PCFSoftShadowMap
+
+        // Brighter but still moody tone mapping
+        renderer.value.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.value.toneMappingExposure = 1.1 // Increased exposure for brightness
+
+        container.appendChild(renderer.value.domElement)
     }
 
-    // Load castle model
+    /**
+     * Adds moderately somber lighting to the scene
+     */
+    const addLights = () => {
+        // Ambient light - brighter but still cool-toned for mood
+        const ambientLight = new THREE.AmbientLight(0x8090a5, 0.7)
+        scene.value.add(ambientLight)
+
+        // Main light source - brighter but still cool-toned
+        const mainLight = new THREE.DirectionalLight(0xb0c0d5, 0.8)
+        mainLight.position.set(30, 100, 20)
+        mainLight.castShadow = true
+        mainLight.shadow.mapSize.width = 2048
+        mainLight.shadow.mapSize.height = 2048
+        mainLight.shadow.camera.far = 500
+        mainLight.shadow.bias = -0.0005
+        scene.value.add(mainLight)
+
+        // Fill light for better visibility
+        const fillLight = new THREE.DirectionalLight(0x5d6e87, 0.4)
+        fillLight.position.set(-50, 40, -30)
+        scene.value.add(fillLight)
+
+        // Warm interior lights
+        const interiorLight1 = new THREE.PointLight(0xffaa55, 1.0, 120)
+        interiorLight1.position.set(-20, 25, 50)
+        scene.value.add(interiorLight1)
+
+        const interiorLight2 = new THREE.PointLight(0xffaa55, 0.8, 100)
+        interiorLight2.position.set(25, 20, -30)
+        scene.value.add(interiorLight2)
+
+        // Additional visibility light
+        const visibilityLight = new THREE.HemisphereLight(0x606c84, 0x2a303c, 0.5)
+        scene.value.add(visibilityLight)
+
+        // Flickering animation - more subtle
+        const flickerLights = () => {
+            if (!modelLoaded.value) return
+
+            // Subtle random intensity fluctuation
+            interiorLight1.intensity = 1.0 + Math.random() * 0.1
+            interiorLight2.intensity = 0.8 + Math.random() * 0.1
+
+            // Continue flickering
+            setTimeout(flickerLights, 150 + Math.random() * 250)
+        }
+
+        // Start flickering when model is loaded
+        setTimeout(() => {
+            if (modelLoaded.value) flickerLights()
+        }, 2000)
+    }
+
+    /**
+     * Loads the castle model from GLB file
+     */
     const loadCastleModel = () => {
         const loader = new GLTFLoader()
         loader.load('/game/castle/castle-v2.glb', (gltf) => {
             castle.value = gltf.scene
             castle.value.scale.set(1, 1, 1)
-            scene.value.add(castle.value)
 
+            // Add shadows to all meshes for mood
+            castle.value.traverse((object) => {
+                if (object instanceof THREE.Mesh) {
+                    object.castShadow = true
+                    object.receiveShadow = true
+
+                    // Slightly adjust materials for mood without making them too dark
+                    if (object.material) {
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(adjustMaterial)
+                        } else {
+                            adjustMaterial(object.material)
+                        }
+                    }
+                }
+            })
+
+            scene.value.add(castle.value)
             modelLoaded.value = true
         })
     }
 
-    // Animation loop
+    /**
+     * Adjusts material for a slightly melancholic look
+     */
+    const adjustMaterial = (material: THREE.Material) => {
+        if (material instanceof THREE.MeshStandardMaterial) {
+            // Slightly desaturate colors but maintain visibility
+            if (material.color) {
+                const color = material.color.getHSL({ h: 0, s: 0, l: 0 })
+                material.color.setHSL(color.h, Math.max(0, color.s - 0.15), Math.max(0.2, color.l - 0.05))
+            }
+
+            // Moderate roughness adjustment
+            material.roughness = Math.min(0.9, material.roughness + 0.1)
+        }
+    }
+
+    /**
+     * Starts the main rendering animation loop
+     */
     const startAnimationLoop = () => {
         const animate = () => {
             if (renderer.value) {
@@ -63,7 +170,9 @@ export function useThreeJS() {
         animate()
     }
 
-    // Handle window resize
+    /**
+     * Handles window resize events
+     */
     const onWindowResize = () => {
         if (renderer.value) {
             camera.value.aspect = window.innerWidth / window.innerHeight
@@ -72,7 +181,9 @@ export function useThreeJS() {
         }
     }
 
-    // Cleanup
+    /**
+     * Cleans up resources when component is unmounted
+     */
     const cleanup = () => {
         if (animationFrameId.value !== null) {
             cancelAnimationFrame(animationFrameId.value)
@@ -92,3 +203,4 @@ export function useThreeJS() {
         castle
     }
 }
+

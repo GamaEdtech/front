@@ -2,17 +2,65 @@
 import * as THREE from 'three'
 import { shallowRef } from 'vue'
 
+// Define types for better code organization
+interface MoveState {
+    forward: boolean;
+    backward: boolean;
+    left: boolean;
+    right: boolean;
+    mouseX: number;
+    mouseY: number;
+}
+
+interface BoundaryWall {
+    x: number;
+    z: number;
+    leftX: number;
+    rightX: number;
+}
+
+interface DoorBoundary {
+    leftX: number;
+    rightX: number;
+    z: number;
+    leftWall: {
+        leftX: number;
+        rightX: number;
+    };
+    rightWall: {
+        leftX: number;
+        rightX: number;
+    };
+}
+
+interface CastleBoundaries {
+    leftWall: BoundaryWall;
+    rightWall: BoundaryWall;
+    backWall: BoundaryWall;
+    frontWall: BoundaryWall;
+    corridorRightWall: BoundaryWall;
+    corridorLeftWall: BoundaryWall;
+    roomLeftWall: BoundaryWall;
+    roomRightWall: BoundaryWall;
+    door1: DoorBoundary;
+    door2: DoorBoundary;
+    door3: DoorBoundary;
+}
+
 export function useCharacterController(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
 ) {
+    // Character references
     const character = shallowRef<THREE.Object3D | null>(null)
     const characterBox = shallowRef<THREE.Box3 | null>(null)
-    const moveSpeed = 1.5
-    const rotationSpeed = 0.02
+
+    // Movement constants
+    const MOVE_SPEED = 1.5
+    const ROTATION_SPEED = 0.02
 
     // Movement state
-    const moveState = {
+    const moveState: MoveState = {
         forward: false,
         backward: false,
         left: false,
@@ -21,12 +69,105 @@ export function useCharacterController(
         mouseY: 0
     }
 
-    // Create character
+    // Castle boundaries for collision detection
+    const boundaries: CastleBoundaries = {
+        leftWall: {
+            x: -78,
+            z: -478.139803,
+            leftX: -79,
+            rightX: -77
+        },
+        rightWall: {
+            x: 70,
+            z: -478.139803,
+            leftX: 69,
+            rightX: 71
+        },
+        backWall: {
+            z: 490,
+            x: 0,
+            leftX: -78,
+            rightX: 70
+        },
+        frontWall: {
+            z: -812,
+            x: 0,
+            leftX: -78,
+            rightX: 70
+        },
+        corridorRightWall: {
+            leftX: 2.4774,
+            rightX: 85,
+            z: -478.139803,
+            x: 43.7387
+        },
+        corridorLeftWall: {
+            leftX: -107.58,
+            rightX: -34.8965,
+            z: -478.139803,
+            x: -71.2383
+        },
+        roomLeftWall: {
+            x: -145.62,
+            z: -577,
+            leftX: -146,
+            rightX: -145
+        },
+        roomRightWall: {
+            x: 38.5,
+            z: -577,
+            leftX: 38,
+            rightX: 39
+        },
+        door1: {
+            leftX: 24,
+            rightX: 62,
+            z: 248.79,
+            leftWall: {
+                leftX: -78,
+                rightX: 24
+            },
+            rightWall: {
+                leftX: 62,
+                rightX: 72
+            }
+        },
+        door2: {
+            leftX: -76,
+            rightX: -36,
+            z: 3.10,
+            leftWall: {
+                leftX: -79,
+                rightX: -72
+            },
+            rightWall: {
+                leftX: -36,
+                rightX: 62
+            }
+        },
+        door3: {
+            leftX: 24,
+            rightX: 62,
+            z: -242.20,
+            leftWall: {
+                leftX: -78,
+                rightX: 24
+            },
+            rightWall: {
+                leftX: 62,
+                rightX: 72
+            }
+        },
+    }
+
+    /**
+     * Creates and sets up the character in the scene
+     */
     const createCharacter = () => {
         // Create a character container
         const characterContainer = new THREE.Object3D()
 
-        // Create character body (temporary box)
+        // Create character body
         const geometry = new THREE.BoxGeometry(2, 4, 2)
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const body = new THREE.Mesh(geometry, material)
@@ -37,7 +178,7 @@ export function useCharacterController(
         scene.add(characterContainer)
         character.value = characterContainer
 
-        // Set up character position and rotation
+        // Set up character position
         characterContainer.position.set(0, 50, 450) // Starting position
 
         // Create bounding box for collision detection
@@ -51,7 +192,9 @@ export function useCharacterController(
         return characterContainer
     }
 
-    // Setup input controls
+    /**
+     * Sets up input controls for character movement
+     */
     const setupControls = () => {
         // Keyboard events
         window.addEventListener('keydown', onKeyDown)
@@ -66,7 +209,9 @@ export function useCharacterController(
         })
     }
 
-    // Handle key down
+    /**
+     * Handles keydown events for movement
+     */
     const onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
             case 'KeyW':
@@ -84,7 +229,9 @@ export function useCharacterController(
         }
     }
 
-    // Handle key up
+    /**
+     * Handles keyup events for movement
+     */
     const onKeyUp = (event: KeyboardEvent) => {
         switch (event.code) {
             case 'KeyW':
@@ -102,7 +249,9 @@ export function useCharacterController(
         }
     }
 
-    // Handle mouse movement for head rotation
+    /**
+     * Handles mouse movement for camera rotation
+     */
     const onMouseMove = (event: MouseEvent) => {
         if (document.pointerLockElement === document.body) {
             moveState.mouseX += event.movementX * 0.1
@@ -111,178 +260,154 @@ export function useCharacterController(
             // Limit vertical rotation
             moveState.mouseY = Math.max(-45, Math.min(45, moveState.mouseY))
 
-            // Apply rotation to camera
+            // Apply rotation to character and camera
             if (character.value) {
-                character.value.rotation.y = -moveState.mouseX * rotationSpeed
-                camera.rotation.x = -moveState.mouseY * rotationSpeed * 0.5
+                character.value.rotation.y = -moveState.mouseX * ROTATION_SPEED
+                camera.rotation.x = -moveState.mouseY * ROTATION_SPEED * 0.5
             }
         }
     }
 
-    // Update character position with collision detection focused on Material2006 objects
-    const updateCharacter = () => {
-        if (!character.value || !characterBox.value) return
-
+    /**
+     * Calculates movement direction based on input
+     */
+    const calculateMovementDirection = (): THREE.Vector3 => {
         const direction = new THREE.Vector3()
 
-        // Calculate movement direction based on character's facing direction
-        if (moveState.forward) {
-            direction.z -= moveSpeed
-        }
-        if (moveState.backward) {
-            direction.z += moveSpeed
-        }
-        if (moveState.left) {
-            direction.x -= moveSpeed
-        }
-        if (moveState.right) {
-            direction.x += moveSpeed
-        }
+        if (moveState.forward) direction.z -= MOVE_SPEED
+        if (moveState.backward) direction.z += MOVE_SPEED
+        if (moveState.left) direction.x -= MOVE_SPEED
+        if (moveState.right) direction.x += MOVE_SPEED
 
         // Normalize for consistent speed in all directions
         if (direction.length() > 0) {
-            direction.normalize().multiplyScalar(moveSpeed)
+            direction.normalize().multiplyScalar(MOVE_SPEED)
         }
 
-        // Transform direction to world space based on character's rotation
-        direction.applyQuaternion(character.value.quaternion)
-
-        // Test movement for collision
-        const potentialPosition = character.value.position.clone().add(direction)
-
-        // Update character bounding box for new position
-        const potentialBox = characterBox.value.clone()
-        potentialBox.translate(direction)
-
-        // Check for collisions specifically with Material2006 objects
-        let collision = false
-
-        console.log(potentialPosition);
-
-
-        // Define the boundaries
-        const boundaries = {
-            leftWall: {
-                x: -78,
-                z: -478.139803
-            },
-            rightWall: {
-                x: 70,
-                z: -478.139803
-            },
-            backWall: {
-                z: 490
-            },
-            frontWall: {
-                z: -812
-            },
-            corridorRightWall: {
-                leftX: 2.4774,
-                rightX: 85,
-                z: -478.139803
-            },
-            corridorLeftWall: {
-                leftX: -107.58,
-                rightX: -34.8965,
-                z: -478.139803
-            },
-            roomLeftWall: {
-                x: -145.62,
-                z: -577
-            },
-            roomRightWall: {
-                x: 38.5,
-                z: -577
-            },
-            door1: {
-                leftX: 24,
-                rightX: 62,
-                z: 248.79,
-
-                leftWall: {
-                    leftX: -78,
-                    rightX: 24
-                },
-                rightWall: {
-                    leftX: 62,
-                    rightX: 72
-                }
-            },
-            door2: {
-                leftX: -76,
-                rightX: -36,
-                z: 3.10,
-
-                leftWall: {
-                    leftX: -79,
-                    rightX: -72
-                },
-                rightWall: {
-                    leftX: -36,
-                    rightX: 62
-                }
-            },
-            door3: {
-                leftX: 24,
-                rightX: 62,
-                z: -242.20,
-
-                leftWall: {
-                    leftX: -78,
-                    rightX: 24
-                },
-                rightWall: {
-                    leftX: 62,
-                    rightX: 72
-                }
-            },
-        }
-
-        // Check if the potential position is within the boundaries
-        if (
-            (potentialPosition.x < boundaries.leftWall.x && potentialPosition.z > boundaries.leftWall.z)
-            || (potentialPosition.x > boundaries.rightWall.x && potentialPosition.z > boundaries.rightWall.z)
-            || (potentialPosition.z > boundaries.backWall.z)
-            || (potentialPosition.z < boundaries.frontWall.z)
-            || ((potentialPosition.x < boundaries.corridorRightWall.rightX && potentialPosition.x > boundaries.corridorRightWall.leftX) && (potentialPosition.z < boundaries.corridorRightWall.z && potentialPosition.z > boundaries.corridorRightWall.z - 100))
-            || ((potentialPosition.x < boundaries.corridorLeftWall.rightX && potentialPosition.x > boundaries.corridorLeftWall.leftX) && (potentialPosition.z < boundaries.corridorLeftWall.z && potentialPosition.z > boundaries.corridorLeftWall.z - 100))
-            || (potentialPosition.x < boundaries.roomLeftWall.x && potentialPosition.z < boundaries.roomLeftWall.z)
-            || (potentialPosition.x > boundaries.roomRightWall.x && potentialPosition.z < boundaries.roomRightWall.z)
-            || ((potentialPosition.x < boundaries.door1.leftWall.rightX && potentialPosition.x > boundaries.door1.leftWall.leftX) && (potentialPosition.z < boundaries.door1.z && potentialPosition.z > boundaries.door1.z - 5))
-            || ((potentialPosition.x < boundaries.door1.rightWall.rightX && potentialPosition.x > boundaries.door1.rightWall.leftX) && (potentialPosition.z < boundaries.door1.z && potentialPosition.z > boundaries.door1.z - 5))
-            || ((potentialPosition.x < boundaries.door2.rightWall.rightX && potentialPosition.x > boundaries.door2.rightWall.leftX) && (potentialPosition.z < boundaries.door2.z && potentialPosition.z > boundaries.door2.z - 5))
-            || ((potentialPosition.x < boundaries.door2.leftWall.rightX && potentialPosition.x > boundaries.door2.leftWall.leftX) && (potentialPosition.z < boundaries.door2.z && potentialPosition.z > boundaries.door2.z - 5))
-            || ((potentialPosition.x < boundaries.door3.leftWall.rightX && potentialPosition.x > boundaries.door3.leftWall.leftX) && (potentialPosition.z < boundaries.door3.z && potentialPosition.z > boundaries.door3.z - 5))
-            || ((potentialPosition.x < boundaries.door3.rightWall.rightX && potentialPosition.x > boundaries.door3.rightWall.leftX) && (potentialPosition.z < boundaries.door3.z && potentialPosition.z > boundaries.door3.z - 5))) {
-            collision = true
-        }
-
-        // If there's a collision, try to move in other directions
-        if (collision) {
-            // Try moving forward/backward
-            if (moveState.forward || moveState.backward) {
-                const forwardDirection = new THREE.Vector3(0, 0, moveState.forward ? -moveSpeed : moveSpeed)
-                forwardDirection.applyQuaternion(character.value.quaternion)
-            }
-
-            // Try moving left/right
-            if (moveState.left || moveState.right) {
-                const sideDirection = new THREE.Vector3(moveState.left ? -moveSpeed : moveSpeed, 0, 0)
-                sideDirection.applyQuaternion(character.value.quaternion)
-            }
-        } else {
-            // Move character if no collision
-            character.value.position.copy(potentialPosition)
-            characterBox.value.setFromObject(character.value)
-        }
+        return direction
     }
 
-    // Cleanup event listeners
+    /**
+     * Checks if a position collides with castle boundaries
+     */
+    const checkCollision = (position: THREE.Vector3): boolean => {
+        const { x, z } = position
+        const b = boundaries;
+
+        // Check main walls
+        if ((x < b.leftWall.x && z > b.leftWall.z) ||
+            (x > b.rightWall.x && z > b.rightWall.z) ||
+            (z > b.backWall.z) ||
+            (z < b.frontWall.z)) {
+            return true;
+        }
+
+        // Check corridor walls
+        if ((x < b.corridorRightWall.rightX && x > b.corridorRightWall.leftX) &&
+            (z < b.corridorRightWall.z && z > b.corridorRightWall.z - 100)) {
+            return true;
+        }
+
+        if ((x < b.corridorLeftWall.rightX && x > b.corridorLeftWall.leftX) &&
+            (z < b.corridorLeftWall.z && z > b.corridorLeftWall.z - 100)) {
+            return true;
+        }
+
+        // Check room walls
+        if ((x < b.roomLeftWall.x && z < b.roomLeftWall.z) ||
+            (x > b.roomRightWall.x && z < b.roomRightWall.z)) {
+            return true;
+        }
+
+        // Check doors
+        const checkDoor = (door: DoorBoundary) => {
+            return ((x < door.leftWall.rightX && x > door.leftWall.leftX) &&
+                (z < door.z && z > door.z - 5)) ||
+                ((x < door.rightWall.rightX && x > door.rightWall.leftX) &&
+                    (z < door.z && z > door.z - 5));
+        };
+
+        if (checkDoor(b.door1) || checkDoor(b.door2) || checkDoor(b.door3)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks collisions for a single component (x or z)
+     */
+    const checkComponentCollision = (currentPos: THREE.Vector3, newPos: THREE.Vector3): boolean => {
+        // Create a test position that only moves in one component
+        const testPosX = currentPos.clone();
+        testPosX.x = newPos.x;
+
+        const testPosZ = currentPos.clone();
+        testPosZ.z = newPos.z;
+
+        return checkCollision(testPosX) || checkCollision(testPosZ);
+    }
+
+    /**
+     * Updates character position with collision detection and wall sliding
+     */
+    const updateCharacter = () => {
+        if (!character.value || !characterBox.value) return
+
+        // Calculate movement direction
+        const direction = calculateMovementDirection()
+
+        // Transform direction to world space based on character's rotation
+        if (character.value) {
+            direction.applyQuaternion(character.value.quaternion)
+        }
+
+        // Current position
+        const currentPosition = character.value.position.clone()
+
+        // Test movement for collision (full movement)
+        const potentialPosition = currentPosition.clone().add(direction)
+
+        // Check for collisions
+        const collision = checkCollision(potentialPosition)
+
+        if (!collision) {
+            // No collision, move normally
+            character.value.position.copy(potentialPosition)
+        } else {
+            // Try moving only in X direction
+            const xOnlyPosition = currentPosition.clone()
+            xOnlyPosition.x += direction.x
+
+            // Try moving only in Z direction
+            const zOnlyPosition = currentPosition.clone()
+            zOnlyPosition.z += direction.z
+
+            const xCollision = checkCollision(xOnlyPosition)
+            const zCollision = checkCollision(zOnlyPosition)
+
+            // Allow sliding along walls
+            if (!xCollision) {
+                character.value.position.x = xOnlyPosition.x
+            }
+
+            if (!zCollision) {
+                character.value.position.z = zOnlyPosition.z
+            }
+        }
+
+        // Update character bounding box
+        characterBox.value.setFromObject(character.value)
+    }
+
+    /**
+     * Cleans up event listeners
+     */
     const cleanup = () => {
-        window.removeEventListener('keydown', onKeyDown)
-        window.removeEventListener('keyup', onKeyUp)
-        window.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('click', () => { })
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+        window.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('click', () => { });
     }
 
     return {
