@@ -137,7 +137,7 @@ function goToRegister() {
 }
 
 function goToRecover() {
-  emit('switchToRegister')
+  emit('switchToRecover')
 }
 
 function closeDialog() {
@@ -151,7 +151,7 @@ const recheckEnteredIdentity = () => {
 </script>
 
 <template>
-  <v-dialog v-model="props.dialog" max-width="300px">
+  <v-dialog v-model="props.dialog" max-width="300px" @click:outside="closeDialog">
     <v-card>
       <v-card-title>
         <span class="text-h5">Login</span>
