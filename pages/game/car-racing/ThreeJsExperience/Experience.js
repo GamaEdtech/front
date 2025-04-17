@@ -5,6 +5,10 @@ import Time from "./utils/Time"
 import Debug from "./utils/Debug"
 import Renderer from "./Renderer"
 import World from "./world/World"
+import Resources from "./utils/Resources"
+
+import sources from "./sources"
+
 
 let instance = null
 export default class Experience {
@@ -67,8 +71,8 @@ export default class Experience {
         this.debug = new Debug()
         this.sizes = new Sizes()
         this.time = new Time()
+        this.resources = new Resources(sources)
         this.scene = new THREE.Scene()
-        this.world = new World()
         this.camera = new Camera()
         this.renderer = new Renderer()
 
@@ -89,6 +93,16 @@ export default class Experience {
         })
 
 
+        // Wait for resources
+        this.resources.on('ready', () => {
+            this.world = new World()
+        })
+
+        if (sources.length == 0) {
+            this.world = new World()
+        }
+
+
     }
 
     resize() {
@@ -99,8 +113,10 @@ export default class Experience {
     update() {
         this.debug.update()
         this.camera.update()
-        this.world.update()
         this.renderer.update()
+        if (this.world) {
+            this.world.update()
+        }
     }
 
     destroy() {
