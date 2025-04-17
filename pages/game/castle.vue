@@ -1,5 +1,5 @@
 <template>
-    <div ref="container" class="w-full h-screen" />
+    <div ref="container" class="container" />
 </template>
 
 <script setup lang="ts">
@@ -69,17 +69,7 @@ onMounted(() => {
 </script>
 
 <style>
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-.w-full {
-    width: 100%;
-}
-
-.h-screen {
-    height: 100vh;
+.container{
+    margin-top: 8rem;
 }
 </style>

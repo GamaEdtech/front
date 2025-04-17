@@ -43,7 +43,7 @@ export function useThreeJS() {
     // Load castle model
     const loadCastleModel = () => {
         const loader = new GLTFLoader()
-        loader.load('/game/castle/models/castle-v2.glb', (gltf) => {
+        loader.load('/game/castle/castle-v2.glb', (gltf) => {
             castle.value = gltf.scene
             castle.value.scale.set(1, 1, 1)
             scene.value.add(castle.value)
