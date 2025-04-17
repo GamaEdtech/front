@@ -652,14 +652,12 @@ watch(() => route.query.city, (val) => {
         text-overflow: ellipsis;
         display: -webkit-box !important;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
       }
   .content-items .content-item .item-content-subtitle {
         overflow: hidden;
         line-height: 1.8rem;
         text-overflow: ellipsis;
         display: -webkit-box !important;
-        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         min-height: 2.8rem;
       }
