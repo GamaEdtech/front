@@ -1,8 +1,8 @@
 <template>
-  <div id="search-page-filter">
+  <div id="search-page-filter" >
     <div class="content-search">
       <!--Selected filter, user can disable any filter from here-->
-      <div v-show="enabledAppliedFilter()" id="chip-container">
+      <div v-show="enabledAppliedFilter()" id="chip-container ">
         <p
           class="my-2 mb-md-2 gama-text-body2"
           style="font-weight: 700 !important"
@@ -141,8 +141,8 @@
             Board
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-radio-group v-model="board_val" class="mt-0">
-              <v-radio label="All" color="red" :value="0"></v-radio>
+            <v-radio-group v-model="board_val">
+              <v-radio label="All" color="red" :value="0" />
               <v-radio
                 v-for="item in filter.section_list"
                 :key="item.id"
@@ -157,20 +157,20 @@
         <!-- Grade panel -->
         <v-expansion-panel>
           <v-expansion-panel-title
-          :style="{
-            color: !filter.base_list.length ? 'black' : 'transparent',
-            pointerEvents: !filter.base_list.length ? 'none' : 'auto',
-          }"
-            class="filter-title " 
+            :style="{
+              color: !filter.base_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.base_list.length ? 'none' : 'auto',
+            }"
+            class="filter-title"
             :class="{ 'filter-inactive': !filter.base_list.length }"
-            >
+          >
             Grade
           </v-expansion-panel-title>
           <v-expansion-panel-text>
             <v-radio-group
               v-model="base_val"
               @change="changeBaseVal()"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -200,7 +200,7 @@
             <v-radio-group
               @change="changeLessonVal"
               v-model="lesson_val"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -230,7 +230,7 @@
             <v-radio-group
               @change="changeTopicVal"
               v-model="topic_val"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -270,7 +270,7 @@
             <v-radio-group
               @change="changeFileTypeVal"
               v-model="file_type_val"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -293,7 +293,7 @@
             <v-radio-group
               v-model="year_val"
               @change="changeYearVal()"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -316,7 +316,7 @@
             <v-radio-group
               @change="changeMonthVal()"
               v-model="month_val"
-              class="mt-0"
+              class="mt-0 content-search"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -536,6 +536,8 @@ export default {
       ) {
         this.getFileType();
       }
+      // Update breadcrumbs when type changes
+      this.setBreadcrumbInfo();
     },
     board_val(val) {
       //Reset base filter
@@ -580,13 +582,38 @@ export default {
       } else {
         this.applied_filter.select_section_title = "";
         this.loadtime = false;
+        // Ensure breadcrumbs are updated when board filter is removed
+        this.setBreadcrumbInfo();
       }
     },
     base_val(val) {
-      if (val == 0) this.changeBaseVal();
+      if (val == 0) {
+        this.changeBaseVal();
+        // Ensure breadcrumbs are updated when base filter is removed via chip
+        this.setBreadcrumbInfo();
+      }
     },
     lesson_val(val) {
-      if (val == 0) this.changeLessonVal();
+      if (val == 0) {
+        this.changeLessonVal();
+        // Ensure breadcrumbs are updated when lesson filter is removed via chip
+        this.setBreadcrumbInfo();
+      }
+    },
+    topic_val(val) {
+      if (val == 0) {
+        // Ensure breadcrumbs are updated when topic filter is removed via chip
+        this.applied_filter.select_topic_title = "";
+        this.setBreadcrumbInfo();
+      }
+    },
+    file_type_val(val) {
+      if (val == 0) {
+        this.applied_filter.select_file_type_title = "";
+        // Ensure breadcrumbs are updated when file type filter is removed
+        this.setBreadcrumbInfo();
+      }
+      this.updateQueryParams();
     },
     test_level_val(val) {
       if (val > 0) {
@@ -597,13 +624,6 @@ export default {
         this.applied_filter.select_test_level_title = "";
       }
     },
-    file_type_val(val) {
-      if (val == 0) {
-        this.applied_filter.select_file_type_title = "";
-      }
-      this.updateQueryParams();
-    },
-
     state_val(val) {
       this.filter.city_list = [];
 
@@ -801,9 +821,14 @@ export default {
           this.applied_filter.select_base_title = this.filter.base_list.find(
             (x) => x.id === this.base_val
           ).title;
+          
+        // Update breadcrumbs immediately
+        this.setBreadcrumbInfo();
       } else {
         this.applied_filter.select_base_title = "";
         this.loadtime = false;
+        // Update breadcrumbs when filter is cleared
+        this.setBreadcrumbInfo();
       }
     },
 
@@ -830,9 +855,14 @@ export default {
         if (this.filter.lesson_list.length > 0)
           this.applied_filter.select_lesson_title =
             this.filter.lesson_list.find((x) => x.id == this.lesson_val).title;
+            
+        // Update breadcrumbs immediately
+        this.setBreadcrumbInfo();
       } else {
         this.applied_filter.select_topic_title = "";
         this.loadtime = false;
+        // Update breadcrumbs when filter is cleared
+        this.setBreadcrumbInfo();
       }
     },
 
@@ -845,13 +875,17 @@ export default {
       this.updateQueryParams();
       //Enable topic title tag
 
-      if (this.topic_val > 0)
+      if (this.topic_val > 0) {
         this.applied_filter.select_topic_title = this.filter.topic_list.find(
           (x) => x.id === this.topic_val
         ).title;
-      else {
+        // Update breadcrumbs immediately
+        this.setBreadcrumbInfo();
+      } else {
         this.applied_filter.select_topic_title = "";
         this.loadtime = false;
+        // Update breadcrumbs when filter is cleared
+        this.setBreadcrumbInfo();
       }
     },
 
@@ -951,49 +985,76 @@ export default {
     setBreadcrumbInfo(setTitle = true) {
       this.breadcrumbs = [];
 
-      //Type breadcrumb
+      // Add default home item
+      this.breadcrumbs.push({
+        title: 'Home',
+        disabled: false,
+        href: '/',
+      });
+
+      // Type breadcrumb (main category)
       var active_tab = this.$route.query.type;
       var breadcrumb_item = {
-        text: "",
+        title: "", // Changed from "text" to "title" for Vuetify 3
         disabled: false,
         href: `/search?type=${active_tab}`,
       };
-      if (active_tab === "test") breadcrumb_item.text = "Past Papers";
-      else if (active_tab === "learnfiles") breadcrumb_item.text = "Multimedia";
-      else if (active_tab === "question") breadcrumb_item.text = "Forum";
-      else if (active_tab === "azmoon") breadcrumb_item.text = "QuizHub";
-      else if (active_tab === "dars") breadcrumb_item.text = "Tutorial";
-      else if (active_tab === "tutor") breadcrumb_item.text = "Tutor";
+      
+      if (active_tab === "test") breadcrumb_item.title = "Past Papers";
+      else if (active_tab === "learnfiles") breadcrumb_item.title = "Multimedia";
+      else if (active_tab === "question") breadcrumb_item.title = "Forum";
+      else if (active_tab === "azmoon") breadcrumb_item.title = "QuizHub";
+      else if (active_tab === "dars") breadcrumb_item.title = "Tutorial";
+      else if (active_tab === "tutor") breadcrumb_item.title = "Tutor";
 
       this.breadcrumbs.push(breadcrumb_item);
 
-      //Grade section
+      // Board/Section filter
       if (this.applied_filter.select_section_title) {
         this.breadcrumbs.push({
-          text: this.applied_filter.select_section_title,
+          title: this.applied_filter.select_section_title, // Changed from "text" to "title"
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}`,
         });
       }
 
-      //Base section
+      // Grade/Base filter
       if (this.applied_filter.select_base_title) {
         this.breadcrumbs.push({
-          text: this.applied_filter.select_base_title,
+          title: this.applied_filter.select_base_title, // Changed from "text" to "title"
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}`,
         });
       }
 
-      //Lesson section
+      // Subject/Lesson filter
       if (this.applied_filter.select_lesson_title) {
         this.breadcrumbs.push({
-          text: this.applied_filter.select_lesson_title,
+          title: this.applied_filter.select_lesson_title, // Changed from "text" to "title"
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}`,
         });
       }
+      
+      // Topic filter
+      if (this.applied_filter.select_topic_title) {
+        this.breadcrumbs.push({
+          title: this.applied_filter.select_topic_title, // Changed from "text" to "title"
+          disabled: false,
+          href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}&topic=${this.topic_val}`,
+        });
+      }
+      
+      // File type filter
+      if (this.applied_filter.select_file_type_title) {
+        this.breadcrumbs.push({
+          title: this.applied_filter.select_file_type_title, // Changed from "text" to "title"
+          disabled: false,
+          href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}&topic=${this.topic_val}&${active_tab === "test" ? "test_type" : "file_type"}=${this.file_type_val}`,
+        });
+      }
 
+      // Update page title if needed
       if (setTitle) {
         let page_title = "";
         if (this.$route.query.type === "test") {
@@ -1034,7 +1095,12 @@ export default {
         //Emit to parent
         this.$emit("setPageTitle", page_title);
       }
-      this.$emit("update:modelValue", this.breadcrumbs);
+      
+      // Force update the breadcrumbs by emitting the updated array
+      this.$emit("update:modelValue", [...this.breadcrumbs]);
+      
+      // Log the breadcrumbs to verify they're being generated
+      console.log("Breadcrumbs updated:", this.breadcrumbs);
     },
     setFilter(type, list) {
       if (type == "board") this.filter.section_list = list;
@@ -1144,10 +1210,6 @@ export default {
 
 <style scoped>
 @media screen and (max-width: 600px) {
-  .content-search .v-expansion-panel-title,
-  .v-expansion-panel-text {
-    background: #fff !important;
-  }
 }
 
 /* Filter panels styles to exactly match the screenshot */
@@ -1165,6 +1227,12 @@ export default {
   font-weight: 500;
   color: #000000 !important;
 }
+:deep(.v-expansion-panel-text__wrapper) {
+  max-height: 20rem !important;
+  overflow-y: auto !important;
+  padding-inline: 0 !important;
+  padding-top: 0 !important;
+}
 
 /* Style for expanded panel title icons */
 .filter-title .v-expansion-panel-title__icon {
@@ -1174,7 +1242,7 @@ export default {
 /* Inactive filter styles */
 .filter-inactive {
   color: rgba(0, 0, 0, 0.38) !important;
-  font-size: .875rem;
+  font-size: 0.875rem;
   font-weight: 600 !important;
   letter-spacing: 0.0071428571em;
   line-height: 1.375rem;
@@ -1186,8 +1254,9 @@ export default {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
- .v-expansion-panel-title:hover ::v-deep .v-expansion-panel-title__overlay {
-    opacity: 0 !important;
+/* Remove overlay on hover */
+.v-expansion-panel-title:deep(.v-expansion-panel-title__overlay) {
+  opacity: 0 !important;
 }
 /* Remove divider lines between panels */
 .v-expansion-panel:not(:first-child)::after {
@@ -1199,8 +1268,6 @@ export default {
   border: none !important;
   box-shadow: none !important;
 }
-
-
 
 /* Radio group styling */
 .v-radio-group {
@@ -1216,7 +1283,7 @@ export default {
   max-height: 20rem;
   overflow-y: auto;
   margin: 0;
-  padding: 0;
+  padding: 1rem !important;
 }
 
 @media (min-width: 960px) {
@@ -1237,5 +1304,58 @@ export default {
 
 .v-chip.v-size--default .v-chip__content {
   padding: 0 12px;
+}
+.v-radio:not(:only-child) {
+  margin-bottom: 8px !important;
+  margin-top: 0px !important;
+  max-height: 1.5rem !important;
+  cursor: pointer !important;
+}
+:deep(.v-selection-control-group) {
+  margin-top: 0.5rem !important;
+  white-space: nowrap !important;
+  word-break: revert-layer !important;
+  height: auto !important;
+  gap: 1rem !important;
+  opacity: 1 !important;
+}
+
+:deep(.v-selection-control__input) {
+  font-size: 16px !important;
+}
+
+:deep(.v-selection-control .v-label) {
+  font-size: 16px !important;
+  color: #0009 !important;
+  height: auto !important;
+  min-width: max-content !important;
+}
+
+/* Custom breadcrumbs styling to match the screenshot */
+:deep(.v-breadcrumbs) {
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+:deep(.v-breadcrumbs-item) {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+:deep(.v-breadcrumbs-item--disabled) {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+:deep(.v-breadcrumbs-divider) {
+  margin: 0 4px;
+  color: rgba(0, 0, 0, 0.38);
+}
+
+#chip-container {
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 16px;
 }
 </style>
