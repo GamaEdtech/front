@@ -165,7 +165,7 @@
             <v-carousel-item
               v-for="(image, index) in galleryImages"
               :key="index"
-              :src="image"
+              :src="image.fileUri"
               eager
               cover
               class="pointer"

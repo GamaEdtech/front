@@ -80,7 +80,7 @@ export default {
     cropFile({ coordinates, canvas, image }) {
       canvas.toBlob((blob) => {
         this.cropped_data = blob; // Keep the Blob as is (no format conversion)
-      });
+      }, "image/webp");
     },
     emitFile() {
       this.$emit("croppedData", this.cropped_data);
