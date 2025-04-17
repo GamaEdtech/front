@@ -121,7 +121,6 @@ export default defineNuxtConfig({
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     "@pinia/nuxt",
-    '~/modules/multimedia/module',
     "dayjs-nuxt",
     "nuxt-gtag",
     (_options, nuxt) => {
