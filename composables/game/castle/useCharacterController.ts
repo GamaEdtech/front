@@ -173,6 +173,9 @@ export function useCharacterController(
             backWall: {
                 z: 490
             },
+            frontWall: {
+                z: -812
+            },
             corridorRightWall: {
                 leftX: 2.4774,
                 rightX: 85,
@@ -182,7 +185,57 @@ export function useCharacterController(
                 leftX: -107.58,
                 rightX: -34.8965,
                 z: -478.139803
-            }
+            },
+            roomLeftWall: {
+                x: -145.62,
+                z: -577
+            },
+            roomRightWall: {
+                x: 38.5,
+                z: -577
+            },
+            door1: {
+                leftX: 24,
+                rightX: 62,
+                z: 248.79,
+
+                leftWall: {
+                    leftX: -78,
+                    rightX: 24
+                },
+                rightWall: {
+                    leftX: 62,
+                    rightX: 72
+                }
+            },
+            door2: {
+                leftX: -76,
+                rightX: -36,
+                z: 3.10,
+
+                leftWall: {
+                    leftX: -79,
+                    rightX: -72
+                },
+                rightWall: {
+                    leftX: -36,
+                    rightX: 62
+                }
+            },
+            door3: {
+                leftX: 24,
+                rightX: 62,
+                z: -242.20,
+
+                leftWall: {
+                    leftX: -78,
+                    rightX: 24
+                },
+                rightWall: {
+                    leftX: 62,
+                    rightX: 72
+                }
+            },
         }
 
         // Check if the potential position is within the boundaries
@@ -190,8 +243,17 @@ export function useCharacterController(
             (potentialPosition.x < boundaries.leftWall.x && potentialPosition.z > boundaries.leftWall.z)
             || (potentialPosition.x > boundaries.rightWall.x && potentialPosition.z > boundaries.rightWall.z)
             || (potentialPosition.z > boundaries.backWall.z)
+            || (potentialPosition.z < boundaries.frontWall.z)
             || ((potentialPosition.x < boundaries.corridorRightWall.rightX && potentialPosition.x > boundaries.corridorRightWall.leftX) && (potentialPosition.z < boundaries.corridorRightWall.z && potentialPosition.z > boundaries.corridorRightWall.z - 100))
-            || ((potentialPosition.x < boundaries.corridorLeftWall.rightX && potentialPosition.x > boundaries.corridorLeftWall.leftX) && (potentialPosition.z < boundaries.corridorLeftWall.z && potentialPosition.z > boundaries.corridorLeftWall.z - 100))) {
+            || ((potentialPosition.x < boundaries.corridorLeftWall.rightX && potentialPosition.x > boundaries.corridorLeftWall.leftX) && (potentialPosition.z < boundaries.corridorLeftWall.z && potentialPosition.z > boundaries.corridorLeftWall.z - 100))
+            || (potentialPosition.x < boundaries.roomLeftWall.x && potentialPosition.z < boundaries.roomLeftWall.z)
+            || (potentialPosition.x > boundaries.roomRightWall.x && potentialPosition.z < boundaries.roomRightWall.z)
+            || ((potentialPosition.x < boundaries.door1.leftWall.rightX && potentialPosition.x > boundaries.door1.leftWall.leftX) && (potentialPosition.z < boundaries.door1.z && potentialPosition.z > boundaries.door1.z - 5))
+            || ((potentialPosition.x < boundaries.door1.rightWall.rightX && potentialPosition.x > boundaries.door1.rightWall.leftX) && (potentialPosition.z < boundaries.door1.z && potentialPosition.z > boundaries.door1.z - 5))
+            || ((potentialPosition.x < boundaries.door2.rightWall.rightX && potentialPosition.x > boundaries.door2.rightWall.leftX) && (potentialPosition.z < boundaries.door2.z && potentialPosition.z > boundaries.door2.z - 5))
+            || ((potentialPosition.x < boundaries.door2.leftWall.rightX && potentialPosition.x > boundaries.door2.leftWall.leftX) && (potentialPosition.z < boundaries.door2.z && potentialPosition.z > boundaries.door2.z - 5))
+            || ((potentialPosition.x < boundaries.door3.leftWall.rightX && potentialPosition.x > boundaries.door3.leftWall.leftX) && (potentialPosition.z < boundaries.door3.z && potentialPosition.z > boundaries.door3.z - 5))
+            || ((potentialPosition.x < boundaries.door3.rightWall.rightX && potentialPosition.x > boundaries.door3.rightWall.leftX) && (potentialPosition.z < boundaries.door3.z && potentialPosition.z > boundaries.door3.z - 5))) {
             collision = true
         }
 
