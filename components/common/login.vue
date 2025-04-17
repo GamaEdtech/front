@@ -1,9 +1,12 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
 
-const login_dialog = ref(false);
+
+const props = defineProps({
+  dialog: Boolean
+})
 const passVisible = ref(false);
 const login_loading = ref(false);
 const validationSchema = yup.object().shape({
@@ -27,6 +30,69 @@ const sendOtpBtnStatus = ref(true);
 const google_login_loading = ref(true);
 const identity_holder = ref(true);
 const otp_holder = ref(false);
+const googleLoginBtn = ref(null)
+
+
+async function handleCredentialResponse(response) {
+  try {
+    const res = await fetch(
+      '/api/v1/users/googleAuth',{
+        method:'POST',
+      body: new URLSearchParams({
+        id_token: response.credential,
+      }),
+      }
+    )
+
+    const token = res.data.data.jwtToken
+    const userInfo = res.data.data.info
+
+    // Handle auth logic (depending on your auth setup)
+    if (auth?.setUserToken && auth?.setUser) {
+      auth.setUserToken(token)
+      auth.setUser(userInfo)
+    }
+
+    submitLoginV2(token)
+
+    login_dialog.value = false
+    $toast.success('Logged in successfully')
+
+    if (route.path === '/') {
+      router.push('/user')
+    }
+
+  } catch (err) {
+    const status = err?.response?.status
+
+    if (status === 401) {
+      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+    } else if (status === 500 || status === 504) {
+      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+    }
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    if (window.google?.accounts?.id && googleLoginBtn.value) {
+      window.google.accounts.id.initialize({
+        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+        auto_select: true
+      })
+
+      window.google.accounts.id.renderButton(googleLoginBtn.value, {
+        text: 'Login',
+        size: 'large',
+        width: '252',
+        theme: 'outline'
+      })
+
+      google_login_loading.value = false
+    }
+  }, 4000)
+})
 
 const submit = handleSubmit(async () => {
   login_loading.value = true;
@@ -41,14 +107,15 @@ const submit = handleSubmit(async () => {
       }),
     });
 
-    if (!response.ok) throw await response.json();
+    if (!response.ok) throw await response.json()
+    
 
     const data = await response.json();
 
-    if (data.type === "loginByOTP") {
-      $toast.success("Otp code sent");
+    if (data.data.type === "loginByOTP") {
+      //toast.success("Otp code sent");
       identity_holder.value = false;
-      otp_holder.value = true;
+      otp_holder.value = true;      
     } else {
       $auth.setUserToken(data.jwtToken);
       $auth.setUser(data.info);
@@ -63,15 +130,19 @@ const submit = handleSubmit(async () => {
   }
 });
 
-const switchToRegister = () => {
-  const emit = defineEmits(['update:switchToRegister'])
-  emit("update:switchToRegister", "register");
-};
+const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
 
-const switchToPassRecover = () => {
-  const emit = defineEmits(['update:switchToRegister'])
-  emit("update:switchToPassRecover", "pass_recover");
-};
+function goToRegister() {
+  emit('switchToRegister')
+}
+
+function goToRecover() {
+  emit('switchToRegister')
+}
+
+function closeDialog() {
+  emit('update:dialog', false)
+}
 
 const recheckEnteredIdentity = () => {
   otp_holder.value = false;
@@ -80,7 +151,7 @@ const recheckEnteredIdentity = () => {
 </script>
 
 <template>
-  <v-dialog v-model="login_dialog" max-width="300px">
+  <v-dialog v-model="props.dialog" max-width="300px">
     <v-card>
       <v-card-title>
         <span class="text-h5">Login</span>
@@ -128,7 +199,7 @@ const recheckEnteredIdentity = () => {
                       required
                       :error-messages="password.errorMessage.value"
                     />
-                    <p @click="switchToPassRecover" class="pointer">
+                    <p @click="goToRecover" class="pointer">
                       Forget password
                     </p>
                   </v-col>
@@ -136,14 +207,14 @@ const recheckEnteredIdentity = () => {
                     <v-divider class="mb-3" />
                     <p
                       class="text-h6 text-center pointer"
-                      @click="switchToRegister"
+                      @click="goToRegister"
                     >
                       Not registered? Register now
                     </p>
                     <v-divider class="mt-3" />
                   </v-col>
                   <v-col cols="6">
-                    <v-btn outlined block @click="model = !login_dialog">Cancel</v-btn>
+                    <v-btn outlined block @click="closeDialog">Cancel</v-btn>
                   </v-col>
                   <v-col cols="6">
                     <v-btn

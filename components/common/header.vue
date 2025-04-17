@@ -116,10 +116,12 @@
 
       <div>
         <!--Login component-->
-        <common-login
-          v-model="login_modal"
-          v-model:switchToRegister="currentOpenDialog"
-          v-model:switchToPassRecover="currentOpenDialog"
+        <component
+          v-model:dialog="loginDialogVisible"
+          :is="currentAuthComponentMap[currentAuthComponent]"
+          @switchToLogin="switchTo('login')"
+          @switchToRegister="switchTo('register')"
+          @switchToRecover="switchTo('recover')"
         />
         <!--End login component-->
 
@@ -591,6 +593,24 @@
   </div>
 </template>
 <script setup>
+import CommonLogin from '~/components/common/login.vue'
+import CommonRegister from '~/components/common/register.vue'
+import CommonRecover from '~/components/common/pass-recover.vue'
+
+const isAuthModalOpen = ref(false);
+const currentAuthComponent = ref('login')
+
+const loginDialogVisible = ref(false)
+
+const currentAuthComponentMap = {
+  'login': CommonLogin,
+  'register': CommonRegister,
+  'recover': CommonRecover
+}
+
+function switchTo(name) {
+  currentAuthComponent.value = name
+}
 const sidebar = ref(false);
 const dialog = ref(false);
 const logo = ref("mainlogo-gamatrain.png");
@@ -800,8 +820,11 @@ onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll.value);
 });
 const login_modal = ref(null);
-const openLoginDialog = () => {
-  login_modal.value = true;
+const openLoginDialog = (componentName = 'login') => {
+  currentAuthComponent.value = componentName;
+  isAuthModalOpen.value = true;
+  loginDialogVisible.value = true
+  
 };
 const openRegisterDialog = () => {
   register_modal.value.register_dialog = true;
