@@ -5,6 +5,7 @@
       <slot />
     </div>
     <common-footer />
+    <AppGlobalSnackbar />
   </v-app>
 </template>
 
