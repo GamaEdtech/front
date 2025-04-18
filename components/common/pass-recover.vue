@@ -15,6 +15,7 @@ let otp = ref("")
 let identity = ref("")
 let otp_loading = ref(false)
 let countDown = ref(60)
+let timerId = ref(null)
 let sendOtpBtnStatus = ref(true)
 
 let identityHolder = ref(true)
@@ -158,13 +159,24 @@ const sendOtpCodeAgain = () => {
 
 // Timer for countdown
 const countDownTimer = () => {
-  if (countDown.value > 0) {
-    setTimeout(() => {
-      countDown.value -= 1;
-      countDownTimer();
-    }, 1000);
+  if (timerId) {
+    clearTimeout(timerId)
+    timerId = null
   }
-};
+  countDown.value = 60
+  tick()
+}
+
+const tick = () => {
+  if (countDown.value > 0) {
+    timerId = setTimeout(() => {
+      countDown.value -= 1
+      tick()
+    }, 1000)
+  } else {
+    timerId = null 
+  }
+}
 
 
 // Final password recovery
