@@ -79,23 +79,9 @@
             <v-col cols="12" md="6">
               <!--  Description   -->
               <exam-detail-description-section
-                :title="contentData.title"
-                :topics="contentData.topics"
-                :tests-num="contentData.tests_num"
-                :level="contentData.level"
-                :start-date="contentData.start_date"
-                :end-date="contentData.end_date"
-                :exam-time="contentData.azmoon_time"
-                :section-title="contentData.section_title"
-                :section-id="contentData.section"
-                :base-title="contentData.base_title"
-                :base-id="contentData.base"
-                :lesson-title="contentData.lesson_title"
-                :lesson-id="contentData.lesson"
+                :content-data="contentData"
                 :is-logged-in="$auth.loggedIn"
                 :credit="$auth.user?.credit || 0"
-                :participation="contentData.participation"
-                :pdf-price="contentData.files?.pdf?.price || 0"
                 @login="openAuthDialog('login')"
                 @register="openAuthDialog('register')"
               />

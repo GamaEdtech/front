@@ -3,34 +3,37 @@
     <div class="w-100">
       <div class="d-flex align-center justify-space-between header">
         <h1 class="detail-title gama-text-h5">
-          {{ title }}
+          {{ contentData.title }}
         </h1>
       </div>
 
       <div class="description-holder my-4">
         <!--Topics-->
-        <p class="gama-text-body2" v-if="topics && topics.length > 0">
+        <p
+          class="gama-text-body2"
+          v-if="contentData.topics && contentData.topics.length > 0"
+        >
           <i class="fa-solid fa-list ml-1 icon"></i>
           Topics:
         </p>
-        <ul v-if="topics && topics.length > 0">
-          <li v-for="(item, index) in topics" :key="index">
+        <ul v-if="contentData.topics && contentData.topics.length > 0">
+          <li v-for="(item, index) in contentData.topics" :key="index">
             {{ item.title }}
           </li>
         </ul>
         <!--End topics-->
 
         <!--Question number-->
-        <p class="mt-1 gama-text-body2" v-if="testsNum">
+        <p class="mt-1 gama-text-body2" v-if="contentData.tests_num">
           <i class="fa-solid fa-question ml-1 icon"></i>
-          Questions: {{ testsNum }}
+          Questions: {{ contentData.tests_num }}
         </p>
         <!--End question number-->
 
         <!--Difficulty level-->
-        <p class="mt-1 gama-text-body2" v-if="level">
+        <p class="mt-1 gama-text-body2" v-if="contentData.level">
           <i class="fa-solid fa-temperature-three-quarters ml-1 icon"></i>
-          Difficulty level: {{ level }}
+          Difficulty level: {{ contentData.level }}
         </p>
         <!--End difficulty level-->
 
@@ -38,7 +41,7 @@
         <p class="mt-1 gama-text-body2">
           <i class="fa-solid fa-circle-play"></i>
           Start:
-          {{ startDate ? startDate : "-" }}
+          {{ contentData.start_date ? contentData.start_date : "-" }}
         </p>
         <!--End start date-->
 
@@ -46,14 +49,14 @@
         <p class="mt-1 gama-text-body2">
           <i class="fa-solid fa-circle-stop"></i>
           End:
-          {{ endDate ? endDate : "-" }}
+          {{ contentData.end_date ? contentData.end_date : "-" }}
         </p>
         <!--End end date-->
 
         <!--Duration-->
-        <p class="mt-1 gama-text-body2" v-if="examTime">
+        <p class="mt-1 gama-text-body2" v-if="contentData.azmoon_time">
           <i class="fa-solid fa-clock"></i>
-          Duration: {{ examTime }} minutes
+          Duration: {{ contentData.azmoon_time }} minutes
         </p>
         <!--End duration-->
       </div>
@@ -61,27 +64,27 @@
       <div class="label-holder">
         <v-chip
           link
-          v-show="sectionTitle"
+          v-show="contentData.section_title"
           class="mr-1"
-          :to="`/search?type=azmoon&section=${sectionId}`"
+          :to="`/search?type=azmoon&section=${contentData.section}`"
         >
-          {{ sectionTitle }}
+          {{ contentData.section_title }}
         </v-chip>
         <v-chip
           link
-          v-show="baseTitle"
-          :to="`/search?type=azmoon&section=${sectionId}&base=${baseId}`"
+          v-show="contentData.base_title"
+          :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
           class="mr-1"
         >
-          {{ baseTitle }}
+          {{ contentData.base_title }}
         </v-chip>
         <v-chip
           link
-          v-show="lessonTitle"
-          :to="`/search?type=azmoon&section=${sectionId}&base=${baseId}&lesson=${lessonId}`"
+          v-show="contentData.lesson_title"
+          :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
           class="ma-1"
         >
-          {{ lessonTitle }}
+          {{ contentData.lesson_title }}
         </v-chip>
       </div>
     </div>
@@ -107,58 +110,12 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 const props = defineProps({
-  title: {
-    type: String,
-    default: "",
-  },
-  topics: {
-    type: Array,
-    default: () => [],
-  },
-  testsNum: {
-    type: [Number, String],
-    default: 0,
-  },
-  level: {
-    type: String,
-    default: "",
-  },
-  startDate: {
-    type: String,
-    default: "",
-  },
-  endDate: {
-    type: String,
-    default: "",
-  },
-  examTime: {
-    type: [Number, String],
-    default: 0,
-  },
-  sectionTitle: {
-    type: String,
-    default: "",
-  },
-  sectionId: {
-    type: [Number, String],
-    default: "",
-  },
-  baseTitle: {
-    type: String,
-    default: "",
-  },
-  baseId: {
-    type: [Number, String],
-    default: "",
-  },
-  lessonTitle: {
-    type: String,
-    default: "",
-  },
-  lessonId: {
-    type: [Number, String],
-    default: "",
+  contentData: {
+    type: Object,
+    required: true,
   },
   isLoggedIn: {
     type: Boolean,
@@ -168,22 +125,17 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  participation: {
-    type: Object,
-    default: () => ({}),
-  },
-  pdfPrice: {
-    type: Number,
-    default: 0,
-  },
 });
+
+// Create a shortcut computed property for better readability
+const contentData = computed(() => props.contentData);
 
 const emit = defineEmits(["login", "register"]);
 
 // Computed properties
 const isFree = computed(() => {
-  const participationPrice = props.participation?.price || 0;
-  const pdfPrice = props.pdfPrice || 0;
+  const participationPrice = contentData.value.participation?.price || 0;
+  const pdfPrice = contentData.value.files?.pdf?.price || 0;
 
   return !(participationPrice > 0 && pdfPrice > 0);
 });
