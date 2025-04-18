@@ -469,157 +469,199 @@ watch(() => route.query.city, (val) => {
 </script>
 
 <template>
-  <div>
-    <!--Mobile filter-->
-    <v-row justify="center" class="d-block d-md-none">
-      <v-dialog
-        v-model="dialog"
-        fullscreen
-        hide-overlay
-        transition="dialog-bottom-transition "
-      >
-        <v-card>
-          <div style="position: sticky; top: 0; left: 0; right: 0; z-index: 10">
-            <v-toolbar class="filter-btn-header">
-              <v-toolbar-items>
-                <v-btn
-                  class="text-h5 font-weight-bold"
-                  variant="text"
-                  @click="dialog = false"
-                >
-                  Search in content
+  <section class="search-page mt-md-16 mt-lg-0">
+    <div class="container">
+      <!--Mobile filter-->
+      <v-row justify="center" class="d-block d-md-none">
+        <v-dialog
+          v-model="dialog"
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition "
+        >
+          <v-card>
+            <div style="position: sticky; top: 0; left: 0; right: 0; z-index: 10">
+              <v-toolbar class="filter-btn-header">
+                <v-toolbar-items>
+                  <v-btn
+                    class="text-h5 font-weight-bold"
+                    variant="text"
+                    @click="dialog = false"
+                  >
+                    Search in content
+                  </v-btn>
+                </v-toolbar-items>
+                <v-spacer></v-spacer>
+                <v-btn variant="icon" @click="dialog = false">
+                  <v-icon>mdi-close</v-icon>
                 </v-btn>
-              </v-toolbar-items>
-              <v-spacer></v-spacer>
-              <v-btn variant="icon" @click="dialog = false">
-                <v-icon>mdi-close</v-icon>
+              </v-toolbar>
+            </div>
+            <v-card-text>
+              <search-filter
+                ref="side_filter"
+                class="mx-3"
+                v-model="breadcrumbs"
+                @setPageTitle="setPageTitle()"
+              />
+            </v-card-text>
+            <v-card-actions
+              style="position: sticky; bottom: 0; left: 0; right: 0"
+            >
+              <v-btn
+                size="medium"
+                block
+                class="filter-show-result mr-4"
+                @click="dialog = !dialog"
+              >
+                show result ({{ result_count }})
               </v-btn>
-            </v-toolbar>
-          </div>
-          <v-card-text>
-            <search-filter
-              ref="side_filter"
-              class="mx-3"
-              v-model="breadcrumbs"
-              @setPageTitle="setPageTitle()"
-            />
-          </v-card-text>
-          <v-card-actions
-            style="position: sticky; bottom: 0; left: 0; right: 0"
-          >
-            <v-btn
-              size="medium"
-              block
-              class="filter-show-result mr-4"
-              @click="dialog = !dialog"
-            >
-              show result ({{ result_count }})
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-btn
-        @click="openDialog()"
-        class="d-block d-md-none"
-        min-width="40"
-        position="fixed"
-        location="bottom right"
-        style="z-index: 10"
-        size="x-large"
-        color="teal"
-        variant="elevated"
-        rounded="pill"
-      >
-        <v-icon> mdi-filter </v-icon>
-        <v-slide-x-reverse-transition>
-          <span v-show="expandFilterMenu" class="text-h6"> filter </span>
-        </v-slide-x-reverse-transition>
-      </v-btn>
-    </v-row>
-
-    <!-- Start  -->
-    <section class="search-page mt-md-16 mt-lg-0">
-      <v-container>
-        <v-row>
-          <v-col md="3" lg="3" class="d-none d-md-block">
-            <v-card flat color="#f5f5f5" style="position: sticky; top: 1rem">
-              <v-card-text>
-                <search-filter
-                  ref="side_filter"
-                  v-model="breadcrumbs"
-                  @setPageTitle="setPageTitle"
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-btn
+          @click="openDialog()"
+          class="d-block d-md-none"
+          min-width="40"
+          position="fixed"
+          location="bottom right"
+          style="z-index: 10"
+          size="x-large"
+          color="teal"
+          variant="elevated"
+          rounded="pill"
+        >
+          <v-icon> mdi-filter </v-icon>
+          <v-slide-x-reverse-transition>
+            <span v-show="expandFilterMenu" class="text-h6"> filter </span>
+          </v-slide-x-reverse-transition>
+        </v-btn>
+      </v-row>
+  
+      <!-- Start  -->
+      <section class="search-page mt-md-16 mt-lg-0">
+        <v-container>
+          <v-row>
+            <v-col md="3" lg="3" class="d-none d-md-block">
+              <v-card flat color="#f5f5f5" style="position: sticky; top: 1rem">
+                <v-card-text>
+                  <search-filter
+                    ref="side_filter"
+                    v-model="breadcrumbs"
+                    @setPageTitle="setPageTitle"
+                  />
+                </v-card-text>
+              </v-card>
+            </v-col>
+  
+            <v-col lg="9" md="9" sm="12" class="search-contents px-0">
+              <v-breadcrumbs
+                :items="breadcrumbs"
+                class="search-breadcrumb d-none d-md-block"
+              >
+                <template #divider>
+                  <v-icon icon="mdi-chevron-right" />
+                </template>
+              </v-breadcrumbs>
+  
+              <!-- Search tabs -->
+              <common-tabs
+                ref="content_tabs"
+              />
+              <!-- End search tabs -->
+  
+              <div
+                class="text-center"
+                v-if="page_loading === false && items.length === 0"
+              >
+                Oops! no data found
+              </div>
+              <div v-else>
+                <search-type-paper
+                  v-if="$route.query.type === 'test'"
+                  :items="items"
                 />
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          <v-col lg="9" md="9" sm="12" class="search-contents px-0">
-            <v-breadcrumbs
-              :items="breadcrumbs"
-              class="search-breadcrumb d-none d-md-block"
-            >
-              <template #divider>
-                <v-icon icon="mdi-chevron-right" />
-              </template>
-            </v-breadcrumbs>
-
-            <!-- Search tabs -->
-            <common-tabs
-              ref="content_tabs"
-            />
-            <!-- End search tabs -->
-
-            <div
-              class="text-center"
-              v-if="page_loading === false && items.length === 0"
-            >
-              Oops! no data found
-            </div>
-            <div v-else>
-              <search-type-paper
-                v-if="$route.query.type === 'test'"
-                :items="items"
-              />
-              <search-type-multimedia
-                v-else-if="$route.query.type === 'learnfiles'"
-                :items="items"
-              />
-              <search-type-q-a
-                v-else-if="$route.query.type === 'question'"
-                :items="items"
-              />
-              <search-type-exam
-                v-else-if="$route.query.type === 'azmoon'"
-                :items="items"
-              />
-              <search-type-tutorial
-                v-else-if="$route.query.type === 'dars'"
-                :items="items"
-              />
-              <search-type-tutor
-                v-else-if="$route.query.type === 'tutor'"
-                :items="items"
-              />
-            </div>
-            <v-row v-show="page_loading">
-              <v-col cols="12" class="text-center">
-                <v-progress-circular
-                  :size="40"
-                  :width="4"
-                  class="mt-12 mb-12"
-                  color="orange"
-                  indeterminate
+                <search-type-multimedia
+                  v-else-if="$route.query.type === 'learnfiles'"
+                  :items="items"
                 />
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </section>
-  </div>
+                <search-type-q-a
+                  v-else-if="$route.query.type === 'question'"
+                  :items="items"
+                />
+                <search-type-exam
+                  v-else-if="$route.query.type === 'azmoon'"
+                  :items="items"
+                />
+                <search-type-tutorial
+                  v-else-if="$route.query.type === 'dars'"
+                  :items="items"
+                />
+                <search-type-tutor
+                  v-else-if="$route.query.type === 'tutor'"
+                  :items="items"
+                />
+              </div>
+              <v-row v-show="page_loading">
+                <v-col cols="12" class="text-center">
+                  <v-progress-circular
+                    :size="40"
+                    :width="4"
+                    class="mt-12 mb-12"
+                    color="orange"
+                    indeterminate
+                  />
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </section>
+    </div>
+  </section>
 </template>
 
-<style>
+<style >
+@media (min-width: 1264px) {
+    .v-application .mt-lg-0 {
+        margin-top: 0 !important;
+    }
+}
+@media (min-width: 960px) {
+    .v-application .mt-md-16 {
+        margin-top: 64px !important;
+    }
+}
+.search-page {
+    border-top: 1px solid rgba(33, 33, 33, .08);
+}
+
+@media (min-width: 1264px) {
+    .container {
+        max-width: 1185px;
+    }
+}
+@media (min-width: 960px) {
+    .container {
+        max-width: 900px;
+    }
+}
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 12px;
+    width: 100%;
+}
+@media only screen and (min-width: 1264px) {
+    .container {
+        max-width: 80% !important;
+    }
+}
+@media only screen and (min-width: 600px) {
+    .container {
+        max-width: 100% !important;
+    }
+}
 .content-items .content-item {
     min-height: 23rem !important;
 }
