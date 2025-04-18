@@ -10,7 +10,7 @@
         <div class="mt-0 py-0 header-path">
           <!-- Skeleton loader for breadcrumb -->
           <v-skeleton-loader
-            v-if="pending"
+            v-if="dataFetching"
             class="mx-auto"
             height="60"
           ></v-skeleton-loader>
@@ -25,7 +25,7 @@
     <section>
       <v-container class="py-0">
         <!-- Skeleton loading state -->
-        <div v-if="pending" class="detail mt-md-8">
+        <div v-if="dataFetching" class="detail mt-md-8">
           <v-row>
             <!-- Skeleton for gallery -->
             <v-col cols="12" md="3">
@@ -106,7 +106,7 @@
 
     <!--Mobile order section-->
     <exam-detail-mobile-order-section
-      v-if="!pending"
+      v-if="!dataFetching"
       :exam-id="contentData.id"
       :exam-prices="contentData.price"
       :is-logged-in="$auth.loggedIn"
@@ -266,10 +266,18 @@ const { $auth, $toast } = useNuxtApp();
 
 // Component data
 const contentData = ref({});
-const pending = ref(true);
 const crash_report = ref(null);
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
+
+// Reactive data for breadcrumbs
+const breads = reactive([
+  {
+    text: "Online exam",
+    disabled: false,
+    href: "/search?type=azmoon",
+  },
+]);
 
 // Gallery data
 const galleryImages = ref([]);
@@ -281,9 +289,21 @@ const galleryHelpData = ref({
   lesson: "",
 });
 
-// Reactive data
+// Other reactive data
 const sell_btn = ref(true);
 const rating = ref(4.5);
+
+// Computed properties
+const isFree = computed(() => {
+  if (!contentData.value) return true;
+
+  if (
+    contentData.value.participation?.price > 0 &&
+    contentData.value.files?.pdf?.price > 0
+  )
+    return false;
+  else return true;
+});
 
 // Fetch the exam data
 async function fetchExamData() {
@@ -302,7 +322,11 @@ async function fetchExamData() {
 }
 
 // Use asyncData to fetch data
-const { data: asyncContentData, error } = useAsyncData(
+const {
+  data: asyncContentData,
+  error,
+  pending: dataFetching,
+} = useAsyncData(
   `exam-${route.params.id}`,
   async () => {
     try {
@@ -325,119 +349,69 @@ useHead(() => ({
   title: contentData.value?.title || "Exam Details",
 }));
 
-// Lifecycle hooks
-onMounted(async () => {
-  pending.value = true;
-
-  // Verify we have content data
-  if (!contentData.value || Object.keys(contentData.value).length === 0) {
-    if (asyncContentData.value) {
-      contentData.value = asyncContentData.value;
-
-      // Update gallery data
-      if (contentData.value.thumb_pic_url) {
-        console.log("Setting gallery image:", contentData.value.thumb_pic_url);
-        galleryImages.value = [contentData.value.thumb_pic_url];
-      }
-
-      galleryHelpData.value = {
-        state: contentData.value.state || "",
-        section: contentData.value.section || "",
-        base: contentData.value.base || "",
-        course: contentData.value.course || "",
-        lesson: contentData.value.lesson || "",
-      };
-
-      initBreadCrumb();
-    }
-  }
-
-  pending.value = false;
-});
-
-// Reactive data
-const breads = reactive([
-  {
-    text: "Online exam",
-    disabled: false,
-    href: "/search?type=azmoon",
-  },
-]);
-
-const detail = reactive({
-  poster: "poster1.jpg",
-  linkPoster: "",
-  title: "A collection of 120 test questions for lessons 6 to 9 on (3) 12th",
-  rate: 5,
-  previewImage: "test1.png",
-  labels: [
-    "History (3)",
-    "Twelfth",
-    "Second Secondary",
-    "Literature",
-    "Kermanshah",
-    "District 2",
-    "Shohadai Parvin",
-    "Farvardin",
-    "2019",
-  ],
-});
-
-// Sample data (could be moved to its own file if needed)
-const sampleTestList = reactive([
-  {
-    type: "azmoon",
-    img: "test2.png",
-    description:
-      "The series of tests of the twelfth history book Lessons 1 to 12",
-    pages: "222",
-    owner: "Gama management team",
-    ownerImg: "gamaadmin.png",
-  },
-  // ... existing code ...
-]);
-
-const relatedList = reactive([
-  {
-    class: "learning",
-    header: "Related educational content",
-    icon: "learnfiles",
-    description: " File های پاورپوینت، ویدئو، صوتی، متنی و ...",
-    contentItemList: [
-      {
-        title:
-          "Online teaching, page 53 to 58 of Arabic (3) twelfth human | Lesson 4: The order of nature",
-        link: "",
-      },
-      // ... existing code ...
-    ],
-  },
-  // ... existing code ...
-]);
-
-// Methods
-const initBreadCrumb = () => {
+// Method to initialize breadcrumbs
+function initBreadCrumb() {
   if (!contentData.value) return;
 
-  breads.push(
-    {
+  // Clear existing breadcrumbs except the first one
+  while (breads.length > 1) {
+    breads.pop();
+  }
+
+  if (contentData.value.section_title) {
+    breads.push({
       text: contentData.value.section_title,
       disabled: false,
       href: `/search?type=azmoon&section=${contentData.value.section}`,
-    },
-    {
+    });
+  }
+
+  if (contentData.value.base_title) {
+    breads.push({
       text: contentData.value.base_title,
       disabled: false,
       href: `/search?type=azmoon&section=${contentData.value.section}&base=${contentData.value.base}`,
-    },
-    {
+    });
+  }
+
+  if (contentData.value.lesson_title) {
+    breads.push({
       text: contentData.value.lesson_title,
       disabled: false,
       href: `/search?type=azmoon&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
-    }
-  );
-};
+    });
+  }
+}
 
+// Function to update gallery data
+function updateGalleryData() {
+  if (contentData.value?.thumb_pic_url) {
+    galleryImages.value = [contentData.value.thumb_pic_url];
+  }
+
+  galleryHelpData.value = {
+    state: contentData.value?.state || "",
+    section: contentData.value?.section || "",
+    base: contentData.value?.base || "",
+    course: contentData.value?.course || "",
+    lesson: contentData.value?.lesson || "",
+  };
+}
+
+// Watch for data changes and update contentData
+watch(
+  asyncContentData,
+  (newData) => {
+    if (newData) {
+      contentData.value = newData;
+      updateGalleryData();
+      initBreadCrumb();
+    }
+  },
+  { immediate: true }
+);
+
+// Methods
 const openAuthDialog = (val) => {
   router.push({ query: { auth_form: val } });
 };
@@ -486,22 +460,68 @@ const openCrashReportDialog = () => {
   crash_report.value.form.type = "test";
 };
 
-// Computed properties
-const isFree = computed(() => {
-  if (!contentData.value) return true;
-
-  if (
-    contentData.value.participation?.price > 0 &&
-    contentData.value.files?.pdf?.price > 0
-  )
-    return false;
-  else return true;
+// Lifecycle hooks
+onMounted(() => {
+  // If data is already available, update the state
+  if (asyncContentData.value && !contentData.value?.id) {
+    contentData.value = asyncContentData.value;
+    updateGalleryData();
+    initBreadCrumb();
+  }
 });
 
 // Define expose for components that need to be accessed by ref
 defineExpose({
   crash_report,
 });
+
+// Sample data (only used for scaffolding - could be removed in production)
+const detail = reactive({
+  poster: "poster1.jpg",
+  linkPoster: "",
+  title: "A collection of 120 test questions for lessons 6 to 9 on (3) 12th",
+  rate: 5,
+  previewImage: "test1.png",
+  labels: [
+    "History (3)",
+    "Twelfth",
+    "Second Secondary",
+    "Literature",
+    "Kermanshah",
+    "District 2",
+    "Shohadai Parvin",
+    "Farvardin",
+    "2019",
+  ],
+});
+
+const sampleTestList = reactive([
+  {
+    type: "azmoon",
+    img: "test2.png",
+    description:
+      "The series of tests of the twelfth history book Lessons 1 to 12",
+    pages: "222",
+    owner: "Gama management team",
+    ownerImg: "gamaadmin.png",
+  },
+]);
+
+const relatedList = reactive([
+  {
+    class: "learning",
+    header: "Related educational content",
+    icon: "learnfiles",
+    description: " File های پاورپوینت، ویدئو، صوتی، متنی و ...",
+    contentItemList: [
+      {
+        title:
+          "Online teaching, page 53 to 58 of Arabic (3) twelfth human | Lesson 4: The order of nature",
+        link: "",
+      },
+    ],
+  },
+]);
 </script>
 
 <script>
