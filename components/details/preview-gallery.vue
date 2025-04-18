@@ -52,7 +52,7 @@
           <!--End mobile side section-->
 
           <!--Desktop side section-->
-          <v-col cols="2" class="pr-0 d-none d-md-flex flex-column">
+          <v-col cols="3" class="pr-0 d-none d-md-block">
             <v-btn
               icon
               large
@@ -62,11 +62,10 @@
               :key="index"
               class="mb-3 bg-blue-grey-darken-2 flex-shrink-0"
             >
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
+              <v-tooltip location="right">
+                <template v-slot:activator="{ props }">
                   <span
-                    v-bind="attrs"
-                    v-on="on"
+                    v-bind="props"
                     style="font-size: 26px"
                     :class="`icon icon-${item.icon} white--text text--darken-1`"
                   />
@@ -77,7 +76,7 @@
           </v-col>
           <!--End desktop side section-->
 
-          <v-col cols="12" md="10" class="pl-1">
+          <v-col cols="12" md="9" class="pl-1">
             <div class="mx-8 mx-md-0">
               <v-carousel
                 id="product-carousel"
