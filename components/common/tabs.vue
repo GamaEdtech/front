@@ -1,81 +1,85 @@
 <template>
-  <v-card class="d-block tab-header sticky-scroll" id="search-top-filter">
-    <v-tabs v-model="active_tab">
-      <v-tab @click="openLink('test')">
-        <v-badge
-          class="pa-1 mx-1 badge-sample"
-          color="blue"
-          :content="content_statistics.test"
-        >
-          <div class="nav-link sample-q-icon">
-            <span class="icon icon-paper"></span>
-            Past Papers
-          </div>
-        </v-badge>
-      </v-tab>
-      <v-tab @click="openLink('learnfiles')">
-        <v-badge
-          bordered
-          class="pa-1 mx-1 badge-training"
-          :content="content_statistics.learnfiles"
-          color="#2E7D32"
-        >
-          <div class="nav-link training-content-icon">
-            <span class="icon icon-multimedia"></span>
-            Multimedia
-          </div>
-        </v-badge>
-      </v-tab>
-      <v-tab @click="openLink('question')">
-        <v-badge
-          bordered
-          class="pa-1 mx-1 badge-q"
-          :content="content_statistics.question"
-          color="#BF360C"
-        >
-          <div class="nav-link q-a-icon">
-            <span class="icon icon-q-a"></span>
-            Forum
-          </div>
-        </v-badge>
-      </v-tab>
-      <v-tab @click="openLink('azmoon')">
-        <v-badge
-          bordered
-          class="pa-1 mx-1 badge-online"
-          :content="content_statistics.azmoon"
-          color="#5600E8"
-        >
-          <div class="nav-link exam-icon">
-            <span class="icon icon-exam"></span>
-            QuizHub
-          </div>
-        </v-badge>
-      </v-tab>
-      <v-tab @click="openLink('dars')">
-        <v-badge
-          bordered
-          class="pa-1 ml-1 mr-4 badge-tutorial"
-          :content="content_statistics.tutorial"
-          color="#BD081C"
-        >
-          <div class="nav-link tutorial-icon">
-            <span class="icon icon-tutorial"></span>
-            Tutorial
-          </div>
-        </v-badge>
-      </v-tab>
-      <!--      <v-tab @click="openLink('tutor')">-->
-      <!--        <v-badge bordered class="pa-1 mx-1 badge-teachers"-->
-      <!--                 :content="content_statistics.tutor" color="#8E24AA">-->
-      <!--          <div class="nav-link teacher-icon">-->
-      <!--            <span class="icon icong-teacher"></span>-->
-      <!--            Tutor-->
-      <!--          </div>-->
-      <!--        </v-badge>-->
-      <!--      </v-tab>-->
-    </v-tabs>
-  </v-card>
+    <v-card class="d-block tab-header" id="search-top-filter" flat>
+      <v-tabs 
+        v-model="active_tab"
+        background-color="#F5F5F5"
+        align-tabs="start"
+        slider-color="transparent"
+        density=""
+        class="pa-2"
+      >
+        <v-tab @click="openLink('test')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+          <v-badge
+            class="py-1 mx-1 badge-sample"
+            color="#2962FF"
+            :content="content_statistics.test"
+            bordered
+            offset-y="5"
+          >
+            <div class="nav-link sample-q-icon">
+              <span class="icon icon-paper"></span>
+              Past Papers
+            </div>
+          </v-badge>
+        </v-tab>
+        <v-tab @click="openLink('learnfiles')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+          <v-badge
+            bordered
+            class="pa-1 mx-1 badge-training"
+            :content="content_statistics.learnfiles"
+            color="#2E7D32"
+            offset-y="5"  
+          >
+            <div class="nav-link training-content-icon">
+              <span class="icon icon-multimedia"></span>
+              Multimedia
+            </div>
+          </v-badge>
+        </v-tab>
+        <v-tab @click="openLink('question')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+          <v-badge
+            bordered
+            class="pa-1 mx-1 badge-q"
+            :content="content_statistics.question"
+            color="#BF360C"
+            offset-y="5"
+          >
+            <div class="nav-link q-a-icon">
+              <span class="icon icon-q-a"></span>
+              Forum
+            </div>
+          </v-badge>
+        </v-tab>
+        <v-tab @click="openLink('azmoon')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+          <v-badge
+            bordered
+            class="pa-1 mx-1 badge-online"
+            :content="content_statistics.azmoon"
+            color="#5600E8"
+            offset-y="5"
+          >
+            <div class="nav-link exam-icon">
+              <span class="icon icon-exam"></span>
+              QuizHub
+            </div>
+          </v-badge>
+        </v-tab>
+        <v-tab @click="openLink('dars')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+          <v-badge
+            bordered
+            class="pa-1 mx-1 badge-tutorial"
+            :content="content_statistics.tutorial"
+            color="#BD081C"
+            offset-y="5"
+          >
+            <div class="nav-link tutorial-icon">
+              <span class="icon icon-tutorial"></span>
+              Tutorial
+            </div>
+          </v-badge>
+        </v-tab>
+      </v-tabs>
+    </v-card>
 </template>
 
 <script setup>
@@ -92,6 +96,18 @@ const content_statistics = ref({
   tutor: "--",
   tutorial: "--",
 });
+
+// Get title for the current section
+const getCurrentSectionTitle = () => {
+  const type = route.query.type;
+  if (type === "test") return "Past Papers";
+  if (type === "learnfiles") return "Multimedia";
+  if (type === "question") return "Forum";
+  if (type === "azmoon") return "QuizHub";
+  if (type === "dars") return "Tutorial";
+  if (type === "tutor") return "Tutor";
+  return "Past Papers"; // Default
+};
 
 // Set the active tab based on the route
 onBeforeMount(() => {
@@ -156,142 +172,207 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-// .v-toolbar.v-toolbar--flat.v-toolbar--density-default.v-theme--light.v-locale--is-ltr.v-app-bar.d-block.d-lg-none .mobile_bar{
-//   display: none;
-// }
 #search-top-filter {
-  .icon-paper,
-  .icon-multimedia,
-  .icon-q-a,
-  .icon-exam {
-    font-size: 3rem !important;
-  }
   position: sticky;
   top: 0;
   z-index: 5;
+  .icon-paper,
+  .icon-multimedia,
+  .icon-q-a,
+  .icon-exam,
+  .icon-tutorial {
+    font-size: 2.5rem !important;
+    margin-top: 0.5rem;
+  }
 }
 
-/*Remove default style for vuetify tabs and apply new style*/
-.tab-header .v-tab {
-  text-transform: none !important;
-  font-size: 1.2rem;
+/* Tab container */
+:deep(.v-tabs) {
+  background-color: #F5F5F5 !important;
+  border-radius: 1.2rem !important;
 }
 
-.tab-header .v-tab .nav-link {
-  padding: 0.8rem 0.8rem 0.8rem 0;
-  display: flex;
-  align-items: center;
+/* Active tab styles */
+:deep(.v-btn__overlay) {
+  background-color: unset !important;
+  border-radius: unset !important;
+  opacity: unset !important;
+  transition: unset !important;
+  box-shadow: unset !important;
+  border: unset !important;
+  margin: unset !important;
+  padding: unset !important;
 }
 
-.tab-header .v-tab:before {
-  background-color: transparent !important;
+/* Active tab styles - refined for exact match */
+:deep(.v-tab--selected.tab-item) {
+  .badge-sample .nav-link {
+    box-shadow: 0 1px 2px rgba(41, 98, 255, 0.1);
+    border-color: #CFD1D8;
+    background: rgba(41, 98, 255, .05) !important;
+  }
+  
+  .badge-training .nav-link {
+    box-shadow: 0 1px 2px rgba(46, 125, 50, 0.1);
+    border-color: rgba(46, 125, 50, 0.2);
+    background: rgba(46, 125, 50, .05) !important;
+  }
+  
+  .badge-q .nav-link {
+    box-shadow: 0 1px 2px rgba(191, 54, 12, 0.1);
+    border-color: rgba(191, 54, 12, 0.2);
+    background: rgba(191, 54, 12, .05) !important;
+  }
+  
+  .badge-online .nav-link {
+    box-shadow: 0 1px 2px rgba(86, 0, 232, 0.1);
+    border-color: rgba(86, 0, 232, 0.2);
+    background: rgba(86, 0, 232, .05) !important;
+  }
+  
+  .badge-tutorial .nav-link {
+    box-shadow: 0 1px 2px rgba(189, 8, 28, 0.1);
+    border-color: rgba(189, 8, 28, 0.2);
+    background: rgba(189, 8, 28, .05) !important;
+  }
 }
 
-.tab-header .v-badge__wrapper {
-  right: 1.5rem !important;
-  top: 0rem !important;
+/* Badge styling */
+:deep(.v-badge) {
+  display: inline-block;
+  .v-badge__badge {
+    left: calc(100% - 8px) !important;
+    font-size: 1.1rem !important;
+    padding: 0.8rem !important;
+    font-weight: bold !important;
+    min-width: min-content !important;
+    min-height: 22px !important;
+    border-radius: 11px !important;
+    background: #2962FF !important;
+    color: #fff !important;
+  }
 }
 
-.tab-header .v-tab--active .nav-link {
-  padding: 0.8rem 0.8rem 0.8rem 0.2rem;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 1.4rem;
-  display: flex;
-  align-items: center;
-  color: #000000;
+.v-badge .nav-link {
+  align-items: center !important;
+  display: flex !important;
 }
 
-.tab-header .v-tab--active .badge-sample .nav-link {
-  background: rgba(41, 98, 255, 0.05);
+/* Badge colors for each type */
+:deep(.badge-sample .v-badge__badge) {
+  background-color: #2962FF !important;
+  color: white !important;
 }
 
-.tab-header .v-tab--active .badge-training .nav-link {
-  background: rgba(1, 87, 155, 0.02);
+:deep(.badge-training .v-badge__badge) {
+  background-color: #2E7D32 !important;
+  color: white !important;
 }
 
-.tab-header .v-tab--active .badge-q .nav-link {
-  background: rgba(189, 8, 28, 0.05);
+:deep(.badge-q .v-badge__badge) {
+  background-color: #BF360C !important;
+  color: white !important;
 }
 
-.tab-header .v-tab--active .badge-online .nav-link {
-  background: rgba(86, 0, 232, 0.05);
+:deep(.badge-online .v-badge__badge) {
+  background-color: #5600E8 !important;
+  color: white !important;
 }
 
-.tab-header .v-tab--active .badge-tutorial .nav-link {
-  background: rgba(189, 8, 28, 0.05);
+:deep(.badge-tutorial .v-badge__badge) {
+  background-color: #BD081C !important;
+  color: white !important;
 }
 
-.tab-header .v-tab--active .badge-teachers .nav-link {
-  background: rgba(142, 36, 170, 0.05);
-}
-
-/*.tab-header .nav-link .icon {*/
-/*  display: none !important;*/
-/*}*/
-
-.tab-header .v-tab--active .nav-link .icon {
-  display: block !important;
-  font-size: 2.5rem !important;
-  padding-left: 1rem !important;
-}
-
-.tab-header .v-tabs-slider {
-  display: none !important;
-}
-
-.tab-header .v-tab--active:hover::before {
-  opacity: 0;
-}
-
-.tab-header .v-tab:hover::before {
-  opacity: 0;
-}
-
-.tab-header .v-badge__badge {
-  top: -0.2rem !important;
-}
-
+/* Icon styling for each tab type */
 .sample-q-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
   color: #2962ff;
 }
 
 .training-content-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
-  color: #2e7d32ff;
+  color: #2E7D32;
 }
 
 .q-a-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
-  color: #bf360c;
+  color: #BF360C;
 }
 
 .exam-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
-  color: #5600e8;
+  color: #5600E8;
 }
 
+
 .tutorial-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
-  color: #bd081c;
+  color: #BD081C;
 }
 
 .teacher-icon span {
-  font-size: 2.5rem;
+  font-size: 3rem !important;
   padding-left: 1rem;
   padding-right: 0.4rem;
-  color: #8e24aa;
+  color: #8E24AA;
+}
+.tab-header {
+  margin: 1rem 0 !important;
+  border-radius: 1.2rem !important;
+  background-color: #F5F5F5 !important;
+  padding: 0rem !important;
+}
+.tab-item {
+  text-transform: none !important;
+  font-size: 1.2rem !important;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 0.8rem 0.8rem 0 !important;
+  margin: 0.2rem !important;
+}
+:deep(.v-tab--selected .nav-link) {
+  border: 1px solid rgba(0,0,0,0.12) !important;
+  border-radius: 1.4rem !important;
+  background: rgba(41,98,255,0.05) !important;
+  color: #000 !important;
+}
+:deep(.v-tab:not(.v-tab--selected) .nav-link) {
+  color: #00000065 ;
 }
 
-/*End Remove default style for vuetify tabs and apply new style*/
+:deep(.badge-sample .v-badge__badge) { background-color: #2962FF !important; }
+:deep(.badge-training .v-badge__badge) { background-color: #2E7D32 !important; }
+:deep(.badge-q .v-badge__badge) { background-color: #BF360C !important; }
+:deep(.badge-online .v-badge__badge) { background-color: #5600E8 !important; }
+:deep(.badge-tutorial .v-badge__badge) { background-color: #BD081C !important; }
+:deep(.v-tabs__prev) { display: none !important; }
+:deep(.v-tabs__next) {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 8px;
+  z-index: 10;
+}
+:v-deep(.v-tabs__wrapper) { padding-left: 0 !important; padding-right: 48px !important; }
 </style>
