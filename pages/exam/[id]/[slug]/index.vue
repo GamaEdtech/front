@@ -513,34 +513,6 @@ export default {
 </script>
 
 <style>
-.content_main_info {
-  padding: 27px;
-  background: #f5f5f5 !important;
-  border-radius: 6px;
-}
-
-.content_main_info .creator_title {
-  font-size: 18px;
-}
-
-.order-btn-holder {
-  /*position: -webkit-sticky!important;*/
-  position: fixed !important;
-  bottom: 0 !important;
-  right: 0 !important;
-  left: 0 !important;
-  z-index: 2 !important;
-  border-top: 0.1rem solid #e1e2e3;
-}
-
-.order-btn-holder .v-btn {
-  width: 40% !important;
-}
-
-.order-btn-holder span {
-  font-size: 1.3rem;
-}
-
 p {
   font-size: 1.3rem !important;
 }

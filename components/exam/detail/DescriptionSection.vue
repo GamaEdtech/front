@@ -149,31 +149,3 @@ function onRegister() {
   emit("register");
 }
 </script>
-
-<style scoped>
-.detail-title {
-  font-weight: bold;
-}
-
-.description-holder {
-  line-height: 1.8;
-}
-
-.label-holder {
-  margin-top: 12px;
-}
-
-.icon {
-  color: #607d8b;
-  margin-right: 8px;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.login,
-.register {
-  color: #2196f3;
-}
-</style>

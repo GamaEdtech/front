@@ -81,18 +81,3 @@ function shareSocial(platform) {
   emit("share", platform, props.title);
 }
 </script>
-
-<style scoped>
-.pointer {
-  cursor: pointer;
-}
-
-.share-trigger {
-  display: inline-flex;
-  align-items: center;
-}
-
-.icon {
-  margin-right: 4px;
-}
-</style>
