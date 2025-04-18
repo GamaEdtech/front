@@ -1,5 +1,157 @@
+<script setup>
+import { onMounted, ref } from "vue";
+import { useField, useForm } from "vee-validate";
+import * as yup from "yup";
+
+
+const props = defineProps({
+  dialog: Boolean
+})
+const passVisible = ref(false);
+const login_loading = ref(false);
+const validationSchema = yup.object().shape({
+  identity: yup
+    .string()
+    .required("Email is required")
+    .email("Must be a valid email"),
+  password: yup.string().required().min(4),
+});
+const { handleSubmit, handleReset } = useForm({
+  validationSchema,
+});
+const identity = useField("identity");
+const password = useField("password");
+
+const otp = ref("");
+const otp_loading = ref(false);
+const countDown = ref(60);
+const sendOtpBtnStatus = ref(true);
+
+const google_login_loading = ref(true);
+const identity_holder = ref(true);
+const otp_holder = ref(false);
+const googleLoginBtn = ref(null)
+
+
+async function handleCredentialResponse(response) {
+  try {
+    const res = await fetch(
+      '/api/v1/users/googleAuth',{
+        method:'POST',
+      body: new URLSearchParams({
+        id_token: response.credential,
+      }),
+      }
+    )
+
+    const token = res.data.data.jwtToken
+    const userInfo = res.data.data.info
+
+    // Handle auth logic (depending on your auth setup)
+    if (auth?.setUserToken && auth?.setUser) {
+      auth.setUserToken(token)
+      auth.setUser(userInfo)
+    }
+
+    submitLoginV2(token)
+
+    login_dialog.value = false
+    $toast.success('Logged in successfully')
+
+    if (route.path === '/') {
+      router.push('/user')
+    }
+
+  } catch (err) {
+    const status = err?.response?.status
+
+    if (status === 401) {
+      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+    } else if (status === 500 || status === 504) {
+      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+    }
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    if (window.google?.accounts?.id && googleLoginBtn.value) {
+      window.google.accounts.id.initialize({
+        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+        auto_select: true
+      })
+
+      window.google.accounts.id.renderButton(googleLoginBtn.value, {
+        text: 'Login',
+        size: 'large',
+        width: '252',
+        theme: 'outline'
+      })
+
+      google_login_loading.value = false
+    }
+  }, 4000)
+})
+
+const submit = handleSubmit(async () => {
+  login_loading.value = true;
+  try {
+    const response = await fetch("/api/v1/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        identity: identity.value.value,
+        pass: password.value.value,
+        type: "request",
+      }),
+    });
+
+    if (!response.ok) throw await response.json()
+    
+
+    const data = await response.json();
+
+    if (data.data.type === "loginByOTP") {
+      //toast.success("Otp code sent");
+      identity_holder.value = false;
+      otp_holder.value = true;      
+    } else {
+      $auth.setUserToken(data.jwtToken);
+      $auth.setUser(data.info);
+      $toast.success("Logged in successfully");
+      model.value = false;
+      if ($route.path === "/") $router.push({ path: "/user" });
+    }
+  } catch (error) {
+    if (error.status === 400) $toast.error(error.message);
+  } finally {
+    login_loading.value = false;
+  }
+});
+
+const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
+
+function goToRegister() {
+  emit('switchToRegister')
+}
+
+function goToRecover() {
+  emit('switchToRecover')
+}
+
+function closeDialog() {
+  emit('update:dialog', false)
+}
+
+const recheckEnteredIdentity = () => {
+  otp_holder.value = false;
+  identity_holder.value = true;
+};
+</script>
+
 <template>
-  <v-dialog v-model="model" max-width="300px">
+  <v-dialog v-model="props.dialog" max-width="300px" @click:outside="closeDialog">
     <v-card>
       <v-card-title>
         <span class="text-h5">Login</span>
@@ -47,7 +199,7 @@
                       required
                       :error-messages="password.errorMessage.value"
                     />
-                    <p @click="switchToPassRecover" class="pointer">
+                    <p @click="goToRecover" class="pointer">
                       Forget password
                     </p>
                   </v-col>
@@ -55,14 +207,14 @@
                     <v-divider class="mb-3" />
                     <p
                       class="text-h6 text-center pointer"
-                      @click="switchToRegister"
+                      @click="goToRegister"
                     >
                       Not registered? Register now
                     </p>
                     <v-divider class="mt-3" />
                   </v-col>
                   <v-col cols="6">
-                    <v-btn outlined block @click="model = !model">Cancel</v-btn>
+                    <v-btn outlined block @click="closeDialog">Cancel</v-btn>
                   </v-col>
                   <v-col cols="6">
                     <v-btn
@@ -119,84 +271,7 @@
   </v-dialog>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { useField, useForm } from "vee-validate";
-import * as yup from "yup";
 
-const model = defineModel(false);
-const passVisible = ref(false);
-const login_loading = ref(false);
-const validationSchema = yup.object().shape({
-  identity: yup
-    .string()
-    .required("Email is required")
-    .email("Must be a valid email"),
-  password: yup.string().required().min(4),
-});
-const { handleSubmit, handleReset } = useForm({
-  validationSchema,
-});
-const identity = useField("identity");
-const password = useField("password");
-
-const otp = ref("");
-const otp_loading = ref(false);
-const countDown = ref(60);
-const sendOtpBtnStatus = ref(true);
-
-const google_login_loading = ref(true);
-const identity_holder = ref(true);
-const otp_holder = ref(false);
-
-const submit = handleSubmit(async () => {
-  login_loading.value = true;
-  try {
-    const response = await fetch("/api/v1/users/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        identity: identity.value.value,
-        pass: password.value.value,
-        type: "request",
-      }),
-    });
-
-    if (!response.ok) throw await response.json();
-
-    const data = await response.json();
-
-    if (data.type === "loginByOTP") {
-      $toast.success("Otp code sent");
-      identity_holder.value = false;
-      otp_holder.value = true;
-    } else {
-      $auth.setUserToken(data.jwtToken);
-      $auth.setUser(data.info);
-      $toast.success("Logged in successfully");
-      model.value = false;
-      if ($route.path === "/") $router.push({ path: "/user" });
-    }
-  } catch (error) {
-    if (error.status === 400) $toast.error(error.message);
-  } finally {
-    login_loading.value = false;
-  }
-});
-
-const switchToRegister = () => {
-  emit("update:switchToRegister", "register");
-};
-
-const switchToPassRecover = () => {
-  emit("update:switchToPassRecover", "pass_recover");
-};
-
-const recheckEnteredIdentity = () => {
-  otp_holder.value = false;
-  identity_holder.value = true;
-};
-</script>
 
 <style scoped>
 .btn-google {
