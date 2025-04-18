@@ -34,11 +34,10 @@
               :key="index"
               class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
+              <v-tooltip location="right">
+                <template v-slot:activator="{ props }">
                   <span
-                    v-bind="attrs"
-                    v-on="on"
+                    v-bind="props"
                     style="font-size: 26px"
                     :class="
                       'white--text text--lighten-1 icon icon-' + item.icon
