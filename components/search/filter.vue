@@ -1,5 +1,5 @@
 <template>
-  <div id="search-page-filter" >
+  <div id="search-page-filter">
     <div class="content-search">
       <!--Selected filter, user can disable any filter from here-->
       <div v-show="enabledAppliedFilter()" id="chip-container ">
@@ -524,6 +524,7 @@ export default {
     this.$nextTick(() => {
       // Set panelModel to force the Board panel (index 0) to be expanded
       this.panelModel = [0];
+      this.setBreadcrumbInfo();
     });
   },
   watch: {
@@ -821,7 +822,7 @@ export default {
           this.applied_filter.select_base_title = this.filter.base_list.find(
             (x) => x.id === this.base_val
           ).title;
-          
+
         // Update breadcrumbs immediately
         this.setBreadcrumbInfo();
       } else {
@@ -855,7 +856,7 @@ export default {
         if (this.filter.lesson_list.length > 0)
           this.applied_filter.select_lesson_title =
             this.filter.lesson_list.find((x) => x.id == this.lesson_val).title;
-            
+
         // Update breadcrumbs immediately
         this.setBreadcrumbInfo();
       } else {
@@ -985,23 +986,17 @@ export default {
     setBreadcrumbInfo(setTitle = true) {
       this.breadcrumbs = [];
 
-      // Add default home item
-      this.breadcrumbs.push({
-        title: 'Home',
-        disabled: false,
-        href: '/',
-      });
-
       // Type breadcrumb (main category)
       var active_tab = this.$route.query.type;
       var breadcrumb_item = {
-        title: "", // Changed from "text" to "title" for Vuetify 3
+        title: "", 
         disabled: false,
         href: `/search?type=${active_tab}`,
       };
-      
+
       if (active_tab === "test") breadcrumb_item.title = "Past Papers";
-      else if (active_tab === "learnfiles") breadcrumb_item.title = "Multimedia";
+      else if (active_tab === "learnfiles")
+        breadcrumb_item.title = "Multimedia";
       else if (active_tab === "question") breadcrumb_item.title = "Forum";
       else if (active_tab === "azmoon") breadcrumb_item.title = "QuizHub";
       else if (active_tab === "dars") breadcrumb_item.title = "Tutorial";
@@ -1035,7 +1030,7 @@ export default {
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}`,
         });
       }
-      
+
       // Topic filter
       if (this.applied_filter.select_topic_title) {
         this.breadcrumbs.push({
@@ -1044,13 +1039,17 @@ export default {
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}&topic=${this.topic_val}`,
         });
       }
-      
+
       // File type filter
       if (this.applied_filter.select_file_type_title) {
         this.breadcrumbs.push({
           title: this.applied_filter.select_file_type_title, // Changed from "text" to "title"
           disabled: false,
-          href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}&topic=${this.topic_val}&${active_tab === "test" ? "test_type" : "file_type"}=${this.file_type_val}`,
+          href: `/search?type=${active_tab}&section=${this.board_val}&base=${
+            this.base_val
+          }&lesson=${this.lesson_val}&topic=${this.topic_val}&${
+            active_tab === "test" ? "test_type" : "file_type"
+          }=${this.file_type_val}`,
         });
       }
 
@@ -1095,10 +1094,10 @@ export default {
         //Emit to parent
         this.$emit("setPageTitle", page_title);
       }
-      
+
       // Force update the breadcrumbs by emitting the updated array
       this.$emit("update:modelValue", [...this.breadcrumbs]);
-      
+
       // Log the breadcrumbs to verify they're being generated
       console.log("Breadcrumbs updated:", this.breadcrumbs);
     },
