@@ -1,0 +1,787 @@
+<template>
+  <div class="test-details-content">
+    <!-- Start : Category -->
+    <category />
+    <!-- End:Category -->
+
+    <!--  Start: breadcrumb  -->
+    <section>
+      <v-container class="py-0">
+        <div class="mt-0 py-0 header-path">
+          <breadcrumb :breads="breads" />
+        </div>
+      </v-container>
+    </section>
+    <!--  End: breadcrumb  -->
+
+    <!--  Start: detail  -->
+    <section>
+      <v-container class="py-0">
+        <div class="detail mt-md-8">
+          <v-row>
+            <v-col cols="12" md="3">
+              <!--Show gallery of preview and book first page-->
+              <preview-gallery ref="preview_gallery" />
+              <!--Show gallery of preview and book first page-->
+            </v-col>
+            <v-col cols="12" md="6">
+              <!--  Description   -->
+              <div class="d-flex mb-4">
+                <div class="w-100">
+                  <div class="d-flex align-center justify-space-between header">
+                    <h1 class="detail-title gama-text-h5">
+                      {{ contentData.title }}
+                    </h1>
+                  </div>
+                  <div class="description-holder my-4">
+                    <!--Topics-->
+                    <p class="gama-text-body2">
+                      <i class="fa-solid fa-list ml-1 icon"></i>
+                      Topics:
+                    </p>
+                    <ul>
+                      <li
+                        v-for="(item, index) in contentData.topics"
+                        :key="index"
+                      >
+                        {{ item.title }}
+                      </li>
+                    </ul>
+                    <!--End topics-->
+
+                    <!--Question number-->
+                    <p class="mt-1 gama-text-body2">
+                      <i class="fa-solid fa-question ml-1 icon"></i>
+                      Questions: {{ contentData.tests_num }}
+                    </p>
+                    <!--End question number-->
+
+                    <!--Difficulty level-->
+                    <p class="mt-1 gama-text-body2">
+                      <i
+                        class="fa-solid fa-temperature-three-quarters ml-1 icon"
+                      ></i>
+                      Difficulty level: {{ contentData.level }}
+                    </p>
+                    <!--End difficulty level-->
+
+                    <!--Start date-->
+                    <p class="mt-1 gama-text-body2">
+                      <i class="fa-solid fa-circle-play"></i>
+                      Start:
+                      {{
+                        contentData.start_date ? contentData.start_date : "-"
+                      }}
+                    </p>
+                    <!--End start date-->
+
+                    <!--End date-->
+                    <p class="mt-1 gama-text-body2">
+                      <i class="fa-solid fa-circle-stop"></i>
+                      End:
+                      {{ contentData.end_date ? contentData.end_date : "-" }}
+                    </p>
+                    <!--End end date-->
+
+                    <!--Duration-->
+                    <p class="mt-1 gama-text-body2">
+                      <i class="fa-solid fa-clock"></i>
+                      Duration: {{ contentData.azmoon_time }} minutes
+                    </p>
+                    <!--End duration-->
+                  </div>
+
+                  <div class="label-holder">
+                    <v-chip
+                      link
+                      v-show="contentData.section_title"
+                      class="mr-1"
+                      :to="`/search?type=azmoon&section=${contentData.section}`"
+                    >
+                      {{ contentData.section_title }}
+                    </v-chip>
+                    <v-chip
+                      link
+                      v-show="contentData.base_title"
+                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
+                      class="mr-1"
+                    >
+                      {{ contentData.base_title }}
+                    </v-chip>
+                    <v-chip
+                      link
+                      v-show="contentData.lesson_title"
+                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
+                      class="ma-1"
+                    >
+                      {{ contentData.lesson_title }}
+                    </v-chip>
+                    <!-- <v-chip class="ma-1"
+                            v-show="contentData.edu_month_title">
+                      {{ contentData.edu_month_title }}
+                    </v-chip> -->
+                  </div>
+                </div>
+              </div>
+              <!--   Download Btn and Description  -->
+              <div v-if="!isFree" class="text-center download-sec">
+                <div class="d-none d-md-block mb-4">
+                  <p v-if="!$auth.loggedIn" class="gama-text-body2">
+                    <span class="mdi mdi-bell icon"></span>
+                    <span @click="openAuthDialog('login')" class="login"
+                      >Login</span
+                    >
+                    <span @click="openAuthDialog('register')" class="register">
+                      (register)
+                    </span>
+                    to download and charge your wallet.
+                  </p>
+                  <span v-else class="gama-text-body2">
+                    Your wallet charge is ${{ $auth.user.credit }}
+                  </span>
+                  <nuxt-link
+                    class="blue--text"
+                    v-if="$auth.loggedIn"
+                    to="/user/charge-wallet"
+                    >(Top Up Wallet)
+                  </nuxt-link>
+                </div>
+                <!-- <div class="font-weight-bold answer gama-text-body2">
+                  <span class="mdi mdi-checkbox-marked icon"></span>
+                  <span> The key answer sheet is at the end of the exam file.</span>
+                </div> -->
+              </div>
+              <!--   fileCopyRight  -->
+              <!-- <div class="d-none d-md-block text-center file-copy-right gama-text-body2">
+                <span >It is forbidden to republish the contents in cyber space.</span>
+              </div> -->
+            </v-col>
+            <v-col md="3">
+              <v-card flat class="content_main_info">
+                <v-row class="align-center">
+                  <v-col cols="3">
+                    <v-img
+                      :src="contentData.avatar"
+                      alt=""
+                      class="d-inline-block"
+                      cover
+                      height="48"
+                      width="48"
+                    />
+                  </v-col>
+                  <v-col cols="9" class="pl-0">
+                    <p class="creator_title">
+                      {{ contentData.first_name }} {{ contentData.last_name }}
+                    </p>
+                  </v-col>
+                </v-row>
+                <v-divider class="my-2" />
+                <v-row>
+                  <v-col cols="12" class="pb-0">
+                    <i class="fa-solid fa-folder mr-1 icon"></i>
+                    File type: {{ contentData.azmoon_type_title }}
+                  </v-col>
+                  <v-col cols="12" class="pb-0">
+                    <i class="fa-solid fa-eye mr-1 icon"></i>
+                    Viewed: Unknown
+                  </v-col>
+                  <v-col cols="12" class="pb-0">
+                    <i class="fa-solid fa-calendar-alt mr-1 icon"></i>
+                    Last update:
+                    {{
+                      $filters.timeAgo.calc(contentData.value?.data?.up_date)
+                    }}
+                  </v-col>
+                  <v-col cols="12" class="pb-0">
+                    <div class="pointer" @click="openCrashReportDialog">
+                      <i class="fa-solid fa-bug mr-1 icon"></i>
+                      Crash report
+                    </div>
+                  </v-col>
+                  <v-col cols="12" class="pb-0">
+                    <!--Dialog for share-->
+                    <v-dialog
+                      transition="dialog-top-transition"
+                      class="share_dialog"
+                      max-width="600"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <span v-bind="attrs" v-on="on">
+                          <i class="fa-solid fa-share-alt mr-1 icon"></i>
+                          Share
+                        </span>
+                      </template>
+                      <template v-slot:default="dialog">
+                        <v-card>
+                          <v-toolbar color="default"> Share </v-toolbar>
+                          <v-card-text class="mt-5">
+                            <p class="mb-3">Share this content:</p>
+                            <v-row>
+                              <v-col cols="12">
+                                <v-btn outlined block @click="copyUrl">
+                                  <i class="fa-solid fa-copy mr-1 icon"></i
+                                  >&nbsp;
+                                  {{ copy_btn }}
+                                </v-btn>
+                              </v-col>
+                              <v-col cols="6">
+                                <v-btn
+                                  @click="shareSocial('whatsapp')"
+                                  target="_blank"
+                                  block
+                                  color="#25d366"
+                                  class="white--text"
+                                >
+                                  <i class="fab fa-whatsapp mr-1 icon"></i>
+                                  WhatsApp
+                                </v-btn>
+                              </v-col>
+                              <v-col cols="6">
+                                <v-btn
+                                  block
+                                  color="#00acee"
+                                  class="white--text"
+                                  @click="shareSocial('telegram')"
+                                >
+                                  <i
+                                    class="fab fa-telegram-plane mr-1 icon"
+                                  ></i>
+                                  Telegram
+                                </v-btn>
+                              </v-col>
+                            </v-row>
+                          </v-card-text>
+                          <v-card-actions class="justify-end">
+                            <v-btn text @click="dialog.value = false"
+                              >close
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </template>
+                    </v-dialog>
+                  </v-col>
+                </v-row>
+
+                <div class="text-center mt-2">
+                  <v-rating
+                    v-model="rating"
+                    color="yellow darken-3"
+                    background-color="grey darken-1"
+                    empty-icon="$ratingFull"
+                    half-increments
+                    hover
+                  />
+                </div>
+                <v-divider class="d-none d-md-block" />
+
+                <v-row class="mt-1 d-none d-md-block">
+                  <v-col
+                    v-for="(item, key) in contentData.price"
+                    :key="key"
+                    cols="12"
+                    class="pb-0"
+                  >
+                    <!--For not authenticated user-->
+                    <v-btn
+                      v-show="!$auth.loggedIn"
+                      @click="openAuthDialog('login')"
+                      v-if="key === 'participation'"
+                      block
+                      color="success"
+                    >
+                      Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
+                    </v-btn>
+
+                    <!--For authenticated user-->
+                    <v-btn
+                      v-show="$auth.loggedIn"
+                      :to="`/exam/start/${contentData.id}`"
+                      v-if="key === 'participation'"
+                      block
+                      color="success"
+                    >
+                      <span v-if="contentData.examUserData.status == 1">
+                        Show result
+                      </span>
+                      <span v-else>
+                        Start Exam{{
+                          item.price > 0 ? " | $" + item.price : ""
+                        }}
+                      </span>
+                    </v-btn>
+
+                    <v-btn v-else-if="key === 'word'" block color="primary">
+                      Download WORD{{
+                        item.price > 0 ? " | $" + item.price : ""
+                      }}
+                    </v-btn>
+                    <v-btn
+                      @click="startDownload()"
+                      :loading="download_loading"
+                      v-else-if="key === 'pdf'"
+                      block
+                      color="error"
+                    >
+                      Download PDF{{
+                        item.price > 0 ? " | $" + item.price : ""
+                      }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card>
+              <!-- <v-row>
+                <v-col cols="12" class="text-center">
+                  <p class="mt-2  gama-text-overline">
+                    <i class="fa-solid fa-exclamation-circle mr-1 icon"></i>
+                    Republishing is prohibited in cyber space.</p>
+                </v-col>
+              </v-row> -->
+            </v-col>
+          </v-row>
+        </div>
+      </v-container>
+    </section>
+
+    <!--Mobile order section-->
+    <v-card class="order-btn-holder d-block d-md-none">
+      <v-card-text class="pb-0">
+        <v-row class="px-10 text-center">
+          <v-col
+            v-for="(item, key) in contentData.price"
+            :key="key"
+            cols="12"
+            class="pb-1 pt-0"
+          >
+            <v-btn
+              v-show="!$auth.loggedIn"
+              @click="openAuthDialog('login')"
+              v-if="key === 'participation'"
+              block
+              color="success"
+            >
+              Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
+            </v-btn>
+            <v-btn
+              v-show="$auth.loggedIn"
+              :to="`/exam/start/${contentData.id}`"
+              v-if="key === 'participation'"
+              block
+              color="success"
+            >
+              <span v-if="contentData.examUserData.status == 1">
+                Show result
+              </span>
+              <span v-else>
+                Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
+              </span>
+            </v-btn>
+            <v-btn v-else-if="key === 'word'" block color="primary">
+              Download WORD{{ item.price > 0 ? " | $" + item.price : "" }}
+            </v-btn>
+            <v-btn v-else-if="key === 'pdf'" block color="error">
+              Download PDF{{ item.price > 0 ? " | $" + item.price : "" }}
+            </v-btn>
+          </v-col>
+
+          <v-col cols="12">
+            <div v-if="!isFree" class="mb-4">
+              <p v-if="!$auth.loggedIn">
+                <span class="mdi mdi-bell icon"></span>
+                <span @click="openAuthDialog('login')" class="login blue--text"
+                  >Login</span
+                >
+                <span
+                  @click="openAuthDialog('register')"
+                  class="register blue--text"
+                >
+                  (register)
+                </span>
+                <span>to download and charge.</span>
+              </p>
+              <span v-else>
+                Your wallet charge is ${{ $auth.user.credit }}
+                <nuxt-link
+                  class="blue--text"
+                  v-if="$auth.loggedIn"
+                  to="/user/charge-wallet"
+                  >(Top Up Wallet)</nuxt-link
+                >
+              </span>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+    <!--End mobile order section-->
+
+    <!--  End: detail  -->
+
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="6">
+          <!--  Start: Course Card  -->
+          <!--          <section>-->
+          <!--            <div class="d-flex  align-center course-card box">-->
+          <!--              <div class="right">-->
+          <!--                <v-row>-->
+          <!--                  <v-col cols="2">-->
+          <!--                    <nuxt-link to="">-->
+          <!--                      <img height="98" width="98" :src="require(`~/assets/images/teacher1.png`)" alt=""/>-->
+          <!--                    </nuxt-link>-->
+          <!--                  </v-col>-->
+          <!--                  <v-col cols="10">-->
+          <!--                    <div class="description ml-4">-->
+          <!--                      <div>-->
+          <!--                        <nuxt-link to="">-->
+          <!--                          <h2 class="course-title">PowerPoint of the complete educational course, date (3) of the 12th-->
+          <!--                            grade of the second secondary-theoretical period</h2>-->
+          <!--                        </nuxt-link>-->
+          <!--                      </div>-->
+          <!--                      <v-row>-->
+          <!--                        <v-col cols="10">-->
+          <!--                          <div>-->
+          <!--                            <nuxt-link to="" class="teacher">-->
+          <!--                              <i class="fa-solid fa-user icon"></i>-->
+          <!--                              <span>Lecturer: Shamsi Shabani</span>-->
+          <!--                            </nuxt-link>-->
+          <!--                          </div>-->
+          <!--                          <div>-->
+          <!--                            <p class="duration">-->
+          <!--                              <i class="fa-solid fa-clock icon"></i>-->
+          <!--                              <span>Course duration: 942 slides (13 files)</span>-->
+          <!--                            </p>-->
+          <!--                          </div>-->
+          <!--                        </v-col>-->
+          <!--                        <v-col cols="2">-->
+          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
+          <!--                            <strong>-->
+          <!--                              View-->
+          <!--                            </strong>-->
+          <!--                          </nuxt-link>-->
+          <!--                        </v-col>-->
+          <!--                      </v-row>-->
+          <!--                    </div>-->
+          <!--                  </v-col>-->
+          <!--                </v-row>-->
+          <!--              </div>-->
+
+          <!--            </div>-->
+          <!--          </section>-->
+          <!--  End: Course Card  -->
+        </v-col>
+
+        <v-col cols="12" md="6">
+          <!--  Start:  Azmoon test album card   -->
+          <!--          <section>-->
+          <!--            <div class="d-flex align-center album-card box">-->
+          <!--              <div class="right">-->
+          <!--                <v-row>-->
+          <!--                  <v-col cols="2">-->
+          <!--                    <nuxt-link to="">-->
+          <!--                      <img :src="require(`~/assets/images/poster1.jpg`)" alt="" class="poster-img"/>-->
+          <!--                    </nuxt-link>-->
+          <!--                  </v-col>-->
+          <!--                  <v-col cols="10">-->
+          <!--                    <div class="description ml-2">-->
+          <!--                      <nuxt-link to="">-->
+          <!--                        <h2 class="course-title">Exam test bank album, date (3) twelfth of the second term of-->
+          <!--                          high school-theoretical</h2>-->
+          <!--                      </nuxt-link>-->
+
+          <!--                      <v-row>-->
+          <!--                        <v-col cols="10">-->
+          <!--                          <div class="num">-->
+          <!--                            <i class="fa-solid fa-list-ol icon"></i>-->
+          <!--                            <span>Number of tests: 1399</span>-->
+          <!--                          </div>-->
+          <!--                          <div class="level">-->
+          <!--                            <i class="fa-solid fa-superscript icon"></i>-->
+          <!--                            <span>Difficulty: Easy</span>-->
+          <!--                          </div>-->
+          <!--                        </v-col>-->
+          <!--                        <v-col cols="2">-->
+          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
+          <!--                            <strong>-->
+          <!--                              View-->
+          <!--                            </strong>-->
+          <!--                          </nuxt-link>-->
+          <!--                        </v-col>-->
+          <!--                      </v-row>-->
+          <!--                    </div>-->
+          <!--                  </v-col>-->
+          <!--                </v-row>-->
+          <!--              </div>-->
+
+          <!--            </div>-->
+          <!--          </section>-->
+          <!--  End:  Azmoon test album card   -->
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <!-- Start : Sample Test -->
+    <!--    <related-content/>-->
+    <!-- End : Sample test -->
+    <!-- Start: Feed -->
+    <section class="feed">
+      <!--      <v-container class="pa-4 pa-md-12 pt-10">-->
+      <!--        <v-row>-->
+      <!--          <v-col cols="12" md="6">-->
+      <!--            <latest-training-content/>-->
+      <!--          </v-col>-->
+
+      <!--          <v-col cols="12" md="6" class="related-ask-test py-0 d-flex flex-column justify-space-between">-->
+      <!--            <related-qa/>-->
+
+      <!--            <related-online-exam/>-->
+      <!--          </v-col>-->
+
+      <!--        </v-row>-->
+      <!--      </v-container>-->
+    </section>
+    <!-- End: Feed -->
+
+    <crash-report ref="crash_report" />
+  </div>
+</template>
+
+<script setup>
+import Breadcrumb from "@/components/widgets/breadcrumb";
+import LastViews from "@/components/common/last-views";
+import RelatedCardBox from "./components/related-card-box";
+import Category from "@/components/common/category";
+import PreviewGallery from "@/components/details/preview-gallery";
+import RelatedContent from "@/components/details/related-content";
+import LatestTrainingContent from "@/components/details/latest-training-content";
+import RelatedQa from "@/components/details/related-qa";
+import RelatedOnlineExam from "@/components/details/related-online-exam";
+import CrashReport from "~/components/common/crash-report.vue";
+
+// Get api, router, and route
+const route = useRoute();
+const router = useRouter();
+const { data: contentData } = await useFetch(
+  `/api/v1/exams/${route.params.id}`
+);
+
+// Refs
+const sell_btn = ref(true);
+const rating = ref(4.5);
+const preview_gallery = ref(null);
+const crash_report = ref(null);
+const copy_btn = ref("Copy");
+const download_loading = ref(false);
+
+// Reactive data
+const breads = reactive([
+  {
+    text: "Online exam",
+    disabled: false,
+    href: "/search?type=azmoon",
+  },
+]);
+
+const detail = reactive({
+  poster: "poster1.jpg",
+  linkPoster: "",
+  title: "A collection of 120 test questions for lessons 6 to 9 on (3) 12th",
+  rate: 5,
+  previewImage: "test1.png",
+  labels: [
+    "History (3)",
+    "Twelfth",
+    "Second Secondary",
+    "Literature",
+    "Kermanshah",
+    "District 2",
+    "Shohadai Parvin",
+    "Farvardin",
+    "2019",
+  ],
+});
+
+// Sample data (could be moved to its own file if needed)
+const sampleTestList = reactive([
+  {
+    type: "azmoon",
+    img: "test2.png",
+    description:
+      "The series of tests of the twelfth history book Lessons 1 to 12",
+    pages: "222",
+    owner: "Gama management team",
+    ownerImg: "gamaadmin.png",
+  },
+  // ... existing code ...
+]);
+
+const relatedList = reactive([
+  {
+    class: "learning",
+    header: "Related educational content",
+    icon: "learnfiles",
+    description: " File های پاورپوینت، ویدئو، صوتی، متنی و ...",
+    contentItemList: [
+      {
+        title:
+          "Online teaching, page 53 to 58 of Arabic (3) twelfth human | Lesson 4: The order of nature",
+        link: "",
+      },
+      // ... existing code ...
+    ],
+  },
+  // ... existing code ...
+]);
+
+// Methods
+const initBreadCrumb = () => {
+  breads.push(
+    {
+      text: contentData.value?.section_title,
+      disabled: false,
+      href: `/search?type=azmoon&section=${contentData.value?.section}`,
+    },
+    {
+      text: contentData.value?.base_title,
+      disabled: false,
+      href: `/search?type=azmoon&section=${contentData.value?.section}&base=${contentData.value?.base}`,
+    },
+    {
+      text: contentData.value?.lesson_title,
+      disabled: false,
+      href: `/search?type=azmoon&section=${contentData.value?.section}&base=${contentData.value?.base}&lesson=${contentData.value?.lesson}`,
+    }
+  );
+};
+
+const openAuthDialog = (val) => {
+  router.push({ query: { auth_form: val } });
+};
+
+const copyUrl = () => {
+  navigator.clipboard.writeText(window.location.href);
+  copy_btn.value = "Copied";
+};
+
+const shareSocial = (social_name) => {
+  if (social_name === "whatsapp")
+    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
+  else if (social_name === "telegram")
+    window.open(
+      `https://telegram.me/share/url?url=${window.location.href}&text=${contentData.value?.title}`
+    );
+};
+
+const startDownload = async () => {
+  download_loading.value = true;
+  try {
+    const response = await $fetch(`/api/v1/exams/download/${route.params.id}`);
+    const FileSaver = await import("file-saver");
+    FileSaver.saveAs(response.data.url, response.data.name);
+  } catch (err) {
+    if (err.response?.status == 400) {
+      if (
+        err.response.data.status == 0 &&
+        err.response.data.error == "creditNotEnough"
+      ) {
+        useToast().info("No enough credit");
+      }
+    } else if (err.response?.status == 403) {
+      router.push({ query: { auth_form: "login" } });
+    }
+    console.log(err);
+  } finally {
+    download_loading.value = false;
+  }
+};
+
+const openCrashReportDialog = () => {
+  crash_report.value.dialog = true;
+  crash_report.value.form.type = "test";
+};
+
+// Computed properties
+const isFree = computed(() => {
+  if (
+    contentData.value?.data?.participation?.price > 0 &&
+    contentData.value?.data?.files?.pdf?.price > 0
+  )
+    return false;
+  else return true;
+});
+
+// Provide page title
+const title = computed(() => contentData.value?.data?.title || "");
+
+// Set page head
+useHead({
+  title,
+});
+
+// Lifecycle hooks
+onMounted(() => {
+  console.log("contentData", contentData.value?.data);
+
+  if (contentData.value?.data) {
+    preview_gallery.value.images.push(contentData.value.data.thumb_pic_url);
+    preview_gallery.value.carouselVal = 1;
+
+    preview_gallery.value.help_link_data = {
+      state: contentData.value.data.state,
+      section: contentData.value.data.section,
+      base: contentData.value.data.base,
+      course: contentData.value.data.course,
+      lesson: contentData.value.data.lesson,
+    };
+
+    initBreadCrumb();
+  }
+});
+
+// Define expose for components that need to be accessed by ref
+defineExpose({
+  preview_gallery,
+  crash_report,
+});
+</script>
+
+<script>
+// Component metadata
+export default {
+  name: "exam-details",
+  auth: false,
+};
+</script>
+
+<style>
+.content_main_info {
+  padding: 27px;
+  background: #f5f5f5 !important;
+  border-radius: 6px;
+}
+
+.content_main_info .creator_title {
+  font-size: 18px;
+}
+
+.order-btn-holder {
+  /*position: -webkit-sticky!important;*/
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  border-top: 0.1rem solid #e1e2e3;
+}
+
+.order-btn-holder .v-btn {
+  width: 40% !important;
+}
+
+.order-btn-holder span {
+  font-size: 1.3rem;
+}
+
+p {
+  font-size: 1.3rem !important;
+}
+</style>
