@@ -370,23 +370,6 @@ export default {
       let fileType = "image/webp";
       let fileExt = "webp";
 
-      // if (originalFile) {
-      //   // Try to get the original file type
-      //   if (
-      //     originalFile.type.includes("jpeg") ||
-      //     originalFile.type.includes("jpg")
-      //   ) {
-      //     fileType = "image/jpeg";
-      //     fileExt = "jpg";
-      //   } else if (originalFile.type.includes("png")) {
-      //     fileType = "image/png";
-      //     fileExt = "png";
-      //   } else if (originalFile.type.includes("webp")) {
-      //     fileType = "image/webp";
-      //     fileExt = "webp";
-      //   }
-      // }
-
       const filename = `image_${timestamp}_${this.currentCropIndex}.${fileExt}`;
       const file = new File([data], filename, { type: fileType });
 
