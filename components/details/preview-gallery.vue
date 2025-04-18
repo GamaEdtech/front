@@ -5,14 +5,14 @@
         <v-row justify="center">
           <!--Mobile side section-->
           <v-col cols="12" class="pr-0 d-flex d-md-none">
-            <v-btn
+            <!-- <v-btn
               icon
-              small
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon mr-1"
+              class="bg-blue-grey-darken-2 mr-1"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
@@ -20,6 +20,29 @@
                     v-bind="attrs"
                     v-on="on"
                     :class="' icon icong-' + item.icon"
+                  />
+                </template>
+                <span>{{ item.text }}</span>
+              </v-tooltip>
+            </v-btn> -->
+            <v-btn
+              icon
+              large
+              :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
+                  &lesson=${help_link_data.lesson}`"
+              v-for="(item, index) in items"
+              :key="index"
+              class="bg-blue-grey-darken-2 mx-3"
+            >
+              <v-tooltip right>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                    style="font-size: 26px"
+                    :class="
+                      'white--text text--lighten-1 icon icon-' + item.icon
+                    "
                   />
                 </template>
                 <span>{{ item.text }}</span>
@@ -29,25 +52,28 @@
           <!--End mobile side section-->
 
           <!--Desktop side section-->
-          <v-col cols="2" class="pr-0 d-none d-md-block">
-            <nuxt-link
+          <v-col cols="2" class="pr-0 d-none d-md-flex flex-column">
+            <v-btn
+              icon
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon"
+              class="mb-3 bg-blue-grey-darken-2 flex-shrink-0"
             >
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-bind="attrs"
                     v-on="on"
-                    :class="' icon icong-' + item.icon"
+                    style="font-size: 26px"
+                    :class="`icon icon-${item.icon} white--text text--darken-1`"
                   />
                 </template>
                 <span>{{ item.text }}</span>
               </v-tooltip>
-            </nuxt-link>
+            </v-btn>
           </v-col>
           <!--End desktop side section-->
 
@@ -58,8 +84,15 @@
                 :show-arrows="false"
                 :hide-delimiters="images.length > 1 ? false : true"
                 v-model="carouselVal"
+                height="auto"
+                contain
+                class="product-carousel"
               >
-                <v-carousel-item v-for="(image, index) in images" :key="index">
+                <v-carousel-item
+                  v-for="(image, index) in images"
+                  :key="index"
+                  contain
+                >
                   <img :src="image" class="carousel-img" />
                 </v-carousel-item>
               </v-carousel>
@@ -94,14 +127,29 @@
 export default {
   name: "preview-gallery",
   props: {
-    images: {
+    imageUrls: {
       type: Array,
-      required: true,
+      default: () => [],
+    },
+    helpLinkData: {
+      type: Object,
+      default: () => ({
+        state: "",
+        section: "",
+        base: "",
+        course: "",
+        lesson: "",
+      }),
+    },
+    initialSlide: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
     return {
-      carouselVal: null,
+      carouselVal: 0,
+      images: [],
       help_link_data: {
         state: "",
         section: "",
@@ -116,37 +164,63 @@ export default {
         {
           class: "exam",
           text: "Related exam",
-          icon: "azmoon",
+          icon: "exam",
           link: "/search?type=azmoon",
         },
         {
           class: "test",
           text: "Related paper",
-          icon: "test",
+          icon: "paper",
           link: "/search?type=test",
         },
         {
           class: "content",
           text: "Related multimedia",
-          icon: "learnfiles",
+          icon: "multimedia",
           link: "/search?type=learnfiles",
         },
         {
           class: "faq",
           text: "Related Q & A",
-          icon: "qa",
+          icon: "q-a",
           link: "/search?type=question",
         },
         {
           class: "textbook ",
           text: "Related tutorial",
-          icon: "blog",
+          icon: "tutorial",
           link: "/search?type=dars",
         },
         // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
         // { class: "tutor", text: "Tutor", icon: "teacher" ,link:"/search?type=tutor" },
       ],
     };
+  },
+  watch: {
+    imageUrls: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal && newVal.length > 0) {
+          this.images = [...newVal];
+        }
+      },
+    },
+    helpLinkData: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.help_link_data = { ...newVal };
+        }
+      },
+    },
+    initialSlide: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal !== undefined) {
+          this.carouselVal = newVal;
+        }
+      },
+    },
   },
   methods: {
     changeSlide(index) {
@@ -157,16 +231,36 @@ export default {
 </script>
 
 <style scoped>
+/* Global carousel image constraints */
+.carousel-img {
+  object-fit: contain !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+.product-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+}
+
 #details-gallery-portrate {
   #product-carousel {
-    width: 22.2rem;
+    /* width: 22.2rem; */
     height: 28rem !important;
-
     margin: auto auto;
+    overflow: hidden;
+
     .carousel-img {
-      max-width: 22.2rem;
+      /* max-width: 22.2rem; */
       width: 100%;
       height: auto;
+      max-height: 28rem;
+      object-fit: contain;
       border-radius: 1.2rem;
     }
   }
@@ -224,14 +318,17 @@ export default {
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 29rem;
+      /* width: 29rem; */
       height: 36rem !important;
-
       margin: auto auto;
+      overflow: hidden;
+
       .carousel-img {
-        max-width: 29rem;
-        width: 100%;
+        /* max-width: 29rem !important; */
+        width: 100% !important;
         height: auto;
+        max-height: 36rem;
+        object-fit: contain;
         border-radius: 1.2rem;
       }
     }
@@ -241,14 +338,18 @@ export default {
 @media (min-width: 1264px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 29rem;
+      /* width: 29rem; */
+      width: 100% !important;
       height: 24rem !important;
-
       margin: auto auto;
+      overflow: hidden;
+
       .carousel-img {
-        max-width: 29rem;
+        /* max-width: 29rem; */
         width: 100%;
         height: auto;
+        max-height: 24rem;
+        object-fit: contain;
         border-radius: 1.2rem;
       }
     }
@@ -259,6 +360,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 25.4rem !important;
+
+      .carousel-img {
+        max-height: 25.4rem;
+      }
     }
   }
 }
@@ -267,6 +372,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 26.5rem !important;
+
+      .carousel-img {
+        max-height: 26.5rem;
+      }
     }
   }
 }
@@ -275,6 +384,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 28rem !important;
+
+      .carousel-img {
+        max-height: 28rem;
+      }
     }
   }
 }
@@ -283,6 +396,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 29.2rem !important;
+
+      .carousel-img {
+        max-height: 29.2rem;
+      }
     }
   }
 }
@@ -291,6 +408,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 30.2rem !important;
+
+      .carousel-img {
+        max-height: 30.2rem;
+      }
     }
   }
 }
@@ -299,6 +420,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 31.2rem !important;
+
+      .carousel-img {
+        max-height: 31.2rem;
+      }
     }
   }
 }
@@ -307,6 +432,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 32.2rem !important;
+
+      .carousel-img {
+        max-height: 32.2rem;
+      }
     }
   }
 }
@@ -315,6 +444,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 33.2rem !important;
+
+      .carousel-img {
+        max-height: 33.2rem;
+      }
     }
   }
 }
@@ -323,6 +456,10 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 34.4rem !important;
+
+      .carousel-img {
+        max-height: 34.4rem;
+      }
     }
   }
 }

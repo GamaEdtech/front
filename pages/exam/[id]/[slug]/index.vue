@@ -8,7 +8,14 @@
     <section>
       <v-container class="py-0">
         <div class="mt-0 py-0 header-path">
-          <breadcrumb :breads="breads" />
+          <!-- Skeleton loader for breadcrumb -->
+          <v-skeleton-loader
+            v-if="pending"
+            class="mx-auto"
+            height="60"
+          ></v-skeleton-loader>
+          <!-- Actual breadcrumb when loaded -->
+          <breadcrumb v-else :breads="breads" />
         </div>
       </v-container>
     </section>
@@ -17,11 +24,56 @@
     <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
-        <div class="detail mt-md-8">
+        <!-- Skeleton loading state -->
+        <div v-if="pending" class="detail mt-md-8">
+          <v-row>
+            <!-- Skeleton for gallery -->
+            <v-col cols="12" md="3">
+              <v-skeleton-loader
+                class="mx-auto"
+                height="300"
+              ></v-skeleton-loader>
+            </v-col>
+
+            <!-- Skeleton for description -->
+            <v-col cols="12" md="6">
+              <v-skeleton-loader
+                class="mx-auto"
+                height="300"
+              ></v-skeleton-loader>
+            </v-col>
+
+            <!-- Skeleton for sidebar -->
+            <v-col md="3">
+              <v-skeleton-loader
+                class="mx-auto"
+                type="list-item-avatar"
+              ></v-skeleton-loader>
+
+              <v-skeleton-loader
+                class="mx-auto mt-2"
+                type="list-item-three-line"
+                repeat="4"
+              ></v-skeleton-loader>
+
+              <v-skeleton-loader
+                class="mx-auto mt-4"
+                type="button"
+              ></v-skeleton-loader>
+            </v-col>
+          </v-row>
+        </div>
+
+        <!-- Actual content when loaded -->
+        <div v-else class="detail mt-md-8">
           <v-row>
             <v-col cols="12" md="3">
               <!--Show gallery of preview and book first page-->
-              <preview-gallery ref="preview_gallery" />
+              <preview-gallery
+                :image-urls="galleryImages"
+                :help-link-data="galleryHelpData"
+                :initial-slide="1"
+              />
               <!--Show gallery of preview and book first page-->
             </v-col>
             <v-col cols="12" md="6">
@@ -343,7 +395,7 @@
     </section>
 
     <!--Mobile order section-->
-    <v-card class="order-btn-holder d-block d-md-none">
+    <v-card v-if="!pending" class="order-btn-holder d-block d-md-none">
       <v-card-text class="pb-0">
         <v-row class="px-10 text-center">
           <v-col
@@ -560,17 +612,98 @@ import CrashReport from "~/components/common/crash-report.vue";
 // Get api, router, and route
 const route = useRoute();
 const router = useRouter();
-const { data: contentData } = await useFetch(
-  `/api/v1/exams/${route.params.id}`
-);
+const { $auth, $toast } = useNuxtApp();
 
-// Refs
-const sell_btn = ref(true);
-const rating = ref(4.5);
-const preview_gallery = ref(null);
+// Component data
+const contentData = ref({});
+const pending = ref(true);
 const crash_report = ref(null);
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
+
+// Gallery data
+const galleryImages = ref([]);
+const galleryHelpData = ref({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
+
+// Reactive data
+const sell_btn = ref(true);
+const rating = ref(4.5);
+
+// Fetch the exam data
+async function fetchExamData() {
+  try {
+    const { id } = route.params;
+    const response = await $fetch(`/api/v1/exams/${id}`);
+
+    if (response.status === 1 && response.data) {
+      return response.data;
+    }
+
+    return response;
+  } catch (err) {
+    throw err;
+  }
+}
+
+// Use asyncData to fetch data
+const { data: asyncContentData, error } = useAsyncData(
+  `exam-${route.params.id}`,
+  async () => {
+    try {
+      const data = await fetchExamData();
+      return data;
+    } catch (err) {
+      return null;
+    }
+  },
+  {
+    server: true,
+    lazy: false,
+    immediate: true,
+    watch: [() => route.params.id],
+  }
+);
+
+// Set page title
+useHead(() => ({
+  title: contentData.value?.title || "Exam Details",
+}));
+
+// Lifecycle hooks
+onMounted(async () => {
+  pending.value = true;
+
+  // Verify we have content data
+  if (!contentData.value || Object.keys(contentData.value).length === 0) {
+    if (asyncContentData.value) {
+      contentData.value = asyncContentData.value;
+
+      // Update gallery data
+      if (contentData.value.thumb_pic_url) {
+        console.log("Setting gallery image:", contentData.value.thumb_pic_url);
+        galleryImages.value = [contentData.value.thumb_pic_url];
+      }
+
+      galleryHelpData.value = {
+        state: contentData.value.state || "",
+        section: contentData.value.section || "",
+        base: contentData.value.base || "",
+        course: contentData.value.course || "",
+        lesson: contentData.value.lesson || "",
+      };
+
+      initBreadCrumb();
+    }
+  }
+
+  pending.value = false;
+});
 
 // Reactive data
 const breads = reactive([
@@ -634,21 +767,23 @@ const relatedList = reactive([
 
 // Methods
 const initBreadCrumb = () => {
+  if (!contentData.value) return;
+
   breads.push(
     {
-      text: contentData.value?.section_title,
+      text: contentData.value.section_title,
       disabled: false,
-      href: `/search?type=azmoon&section=${contentData.value?.section}`,
+      href: `/search?type=azmoon&section=${contentData.value.section}`,
     },
     {
-      text: contentData.value?.base_title,
+      text: contentData.value.base_title,
       disabled: false,
-      href: `/search?type=azmoon&section=${contentData.value?.section}&base=${contentData.value?.base}`,
+      href: `/search?type=azmoon&section=${contentData.value.section}&base=${contentData.value.base}`,
     },
     {
-      text: contentData.value?.lesson_title,
+      text: contentData.value.lesson_title,
       disabled: false,
-      href: `/search?type=azmoon&section=${contentData.value?.section}&base=${contentData.value?.base}&lesson=${contentData.value?.lesson}`,
+      href: `/search?type=azmoon&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
     }
   );
 };
@@ -663,11 +798,13 @@ const copyUrl = () => {
 };
 
 const shareSocial = (social_name) => {
+  const pageTitle = contentData.value?.title || "";
+
   if (social_name === "whatsapp")
     window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
   else if (social_name === "telegram")
     window.open(
-      `https://telegram.me/share/url?url=${window.location.href}&text=${contentData.value?.title}`
+      `https://telegram.me/share/url?url=${window.location.href}&text=${pageTitle}`
     );
 };
 
@@ -701,45 +838,18 @@ const openCrashReportDialog = () => {
 
 // Computed properties
 const isFree = computed(() => {
+  if (!contentData.value) return true;
+
   if (
-    contentData.value?.data?.participation?.price > 0 &&
-    contentData.value?.data?.files?.pdf?.price > 0
+    contentData.value.participation?.price > 0 &&
+    contentData.value.files?.pdf?.price > 0
   )
     return false;
   else return true;
 });
 
-// Provide page title
-const title = computed(() => contentData.value?.data?.title || "");
-
-// Set page head
-useHead({
-  title,
-});
-
-// Lifecycle hooks
-onMounted(() => {
-  console.log("contentData", contentData.value?.data);
-
-  if (contentData.value?.data) {
-    preview_gallery.value.images.push(contentData.value.data.thumb_pic_url);
-    preview_gallery.value.carouselVal = 1;
-
-    preview_gallery.value.help_link_data = {
-      state: contentData.value.data.state,
-      section: contentData.value.data.section,
-      base: contentData.value.data.base,
-      course: contentData.value.data.course,
-      lesson: contentData.value.data.lesson,
-    };
-
-    initBreadCrumb();
-  }
-});
-
 // Define expose for components that need to be accessed by ref
 defineExpose({
-  preview_gallery,
   crash_report,
 });
 </script>
