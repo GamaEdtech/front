@@ -1,7 +1,7 @@
 <template>
   <div class="test-details-content">
     <!-- Start : Category -->
-    <category />
+    <common-category />
     <!-- End:Category -->
 
     <!--  Start: breadcrumb  -->
@@ -15,7 +15,7 @@
             height="60"
           ></v-skeleton-loader>
           <!-- Actual breadcrumb when loaded -->
-          <breadcrumb v-else :breads="breads" />
+          <widgets-breadcrumb v-else :breads="breads" />
         </div>
       </v-container>
     </section>
@@ -69,7 +69,7 @@
           <v-row>
             <v-col cols="12" md="3">
               <!--Show gallery of preview and book first page-->
-              <preview-gallery
+              <details-preview-gallery
                 :image-urls="galleryImages"
                 :help-link-data="galleryHelpData"
                 :initial-slide="1"
@@ -273,20 +273,13 @@
 </template>
 
 <script setup>
-import Breadcrumb from "@/components/widgets/breadcrumb";
 import LastViews from "@/components/common/last-views";
 import RelatedCardBox from "./components/related-card-box";
-import Category from "@/components/common/category";
-import PreviewGallery from "@/components/details/preview-gallery";
 import RelatedContent from "@/components/details/related-content";
 import LatestTrainingContent from "@/components/details/latest-training-content";
 import RelatedQa from "@/components/details/related-qa";
 import RelatedOnlineExam from "@/components/details/related-online-exam";
 import CrashReport from "~/components/common/crash-report.vue";
-import ExamDetailDescriptionSection from "@/components/exam/detail/DescriptionSection.vue";
-import ExamDetailSidebarDetails from "@/components/exam/detail/SidebarDetails.vue";
-import ExamDetailMobileOrderSection from "@/components/exam/detail/MobileOrderSection.vue";
-import ExamDetailShareDialog from "@/components/exam/detail/ShareDialog.vue";
 
 // Get api, router, and route
 const route = useRoute();

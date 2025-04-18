@@ -4,27 +4,10 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Mobile side section-->
-          <v-col cols="12" class="pr-0 d-flex d-md-none">
-            <!-- <v-btn
-              icon
-              large
-              :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
-                  &lesson=${help_link_data.lesson}`"
-              v-for="(item, index) in items"
-              :key="index"
-              class="bg-blue-grey-darken-2 mr-1"
-            >
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
-                  <span
-                    v-bind="attrs"
-                    v-on="on"
-                    :class="' icon icong-' + item.icon"
-                  />
-                </template>
-                <span>{{ item.text }}</span>
-              </v-tooltip>
-            </v-btn> -->
+          <v-col
+            cols="12"
+            class="pr-0 d-flex d-md-none overflow-x-auto mt-3 mt-md-0"
+          >
             <v-btn
               icon
               large
