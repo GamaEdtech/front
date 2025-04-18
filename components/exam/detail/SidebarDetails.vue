@@ -115,7 +115,6 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
 import ExamDetailShareDialog from "./ShareDialog.vue";
 
 const props = defineProps({

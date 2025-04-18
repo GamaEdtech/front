@@ -105,8 +105,6 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from "vue";
-
 // Props with types and defaults
 const props = defineProps({
   imageUrls: {
