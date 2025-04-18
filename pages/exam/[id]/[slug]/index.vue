@@ -102,18 +102,10 @@
             </v-col>
             <v-col md="3">
               <exam-detail-sidebar-details
-                :avatar="contentData.avatar"
-                :first-name="contentData.first_name"
-                :last-name="contentData.last_name"
-                :exam-type-title="contentData.azmoon_type_title"
-                :views="contentData.views"
-                :up-date="contentData.up_date"
-                :exam-id="contentData.id"
-                :exam-prices="contentData.price"
+                :content-data="contentData"
                 :is-logged-in="$auth.loggedIn"
-                :user-exam-status="contentData.examUserData?.status || 0"
+                :credit="$auth.user?.credit || 0"
                 :download-loading="download_loading"
-                :title="contentData.title"
                 @download="startDownload"
                 @login="openAuthDialog('login')"
                 @copy-url="copyUrl"

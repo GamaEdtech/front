@@ -4,7 +4,7 @@
     <v-row class="align-center">
       <v-col cols="3">
         <v-img
-          :src="avatar"
+          :src="contentData.avatar"
           alt=""
           class="d-inline-block"
           cover
@@ -13,7 +13,9 @@
         />
       </v-col>
       <v-col cols="9" class="pl-0">
-        <p class="creator_title">{{ firstName }} {{ lastName }}</p>
+        <p class="creator_title">
+          {{ contentData.first_name }} {{ contentData.last_name }}
+        </p>
       </v-col>
     </v-row>
 
@@ -23,11 +25,11 @@
     <v-row>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-folder mr-1 icon"></i>
-        File type: {{ examTypeTitle }}
+        File type: {{ contentData.azmoon_type_title }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-eye mr-1 icon"></i>
-        Viewed: {{ views || "Unknown" }}
+        Viewed: {{ contentData.views || "Unknown" }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-calendar-alt mr-1 icon"></i>
@@ -42,7 +44,7 @@
       <v-col cols="12" class="pb-0">
         <!--Dialog for share-->
         <exam-detail-share-dialog
-          :title="title"
+          :title="contentData.title"
           @copy-url="onCopyUrl"
           @share="onShare"
         />
@@ -66,7 +68,7 @@
     <!-- Action buttons -->
     <v-row class="mt-1 d-none d-md-block">
       <v-col
-        v-for="(item, key) in examPrices"
+        v-for="(item, key) in contentData.price"
         :key="key"
         cols="12"
         class="pb-0"
@@ -85,12 +87,14 @@
         <!--For authenticated user-->
         <v-btn
           v-show="isLoggedIn"
-          :to="`/exam/start/${examId}`"
+          :to="`/exam/start/${contentData.id}`"
           v-if="key === 'participation'"
           block
           color="success"
         >
-          <span v-if="userExamStatus === 1"> Show result </span>
+          <span v-if="contentData.examUserData?.status === 1">
+            Show result
+          </span>
           <span v-else>
             Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
           </span>
@@ -115,46 +119,19 @@
 </template>
 
 <script setup>
+import { ref, computed } from "vue";
 import ExamDetailShareDialog from "./ShareDialog.vue";
 
 const props = defineProps({
-  avatar: {
-    type: String,
-    default: "",
-  },
-  firstName: {
-    type: String,
-    default: "",
-  },
-  lastName: {
-    type: String,
-    default: "",
-  },
-  examTypeTitle: {
-    type: String,
-    default: "",
-  },
-  views: {
-    type: [Number, String],
-    default: "Unknown",
-  },
-  upDate: {
-    type: String,
-    default: "",
-  },
-  examId: {
-    type: [String, Number],
-    required: true,
-  },
-  examPrices: {
+  contentData: {
     type: Object,
-    default: () => ({}),
+    required: true,
   },
   isLoggedIn: {
     type: Boolean,
     default: false,
   },
-  userExamStatus: {
+  credit: {
     type: Number,
     default: 0,
   },
@@ -162,11 +139,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  title: {
-    type: String,
-    default: "",
-  },
 });
+
+// Add a shortcut computed property for better readability in the code
+const contentData = computed(() => props.contentData);
 
 const emit = defineEmits([
   "download",
@@ -182,7 +158,7 @@ const rating = ref(4.5);
 // Computed properties
 const lastUpdate = computed(() => {
   // You can use a time-ago filter here if available
-  return props.upDate || "Unknown";
+  return contentData.value.up_date || "Unknown";
 });
 
 // Methods
@@ -199,7 +175,7 @@ function onCopyUrl() {
 }
 
 function onShare(platform) {
-  emit("share", platform, props.title);
+  emit("share", platform, contentData.value.title);
 }
 
 function onCrashReport() {
