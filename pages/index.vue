@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="px-0 py-0 mt-md-0">
     <h1 class="d-none">
-      Free Past Papers, Quiz, Powerpoint and Study Guid | GsamaTrain
+      Free Past Papers, Quiz, Powerpoint and Study Guid | GamaTrain
     </h1>
 
     <main-slider />
@@ -156,8 +156,7 @@ export default {
   head() {
     return {
       titleTemplate: "%s",
-      title:
-        "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+      title: "Free Past Papers, Quiz, Powerpoint and Study Guid",
       meta: [
         {
           hid: "description",
@@ -168,14 +167,12 @@ export default {
         {
           hid: "apple-mobile-web-app-title",
           name: "apple-mobile-web-app-title",
-          content:
-            "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
         },
         {
           hid: "og:title",
           name: "og:title",
-          content:
-            "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
         },
         {
           hid: "og:site_name",

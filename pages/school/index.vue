@@ -429,7 +429,7 @@ export default {
       const perPage = 20; // Change this to match `this.perPage`
       const page = parseInt(query.page) || 1;
       const baseURL = process.server
-        ? `https://api.gamaedtech.com/api/v1/schools`
+        ? `${process.env.API2_BASE_URL}/api/v1/schools`
         : "/api/v2/schools";
 
       const params = {

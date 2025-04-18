@@ -36,11 +36,7 @@
             id="schoolDetailsMap"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker
-              @click="$router.push(`/school/1`)"
-              :lat-lng="map.latLng"
-              :icon="map.schoolIcon"
-            ></l-marker>
+            <l-marker :lat-lng="map.latLng" :icon="map.schoolIcon"></l-marker>
           </l-map>
         </client-only>
 
@@ -165,7 +161,7 @@
             <v-carousel-item
               v-for="(image, index) in galleryImages"
               :key="index"
-              :src="image"
+              :src="image.fileUri"
               eager
               cover
               class="pointer"
@@ -1566,11 +1562,11 @@ export default {
   },
   async asyncData({ params, $axios }) {
     const baseURL = process.server
-      ? `https://api.gamaedtech.com/api/v1/`
-      : "/api/v2/";
+      ? `${process.env.API2_BASE_URL}/api/v1`
+      : "/api/v2";
 
-    const content = await $axios.$get(`${baseURL}schools/${params.id}`);
-    const rating = await $axios.$get(`${baseURL}schools/${params.id}/rate`);
+    const content = await $axios.$get(`${baseURL}/schools/${params.id}`);
+    const rating = await $axios.$get(`${baseURL}/schools/${params.id}/rate`);
 
     var contentData = [];
     var ratingData = [];

@@ -87,7 +87,7 @@
                 >
                   <div class="position-relative">
                     <v-img
-                      :src="item"
+                      :src="item.fileUri"
                       aspect-ratio="1"
                       class="position-relative rounded"
                       :class="mainImage === item ? 'primary--border' : ''"
@@ -194,7 +194,7 @@ export default {
   },
   methods: {
     handleSelectedImage(row, index) {
-      this.mainImage = row;
+      this.mainImage = row.fileUri;
       this.selectedImageIndex = index + 1;
     },
     handlePreviewSelected(preview, index) {
@@ -367,25 +367,8 @@ export default {
       // Determine file type from the cropped data - cropped image is usually in PNG format
       // but we'll respect the original file type if possible
       const originalFile = this.pendingUploads[this.currentCropIndex];
-      let fileType = "image/png";
-      let fileExt = "png";
-
-      if (originalFile) {
-        // Try to get the original file type
-        if (
-          originalFile.type.includes("jpeg") ||
-          originalFile.type.includes("jpg")
-        ) {
-          fileType = "image/jpeg";
-          fileExt = "jpg";
-        } else if (originalFile.type.includes("png")) {
-          fileType = "image/png";
-          fileExt = "png";
-        } else if (originalFile.type.includes("webp")) {
-          fileType = "image/webp";
-          fileExt = "webp";
-        }
-      }
+      let fileType = "image/webp";
+      let fileExt = "webp";
 
       const filename = `image_${timestamp}_${this.currentCropIndex}.${fileExt}`;
       const file = new File([data], filename, { type: fileType });
@@ -425,7 +408,7 @@ export default {
   watch: {
     images(newValue) {
       if (newValue.length >= 1) {
-        this.mainImage = newValue[0];
+        this.mainImage = newValue[0].fileUri;
         this.selectedImageIndex = 1;
       }
     },
@@ -433,7 +416,7 @@ export default {
   mounted() {
     // Initialize selected image if images exist
     if (this.images && this.images.length > 0) {
-      this.mainImage = this.images[0];
+      this.mainImage = this.images[0].fileUri;
       this.selectedImageIndex = 1;
     }
   },
