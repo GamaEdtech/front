@@ -104,111 +104,112 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "preview-gallery",
-  props: {
-    imageUrls: {
-      type: Array,
-      default: () => [],
-    },
-    helpLinkData: {
-      type: Object,
-      default: () => ({
-        state: "",
-        section: "",
-        base: "",
-        course: "",
-        lesson: "",
-      }),
-    },
-    initialSlide: {
-      type: Number,
-      default: 0,
-    },
-  },
-  data() {
-    return {
-      carouselVal: 0,
-      images: [],
-      help_link_data: {
-        state: "",
-        section: "",
-        base: "",
-        course: "",
-        lesson: "",
-      },
+<script setup>
+import { ref, reactive, watch } from "vue";
 
-      active_img: 1,
+// Props with types and defaults
+const props = defineProps({
+  imageUrls: {
+    type: Array,
+    default: () => [],
+  },
+  helpLinkData: {
+    type: Object,
+    default: () => ({
+      state: "",
+      section: "",
+      base: "",
+      course: "",
+      lesson: "",
+    }),
+  },
+  initialSlide: {
+    type: Number,
+    default: 0,
+  },
+});
 
-      items: [
-        {
-          class: "exam",
-          text: "Related exam",
-          icon: "exam",
-          link: "/search?type=azmoon",
-        },
-        {
-          class: "test",
-          text: "Related paper",
-          icon: "paper",
-          link: "/search?type=test",
-        },
-        {
-          class: "content",
-          text: "Related multimedia",
-          icon: "multimedia",
-          link: "/search?type=learnfiles",
-        },
-        {
-          class: "faq",
-          text: "Related Q & A",
-          icon: "q-a",
-          link: "/search?type=question",
-        },
-        {
-          class: "textbook ",
-          text: "Related tutorial",
-          icon: "tutorial",
-          link: "/search?type=dars",
-        },
-        // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
-        // { class: "tutor", text: "Tutor", icon: "teacher" ,link:"/search?type=tutor" },
-      ],
-    };
+// Reactive state
+const carouselVal = ref(0);
+const images = ref([]);
+const help_link_data = reactive({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
+
+const active_img = ref(1);
+
+const items = reactive([
+  {
+    class: "exam",
+    text: "Related exam",
+    icon: "exam",
+    link: "/search?type=azmoon",
   },
-  watch: {
-    imageUrls: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal && newVal.length > 0) {
-          this.images = [...newVal];
-        }
-      },
-    },
-    helpLinkData: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.help_link_data = { ...newVal };
-        }
-      },
-    },
-    initialSlide: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal !== undefined) {
-          this.carouselVal = newVal;
-        }
-      },
-    },
+  {
+    class: "test",
+    text: "Related paper",
+    icon: "paper",
+    link: "/search?type=test",
   },
-  methods: {
-    changeSlide(index) {
-      this.carouselVal = index;
-    },
+  {
+    class: "content",
+    text: "Related multimedia",
+    icon: "multimedia",
+    link: "/search?type=learnfiles",
   },
-};
+  {
+    class: "faq",
+    text: "Related Q & A",
+    icon: "q-a",
+    link: "/search?type=question",
+  },
+  {
+    class: "textbook ",
+    text: "Related tutorial",
+    icon: "tutorial",
+    link: "/search?type=dars",
+  },
+]);
+
+// Methods
+function changeSlide(index) {
+  carouselVal.value = index;
+}
+
+// Watch effects
+watch(
+  () => props.imageUrls,
+  (newVal) => {
+    if (newVal && newVal.length > 0) {
+      images.value = [...newVal];
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.helpLinkData,
+  (newVal) => {
+    if (newVal) {
+      Object.assign(help_link_data, newVal);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.initialSlide,
+  (newVal) => {
+    if (newVal !== undefined) {
+      carouselVal.value = newVal;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
