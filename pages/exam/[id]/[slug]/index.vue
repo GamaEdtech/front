@@ -78,316 +78,48 @@
             </v-col>
             <v-col cols="12" md="6">
               <!--  Description   -->
-              <div class="d-flex mb-4">
-                <div class="w-100">
-                  <div class="d-flex align-center justify-space-between header">
-                    <h1 class="detail-title gama-text-h5">
-                      {{ contentData.title }}
-                    </h1>
-                  </div>
-                  <div class="description-holder my-4">
-                    <!--Topics-->
-                    <p class="gama-text-body2">
-                      <i class="fa-solid fa-list ml-1 icon"></i>
-                      Topics:
-                    </p>
-                    <ul>
-                      <li
-                        v-for="(item, index) in contentData.topics"
-                        :key="index"
-                      >
-                        {{ item.title }}
-                      </li>
-                    </ul>
-                    <!--End topics-->
-
-                    <!--Question number-->
-                    <p class="mt-1 gama-text-body2">
-                      <i class="fa-solid fa-question ml-1 icon"></i>
-                      Questions: {{ contentData.tests_num }}
-                    </p>
-                    <!--End question number-->
-
-                    <!--Difficulty level-->
-                    <p class="mt-1 gama-text-body2">
-                      <i
-                        class="fa-solid fa-temperature-three-quarters ml-1 icon"
-                      ></i>
-                      Difficulty level: {{ contentData.level }}
-                    </p>
-                    <!--End difficulty level-->
-
-                    <!--Start date-->
-                    <p class="mt-1 gama-text-body2">
-                      <i class="fa-solid fa-circle-play"></i>
-                      Start:
-                      {{
-                        contentData.start_date ? contentData.start_date : "-"
-                      }}
-                    </p>
-                    <!--End start date-->
-
-                    <!--End date-->
-                    <p class="mt-1 gama-text-body2">
-                      <i class="fa-solid fa-circle-stop"></i>
-                      End:
-                      {{ contentData.end_date ? contentData.end_date : "-" }}
-                    </p>
-                    <!--End end date-->
-
-                    <!--Duration-->
-                    <p class="mt-1 gama-text-body2">
-                      <i class="fa-solid fa-clock"></i>
-                      Duration: {{ contentData.azmoon_time }} minutes
-                    </p>
-                    <!--End duration-->
-                  </div>
-
-                  <div class="label-holder">
-                    <v-chip
-                      link
-                      v-show="contentData.section_title"
-                      class="mr-1"
-                      :to="`/search?type=azmoon&section=${contentData.section}`"
-                    >
-                      {{ contentData.section_title }}
-                    </v-chip>
-                    <v-chip
-                      link
-                      v-show="contentData.base_title"
-                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
-                      class="mr-1"
-                    >
-                      {{ contentData.base_title }}
-                    </v-chip>
-                    <v-chip
-                      link
-                      v-show="contentData.lesson_title"
-                      :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
-                      class="ma-1"
-                    >
-                      {{ contentData.lesson_title }}
-                    </v-chip>
-                    <!-- <v-chip class="ma-1"
-                            v-show="contentData.edu_month_title">
-                      {{ contentData.edu_month_title }}
-                    </v-chip> -->
-                  </div>
-                </div>
-              </div>
-              <!--   Download Btn and Description  -->
-              <div v-if="!isFree" class="text-center download-sec">
-                <div class="d-none d-md-block mb-4">
-                  <p v-if="!$auth.loggedIn" class="gama-text-body2">
-                    <span class="mdi mdi-bell icon"></span>
-                    <span @click="openAuthDialog('login')" class="login"
-                      >Login</span
-                    >
-                    <span @click="openAuthDialog('register')" class="register">
-                      (register)
-                    </span>
-                    to download and charge your wallet.
-                  </p>
-                  <span v-else class="gama-text-body2">
-                    Your wallet charge is ${{ $auth.user.credit }}
-                  </span>
-                  <nuxt-link
-                    class="blue--text"
-                    v-if="$auth.loggedIn"
-                    to="/user/charge-wallet"
-                    >(Top Up Wallet)
-                  </nuxt-link>
-                </div>
-                <!-- <div class="font-weight-bold answer gama-text-body2">
-                  <span class="mdi mdi-checkbox-marked icon"></span>
-                  <span> The key answer sheet is at the end of the exam file.</span>
-                </div> -->
-              </div>
-              <!--   fileCopyRight  -->
-              <!-- <div class="d-none d-md-block text-center file-copy-right gama-text-body2">
-                <span >It is forbidden to republish the contents in cyber space.</span>
-              </div> -->
+              <exam-detail-description-section
+                :title="contentData.title"
+                :topics="contentData.topics"
+                :tests-num="contentData.tests_num"
+                :level="contentData.level"
+                :start-date="contentData.start_date"
+                :end-date="contentData.end_date"
+                :exam-time="contentData.azmoon_time"
+                :section-title="contentData.section_title"
+                :section-id="contentData.section"
+                :base-title="contentData.base_title"
+                :base-id="contentData.base"
+                :lesson-title="contentData.lesson_title"
+                :lesson-id="contentData.lesson"
+                :is-logged-in="$auth.loggedIn"
+                :credit="$auth.user?.credit || 0"
+                :participation="contentData.participation"
+                :pdf-price="contentData.files?.pdf?.price || 0"
+                @login="openAuthDialog('login')"
+                @register="openAuthDialog('register')"
+              />
             </v-col>
             <v-col md="3">
-              <v-card flat class="content_main_info">
-                <v-row class="align-center">
-                  <v-col cols="3">
-                    <v-img
-                      :src="contentData.avatar"
-                      alt=""
-                      class="d-inline-block"
-                      cover
-                      height="48"
-                      width="48"
-                    />
-                  </v-col>
-                  <v-col cols="9" class="pl-0">
-                    <p class="creator_title">
-                      {{ contentData.first_name }} {{ contentData.last_name }}
-                    </p>
-                  </v-col>
-                </v-row>
-                <v-divider class="my-2" />
-                <v-row>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-folder mr-1 icon"></i>
-                    File type: {{ contentData.azmoon_type_title }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-eye mr-1 icon"></i>
-                    Viewed: Unknown
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <i class="fa-solid fa-calendar-alt mr-1 icon"></i>
-                    Last update:
-                    {{
-                      $filters.timeAgo.calc(contentData.value?.data?.up_date)
-                    }}
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <div class="pointer" @click="openCrashReportDialog">
-                      <i class="fa-solid fa-bug mr-1 icon"></i>
-                      Crash report
-                    </div>
-                  </v-col>
-                  <v-col cols="12" class="pb-0">
-                    <!--Dialog for share-->
-                    <v-dialog
-                      transition="dialog-top-transition"
-                      class="share_dialog"
-                      max-width="600"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
-                          <i class="fa-solid fa-share-alt mr-1 icon"></i>
-                          Share
-                        </span>
-                      </template>
-                      <template v-slot:default="dialog">
-                        <v-card>
-                          <v-toolbar color="default"> Share </v-toolbar>
-                          <v-card-text class="mt-5">
-                            <p class="mb-3">Share this content:</p>
-                            <v-row>
-                              <v-col cols="12">
-                                <v-btn outlined block @click="copyUrl">
-                                  <i class="fa-solid fa-copy mr-1 icon"></i
-                                  >&nbsp;
-                                  {{ copy_btn }}
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  @click="shareSocial('whatsapp')"
-                                  target="_blank"
-                                  block
-                                  color="#25d366"
-                                  class="white--text"
-                                >
-                                  <i class="fab fa-whatsapp mr-1 icon"></i>
-                                  WhatsApp
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  block
-                                  color="#00acee"
-                                  class="white--text"
-                                  @click="shareSocial('telegram')"
-                                >
-                                  <i
-                                    class="fab fa-telegram-plane mr-1 icon"
-                                  ></i>
-                                  Telegram
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
-                          <v-card-actions class="justify-end">
-                            <v-btn text @click="dialog.value = false"
-                              >close
-                            </v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </template>
-                    </v-dialog>
-                  </v-col>
-                </v-row>
-
-                <div class="text-center mt-2">
-                  <v-rating
-                    v-model="rating"
-                    color="yellow darken-3"
-                    background-color="grey darken-1"
-                    empty-icon="$ratingFull"
-                    half-increments
-                    hover
-                  />
-                </div>
-                <v-divider class="d-none d-md-block" />
-
-                <v-row class="mt-1 d-none d-md-block">
-                  <v-col
-                    v-for="(item, key) in contentData.price"
-                    :key="key"
-                    cols="12"
-                    class="pb-0"
-                  >
-                    <!--For not authenticated user-->
-                    <v-btn
-                      v-show="!$auth.loggedIn"
-                      @click="openAuthDialog('login')"
-                      v-if="key === 'participation'"
-                      block
-                      color="success"
-                    >
-                      Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
-                    </v-btn>
-
-                    <!--For authenticated user-->
-                    <v-btn
-                      v-show="$auth.loggedIn"
-                      :to="`/exam/start/${contentData.id}`"
-                      v-if="key === 'participation'"
-                      block
-                      color="success"
-                    >
-                      <span v-if="contentData.examUserData.status == 1">
-                        Show result
-                      </span>
-                      <span v-else>
-                        Start Exam{{
-                          item.price > 0 ? " | $" + item.price : ""
-                        }}
-                      </span>
-                    </v-btn>
-
-                    <v-btn v-else-if="key === 'word'" block color="primary">
-                      Download WORD{{
-                        item.price > 0 ? " | $" + item.price : ""
-                      }}
-                    </v-btn>
-                    <v-btn
-                      @click="startDownload()"
-                      :loading="download_loading"
-                      v-else-if="key === 'pdf'"
-                      block
-                      color="error"
-                    >
-                      Download PDF{{
-                        item.price > 0 ? " | $" + item.price : ""
-                      }}
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card>
-              <!-- <v-row>
-                <v-col cols="12" class="text-center">
-                  <p class="mt-2  gama-text-overline">
-                    <i class="fa-solid fa-exclamation-circle mr-1 icon"></i>
-                    Republishing is prohibited in cyber space.</p>
-                </v-col>
-              </v-row> -->
+              <exam-detail-sidebar-details
+                :avatar="contentData.avatar"
+                :first-name="contentData.first_name"
+                :last-name="contentData.last_name"
+                :exam-type-title="contentData.azmoon_type_title"
+                :views="contentData.views"
+                :up-date="contentData.up_date"
+                :exam-id="contentData.id"
+                :exam-prices="contentData.price"
+                :is-logged-in="$auth.loggedIn"
+                :user-exam-status="contentData.examUserData?.status || 0"
+                :download-loading="download_loading"
+                :title="contentData.title"
+                @download="startDownload"
+                @login="openAuthDialog('login')"
+                @copy-url="copyUrl"
+                @share="shareSocial"
+                @crash-report="openCrashReportDialog"
+              />
             </v-col>
           </v-row>
         </div>
@@ -395,75 +127,18 @@
     </section>
 
     <!--Mobile order section-->
-    <v-card v-if="!pending" class="order-btn-holder d-block d-md-none">
-      <v-card-text class="pb-0">
-        <v-row class="px-10 text-center">
-          <v-col
-            v-for="(item, key) in contentData.price"
-            :key="key"
-            cols="12"
-            class="pb-1 pt-0"
-          >
-            <v-btn
-              v-show="!$auth.loggedIn"
-              @click="openAuthDialog('login')"
-              v-if="key === 'participation'"
-              block
-              color="success"
-            >
-              Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
-            </v-btn>
-            <v-btn
-              v-show="$auth.loggedIn"
-              :to="`/exam/start/${contentData.id}`"
-              v-if="key === 'participation'"
-              block
-              color="success"
-            >
-              <span v-if="contentData.examUserData.status == 1">
-                Show result
-              </span>
-              <span v-else>
-                Start Exam{{ item.price > 0 ? " | $" + item.price : "" }}
-              </span>
-            </v-btn>
-            <v-btn v-else-if="key === 'word'" block color="primary">
-              Download WORD{{ item.price > 0 ? " | $" + item.price : "" }}
-            </v-btn>
-            <v-btn v-else-if="key === 'pdf'" block color="error">
-              Download PDF{{ item.price > 0 ? " | $" + item.price : "" }}
-            </v-btn>
-          </v-col>
-
-          <v-col cols="12">
-            <div v-if="!isFree" class="mb-4">
-              <p v-if="!$auth.loggedIn">
-                <span class="mdi mdi-bell icon"></span>
-                <span @click="openAuthDialog('login')" class="login blue--text"
-                  >Login</span
-                >
-                <span
-                  @click="openAuthDialog('register')"
-                  class="register blue--text"
-                >
-                  (register)
-                </span>
-                <span>to download and charge.</span>
-              </p>
-              <span v-else>
-                Your wallet charge is ${{ $auth.user.credit }}
-                <nuxt-link
-                  class="blue--text"
-                  v-if="$auth.loggedIn"
-                  to="/user/charge-wallet"
-                  >(Top Up Wallet)</nuxt-link
-                >
-              </span>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+    <exam-detail-mobile-order-section
+      v-if="!pending"
+      :exam-id="contentData.id"
+      :exam-prices="contentData.price"
+      :is-logged-in="$auth.loggedIn"
+      :credit="$auth.user?.credit || 0"
+      :user-exam-status="contentData.examUserData?.status || 0"
+      :download-loading="download_loading"
+      @download="startDownload"
+      @login="openAuthDialog('login')"
+      @register="openAuthDialog('register')"
+    />
     <!--End mobile order section-->
 
     <!--  End: detail  -->
@@ -608,6 +283,10 @@ import LatestTrainingContent from "@/components/details/latest-training-content"
 import RelatedQa from "@/components/details/related-qa";
 import RelatedOnlineExam from "@/components/details/related-online-exam";
 import CrashReport from "~/components/common/crash-report.vue";
+import ExamDetailDescriptionSection from "@/components/exam/detail/DescriptionSection.vue";
+import ExamDetailSidebarDetails from "@/components/exam/detail/SidebarDetails.vue";
+import ExamDetailMobileOrderSection from "@/components/exam/detail/MobileOrderSection.vue";
+import ExamDetailShareDialog from "@/components/exam/detail/ShareDialog.vue";
 
 // Get api, router, and route
 const route = useRoute();
