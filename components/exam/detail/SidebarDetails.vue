@@ -175,8 +175,6 @@ function onCopyUrl() {
 }
 
 function onShare(platform) {
-  // emit("share", platform, contentData.value.title);
-
   const pageTitle = contentData.value?.title || "";
 
   if (platform === "whatsapp")
