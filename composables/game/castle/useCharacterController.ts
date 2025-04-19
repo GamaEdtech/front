@@ -57,6 +57,7 @@ interface CastleBoundaries {
 export function useCharacterController(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
+    container: HTMLDivElement
 ) {
     // Character references
     const character = shallowRef<THREE.Object3D | null>(null)
@@ -280,8 +281,8 @@ export function useCharacterController(
         window.addEventListener('mousemove', onMouseMove)
 
         // Lock pointer for better control
-        document.addEventListener('click', () => {
-            document.body.requestPointerLock()
+        container.addEventListener('click', () => {
+            container.requestPointerLock()
         })
     }
 
@@ -329,7 +330,7 @@ export function useCharacterController(
      * Handles mouse movement for camera rotation
      */
     const onMouseMove = (event: MouseEvent) => {
-        if (document.pointerLockElement === document.body) {
+        if (document.pointerLockElement === container) {
             moveState.mouseX += event.movementX * 0.1
             moveState.mouseY += event.movementY * 0.1
 

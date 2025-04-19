@@ -9,12 +9,13 @@
 
                 <v-divider class="my-2"></v-divider>
 
-                <p class="mb-2">Press <kbd>E</kbd> to open the door</p>
-                <p v-if="doorLabel" class="text-caption text-grey">{{ doorLabel }}</p>
+                <p v-if="isMobile" class="mb-2">Press below button to fix math problem and open the door</p>
+                <p v-else class="mb-2">Press <kbd>E</kbd> to fix math problem and open the door</p>
 
-                <v-btn variant="tonal" color="primary" block class="mt-2">
+                <v-btn @click="handleKeyPress" variant="tonal" color="primary" block class="mt-2">
                     <v-icon start>mdi-keyboard</v-icon>
-                    Press E key
+                    <span v-if="!isMobile">Press E key</span>
+                    <span v-else>Fix problem</span>
                 </v-btn>
             </v-card-text>
         </v-card>
@@ -22,7 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
+import { useDeviceDetection } from '@/store/device';
+
+const { isMobile } = useDeviceDetection();
 
 const props = defineProps<{
     isNearDoor: boolean;
@@ -32,9 +36,13 @@ const emit = defineEmits(['doorInteraction']);
 
 // Handle keyboard interaction
 const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.code === 'KeyE' && props.isNearDoor) {
-        console.log('Door interaction triggered via E key');
+    if (isMobile.value && props.isNearDoor) {
         emit('doorInteraction');
+    }else{
+        if (event.code === 'KeyE' && props.isNearDoor) {
+            console.log('Door interaction triggered via E key');
+            emit('doorInteraction');
+        }
     }
 };
 

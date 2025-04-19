@@ -1,7 +1,8 @@
 <template>
     <div>
         <div ref="container" class="container" />
-        <DoorInteractionPrompt :is-near-door="isNearDoor" @door-interaction="handleDoorInteraction" />
+        <DoorInteractionPrompt v-if="!isMathModalOpen" :is-near-door="isNearDoor" @door-interaction="handleDoorInteraction" />
+        <MathModal v-if="isMathModalOpen" @close-math-modal="closeMathModal" />
     </div>
 </template>
 
@@ -10,17 +11,24 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useThreeJS } from '../../composables/game/castle/useThreejs'
 import { useCharacterController } from '../../composables/game/castle/useCharacterController'
 import DoorInteractionPrompt from '../../components/game/castle/DoorInteractionPrompt.vue'
+import MathModal from '../../components/game/castle/MathModal.vue'
 import { openedDoors, nearDoor } from '@/store/doorStatus'
 
 const container = ref<HTMLDivElement | null>(null)
 const isNearDoor = ref(false)
+const isMathModalOpen = ref(false)
+
+const closeMathModal = () => {
+    isMathModalOpen.value = false;
+    openedDoors[nearDoor.value as keyof typeof openedDoors] = true;
+    container.value!.requestPointerLock()
+}
 
 // Handle door interaction when user presses E key
 const handleDoorInteraction = () => {
     console.log("Door interaction handled in castle.vue!");
-
-    openedDoors[nearDoor.value as keyof typeof openedDoors] = true;
-    // Here you would add code to actually open the door in the 3D scene
+    document.exitPointerLock();
+    isMathModalOpen.value = true;
 }
 
 onMounted(() => {
@@ -53,7 +61,7 @@ onMounted(() => {
         console.log("Castle model loaded, initializing character controller")
 
         // Initialize character controller
-        characterController = useCharacterController(scene.value, camera.value)
+        characterController = useCharacterController(scene.value, camera.value, container.value!)
         characterController.createCharacter()
         characterController.setupControls()
 
