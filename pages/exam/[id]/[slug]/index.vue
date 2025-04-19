@@ -95,7 +95,6 @@
                 @download="startDownload"
                 @login="openAuthDialog('login')"
                 @copy-url="copyUrl"
-                @share="shareSocial"
                 @crash-report="openCrashReportDialog"
               />
             </v-col>
@@ -270,17 +269,6 @@ const openAuthDialog = (val) => {
 const copyUrl = () => {
   navigator.clipboard.writeText(window.location.href);
   copy_btn.value = "Copied";
-};
-
-const shareSocial = (social_name) => {
-  const pageTitle = contentData.value?.title || "";
-
-  if (social_name === "whatsapp")
-    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
-  else if (social_name === "telegram")
-    window.open(
-      `https://telegram.me/share/url?url=${window.location.href}&text=${pageTitle}`
-    );
 };
 
 const startDownload = async () => {

@@ -175,7 +175,16 @@ function onCopyUrl() {
 }
 
 function onShare(platform) {
-  emit("share", platform, contentData.value.title);
+  // emit("share", platform, contentData.value.title);
+
+  const pageTitle = contentData.value?.title || "";
+
+  if (platform === "whatsapp")
+    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
+  else if (platform === "telegram")
+    window.open(
+      `https://telegram.me/share/url?url=${window.location.href}&text=${pageTitle}`
+    );
 }
 
 function onCrashReport() {
