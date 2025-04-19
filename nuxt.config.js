@@ -241,7 +241,14 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu"],
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "three", "lil-gui"],
+    extend(config, ctx) {
+      config.module.rules.push({
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+        loader: 'raw-loader',
+        exclude: /node_modules/
+      })
+    }
   },
 
   pwa: {
