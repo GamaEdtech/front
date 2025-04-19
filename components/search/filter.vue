@@ -102,7 +102,7 @@
           "
           @click:close="year_val = 0"
         >
-          <span> Year: {{ applied_filter.select_year_title }} </span>
+          <span> {{ applied_filter.select_year_title }} </span>
         </v-chip>
 
         <!-- Month chip -->
@@ -158,11 +158,11 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.base_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.base_list.length ? 'none' : 'auto',
+              color: !filter.base_list || !filter.base_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.base_list || !filter.base_list.length ? 'none' : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.base_list.length }"
+            :class="{ 'filter-inactive': !filter.base_list || !filter.base_list.length }"
           >
             Grade
           </v-expansion-panel-title>
@@ -188,11 +188,11 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.lesson_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.lesson_list.length ? 'none' : 'auto',
+              color: !filter.lesson_list || !filter.lesson_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.lesson_list || !filter.lesson_list.length ? 'none' : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.lesson_list.length }"
+            :class="{ 'filter-inactive': !filter.lesson_list || !filter.lesson_list.length }"
           >
             Subject
           </v-expansion-panel-title>
@@ -218,11 +218,11 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.topic_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.topic_list.length ? 'none' : 'auto',
+              color: !filter.topic_list || !filter.topic_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.topic_list || !filter.topic_list.length ? 'none' : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.topic_list.length }"
+            :class="{ 'filter-inactive': !filter.topic_list || !filter.topic_list.length }"
           >
             Topic
           </v-expansion-panel-title>
@@ -255,10 +255,11 @@
         >
           <v-expansion-panel-title
             :style="{
-              color: !filter.file_type_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.file_type_list.length ? 'none' : 'auto',
+              color: !filter.file_type_list || !filter.file_type_list.length ? 'black' : 'transparent',
+              pointerEvents: !filter.file_type_list || !filter.file_type_list.length ? 'none' : 'auto',
             }"
             class="filter-title filter-inactive"
+            :class="{ 'filter-inactive': !filter.file_type_list || !filter.file_type_list.length }"
           >
             {{
               $route.query.type === "test" || $route.query.type === "azmoon"
@@ -376,7 +377,7 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
-      year_val: this.$route.query.year ? this.$route.query.year : 0,
+      year_val: this.$route.query.year ? this.$route.query.year : (this.$route.query.edu_year ? this.$route.query.edu_year : 0),
       month_val: this.$route.query.month ? this.$route.query.month : 0,
       state_val: 0,
       city_val: 0,
@@ -385,6 +386,7 @@ export default {
       free_checkbox_val: this.$route.query.free === "1" ? 1 : 0,
       answer_checkbox_val: this.$route.query.a_file === "1" ? 1 : 0,
       loadtime: false,
+      using_edu_year: !!this.$route.query.edu_year, // Track if we're using edu_year parameter
 
       applied_filter: {
         select_section_title: "",
@@ -464,6 +466,8 @@ export default {
     };
   },
   created() {
+    console.log("Route query in created:", this.$route.query);
+    
     // In Nuxt 3, we use $fetch for API calls
     // Load the section list for the Board filter
     $fetch("/api/v1/types/list", {
@@ -473,8 +477,10 @@ export default {
       .then((res) => {
         if (res && res.data) {
           this.filter.section_list = res.data;
+          console.log("Section list loaded:", this.filter.section_list);
+          
           // If section parameter exists in URL, load related data
-          if (this.$route.query.section > 0) {
+          if (this.$route.query.section) {
             this.getFilterList(
               {
                 type: "base",
@@ -483,12 +489,15 @@ export default {
               "base"
             );
 
-            // Set section title in filters
+            // Set section title in filters - use string comparison for consistent type handling
             const sectionItem = this.filter.section_list.find(
-              (x) => x.id === parseInt(this.$route.query.section)
+              (x) => String(x.id) === String(this.$route.query.section)
             );
+            console.log("Found section item in created:", sectionItem);
+            
             if (sectionItem) {
               this.applied_filter.select_section_title = sectionItem.title;
+              console.log("Set board title to:", this.applied_filter.select_section_title);
             }
           }
         }
@@ -516,10 +525,23 @@ export default {
       this.getFileType();
     }
 
+    // Set year title if edu_year or year is present in URL
+    if (this.$route.query.edu_year) {
+      this.applied_filter.select_year_title = this.$route.query.edu_year;
+      this.using_edu_year = true;
+    } else if (this.$route.query.year) {
+      this.applied_filter.select_year_title = this.$route.query.year;
+      this.using_edu_year = false;
+    }
+
     // Initialize filter with Board panel expanded by default
     this.panelModel = [0]; // Board panel
   },
   mounted() {
+    console.log("Route query:", this.$route.query);
+    console.log("Board value:", this.board_val, "type:", typeof this.board_val);
+    console.log("Applied filters:", this.applied_filter);
+    
     // Force expand Board panel after mounting to ensure it shows properly
     this.$nextTick(() => {
       // Set panelModel to force the Board panel (index 0) to be expanded
@@ -530,6 +552,7 @@ export default {
   watch: {
     "$route.query.type"(val) {
       this.filter.file_type_list = [];
+  
       if (
         this.$route.query.type === "test" ||
         this.$route.query.type === "azmoon" ||
@@ -565,8 +588,15 @@ export default {
       this.setBreadcrumbInfo();
 
       if (val > 0) {
-        this.applied_filter.select_section_title =
-          this.filter.section_list.find((x) => x.id === val).title;
+        // Use string comparison for consistent handling of IDs
+        const sectionItem = this.filter.section_list.find(
+          (x) => String(x.id) === String(val)
+        );
+        
+        if (sectionItem) {
+          this.applied_filter.select_section_title = sectionItem.title;
+        }
+        
         //Load base list
         var params = {
           type: "base",
@@ -654,6 +684,15 @@ export default {
         this.applied_filter.select_city_title = "";
       }
     },
+    year_val(val) {
+      if (val == 0) {
+        this.applied_filter.select_year_title = "";
+      } else {
+        this.applied_filter.select_year_title = val.toString();
+      }
+      this.updateQueryParams();
+      this.setBreadcrumbInfo();
+    },
   },
 
   methods: {
@@ -676,104 +715,108 @@ export default {
 
     // Separated response handling to its own method for clarity
     handleFilterResponse(res, type) {
-      var data = {};
-      if (type === "section") {
-        this.filter.section_list = res.data;
-        console.log("Board filter items loaded:", this.filter.section_list);
+      if (res && res.data) {
+        if (type === "section") {
+          this.filter.section_list = res.data;
+          console.log("Section list loaded in handleFilterResponse:", this.filter.section_list);
+          
+          if (this.board_val) {
+            console.log("Current board_val:", this.board_val, "type:", typeof this.board_val);
+            
+            // Use string comparison for reliable ID matching
+            const sectionItem = this.filter.section_list.find(
+              (x) => String(x.id) === String(this.board_val)
+            );
+            
+            console.log("Found section item in handleFilterResponse:", sectionItem);
+            
+            if (sectionItem) {
+              this.applied_filter.select_section_title = sectionItem.title;
+              console.log("Set section title to:", this.applied_filter.select_section_title);
+            } else {
+              console.log("Available section IDs:", this.filter.section_list.map(x => ({ id: x.id, type: typeof x.id })));
+            }
+          }
+        } else if (type === "base") {
+          this.filter.base_list = res.data;
 
-        //Initiate loading filter
-        if (this.$route.query.section > 0) {
-          data = {
-            type: "base",
-            section_id: this.$route.query.section,
-          };
+          //Expand Grade panel when base list is received
+          if (this.filter.base_list.length > 0) this.panelModel = [1];
 
-          this.getFilterList(data, "base");
-          this.base_val = this.$route.query.base;
+          //Get lesson data
+          if (this.$route.query.base > 0) {
+            var data = {
+              type: "lesson",
+              base_id: this.$route.query.base,
+            };
+            this.getFilterList(data, "lesson");
 
-          this.applied_filter.select_section_title =
-            this.filter.section_list.find((x) => x.id === this.board_val).title;
+            //Set lesson val
+            this.lesson_val = this.$route.query.lesson ? this.$route.query.lesson : 0;
 
-          //Set breadcrumbs info
-          this.setBreadcrumbInfo();
-        }
-        //
-      } else if (type === "base") {
-        this.filter.base_list = res.data;
-
-        //Get lesson data
-        if (this.$route.query.base > 0) {
-          data = {
-            type: "lesson",
-            base_id: this.$route.query.base,
-          };
-          this.getFilterList(data, "lesson");
-
-          //Set lesson val
-          this.lesson_val = this.$route.query.lesson;
-
-          //Enable tag
-          this.applied_filter.select_base_title = this.filter.base_list.find(
-            (x) => x.id === this.base_val
-          ).title;
-
-          //Set breadcrumbs info
-          this.setBreadcrumbInfo();
-        }
-      } else if (type === "lesson") {
-        this.filter.lesson_list = res.data;
-
-        if (this.filter.lesson_list.length > 0) this.panelModel = [2];
-
-        //Get lesson data
-        if (this.$route.query.lesson > 0) {
-          data = {
-            type: "topic",
-            lesson_id: this.$route.query.lesson,
-          };
-          this.getFilterList(data, "topic");
-
-          //Set topic val
-          this.topic_val = this.$route.query.topic;
-
-          //Enable tag
-          this.applied_filter.select_lesson_title =
-            this.filter.lesson_list.find(
-              (x) => x.id === this.$route.query.lesson
+            //Enable tag
+            this.applied_filter.select_base_title = this.filter.base_list.find(
+              (x) => x.id === this.base_val
             ).title;
 
-          //Set breadcrumbs info
-          this.setBreadcrumbInfo();
+            //Set breadcrumbs info
+            this.setBreadcrumbInfo();
+          }
+        } else if (type === "lesson") {
+          this.filter.lesson_list = res.data;
+
+          if (this.filter.lesson_list.length > 0) this.panelModel = [2];
+
+          //Get lesson data
+          if (this.$route.query.lesson > 0) {
+            var data = {
+              type: "topic",
+              lesson_id: this.$route.query.lesson,
+            };
+            this.getFilterList(data, "topic");
+
+            //Set topic val
+            this.topic_val = this.$route.query.topic;
+
+            //Enable tag
+            this.applied_filter.select_lesson_title =
+              this.filter.lesson_list.find(
+                (x) => x.id === this.$route.query.lesson
+              ).title;
+
+            //Set breadcrumbs info
+            this.setBreadcrumbInfo();
+          }
+        } else if (type === "topic") {
+          this.filter.topic_list = res.data;
+
+          if (this.filter.topic_list.length > 0) this.panelModel = [3];
+
+          //Enable tag
+          if (this.$route.query.topic > 0)
+            this.applied_filter.select_topic_title = this.filter.topic_list.find(
+              (x) => x.id === this.topic_val
+            ).title;
+        } else if (type === "state") {
+          this.filter.state_list = res.data;
+
+          //Enable tag
+          if (this.$route.query.state > 0) {
+            this.state_val = this.$route.query.state;
+            this.applied_filter.select_state_title = this.filter.state_list.find(
+              (x) => x.id === this.state_val
+            ).title;
+          }
+          if (this.$route.query.city > 0) this.city_val = this.$route.query.city;
+        } else if (type === "city") {
+          this.filter.city_list = res.data;
+
+          //Enable tag
+          if (this.city_val > 0 && this.filter.city_list.length)
+            this.applied_filter.select_city_title = this.filter.city_list.find(
+              (x) => x.id === this.city_val
+            ).title;
         }
-      } else if (type === "topic") {
-        this.filter.topic_list = res.data;
-
-        if (this.filter.topic_list.length > 0) this.panelModel = [3];
-
-        //Enable tag
-        if (this.$route.query.topic > 0)
-          this.applied_filter.select_topic_title = this.filter.topic_list.find(
-            (x) => x.id === this.topic_val
-          ).title;
-      } else if (type === "state") {
-        this.filter.state_list = res.data;
-
-        //Enable tag
-        if (this.$route.query.state > 0) {
-          this.state_val = this.$route.query.state;
-          this.applied_filter.select_state_title = this.filter.state_list.find(
-            (x) => x.id === this.state_val
-          ).title;
-        }
-        if (this.$route.query.city > 0) this.city_val = this.$route.query.city;
-      } else if (type === "city") {
-        this.filter.city_list = res.data;
-
-        //Enable tag
-        if (this.city_val > 0 && this.filter.city_list.length)
-          this.applied_filter.select_city_title = this.filter.city_list.find(
-            (x) => x.id === this.city_val
-          ).title;
       }
     },
     setAppliedFilter(filters) {
@@ -781,7 +824,7 @@ export default {
       this.setBreadcrumbInfo(false);
     },
 
-    //Check user selected at least one filter
+    //Fix the enabledAppliedFilter method to properly check for year and month values
     enabledAppliedFilter() {
       if (
         this.applied_filter.select_base_title ||
@@ -1153,6 +1196,7 @@ export default {
       if (this.loadtime) return;
 
       const query = { type: this.$route.query.type };
+ 
       if (this.board_val !== 0) {
         query.section = this.board_val;
       }
@@ -1174,8 +1218,13 @@ export default {
       if (this.test_level_val !== 0 && query.type === "test") {
         query.level = this.test_level_val;
       }
-      if (this.year_val !== 0 && query.type === "test") {
-        query.year = this.year_val;
+      if (this.year_val !== 0) {
+        // Use the parameter format that was in the original URL
+        if (this.using_edu_year) {
+          query.edu_year = this.year_val;
+        } else {
+          query.year = this.year_val;
+        }
       }
       if (this.month_val !== 0 && query.type === "test") {
         query.month = this.month_val;
