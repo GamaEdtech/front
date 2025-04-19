@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-4">
     <v-footer>
       <v-container id="footer" class="px-0">
         <v-row>

@@ -2174,7 +2174,7 @@ body {
 //   }
 // }
 
-.container--fluid {
+.v-container--fluid {
   max-width: inherit !important;
 }
 
@@ -2238,11 +2238,11 @@ body {
 }
 
 @media only screen and (min-width: 600px) {
-  .container {
+  .v-container {
     max-width: 100% !important;
   }
 
-  .container--fluid {
+  .v-container--fluid {
     max-width: inherit !important;
   }
 
@@ -2697,11 +2697,11 @@ body {
 }
 
 @media only screen and (min-width: 1264px) {
-  .container {
+  .v-container {
     max-width: 80% !important;
   }
 
-  .container--fluid {
+  .v-container--fluid {
     max-width: inherit !important;
   }
 
@@ -3088,7 +3088,7 @@ body {
 }
 
 .feed {
-  .container {
+  .v-container {
     padding: 5rem 1rem;
   }
 
@@ -4563,4 +4563,14 @@ body {
 
 .v-theme--light.v-app-bar.v-toolbar {
   background-color: #f5f5f5;
+}
+
+.v-application ol,
+.v-application ul {
+  padding-left: 24px;
+}
+
+.v-theme--light.v-footer {
+  background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.87);
 }
