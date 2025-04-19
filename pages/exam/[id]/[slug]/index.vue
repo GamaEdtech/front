@@ -121,148 +121,15 @@
 
     <!--  End: detail  -->
 
-    <v-container>
-      <v-row>
-        <v-col cols="12" md="6">
-          <!--  Start: Course Card  -->
-          <!--          <section>-->
-          <!--            <div class="d-flex  align-center course-card box">-->
-          <!--              <div class="right">-->
-          <!--                <v-row>-->
-          <!--                  <v-col cols="2">-->
-          <!--                    <nuxt-link to="">-->
-          <!--                      <img height="98" width="98" :src="require(`~/assets/images/teacher1.png`)" alt=""/>-->
-          <!--                    </nuxt-link>-->
-          <!--                  </v-col>-->
-          <!--                  <v-col cols="10">-->
-          <!--                    <div class="description ml-4">-->
-          <!--                      <div>-->
-          <!--                        <nuxt-link to="">-->
-          <!--                          <h2 class="course-title">PowerPoint of the complete educational course, date (3) of the 12th-->
-          <!--                            grade of the second secondary-theoretical period</h2>-->
-          <!--                        </nuxt-link>-->
-          <!--                      </div>-->
-          <!--                      <v-row>-->
-          <!--                        <v-col cols="10">-->
-          <!--                          <div>-->
-          <!--                            <nuxt-link to="" class="teacher">-->
-          <!--                              <i class="fa-solid fa-user icon"></i>-->
-          <!--                              <span>Lecturer: Shamsi Shabani</span>-->
-          <!--                            </nuxt-link>-->
-          <!--                          </div>-->
-          <!--                          <div>-->
-          <!--                            <p class="duration">-->
-          <!--                              <i class="fa-solid fa-clock icon"></i>-->
-          <!--                              <span>Course duration: 942 slides (13 files)</span>-->
-          <!--                            </p>-->
-          <!--                          </div>-->
-          <!--                        </v-col>-->
-          <!--                        <v-col cols="2">-->
-          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
-          <!--                            <strong>-->
-          <!--                              View-->
-          <!--                            </strong>-->
-          <!--                          </nuxt-link>-->
-          <!--                        </v-col>-->
-          <!--                      </v-row>-->
-          <!--                    </div>-->
-          <!--                  </v-col>-->
-          <!--                </v-row>-->
-          <!--              </div>-->
-
-          <!--            </div>-->
-          <!--          </section>-->
-          <!--  End: Course Card  -->
-        </v-col>
-
-        <v-col cols="12" md="6">
-          <!--  Start:  Azmoon test album card   -->
-          <!--          <section>-->
-          <!--            <div class="d-flex align-center album-card box">-->
-          <!--              <div class="right">-->
-          <!--                <v-row>-->
-          <!--                  <v-col cols="2">-->
-          <!--                    <nuxt-link to="">-->
-          <!--                      <img :src="require(`~/assets/images/poster1.jpg`)" alt="" class="poster-img"/>-->
-          <!--                    </nuxt-link>-->
-          <!--                  </v-col>-->
-          <!--                  <v-col cols="10">-->
-          <!--                    <div class="description ml-2">-->
-          <!--                      <nuxt-link to="">-->
-          <!--                        <h2 class="course-title">Exam test bank album, date (3) twelfth of the second term of-->
-          <!--                          high school-theoretical</h2>-->
-          <!--                      </nuxt-link>-->
-
-          <!--                      <v-row>-->
-          <!--                        <v-col cols="10">-->
-          <!--                          <div class="num">-->
-          <!--                            <i class="fa-solid fa-list-ol icon"></i>-->
-          <!--                            <span>Number of tests: 1399</span>-->
-          <!--                          </div>-->
-          <!--                          <div class="level">-->
-          <!--                            <i class="fa-solid fa-superscript icon"></i>-->
-          <!--                            <span>Difficulty: Easy</span>-->
-          <!--                          </div>-->
-          <!--                        </v-col>-->
-          <!--                        <v-col cols="2">-->
-          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
-          <!--                            <strong>-->
-          <!--                              View-->
-          <!--                            </strong>-->
-          <!--                          </nuxt-link>-->
-          <!--                        </v-col>-->
-          <!--                      </v-row>-->
-          <!--                    </div>-->
-          <!--                  </v-col>-->
-          <!--                </v-row>-->
-          <!--              </div>-->
-
-          <!--            </div>-->
-          <!--          </section>-->
-          <!--  End:  Azmoon test album card   -->
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Start : Sample Test -->
-    <!--    <related-content/>-->
-    <!-- End : Sample test -->
-    <!-- Start: Feed -->
-    <section class="feed">
-      <!--      <v-container class="pa-4 pa-md-12 pt-10">-->
-      <!--        <v-row>-->
-      <!--          <v-col cols="12" md="6">-->
-      <!--            <latest-training-content/>-->
-      <!--          </v-col>-->
-
-      <!--          <v-col cols="12" md="6" class="related-ask-test py-0 d-flex flex-column justify-space-between">-->
-      <!--            <related-qa/>-->
-
-      <!--            <related-online-exam/>-->
-      <!--          </v-col>-->
-
-      <!--        </v-row>-->
-      <!--      </v-container>-->
-    </section>
-    <!-- End: Feed -->
-
-    <crash-report ref="crash_report" />
+    <common-crash-report ref="crash_report" />
   </div>
 </template>
 
 <script setup>
-import LastViews from "@/components/common/last-views";
-import RelatedCardBox from "./components/related-card-box";
-import RelatedContent from "@/components/details/related-content";
-import LatestTrainingContent from "@/components/details/latest-training-content";
-import RelatedQa from "@/components/details/related-qa";
-import RelatedOnlineExam from "@/components/details/related-online-exam";
-import CrashReport from "~/components/common/crash-report.vue";
-
 // Get api, router, and route
 const route = useRoute();
 const router = useRouter();
-const { $auth, $toast } = useNuxtApp();
+const { $auth } = useNuxtApp();
 
 // Component data
 const contentData = ref({});
@@ -287,22 +154,6 @@ const galleryHelpData = ref({
   base: "",
   course: "",
   lesson: "",
-});
-
-// Other reactive data
-const sell_btn = ref(true);
-const rating = ref(4.5);
-
-// Computed properties
-const isFree = computed(() => {
-  if (!contentData.value) return true;
-
-  if (
-    contentData.value.participation?.price > 0 &&
-    contentData.value.files?.pdf?.price > 0
-  )
-    return false;
-  else return true;
 });
 
 // Fetch the exam data
@@ -474,54 +325,6 @@ onMounted(() => {
 defineExpose({
   crash_report,
 });
-
-// Sample data (only used for scaffolding - could be removed in production)
-const detail = reactive({
-  poster: "poster1.jpg",
-  linkPoster: "",
-  title: "A collection of 120 test questions for lessons 6 to 9 on (3) 12th",
-  rate: 5,
-  previewImage: "test1.png",
-  labels: [
-    "History (3)",
-    "Twelfth",
-    "Second Secondary",
-    "Literature",
-    "Kermanshah",
-    "District 2",
-    "Shohadai Parvin",
-    "Farvardin",
-    "2019",
-  ],
-});
-
-const sampleTestList = reactive([
-  {
-    type: "azmoon",
-    img: "test2.png",
-    description:
-      "The series of tests of the twelfth history book Lessons 1 to 12",
-    pages: "222",
-    owner: "Gama management team",
-    ownerImg: "gamaadmin.png",
-  },
-]);
-
-const relatedList = reactive([
-  {
-    class: "learning",
-    header: "Related educational content",
-    icon: "learnfiles",
-    description: " File های پاورپوینت، ویدئو، صوتی، متنی و ...",
-    contentItemList: [
-      {
-        title:
-          "Online teaching, page 53 to 58 of Arabic (3) twelfth human | Lesson 4: The order of nature",
-        link: "",
-      },
-    ],
-  },
-]);
 </script>
 
 <script>
