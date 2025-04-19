@@ -1,6 +1,12 @@
 // composables/useCharacterController.ts
 import * as THREE from 'three'
-import { shallowRef } from 'vue'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { shallowRef, ref } from 'vue'
+import { nearDoor, openedDoors} from '@/store/doorStatus'
+import { watch } from 'vue'
+import { doorModels } from '~/store/doorModels'
+import { animate } from 'animejs'
 
 // Define types for better code organization
 interface MoveState {
@@ -47,6 +53,7 @@ interface CastleBoundaries {
     door3: DoorBoundary;
 }
 
+
 export function useCharacterController(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
@@ -54,6 +61,15 @@ export function useCharacterController(
     // Character references
     const character = shallowRef<THREE.Object3D | null>(null)
     const characterBox = shallowRef<THREE.Box3 | null>(null)
+
+    // Interaction state
+    const isNearDoor = ref(false)
+    const doorPositions: Record<string, THREE.Vector3> = {
+        door001: new THREE.Vector3(43, 55, 248), // Estimated position for Door.001
+        door002: new THREE.Vector3(-56, 55, 3), // Estimated position for Door.002
+        door003: new THREE.Vector3(43, 55, -242) // Position of Door.003
+    }
+    const INTERACTION_DISTANCE = 50 // Distance to show interaction prompt
 
     // Movement constants
     const MOVE_SPEED = 1.5
@@ -102,8 +118,8 @@ export function useCharacterController(
             x: 43.7387
         },
         corridorLeftWall: {
-            leftX: -107.58,
-            rightX: -34.8965,
+            leftX: -160.58,
+            rightX: -31.8965,
             z: -478.139803,
             x: -71.2383
         },
@@ -125,10 +141,10 @@ export function useCharacterController(
             z: 248.79,
             leftWall: {
                 leftX: -78,
-                rightX: 24
+                rightX: 28
             },
             rightWall: {
-                leftX: 62,
+                leftX: 58,
                 rightX: 72
             }
         },
@@ -141,8 +157,8 @@ export function useCharacterController(
                 rightX: -72
             },
             rightWall: {
-                leftX: -36,
-                rightX: 62
+                leftX: -40,
+                rightX: 70
             }
         },
         door3: {
@@ -151,13 +167,73 @@ export function useCharacterController(
             z: -242.20,
             leftWall: {
                 leftX: -78,
-                rightX: 24
+                rightX: 30
             },
             rightWall: {
-                leftX: 62,
+                leftX: 58,
                 rightX: 72
             }
         },
+    }
+
+    watch(openedDoors, (newVal) => {
+        if(newVal.door001 == true) {
+            if (doorModels.door001.model) {
+                animate(doorModels.door001.model.rotation, {
+                    z: -3.2,
+                    duration: 1000,
+                    easing: 'easeInOutSine'
+                })
+            }
+        }
+        if(newVal.door002 == true) {
+            if (doorModels.door002.model) {
+                animate(doorModels.door002.model.rotation, {
+                    z: -3.2,
+                    duration: 1000,
+                    easing: 'easeInOutSine'
+                })
+            }
+        }
+        if(newVal.door003 == true) {
+            if (doorModels.door003.model) {
+                animate(doorModels.door003.model.rotation, {
+                    z: -3.2,
+                    duration: 1000,
+                    easing: 'easeInOutSine'
+                })
+            }
+        }
+        
+    }, { deep: true })
+
+    /**
+     * Updates interaction state based on proximity to doors
+     */
+    const updateInteractions = () => {
+        if (!character.value) return
+
+        let nearAnyDoor = false;
+
+        // Check distance to each door
+        for (const doorKey in doorPositions) {
+            const doorPosition = doorPositions[doorKey];
+            const distanceToDoor = character.value.position.distanceTo(doorPosition);
+            
+            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors[doorKey as "door001" | "door002" | "door003"]) {
+                nearAnyDoor = true;
+                nearDoor.value = doorKey as "door001" | "door002" | "door003";
+                break;
+            }
+        }
+
+        // Update door proximity state (only log when state changes)
+        const wasNearDoor = isNearDoor.value;
+        isNearDoor.value = nearAnyDoor;
+
+        if (wasNearDoor !== isNearDoor.value) {
+            console.log(`Door proximity changed: ${isNearDoor.value ? "Near door" : "Away from door"}`);
+        }
     }
 
     /**
@@ -320,14 +396,24 @@ export function useCharacterController(
         }
 
         // Check doors
-        const checkDoor = (door: DoorBoundary) => {
+        const checkDoorWalls = (door: DoorBoundary) => {
+            
             return ((x < door.leftWall.rightX && x > door.leftWall.leftX) &&
                 (z < door.z && z > door.z - 5)) ||
                 ((x < door.rightWall.rightX && x > door.rightWall.leftX) &&
                     (z < door.z && z > door.z - 5));
         };
 
-        if (checkDoor(b.door1) || checkDoor(b.door2) || checkDoor(b.door3)) {
+        const checkDoor = (door: DoorBoundary, doorName: string) => {
+            return ((x > door.leftX && x < door.rightX) &&
+                (z > door.z && z < door.z + 5)) && !openedDoors[doorName as "door001" | "door002" | "door003"];
+        };
+
+        if (checkDoorWalls(b.door1) || checkDoorWalls(b.door2) || checkDoorWalls(b.door3)) {
+            return true;
+        }
+
+        if (checkDoor(b.door1, "door001") || checkDoor(b.door2, "door002") || checkDoor(b.door3, "door003")) {
             return true;
         }
 
@@ -337,16 +423,16 @@ export function useCharacterController(
     /**
      * Checks collisions for a single component (x or z)
      */
-    const checkComponentCollision = (currentPos: THREE.Vector3, newPos: THREE.Vector3): boolean => {
-        // Create a test position that only moves in one component
-        const testPosX = currentPos.clone();
-        testPosX.x = newPos.x;
+    // const checkComponentCollision = (currentPos: THREE.Vector3, newPos: THREE.Vector3): boolean => {
+    //     // Create a test position that only moves in one component
+    //     const testPosX = currentPos.clone();
+    //     testPosX.x = newPos.x;
 
-        const testPosZ = currentPos.clone();
-        testPosZ.z = newPos.z;
+    //     const testPosZ = currentPos.clone();
+    //     testPosZ.z = newPos.z;
 
-        return checkCollision(testPosX) || checkCollision(testPosZ);
-    }
+    //     return checkCollision(testPosX) || checkCollision(testPosZ);
+    // }
 
     /**
      * Updates character position with collision detection and wall sliding
@@ -398,16 +484,19 @@ export function useCharacterController(
 
         // Update character bounding box
         characterBox.value.setFromObject(character.value)
+
+        // Update interaction states
+        updateInteractions()
     }
 
     /**
      * Cleans up event listeners
      */
     const cleanup = () => {
-        window.removeEventListener('keydown', onKeyDown);
-        window.removeEventListener('keyup', onKeyUp);
-        window.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('click', () => { });
+        window.removeEventListener('keydown', onKeyDown)
+        window.removeEventListener('keyup', onKeyUp)
+        window.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('click', () => { })
     }
 
     return {
@@ -415,6 +504,7 @@ export function useCharacterController(
         setupControls,
         updateCharacter,
         cleanup,
-        character
+        character,
+        isNearDoor
     }
 }

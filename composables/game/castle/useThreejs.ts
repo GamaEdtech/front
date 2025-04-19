@@ -2,6 +2,7 @@
 import * as THREE from 'three'
 import { ref, shallowRef } from 'vue'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { doorModels } from '~/store/doorModels'
 
 export function useThreeJS() {
     // Scene elements
@@ -119,11 +120,33 @@ export function useThreeJS() {
             castle.value = gltf.scene
             castle.value.scale.set(1, 1, 1)
 
-            // Add shadows to all meshes for mood
+            // Debug: Log all mesh names and their hierarchy
+            console.log("--- 3D MODEL MESH NAMES ---");
+            let meshCount = 0;
+
             castle.value.traverse((object) => {
                 if (object instanceof THREE.Mesh) {
-                    object.castShadow = true
-                    object.receiveShadow = true
+                    // Print mesh name and path
+                    let path = "";
+                    let current: THREE.Object3D | null = object;
+                    while (current) {
+                        path = current.name + (path ? " > " + path : "");
+                        current = current.parent;
+                    }
+
+                    console.log(`Mesh #${meshCount++}: ${object.name} (Full path: ${path})`);
+                    console.log(`Material: ${object.material.name || "unnamed"}`);
+                    console.log("---");
+                    
+                    if (['Door.001', 'Door.002', 'Door.003'].includes(object.material.name)) {
+                        const doorName = object.material.name.toLowerCase().replace('.', '')
+                        
+                        doorModels[doorName as "door001" | "door002" | "door003"].model = object
+                    }
+
+                    // Set up normal rendering with shadows
+                    object.castShadow = true;
+                    object.receiveShadow = true;
 
                     // Slightly adjust materials for mood without making them too dark
                     if (object.material) {
@@ -135,6 +158,8 @@ export function useThreeJS() {
                     }
                 }
             })
+
+            console.log(`Total meshes found: ${meshCount}`);
 
             scene.value.add(castle.value)
             modelLoaded.value = true
