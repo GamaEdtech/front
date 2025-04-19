@@ -34,7 +34,11 @@
           <!--End mobile side section-->
 
           <!--Desktop side section-->
-          <v-col cols="3" class="pr-0 d-none d-md-block">
+          <v-col
+            cols="2"
+            xl="2"
+            class="pr-0 pl-0 d-none d-md-flex flex-column align-center"
+          >
             <v-btn
               icon
               large
@@ -58,7 +62,7 @@
           </v-col>
           <!--End desktop side section-->
 
-          <v-col cols="12" md="9" class="pl-1">
+          <v-col cols="12" md="9" xl="10" class="pl-0">
             <div class="mx-8 mx-md-0">
               <v-carousel
                 id="product-carousel"
@@ -66,13 +70,13 @@
                 :hide-delimiters="images.length > 1 ? false : true"
                 v-model="carouselVal"
                 height="auto"
-                contain
+                cover
                 class="product-carousel"
               >
                 <v-carousel-item
                   v-for="(image, index) in images"
                   :key="index"
-                  contain
+                  cover
                 >
                   <img :src="image" class="carousel-img" />
                 </v-carousel-item>
@@ -210,37 +214,17 @@ watch(
 );
 </script>
 
-<style scoped>
-/* Global carousel image constraints */
-.carousel-img {
-  object-fit: contain !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  margin: 0 auto !important;
-  box-sizing: border-box !important;
-}
-
-.product-carousel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden !important;
-}
-
+<style lang="scss" scoped>
 #details-gallery-portrate {
   #product-carousel {
-    /* width: 22.2rem; */
+    width: 22.2rem;
     height: 28rem !important;
-    margin: auto auto;
-    overflow: hidden;
 
+    margin: auto auto;
     .carousel-img {
-      /* max-width: 22.2rem; */
+      max-width: 22.2rem;
       width: 100%;
       height: auto;
-      max-height: 28rem;
-      object-fit: contain;
       border-radius: 1.2rem;
     }
   }
@@ -298,17 +282,14 @@ watch(
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      /* width: 29rem; */
+      width: 20rem;
       height: 36rem !important;
-      margin: auto auto;
-      overflow: hidden;
 
+      margin: auto auto;
       .carousel-img {
-        /* max-width: 29rem !important; */
-        width: 100% !important;
+        max-width: 20rem;
+        width: 100%;
         height: auto;
-        max-height: 36rem;
-        object-fit: contain;
         border-radius: 1.2rem;
       }
     }
@@ -318,18 +299,14 @@ watch(
 @media (min-width: 1264px) {
   #details-gallery-portrate {
     #product-carousel {
-      /* width: 29rem; */
-      width: 100% !important;
+      width: 29rem;
       height: 24rem !important;
-      margin: auto auto;
-      overflow: hidden;
 
+      margin: auto auto;
       .carousel-img {
-        /* max-width: 29rem; */
+        max-width: 21rem;
         width: 100%;
         height: auto;
-        max-height: 24rem;
-        object-fit: contain;
         border-radius: 1.2rem;
       }
     }
@@ -340,9 +317,8 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 25.4rem !important;
-
       .carousel-img {
-        max-height: 25.4rem;
+        max-width: 24rem;
       }
     }
   }
@@ -352,10 +328,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 26.5rem !important;
-
-      .carousel-img {
-        max-height: 26.5rem;
-      }
     }
   }
 }
@@ -364,10 +336,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 28rem !important;
-
-      .carousel-img {
-        max-height: 28rem;
-      }
     }
   }
 }
@@ -376,10 +344,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 29.2rem !important;
-
-      .carousel-img {
-        max-height: 29.2rem;
-      }
     }
   }
 }
@@ -388,10 +352,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 30.2rem !important;
-
-      .carousel-img {
-        max-height: 30.2rem;
-      }
     }
   }
 }
@@ -400,10 +360,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 31.2rem !important;
-
-      .carousel-img {
-        max-height: 31.2rem;
-      }
     }
   }
 }
@@ -412,10 +368,6 @@ watch(
   #details-gallery-portrate {
     #product-carousel {
       height: 32.2rem !important;
-
-      .carousel-img {
-        max-height: 32.2rem;
-      }
     }
   }
 }
@@ -423,23 +375,7 @@ watch(
 @media (min-width: 1714px) {
   #details-gallery-portrate {
     #product-carousel {
-      height: 33.2rem !important;
-
-      .carousel-img {
-        max-height: 33.2rem;
-      }
-    }
-  }
-}
-
-@media (min-width: 1714px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 34.4rem !important;
-
-      .carousel-img {
-        max-height: 34.4rem;
-      }
+      height: 29.4rem !important;
     }
   }
 }
