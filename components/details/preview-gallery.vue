@@ -4,22 +4,27 @@
       <div class="card-carousel">
         <v-row justify="center">
           <!--Mobile side section-->
-          <v-col cols="12" class="pr-0 d-flex d-md-none">
+          <v-col
+            cols="12"
+            class="pr-0 d-flex d-md-none overflow-x-auto mt-3 mt-md-0"
+          >
             <v-btn
               icon
-              small
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon mr-1"
+              class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
+              <v-tooltip location="right">
+                <template v-slot:activator="{ props }">
                   <span
-                    v-bind="attrs"
-                    v-on="on"
-                    :class="' icon icong-' + item.icon"
+                    v-bind="props"
+                    style="font-size: 26px"
+                    :class="
+                      'white--text text--lighten-1 icon icon-' + item.icon
+                    "
                   />
                 </template>
                 <span>{{ item.text }}</span>
@@ -29,37 +34,50 @@
           <!--End mobile side section-->
 
           <!--Desktop side section-->
-          <v-col cols="2" class="pr-0 d-none d-md-block">
-            <nuxt-link
+          <v-col
+            cols="2"
+            xl="2"
+            class="pr-0 pl-0 d-none d-md-flex flex-column align-center"
+          >
+            <v-btn
+              icon
+              large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
               v-for="(item, index) in items"
               :key="index"
-              class="side-help-icon"
+              class="mb-3 bg-blue-grey-darken-2 flex-shrink-0"
             >
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
+              <v-tooltip location="right">
+                <template v-slot:activator="{ props }">
                   <span
-                    v-bind="attrs"
-                    v-on="on"
-                    :class="' icon icong-' + item.icon"
+                    v-bind="props"
+                    style="font-size: 26px"
+                    :class="`icon icon-${item.icon} white--text text--darken-1`"
                   />
                 </template>
                 <span>{{ item.text }}</span>
               </v-tooltip>
-            </nuxt-link>
+            </v-btn>
           </v-col>
           <!--End desktop side section-->
 
-          <v-col cols="12" md="10" class="pl-1">
+          <v-col cols="12" md="9" xl="10" class="pl-0">
             <div class="mx-8 mx-md-0">
               <v-carousel
                 id="product-carousel"
                 :show-arrows="false"
                 :hide-delimiters="images.length > 1 ? false : true"
                 v-model="carouselVal"
+                height="auto"
+                cover
+                class="product-carousel"
               >
-                <v-carousel-item v-for="(image, index) in images" :key="index">
+                <v-carousel-item
+                  v-for="(image, index) in images"
+                  :key="index"
+                  cover
+                >
                   <img :src="image" class="carousel-img" />
                 </v-carousel-item>
               </v-carousel>
@@ -90,73 +108,113 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "preview-gallery",
-  props: {
-    images: {
-      type: Array,
-      required: true,
-    },
+<script setup>
+// Props with types and defaults
+const props = defineProps({
+  imageUrls: {
+    type: Array,
+    default: () => [],
   },
-  data() {
-    return {
-      carouselVal: null,
-      help_link_data: {
-        state: "",
-        section: "",
-        base: "",
-        course: "",
-        lesson: "",
-      },
+  helpLinkData: {
+    type: Object,
+    default: () => ({
+      state: "",
+      section: "",
+      base: "",
+      course: "",
+      lesson: "",
+    }),
+  },
+  initialSlide: {
+    type: Number,
+    default: 0,
+  },
+});
 
-      active_img: 1,
+// Reactive state
+const carouselVal = ref(0);
+const images = ref([]);
+const help_link_data = reactive({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
 
-      items: [
-        {
-          class: "exam",
-          text: "Related exam",
-          icon: "azmoon",
-          link: "/search?type=azmoon",
-        },
-        {
-          class: "test",
-          text: "Related paper",
-          icon: "test",
-          link: "/search?type=test",
-        },
-        {
-          class: "content",
-          text: "Related multimedia",
-          icon: "learnfiles",
-          link: "/search?type=learnfiles",
-        },
-        {
-          class: "faq",
-          text: "Related Q & A",
-          icon: "qa",
-          link: "/search?type=question",
-        },
-        {
-          class: "textbook ",
-          text: "Related tutorial",
-          icon: "blog",
-          link: "/search?type=dars",
-        },
-        // { class: "school", text: "School", icon: "school" ,link:"/search?type=school" },
-        // { class: "tutor", text: "Tutor", icon: "teacher" ,link:"/search?type=tutor" },
-      ],
-    };
+const active_img = ref(1);
+
+const items = reactive([
+  {
+    class: "exam",
+    text: "Related exam",
+    icon: "exam",
+    link: "/search?type=azmoon",
   },
-  methods: {
-    changeSlide(index) {
-      this.carouselVal = index;
-    },
+  {
+    class: "test",
+    text: "Related paper",
+    icon: "paper",
+    link: "/search?type=test",
   },
-};
+  {
+    class: "content",
+    text: "Related multimedia",
+    icon: "multimedia",
+    link: "/search?type=learnfiles",
+  },
+  {
+    class: "faq",
+    text: "Related Q & A",
+    icon: "q-a",
+    link: "/search?type=question",
+  },
+  {
+    class: "textbook ",
+    text: "Related tutorial",
+    icon: "tutorial",
+    link: "/search?type=dars",
+  },
+]);
+
+// Methods
+function changeSlide(index) {
+  carouselVal.value = index;
+}
+
+// Watch effects
+watch(
+  () => props.imageUrls,
+  (newVal) => {
+    if (newVal && newVal.length > 0) {
+      images.value = [...newVal];
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.helpLinkData,
+  (newVal) => {
+    if (newVal) {
+      Object.assign(help_link_data, newVal);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.initialSlide,
+  (newVal) => {
+    if (newVal !== undefined) {
+      carouselVal.value = newVal;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #details-gallery-portrate {
   #product-carousel {
     width: 22.2rem;
@@ -224,12 +282,12 @@ export default {
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 29rem;
+      width: 20rem;
       height: 36rem !important;
 
       margin: auto auto;
       .carousel-img {
-        max-width: 29rem;
+        max-width: 20rem;
         width: 100%;
         height: auto;
         border-radius: 1.2rem;
@@ -246,7 +304,7 @@ export default {
 
       margin: auto auto;
       .carousel-img {
-        max-width: 29rem;
+        max-width: 21rem;
         width: 100%;
         height: auto;
         border-radius: 1.2rem;
@@ -259,6 +317,9 @@ export default {
   #details-gallery-portrate {
     #product-carousel {
       height: 25.4rem !important;
+      .carousel-img {
+        max-width: 24rem;
+      }
     }
   }
 }
@@ -314,15 +375,7 @@ export default {
 @media (min-width: 1714px) {
   #details-gallery-portrate {
     #product-carousel {
-      height: 33.2rem !important;
-    }
-  }
-}
-
-@media (min-width: 1714px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 34.4rem !important;
+      height: 29.4rem !important;
     }
   }
 }
