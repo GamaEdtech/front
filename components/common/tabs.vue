@@ -1,11 +1,12 @@
 <template>
-    <v-card class="d-block tab-header" id="search-top-filter" flat>
-      <v-tabs 
+    <v-card rounded="0"
+    flat  id="search-top-filter">
+    <v-window class=" tab-header" >
+      <v-window-item 
         v-model="active_tab"
         background-color="#F5F5F5"
         align-tabs="start"
         slider-color="transparent"
-        density=""
         class="pa-2"
       >
         <v-tab @click="openLink('test')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
@@ -78,7 +79,8 @@
             </div>
           </v-badge>
         </v-tab>
-      </v-tabs>
+      </v-window-item>
+    </v-window>
     </v-card>
 </template>
 
@@ -176,6 +178,7 @@ defineExpose({
   position: sticky;
   top: 0;
   z-index: 5;
+  overflow-x: scroll;
   .icon-paper,
   .icon-multimedia,
   .icon-q-a,
@@ -332,6 +335,10 @@ defineExpose({
   border-radius: 1.2rem !important;
   background-color: #F5F5F5 !important;
   padding: 0rem !important;
+  border: none !important;
+  min-width: max-content ;
+  cursor: unset !important;
+  touch-action: pan-x !important;
 }
 .tab-item {
   text-transform: none !important;
@@ -375,4 +382,16 @@ defineExpose({
   z-index: 10;
 }
 :v-deep(.v-tabs__wrapper) { padding-left: 0 !important; padding-right: 48px !important; }
+
+
+::-webkit-scrollbar {
+  display: none;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 0.8rem;
+    background: #cacdd3;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
 </style>
