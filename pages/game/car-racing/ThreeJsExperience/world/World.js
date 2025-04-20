@@ -5,6 +5,7 @@ import Road from "./Road.js"
 import Mountain from "./Mountain.js"
 import Lighting from "./Lighting.js"
 import Clouds from "./Clouds.js"
+import Trees from "./Trees.js"
 
 export default class World {
     constructor() {
@@ -18,10 +19,11 @@ export default class World {
         this.road = new Road()
         this.mountain = new Mountain()
         this.clouds = new Clouds()
+        this.trees = new Trees()
     }
 
 
     update() {
-        this.clouds.update()
+        // this.clouds.update()
     }
 }
