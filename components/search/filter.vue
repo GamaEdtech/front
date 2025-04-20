@@ -107,7 +107,7 @@
 
         <!-- Month chip -->
         <v-chip
-          v-if="applied_filter.select_month_title"
+          v-if="applied_filter.select_month_title && $route.query.type !== 'azmoon'"
           class="mt-1"
           closable
           variant="outlined"
@@ -141,8 +141,8 @@
             Board
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-radio-group v-model="board_val">
-              <v-radio label="All" color="red" :value="0" />
+            <v-radio-group v-model="board_val" density="comfortable">
+              <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
                 v-for="item in filter.section_list"
                 :key="item.id"
@@ -177,6 +177,7 @@
               v-model="base_val"
               @change="changeBaseVal()"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -216,6 +217,7 @@
               @change="changeLessonVal"
               v-model="lesson_val"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -255,6 +257,7 @@
               @change="changeTopicVal"
               v-model="topic_val"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -305,6 +308,7 @@
               @change="changeFileTypeVal"
               v-model="file_type_val"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -328,21 +332,22 @@
               v-model="year_val"
               @change="changeYearVal()"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
                 v-for="(item, key) in filter.year_list"
                 :key="key"
-                :label="item"
+                :label="String(item)"
                 color="red"
-                :value="item"
+                :value="String(item)"
               ></v-radio>
             </v-radio-group>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!-- Month panel -->
-        <v-expansion-panel v-show="$route.query.type === 'test'">
+        <!-- <v-expansion-panel v-show="$route.query.type !== 'azmoon' && $route.query.type !== 'test'">
           <v-expansion-panel-title class="filter-title font-weight-bold">
             Month
           </v-expansion-panel-title>
@@ -351,6 +356,7 @@
               @change="changeMonthVal()"
               v-model="month_val"
               class="mt-0 content-search"
+              density="comfortable"
             >
               <v-radio label="All" color="red" :value="0"></v-radio>
               <v-radio
@@ -362,7 +368,7 @@
               ></v-radio>
             </v-radio-group>
           </v-expansion-panel-text>
-        </v-expansion-panel>
+        </v-expansion-panel> -->
       </v-expansion-panels>
     </div>
   </div>
@@ -410,7 +416,7 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
-      year_val: this.$route.query.edu_year ? this.$route.query.edu_year : 0,
+      year_val: this.$route.query.edu_year ? String(this.$route.query.edu_year) : 0,
       month_val: this.$route.query.edu_month
         ? Number(this.$route.query.edu_month)
         : 0,
@@ -593,6 +599,11 @@ export default {
     };
   },
   created() {
+    console.log("Route query in created:", this.$route.query);
+    
+    // Convert year list values to strings to ensure consistent types
+    this.filter.year_list = this.filter.year_list.map(year => String(year));
+    
     // In Nuxt 3, we use $fetch for API calls
     // Load the section list for the Board filter
     $fetch("/api/v1/types/list", {
@@ -1085,15 +1096,16 @@ export default {
 
     //Change year val option
     changeYearVal() {
-      this.updateQueryParams();
-
-      //Enable year title tag
-      if (this.year_val > 0) {
-        this.applied_filter.select_year_title = this.year_val.toString();
+      // Ensure the year value is set correctly
+      if (this.year_val !== 0) {
+        // Always store year_val as string to prevent type issues
+        this.year_val = String(this.year_val);
+        this.applied_filter.select_year_title = this.year_val;
       } else {
         this.applied_filter.select_year_title = "";
       }
-
+      
+      this.updateQueryParams();
       this.setBreadcrumbInfo();
     },
 
@@ -1361,10 +1373,12 @@ export default {
         query.level = this.test_level_val;
       }
       if (this.year_val !== 0) {
-        query.edu_year = this.year_val;
+        // Ensure year value is properly set in the query param
+        query.edu_year = String(this.year_val);
+        this.using_edu_year = true;
       }
-      if (this.month_val !== 0 && query.type === "test") {
-        query.month = this.month_val;
+      if (this.month_val !== 0 && query.type !== "azmoon") {
+        query.edu_month = this.month_val;
       }
       if (this.word_checkbox_val === 1 && query.type === "test") {
         query.word = 1;
@@ -1490,30 +1504,30 @@ export default {
 .v-chip.v-size--default .v-chip__content {
   padding: 0 12px;
 }
-.v-radio:not(:only-child) {
+/* Update v-radio styles for Vuetify 3 */
+:deep(.v-radio) {
   margin-bottom: 8px !important;
   margin-top: 0px !important;
-  max-height: 1.5rem !important;
+  min-height: 32px !important;
   cursor: pointer !important;
 }
-:deep(.v-selection-control-group) {
+:deep(.v-radio-group) {
   margin-top: 0.5rem !important;
   white-space: nowrap !important;
   word-break: revert-layer !important;
-  height: auto !important;
   gap: 1rem !important;
-  opacity: 1 !important;
 }
 
-:deep(.v-selection-control__input) {
+/* Update selection controls for Vuetify 3 */
+:deep(.v-selection-control__wrapper) {
   font-size: 16px !important;
 }
 
-:deep(.v-selection-control .v-label) {
+:deep(.v-selection-control__wrapper .v-label) {
   font-size: 16px !important;
-  color: #0009 !important;
-  height: auto !important;
+  color: rgba(0, 0, 0, 0.87) !important;
   min-width: max-content !important;
+  opacity: 1 !important;
 }
 
 /* Custom breadcrumbs styling to match the screenshot */
