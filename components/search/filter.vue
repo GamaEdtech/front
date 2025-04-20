@@ -158,11 +158,17 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.base_list || !filter.base_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.base_list || !filter.base_list.length ? 'none' : 'auto',
+              color:
+                !filter.base_list || !filter.base_list.length
+                  ? 'black'
+                  : 'transparent',
+              pointerEvents:
+                !filter.base_list || !filter.base_list.length ? 'none' : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.base_list || !filter.base_list.length }"
+            :class="{
+              'filter-inactive': !filter.base_list || !filter.base_list.length,
+            }"
           >
             Grade
           </v-expansion-panel-title>
@@ -188,11 +194,20 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.lesson_list || !filter.lesson_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.lesson_list || !filter.lesson_list.length ? 'none' : 'auto',
+              color:
+                !filter.lesson_list || !filter.lesson_list.length
+                  ? 'black'
+                  : 'transparent',
+              pointerEvents:
+                !filter.lesson_list || !filter.lesson_list.length
+                  ? 'none'
+                  : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.lesson_list || !filter.lesson_list.length }"
+            :class="{
+              'filter-inactive':
+                !filter.lesson_list || !filter.lesson_list.length,
+            }"
           >
             Subject
           </v-expansion-panel-title>
@@ -218,11 +233,20 @@
         <v-expansion-panel>
           <v-expansion-panel-title
             :style="{
-              color: !filter.topic_list || !filter.topic_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.topic_list || !filter.topic_list.length ? 'none' : 'auto',
+              color:
+                !filter.topic_list || !filter.topic_list.length
+                  ? 'black'
+                  : 'transparent',
+              pointerEvents:
+                !filter.topic_list || !filter.topic_list.length
+                  ? 'none'
+                  : 'auto',
             }"
             class="filter-title"
-            :class="{ 'filter-inactive': !filter.topic_list || !filter.topic_list.length }"
+            :class="{
+              'filter-inactive':
+                !filter.topic_list || !filter.topic_list.length,
+            }"
           >
             Topic
           </v-expansion-panel-title>
@@ -255,11 +279,20 @@
         >
           <v-expansion-panel-title
             :style="{
-              color: !filter.file_type_list || !filter.file_type_list.length ? 'black' : 'transparent',
-              pointerEvents: !filter.file_type_list || !filter.file_type_list.length ? 'none' : 'auto',
+              color:
+                !filter.file_type_list || !filter.file_type_list.length
+                  ? 'black'
+                  : 'transparent',
+              pointerEvents:
+                !filter.file_type_list || !filter.file_type_list.length
+                  ? 'none'
+                  : 'auto',
             }"
             class="filter-title filter-inactive"
-            :class="{ 'filter-inactive': !filter.file_type_list || !filter.file_type_list.length }"
+            :class="{
+              'filter-inactive':
+                !filter.file_type_list || !filter.file_type_list.length,
+            }"
           >
             {{
               $route.query.type === "test" || $route.query.type === "azmoon"
@@ -377,8 +410,10 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
-      year_val: this.$route.query.year ? this.$route.query.year : (this.$route.query.edu_year ? this.$route.query.edu_year : 0),
-      month_val: this.$route.query.month ? this.$route.query.month : 0,
+      year_val: this.$route.query.edu_year ? this.$route.query.edu_year : 0,
+      month_val: this.$route.query.edu_month
+        ? Number(this.$route.query.edu_month)
+        : 0,
       state_val: 0,
       city_val: 0,
       word_checkbox_val: this.$route.query.word === "1" ? 1 : 0,
@@ -407,7 +442,97 @@ export default {
         lesson_list: [],
         topic_list: [],
         file_type_list: [],
-        year_list: [2022, 2021, 2020, 2019, 2018, 2017, 2016],
+        year_list: [
+          2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+          2014, 2013,
+        ],
+        session_list: {
+          4161: [
+            { id: 3, title: "March" },
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          22: [
+            { id: 3, title: "March" },
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          6374: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          23: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          6533: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          6635: [
+            { id: 4, title: "April" },
+            { id: 10, title: "October" },
+          ],
+          6639: [
+            { id: 4, title: "April" },
+            { id: 10, title: "October" },
+          ],
+          //AQA-GCSE
+          6672: [
+            { id: 6, title: "June" },
+            { id: 11, title: "November" },
+          ],
+          //AQA-AS LEVEL
+          6673: [{ id: 6, title: "June" }],
+          //AQA-A LEVEL
+          6674: [{ id: 6, title: "June" }],
+          //OCR GCSE
+          6676: [
+            { id: 6, title: "June" },
+            { id: 11, title: "November" },
+          ],
+          //OCR AS LEVEL
+          6677: [
+            { id: 6, title: "June" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          //OCR A LEVEL
+          6678: [
+            { id: 6, title: "June" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          //Edexcel A LEVEL
+          6671: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          //Edexcel AS LEVEL
+          6675: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          //Edexcel GCSE
+          6669: [
+            { id: 6, title: "May/Jun" },
+            { id: 11, title: "Oct/Nov" },
+          ],
+          //Edexcel International A/AS LEVEL
+          6670: [
+            { id: 1, title: "January" },
+            { id: 4, title: "April" },
+            { id: 6, title: "June" },
+            { id: 10, title: "October" },
+            { id: 11, title: "November" },
+          ],
+          //Edexcel International GCSE
+          6668: [
+            { id: 1, title: "January" },
+            { id: 4, title: "April" },
+            { id: 6, title: "June" },
+            { id: 10, title: "October" },
+            { id: 11, title: "November" },
+          ],
+        },
         month_list: [
           { id: 1, title: "January" },
           { id: 2, title: "February" },
@@ -422,6 +547,8 @@ export default {
           { id: 11, title: "November" },
           { id: 12, title: "December" },
         ],
+        state_list: [],
+        city_list: [],
         test_level_list: [
           {
             id: "1",
@@ -466,8 +593,6 @@ export default {
     };
   },
   created() {
-    console.log("Route query in created:", this.$route.query);
-    
     // In Nuxt 3, we use $fetch for API calls
     // Load the section list for the Board filter
     $fetch("/api/v1/types/list", {
@@ -477,8 +602,7 @@ export default {
       .then((res) => {
         if (res && res.data) {
           this.filter.section_list = res.data;
-          console.log("Section list loaded:", this.filter.section_list);
-          
+
           // If section parameter exists in URL, load related data
           if (this.$route.query.section) {
             this.getFilterList(
@@ -493,11 +617,16 @@ export default {
             const sectionItem = this.filter.section_list.find(
               (x) => String(x.id) === String(this.$route.query.section)
             );
-            console.log("Found section item in created:", sectionItem);
-            
+            this.$nextTick(() => {
+              if (this.month_val && this.filter.month_list)
+                this.applied_filter.select_month_title =
+                  this.filter.month_list.find(
+                    (x) => x.id == this.month_val
+                  ).title;
+            });
+
             if (sectionItem) {
               this.applied_filter.select_section_title = sectionItem.title;
-              console.log("Set board title to:", this.applied_filter.select_section_title);
             }
           }
         }
@@ -541,7 +670,7 @@ export default {
     console.log("Route query:", this.$route.query);
     console.log("Board value:", this.board_val, "type:", typeof this.board_val);
     console.log("Applied filters:", this.applied_filter);
-    
+
     // Force expand Board panel after mounting to ensure it shows properly
     this.$nextTick(() => {
       // Set panelModel to force the Board panel (index 0) to be expanded
@@ -552,7 +681,7 @@ export default {
   watch: {
     "$route.query.type"(val) {
       this.filter.file_type_list = [];
-  
+
       if (
         this.$route.query.type === "test" ||
         this.$route.query.type === "azmoon" ||
@@ -592,11 +721,11 @@ export default {
         const sectionItem = this.filter.section_list.find(
           (x) => String(x.id) === String(val)
         );
-        
+
         if (sectionItem) {
           this.applied_filter.select_section_title = sectionItem.title;
         }
-        
+
         //Load base list
         var params = {
           type: "base",
@@ -718,23 +847,43 @@ export default {
       if (res && res.data) {
         if (type === "section") {
           this.filter.section_list = res.data;
-          console.log("Section list loaded in handleFilterResponse:", this.filter.section_list);
-          
+          console.log(
+            "Section list loaded in handleFilterResponse:",
+            this.filter.section_list
+          );
+
           if (this.board_val) {
-            console.log("Current board_val:", this.board_val, "type:", typeof this.board_val);
-            
+            console.log(
+              "Current board_val:",
+              this.board_val,
+              "type:",
+              typeof this.board_val
+            );
+
             // Use string comparison for reliable ID matching
             const sectionItem = this.filter.section_list.find(
               (x) => String(x.id) === String(this.board_val)
             );
-            
-            console.log("Found section item in handleFilterResponse:", sectionItem);
-            
+
+            console.log(
+              "Found section item in handleFilterResponse:",
+              sectionItem
+            );
+
             if (sectionItem) {
               this.applied_filter.select_section_title = sectionItem.title;
-              console.log("Set section title to:", this.applied_filter.select_section_title);
+              console.log(
+                "Set section title to:",
+                this.applied_filter.select_section_title
+              );
             } else {
-              console.log("Available section IDs:", this.filter.section_list.map(x => ({ id: x.id, type: typeof x.id })));
+              console.log(
+                "Available section IDs:",
+                this.filter.section_list.map((x) => ({
+                  id: x.id,
+                  type: typeof x.id,
+                }))
+              );
             }
           }
         } else if (type === "base") {
@@ -752,7 +901,9 @@ export default {
             this.getFilterList(data, "lesson");
 
             //Set lesson val
-            this.lesson_val = this.$route.query.lesson ? this.$route.query.lesson : 0;
+            this.lesson_val = this.$route.query.lesson
+              ? this.$route.query.lesson
+              : 0;
 
             //Enable tag
             this.applied_filter.select_base_title = this.filter.base_list.find(
@@ -794,20 +945,19 @@ export default {
 
           //Enable tag
           if (this.$route.query.topic > 0)
-            this.applied_filter.select_topic_title = this.filter.topic_list.find(
-              (x) => x.id === this.topic_val
-            ).title;
+            this.applied_filter.select_topic_title =
+              this.filter.topic_list.find((x) => x.id === this.topic_val).title;
         } else if (type === "state") {
           this.filter.state_list = res.data;
 
           //Enable tag
           if (this.$route.query.state > 0) {
             this.state_val = this.$route.query.state;
-            this.applied_filter.select_state_title = this.filter.state_list.find(
-              (x) => x.id === this.state_val
-            ).title;
+            this.applied_filter.select_state_title =
+              this.filter.state_list.find((x) => x.id === this.state_val).title;
           }
-          if (this.$route.query.city > 0) this.city_val = this.$route.query.city;
+          if (this.$route.query.city > 0)
+            this.city_val = this.$route.query.city;
         } else if (type === "city") {
           this.filter.city_list = res.data;
 
@@ -1032,14 +1182,13 @@ export default {
       // Type breadcrumb (main category)
       var active_tab = this.$route.query.type;
       var breadcrumb_item = {
-        title: "", 
+        title: "",
         disabled: false,
         href: `/search?type=${active_tab}`,
       };
 
       if (active_tab === "test") breadcrumb_item.title = "Past Papers";
-      else if (active_tab === "learnfiles")
-        breadcrumb_item.title = "Multimedia";
+      else if (active_tab === "learnfiles") breadcrumb_item.title = "Multimedia";
       else if (active_tab === "question") breadcrumb_item.title = "Forum";
       else if (active_tab === "azmoon") breadcrumb_item.title = "QuizHub";
       else if (active_tab === "dars") breadcrumb_item.title = "Tutorial";
@@ -1047,28 +1196,28 @@ export default {
 
       this.breadcrumbs.push(breadcrumb_item);
 
-      // Board/Section filter
+      // Grade section
       if (this.applied_filter.select_section_title) {
         this.breadcrumbs.push({
-          title: this.applied_filter.select_section_title, // Changed from "text" to "title"
+          title: this.applied_filter.select_section_title,
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}`,
         });
       }
 
-      // Grade/Base filter
+      // Base filter
       if (this.applied_filter.select_base_title) {
         this.breadcrumbs.push({
-          title: this.applied_filter.select_base_title, // Changed from "text" to "title"
+          title: this.applied_filter.select_base_title,
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}`,
         });
       }
 
-      // Subject/Lesson filter
+      // Lesson filter
       if (this.applied_filter.select_lesson_title) {
         this.breadcrumbs.push({
-          title: this.applied_filter.select_lesson_title, // Changed from "text" to "title"
+          title: this.applied_filter.select_lesson_title,
           disabled: false,
           href: `/search?type=${active_tab}&section=${this.board_val}&base=${this.base_val}&lesson=${this.lesson_val}`,
         });
@@ -1137,12 +1286,8 @@ export default {
         //Emit to parent
         this.$emit("setPageTitle", page_title);
       }
-
-      // Force update the breadcrumbs by emitting the updated array
+      //Emit to parent breadcrumbs    
       this.$emit("update:modelValue", [...this.breadcrumbs]);
-
-      // Log the breadcrumbs to verify they're being generated
-      console.log("Breadcrumbs updated:", this.breadcrumbs);
     },
     setFilter(type, list) {
       if (type == "board") this.filter.section_list = list;
@@ -1155,7 +1300,6 @@ export default {
     //Get file type
     async getFileType() {
       try {
-        // Prepare params for API call
         const params = {
           type:
             this.$route.query.type == "test" ||
@@ -1173,10 +1317,8 @@ export default {
         const response = await $fetch("/api/v1/types/list", {
           params,
           method: "GET",
-        });
-
-        if (response && response.data) {
-          this.filter.file_type_list = response.data;
+        }).then((res) => {
+          this.filter.file_type_list = res.data;
 
           if (this.$route.query.test_type > 0) {
             this.file_type_val = this.$route.query.test_type;
@@ -1185,7 +1327,7 @@ export default {
                 (x) => x.id === this.file_type_val
               )?.title;
           }
-        }
+        });
       } catch (err) {
         console.error("Error fetching file type data:", err);
       }
@@ -1196,7 +1338,7 @@ export default {
       if (this.loadtime) return;
 
       const query = { type: this.$route.query.type };
- 
+
       if (this.board_val !== 0) {
         query.section = this.board_val;
       }
@@ -1219,12 +1361,7 @@ export default {
         query.level = this.test_level_val;
       }
       if (this.year_val !== 0) {
-        // Use the parameter format that was in the original URL
-        if (this.using_edu_year) {
-          query.edu_year = this.year_val;
-        } else {
-          query.year = this.year_val;
-        }
+        query.edu_year = this.year_val;
       }
       if (this.month_val !== 0 && query.type === "test") {
         query.month = this.month_val;
