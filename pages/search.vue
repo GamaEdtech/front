@@ -196,7 +196,6 @@ const getContentList = async () => {
       params.city = route.query.city;
     }
     try {
-      console.log("Sending API request with params:", params);
       const response = await $fetch("/api/v1/search", { params });
       items.value.push(...response.data.list);
       result_count.value = response.data.num;

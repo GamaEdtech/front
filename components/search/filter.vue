@@ -599,7 +599,6 @@ export default {
     };
   },
   created() {
-    console.log("Route query in created:", this.$route.query);
     
     // Convert year list values to strings to ensure consistent types
     this.filter.year_list = this.filter.year_list.map(year => String(year));
@@ -678,10 +677,6 @@ export default {
     this.panelModel = [0]; // Board panel
   },
   mounted() {
-    console.log("Route query:", this.$route.query);
-    console.log("Board value:", this.board_val, "type:", typeof this.board_val);
-    console.log("Applied filters:", this.applied_filter);
-
     // Force expand Board panel after mounting to ensure it shows properly
     this.$nextTick(() => {
       // Set panelModel to force the Board panel (index 0) to be expanded
@@ -858,43 +853,16 @@ export default {
       if (res && res.data) {
         if (type === "section") {
           this.filter.section_list = res.data;
-          console.log(
-            "Section list loaded in handleFilterResponse:",
-            this.filter.section_list
-          );
+
 
           if (this.board_val) {
-            console.log(
-              "Current board_val:",
-              this.board_val,
-              "type:",
-              typeof this.board_val
-            );
-
             // Use string comparison for reliable ID matching
             const sectionItem = this.filter.section_list.find(
               (x) => String(x.id) === String(this.board_val)
             );
 
-            console.log(
-              "Found section item in handleFilterResponse:",
-              sectionItem
-            );
-
             if (sectionItem) {
               this.applied_filter.select_section_title = sectionItem.title;
-              console.log(
-                "Set section title to:",
-                this.applied_filter.select_section_title
-              );
-            } else {
-              console.log(
-                "Available section IDs:",
-                this.filter.section_list.map((x) => ({
-                  id: x.id,
-                  type: typeof x.id,
-                }))
-              );
             }
           }
         } else if (type === "base") {
