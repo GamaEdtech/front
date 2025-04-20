@@ -167,7 +167,7 @@ useHead(() => ({
 
 // Methods
 const setPageTitle = (e) => {
-  // page_title.value = e;
+  page_title.value = e;
 };
 
 // Get content list
@@ -187,6 +187,8 @@ const getContentList = async () => {
       word: route.query.word,
       free: route.query.free,
       a_file: route.query.a_file,
+      edu_year: route.query.edu_year,
+      edu_month: route.query.edu_month,
     };
 
     if (route.query.type == "tutor") {
@@ -194,6 +196,7 @@ const getContentList = async () => {
       params.city = route.query.city;
     }
     try {
+      console.log("Sending API request with params:", params);
       const response = await $fetch("/api/v1/search", { params });
       items.value.push(...response.data.list);
       result_count.value = response.data.num;
@@ -203,7 +206,7 @@ const getContentList = async () => {
         all_files_loaded.value = true;
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching search results:", err);
     } finally {
       page_loading.value = false;
     }
@@ -343,6 +346,21 @@ watch(() => route.query.type, (val) => {
   }
 
   side_filter.value.setBreadcrumbInfo();
+  getContentList();
+});
+
+// Add watchers for year and month query params
+watch(() => route.query.edu_year, (val) => {
+  page.value = 1;
+  items.value = [];
+  all_files_loaded.value = false;
+  getContentList();
+});
+
+watch(() => route.query.edu_month, (val) => {
+  page.value = 1;
+  items.value = [];
+  all_files_loaded.value = false;
   getContentList();
 });
 
