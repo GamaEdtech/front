@@ -6,7 +6,7 @@ export default class Debug {
         this.ui = new GUI()
         this.stats = new Stats();
         this.stats.showPanel(0);
-        // document.body.appendChild(this.stats.dom);
+        document.body.appendChild(this.stats.dom);
     }
 
     update() {
