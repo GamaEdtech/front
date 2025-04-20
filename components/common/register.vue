@@ -97,7 +97,7 @@ const requestRegister = async () => {
 
 const onFinish = async () => {
   try {
-    await fetch('/api/v1/users/register', {
+    const response = await fetch('/api/v1/users/register', {
       method: 'POST',
       body: new URLSearchParams({
         type: "confirm",
@@ -105,12 +105,15 @@ const onFinish = async () => {
         code: otp.value,
       })
     })
-    otp_holder.value = false
-    select_pass_holder.value = true
-    
+    const data = await response.json()
+    if(data.status === 1){
+      otp_holder.value = false
+      select_pass_holder.value = true
+    }
+    //if(data.error === "incorrectCode")
+      //toast.error(data.message)
   }
   catch(err) {
-      //if (err.response.status === 400) 
         //toast.error(err.response._data.message)
     }
   finally {
