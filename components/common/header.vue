@@ -145,7 +145,7 @@
       <v-navigation-drawer
         v-model="sidebar"
         app
-        class="d-none d-lg-flex main-sidebar"
+        class="hidden-lg-and-up main-sidebar"
       >
         <v-list density="compact">
           <!-- Profile Info -->
@@ -235,7 +235,7 @@
 
       <!--Mobile nav-->
       <v-app-bar
-        class="d-block d-lg-none mobile_bar"
+        class="d-block d-lg-none mobile_bar top-0 px-5"
         fixed
         flat
         :class="menuSetting.class"
