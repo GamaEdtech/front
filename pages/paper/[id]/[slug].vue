@@ -196,8 +196,9 @@
             <v-col cols="12" sm="5" lg="3" order-lg="first">
               <!--Show gallery of preview and book first page-->
               <details-preview-gallery
-                :images="previewImages"
-                ref="preview_gallery"
+                :image-urls="previewImages"
+                :help-link-data="galleryHelpData"
+                :initial-slide="1"
               />
               <!--Show gallery of preview and book first page-->
             </v-col>
@@ -698,8 +699,14 @@ useHead({
   },
 });
 
-const preview_gallery = ref(null);
 const previewImages = ref([]);
+const galleryHelpData = ref({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
 
 //Init gallery image
 if (contentData.value) {
@@ -707,12 +714,13 @@ if (contentData.value) {
   previewImages.value.push(contentData.value.lesson_pic);
   previewImages.value.carouselVal = 0;
   //Update help link data
-  previewImages.value.help_link_data = {
-    state: contentData.value.state,
-    section: contentData.value.section,
-    base: contentData.value.base,
-    course: contentData.value.course,
-    lesson: contentData.value.lesson,
+
+  galleryHelpData.value = {
+    state: contentData.value?.state || "",
+    section: contentData.value?.section || "",
+    base: contentData.value?.base || "",
+    course: contentData.value?.course || "",
+    lesson: contentData.value?.lesson || "",
   };
 }
 
