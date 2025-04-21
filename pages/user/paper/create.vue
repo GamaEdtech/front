@@ -2,7 +2,7 @@
   <div cols="12" class="px-0 px-sm-2 mt-4">
     <v-row>
       <v-col cols="12" class="pl-5">
-        <span class="text-h4 teal--text"> Paper submission form </span>
+        <span class="text-h4 text-teal"> Paper submission form </span>
       </v-col>
     </v-row>
     <v-card class="mt-3">

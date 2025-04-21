@@ -1,11 +1,14 @@
 <template>
   <v-list density="compact">
     <div v-for="(item, index) in items" :key="item.title">
-      <v-list-item v-show="!item.subMenuList" link :to="item.link">
-        <template v-slot:prepend>
-          <v-icon>{{ item.icon }}</v-icon>
-        </template>
-        <v-list-item-title v-text="item.title"></v-list-item-title>
+      <v-list-item v-show="!item.subMenuList" link :to="item.link" class="py-2">
+        <!-- <template v-slot:prepend>
+          <v-icon size="20" class="mr-2">{{ item.icon }}</v-icon>
+        </template> -->
+        <div class="d-flex align-center">
+          <v-icon size="20" class="mr-2">{{ item.icon }}</v-icon>
+          <v-list-item-title v-text="item.title"></v-list-item-title>
+        </div>
       </v-list-item>
       <v-list-group
         v-show="item.subMenuList"
@@ -15,16 +18,19 @@
         @click="toggleGroup(index)"
       >
         <template v-slot:activator="{ props }">
-          <v-list-item v-bind="props">
-            <template v-slot:prepend>
-              <v-icon>{{ item.icon }}</v-icon>
-            </template>
-            <v-list-item-title v-text="item.title"></v-list-item-title>
+          <v-list-item v-bind="props" class="py-2">
+            <!-- <template v-slot:prepend>
+              <v-icon size="20" class="mr-2">{{ item.icon }}</v-icon>
+            </template> -->
+            <div class="d-flex align-center">
+              <v-icon size="20" class="mr-2">{{ item.icon }}</v-icon>
+              <v-list-item-title v-text="item.title"></v-list-item-title>
+            </div>
           </v-list-item>
         </template>
 
         <v-list-item
-          class="pl-7"
+          class="pl-7 py-2"
           active-class="menu_active"
           v-for="(subMenuItem, side) in item.subMenuList"
           :to="subMenuItem.link"
@@ -121,4 +127,27 @@ const items = ref([
 ]);
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-list-item__prepend {
+  margin-right: 12px !important;
+}
+
+.menu_active {
+  background-color: rgba(var(--v-theme-primary), 0.1);
+  color: rgb(var(--v-theme-primary));
+  border-radius: 4px;
+}
+
+.menu_group_active {
+  background-color: transparent;
+}
+
+.v-list-group__items .v-list-item {
+  padding-left: 12px;
+  min-height: 40px;
+}
+
+.v-list-item {
+  min-height: 44px;
+}
+</style>

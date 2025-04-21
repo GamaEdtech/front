@@ -3,8 +3,8 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Paper </span>
+          <!-- <span class="icon icong-test text-h3 teal--text"></span> -->
+          <span class="text-h4 text-teal"> My Past Papers List </span>
         </v-col>
       </v-row>
 
@@ -219,7 +219,7 @@ import { useAuth } from "#imports";
 
 // Define layout and page metadata
 definePageMeta({
-  layout: "dashboard_layout",
+  layout: "dashboard-layout",
 });
 
 // Use services
