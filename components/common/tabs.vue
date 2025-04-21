@@ -9,7 +9,7 @@
         slider-color="transparent"
         class="pa-2"
       >
-        <v-tab @click="openLink('test')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+        <v-tab   @click="openLink('test')" rounded color="rgba(0, 0, 0, .87)" class="tab-item" :class="{ 'tab-active': $route.query.type === 'test' }">
           <v-badge
             class="py-1 mx-1 badge-sample"
             color="#2962FF"
@@ -23,7 +23,7 @@
             </div>
           </v-badge>
         </v-tab>
-        <v-tab @click="openLink('learnfiles')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+        <v-tab @click="openLink('learnfiles')" rounded color="rgba(0, 0, 0, .87)" class="tab-item" :class="{ 'tab-active': $route.query.type === 'learnfiles' }">
           <v-badge
             bordered
             class="pa-1 mx-1 badge-training"
@@ -37,7 +37,7 @@
             </div>
           </v-badge>
         </v-tab>
-        <v-tab @click="openLink('question')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+        <v-tab @click="openLink('question')" rounded color="rgba(0, 0, 0, .87)" class="tab-item" :class="{ 'tab-active': $route.query.type === 'question' }">
           <v-badge
             bordered
             class="pa-1 mx-1 badge-q"
@@ -51,7 +51,7 @@
             </div>
           </v-badge>
         </v-tab>
-        <v-tab @click="openLink('azmoon')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+        <v-tab @click="openLink('azmoon')" rounded color="rgba(0, 0, 0, .87)" class="tab-item" :class="{ 'tab-active': $route.query.type === 'azmoon' }">
           <v-badge
             bordered
             class="pa-1 mx-1 badge-online"
@@ -65,7 +65,7 @@
             </div>
           </v-badge>
         </v-tab>
-        <v-tab @click="openLink('dars')" rounded color="rgba(0, 0, 0, .87)" class="tab-item">
+        <v-tab @click="openLink('dars')" rounded color="rgba(0, 0, 0, .87)" class="tab-item" :class="{ 'tab-active': $route.query.type === 'dars' }">
           <v-badge
             bordered
             class="pa-1 mx-1 badge-tutorial"
@@ -176,7 +176,7 @@ defineExpose({
 <style lang="scss" scoped>
 #search-top-filter {
   position: sticky;
-  top: 0;
+  top: 60px;
   z-index: 5;
   overflow-x: scroll;
   .icon-paper,
@@ -188,6 +188,12 @@ defineExpose({
     margin-top: 0.5rem;
   }
 }
+@media (max-width: 600px) {
+  #search-top-filter {
+    top: 50px;
+    margin-bottom: 3rem;
+  }
+}
 
 /* Tab container */
 :deep(.v-tabs) {
@@ -195,7 +201,6 @@ defineExpose({
   border-radius: 1.2rem !important;
 }
 
-/* Active tab styles */
 :deep(.v-btn__overlay) {
   background-color: unset !important;
   border-radius: unset !important;
@@ -207,36 +212,53 @@ defineExpose({
   padding: unset !important;
 }
 
-/* Active tab styles - refined for exact match */
-:deep(.v-tab--selected.tab-item) {
+/* Direct targeting of active tabs with our custom class */
+.tab-item.tab-active {
+  position: relative;
+  z-index: 1;
+  .nav-link {
+    border: 1px solid rgba(0,0,0,0.12) !important;
+    border-radius: 1.4rem !important;
+    color: rgba(0,0,0,0.9) !important;
+    font-weight: 500;
+  }
+  
+  span.icon {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Color-specific active tab styles */
+.tab-item.tab-active {
+  /* Past Papers active tab */
   .badge-sample .nav-link {
-    box-shadow: 0 1px 2px rgba(41, 98, 255, 0.1);
-    border-color: #CFD1D8;
-    background: rgba(41, 98, 255, .05) !important;
+    background: rgba(41,98,255,0.08) !important;
+    border-color: rgba(41,98,255,0.3) !important;
   }
   
+  /* Multimedia active tab */
   .badge-training .nav-link {
-    box-shadow: 0 1px 2px rgba(46, 125, 50, 0.1);
-    border-color: rgba(46, 125, 50, 0.2);
-    background: rgba(46, 125, 50, .05) !important;
+    background: rgba(46,125,50,0.08) !important;
+    border-color: rgba(46,125,50,0.3) !important;
   }
   
+  /* Forum active tab */
   .badge-q .nav-link {
-    box-shadow: 0 1px 2px rgba(191, 54, 12, 0.1);
-    border-color: rgba(191, 54, 12, 0.2);
-    background: rgba(191, 54, 12, .05) !important;
+    background: rgba(191,54,12,0.08) !important;
+    border-color: rgba(191,54,12,0.3) !important;
   }
   
+  /* QuizHub active tab */
   .badge-online .nav-link {
-    box-shadow: 0 1px 2px rgba(86, 0, 232, 0.1);
-    border-color: rgba(86, 0, 232, 0.2);
-    background: rgba(86, 0, 232, .05) !important;
+    background: rgba(86,0,232,0.08) !important;
+    border-color: rgba(86,0,232,0.3) !important;
   }
   
+  /* Tutorial active tab */
   .badge-tutorial .nav-link {
-    box-shadow: 0 1px 2px rgba(189, 8, 28, 0.1);
-    border-color: rgba(189, 8, 28, 0.2);
-    background: rgba(189, 8, 28, .05) !important;
+    background: rgba(189,8,28,0.08) !important;
+    border-color: rgba(189,8,28,0.3) !important;
   }
 }
 
@@ -316,7 +338,6 @@ defineExpose({
   color: #5600E8;
 }
 
-
 .tutorial-icon span {
   font-size: 3rem !important;
   padding-left: 1rem;
@@ -330,34 +351,39 @@ defineExpose({
   padding-right: 0.4rem;
   color: #8E24AA;
 }
+
 .tab-header {
   margin: 1rem 0 !important;
   border-radius: 1.2rem !important;
   background-color: #F5F5F5 !important;
   padding: 0rem !important;
   border: none !important;
-  min-width: max-content ;
+  min-width: max-content;
   cursor: unset !important;
   touch-action: pan-x !important;
 }
+
 .tab-item {
   text-transform: none !important;
   font-size: 1.2rem !important;
+  transition: all 0.25s ease-in-out;
 }
+
 .nav-link {
   display: flex;
   align-items: center;
   padding: 0.8rem 0.8rem 0.8rem 0 !important;
   margin: 0.2rem !important;
+  transition: all 0.2s ease;
 }
-:deep(.v-tab--selected .nav-link) {
-  border: 1px solid rgba(0,0,0,0.12) !important;
-  border-radius: 1.4rem !important;
-  background: rgba(41,98,255,0.05) !important;
-  color: #000 !important;
-}
-:deep(.v-tab:not(.v-tab--selected) .nav-link) {
-  color: #00000065 ;
+
+/* Make non-active tabs more subtle */
+.tab-item:not(.tab-active) .nav-link {
+  color: rgba(0, 0, 0, 0.6);
+  
+  span.icon {
+    opacity: 0.7;
+  }
 }
 
 :deep(.badge-sample .v-badge__badge) { background-color: #2962FF !important; }
@@ -381,17 +407,19 @@ defineExpose({
   right: 8px;
   z-index: 10;
 }
-:v-deep(.v-tabs__wrapper) { padding-left: 0 !important; padding-right: 48px !important; }
+:deep(.v-tabs__wrapper) { padding-left: 0 !important; padding-right: 48px !important; }
 
-
+.selected-tab .nav-link {
+  display: none !important;
+}
 ::-webkit-scrollbar {
   display: none;
 }
 ::-webkit-scrollbar-thumb {
-    border-radius: 0.8rem;
-    background: #cacdd3;
+  border-radius: 0.8rem;
+  background: #cacdd3;
 }
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+  background: #f1f1f1;
 }
 </style>
