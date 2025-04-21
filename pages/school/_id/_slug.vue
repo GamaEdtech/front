@@ -1351,7 +1351,7 @@
           :href="`https://www.google.com/maps?q=${contentData.latitude}, ${contentData.longitude}`"
           target="blank"
           class="ml-1 blue--text"
-          >See on Google</a
+          >See on Google Map</a
         >
         <v-card-actions class="justify-center pb-13">
           <v-btn
