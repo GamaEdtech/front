@@ -273,7 +273,11 @@
 
         <!-- Classification panel -->
         <v-expansion-panel
-          :disabled="!board_val && $route.query.type !== 'learnfiles'"
+          :disabled="
+            !board_val &&
+            $route.query.type !== 'learnfiles' &&
+            $route.query.type !== 'azmoon'
+          "
           v-show="
             $route.query.type === 'test' ||
             $route.query.type === 'learnfiles' ||
@@ -283,18 +287,18 @@
           <v-expansion-panel-title
             :style="{
               color:
-                !filter.file_type_list || !filter.file_type_list.length
-                  ? 'black'
-                  : 'transparent',
+                !filter.file_type_list && filter.file_type_list.length
+                  ? '#000000'
+                  : 'rgba(0, 0, 0, 0.38)',
               pointerEvents:
-                !filter.file_type_list || !filter.file_type_list.length
+                !board_val || !filter.file_type_list.length
                   ? 'none'
                   : 'auto',
             }"
-            class="filter-title filter-inactive"
+            class="filter-title "
             :class="{
               'filter-inactive':
-                !filter.file_type_list || !filter.file_type_list.length,
+                !board_val || !filter.file_type_list.length,
             }"
           >
             {{
@@ -1388,7 +1392,7 @@ export default {
   min-height: 48px !important;
   padding: 12px 16px !important;
   font-size: 16px !important;
-  font-weight: 500;
+  font-weight: 700 !important;
   color: #000000 !important;
 }
 :deep(.v-expansion-panel-text__wrapper) {
