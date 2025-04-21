@@ -1,370 +1,375 @@
 <template>
-  <div cols="12" class="px-0 px-sm-2 mt-4">
-    <v-row>
-      <v-col cols="12" class="pl-5">
-        <span class="text-h4 text-teal"> Paper submission form </span>
-      </v-col>
-    </v-row>
-    <v-card class="mt-3">
-      <v-card-text class="py-10 px-8">
-        <VForm
-          ref="form"
-          v-model="isFormValid"
-          @submit.prevent="updateQuestion"
-          lazy-validation
-        >
-          <v-row>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                v-model="formData.section"
-                :items="section_list"
-                :rules="[(v) => !!v || 'Board is required']"
-                item-title="title"
-                item-value="id"
-                label="Board"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                v-model="formData.base"
-                :items="grade_list"
-                :rules="[(v) => !!v || 'Grade is required']"
-                item-value="id"
-                item-title="title"
-                label="Grade"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                :items="lesson_list"
-                :rules="[(v) => !!v || 'Subject is required']"
-                item-value="id"
-                item-title="title"
-                v-model="formData.lesson"
-                label="Subject"
-              />
-            </v-col>
-            <v-col cols="12" md="12">
-              <form-topic-selector
-                ref="topicSelectorRef"
-                :topic-list="topic_list"
-                :selectedTopics="formData.topics"
-                @selectTopic="selectTopic"
-                v-if="topic_list.length > 0"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="test_type_list"
-                item-value="id"
-                item-title="title"
-                v-model="formData.test_type"
-                label="Test type"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                :items="answer_status_list"
-                :rules="[
-                  (v) =>
-                    (v !== null && v !== undefined && v !== '') ||
-                    v === 0 ||
-                    'Answer status is required',
-                ]"
-                item-value="id"
-                item-title="title"
-                v-model="formData.answer_type"
-                label="Answer status"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="test_level_list"
-                item-value="id"
-                item-title="title"
-                v-model="formData.level"
-                label="Level"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                :items="year_list"
-                :rules="[(v) => !!v || 'Year is required']"
-                v-model="formData.edu_year"
-                label="Year"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                required
-                density="compact"
-                variant="outlined"
-                :items="month_list"
-                :rules="[(v) => !!v || 'Month is required']"
-                v-model="formData.edu_month"
-                item-title="title"
-                item-value="id"
-                label="Month"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="holding_level_list"
-                v-model="formData.holding_level"
-                item-title="title"
-                item-value="id"
-                label="Holding level"
-              />
-            </v-col>
+  <div cols="12" class="px-0 px-sm-2 mt-4" style="position: relative">
+    <!-- Main loader overlay -->
+    <template v-if="isLoading">
+      <v-skeleton-loader
+        type="article, article, table"
+        class="my-4"
+      ></v-skeleton-loader>
+    </template>
 
-            <v-col cols="12" md="4" v-if="formData.holding_level < 4">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="state_list"
-                v-model="formData.state"
-                item-title="title"
-                item-value="id"
-                label="State"
-              />
-            </v-col>
-            <v-col cols="12" md="4" v-if="formData.holding_level < 3">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="area_list"
-                v-model="formData.area"
-                item-title="title"
-                item-value="id"
-                label="Area"
-              />
-            </v-col>
-            <v-col cols="12" md="4" v-if="formData.holding_level < 2">
-              <v-autocomplete
-                density="compact"
-                variant="outlined"
-                :items="school_list"
-                v-model="formData.school"
-                item-title="title"
-                item-value="id"
-                label="School"
-              />
-            </v-col>
+    <template v-else>
+      <v-row>
+        <v-col cols="12" class="pl-5">
+          <span class="text-h4 text-teal"> Paper submission form </span>
+        </v-col>
+      </v-row>
+      <v-card class="mt-3">
+        <v-card-text class="py-10 px-8">
+          <VForm
+            ref="form"
+            v-model="isFormValid"
+            @submit.prevent="updateQuestion"
+            lazy-validation
+          >
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  v-model="formData.section"
+                  :items="section_list"
+                  :rules="[(v) => !!v || 'Board is required']"
+                  item-title="title"
+                  item-value="id"
+                  label="Board"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  v-model="formData.base"
+                  :items="grade_list"
+                  :rules="[(v) => !!v || 'Grade is required']"
+                  item-value="id"
+                  item-title="title"
+                  label="Grade"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  :items="lesson_list"
+                  :rules="[(v) => !!v || 'Subject is required']"
+                  item-value="id"
+                  item-title="title"
+                  v-model="formData.lesson"
+                  label="Subject"
+                />
+              </v-col>
+              <v-col cols="12" md="12">
+                <form-topic-selector
+                  ref="topicSelectorRef"
+                  :topic-list="topic_list"
+                  :selectedTopics="formData.topics"
+                  @selectTopic="selectTopic"
+                  v-if="topic_list.length > 0"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="test_type_list"
+                  item-value="id"
+                  item-title="title"
+                  v-model="formData.test_type"
+                  label="Test type"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  :items="answer_status_list"
+                  :rules="[
+                    (v) =>
+                      (v !== null && v !== undefined && v !== '') ||
+                      v === 0 ||
+                      'Answer status is required',
+                  ]"
+                  item-value="id"
+                  item-title="title"
+                  v-model="formData.answer_type"
+                  label="Answer status"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="test_level_list"
+                  item-value="id"
+                  item-title="title"
+                  v-model="formData.level"
+                  label="Level"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  :items="year_list"
+                  :rules="[(v) => !!v || 'Year is required']"
+                  v-model="formData.edu_year"
+                  label="Year"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  required
+                  density="compact"
+                  variant="outlined"
+                  :items="month_list"
+                  :rules="[(v) => !!v || 'Month is required']"
+                  v-model="formData.edu_month"
+                  item-title="title"
+                  item-value="id"
+                  label="Month"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="holding_level_list"
+                  v-model="formData.holding_level"
+                  item-title="title"
+                  item-value="id"
+                  label="Holding level"
+                />
+              </v-col>
 
-            <v-col cols="12" md="12">
-              <v-text-field
-                required
-                density="compact"
-                variant="outlined"
-                v-model="formData.title"
-                :rules="[(v) => !!v || 'Title is required']"
-                label="Title"
-              />
-            </v-col>
-            <v-col cols="12" md="12">
-              <v-textarea
-                required
-                density="compact"
-                variant="outlined"
-                v-model="formData.description"
-                :rules="[
-                  (v) => !!v || 'Description is required',
-                  (v) =>
-                    (v && v.length >= 70) ||
-                    'Description must be at least 70 characters',
-                ]"
-                label="Describe"
-                hint="You must enter at least 70 characters."
-                persistent-hint
-                placeholder="Write a brief description about the files to help the user make an informed choice"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-file-input
-                density="compact"
-                variant="outlined"
-                v-model="file_pdf"
-                :prepend-icon="null"
-                accept="application/pdf"
-                label="Pdf question & answer file"
-                color="red"
-                :loading="file_pdf_loading"
-                @change="uploadFile('file_pdf', $event)"
-                prepend-inner-icon="mdi-file-pdf-box"
-                append-inner-icon="mdi-folder-open"
-              >
-                <template #append>
-                  <v-btn
-                    icon
-                    variant="plain"
-                    color="red"
-                    @click="startDownload('q_pdf')"
-                    v-show="paperData?.files?.pdf?.exist || formData.file_pdf"
-                    class="ml-2"
-                  >
-                    <v-icon color="red"> mdi-download </v-icon>
-                  </v-btn>
-                </template>
-              </v-file-input>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-file-input
-                density="compact"
-                variant="outlined"
-                v-model="file_word"
-                label="Word question & answer file"
-                :prepend-icon="null"
-                accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                :loading="file_word_loading"
-                color="blue"
-                @change="uploadFile('file_word', $event)"
-                prepend-inner-icon="mdi-file-word-outline"
-                append-inner-icon="mdi-folder-open"
-              >
-                <template #append>
-                  <v-btn
-                    icon
-                    color="teal"
-                    variant="plain"
-                    @click="startDownload('q_word')"
-                    v-show="paperData?.files?.word?.exist || formData.file_word"
-                    class="ml-2"
-                  >
-                    <v-icon color="teal"> mdi-download </v-icon>
-                  </v-btn>
-                </template>
-              </v-file-input>
-            </v-col>
+              <v-col cols="12" md="4" v-if="formData.holding_level < 4">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="state_list"
+                  v-model="formData.state"
+                  item-title="title"
+                  item-value="id"
+                  label="State"
+                />
+              </v-col>
+              <v-col cols="12" md="4" v-if="formData.holding_level < 3">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="area_list"
+                  v-model="formData.area"
+                  item-title="title"
+                  item-value="id"
+                  label="Area"
+                />
+              </v-col>
+              <v-col cols="12" md="4" v-if="formData.holding_level < 2">
+                <v-autocomplete
+                  density="compact"
+                  variant="outlined"
+                  :items="school_list"
+                  v-model="formData.school"
+                  item-title="title"
+                  item-value="id"
+                  label="School"
+                />
+              </v-col>
 
-            <v-col cols="12" md="4">
-              <v-file-input
-                density="compact"
-                variant="outlined"
-                v-model="file_answer"
-                label="Answer file"
-                :prepend-icon="null"
-                accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                :loading="file_answer_loading"
-                color="default"
-                @change="uploadFile('file_answer', $event)"
-                prepend-inner-icon="mdi-file"
-                append-inner-icon="mdi-folder-open"
-              >
-                <template #append>
-                  <v-btn
-                    icon
-                    variant="plain"
-                    color="blue"
-                    @click="startDownload('a_file')"
-                    v-show="
-                      paperData?.files?.answer?.exist || formData.file_answer
-                    "
-                    class="ml-2"
-                  >
-                    <v-icon color="blue"> mdi-download </v-icon>
-                  </v-btn>
-                </template>
-              </v-file-input>
-            </v-col>
+              <v-col cols="12" md="12">
+                <v-text-field
+                  required
+                  density="compact"
+                  variant="outlined"
+                  v-model="formData.title"
+                  :rules="[(v) => !!v || 'Title is required']"
+                  label="Title"
+                />
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-textarea
+                  required
+                  density="compact"
+                  variant="outlined"
+                  v-model="formData.description"
+                  :rules="[
+                    (v) => !!v || 'Description is required',
+                    (v) =>
+                      (v && v.length >= 70) ||
+                      'Description must be at least 70 characters',
+                  ]"
+                  label="Describe"
+                  hint="You must enter at least 70 characters."
+                  persistent-hint
+                  placeholder="Write a brief description about the files to help the user make an informed choice"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-file-input
+                  density="compact"
+                  variant="outlined"
+                  v-model="file_pdf"
+                  :prepend-icon="null"
+                  accept="application/pdf"
+                  label="Pdf question & answer file"
+                  color="red"
+                  :loading="file_pdf_loading"
+                  @change="uploadFile('file_pdf', $event)"
+                  prepend-inner-icon="mdi-file-pdf-box"
+                  append-inner-icon="mdi-folder-open"
+                >
+                  <template #append>
+                    <v-icon
+                      @click="startDownload('q_pdf')"
+                      v-show="paperData?.files?.pdf?.exist || formData.file_pdf"
+                      color="red"
+                      size="x-large"
+                    >
+                      mdi-download
+                    </v-icon>
+                  </template>
+                </v-file-input>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-file-input
+                  density="compact"
+                  variant="outlined"
+                  v-model="file_word"
+                  label="Word question & answer file"
+                  :prepend-icon="null"
+                  accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  :loading="file_word_loading"
+                  color="blue"
+                  @change="uploadFile('file_word', $event)"
+                  prepend-inner-icon="mdi-file-word-outline"
+                  append-inner-icon="mdi-folder-open"
+                >
+                  <template #append>
+                    <v-icon
+                      color="teal"
+                      @click="startDownload('q_word')"
+                      v-show="
+                        paperData?.files?.word?.exist || formData.file_word
+                      "
+                      size="x-large"
+                    >
+                      mdi-download
+                    </v-icon>
+                  </template>
+                </v-file-input>
+              </v-col>
 
-            <v-col cols="12" v-if="extraAttr.length">
-              <v-row v-for="(item, index) in extraAttr" :key="index">
-                <v-col cols="12" md="4">
-                  <v-autocomplete
-                    :items="extra_type_list"
-                    variant="outlined"
-                    density="compact"
-                    v-model="item.type"
-                    item-title="title"
-                    item-value="id"
-                    label="Select file type"
-                  />
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-file-input
-                    density="compact"
-                    variant="outlined"
-                    label="Select file"
-                    :prepend-icon="null"
-                    :loading="file_extra_loading"
-                    color="green"
-                    v-model="item.file_extra"
-                    @change="(event) => uploadFile('file_extra', event, index)"
-                    prepend-inner-icon="mdi-plus"
-                    append-inner-icon="mdi-folder-open"
-                  >
-                    <template #append>
-                      <v-btn
-                        icon
-                        variant="plain"
-                        color="primary"
-                        v-show="item.id && item.file"
-                        @click="startDownload('extra', item.id)"
-                        class="ml-2"
-                      >
-                        <v-icon> mdi-download </v-icon>
-                      </v-btn>
-                    </template>
-                  </v-file-input>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="12">
-              <v-btn variant="outlined" color="success" @click="addExtraAttr">
-                <v-icon> mdi-plus </v-icon>
-                Add Solution video
-              </v-btn>
-            </v-col>
-            <v-col cols="12" md="12">
-              <v-checkbox
-                density="compact"
-                v-model="formData.free_agreement"
-                label="I would like the file to be freely available to others."
-              />
-            </v-col>
+              <v-col cols="12" md="4">
+                <v-file-input
+                  density="compact"
+                  variant="outlined"
+                  v-model="file_answer"
+                  label="Answer file"
+                  :prepend-icon="null"
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  :loading="file_answer_loading"
+                  color="default"
+                  @change="uploadFile('file_answer', $event)"
+                  prepend-inner-icon="mdi-file"
+                  append-inner-icon="mdi-folder-open"
+                >
+                  <template #append>
+                    <v-icon
+                      color="blue"
+                      @click="startDownload('a_file')"
+                      v-show="
+                        paperData?.files?.answer?.exist || formData.file_answer
+                      "
+                      size="x-large"
+                    >
+                      mdi-download
+                    </v-icon>
+                  </template>
+                </v-file-input>
+              </v-col>
 
-            <v-col cols="12" md="6" class="pb-0">
-              <v-btn
-                color="primary"
-                type="submit"
-                block
-                :loading="loading.form"
-                :disabled="!isFormValid"
-              >
-                Update
-              </v-btn>
-            </v-col>
+              <v-col cols="12" v-if="extraAttr.length">
+                <v-row v-for="(item, index) in extraAttr" :key="index">
+                  <v-col cols="12" md="4">
+                    <v-autocomplete
+                      :items="extra_type_list"
+                      variant="outlined"
+                      density="compact"
+                      v-model="item.type"
+                      item-title="title"
+                      item-value="id"
+                      label="Select file type"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-file-input
+                      density="compact"
+                      variant="outlined"
+                      label="Select file"
+                      :prepend-icon="null"
+                      :loading="file_extra_loading"
+                      color="green"
+                      v-model="item.file_extra"
+                      @change="
+                        (event) => uploadFile('file_extra', event, index)
+                      "
+                      prepend-inner-icon="mdi-plus"
+                      append-inner-icon="mdi-folder-open"
+                    >
+                      <template #append>
+                        <v-icon
+                          v-show="item.id && item.file"
+                          @click="startDownload('extra', item.id)"
+                          size="x-large"
+                        >
+                          mdi-download
+                        </v-icon>
+                      </template>
+                    </v-file-input>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12">
+                <v-btn variant="outlined" color="success" @click="addExtraAttr">
+                  <v-icon> mdi-plus </v-icon>
+                  Add Solution video
+                </v-btn>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-checkbox
+                  density="compact"
+                  v-model="formData.free_agreement"
+                  label="I would like the file to be freely available to others."
+                />
+              </v-col>
 
-            <v-col cols="6">
-              <v-btn variant="outlined" color="error" to="/user/paper" block>
-                Discard
-              </v-btn>
-            </v-col>
-          </v-row>
-        </VForm>
-      </v-card-text>
-    </v-card>
+              <v-col cols="12" md="6" class="pb-0">
+                <v-btn
+                  color="primary"
+                  type="submit"
+                  block
+                  :loading="loading.form"
+                  :disabled="!isFormValid"
+                >
+                  Update
+                </v-btn>
+              </v-col>
+
+              <v-col cols="6">
+                <v-btn variant="outlined" color="error" to="/user/paper" block>
+                  Discard
+                </v-btn>
+              </v-col>
+            </v-row>
+          </VForm>
+        </v-card-text>
+      </v-card>
+    </template>
   </div>
 </template>
 
@@ -389,6 +394,7 @@ const route = useRoute();
 const form = ref(null);
 const isFormValid = ref(true);
 const topicSelectorRef = ref(null);
+const isLoading = ref(true); // Global loading state
 
 // Reactive state
 const formData = reactive({
@@ -407,7 +413,7 @@ const formData = reactive({
   state: "",
   area: "",
   school: "",
-  free_agreement: 0,
+  free_agreement: false,
   file_pdf: "",
   file_word: "",
   file_answer: "",
@@ -497,14 +503,6 @@ const { data: paperData } = await useAsyncData("paper-data", async () => {
     return null;
   }
 });
-
-// Watch for free_agreement changes
-watch(
-  () => formData.free_agreement,
-  (val) => {
-    formData.free_agreement = val ? 1 : 0;
-  }
-);
 
 // Methods
 const changeOption = (optionName, optionVal) => {
@@ -937,13 +935,6 @@ watch(
   }
 );
 
-watch(
-  () => formData.free_agreement,
-  (val) => {
-    formData.free_agreement = val ? 1 : 0;
-  }
-);
-
 const startDownload = (type, extra_id = "") => {
   const auth = useAuth();
   if (auth.loggedIn) {
@@ -995,11 +986,20 @@ const startDownload = (type, extra_id = "") => {
 
 // Initialize on mount
 onMounted(async () => {
-  await getTypeList("section");
-  await getTypeList("test_type");
-  await getTypeList("state");
-  await getExtraFileType();
-  await initData();
+  isLoading.value = true;
+  try {
+    await getTypeList("section");
+    await getTypeList("test_type");
+    await getTypeList("state");
+    await getExtraFileType();
+    await initData();
+  } catch (error) {
+    console.error("Error during initialization:", error);
+    $toast.error("Error loading form data. Please try again.");
+  } finally {
+    // Hide the loading state whether successful or not
+    isLoading.value = false;
+  }
 });
 </script>
 
@@ -1039,5 +1039,18 @@ onMounted(async () => {
 .topic_season {
   font-weight: bolder !important;
   color: blue !important;
+}
+
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
