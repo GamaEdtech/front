@@ -10,8 +10,7 @@ export default class Clouds {
         this.options = this.experience.options
         this.resources = this.experience.resources
 
-        this.cloudCount = 30
-        this.totalClouds = this.cloudCount * 2
+        this.cloudCount = this.options.cloudCount
 
         // // floating animation clouds
         // this.floatSpeed = 0.5
@@ -39,16 +38,16 @@ export default class Clouds {
     }
 
     setMesh() {
-        this.meshes = new THREE.InstancedMesh(this.geometry, this.material, this.totalClouds)
+        this.meshes = new THREE.InstancedMesh(this.geometry, this.material, this.cloudCount)
         this.meshes.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
         this.dummy = new THREE.Object3D()
 
-        for (let i = 0; i < this.totalClouds; i++) {
-            const x = Math.random() * 200
+        for (let i = 0; i < this.cloudCount; i++) {
+            const x = Math.random() * this.options.roadSize
             const y = 10 + Math.random() * 4
-            const z = i < this.cloudCount
-                ? Math.random() * 30
-                : 60 + Math.random() * 30
+            const z = i < this.cloudCount / 2
+                ? Math.random() * this.options.mountainWidth
+                : (this.options.mountainWidth + this.options.groundWidth) + Math.random() * this.options.mountainWidth
 
             const scale = 0.02 + Math.random() * 0.1
 

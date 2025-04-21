@@ -66,8 +66,10 @@ export default class Experience {
 
 
             // tree
-            treeCount: 30
+            treeCount: 30,
 
+            // cloud
+            cloudCount: 50,
         }
 
 
