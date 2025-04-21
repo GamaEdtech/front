@@ -31,6 +31,9 @@ export default class Mountain {
     }
 
     setMaterial() {
+        this.noiseTexture = this.experience.resources.items.perlinNoiseTexture
+        this.noiseTexture.wrapS = THREE.RepeatWrapping;
+        this.noiseTexture.wrapT = THREE.RepeatWrapping;
         this.material = new CustomShaderMaterial({
             baseMaterial: THREE.MeshStandardMaterial,
             vertexShader: vertex,
@@ -51,7 +54,8 @@ export default class Mountain {
                 uColorSand: new THREE.Uniform(new THREE.Color(this.options.colorSand)),
                 uColorGrass: new THREE.Uniform(new THREE.Color(this.options.colorGrass)),
                 uColorSnow: new THREE.Uniform(new THREE.Color(this.options.colorSnow)),
-                uColorRock: new THREE.Uniform(new THREE.Color(this.options.colorRock))
+                uColorRock: new THREE.Uniform(new THREE.Color(this.options.colorRock)),
+                uPerlinTexture: new THREE.Uniform(this.noiseTexture)
             }
         })
 
@@ -108,7 +112,7 @@ export default class Mountain {
         MountainFolder.add(this.options, "positionFrequency").min(0).max(1).step(0.001).name("position Frequency").onChange(() => {
             this.material.uniforms.uPositionFrequency.value = this.options.positionFrequency
         })
-        MountainFolder.add(this.options, "strength").min(0).max(100).step(0.001).name("strength Frequency").onChange(() => {
+        MountainFolder.add(this.options, "strength").min(0).max(400).step(0.001).name("strength Frequency").onChange(() => {
             this.material.uniforms.uStrength.value = this.options.strength
         })
         MountainFolder.add(this.options, "warpFrequency").min(0).max(10).step(0.001).name("warp Frequency").onChange(() => {

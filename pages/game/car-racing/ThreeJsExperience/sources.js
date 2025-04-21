@@ -2,6 +2,13 @@
 
 export default [
 
+    // perlin noise texture
+    {
+        name: 'perlinNoiseTexture',
+        type: 'texture',
+        path: "/images/car-racing/perlin.png"
+    },
+
     // cloud source
     {
         name: 'cloudGLTFModel',

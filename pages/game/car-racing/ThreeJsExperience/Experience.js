@@ -33,7 +33,7 @@ export default class Experience {
             // fog
             fogColor: "#8ec3fb",
             near: 20,
-            far: 100,
+            far: 60,
 
             //ground
             groundSize: 200,
@@ -53,8 +53,10 @@ export default class Experience {
             // mountain
             mountainSize: 200,
             mountainWidth: 30,
-            positionFrequency: 0.041,
-            strength: 36,
+            // positionFrequency: 0.041,
+            // strength: 36,
+            positionFrequency: 0.017,
+            strength: 70,
             warpFrequency: 0,
             warpStrength: 0,
             colorWaterDeep: "#02587e",
