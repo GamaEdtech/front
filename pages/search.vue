@@ -486,7 +486,7 @@ watch(() => route.query.city, (val) => {
 </script>
 
 <template>
-  <section class="search-page mt-md-16 mt-lg-0">
+  <section class="search-page mt-lg-0">
     <div class="container">
       <!--Mobile filter-->
       <v-row justify="center" class="d-block d-md-none">
@@ -496,9 +496,9 @@ watch(() => route.query.city, (val) => {
           hide-overlay
           transition="dialog-bottom-transition "
         >
-          <v-card>
+          <v-card   style="background-color: #f5f5f5; padding: unset !important;">
             <div style="position: sticky; top: 0; left: 0; right: 0; z-index: 10">
-              <v-toolbar class="filter-btn-header">
+              <v-toolbar class="filter-btn-header" >
                 <v-toolbar-items>
                   <v-btn
                     class="text-h5 font-weight-bold"
@@ -514,7 +514,7 @@ watch(() => route.query.city, (val) => {
                 </v-btn>
               </v-toolbar>
             </div>
-            <v-card-text>
+            <v-card-text style="background-color: #f5f5f5; padding: unset !important;">
               <search-filter
                 ref="side_filter"
                 class="mx-3"
@@ -523,13 +523,18 @@ watch(() => route.query.city, (val) => {
               />
             </v-card-text>
             <v-card-actions
-              style="position: sticky; bottom: 0; left: 0; right: 0"
+              style="position: sticky; bottom: 0; left: 0; right: 0;"
             >
               <v-btn
-                size="medium"
+                size="large"
                 block
-                class="filter-show-result mr-4"
+                class="filter-show-result m-4 mb-4"
                 @click="dialog = !dialog"
+                color="#008b8b"
+                variant="flat"
+                rounded="small"
+                style="font-size: 1.3rem; text-transform: none;;"
+
               >
                 show result ({{ result_count }})
               </v-btn>
@@ -651,6 +656,7 @@ watch(() => route.query.city, (val) => {
 }
 .search-page {
     border-top: 1px solid rgba(33, 33, 33, .08);
+    position: static !important;
 }
 
 @media (min-width: 1264px) {
