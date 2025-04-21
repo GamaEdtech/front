@@ -1,8 +1,7 @@
 <template>
   <v-app>
-    <!-- TODO: remove for now, need to be fixed  -->
-    <!-- <common-header /> -->
-    <div class="mt-16">
+    <common-header />
+    <div >
       <slot />
     </div>
   </v-app>

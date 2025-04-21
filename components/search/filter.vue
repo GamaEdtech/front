@@ -1376,9 +1376,6 @@ export default {
 </script>
 
 <style scoped>
-@media screen and (max-width: 600px) {
-}
-
 /* Filter panels styles to exactly match the screenshot */
 .filter-panels {
   border-radius: 0 !important;
@@ -1410,7 +1407,7 @@ export default {
 .filter-inactive {
   color: rgba(0, 0, 0, 0.38) !important;
   font-size: 0.875rem;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   letter-spacing: 0.0071428571em;
   line-height: 1.375rem;
 }
