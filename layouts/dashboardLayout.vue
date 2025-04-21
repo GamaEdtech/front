@@ -27,6 +27,7 @@
       </v-container>
     </div>
     <main_footer />
+    <AppGlobalSnackbar />
   </v-app>
 </template>
 

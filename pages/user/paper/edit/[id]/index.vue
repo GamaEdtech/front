@@ -212,19 +212,18 @@
                 :loading="file_pdf_loading"
                 @change="uploadFile('file_pdf', $event)"
                 prepend-inner-icon="mdi-file-pdf-box"
-                append-icon="mdi-folder-open"
+                append-inner-icon="mdi-folder-open"
               >
-                <template #append-outer>
+                <template #append>
                   <v-btn
                     icon
-                    variant="tonal"
-                    color="primary"
-                    size="small"
+                    variant="plain"
+                    color="red"
                     @click="startDownload('q_pdf')"
-                    v-show="paperData?.files?.pdf?.exist"
+                    v-show="paperData?.files?.pdf?.exist || formData.file_pdf"
                     class="ml-2"
                   >
-                    <v-icon> mdi-download </v-icon>
+                    <v-icon color="red"> mdi-download </v-icon>
                   </v-btn>
                 </template>
               </v-file-input>
@@ -241,19 +240,18 @@
                 color="blue"
                 @change="uploadFile('file_word', $event)"
                 prepend-inner-icon="mdi-file-word-outline"
-                append-icon="mdi-folder-open"
+                append-inner-icon="mdi-folder-open"
               >
-                <template #append-outer>
+                <template #append>
                   <v-btn
                     icon
-                    variant="tonal"
-                    color="primary"
-                    size="small"
+                    color="teal"
+                    variant="plain"
                     @click="startDownload('q_word')"
-                    v-show="paperData?.files?.word?.exist"
+                    v-show="paperData?.files?.word?.exist || formData.file_word"
                     class="ml-2"
                   >
-                    <v-icon> mdi-download </v-icon>
+                    <v-icon color="teal"> mdi-download </v-icon>
                   </v-btn>
                 </template>
               </v-file-input>
@@ -271,19 +269,20 @@
                 color="default"
                 @change="uploadFile('file_answer', $event)"
                 prepend-inner-icon="mdi-file"
-                append-icon="mdi-folder-open"
+                append-inner-icon="mdi-folder-open"
               >
-                <template #append-outer>
+                <template #append>
                   <v-btn
                     icon
-                    variant="tonal"
-                    color="primary"
-                    size="small"
+                    variant="plain"
+                    color="blue"
                     @click="startDownload('a_file')"
-                    v-show="paperData?.files?.answer?.exist"
+                    v-show="
+                      paperData?.files?.answer?.exist || formData.file_answer
+                    "
                     class="ml-2"
                   >
-                    <v-icon> mdi-download </v-icon>
+                    <v-icon color="blue"> mdi-download </v-icon>
                   </v-btn>
                 </template>
               </v-file-input>
@@ -313,15 +312,14 @@
                     v-model="item.file_extra"
                     @change="(event) => uploadFile('file_extra', event, index)"
                     prepend-inner-icon="mdi-plus"
-                    append-icon="mdi-folder-open"
+                    append-inner-icon="mdi-folder-open"
                   >
-                    <template #append-outer>
+                    <template #append>
                       <v-btn
                         icon
-                        variant="tonal"
+                        variant="plain"
                         color="primary"
-                        size="small"
-                        v-show="item.id"
+                        v-show="item.id && item.file"
                         @click="startDownload('extra', item.id)"
                         class="ml-2"
                       >
@@ -371,8 +369,7 @@
 </template>
 
 <script setup>
-import FormTopicSelector from "@/components/form/topic-selector";
-import querystring from "querystring";
+const { $auth, $toast } = useNuxtApp();
 
 // Define layout
 definePageMeta({
@@ -486,13 +483,13 @@ const loading = reactive({
 // Fetch paper data
 const { data: paperData } = await useAsyncData("paper-data", async () => {
   try {
-    const content = await $fetch(`/api/v1/tests/${route.params.id}`, {
+    const content = await useFetch(`/api/v1/tests/${route.params.id}`, {
       headers: {
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
       },
     });
-    if (content.status === 1) {
-      return content.data;
+    if (content.data.value.status === 1) {
+      return content.data.value.data;
     }
     return null;
   } catch (error) {
@@ -571,7 +568,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
+    const response = await useFetch("/api/v1/types/list", {
       method: "GET",
       params,
       headers: {
@@ -580,30 +577,36 @@ const getTypeList = async (type, parent = "") => {
     });
 
     if (type === "section") {
-      section_list.value = response.data;
+      section_list.value = response.data.value.data;
     } else if (type === "base") {
-      grade_list.value = response.data;
+      grade_list.value = response.data.value.data;
+      console.log("Grade list loaded:", grade_list.value);
     } else if (type === "lesson") {
-      lesson_list.value = response.data;
+      lesson_list.value = response.data.value.data;
+      console.log("Lesson list loaded:", lesson_list.value);
     } else if (type === "topic") {
-      topic_list.value = response.data;
+      topic_list.value = response.data.value.data;
+      console.log("Topic list loaded:", topic_list.value);
     } else if (type === "test_type") {
-      test_type_list.value = response.data;
+      test_type_list.value = response.data.value.data;
     } else if (type === "state") {
-      state_list.value = response.data;
+      state_list.value = response.data.value.data;
     } else if (type === "area") {
-      area_list.value = response.data;
+      area_list.value = response.data.value.data;
     } else if (type === "school") {
-      school_list.value = response.data;
+      school_list.value = response.data.value.data;
     }
+
+    return response.data.value.data;
   } catch (err) {
     $toast.error(err);
+    return [];
   }
 };
 
 const getExtraFileType = async () => {
   try {
-    const response = await $fetch("/api/v1/types/list", {
+    const response = await useFetch("/api/v1/types/list", {
       method: "GET",
       params: {
         type: "test_extra_file",
@@ -612,9 +615,11 @@ const getExtraFileType = async () => {
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
       },
     });
-    extra_type_list.value = response.data;
+    extra_type_list.value = response.data.value.data;
+    return response.data.value.data;
   } catch (error) {
     console.error("Error fetching extra file types:", error);
+    return [];
   }
 };
 
@@ -649,7 +654,7 @@ const updateQuestion = async () => {
   }
 
   try {
-    const response = await $fetch(`/api/v1/tests/${route.params.id}`, {
+    const response = await useFetch(`/api/v1/tests/${route.params.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
@@ -658,7 +663,7 @@ const updateQuestion = async () => {
       },
     });
 
-    if (response.data.id == 0 && response.data.repeated) {
+    if (response.data.value.data.id == 0 && response.data.value.data.repeated) {
       $toast.info("The paper is duplicated");
     } else {
       $toast.success("Updated successfully");
@@ -784,7 +789,7 @@ const uploadFile = async (file_name, ev, index = "") => {
       fileFormData.append("file", value);
     }
 
-    const response = await $fetch("/api/v1/upload", {
+    const response = await useFetch("/api/v1/upload", {
       method: "POST",
       body: fileFormData,
       headers: {
@@ -792,19 +797,22 @@ const uploadFile = async (file_name, ev, index = "") => {
       },
     });
 
-    if (file_name == "file_pdf") formData.file_pdf = response.data[0].file.name;
+    if (file_name == "file_pdf")
+      formData.file_pdf = response.data.value.data[0].file.name;
     else if (file_name == "file_word")
-      formData.file_word = response.data[0].file.name;
+      formData.file_word = response.data.value.data[0].file.name;
     else if (file_name == "file_answer")
-      formData.file_answer = response.data[0].file.name;
+      formData.file_answer = response.data.value.data[0].file.name;
     else if (file_name == "file_extra") {
       if (extraAttr.value[index]) {
-        extraAttr.value[index].file = response.data[0].file.name;
+        extraAttr.value[index].file = response.data.value.data[0].file.name;
       }
     }
   } catch (err) {
-    if (err.response?.status == 403) $auth.logout();
-    else $toast.error("Upload failed. Please try again.");
+    if (err.response?.status == 403) {
+      const auth = useAuth();
+      auth.logout();
+    } else $toast.error("Upload failed. Please try again.");
   } finally {
     file_pdf_loading.value = false;
     file_word_loading.value = false;
@@ -822,24 +830,29 @@ const applyExtraType = (value, index) => {
   extraAttr.value[index].type = value;
 };
 
-const initData = () => {
+const initData = async () => {
   if (!paperData.value) return;
+  console.log("paperData", paperData);
 
   formData.section = paperData.value.section;
   if (formData.section) {
     // Load grade list
-    getTypeList("base", formData.section);
-  }
+    await getTypeList("base", formData.section);
 
-  formData.base = paperData.value.base;
-  if (formData.base) {
-    // Load lesson list
-    getTypeList("lesson", formData.base);
-  }
+    // Only set base after grade list is loaded
+    formData.base = paperData.value.base;
 
-  formData.lesson = paperData.value.lesson;
-  if (formData.lesson) {
-    getTypeList("topic", formData.lesson);
+    if (formData.base) {
+      // Load lesson list
+      await getTypeList("lesson", formData.base);
+
+      // Only set lesson after lesson list is loaded
+      formData.lesson = paperData.value.lesson;
+
+      if (formData.lesson) {
+        await getTypeList("topic", formData.lesson);
+      }
+    }
   }
 
   if (paperData.value.topic) {
@@ -931,9 +944,9 @@ watch(
   }
 );
 
-// Add startDownload method
 const startDownload = (type, extra_id = "") => {
-  if ($auth.loggedIn) {
+  const auth = useAuth();
+  if (auth.loggedIn) {
     download_loading.value = true;
     let apiUrl = "";
 
@@ -947,7 +960,7 @@ const startDownload = (type, extra_id = "") => {
       apiUrl = `/api/v1/tests/download/${route.params.id}/extra/${extra_id}`;
     }
 
-    $fetch(apiUrl, {
+    useFetch(apiUrl, {
       method: "GET",
       headers: {
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
@@ -955,7 +968,10 @@ const startDownload = (type, extra_id = "") => {
     })
       .then((response) => {
         var FileSaver = require("file-saver");
-        FileSaver.saveAs(response.data.url, response.data.name);
+        FileSaver.saveAs(
+          response.data.value.data.url,
+          response.data.value.data.name
+        );
       })
       .catch((err) => {
         if (err.response?.status == 400) {
@@ -978,12 +994,12 @@ const startDownload = (type, extra_id = "") => {
 };
 
 // Initialize on mount
-onMounted(() => {
-  getTypeList("section");
-  getTypeList("test_type");
-  getTypeList("state");
-  getExtraFileType();
-  initData();
+onMounted(async () => {
+  await getTypeList("section");
+  await getTypeList("test_type");
+  await getTypeList("state");
+  await getExtraFileType();
+  await initData();
 });
 </script>
 
