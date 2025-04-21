@@ -62,16 +62,16 @@
           </v-col>
           <!--End desktop side section-->
 
-          <v-col cols="12" md="9" xl="10" class="pl-0">
+          <v-col cols="12" md="9" xl="10" class="pl-2">
             <div class="mx-8 mx-md-0">
               <v-carousel
                 id="product-carousel"
                 :show-arrows="false"
-                :hide-delimiters="images.length > 1 ? false : true"
+                :hide-delimiters="false"
                 v-model="carouselVal"
-                height="auto"
-                cover
                 class="product-carousel"
+                cycle
+                :show-arrows-on="'hover'"
               >
                 <v-carousel-item
                   v-for="(image, index) in images"
@@ -81,24 +81,17 @@
                   <img :src="image" class="carousel-img" />
                 </v-carousel-item>
               </v-carousel>
-              <div class="thumbnails" v-if="images.length > 1">
-                <v-slide-group
-                  center-active
-                  class="pa-4"
-                  active-class="success"
+
+              <div class="main-thumbnails" v-if="images.length > 1">
+                <div
+                  v-for="(image, index) in images"
+                  :key="index"
+                  @click="changeSlide(index)"
+                  class="thumbnail-box"
+                  :class="{ 'active-box': carouselVal === index }"
                 >
-                  <v-slide-item
-                    class="mx-2 thumbnail_itm"
-                    v-for="(image, index) in images"
-                    :key="index"
-                  >
-                    <img
-                      :class="carouselVal == index ? 'active_slide' : ''"
-                      @click="changeSlide(index)"
-                      :src="image"
-                    />
-                  </v-slide-item>
-                </v-slide-group>
+                  <img :src="image" class="thumbnail-preview" />
+                </div>
               </div>
             </div>
           </v-col>
@@ -217,52 +210,96 @@ watch(
 <style lang="scss" scoped>
 #details-gallery-portrate {
   #product-carousel {
-    width: 22.2rem;
-    height: 28rem !important;
+    width: 100%;
+    max-width: 100%;
+    height: auto !important;
+    margin: auto;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-    margin: auto auto;
     .carousel-img {
-      max-width: 22.2rem;
       width: 100%;
       height: auto;
-      border-radius: 1.2rem;
+      object-fit: contain;
+      display: block;
+      max-height: 500px;
+      margin: 0 auto;
     }
   }
 }
 
-.thumbnails {
+.thumbnail-nav {
   display: flex;
-  justify-content: space-evenly;
-  flex-direction: row;
-  cursor: pointer;
-  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 8px;
 }
 
-.thumbnails .thumbnail_itm {
-  max-width: 80px !important;
-  max-height: 80px !important;
+.thumbnail-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.active-dot {
+  background-color: #000;
+}
+
+.main-thumbnails {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.thumbnail-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.active-box {
+  border-color: #000;
+}
+
+.thumbnail-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 @media screen and (max-width: 600px) {
-  .thumbnails {
-    display: flex;
-    justify-content: space-evenly;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+  #details-gallery-portrate #product-carousel {
     width: 100%;
+    max-width: 100%;
+    height: auto !important;
+
+    .carousel-img {
+      max-height: 300px;
+    }
   }
 
-  .thumbnails .thumbnail_itm {
-    max-width: 50px !important;
-    max-height: 40px !important;
+  .thumbnail-box {
+    width: 40px;
+    height: 40px;
   }
-}
 
-.active_slide {
-  border: 2px solid #000;
-  border-radius: 5px;
+  .thumbnail-dot {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .side-help-icon {
@@ -282,16 +319,32 @@ watch(
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 20rem;
-      height: 36rem !important;
+      width: 100%;
+      max-width: 100%;
+      height: auto !important;
 
-      margin: auto auto;
       .carousel-img {
-        max-width: 20rem;
-        width: 100%;
-        height: auto;
-        border-radius: 1.2rem;
+        max-height: 350px;
       }
+    }
+  }
+}
+
+@media (min-width: 960px) {
+  #details-gallery-portrate {
+    #product-carousel {
+      width: 100%;
+      max-width: 100%;
+      height: auto !important;
+
+      .carousel-img {
+        max-height: 400px;
+      }
+    }
+
+    .thumbnail-box {
+      width: 70px;
+      height: 70px;
     }
   }
 }
@@ -299,83 +352,18 @@ watch(
 @media (min-width: 1264px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 29rem;
-      height: 24rem !important;
+      width: 100%;
+      max-width: 100%;
+      height: auto !important;
 
-      margin: auto auto;
       .carousel-img {
-        max-width: 21rem;
-        width: 100%;
-        height: auto;
-        border-radius: 1.2rem;
+        max-height: 450px;
       }
     }
-  }
-}
 
-@media (min-width: 1310px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 25.4rem !important;
-      .carousel-img {
-        max-width: 24rem;
-      }
-    }
-  }
-}
-
-@media (min-width: 1368px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 26.5rem !important;
-    }
-  }
-}
-
-@media (min-width: 1428px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 28rem !important;
-    }
-  }
-}
-
-@media (min-width: 1488px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 29.2rem !important;
-    }
-  }
-}
-
-@media (min-width: 1546px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 30.2rem !important;
-    }
-  }
-}
-
-@media (min-width: 1606px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 31.2rem !important;
-    }
-  }
-}
-
-@media (min-width: 1666px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 32.2rem !important;
-    }
-  }
-}
-
-@media (min-width: 1714px) {
-  #details-gallery-portrate {
-    #product-carousel {
-      height: 29.4rem !important;
+    .thumbnail-box {
+      width: 80px;
+      height: 80px;
     }
   }
 }
