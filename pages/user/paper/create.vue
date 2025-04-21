@@ -255,8 +255,7 @@
                     :items="extra_type_list"
                     variant="outlined"
                     density="compact"
-                    :value="item.type"
-                    @input="applyExtraType($event, index)"
+                    v-model="item.type"
                     item-title="title"
                     item-value="id"
                     label="Select file type"
@@ -270,8 +269,8 @@
                     :prepend-icon="null"
                     :loading="file_extra_loading"
                     color="green"
-                    :value="item.file_extra"
-                    @change="uploadFile('file_extra', $event, index)"
+                    v-model="item.file_extra"
+                    @change="(event) => uploadFile('file_extra', event, index)"
                     prepend-inner-icon="mdi-plus"
                     append-icon="mdi-folder-open"
                   />
@@ -452,9 +451,6 @@ const getTypeList = async (type, parent = "") => {
       },
     });
 
-    console.log("type", type);
-    console.log("response", response);
-
     if (type === "section") {
       section_list.value = response.data;
       formData.section = userState.value.lastSelectedCurriculum
@@ -570,22 +566,29 @@ const encode = (s) => {
 };
 
 const selectTopic = (event) => {
-  console.log("Topic selected:", event);
   formData.topics = event;
 };
 
 const uploadFile = async (file_name, ev, index = "") => {
-  console.log("value", ev.target.files[0]);
-  let value = ev.target.files[0];
+  let value;
+  if (ev && ev.target && ev.target.files) {
+    value = ev.target.files[0];
+  } else if (ev instanceof File) {
+    value = ev;
+  } else if (Array.isArray(ev) && ev.length > 0) {
+    value = ev[0];
+  } else {
+    return;
+  }
+
   if (!value) {
+    console.error("No valid file found");
     return;
   }
 
   let fileFormData = new FormData();
 
   try {
-    let isValid = false;
-
     if (file_name == "file_pdf") {
       if (
         !value.type.includes("pdf") &&
@@ -655,6 +658,7 @@ const uploadFile = async (file_name, ev, index = "") => {
       loading.form = true;
       fileFormData.append("file", value);
     } else if (file_name == "file_extra") {
+      file_extra_loading.value = true;
       fileFormData.append("file", value);
     }
 
@@ -671,26 +675,26 @@ const uploadFile = async (file_name, ev, index = "") => {
       formData.file_word = response.data[0].file.name;
     else if (file_name == "file_answer")
       formData.file_answer = response.data[0].file.name;
-    else if (file_name == "file_extra")
-      extraAttr.value[index].file = response.data[0].file.name;
+    else if (file_name == "file_extra") {
+      if (extraAttr.value[index]) {
+        extraAttr.value[index].file = response.data[0].file.name;
+      } else {
+      }
+    }
   } catch (err) {
-    console.error("Upload error:", err);
     if (err.response?.status == 403) $auth.logout();
     else $toast.error("Upload failed. Please try again.");
   } finally {
     file_pdf_loading.value = false;
     file_word_loading.value = false;
     file_answer_loading.value = false;
+    file_extra_loading.value = false;
     loading.form = false;
   }
 };
 
 const addExtraAttr = () => {
-  extraAttr.value.push({ type: "", file: null });
-};
-
-const applyExtraType = (value, index) => {
-  extraAttr.value[index].type = value;
+  extraAttr.value.push({ type: "", file: null, file_extra: null });
 };
 
 watch(
@@ -763,7 +767,6 @@ watch(
   (val) => {}
 );
 
-// Initialize on mount
 onMounted(() => {
   getTypeList("section");
   getTypeList("test_type");
