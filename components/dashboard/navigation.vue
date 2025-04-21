@@ -59,14 +59,14 @@ export default {
               link: "/user/paper",
               icon: "icong-test",
               icon_type: "custom",
-              status: this.$auth.user.group_id == "5" ? false : true,
+              status: this.$auth.user?.group_id == "5" ? false : true,
             },
             {
               title: "Multimedia",
               link: "/user/multimedia",
               icon: "icong-test",
               icon_type: "custom",
-              status: this.$auth.user.group_id == "5" ? false : true,
+              status: this.$auth.user?.group_id == "5" ? false : true,
             },
             {
               title: "Q & A",
