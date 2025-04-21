@@ -54,7 +54,7 @@
               />
             </v-col>
             <v-col cols="12" md="12">
-              <topic-selector
+              <form-topic-selector
                 ref="topicSelectorRef"
                 :topic-list="topic_list"
                 @selectTopic="selectTopic"
@@ -316,9 +316,6 @@
 </template>
 
 <script setup>
-import TopicSelector from "@/components/form/topic-selector";
-
-// Define page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
