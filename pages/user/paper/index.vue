@@ -110,50 +110,53 @@
                       {{ calcStatus(item.status) }}
                     </td>
                     <td class="text-center">
-                      <v-tooltip location="bottom">
-                        <template v-slot:activator="{ props }">
-                          <v-btn
-                            icon
-                            color="green"
-                            :to="`/paper/${item.id}`"
-                            target="_blank"
-                            size="small"
-                            v-bind="props"
-                          >
-                            <v-icon size="small"> mdi-eye </v-icon>
-                          </v-btn>
-                        </template>
-                        <span>View</span>
-                      </v-tooltip>
-                      <v-tooltip location="bottom">
-                        <template v-slot:activator="{ props }">
-                          <v-btn
-                            icon
-                            size="small"
-                            v-bind="props"
-                            :to="`/user/paper/edit/${item.id}`"
-                          >
-                            <v-icon size="small">
-                              mdi-note-edit-outline
-                            </v-icon>
-                          </v-btn>
-                        </template>
-                        <span>Edit</span>
-                      </v-tooltip>
-                      <v-tooltip location="bottom">
-                        <template v-slot:activator="{ props }">
-                          <v-btn
-                            icon
-                            color="error"
-                            @click="openDeleteConfirmDialog(item.id)"
-                            size="small"
-                            v-bind="props"
-                          >
-                            <v-icon size="small"> mdi-delete </v-icon>
-                          </v-btn>
-                        </template>
-                        <span>Delete</span>
-                      </v-tooltip>
+                      <div class="d-flex justify-center">
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              icon
+                              color="green"
+                              :to="`/paper/${item.id}`"
+                              target="_blank"
+                              v-bind="props"
+                              class="mx-1"
+                              variant="plain"
+                            >
+                              <v-icon> mdi-eye </v-icon>
+                            </v-btn>
+                          </template>
+                          <span>View</span>
+                        </v-tooltip>
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              icon
+                              v-bind="props"
+                              :to="`/user/paper/edit/${item.id}`"
+                              class="mx-1"
+                              variant="plain"
+                            >
+                              <v-icon> mdi-note-edit-outline </v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Edit</span>
+                        </v-tooltip>
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              icon
+                              color="error"
+                              @click="openDeleteConfirmDialog(item.id)"
+                              v-bind="props"
+                              class="mx-1"
+                              variant="plain"
+                            >
+                              <v-icon> mdi-delete </v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Delete</span>
+                        </v-tooltip>
+                      </div>
                     </td>
                   </tr>
                   <tr
@@ -172,6 +175,13 @@
                         color="orange"
                         indeterminate
                       />
+                    </td>
+                  </tr>
+                  <tr v-show="all_files_loaded && paper_list.length > 0">
+                    <td colspan="7" class="text-center py-2">
+                      <span class="text-caption text-grey"
+                        >No more papers to load</span
+                      >
                     </td>
                   </tr>
                 </tbody>
@@ -278,11 +288,17 @@ const getPaperList = () => {
       },
     })
       .then((response) => {
-        // $fetch returns the data directly, not wrapped in data.value
         paper_list.value.push(...response.data.list);
 
+        if (
+          response.data.num &&
+          paper_list.value.length >= Number(response.data.num)
+        ) {
+          all_files_loaded.value = true;
+        }
+
+        // Handle case where no more items are returned
         if (response.data.list.length === 0) {
-          //For terminate auto load request
           all_files_loaded.value = true;
         }
       })
@@ -338,6 +354,11 @@ const getTypeList = (type, parent = "") => {
 const scroll = () => {
   //For infinite loading
   window.onscroll = () => {
+    // Don't proceed if all files are loaded
+    if (all_files_loaded.value) {
+      return;
+    }
+
     //Scroll position
     const scrollPosition =
       Math.max(
