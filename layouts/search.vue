@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <common-header />
-    <div class="mt-16">
+    <div >
       <slot />
     </div>
   </v-app>
