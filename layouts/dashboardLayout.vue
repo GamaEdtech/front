@@ -30,23 +30,16 @@
   </v-app>
 </template>
 
-<script>
+<script setup>
 import main_header from "../components/common/header.vue";
 import category from "../components/common/category";
 import main_footer from "../components/common/footer";
 import DashboardDesktopMenu from "@/components/dashboard/desktop-menu";
 import DashboardMobileMenu from "@/components/dashboard/mobile-menu";
 
-export default {
-  components: {
-    main_header,
-    category,
-    main_footer,
-    DashboardMobileMenu,
-    DashboardDesktopMenu,
-  },
-  name: "dashboard_layout",
-};
+definePageMeta({
+  name: "dashboard-layout",
+});
 </script>
 
 <style scoped></style>
