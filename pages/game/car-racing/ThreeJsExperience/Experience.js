@@ -62,7 +62,11 @@ export default class Experience {
             colorSand: "#f8d559",
             colorGrass: "#85d534",
             colorSnow: "#ffffff",
-            colorRock: "#613400"
+            colorRock: "#613400",
+
+
+            // tree
+            treeCount: 30
 
         }
 

@@ -10,7 +10,7 @@ export default class Trees {
         this.options = this.experience.options
         this.resources = this.experience.resources
 
-        this.treeCount = 30
+        this.treeCount = this.options.treeCount
 
         this.setGeometry()
         this.setMaterial()
@@ -37,8 +37,9 @@ export default class Trees {
         this.dummy = new THREE.Object3D()
 
         for (let i = 0; i < this.treeCount; i++) {
-            const x = Math.random() * 200
-            const y = 2.7
+            const x = Math.random() * this.options.roadSize
+            const y = 2.5
+
             const z = i < this.treeCount / 2 ? this.options.mountainWidth - 2 + Math.random() * 4 : this.options.mountainWidth + this.options.groundWidth - 4 + Math.random() * 4
             const scale = 0.5 + Math.random() * 0.2
 
