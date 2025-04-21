@@ -1,56 +1,57 @@
 <template>
   <div cols="12" class="px-0 px-sm-2 mt-4">
-    <!-- <v-row>
-        <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Paper submission form </span>
-        </v-col>
-      </v-row> -->
+    <v-row>
+      <v-col cols="12" class="pl-5">
+        <span class="text-h4 teal--text"> Paper submission form </span>
+      </v-col>
+    </v-row>
     <v-card class="mt-3">
       <v-card-text class="py-10 px-8">
-        <Form @submit="onSubmit">
+        <VForm
+          ref="form"
+          v-model="isFormValid"
+          @submit.prevent="onSubmit"
+          lazy-validation
+        >
           <v-row>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="section" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  v-model="form.section"
-                  :items="section_list"
-                  :error-messages="errors"
-                  item-title="title"
-                  item-value="id"
-                  label="Board"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                v-model="formData.section"
+                :items="section_list"
+                :rules="[(v) => !!v || 'Board is required']"
+                item-title="title"
+                item-value="id"
+                label="Board"
+              />
             </v-col>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="grade" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  v-model="form.base"
-                  :items="grade_list"
-                  item-value="id"
-                  item-title="title"
-                  :error-messages="errors"
-                  label="Grade"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                v-model="formData.base"
+                :items="grade_list"
+                :rules="[(v) => !!v || 'Grade is required']"
+                item-value="id"
+                item-title="title"
+                label="Grade"
+              />
             </v-col>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="lesson" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  :items="lesson_list"
-                  item-value="id"
-                  item-title="title"
-                  v-model="form.lesson"
-                  :error-messages="errors"
-                  label="Subject"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                :items="lesson_list"
+                :rules="[(v) => !!v || 'Subject is required']"
+                item-value="id"
+                item-title="title"
+                v-model="formData.lesson"
+                label="Subject"
+              />
             </v-col>
             <v-col cols="12" md="12">
               <topic-selector
@@ -67,23 +68,27 @@
                 :items="test_type_list"
                 item-value="id"
                 item-title="title"
-                v-model="form.test_type"
+                v-model="formData.test_type"
                 label="Test type"
               />
             </v-col>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="answer_type" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  :items="answer_status_list"
-                  item-value="id"
-                  item-title="title"
-                  v-model="form.answer_type"
-                  label="Answer status"
-                  :error-messages="errors"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                :items="answer_status_list"
+                :rules="[
+                  (v) =>
+                    (v !== null && v !== undefined && v !== '') ||
+                    v === 0 ||
+                    'Answer status is required',
+                ]"
+                item-value="id"
+                item-title="title"
+                v-model="formData.answer_type"
+                label="Answer status"
+              />
             </v-col>
             <v-col cols="12" md="4">
               <v-autocomplete
@@ -92,76 +97,74 @@
                 :items="test_level_list"
                 item-value="id"
                 item-title="title"
-                v-model="form.level"
+                v-model="formData.level"
                 label="Level"
               />
             </v-col>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="edu_year" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  :items="year_list"
-                  v-model="form.edu_year"
-                  :error-messages="errors"
-                  label="Year"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                :items="year_list"
+                :rules="[(v) => !!v || 'Year is required']"
+                v-model="formData.edu_year"
+                label="Year"
+              />
             </v-col>
             <v-col cols="12" md="4">
-              <Field v-slot="{ errors }" name="edu_month" rules="required">
-                <v-autocomplete
-                  density="compact"
-                  variant="outlined"
-                  :items="month_list"
-                  v-model="form.edu_month"
-                  item-title="title"
-                  item-value="id"
-                  :error-messages="errors"
-                  label="Month"
-                />
-              </Field>
+              <v-autocomplete
+                required
+                density="compact"
+                variant="outlined"
+                :items="month_list"
+                :rules="[(v) => !!v || 'Month is required']"
+                v-model="formData.edu_month"
+                item-title="title"
+                item-value="id"
+                label="Month"
+              />
             </v-col>
             <v-col cols="12" md="4">
               <v-autocomplete
                 density="compact"
                 variant="outlined"
                 :items="holding_level_list"
-                v-model="form.holding_level"
+                v-model="formData.holding_level"
                 item-title="title"
                 item-value="id"
                 label="Holding level"
               />
             </v-col>
 
-            <v-col cols="12" md="4" v-if="form.holding_level < 4">
+            <v-col cols="12" md="4" v-if="formData.holding_level < 4">
               <v-autocomplete
                 density="compact"
                 variant="outlined"
                 :items="state_list"
-                v-model="form.state"
+                v-model="formData.state"
                 item-title="title"
                 item-value="id"
                 label="State"
               />
             </v-col>
-            <v-col cols="12" md="4" v-if="form.holding_level < 3">
+            <v-col cols="12" md="4" v-if="formData.holding_level < 3">
               <v-autocomplete
                 density="compact"
                 variant="outlined"
                 :items="area_list"
-                v-model="form.area"
+                v-model="formData.area"
                 item-title="title"
                 item-value="id"
                 label="Area"
               />
             </v-col>
-            <v-col cols="12" md="4" v-if="form.holding_level < 2">
+            <v-col cols="12" md="4" v-if="formData.holding_level < 2">
               <v-autocomplete
                 density="compact"
                 variant="outlined"
                 :items="school_list"
-                v-model="form.school"
+                v-model="formData.school"
                 item-title="title"
                 item-value="id"
                 label="School"
@@ -169,104 +172,80 @@
             </v-col>
 
             <v-col cols="12" md="12">
-              <Field v-slot="{ errors }" name="title" rules="required">
-                <v-text-field
-                  density="compact"
-                  variant="outlined"
-                  v-model="form.title"
-                  :error-messages="errors"
-                  label="Title"
-                />
-              </Field>
+              <v-text-field
+                required
+                density="compact"
+                variant="outlined"
+                v-model="formData.title"
+                :rules="[(v) => !!v || 'Title is required']"
+                label="Title"
+              />
             </v-col>
             <v-col cols="12" md="12">
-              <Field
-                v-slot="{ errors }"
-                name="description"
-                rules="required|min:70"
-              >
-                <v-textarea
-                  density="compact"
-                  variant="outlined"
-                  v-model="form.description"
-                  :error-messages="errors"
-                  label="Describe"
-                  hint="You must enter at least 70 characters."
-                  persistent-hint
-                  placeholder="Write a brief description about the files to help the user make an informed choice"
-                />
-              </Field>
+              <v-textarea
+                required
+                density="compact"
+                variant="outlined"
+                v-model="formData.description"
+                :rules="[
+                  (v) => !!v || 'Description is required',
+                  (v) =>
+                    (v && v.length >= 70) ||
+                    'Description must be at least 70 characters',
+                ]"
+                label="Describe"
+                hint="You must enter at least 70 characters."
+                persistent-hint
+                placeholder="Write a brief description about the files to help the user make an informed choice"
+              />
             </v-col>
             <v-col cols="12" md="4">
-              <Field
-                v-slot="{ validate, errors }"
-                ref="file_pdf_provider"
-                name="pdf_question_answer_file"
-                rules="required|mimes:application/pdf"
-              >
-                <v-file-input
-                  density="compact"
-                  variant="outlined"
-                  v-model="file_pdf"
-                  :error-messages="errors"
-                  :prepend-icon="null"
-                  accept="application/pdf"
-                  ref="file_pdf_provider"
-                  label="Pdf question & answer file"
-                  color="red"
-                  :loading="file_pdf_loading"
-                  @change="uploadFile('file_pdf', $event), validate"
-                  prepend-inner-icon="mdi-file-pdf-box"
-                  append-icon="mdi-folder-open"
-                />
-              </Field>
+              <v-file-input
+                required
+                density="compact"
+                variant="outlined"
+                v-model="file_pdf"
+                :rules="[(v) => !!v || 'PDF file is required']"
+                :prepend-icon="null"
+                accept="application/pdf"
+                label="Pdf question & answer file"
+                color="red"
+                :loading="file_pdf_loading"
+                @change="uploadFile('file_pdf', $event)"
+                prepend-inner-icon="mdi-file-pdf-box"
+                append-icon="mdi-folder-open"
+              />
             </v-col>
             <v-col cols="12" md="4">
-              <Field
-                v-slot="{ validate, errors }"
-                name="file_word"
-                ref="file_word_provider"
-                rules="mimes:application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              >
-                <v-file-input
-                  density="compact"
-                  variant="outlined"
-                  v-model="file_word"
-                  label="Word question & answer file"
-                  :prepend-icon="null"
-                  :error-messages="errors"
-                  accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  :loading="file_word_loading"
-                  color="blue"
-                  @change="uploadFile('file_word', $event), validate"
-                  prepend-inner-icon="mdi-file-word-outline"
-                  append-icon="mdi-folder-open"
-                />
-              </Field>
+              <v-file-input
+                density="compact"
+                variant="outlined"
+                v-model="file_word"
+                label="Word question & answer file"
+                :prepend-icon="null"
+                accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                :loading="file_word_loading"
+                color="blue"
+                @change="uploadFile('file_word', $event)"
+                prepend-inner-icon="mdi-file-word-outline"
+                append-icon="mdi-folder-open"
+              />
             </v-col>
 
             <v-col cols="12" md="4">
-              <Field
-                v-slot="{ validate, errors }"
-                name="file_answer"
-                ref="file_answer_provider"
-                rules="mimes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              >
-                <v-file-input
-                  density="compact"
-                  variant="outlined"
-                  v-model="file_answer"
-                  label="Answer file"
-                  :prepend-icon="null"
-                  :error-messages="errors"
-                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  :loading="file_answer_loading"
-                  color="default"
-                  @change="uploadFile('file_answer', $event), validate"
-                  prepend-inner-icon="mdi-file"
-                  append-icon="mdi-folder-open"
-                />
-              </Field>
+              <v-file-input
+                density="compact"
+                variant="outlined"
+                v-model="file_answer"
+                label="Answer file"
+                :prepend-icon="null"
+                accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                :loading="file_answer_loading"
+                color="default"
+                @change="uploadFile('file_answer', $event)"
+                prepend-inner-icon="mdi-file"
+                append-icon="mdi-folder-open"
+              />
             </v-col>
 
             <v-col cols="12" v-if="extraAttr.length">
@@ -306,14 +285,11 @@
               </v-btn>
             </v-col>
             <v-col cols="12" md="12">
-              <Field v-slot="{ errors }" name="word_question_answer_file">
-                <v-checkbox
-                  density="compact"
-                  v-model="form.free_agreement"
-                  :error-messages="errors"
-                  label="I would like the file to be freely available to others."
-                />
-              </Field>
+              <v-checkbox
+                density="compact"
+                v-model="formData.free_agreement"
+                label="I would like the file to be freely available to others."
+              />
             </v-col>
 
             <v-col cols="12" md="6" class="pb-0">
@@ -322,64 +298,26 @@
                 type="submit"
                 block
                 :loading="loading.form"
-                :disabled="false"
+                :disabled="!isFormValid"
               >
                 Submit
               </v-btn>
             </v-col>
-            <v-col cols="12" md="6">
+
+            <v-col cols="6">
               <v-btn variant="outlined" color="error" to="/user/paper" block>
                 Discard
               </v-btn>
             </v-col>
           </v-row>
-        </Form>
+        </VForm>
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup>
-import {
-  Form,
-  Field,
-  useForm,
-  useFieldValue,
-  useIsFieldValid,
-  defineRule,
-} from "vee-validate";
 import TopicSelector from "@/components/form/topic-selector";
-import { ref, reactive, computed, watch, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useState } from "#app";
-import { useNuxtApp } from "#app";
-
-// Define rules manually
-defineRule("required", (value) => {
-  if (!value || (Array.isArray(value) && !value.length)) {
-    return "This field is required";
-  }
-  return true;
-});
-
-defineRule("min", (value, [limit]) => {
-  if (!value || !value.length) {
-    return true;
-  }
-  if (value.length < limit) {
-    return `This field must be at least ${limit} characters`;
-  }
-  return true;
-});
-
-defineRule("mimes", (value, [expectedTypes]) => {
-  if (!value) return true;
-
-  const fileTypes = expectedTypes.split(",");
-  const fileType = value.type;
-
-  return fileTypes.includes(fileType) || "Invalid file type";
-});
 
 // Define page metadata
 definePageMeta({
@@ -400,37 +338,21 @@ const userState = useState("user", () => ({
 }));
 const { $toast, $auth } = useNuxtApp();
 
-// Setup form validation
-const { handleSubmit, errors } = useForm({
-  validationSchema: {
-    section: "required",
-    base: "required",
-    lesson: "required",
-    title: "required",
-    description: "required|min:70",
-    edu_year: "required",
-    edu_month: "required",
-    answer_type: "required",
-    file_pdf: "required|mimes:application/pdf",
-  },
-});
+// Form validation
+const form = ref(null);
+const isFormValid = ref(false);
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = () => {
   submitQuestion();
-});
+};
 
-// Refs for validation
-const file_pdf_provider = ref(null);
-const file_word_provider = ref(null);
-const file_answer_provider = ref(null);
 const topicSelectorRef = ref(null);
 
-// Form data
-const form = reactive({
+const formData = reactive({
   section: "",
   base: "",
   lesson: "",
-  topics: "",
+  topics: [],
   test_type: "",
   answer_type: 0,
   level: 2,
@@ -445,12 +367,11 @@ const form = reactive({
   file_pdf: "",
   file_word: "",
   file_answer: "",
-  free_agreement: 0,
+  free_agreement: false,
   edu_year: "",
   edu_month: "",
 });
 
-// File section
 const file_pdf = ref(null);
 const file_word = ref(null);
 const file_answer = ref(null);
@@ -460,7 +381,6 @@ const file_word_loading = ref(false);
 const file_answer_loading = ref(false);
 const file_extra_loading = ref(false);
 
-// Lists for dropdowns
 const section_list = ref([]);
 const grade_list = ref([]);
 const field_list = ref([]);
@@ -510,7 +430,6 @@ const loading = reactive({
   form: false,
 });
 
-// Methods
 const getTypeList = async (type, parent = "") => {
   const params = { type };
 
@@ -520,8 +439,8 @@ const getTypeList = async (type, parent = "") => {
   if (type === "area") params.state_id = parent;
 
   if (type === "school") {
-    params.section_id = form.section;
-    params.area_id = form.area;
+    params.section_id = formData.section;
+    params.area_id = formData.area;
   }
 
   try {
@@ -538,17 +457,17 @@ const getTypeList = async (type, parent = "") => {
 
     if (type === "section") {
       section_list.value = response.data;
-      form.section = userState.value.lastSelectedCurriculum
+      formData.section = userState.value.lastSelectedCurriculum
         ? userState.value.lastSelectedCurriculum
         : "";
     } else if (type === "base") {
       grade_list.value = response.data;
-      form.base = userState.value.lastSelectedGrade
+      formData.base = userState.value.lastSelectedGrade
         ? userState.value.lastSelectedGrade
         : "";
     } else if (type === "lesson") {
       lesson_list.value = response.data;
-      form.lesson = userState.value.lastSelectedSubject
+      formData.lesson = userState.value.lastSelectedSubject
         ? userState.value.lastSelectedSubject
         : "";
     } else if (type === "topic") {
@@ -586,26 +505,33 @@ const getExtraFileType = async () => {
 
 const submitQuestion = async () => {
   loading.form = true;
-  //Arrange to form data
-  let formData = new FormData();
-  for (let key in form) {
+  let formSubmitData = new FormData();
+  for (let key in formData) {
     if (!(key == "topics" || key == "file_extra"))
-      formData.append(key, form[key]);
+      formSubmitData.append(key, formData[key]);
   }
 
-  if (form.topics.length)
-    for (let key in form.topics) formData.append("topics[]", form.topics[key]);
+  if (
+    formData.topics &&
+    Array.isArray(formData.topics) &&
+    formData.topics.length
+  )
+    for (let key in formData.topics)
+      formSubmitData.append("topics[]", formData.topics[key]);
 
   if (extraAttr.value.length)
     for (let key in extraAttr.value)
-      formData.append("file_extra[]", JSON.stringify(extraAttr.value[key]));
+      formSubmitData.append(
+        "file_extra[]",
+        JSON.stringify(extraAttr.value[key])
+      );
 
   //End arrange to form data
 
   try {
     const response = await $fetch("/api/v1/tests", {
       method: "POST",
-      body: urlencodeFormData(formData),
+      body: urlencodeFormData(formSubmitData),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
@@ -629,7 +555,6 @@ const submitQuestion = async () => {
   }
 };
 
-//Convert form data from multipart to urlencode
 const urlencodeFormData = (fd) => {
   let s = "";
   for (let pair of fd.entries()) {
@@ -645,62 +570,113 @@ const encode = (s) => {
 };
 
 const selectTopic = (event) => {
-  form.topics = event;
+  console.log("Topic selected:", event);
+  formData.topics = event;
 };
 
-const uploadFile = async (file_name, value, index = "") => {
-  if (!value)
-    //Check empty request
+const uploadFile = async (file_name, ev, index = "") => {
+  console.log("value", ev.target.files[0]);
+  let value = ev.target.files[0];
+  if (!value) {
     return;
-
-  let formData = new FormData();
-
-  if (file_name == "file_pdf") {
-    const { valid } = await file_pdf_provider.value.validate(value);
-    if (!valid) return;
-
-    formData.append("file", value);
-    file_pdf_loading.value = true;
-    loading.form = true;
-  } else if (file_name == "file_word") {
-    const { valid } = await file_word_provider.value.validate(value);
-    if (!valid) return;
-
-    formData.append("file", value);
-    file_word_loading.value = true;
-    loading.form = true;
-  } else if (file_name == "file_answer") {
-    const { valid } = await file_answer_provider.value.validate(value);
-    if (!valid) return;
-
-    formData.append("file", value);
-    file_answer_loading.value = true;
-    loading.form = true;
-  } else if (file_name == "file_extra") {
-    formData.append("file", value);
-    // file_extra_loading.value = true;
   }
 
+  let fileFormData = new FormData();
+
   try {
+    let isValid = false;
+
+    if (file_name == "file_pdf") {
+      if (
+        !value.type.includes("pdf") &&
+        !value.name.toLowerCase().endsWith(".pdf")
+      ) {
+        $toast.error("Please upload a valid PDF file");
+        file_pdf.value = null;
+        return;
+      }
+
+      const isPdf =
+        value.type.includes("pdf") || value.name.toLowerCase().endsWith(".pdf");
+
+      if (!isPdf) {
+        $toast.error("Please upload a valid PDF file");
+        file_pdf.value = null;
+        return;
+      }
+
+      file_pdf_loading.value = true;
+      loading.form = true;
+      fileFormData.append("file", value);
+    } else if (file_name == "file_word") {
+      if (
+        !value.type.includes("word") &&
+        !value.name.toLowerCase().endsWith(".doc") &&
+        !value.name.toLowerCase().endsWith(".docx")
+      ) {
+        $toast.error("Please upload a valid Word document");
+        file_word.value = null;
+        return;
+      }
+
+      const isWord =
+        value.type.includes("word") ||
+        value.name.toLowerCase().endsWith(".doc") ||
+        value.name.toLowerCase().endsWith(".docx");
+
+      if (!isWord) {
+        $toast.error("Please upload a valid Word document");
+        file_word.value = null;
+        return;
+      }
+
+      file_word_loading.value = true;
+      loading.form = true;
+      fileFormData.append("file", value);
+    } else if (file_name == "file_answer") {
+      const isPdf =
+        value.type.includes("pdf") || value.name.toLowerCase().endsWith(".pdf");
+      const isWord =
+        value.type.includes("word") ||
+        value.name.toLowerCase().endsWith(".doc") ||
+        value.name.toLowerCase().endsWith(".docx");
+
+      if (!isPdf && !isWord) {
+        file_answer.value = null;
+        return;
+      }
+
+      if (!isPdf && !isWord) {
+        file_answer.value = null;
+        return;
+      }
+
+      file_answer_loading.value = true;
+      loading.form = true;
+      fileFormData.append("file", value);
+    } else if (file_name == "file_extra") {
+      fileFormData.append("file", value);
+    }
+
     const response = await $fetch("/api/v1/upload", {
       method: "POST",
-      body: formData,
+      body: fileFormData,
       headers: {
-        accept: "*/*",
-        "Content-Type": "multipart/form-data",
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
       },
     });
 
-    if (file_name == "file_pdf") form.file_pdf = response.data[0].file.name;
+    if (file_name == "file_pdf") formData.file_pdf = response.data[0].file.name;
     else if (file_name == "file_word")
-      form.file_word = response.data[0].file.name;
+      formData.file_word = response.data[0].file.name;
     else if (file_name == "file_answer")
-      form.file_answer = response.data[0].file.name;
+      formData.file_answer = response.data[0].file.name;
     else if (file_name == "file_extra")
       extraAttr.value[index].file = response.data[0].file.name;
   } catch (err) {
+    console.error("Upload error:", err);
     if (err.response?.status == 403) $auth.logout();
+    else $toast.error("Upload failed. Please try again.");
   } finally {
     file_pdf_loading.value = false;
     file_word_loading.value = false;
@@ -717,34 +693,33 @@ const applyExtraType = (value, index) => {
   extraAttr.value[index].type = value;
 };
 
-// Watch for changes
 watch(
-  () => form.section,
+  () => formData.section,
   (val) => {
     userState.value.lastSelectedCurriculum = val;
-    form.base = "";
-    form.lesson = "";
-    form.topics = [];
+    formData.base = "";
+    formData.lesson = "";
+    formData.topics = [];
     grade_list.value = [];
     lesson_list.value = [];
     topic_list.value = [];
 
     getTypeList("base", val);
-    if (form.area) getTypeList("school");
+    if (formData.area) getTypeList("school");
   }
 );
 
 watch(
-  () => form.base,
+  () => formData.base,
   (val) => {
     userState.value.lastSelectedGrade = val;
-    form.lesson = "";
+    formData.lesson = "";
     if (val) getTypeList("lesson", val);
   }
 );
 
 watch(
-  () => form.lesson,
+  () => formData.lesson,
   (val) => {
     userState.value.lastSelectedSubject = val;
     if (val) {
@@ -753,7 +728,7 @@ watch(
         topicSelectorRef.value.lesson_selected = true;
       }
     } else {
-      form.topic = [];
+      formData.topic = [];
       topic_list.value = [];
       if (topicSelectorRef.value) {
         topicSelectorRef.value.lesson_selected = false;
@@ -763,31 +738,29 @@ watch(
 );
 
 watch(
-  () => form.holding_level,
+  () => formData.holding_level,
   (val) => {
     userState.value.lastSelectedHoldingLevel = val;
   }
 );
 
 watch(
-  () => form.state,
+  () => formData.state,
   (val) => {
     getTypeList("area", val);
   }
 );
 
 watch(
-  () => form.area,
+  () => formData.area,
   (val) => {
     getTypeList("school");
   }
 );
 
 watch(
-  () => form.free_agreement,
-  (val) => {
-    form.free_agreement = val ? 1 : 0;
-  }
+  () => formData.free_agreement,
+  (val) => {}
 );
 
 // Initialize on mount
