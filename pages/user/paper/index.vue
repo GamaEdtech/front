@@ -85,7 +85,7 @@
                 <tbody>
                   <tr
                     v-show="paper_list.length > 0"
-                    v-for="item in paper_list"
+                    v-for="(item, index) in paper_list"
                     :key="item.id"
                   >
                     <td>{{ item.id }}</td>
@@ -146,7 +146,7 @@
                             <v-btn
                               icon
                               color="error"
-                              @click="openDeleteConfirmDialog(item.id)"
+                              @click="openDeleteConfirmDialog(item.id, index)"
                               v-bind="props"
                               class="mx-1"
                               variant="plain"
@@ -418,9 +418,10 @@ const filterChanged = (type) => {
     getPaperList();
   }
 };
-
-const openDeleteConfirmDialog = (item_id) => {
+const delete_paper_index = ref(null);
+const openDeleteConfirmDialog = (item_id, index) => {
   delete_paper_id.value = item_id;
+  delete_paper_index.value = index;
   deleteConfirmDialog.value = true;
 };
 
@@ -435,19 +436,20 @@ const deletePaper = async () => {
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
       },
     });
-
+    paper_list.value.splice(delete_paper_index.value, 1);
     delete_paper_id.value = null;
+    delete_paper_index.value = null;
     deleteConfirmDialog.value = false;
-
     $toast.success("Deleted successfully");
-    paper_list.value = [];
-    getPaperList();
+    // paper_list.value = [];
+    // getPaperList();
   } catch (e) {
     if (e.response?.status == 400) {
       $toast.error(e.response.data.message || "Error deleting paper");
     }
 
     delete_paper_id.value = null;
+    delete_paper_index.value = null;
     deleteConfirmDialog.value = false;
   } finally {
     delete_loading.value = false;
