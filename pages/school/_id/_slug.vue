@@ -52,7 +52,7 @@
           />
 
           <div class="upload-overlay">
-            <v-btn @click="openTourImgInput" class="" icon color="blue-grey">
+            <v-btn @click="openTourImgInput" class="" icon color="white">
               <v-icon small> mdi-pencil </v-icon>
             </v-btn>
           </div>
@@ -225,12 +225,7 @@
             />
             <div class="upload-overlay px-3">
               <div class="px-3 d-flex justify-center align-center">
-                <v-btn
-                  @click="openTourImgInput"
-                  class=""
-                  icon
-                  color="blue-grey"
-                >
+                <v-btn @click="openTourImgInput" class="" icon color="white">
                   <v-icon small> mdi-pencil </v-icon>
                 </v-btn>
               </div>
@@ -621,7 +616,7 @@
                       :loading="emailSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('email')"
-                      icon
+                      fab
                       depressed
                       x-small
                     >
@@ -671,7 +666,6 @@
                 </template>
 
                 <v-text-field
-                  type="number"
                   :rules="phoneRule"
                   v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
@@ -1666,16 +1660,7 @@ export default {
       ],
       phoneRule: [(v) => !!v || "Phone number is required"],
       nameRule: [(v) => !!v || "Name is required"],
-      addressRule: [
-        (v) => !!v || "Address is required",
-        (v) => !v || v.length >= 10 || "Address must be at least 10 characters",
-        (v) =>
-          !v || v.length <= 500 || "Address must be less than 500 characters",
-        (v) =>
-          !v ||
-          /^[a-zA-Z0-9\s,.-]+$/.test(v) ||
-          "Please enter a valid address format",
-      ],
+      addressRule: [(v) => !!v || "Address is required"],
     };
   },
   head() {
@@ -2201,18 +2186,10 @@ export default {
         this.generalDataEditMode.phone1 = false;
       }
       if (value == "address") {
-        if (!this.form.address || this.form.address.length < 10) {
+        if (!this.isRequired(this.form.address)) {
           this.$toast.error(
             "Please enter a valid address (minimum 10 characters)"
           );
-          return;
-        }
-        if (this.form.address.length > 500) {
-          this.$toast.error("Address is too long (maximum 500 characters)");
-          return;
-        }
-        if (!/^[a-zA-Z0-9\s,.-]+$/.test(this.form.address)) {
-          this.$toast.error("Please enter a valid address format");
           return;
         }
         this.generalDataEditMode.address = false;
@@ -2278,12 +2255,28 @@ export default {
         )
         .then(async (response) => {
           if (response.succeeded) {
+            switch (value) {
+              case "name":
+                this.contentData.name = this.form.name;
+                break;
+              case "website":
+                this.contentData.webSite = this.form.web;
+                break;
+              case "phone":
+                this.contentData.phoneNumber = this.form.phone;
+                break;
+              case "address":
+                this.contentData.address = this.form.address;
+                break;
+              case "email":
+                this.contentData.email = this.form.email;
+                break;
+              default:
+                break;
+            }
             this.$toast.success(
               "Your contribution has been successfully submitted"
             );
-            await this.$nuxt.refresh();
-            this.loadGalleryImages();
-            this.loadTourPanorama();
           } else {
             this.$toast.error(response?.errors[0]?.message);
           }
