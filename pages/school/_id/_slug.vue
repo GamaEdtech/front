@@ -206,12 +206,28 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <template v-if="contentData.tour">
-          <img
-            class="pointer schoolDetailsImg"
-            :src="contentData.tour"
-            alt="School image"
-          />
+        <template v-if="contentData.tour && !tourImgPreview">
+          <div class="position-relative">
+            <img
+              class="pointer schoolDetailsImg"
+              :src="contentData.tour"
+              alt="School image Preview"
+            />
+            <div class="upload-overlay px-3">
+              <div class="px-3 d-flex justify-center align-center">
+                <v-btn
+                  @click="openTourImgInput"
+                  class=""
+                  fab
+                  dark
+                  x-small
+                  color="cyan"
+                >
+                  <v-icon dark x-small> mdi-pencil </v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else>
           <template v-if="tourImgPreview">
@@ -2134,7 +2150,11 @@ export default {
           this.tourPanoramas = response.data;
           if (this.tourPanoramas.length >= 1) {
             // Use Vue's $set to ensure reactivity
-            this.$set(this.contentData, "tour", this.tourPanoramas[0].fileUri);
+            this.$set(
+              this.contentData,
+              "tour",
+              this.tourPanoramas[this.tourPanoramas.length - 1].fileUri
+            );
           } else {
             this.$set(this.contentData, "tour", null);
           }
