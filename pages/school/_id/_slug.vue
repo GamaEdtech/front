@@ -52,15 +52,8 @@
           />
 
           <div class="upload-overlay">
-            <v-btn
-              @click="openTourImgInput"
-              class=""
-              fab
-              dark
-              x-small
-              color="cyan"
-            >
-              <v-icon dark x-small> mdi-pencil </v-icon>
+            <v-btn @click="openTourImgInput" class="" icon color="cyan">
+              <v-icon> mdi-pencil </v-icon>
             </v-btn>
           </div>
         </div>
@@ -232,15 +225,8 @@
             />
             <div class="upload-overlay px-3">
               <div class="px-3 d-flex justify-center align-center">
-                <v-btn
-                  @click="openTourImgInput"
-                  class=""
-                  fab
-                  dark
-                  x-small
-                  color="cyan"
-                >
-                  <v-icon dark x-small> mdi-pencil </v-icon>
+                <v-btn @click="openTourImgInput" class="" icon color="cyan">
+                  <v-icon icon> mdi-pencil </v-icon>
                 </v-btn>
               </div>
             </div>
@@ -358,12 +344,10 @@
                   v-if="!generalDataEditMode.name"
                   @click="editGeneralInfo('name')"
                   class="ml-4"
-                  fab
-                  dark
-                  x-small
+                  icon
                   color="cyan"
                 >
-                  <v-icon dark x-small> mdi-pencil </v-icon>
+                  <v-icon> mdi-pencil </v-icon>
                 </v-btn>
                 <v-text-field
                   v-model="form.name"
@@ -547,12 +531,10 @@
                     v-if="!generalDataEditMode.website"
                     @click="editGeneralInfo('website')"
                     class="ml-2"
-                    fab
-                    dark
-                    x-small
+                    icon
                     color="cyan"
                   >
-                    <v-icon dark x-small> mdi-pencil </v-icon>
+                    <v-icon> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -607,12 +589,10 @@
                     v-if="!generalDataEditMode.email"
                     @click="editGeneralInfo('email')"
                     class="ml-2"
-                    fab
-                    dark
-                    x-small
+                    icon
                     color="cyan"
                   >
-                    <v-icon dark x-small> mdi-pencil </v-icon>
+                    <v-icon> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -636,7 +616,7 @@
                       :loading="emailSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('email')"
-                      fab
+                      icon
                       depressed
                       x-small
                     >
@@ -667,12 +647,10 @@
                     v-if="!generalDataEditMode.phone1"
                     @click="editGeneralInfo('phone')"
                     class="ml-2"
-                    fab
-                    dark
-                    x-small
+                    icon
                     color="cyan"
                   >
-                    <v-icon dark x-small> mdi-pencil </v-icon>
+                    <v-icon> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -726,12 +704,10 @@
                     v-if="!generalDataEditMode.address"
                     @click="editGeneralInfo('address')"
                     class="ml-2"
-                    fab
-                    dark
-                    x-small
+                    icon
                     color="cyan"
                   >
-                    <v-icon dark x-small> mdi-pencil </v-icon>
+                    <v-icon> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
