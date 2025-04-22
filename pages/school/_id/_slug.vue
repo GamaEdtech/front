@@ -2169,7 +2169,6 @@ export default {
         }
         this.generalDataEditMode.website = false;
       }
-
       if (value == "email") {
         if (!this.isValidEmail(this.form.email)) {
           this.$toast.error("Please enter a valid Email");
@@ -2201,7 +2200,6 @@ export default {
         }
         this.generalDataEditMode.address = false;
       }
-
       if (value == "name") {
         if (!this.isRequired(this.form.name)) {
           this.$toast.error("Please enter a valid Name");
@@ -2209,9 +2207,7 @@ export default {
         }
         this.generalDataEditMode.name = false;
       }
-
       var formData = {};
-
       switch (value) {
         case "website":
           this.webSubmitLoader = true;
@@ -2253,7 +2249,6 @@ export default {
         default:
           break;
       }
-
       this.$axios
         .$post(
           `/api/v2/schools/${this.$route.params.id}/contributions`,
@@ -2264,11 +2259,14 @@ export default {
             },
           }
         )
-        .then((response) => {
+        .then(async (response) => {
           if (response.succeeded) {
             this.$toast.success(
               "Your contribution has been successfully submitted"
             );
+            await this.$nuxt.refresh();
+            this.loadGalleryImages();
+            this.loadTourPanorama();
           } else {
             this.$toast.error(response?.errors[0]?.message);
           }
@@ -2278,12 +2276,18 @@ export default {
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
+          this.form.web = null;
+          this.form.email = null;
+          this.form.phone = null;
+          this.form.address = null;
+          this.form.name = null;
           this.mapSubmitLoader = false;
           this.selectLocationDialog = false;
           this.webSubmitLoader = false;
           this.emailSubmitLoader = false;
           this.phoneSubmitLoader = false;
           this.addressSubmitLoader = false;
+          this.nameSubmitLoader = false;
         });
     },
   },
