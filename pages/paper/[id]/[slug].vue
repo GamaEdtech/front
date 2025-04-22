@@ -158,40 +158,6 @@
                   </div>
                 </div>
               </div>
-              <!--   Download Btn and Description  -->
-              <!-- <div class="text-center download-sec"> -->
-              <!-- <div class="d-none d-md-block mb-4" v-show="isFree == false">
-                  <p v-if="!$auth.loggedIn" class="gama-text-body2">
-                    <span class="mdi mdi-bell icon"></span>
-                    <span @click="openAuthDialog('login')" class="login"
-                      >Login</span
-                    >
-                    <span @click="openAuthDialog('register')" class="register">
-                      (register)
-                    </span>
-                    to download and charge your wallet.
-                  </p>
-                  <span v-else class="gama-text-body2">
-                    Your wallet charge is ${{ $auth.user && $auth.user.credit }}
-                  </span>
-                  <nuxt-link
-                    class="blue--text"
-                    v-if="$auth.loggedIn"
-                    to="/user/charge-wallet"
-                    >(Top Up Wallet)</nuxt-link
-                  >
-                </div> -->
-              <!-- <div class="font-weight-bold answer gama-text-body2">
-                  <span class="mdi mdi-checkbox-marked icon"></span>
-                  <span> The key answer sheet is at the end of the exam file.</span>
-                </div> -->
-              <!-- </div> -->
-              <!--   fileCopyRight  -->
-              <!-- <div class="d-none d-md-block text-center">
-                <p class="gama-text-body2 file-copy-right">
-                  It is forbidden to republish the contents in cyber space.
-                </p>
-              </div> -->
             </v-col>
             <v-col cols="12" sm="5" lg="3" order-lg="first">
               <!--Show gallery of preview and book first page-->
@@ -247,66 +213,7 @@
                     </div>
                   </v-col>
                   <v-col cols="12" class="pb-0">
-                    <!--Dialog for share-->
-                    <v-dialog
-                      transition="dialog-top-transition"
-                      class="share_dialog"
-                      max-width="600"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <span v-bind="attrs" v-on="on">
-                          <i class="fa-solid fa-share-alt mr-1 icon"></i>
-                          Share
-                        </span>
-                      </template>
-                      <template v-slot:default="dialog">
-                        <v-card>
-                          <v-toolbar color="default"> Share </v-toolbar>
-                          <v-card-text class="mt-5">
-                            <p class="mb-3">Share this content:</p>
-                            <v-row>
-                              <v-col cols="12">
-                                <v-btn outlined block @click="copyUrl">
-                                  <i class="fa-solid fa-copy mr-1 icon"></i>
-                                  &nbsp;
-                                  {{ copy_btn }}
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  @click="shareSocial('whatsapp')"
-                                  target="_blank"
-                                  block
-                                  color="#25d366"
-                                  class="white--text"
-                                >
-                                  <i class="fab fa-whatsapp mr-1 icon"></i>
-                                  WhatsApp
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="6">
-                                <v-btn
-                                  block
-                                  color="#00acee"
-                                  class="white--text"
-                                  @click="shareSocial('telegram')"
-                                >
-                                  <i
-                                    class="fab fa-telegram-plane mr-1 icon"
-                                  ></i>
-                                  Telegram
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
-                          <v-card-actions class="justify-end">
-                            <v-btn text @click="dialog.value = false"
-                              >close
-                            </v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </template>
-                    </v-dialog>
+                    <common-detail-share-dialog :title="title" />
                   </v-col>
                 </v-row>
 
@@ -408,14 +315,6 @@
                   </v-col>
                 </v-row>
               </v-card>
-              <!-- <v-row>
-                <v-col cols="12" class="text-center">
-                  <p class="mt-2 gama-text-overline">
-                    <i class="fa-solid fa-exclamation-circle mr-1 icon"></i>
-                    Republishing is prohibited in cyber space.
-                  </p>
-                </v-col>
-              </v-row> -->
             </v-col>
           </v-row>
         </div>
@@ -521,141 +420,6 @@
     <!--End mobile order section-->
 
     <!--  End: detail  -->
-
-    <v-container>
-      <v-row>
-        <v-col cols="12" md="6">
-          <!--  Start: Course Card  -->
-          <!--          <section>-->
-          <!--            <div class="d-flex  align-center course-card box">-->
-          <!--              <div class="right">-->
-          <!--                <v-row>-->
-          <!--                  <v-col cols="2">-->
-          <!--                    <nuxt-link to="">-->
-          <!--                      <img height="98" width="98" :src="require(`~/assets/images/teacher1.png`)" alt=""/>-->
-          <!--                    </nuxt-link>-->
-          <!--                  </v-col>-->
-          <!--                  <v-col cols="10">-->
-          <!--                    <div class="description ml-4">-->
-          <!--                      <div>-->
-          <!--                        <nuxt-link to="">-->
-          <!--                          <h2 class="course-title">PowerPoint of the complete educational course, date (3) of the 12th-->
-          <!--                            grade of the second secondary-theoretical period</h2>-->
-          <!--                        </nuxt-link>-->
-          <!--                      </div>-->
-          <!--                      <v-row>-->
-          <!--                        <v-col cols="10">-->
-          <!--                          <div>-->
-          <!--                            <nuxt-link to="" class="teacher">-->
-          <!--                              <i class="fa-solid fa-user icon"></i>-->
-          <!--                              <span>Lecturer: Shamsi Shabani</span>-->
-          <!--                            </nuxt-link>-->
-          <!--                          </div>-->
-          <!--                          <div>-->
-          <!--                            <p class="duration">-->
-          <!--                              <i class="fa-solid fa-clock icon"></i>-->
-          <!--                              <span>Course duration: 942 slides (13 files)</span>-->
-          <!--                            </p>-->
-          <!--                          </div>-->
-          <!--                        </v-col>-->
-          <!--                        <v-col cols="2">-->
-          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
-          <!--                            <strong>-->
-          <!--                              View-->
-          <!--                            </strong>-->
-          <!--                          </nuxt-link>-->
-          <!--                        </v-col>-->
-          <!--                      </v-row>-->
-          <!--                    </div>-->
-          <!--                  </v-col>-->
-          <!--                </v-row>-->
-          <!--              </div>-->
-
-          <!--            </div>-->
-          <!--          </section>-->
-          <!--  End: Course Card  -->
-        </v-col>
-
-        <v-col cols="12" md="6">
-          <!--  Start:  Azmoon test album card   -->
-          <!--          <section>-->
-          <!--            <div class="d-flex align-center album-card box">-->
-          <!--              <div class="right">-->
-          <!--                <v-row>-->
-          <!--                  <v-col cols="2">-->
-          <!--                    <nuxt-link to="">-->
-          <!--                      <img :src="require(`~/assets/images/poster1.jpg`)" alt="" class="poster-img"/>-->
-          <!--                    </nuxt-link>-->
-          <!--                  </v-col>-->
-          <!--                  <v-col cols="10">-->
-          <!--                    <div class="description ml-2">-->
-          <!--                      <nuxt-link to="">-->
-          <!--                        <h2 class="course-title">Exam test bank album, date (3) twelfth of the second term of-->
-          <!--                          high school-theoretical</h2>-->
-          <!--                      </nuxt-link>-->
-
-          <!--                      <v-row>-->
-          <!--                        <v-col cols="10">-->
-          <!--                          <div class="num">-->
-          <!--                            <i class="fa-solid fa-list-ol icon"></i>-->
-          <!--                            <span>Number of tests: 1399</span>-->
-          <!--                          </div>-->
-          <!--                          <div class="level">-->
-          <!--                            <i class="fa-solid fa-superscript icon"></i>-->
-          <!--                            <span>Difficulty: Easy</span>-->
-          <!--                          </div>-->
-          <!--                        </v-col>-->
-          <!--                        <v-col cols="2">-->
-          <!--                          <nuxt-link to="" class="teal&#45;&#45;text">-->
-          <!--                            <strong>-->
-          <!--                              View-->
-          <!--                            </strong>-->
-          <!--                          </nuxt-link>-->
-          <!--                        </v-col>-->
-          <!--                      </v-row>-->
-          <!--                    </div>-->
-          <!--                  </v-col>-->
-          <!--                </v-row>-->
-          <!--              </div>-->
-
-          <!--            </div>-->
-          <!--          </section>-->
-          <!--  End:  Azmoon test album card   -->
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Start : Past Papers -->
-    <!-- <details-related-content
-      class="mt-8"
-      :board="contentData.section"
-      :grade="contentData.base"
-      :subject="contentData.lesson"
-      :test_type="contentData.test_type"
-    /> -->
-
-    <!-- End : Past Papers -->
-    <!-- Start: Feed -->
-    <section class="feed">
-      <!-- <v-container class="pa-4 pa-md-12 pt-10">
-        <v-row>
-          <v-col cols="12" md="6">
-            <details-latest-training-content />
-          </v-col>
-
-          <v-col
-            cols="12"
-            md="6"
-            class="related-ask-test py-0 d-flex flex-column justify-space-between"
-          >
-            <details-related-qa />
-
-            <details-related-online-exam />
-          </v-col>
-        </v-row>
-      </v-container> -->
-    </section>
-    <!-- End: Feed -->
   </div>
 </template>
 <script setup>
@@ -708,7 +472,6 @@ const galleryHelpData = ref({
   lesson: "",
 });
 
-//Init gallery image
 if (contentData.value) {
   previewImages.value.push(contentData.value.thumb_pic);
   previewImages.value.push(contentData.value.lesson_pic);
@@ -724,7 +487,6 @@ if (contentData.value) {
   };
 }
 
-const sell_btn = ref(true);
 const rating = ref(4.5);
 const breads = ref([
   {
@@ -739,27 +501,7 @@ const editMode = ref({
   title_loading: false,
   describe_loading: false,
 });
-const detail = ref({
-  poster: "poster1.jpg",
-  linkPoster: "",
-  title: "A collection of 120 test questions for lessons 6 to 9 on (3) 12th",
-  rate: 5,
-  previewImage: "test1.png",
-  labels: [
-    "History (3)",
-    "Twelfth",
-    "Second Secondary",
-    "Literature",
-    "Kermanshah",
-    "District 2",
-    "Shohadai Parvin",
-    "Farvardin",
-    "2019",
-  ],
-});
-const model = ref(null);
 
-const copy_btn = ref("Copy");
 const download_loading = ref(false);
 const display = useGlobalDisplay(); // Assuming you are using this composable
 
@@ -787,20 +529,6 @@ initBreadCrumb();
 
 const openAuthDialog = (val) => {
   router.push({ query: { auth_form: val } });
-};
-
-//Social section
-const copyUrl = () => {
-  navigator.clipboard.writeText(window.location.href);
-  copy_btn.value = "Copied";
-};
-const shareSocial = (social_name) => {
-  if (social_name == "whatsapp")
-    window.open(`https://api.whatsapp.com/send?text=${window.location.href}`);
-  else if (social_name == "telegram")
-    window.open(
-      `https://telegram.me/share/url?url=${window.location.href}&text=${contentData.value.title}`
-    );
 };
 
 //Download file
