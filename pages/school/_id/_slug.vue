@@ -465,12 +465,12 @@
               <div class="info-sign">
                 <v-icon color="primary"> mdi-web </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data overflow-hidden">
                 <a
                   v-show="contentData.webSite"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
-                  class="blue--text"
+                  class="blue--text overflow-hidden text-ellipsis"
                 >
                   {{ contentData.webSite }}
                 </a>
@@ -2010,7 +2010,7 @@ export default {
           this.tourPanoramas = response.data;
           if (this.tourPanoramas.length >= 1) {
             // Use Vue's $set to ensure reactivity
-            this.$set(this.contentData, "tour", this.tourPanoramas[0]);
+            this.$set(this.contentData, "tour", this.tourPanoramas[0].fileUri);
           } else {
             this.$set(this.contentData, "tour", null);
           }
