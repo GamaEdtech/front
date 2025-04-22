@@ -467,20 +467,37 @@
               </div>
               <div class="info-data overflow-hidden">
                 <a
-                  v-show="contentData.webSite"
+                  v-show="contentData.webSite && !generalDataEditMode.website"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
                   class="blue--text overflow-hidden text-ellipsis"
                 >
                   {{ contentData.webSite }}
                 </a>
-                <span
-                  v-show="!(contentData.webSite || generalDataEditMode.website)"
-                  @click="editGeneralInfo('website')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+                <template v-if="contentData.webSite">
+                  <v-btn
+                    v-if="!generalDataEditMode.website"
+                    @click="editGeneralInfo('website')"
+                    class="ml-2"
+                    fab
+                    dark
+                    x-small
+                    color="cyan"
+                  >
+                    <v-icon dark x-small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="
+                      !(contentData.webSite || generalDataEditMode.website)
+                    "
+                    @click="editGeneralInfo('website')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.web"
@@ -510,18 +527,35 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.email"
+                  v-show="contentData.email && !generalDataEditMode.email"
                   :href="`mailto:${contentData.email}`"
                 >
                   {{ contentData.email }}
                 </a>
-                <span
-                  v-show="!(contentData.email || generalDataEditMode.email)"
-                  @click="editGeneralInfo('email')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.email">
+                  <v-btn
+                    v-if="!generalDataEditMode.email"
+                    @click="editGeneralInfo('email')"
+                    class="ml-2"
+                    fab
+                    dark
+                    x-small
+                    color="cyan"
+                  >
+                    <v-icon dark x-small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="!(contentData.email || generalDataEditMode.email)"
+                    @click="editGeneralInfo('email')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
                   :rules="emailRule"
                   v-model="form.email"
@@ -550,20 +584,39 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phoneNumber"
+                  v-show="
+                    contentData.phoneNumber && !generalDataEditMode.phone1
+                  "
                   :href="`tel: ${contentData.phoneNumber}`"
                 >
                   {{ contentData.phoneNumber }}
                 </a>
-                <span
-                  @click="editGeneralInfo('phone')"
-                  v-show="
-                    !(contentData.phoneNumber || generalDataEditMode.phone1)
-                  "
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.phoneNumber">
+                  <v-btn
+                    v-if="!generalDataEditMode.phone1"
+                    @click="editGeneralInfo('phone')"
+                    class="ml-2"
+                    fab
+                    dark
+                    x-small
+                    color="cyan"
+                  >
+                    <v-icon dark x-small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('phone')"
+                    v-show="
+                      !(contentData.phoneNumber || generalDataEditMode.phone1)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
                   type="number"
                   :rules="phoneRule"
@@ -592,16 +645,34 @@
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
               <div class="info-data info-data-address">
-                <span v-show="contentData.address">{{
+                <span v-show="contentData.address && !generalDataEditMode.address">{{
                   contentData.address
                 }}</span>
-                <span
-                  @click="editGeneralInfo('address')"
-                  v-show="!(contentData.address || generalDataEditMode.address)"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.address">
+                  <v-btn
+                    v-if="!generalDataEditMode.address"
+                    @click="editGeneralInfo('address')"
+                    class="ml-2"
+                    fab
+                    dark
+                    x-small
+                    color="cyan"
+                  >
+                    <v-icon dark x-small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('address')"
+                    v-show="
+                      !(contentData.address || generalDataEditMode.address)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.address"
@@ -2020,16 +2091,16 @@ export default {
     },
     editGeneralInfo(value) {
       if (value == "website") {
-        this.form.web = this.contentData.webSite || "";
+        // this.form.web = this.contentData.webSite || "";
         this.generalDataEditMode.website = true;
       } else if (value == "email") {
-        this.form.email = this.contentData.email || "";
+        // this.form.email = this.contentData.email || "";
         this.generalDataEditMode.email = true;
       } else if (value == "phone") {
-        this.form.phone = this.contentData.phoneNumber || "";
+        // this.form.phone = this.contentData.phoneNumber || "";
         this.generalDataEditMode.phone1 = true;
       } else if (value == "address") {
-        this.form.address = this.contentData.address || "";
+        // this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
       } else if (value == "map") this.generalDataEditMode.map = true;
     },
