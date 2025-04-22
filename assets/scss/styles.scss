@@ -43,11 +43,11 @@ html {
 }
 
 .primary-blue-500 {
-  color: var(--Primary-Blue-500, #2e90fa) ;
+  color: var(--Primary-Blue-500, #2e90fa);
 }
 
 .primary-blue-700 {
-  color: var(--Primary-Blue-700, #1976D2);
+  color: var(--Primary-Blue-700, #1976d2);
 }
 
 //End colors class
@@ -4589,4 +4589,13 @@ body {
 
 .v-btn {
   text-transform: none !important;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flex-grow-1{
+  flex-grow: 1;
 }
