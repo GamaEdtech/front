@@ -470,7 +470,7 @@
                   v-show="contentData.webSite && !generalDataEditMode.website"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
-                  class="blue--text overflow-hidden text-ellipsis"
+                  class="blue--text overflow-hidden text-ellipsis flex-grow-1"
                 >
                   {{ contentData.webSite }}
                 </a>
@@ -527,6 +527,7 @@
               </div>
               <div class="info-data">
                 <a
+                  class="flex-grow-1"
                   v-show="contentData.email && !generalDataEditMode.email"
                   :href="`mailto:${contentData.email}`"
                 >
@@ -584,6 +585,7 @@
               </div>
               <div class="info-data">
                 <a
+                  class="flex-grow-1"
                   v-show="
                     contentData.phoneNumber && !generalDataEditMode.phone1
                   "
@@ -645,9 +647,11 @@
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
               <div class="info-data info-data-address">
-                <span v-show="contentData.address && !generalDataEditMode.address">{{
-                  contentData.address
-                }}</span>
+                <span
+                  class="flex-grow-1"
+                  v-show="contentData.address && !generalDataEditMode.address"
+                  >{{ contentData.address }}</span
+                >
 
                 <template v-if="contentData.address">
                   <v-btn
