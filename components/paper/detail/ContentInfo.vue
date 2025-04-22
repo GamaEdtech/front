@@ -141,6 +141,7 @@
         </v-btn>
       </v-col>
     </v-row>
+    <common-crash-report ref="crash_report" />
   </v-card>
 </template>
 
@@ -153,12 +154,16 @@ const props = defineProps({
 });
 
 const rating = ref(4.5);
-
+const crash_report = ref(null);
 const emits = defineEmits(["download", "crash-report"]);
 
 const openCrashReport = () => {
-  emits("crash-report");
+  crash_report.value.dialog = true;
+  crash_report.value.form.type = "test";
 };
+defineExpose({
+  crash_report,
+});
 </script>
 
 <style scoped>
