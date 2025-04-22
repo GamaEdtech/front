@@ -1,4 +1,3 @@
-<!-- in refactor proccess -->
 <template>
   <div class="test-details-content">
     <!-- Start : Category -->
@@ -26,10 +25,6 @@
               <paper-detail-description
                 :title="contentData?.title"
                 :description="contentData?.description"
-                :edit-mode="editMode"
-                :isOwner="$auth.user?.id == contentData.user_"
-                :isMobile="display.xs"
-                @update-details="updateDetails"
               >
                 <template #labels>
                   <v-chip
@@ -38,9 +33,9 @@
                     :small="display.mdAndDown"
                   >
                     <nuxt-link
-                      :to="`/search?type=test&section=${contentData.section}`"
+                      :to="`/search?type=test&section=${contentData?.section}`"
                     >
-                      {{ contentData.section_title }}
+                      {{ contentData?.section_title }}
                     </nuxt-link>
                   </v-chip>
                   <v-chip
@@ -49,34 +44,33 @@
                     :small="display.mdAndDown"
                   >
                     <nuxt-link
-                      :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}`"
+                      :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}`"
                     >
-                      {{ contentData.base_title }}
+                      {{ contentData?.base_title }}
                     </nuxt-link>
                   </v-chip>
                   <v-chip
-                    link
                     class="ma-1 bg-blue-grey-darken-1 white--text"
                     :small="display.mdAndDown"
                   >
                     <nuxt-link
-                      :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
+                      :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}`"
                     >
-                      {{ contentData.lesson_title }}
+                      {{ contentData?.lesson_title }}
                     </nuxt-link>
                   </v-chip>
                   <v-chip
                     class="ma-1 bg-blue-grey-darken-1 white--text"
                     :small="display.mdAndDown"
                   >
-                    {{ contentData.edu_month_title }}
+                    {{ contentData?.edu_month_title }}
                   </v-chip>
                   <v-chip
                     :small="display.mdAndDown"
-                    :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&edu_year=${contentData.edu_year}`"
+                    :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
                     class="ma-1 bg-blue-grey-darken-1 white--text"
                   >
-                    {{ contentData.edu_year }}
+                    {{ contentData?.edu_year }}
                   </v-chip>
                 </template>
               </paper-detail-description>
@@ -122,21 +116,32 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, watchEffect } from "vue";
-
 const route = useRoute();
 const router = useRouter();
-const { data: contentData, error } = await useAsyncData(async () => {
-  try {
-    const response = await $fetch(`/api/v1/tests/${route.params.id}`);
-    return response.data;
-  } catch (e) {
-    if (e?.status === 404) {
-      router.push("/search?type=test");
-    }
-    throw e;
-  }
+
+const paperId = computed(() => {
+  if (!route.params.id || !route.params.id.length) return null;
+  return route.params.slug[0];
 });
+
+const { data: contentData, error } = await useAsyncData(
+  `paper-${paperId.value}`,
+  async () => {
+    try {
+      const response = await $fetch(`/api/v1/tests/${route.params.slug[0]}`, {
+        headers: {
+          Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
+        },
+      });
+      return response.data;
+    } catch (e) {
+      if (e?.status === 404) {
+        router.push("/search?type=test");
+      }
+      throw e;
+    }
+  }
+);
 
 const schemaData = computed(() => ({
   "@context": "https://schema.org",
@@ -145,13 +150,13 @@ const schemaData = computed(() => ({
   image:
     contentData.value?.thumb_pic ||
     contentData.value?.lesson_pic ||
-    "https://gamatrain.com/images/gamatrain-logo.svg", // Ensure it's a valid URL
-  url: route.fullPath || "", // Optional: Add the page URL
+    "https://gamatrain.com/images/gamatrain-logo.svg",
+  url: route.fullPath || "",
   description: contentData.value?.description || "GamaEdtech",
 }));
 
 useHead({
-  title: contentData.value.title,
+  title: contentData.value?.title,
   script: [
     {
       hid: "json-ld-schema",
@@ -177,7 +182,6 @@ if (contentData.value) {
   previewImages.value.push(contentData.value.thumb_pic);
   previewImages.value.push(contentData.value.lesson_pic);
   previewImages.value.carouselVal = 0;
-  //Update help link data
 
   galleryHelpData.value = {
     state: contentData.value?.state || "",
@@ -188,7 +192,6 @@ if (contentData.value) {
   };
 }
 
-const rating = ref(4.5);
 const breads = ref([
   {
     text: "Paper",
@@ -196,17 +199,13 @@ const breads = ref([
     href: "/search?type=test",
   },
 ]);
-const editMode = ref({
-  title: false,
-  describe: false,
-  title_loading: false,
-  describe_loading: false,
-});
 
 const download_loading = ref(false);
-const display = useGlobalDisplay(); // Assuming you are using this composable
+const display = useGlobalDisplay();
 
 const initBreadCrumb = () => {
+  if (!contentData.value) return;
+
   breads.value.push(
     {
       text: contentData.value.section_title,
@@ -226,23 +225,24 @@ const initBreadCrumb = () => {
   );
 };
 
-initBreadCrumb();
+watchEffect(() => {
+  if (contentData.value) {
+    initBreadCrumb();
+  }
+});
 
 const openAuthDialog = (val) => {
   router.push({ query: { auth_form: val } });
 };
 
-//Download file
 const startDownload = (type) => {
-  //if (this.$auth.loggedIn) {
   download_loading.value = true;
   let apiUrl = "";
   if (type === "q_word")
-    apiUrl = `/api/v1/tests/download/${route.params.id}/word`;
-  if (type === "q_pdf")
-    apiUrl = `/api/v1/tests/download/${route.params.id}/pdf`;
+    apiUrl = `/api/v1/tests/download/${paperId.value}/word`;
+  if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${paperId.value}/pdf`;
   if (type === "a_file")
-    apiUrl = `/api/v1/tests/download/${route.params.id}/answer`;
+    apiUrl = `/api/v1/tests/download/${paperId.value}/answer`;
   $fetch
     .$get(apiUrl)
     .then((response) => {
@@ -259,24 +259,21 @@ const startDownload = (type) => {
         }
       } else if (err.response.status == 403) {
         openAuthDialog("login");
-        // this.$router.push({ query: { auth_form: "login" } });
       }
-      console.log(err);
     })
     .finally(() => {
       download_loading.value = false;
     });
-  // } else {
-  //   this.openAuthDialog("login");
-  // }
 };
-//End download file
 
 const openCrashReportDialog = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
+
 const isFree = computed(() => {
+  if (!contentData.value) return true;
+
   if (
     contentData.value.files.answer.price > 0 &&
     contentData.value.files.pdf.price > 0 &&
@@ -285,55 +282,6 @@ const isFree = computed(() => {
     return false;
   else return true;
 });
-//Convert form data from multipart to urlencode
-const urlencodeFormData = (fd) => {
-  var s = "";
-
-  for (var pair of fd.entries()) {
-    if (typeof pair[1] == "string") {
-      s += (s ? "&" : "") + encode(pair[0]) + "=" + encode(pair[1]);
-    }
-  }
-  return s;
-};
-const encode = (s) => {
-  return encodeURIComponent(s).replace(/%20/g, "+");
-};
-
-const updateDetails = () => {
-  //Arrange to form data
-  editMode.value.title_loading = true;
-  let formData = new FormData();
-  formData.append("title", contentData.value.title);
-  formData.append("description", contentData.value.description);
-
-  //End arrange to form data
-
-  $fetch
-    .$put(`/api/v1/tests/${route.params.id}`, urlencodeFormData(formData), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    })
-    .then((response) => {
-      if (response.data.id == 0 && response.data.repeated)
-        $toast.info("The paper is duplicated");
-      else {
-        $toast.success("Updated successfully");
-      }
-    })
-    .catch((err) => {
-      if (err.response.status == 403)
-        router.push({ query: { auth_form: "login" } });
-      else if (err.response.status == 400)
-        $toast.error(err.response.data.message);
-    })
-    .finally(() => {
-      editMode.value.title = false;
-      editMode.value.describe = false;
-      editMode.value.title_loading = false;
-    });
-};
 </script>
 
 <style>

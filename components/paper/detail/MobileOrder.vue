@@ -3,7 +3,7 @@
     <v-card-text class="pb-0">
       <v-row class="px-10 text-center">
         <v-col cols="12" class="pb-1 pt-0">
-          <div v-if="contentData.files?.word.exist">
+          <div v-if="contentData?.files?.word.exist">
             <v-btn
               @click="$emit('download', 'q_word')"
               block
@@ -12,13 +12,13 @@
             >
               Download Question Doc
               {{
-                contentData.files?.word.price > 0
-                  ? "| $" + contentData.files?.word.price
+                contentData?.files?.word.price > 0
+                  ? "| $" + contentData?.files?.word.price
                   : ""
               }}
             </v-btn>
           </div>
-          <div v-if="contentData.files.pdf.exist">
+          <div v-if="contentData?.files.pdf.exist">
             <v-btn
               @click="$emit('download', 'q_pdf')"
               class="mb-2 white--text font-weight-bold"
@@ -27,15 +27,15 @@
             >
               Question Paper
               {{
-                contentData.files?.pdf.price > 0
-                  ? "| $" + contentData.files?.pdf.price
+                contentData?.files?.pdf.price > 0
+                  ? "| $" + contentData?.files?.pdf.price
                   : ""
               }}
             </v-btn>
           </div>
-          <div v-if="contentData.files.answer.exist">
+          <div v-if="contentData?.files.answer.exist">
             <v-btn
-              v-show="contentData.files.answer.ext == 'pdf'"
+              v-show="contentData?.files.answer.ext == 'pdf'"
               class="mb-2 font-weight-bold"
               @click="$emit('download', 'a_file')"
               block
@@ -43,13 +43,13 @@
             >
               Mark Scheme
               {{
-                contentData.files?.answer.price > 0
-                  ? "| $" + contentData.files?.answer.price
+                contentData?.files?.answer.price > 0
+                  ? "| $" + contentData?.files?.answer.price
                   : ""
               }}
             </v-btn>
             <v-btn
-              v-show="contentData.files.answer.ext == 'word'"
+              v-show="contentData?.files.answer.ext == 'word'"
               @click="$emit('download', 'a_file')"
               block
               color="primary"
@@ -57,8 +57,8 @@
             >
               Download Answer Doc
               {{
-                contentData.files?.answer.price > 0
-                  ? "| $" + contentData.files?.answer.price
+                contentData?.files?.answer.price > 0
+                  ? "| $" + contentData?.files?.answer.price
                   : ""
               }}
             </v-btn>

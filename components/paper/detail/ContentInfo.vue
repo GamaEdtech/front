@@ -3,7 +3,7 @@
     <v-row class="align-center">
       <v-col cols="3">
         <v-img
-          :src="contentData.avatar"
+          :src="contentData?.avatar"
           alt=""
           class="d-inline-block"
           cover
@@ -13,7 +13,7 @@
       </v-col>
       <v-col cols="9" class="pl-0">
         <p class="creator_title">
-          {{ contentData.first_name }} {{ contentData.last_name }}
+          {{ contentData?.first_name }} {{ contentData?.last_name }}
         </p>
       </v-col>
     </v-row>
@@ -21,19 +21,19 @@
     <v-row>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-folder mr-1 icon"></i>
-        Classification: {{ contentData.test_type_title }}
+        Classification: {{ contentData?.test_type_title }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-book-open-reader mr-1 icon"></i>
-        Page count: {{ contentData.q_file_pages }}
+        Page count: {{ contentData?.q_file_pages }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-eye mr-1 icon"></i>
-        Viewed: {{ contentData.views }}
+        Viewed: {{ contentData?.views }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <i class="fa-solid fa-calendar-alt mr-1 icon"></i>
-        Last update: {{ $dayjs(contentData.up_date).fromNow() }}
+        Last update: {{ $dayjs(contentData?.up_date).fromNow() }}
       </v-col>
       <v-col cols="12" class="pb-0">
         <div @click="openCrashReport" class="pointer">
@@ -60,7 +60,7 @@
 
     <v-row class="mt-1 d-none d-md-block">
       <v-col cols="12" class="pb-0">
-        <div v-if="contentData.files?.word.exist">
+        <div v-if="contentData?.files?.word.exist">
           <v-btn
             @click="$emit('download', 'q_word')"
             block
@@ -69,30 +69,30 @@
           >
             Download Question Doc
             {{
-              contentData.files?.word.price > 0
-                ? "| $" + contentData.files?.word.price
+              contentData?.files?.word.price > 0
+                ? "| $" + contentData?.files?.word.price
                 : ""
             }}
           </v-btn>
         </div>
-        <div v-if="contentData.files.pdf.exist">
+        <div v-if="contentData?.files.pdf.exist">
           <v-btn
             @click="$emit('download', 'q_pdf')"
             class="mb-2 white--text font-weight-bold"
             block
             color="#E60012"
           >
-            {{ contentData.test_type_title }}
+            {{ contentData?.test_type_title }}
             {{
-              contentData.files?.pdf.price > 0
-                ? "| $" + contentData.files?.pdf.price
+              contentData?.files?.pdf.price > 0
+                ? "| $" + contentData?.files?.pdf.price
                 : ""
             }}
           </v-btn>
         </div>
-        <div v-if="contentData.files.answer.exist">
+        <div v-if="contentData?.files.answer.exist">
           <v-btn
-            v-show="contentData.files.answer.ext == 'pdf'"
+            v-show="contentData?.files.answer.ext == 'pdf'"
             class="mb-2 font-weight-bold"
             @click="$emit('download', 'a_file')"
             block
@@ -100,13 +100,13 @@
           >
             Mark Scheme
             {{
-              contentData.files?.answer.price > 0
-                ? "| $" + contentData.files?.answer.price
+              contentData?.files?.answer.price > 0
+                ? "| $" + contentData?.files?.answer.price
                 : ""
             }}
           </v-btn>
           <v-btn
-            v-show="contentData.files.answer.ext == 'word'"
+            v-show="contentData?.files.answer.ext == 'word'"
             @click="$emit('download', 'a_file')"
             block
             color="primary"
@@ -114,14 +114,14 @@
           >
             Download Answer Doc
             {{
-              contentData.files?.answer.price > 0
-                ? "| $" + contentData.files?.answer.price
+              contentData?.files?.answer.price > 0
+                ? "| $" + contentData?.files?.answer.price
                 : ""
             }}
           </v-btn>
         </div>
         <v-btn
-          v-if="contentData.exams && contentData.exams[0]?.status != 7"
+          v-if="contentData?.exams && contentData?.exams[0]?.status != 7"
           :to="`/exam/${contentData?.exams[0].id}`"
           block
           color="#5600e8"
@@ -131,7 +131,7 @@
         </v-btn>
         <v-btn
           v-else
-          :to="`/test-maker/create?board=${contentData.section}&grade=${contentData.base}&subject=${contentData.lesson}&paperId=${contentData.id}`"
+          :to="`/test-maker/create?board=${contentData?.section}&grade=${contentData?.base}&subject=${contentData?.lesson}&paperId=${contentData?.id}`"
           block
           outlined
           color="primary"
