@@ -52,8 +52,8 @@
           />
 
           <div class="upload-overlay">
-            <v-btn @click="openTourImgInput" class="" icon color="cyan">
-              <v-icon> mdi-pencil </v-icon>
+            <v-btn @click="openTourImgInput" class="" icon color="blue-grey">
+              <v-icon small> mdi-pencil </v-icon>
             </v-btn>
           </div>
         </div>
@@ -225,8 +225,13 @@
             />
             <div class="upload-overlay px-3">
               <div class="px-3 d-flex justify-center align-center">
-                <v-btn @click="openTourImgInput" class="" icon color="cyan">
-                  <v-icon icon> mdi-pencil </v-icon>
+                <v-btn
+                  @click="openTourImgInput"
+                  class=""
+                  icon
+                  color="blue-grey"
+                >
+                  <v-icon small> mdi-pencil </v-icon>
                 </v-btn>
               </div>
             </div>
@@ -345,9 +350,9 @@
                   @click="editGeneralInfo('name')"
                   class="ml-4"
                   icon
-                  color="cyan"
+                  color="blue-grey"
                 >
-                  <v-icon> mdi-pencil </v-icon>
+                  <v-icon small> mdi-pencil </v-icon>
                 </v-btn>
                 <v-text-field
                   v-model="form.name"
@@ -532,9 +537,9 @@
                     @click="editGeneralInfo('website')"
                     class="ml-2"
                     icon
-                    color="cyan"
+                    color="blue-grey"
                   >
-                    <v-icon> mdi-pencil </v-icon>
+                    <v-icon small> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -590,9 +595,9 @@
                     @click="editGeneralInfo('email')"
                     class="ml-2"
                     icon
-                    color="cyan"
+                    color="blue-grey"
                   >
-                    <v-icon> mdi-pencil </v-icon>
+                    <v-icon small> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -648,9 +653,9 @@
                     @click="editGeneralInfo('phone')"
                     class="ml-2"
                     icon
-                    color="cyan"
+                    color="blue-grey"
                   >
-                    <v-icon> mdi-pencil </v-icon>
+                    <v-icon small> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
@@ -705,9 +710,9 @@
                     @click="editGeneralInfo('address')"
                     class="ml-2"
                     icon
-                    color="cyan"
+                    color="blue-grey"
                   >
-                    <v-icon> mdi-pencil </v-icon>
+                    <v-icon small> mdi-pencil </v-icon>
                   </v-btn>
                 </template>
                 <template v-else>
