@@ -317,7 +317,42 @@
         <v-row>
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
-              {{ contentData.name }}
+              <div class="d-flex align-center">
+                <div v-show="!generalDataEditMode.name">
+                  {{ contentData.name }}
+                </div>
+                <v-btn
+                  v-if="!generalDataEditMode.name"
+                  @click="editGeneralInfo('name')"
+                  class="ml-4"
+                  fab
+                  dark
+                  x-small
+                  color="cyan"
+                >
+                  <v-icon dark x-small> mdi-pencil </v-icon>
+                </v-btn>
+                <v-text-field
+                  v-model="form.name"
+                  v-if="generalDataEditMode.name"
+                  placeholder="Name"
+                  :rules="nameRule"
+                >
+                  <template slot="append-outer">
+                    <v-btn
+                      :loading="nameSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('name')"
+                      fab
+                      depressed
+                      x-small
+                    >
+                      <v-icon> mdi-check </v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </div>
+
               <span v-show="contentData.school_type_title"
                 >,
                 {{ contentData.school_type_title }}
@@ -1547,6 +1582,7 @@ export default {
         email: null,
         phone: null,
         address: null,
+        name: null,
       },
 
       mapMarkerData: {},
@@ -1587,7 +1623,7 @@ export default {
       webSubmitLoader: false,
       emailSubmitLoader: false,
       phoneSubmitLoader: false,
-
+      nameSubmitLoader: false,
       commentList: [],
 
       generalDataEditMode: {
@@ -1596,6 +1632,7 @@ export default {
         phone1: false,
         address: false,
         map: false,
+        name: false,
       },
 
       webUrlRule: [
@@ -1614,6 +1651,7 @@ export default {
           "Please enter a valid email address",
       ],
       phoneRule: [(v) => !!v || "Phone number is required"],
+      nameRule: [(v) => !!v || "Name is required"],
       addressRule: [
         (v) => !!v || "Address is required",
         (v) => !v || v.length >= 10 || "Address must be at least 10 characters",
@@ -2117,7 +2155,11 @@ export default {
       } else if (value == "address") {
         // this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
-      } else if (value == "map") this.generalDataEditMode.map = true;
+      } else if (value == "map") {
+        this.generalDataEditMode.map = true;
+      } else if (value == "name") {
+        this.generalDataEditMode.name = true;
+      }
     },
     updateGeneralInfo(value) {
       if (value == "website") {
@@ -2160,6 +2202,14 @@ export default {
         this.generalDataEditMode.address = false;
       }
 
+      if (value == "name") {
+        if (!this.isRequired(this.form.name)) {
+          this.$toast.error("Please enter a valid Name");
+          return;
+        }
+        this.generalDataEditMode.name = false;
+      }
+
       var formData = {};
 
       switch (value) {
@@ -2185,6 +2235,12 @@ export default {
           this.addressSubmitLoader = true;
           formData = {
             address: this.form.address ?? null,
+          };
+          break;
+        case "name":
+          this.nameSubmitLoader = true;
+          formData = {
+            name: this.form.name ?? null,
           };
           break;
         case "map":
