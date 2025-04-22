@@ -682,6 +682,7 @@
                   v-model="form.address"
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
+                  :rules="addressRule"
                 >
                   <template slot="append-outer">
                     <v-btn
@@ -1613,6 +1614,16 @@ export default {
           "Please enter a valid email address",
       ],
       phoneRule: [(v) => !!v || "Phone number is required"],
+      addressRule: [
+        (v) => !!v || "Address is required",
+        (v) => !v || v.length >= 10 || "Address must be at least 10 characters",
+        (v) =>
+          !v || v.length <= 500 || "Address must be less than 500 characters",
+        (v) =>
+          !v ||
+          /^[a-zA-Z0-9\s,.-]+$/.test(v) ||
+          "Please enter a valid address format",
+      ],
     };
   },
   head() {
@@ -2131,9 +2142,23 @@ export default {
         }
         this.generalDataEditMode.phone1 = false;
       }
-      // else if (value == "email") this.generalDataEditMode.email = false;
-      // else if (value == "phone") this.generalDataEditMode.phone1 = false;
-      else if (value == "address") this.generalDataEditMode.address = false;
+      if (value == "address") {
+        if (!this.form.address || this.form.address.length < 10) {
+          this.$toast.error(
+            "Please enter a valid address (minimum 10 characters)"
+          );
+          return;
+        }
+        if (this.form.address.length > 500) {
+          this.$toast.error("Address is too long (maximum 500 characters)");
+          return;
+        }
+        if (!/^[a-zA-Z0-9\s,.-]+$/.test(this.form.address)) {
+          this.$toast.error("Please enter a valid address format");
+          return;
+        }
+        this.generalDataEditMode.address = false;
+      }
 
       var formData = {};
 
