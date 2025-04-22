@@ -67,11 +67,11 @@
               <v-carousel
                 id="product-carousel"
                 :show-arrows="false"
-                :hide-delimiters="false"
+                :hide-delimiters="images.length <= 1"
                 v-model="carouselVal"
                 class="product-carousel"
                 cycle
-                :show-arrows-on="'hover'"
+                :show-arrows-on="images.length > 1 ? 'hover' : 'never'"
               >
                 <v-carousel-item
                   v-for="(image, index) in images"
