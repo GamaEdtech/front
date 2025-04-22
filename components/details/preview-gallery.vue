@@ -221,9 +221,9 @@ watch(
     .carousel-img {
       width: 100%;
       height: auto;
-      object-fit: contain;
+      object-fit: cover;
       display: block;
-      max-height: 500px;
+      // max-height: 500px;
       margin: 0 auto;
     }
   }
@@ -287,7 +287,7 @@ watch(
     height: auto !important;
 
     .carousel-img {
-      max-height: 300px;
+      // max-height: 300px;
     }
   }
 
@@ -321,10 +321,11 @@ watch(
     #product-carousel {
       width: 100%;
       max-width: 100%;
-      height: auto !important;
-
+      height: 30rem !important;
+      min-height: 30rem !important;
+      max-height: 30rem !important;
       .carousel-img {
-        max-height: 350px;
+        // max-height: 350px;
       }
     }
   }
@@ -338,7 +339,7 @@ watch(
       height: auto !important;
 
       .carousel-img {
-        max-height: 400px;
+        // max-height: 400px;
       }
     }
 
@@ -357,7 +358,7 @@ watch(
       height: auto !important;
 
       .carousel-img {
-        max-height: 450px;
+        // max-height: 450px;
       }
     }
 

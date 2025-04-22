@@ -111,7 +111,7 @@
                   <div class="label-holder">
                     <v-chip
                       link
-                      class="mr-1 blue-grey darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 white--text"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -122,7 +122,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="mr-1 blue-grey darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 white--text"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -133,7 +133,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="ma-1 blue-grey darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -143,7 +143,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 blue-grey darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
                       :small="display.mdAndDown"
                     >
                       {{ contentData.edu_month_title }}
@@ -151,7 +151,7 @@
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/search?type=test&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&edu_year=${contentData.edu_year}`"
-                      class="ma-1 blue-grey darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
                     >
                       {{ contentData.edu_year }}
                     </v-chip>
@@ -313,12 +313,12 @@
                 <div class="text-center mt-2">
                   <v-rating
                     v-model="rating"
-                    color="yellow darken-3"
-                    background-color="grey darken-1"
-                    empty-icon="$ratingFull"
-                    half-increments
                     hover
-                  />
+                    background-color="grey-darken-1"
+                    color="yellow-darken-3"
+                    size="35"
+                    half-increments
+                  ></v-rating>
                 </div>
                 <v-divider class="d-none d-md-block" />
 
@@ -913,7 +913,7 @@ const updateDetails = () => {
 
 <style>
 .content_main_info {
-  padding: 27px;
+  padding: 27px !important;
   background: #f5f5f5 !important;
   border-radius: 6px;
 }
