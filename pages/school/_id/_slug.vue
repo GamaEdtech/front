@@ -40,12 +40,29 @@
           </l-map>
         </client-only>
 
-        <div v-if="contentData.tour">
+        <div
+          class="position-relative under-image-right"
+          v-if="contentData.tour && !tourImgPreview"
+        >
           <img
+            @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             :src="contentData.tour"
-            alt="School image"
+            alt="School image Preview"
           />
+
+          <div class="upload-overlay">
+            <v-btn
+              @click="openTourImgInput"
+              class=""
+              fab
+              dark
+              x-small
+              color="cyan"
+            >
+              <v-icon dark x-small> mdi-pencil </v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else-if="tourImgPreview"
@@ -111,7 +128,7 @@
             <v-carousel-item
               v-for="(image, index) in galleryImages"
               :key="index"
-              :src="image"
+              :src="image?.fileUri"
               eager
               cover
               class="pointer"
@@ -333,7 +350,7 @@
         <v-row>
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
-              <div class="d-flex align-center">
+              <div class="d-flex align-center flex-wrap">
                 <div v-show="!generalDataEditMode.name">
                   {{ contentData.name }}
                 </div>
@@ -1929,7 +1946,7 @@ export default {
             // Change the slide to 'tour' if on mobile view
             if (this.$vuetify.breakpoint.smAndDown) {
               this.slideToggler = "tour";
-              this.changeSlide();
+              // this.changeSlide();
             }
           }, 500);
         })
@@ -2133,10 +2150,9 @@ export default {
       this.$axios
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
-          // Reverse the order of the gallery images array so newest images appear first
           this.galleryImages = [...response.data].reverse();
           if (this.galleryImages.length >= 1) {
-            this.$set(this.contentData, "pic", this.galleryImages[0]);
+            this.$set(this.contentData, "pic", this.galleryImages[0].fileUri);
           } else {
             this.$set(this.contentData, "pic", null);
           }
