@@ -24,8 +24,8 @@
             <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
               <!--  Description   -->
               <paper-detail-description
-                :title="contentData.title"
-                :description="contentData.description"
+                :title="contentData?.title"
+                :description="contentData?.description"
                 :edit-mode="editMode"
                 :isOwner="$auth.user?.id == contentData.user_"
                 :isMobile="display.xs"
@@ -98,7 +98,7 @@
                 @crash-report="openCrashReportDialog"
               >
                 <template #share-dialog>
-                  <common-detail-share-dialog :title="contentData.title" />
+                  <common-detail-share-dialog :title="contentData?.title" />
                 </template>
               </paper-detail-content-info>
             </v-col>
