@@ -2163,16 +2163,12 @@ export default {
     },
     editGeneralInfo(value) {
       if (value == "website") {
-        // this.form.web = this.contentData.webSite || "";
         this.generalDataEditMode.website = true;
       } else if (value == "email") {
-        // this.form.email = this.contentData.email || "";
         this.generalDataEditMode.email = true;
       } else if (value == "phone") {
-        // this.form.phone = this.contentData.phoneNumber || "";
         this.generalDataEditMode.phone1 = true;
       } else if (value == "address") {
-        // this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
       } else if (value == "map") {
         this.generalDataEditMode.map = true;
