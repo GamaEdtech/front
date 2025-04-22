@@ -160,13 +160,17 @@
                     </td>
                   </tr>
                   <tr
-                    v-show="page_loading === false && paper_list.length === 0"
+                    v-show="
+                      !initialLoading &&
+                      page_loading === false &&
+                      paper_list.length === 0
+                    "
                   >
                     <td colspan="7" class="text-center">
                       <p>Oops! no data found</p>
                     </td>
                   </tr>
-                  <tr v-show="page_loading">
+                  <tr v-show="page_loading || initialLoading">
                     <td colspan="7" class="text-center">
                       <v-progress-circular
                         :size="30"
@@ -175,13 +179,6 @@
                         color="orange"
                         indeterminate
                       />
-                    </td>
-                  </tr>
-                  <tr v-show="all_files_loaded && paper_list.length > 0">
-                    <td colspan="7" class="text-center py-2">
-                      <span class="text-caption text-grey"
-                        >No more papers to load</span
-                      >
                     </td>
                   </tr>
                 </tbody>
@@ -244,6 +241,7 @@ useHead({
 
 // Reactive state
 const paper_list = ref([]);
+const initialLoading = ref(true);
 
 // Filter section
 const filter = reactive({
@@ -266,6 +264,7 @@ const timer = ref(null);
 // Delete section
 const deleteConfirmDialog = ref(false);
 const delete_paper_id = ref(null);
+const delete_paper_index = ref(null);
 const delete_loading = ref(false);
 
 // Methods
@@ -308,6 +307,7 @@ const getPaperList = () => {
       })
       .finally(() => {
         page_loading.value = false;
+        initialLoading.value = false;
       });
   }
 };
@@ -418,7 +418,7 @@ const filterChanged = (type) => {
     getPaperList();
   }
 };
-const delete_paper_index = ref(null);
+
 const openDeleteConfirmDialog = (item_id, index) => {
   delete_paper_id.value = item_id;
   delete_paper_index.value = index;
