@@ -49,7 +49,7 @@
           </v-col>
           <v-col cols="10" sm="10" class="pl-0">
             <v-card id="grade-details-card">
-              <div>
+              <!-- <div>
                 <v-row class="stats-details d-none d-md-flex">
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -202,12 +202,66 @@
                     </v-row>
                   </v-col>
                 </v-row>
-              </div>
+              </div> -->
 
-              <v-divider
-                class="d-none d-md-block"
-                style="margin-top: 94px; margin-bottom: 1.2rem"
-              />
+              <!--Active Board Banner  -->
+              <v-banner
+                color="#e6f2fe"
+                single-line
+                class="mb-4"
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  right: 0;
+                  z-index: 1000;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <v-icon slot="icon" color="warning" size="20">
+                  mdi-information-outline
+                </v-icon>
+                <div class="d-flex align-center">
+                  <div class="gama-text-h6" style="color: #2e90fa">CIE</div>
+                  <div class="gama-text-h6 mx-2" style="color: #84caff">
+                    Board
+                  </div>
+                </div>
+                <template v-slot:actions>
+                  <v-btn color="primary" text>
+                    <v-icon color="primary" size="20">mdi-chevron-down</v-icon>
+                  </v-btn>
+                </template>
+              </v-banner>
+              <!-- Active Board Banner End -->
+
+              <!-- Board Content -->
+              <v-sheet
+                class="d-flex align-center w-100 justify-space-between my-4"
+              >
+                <div class="gama-text-h6 mx-2" style="color: #84caff">
+                  Board
+                </div>
+                <div class="d-flex align-center">
+                  <div>Search Results</div>
+                  <div class="gama-text-h6 mx-2" style="color: #84caff">
+                    106
+                  </div>
+                </div>
+              </v-sheet>
+              <!-- Board Content End -->
+
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    outlined
+                    label="Append"
+                    append-icon="mdi-map-marker"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
 
               <div class="d-none d-md-block">
                 <v-row>
