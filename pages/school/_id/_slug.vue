@@ -2363,9 +2363,6 @@ export default {
   .upload-overlay .v-btn {
     margin: 0.25rem 0;
     flex-shrink: 0;
-    /* height: auto !important;
-    padding: 0.5rem 1rem !important;
-    font-size: 0.9rem !important; */
   }
 
   .upload-overlay .v-icon {
