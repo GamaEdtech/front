@@ -1,5 +1,5 @@
 <template>
-  <div cols="12" class="px-0 px-sm-2 mt-4">
+  <div cols="12" class="px-2 px-sm-2 mt-8">
     <v-row>
       <v-col cols="12" class="pl-5">
         <span class="text-h4 text-teal"> Paper submission form </span>
@@ -303,7 +303,7 @@
               </v-btn>
             </v-col>
 
-            <v-col cols="6">
+            <v-col cols="12" md="6">
               <v-btn variant="outlined" color="error" to="/user/paper" block>
                 Discard
               </v-btn>

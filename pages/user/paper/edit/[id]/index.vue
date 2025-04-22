@@ -1,5 +1,5 @@
 <template>
-  <div cols="12" class="px-0 px-sm-2 mt-4" style="position: relative">
+  <div cols="12" class="px-2 px-sm-2 mt-8">
     <!-- Main loader overlay -->
     <template v-if="isLoading">
       <v-skeleton-loader
@@ -11,7 +11,7 @@
     <template v-else>
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="text-h4 text-teal"> Paper submission form </span>
+          <span class="text-h4 text-teal"> Past Papers Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -360,7 +360,7 @@
                 </v-btn>
               </v-col>
 
-              <v-col cols="6">
+              <v-col cols="12" md="6">
                 <v-btn variant="outlined" color="error" to="/user/paper" block>
                   Discard
                 </v-btn>
@@ -578,13 +578,10 @@ const getTypeList = async (type, parent = "") => {
       section_list.value = response.data.value.data;
     } else if (type === "base") {
       grade_list.value = response.data.value.data;
-      console.log("Grade list loaded:", grade_list.value);
     } else if (type === "lesson") {
       lesson_list.value = response.data.value.data;
-      console.log("Lesson list loaded:", lesson_list.value);
     } else if (type === "topic") {
       topic_list.value = response.data.value.data;
-      console.log("Topic list loaded:", topic_list.value);
     } else if (type === "test_type") {
       test_type_list.value = response.data.value.data;
     } else if (type === "state") {
@@ -830,7 +827,6 @@ const applyExtraType = (value, index) => {
 
 const initData = async () => {
   if (!paperData.value) return;
-  console.log("paperData", paperData);
 
   formData.section = paperData.value.section;
   if (formData.section) {
