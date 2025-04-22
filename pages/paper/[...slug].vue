@@ -1,118 +1,123 @@
 <template>
   <div class="test-details-content">
-    <!-- Start : Category -->
-    <common-category />
+    <paper-detail-skeleton-loader v-if="dataFetching" />
 
-    <!-- End:Category -->
+    <!-- Show actual content when loaded -->
+    <template v-else>
+      <!-- Start : Category -->
+      <common-category />
 
-    <!--  Start: breadcrumb  -->
-    <section>
-      <v-container class="py-0">
-        <div class="mt-0 py-0 header-path">
-          <widgets-breadcrumb :breads="breads" />
-        </div>
-      </v-container>
-    </section>
-    <!--  End: breadcrumb  -->
+      <!-- End:Category -->
 
-    <!--  Start: detail  -->
-    <section>
-      <v-container class="py-0">
-        <div class="detail mt-6 mt-md-8">
-          <v-row>
-            <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
-              <!--  Description   -->
-              <paper-detail-description
-                :title="contentData?.title"
-                :description="contentData?.description"
-              >
-                <template #labels>
-                  <v-chip
-                    link
-                    class="mr-1 bg-blue-grey-darken-1 white--text"
-                    :small="display.mdAndDown"
-                  >
-                    <nuxt-link
-                      :to="`/search?type=test&section=${contentData?.section}`"
+      <!--  Start: breadcrumb  -->
+      <section>
+        <v-container class="py-0">
+          <div class="mt-0 py-0 header-path">
+            <widgets-breadcrumb :breads="breads" />
+          </div>
+        </v-container>
+      </section>
+      <!--  End: breadcrumb  -->
+
+      <!--  Start: detail  -->
+      <section>
+        <v-container class="py-0">
+          <div class="detail mt-6 mt-md-8">
+            <v-row>
+              <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
+                <!--  Description   -->
+                <paper-detail-description
+                  :title="contentData?.title"
+                  :description="contentData?.description"
+                >
+                  <template #labels>
+                    <v-chip
+                      link
+                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      :small="display.mdAndDown"
                     >
-                      {{ contentData?.section_title }}
-                    </nuxt-link>
-                  </v-chip>
-                  <v-chip
-                    link
-                    class="mr-1 bg-blue-grey-darken-1 white--text"
-                    :small="display.mdAndDown"
-                  >
-                    <nuxt-link
-                      :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}`"
+                      <nuxt-link
+                        :to="`/search?type=test&section=${contentData?.section}`"
+                      >
+                        {{ contentData?.section_title }}
+                      </nuxt-link>
+                    </v-chip>
+                    <v-chip
+                      link
+                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      :small="display.mdAndDown"
                     >
-                      {{ contentData?.base_title }}
-                    </nuxt-link>
-                  </v-chip>
-                  <v-chip
-                    class="ma-1 bg-blue-grey-darken-1 white--text"
-                    :small="display.mdAndDown"
-                  >
-                    <nuxt-link
-                      :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}`"
+                      <nuxt-link
+                        :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}`"
+                      >
+                        {{ contentData?.base_title }}
+                      </nuxt-link>
+                    </v-chip>
+                    <v-chip
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      :small="display.mdAndDown"
                     >
-                      {{ contentData?.lesson_title }}
-                    </nuxt-link>
-                  </v-chip>
-                  <v-chip
-                    class="ma-1 bg-blue-grey-darken-1 white--text"
-                    :small="display.mdAndDown"
-                  >
-                    {{ contentData?.edu_month_title }}
-                  </v-chip>
-                  <v-chip
-                    :small="display.mdAndDown"
-                    :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
-                    class="ma-1 bg-blue-grey-darken-1 white--text"
-                  >
-                    {{ contentData?.edu_year }}
-                  </v-chip>
-                </template>
-              </paper-detail-description>
-            </v-col>
-            <v-col cols="12" sm="5" lg="3" order-lg="first">
-              <!--Show gallery of preview and book first page-->
-              <details-preview-gallery
-                :image-urls="previewImages"
-                :help-link-data="galleryHelpData"
-                :initial-slide="1"
-              />
-              <!--Show gallery of preview and book first page-->
-            </v-col>
+                      <nuxt-link
+                        :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}`"
+                      >
+                        {{ contentData?.lesson_title }}
+                      </nuxt-link>
+                    </v-chip>
+                    <v-chip
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      :small="display.mdAndDown"
+                    >
+                      {{ contentData?.edu_month_title }}
+                    </v-chip>
+                    <v-chip
+                      :small="display.mdAndDown"
+                      :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
+                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                    >
+                      {{ contentData?.edu_year }}
+                    </v-chip>
+                  </template>
+                </paper-detail-description>
+              </v-col>
+              <v-col cols="12" sm="5" lg="3" order-lg="first">
+                <!--Show gallery of preview and book first page-->
+                <details-preview-gallery
+                  :image-urls="previewImages"
+                  :help-link-data="galleryHelpData"
+                  :initial-slide="1"
+                />
+                <!--Show gallery of preview and book first page-->
+              </v-col>
 
-            <v-col sm="7" md="4" lg="3">
-              <paper-detail-content-info
-                :contentData="contentData"
-                @download="startDownload"
-                @crash-report="openCrashReportDialog"
-              >
-                <template #share-dialog>
-                  <common-detail-share-dialog :title="contentData?.title" />
-                </template>
-              </paper-detail-content-info>
-            </v-col>
-          </v-row>
-        </div>
-      </v-container>
-    </section>
+              <v-col sm="7" md="4" lg="3">
+                <paper-detail-content-info
+                  :contentData="contentData"
+                  @download="startDownload"
+                  @crash-report="openCrashReportDialog"
+                >
+                  <template #share-dialog>
+                    <common-detail-share-dialog :title="contentData?.title" />
+                  </template>
+                </paper-detail-content-info>
+              </v-col>
+            </v-row>
+          </div>
+        </v-container>
+      </section>
 
-    <!--Mobile order section-->
-    <paper-detail-mobile-order
-      :contentData="contentData"
-      :is-logged-in="$auth.loggedIn"
-      :user-credit="$auth.user && $auth.user.credit"
-      :is-free="isFree"
-      @download="startDownload"
-      @open-auth="openAuthDialog"
-    />
-    <!--End mobile order section-->
+      <!--Mobile order section-->
+      <paper-detail-mobile-order
+        :contentData="contentData"
+        :is-logged-in="$auth.loggedIn"
+        :user-credit="$auth.user && $auth.user.credit"
+        :is-free="isFree"
+        @download="startDownload"
+        @open-auth="openAuthDialog"
+      />
+      <!--End mobile order section-->
 
-    <!--  End: detail  -->
+      <!--  End: detail  -->
+    </template>
   </div>
 </template>
 <script setup>
@@ -124,7 +129,13 @@ const paperId = computed(() => {
   return route.params.slug[0];
 });
 
-const { data: contentData, error } = await useAsyncData(
+// Track loading state
+
+const {
+  data: contentData,
+  error,
+  pending: dataFetching,
+} = await useAsyncData(
   `paper-${paperId.value}`,
   async () => {
     try {
@@ -133,13 +144,21 @@ const { data: contentData, error } = await useAsyncData(
           Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDU5MSIsImlkZW50aXR5IjoiYWxiZXJkYXRydG9uZUBnbWFpbC5jb20iLCJncm91cF9pZCI6IjUiLCJzZXNzaW9uX2lkIjoiMGNjOGJhZDJkOGVjOWEyYTgxZmU5NzY0NDFjM2NiNGEzZjEwNmE3MSIsImNvdW50cnkiOiJERSIsImNpdHkiOiJGcmFua2Z1cnQgYW0gTWFpbiIsImlzcyI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImF1ZCI6Imh0dHBzOlwvXC9jb3JlLmdhbWF0cmFpbi5jb21cLyIsImlhdCI6MTc0NDk5OTA5MiwiZXhwIjoxNzQ3NTkxMDkyfQ.6tycb6a9X1IxaZ9DiTDvO5zJC16Zeno8w6vpiXArvYY`,
         },
       });
+
       return response.data;
     } catch (e) {
       if (e?.status === 404) {
         router.push("/search?type=test");
       }
       throw e;
+    } finally {
     }
+  },
+  {
+    server: true,
+    lazy: false,
+    immediate: true,
+    watch: [() => paperId.value],
   }
 );
 
