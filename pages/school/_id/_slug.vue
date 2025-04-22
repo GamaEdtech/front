@@ -2158,7 +2158,6 @@ export default {
           } else {
             this.$set(this.contentData, "tour", null);
           }
-          console.log("this.contentData.tour", this.contentData.tour);
         })
         .catch((err) => {});
     },
