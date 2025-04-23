@@ -89,8 +89,8 @@ export default class Experience {
         this.time = new Time()
         this.resources = new Resources(sources)
         this.scene = new THREE.Scene()
-        this.camera = new Camera()
-        this.renderer = new Renderer()
+        // this.camera = new Camera()
+        // this.renderer = new Renderer()
 
 
         // axes helper
@@ -112,6 +112,8 @@ export default class Experience {
         // Wait for resources
         this.resources.on('ready', () => {
             this.world = new World()
+            this.camera = new Camera()
+            this.renderer = new Renderer()
         })
 
         if (sources.length == 0) {
@@ -121,6 +123,12 @@ export default class Experience {
 
     }
 
+    changeLane(direction) {
+        if (this.world && this.world.car) {
+            this.world.car.changeLane(direction)
+        }
+    }
+
     resize() {
         this.camera.resize()
         this.renderer.resize()
@@ -128,9 +136,9 @@ export default class Experience {
 
     update() {
         this.debug.update()
-        this.camera.update()
-        this.renderer.update()
-        if (this.world) {
+        if (this.world && this.camera && this.renderer) {
+            this.camera.update()
+            this.renderer.update()
             this.world.update()
         }
     }

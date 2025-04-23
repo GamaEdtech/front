@@ -273,5 +273,4 @@ export default {
     "~/serverMiddleware/data-to-xml.js",
     { path: "/api/chatgpt", handler: "~/serverMiddleware/chatgpt.js" },
   ],
-  ssr: false
 };
