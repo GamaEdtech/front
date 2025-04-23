@@ -66,6 +66,8 @@
               <v-banner
                 color="#e6f2fe"
                 single-line
+                height="40"
+                max-height="40"
                 style="
                   position: absolute;
                   top: 0;
@@ -76,6 +78,7 @@
                   align-items: center;
                   justify-content: space-between;
                   margin-bottom: 16px;
+                  border-bottom: 0px !important;
                 "
                 v-if="activeBoard"
               >
@@ -84,9 +87,9 @@
                 </v-icon>
                 <div class="d-flex align-center">
                   <div class="gama-text-h6" style="color: #2e90fa">
-                    {{ activeBoardName || activeBoard.title || activeBoard.name || activeBoard.id }}
+                    {{ activeBoardName}}
                   </div>
-                  <div class="gama-text-h6 mx-2" style="color: #84caff">
+                  <div class="gama-text-caption mx-2" style="color: #84caff; font-weight: 400;">
                     Board
                   </div>
                 </div>
@@ -1915,5 +1918,11 @@ export default {
     line-height: 4.4rem;
     margin-left: 3rem;
   }
+}
+.theme--light.v-banner.v-sheet:not(.v-sheet--outlined):not(.v-sheet--shaped) .v-banner__wrapper {
+    border-bottom: 0px !important;
+}
+.v-application--is-ltr .v-banner__icon {
+    margin-right: 4px !important;
 }
 </style>
