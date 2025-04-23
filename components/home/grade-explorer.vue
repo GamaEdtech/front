@@ -49,6 +49,41 @@
           </v-col>
           <v-col cols="10" sm="10" class="pl-0">
             <v-card id="grade-details-card">
+              <!--Active Board Banner  -->
+              <v-banner
+                color="#e6f2fe"
+                single-line
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  right: 0;
+                  z-index: 100;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 16px;
+                "
+                v-if="activeBoard"
+              >
+                <v-icon slot="icon" color="warning" size="20">
+                  mdi-information-outline
+                </v-icon>
+                <div class="d-flex align-center">
+                  <div class="gama-text-h6" style="color: #2e90fa">
+                    {{ activeBoardName || activeBoard.title || activeBoard.name || activeBoard.id }}
+                  </div>
+                  <div class="gama-text-h6 mx-2" style="color: #84caff">
+                    Board
+                  </div>
+                </div>
+                <template v-slot:actions>
+                  <v-btn color="primary" text @click="showBoardSelector">
+                    <v-icon color="primary" size="20">mdi-chevron-down</v-icon>
+                  </v-btn>
+                </template>
+              </v-banner>
+              <!-- Active Board Banner End -->
               <div>
                 <v-row class="stats-details d-none d-md-flex">
                   <v-col md="6" class="pb-0 pb-sm-6">
@@ -797,6 +832,8 @@ export default {
       currentIndex: -1,
       isMouseDown: false,
       easeSlide: "",
+      activeBoard: null,
+      activeBoardName: null,
     };
   },
   methods: {
@@ -825,7 +862,7 @@ export default {
             var pop_data = this.stats.pop();
             this.gradeColors.unshift(pop_color);
             this.stats.unshift(pop_data);
-            
+
             // Update URL after the last animation step
             if (i === deltaIndex - 1) {
               this.updateUrlWithSelectedGrade();
@@ -840,7 +877,7 @@ export default {
             var splice_data = this.stats.splice(0, 1);
             this.gradeColors.push(...splice_color);
             this.stats.push(...splice_data);
-            
+
             // Update URL after the last animation step
             if (i === deltaIndex + 1) {
               this.updateUrlWithSelectedGrade();
@@ -1037,22 +1074,22 @@ export default {
     updateUrlWithSelectedGrade() {
       // The centered grade (at index 7) is the selected one
       const selectedGrade = this.stats[7];
-      
+
       if (selectedGrade && selectedGrade.base) {
         // Create query with existing params
         const query = { ...this.$route.query };
-        
+
         // Update the base parameter for the grade
         query.base = selectedGrade.base;
-        
+
         // Also ensure we have the section parameter
         if (selectedGrade.section) {
           query.section = selectedGrade.section;
         }
-        
+
         // Update the URL without reloading the page
         this.$router.replace({ query });
-        
+
         // Refresh data based on the new grade
         this.refreshData();
       }
@@ -1063,12 +1100,37 @@ export default {
       // Reset loading states
       this.questionLoading = true;
       this.paperLoading = true;
-      
+
       // Reload questions and papers
-      await Promise.all([
-        this.getQuestions(),
-        this.getPapers()
-      ]);
+      await Promise.all([this.getQuestions(), this.getPapers()]);
+    },
+
+    showBoardSelector() {
+      // Emit an event that can be caught by the default layout component
+      this.$root.$emit('show-board-selector');
+    },
+
+    /**
+     * Get active board data from local storage
+     */
+    getActiveBoard() {
+      try {
+        const storedBoard = localStorage.getItem("selectedBoard");
+        if (storedBoard) {
+          this.activeBoard = JSON.parse(storedBoard);
+          
+          // Use the board name or title from the stored object
+          this.activeBoardName = this.activeBoard.title || 
+                               this.activeBoard.name || 
+                               this.activeBoard.id;
+          
+          console.log("Active board loaded:", this.activeBoard);
+        } else {
+          console.log("No active board found in localStorage");
+        }
+      } catch (error) {
+        console.error("Error loading active board:", error);
+      }
     },
   },
   computed: {
@@ -1080,8 +1142,6 @@ export default {
   },
 
   mounted() {
-    //this.handleAutoCycle();
-
     //tmp to shift until any group have content
     var splice_data = this.stats.splice(0, 5);
     this.stats.push(...splice_data);
@@ -1089,9 +1149,39 @@ export default {
 
     this.getQuestions();
     this.getPapers();
+    
+    // Get active board from localStorage
+    this.getActiveBoard();
+    
+    // Listen for board selection changes from localStorage
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'selectedBoard') {
+        this.getActiveBoard();
+      }
+    });
+    
+    // Listen for board changes from the boardSelector component
+    this.$root.$on('board-changed', (board) => {
+      console.log('Board changed event received:', board);
+      this.activeBoard = board;
+      this.activeBoardName = board.title || board.name || board.id;
+      
+      // After board change, we should refresh data
+      this.refreshData();
+    });
   },
   beforeDestroy() {
     this.stopInterval(); // Stop the interval when the component is about to be unmounted
+    
+    // Clean up event listeners
+    window.removeEventListener('storage', (event) => {
+      if (event.key === 'selectedBoard') {
+        this.getActiveBoard();
+      }
+    });
+    
+    // Clean up root event listeners
+    this.$root.$off('board-changed');
   },
 };
 </script>
@@ -1204,7 +1294,11 @@ export default {
   border-radius: 10rem;
 }
 
-#content-stats-container #grade-details-card .latest-card .v-card__subtitle .owner-container {
+#content-stats-container
+  #grade-details-card
+  .latest-card
+  .v-card__subtitle
+  .owner-container {
   text-align: left;
   color: #afb8c1;
   padding-bottom: 0rem;
@@ -1215,7 +1309,11 @@ export default {
   text-overflow: ellipsis;
 }
 
-#content-stats-container #grade-details-card .latest-card .v-card__subtitle .subdate-container {
+#content-stats-container
+  #grade-details-card
+  .latest-card
+  .v-card__subtitle
+  .subdate-container {
   text-align: right !important;
   color: #6e7781;
   margin-bottom: 0;
@@ -1223,12 +1321,19 @@ export default {
   padding-top: 0.8rem;
 }
 
-#content-stats-container #grade-details-card .latest-card .v-skeleton-loader__list-item-avatar {
+#content-stats-container
+  #grade-details-card
+  .latest-card
+  .v-skeleton-loader__list-item-avatar {
   padding-left: 0;
   padding-right: 0;
 }
 
-#content-stats-container #grade-details-card .latest-card .v-skeleton-loader__list-item-avatar .v-skeleton-loader__avatar {
+#content-stats-container
+  #grade-details-card
+  .latest-card
+  .v-skeleton-loader__list-item-avatar
+  .v-skeleton-loader__avatar {
   width: 3.2rem;
   height: 3.2rem;
 }
@@ -1275,7 +1380,11 @@ export default {
     height: 7.6rem;
   }
 
-  #content-stats-container #grade-details-card .stats-details .row .v-icon.primary--text {
+  #content-stats-container
+    #grade-details-card
+    .stats-details
+    .row
+    .v-icon.primary--text {
     font-size: 2rem !important;
   }
 
@@ -1296,7 +1405,11 @@ export default {
     line-height: 4.4rem;
   }
 
-  #content-stats-container #grade-details-card .stats-details .row .date-holder {
+  #content-stats-container
+    #grade-details-card
+    .stats-details
+    .row
+    .date-holder {
     margin-left: 3rem;
     color: #6e7781;
     font-size: 1.4rem;
@@ -1315,7 +1428,11 @@ export default {
     line-height: 4.4rem;
   }
 
-  #content-stats-container #grade-details-card .latest-card .v-card-title .title {
+  #content-stats-container
+    #grade-details-card
+    .latest-card
+    .v-card-title
+    .title {
     color: #6e7781;
     text-decoration: none;
     font-size: 1.2rem;
@@ -1324,12 +1441,20 @@ export default {
     line-height: 2rem;
   }
 
-  #content-stats-container #grade-details-card .latest-card .v-card-subtitle .owner-container {
+  #content-stats-container
+    #grade-details-card
+    .latest-card
+    .v-card-subtitle
+    .owner-container {
     text-align: left;
     color: #afb8c1;
   }
 
-  #content-stats-container #grade-details-card .latest-card .v-card-subtitle .subdate-container {
+  #content-stats-container
+    #grade-details-card
+    .latest-card
+    .v-card-subtitle
+    .subdate-container {
     text-align: right !important;
     color: #6e7781;
   }
@@ -1365,7 +1490,11 @@ export default {
     margin-left: 3.6rem;
   }
 
-  #content-stats-container #grade-details-card .stats-details .label .stat-icon {
+  #content-stats-container
+    #grade-details-card
+    .stats-details
+    .label
+    .stat-icon {
     position: absolute;
     left: -3.6rem;
     top: -0.5rem;
