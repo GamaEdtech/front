@@ -72,7 +72,7 @@ export default {
     /**
      * Load selections from route query parameters if available
      */
-    loadSelectionsFromRoute() {
+    async loadSelectionsFromRoute() {
       console.log('Loading selections from route:', this.$route.query);
       
       // If we have section in the route, use it for board
@@ -80,14 +80,40 @@ export default {
         const sectionId = String(this.$route.query.section);
         console.log('Found section ID in route:', sectionId);
         
-        // Create a board object that will work with the API
-        this.selectedBoard = {
-          id: sectionId,
-          title: sectionId,
-          name: sectionId,
-          // Include section_id since that's what the API expects
-          section_id: sectionId
-        };
+        // Try to fetch board details from API
+        try {
+          const response = await this.$axios.get(`/api/v1/types/list/?type=section`);
+          
+          let boardDetails = null;
+          
+          if (response.data && Array.isArray(response.data.data)) {
+            // Find the board with the matching ID
+            boardDetails = response.data.data.find(board => 
+              String(board.id) === sectionId
+            );
+          }
+          
+          // Create a proper board object
+          this.selectedBoard = {
+            id: sectionId,
+            title: boardDetails?.title || `Board ${sectionId}`,
+            name: boardDetails?.name || boardDetails?.title || `Board ${sectionId}`,
+            // Include section_id since that's what the API expects
+            section_id: sectionId
+          };
+        } catch (error) {
+          console.error('Error fetching board details:', error);
+          
+          // Fallback to basic board object
+          this.selectedBoard = {
+            id: sectionId,
+            title: `Board ${sectionId}`,
+            name: `Board ${sectionId}`,
+            section_id: sectionId
+          };
+        }
+        
+        console.log('Created board object:', this.selectedBoard);
         
         // Save to local storage for consistency
         localStorage.setItem('selectedBoard', JSON.stringify(this.selectedBoard));

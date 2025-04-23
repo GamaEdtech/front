@@ -258,19 +258,30 @@ export default {
       console.log("Raw selected board:", board);
 
       // Extract relevant properties, ensuring we have strings for IDs
-      // The ID could be a number, so we need to convert it to a string
       const boardId = board.id !== undefined ? String(board.id) : "";
-      const boardTitle = board.title || board.name || "Unknown Board";
+      
+      // Get the proper title and name, preferring original values when available
+      const boardTitle = board.title || board.name || `Board ${boardId}`;
+      const boardName = board.name || board.title || `Board ${boardId}`;
 
-      // Make sure we have a complete board object with consistent property names
+      // Make sure we have a complete board object with proper property values
       this.selectedBoard = {
         id: boardId,
-        title: boardTitle,
-        name: boardTitle, // Include both name and title for consistency
+        title: boardTitle, // Use the actual title
+        name: boardName, // Use the actual name
         logo: board.logo || this.getBoardLogo(boardId),
         // Keep any original properties that might be needed by the API
         ...(typeof board === "object" ? board : {}),
       };
+
+      // Make sure we don't overwrite the title/name with the ID
+      if (this.selectedBoard.title === boardId) {
+        this.selectedBoard.title = `Board ${boardId}`;
+      }
+      
+      if (this.selectedBoard.name === boardId) {
+        this.selectedBoard.name = `Board ${boardId}`;
+      }
 
       console.log("Processed board object:", this.selectedBoard);
 

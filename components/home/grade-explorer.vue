@@ -86,8 +86,8 @@
                   mdi-information-outline
                 </v-icon>
                 <div class="d-flex align-center">
-                  <div class="gama-text-h6" style="color: #2e90fa">
-                    {{ activeBoardName}}
+                  <div class="gama-text-h6" style="color: #2e90fa; font-weight: 600;">
+                    {{ activeBoardName }}
                   </div>
                   <div class="gama-text-caption mx-2" style="color: #84caff; font-weight: 400;">
                     Board
@@ -1302,10 +1302,8 @@ export default {
         if (storedBoard) {
           this.activeBoard = JSON.parse(storedBoard);
           
-          // Use the board name or title from the stored object
-          this.activeBoardName = this.activeBoard.title || 
-                               this.activeBoard.name || 
-                               this.activeBoard.id;
+          // Use the board name or title from the stored object, never fall back to the ID
+          this.activeBoardName = this.getBoardDisplayName(this.activeBoard);
           
           console.log("Active board loaded:", this.activeBoard);
         } else {
@@ -1314,6 +1312,28 @@ export default {
       } catch (error) {
         console.error("Error loading active board:", error);
       }
+    },
+    
+    /**
+     * Gets a human-readable display name for a board
+     * @param {Object} board - The board object
+     * @returns {string} - A user-friendly display name
+     */
+    getBoardDisplayName(board) {
+      if (!board) return "Select Board";
+      
+      // First try to use the title property
+      if (board.title && board.title !== board.id) {
+        return board.title;
+      }
+      
+      // Then try to use the name property
+      if (board.name && board.name !== board.id) {
+        return board.name;
+      }
+      
+      // If we only have the ID, make it more user-friendly
+      return `Board ${board.id}`;
     },
 
     /**
@@ -1544,7 +1564,9 @@ export default {
     this.$root.$on('board-changed', (board) => {
       console.log('Board changed event received:', board);
       this.activeBoard = board;
-      this.activeBoardName = board.title || board.name || board.id;
+      
+      // Use the getBoardDisplayName method to get a proper name
+      this.activeBoardName = this.getBoardDisplayName(board);
       
       // Reset grade selection flag when board changes
       this.hasSelectedGrade = false;
