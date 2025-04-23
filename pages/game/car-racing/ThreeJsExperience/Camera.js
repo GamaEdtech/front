@@ -14,20 +14,21 @@ export default class Camera {
         this.debug = this.experience.debug
         this.options = this.experience.options
 
-        this.positionY = 2
-        this.positionX = this.options.roadSize
+        this.positionY = this.options.cameraYPosition
+        this.positionX = this.options.roadSize - (this.options.offsetXStart - this.options.distanceCameraFromCar)
+        this.speed = this.options.carBaseSpeed
 
-        window.addEventListener("keydown", (event) => {
-            if (event.key == "ArrowUp") {
-                this.positionX -= 0.1
-                const z = this.calculatePositionZ(this.positionX);
-                this.instance.position.set(this.positionX, this.positionY, z)
-            } else if (event.key == "ArrowDown") {
-                this.positionX += 0.1
-                const z = this.calculatePositionZ(this.positionX);
-                this.instance.position.set(this.positionX, this.positionY, z)
-            }
-        })
+        // window.addEventListener("keydown", (event) => {
+        //     if (event.key == "ArrowUp") {
+        //         this.positionX -= 0.2
+        //         const z = this.calculatePositionZ(this.positionX);
+        //         this.instance.position.set(this.positionX, this.positionY, z)
+        //     } else if (event.key == "ArrowDown") {
+        //         this.positionX += 0.2
+        //         const z = this.calculatePositionZ(this.positionX);
+        //         this.instance.position.set(this.positionX, this.positionY, z)
+        //     }
+        // })
 
         this.setInstance()
         this.setControls()
@@ -41,13 +42,10 @@ export default class Camera {
 
     setInstance() {
         this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 60)
-        const z = this.calculatePositionZ(this.positionX);
-        this.instance.position.set(this.positionX, this.positionY, z)
-
-
+        this.instance.position.set(this.positionX, this.positionY, this.calculatePositionZ(this.positionX))
 
         // this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
-        // this.instance.position.set(100, 100, 100)
+        // this.instance.position.set(220, 10, 50)
 
         this.scene.add(this.instance)
     }
@@ -75,8 +73,10 @@ export default class Camera {
     update() {
         this.controls.update()
 
-
+        this.positionX -= this.speed * this.time.delta / 1000
+        const zCloser = this.calculatePositionZ(this.positionX);
         const z = this.calculatePositionZ(this.positionX - 5);
+        this.instance.position.set(this.positionX, this.positionY, zCloser)
         this.instance.lookAt(this.positionX - 5, this.positionY, z)
 
         this.instance.updateProjectionMatrix();

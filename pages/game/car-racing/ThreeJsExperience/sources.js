@@ -32,4 +32,11 @@ export default [
         type: 'texture',
         path: "/images/car-racing/bakedTreeTexture.jpg"
     },
+
+    // car source
+    {
+        name: 'carGLTFModel',
+        type: 'gltfModel',
+        path: "/images/car-racing/car.glb"
+    },
 ]

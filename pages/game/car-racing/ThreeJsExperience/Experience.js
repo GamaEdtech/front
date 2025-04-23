@@ -72,6 +72,14 @@ export default class Experience {
 
             // cloud
             cloudCount: 50,
+
+
+            // car
+            carBaseSpeed: 2,
+            offsetXStart: 15,
+            laneLerpSpeed: 3,
+            distanceCameraFromCar: 7,
+            cameraYPosition: 2,
         }
 
 
