@@ -37,8 +37,11 @@
               :loading="isLoading"
             ></v-text-field>
             <v-btn
-              color="primary"
-              class="ml-2 search-btn"
+              style="
+                background-color: #ffb600 !important;
+                font-weight: 600;
+              "
+              class="ml-2"
               rounded
               @click="handleSearch"
               :loading="isLoading"

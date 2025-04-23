@@ -258,6 +258,7 @@
                   </v-col>
                 </v-row>
               </div>
+              <v-divider class="mt-12 mb-8" />
 
               <div class="d-none d-md-block">
                 <v-row>
