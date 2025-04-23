@@ -4,14 +4,27 @@
       <v-card-text>
         <v-row>
           <v-col cols="2" sm="2" class="px-0">
+            <!-- Show loading spinner when grades are loading -->
+            <v-sheet v-if="gradesLoading" class="text-center pa-3">
+              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              <div class="mt-2 caption">Loading grades...</div>
+            </v-sheet>
+            
+            <!-- Show message if no grades are available -->
+            <v-sheet v-else-if="localStats.length === 0" class="text-center pa-3">
+              <v-icon color="warning">mdi-alert-circle-outline</v-icon>
+              <div class="mt-2 caption">No grades available for this board.</div>
+            </v-sheet>
+            
+            <!-- Show grades wheel if grades are available -->
             <v-sheet
-              v-if="stats.length <= 16"
+              v-else-if="localStats.length <= 16"
               class="text-right"
               id="stats-handler"
               ref="statsHandler"
             >
               <div
-                v-for="(item, index) in stats"
+                v-for="(item, index) in localStats"
                 :key="index"
                 @touchstart="handleTouchStart(index)"
                 @touchend="handleTouchEnd(index)"
@@ -383,7 +396,8 @@ export default {
   name: "grade-explorer-component",
   props: {
     stats: {
-      default: [],
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -851,15 +865,30 @@ export default {
         questions: 0
       },
       categoryCountsLoading: true,
+      gradesLoading: false,
+      // Local copy of stats for internal manipulation
+      localStats: [],
     };
   },
   methods: {
     showDate() {
-      if (
-        this.$moment(this.stats[7].last_update).format("MMM,DD YYYY") !==
-        "Invalid date"
-      )
-        return this.$moment(this.stats[7].last_update).format("MMM,DD YYYY");
+      try {
+        if (
+          this.localStats && 
+          this.localStats.length > 7 && 
+          this.localStats[7] && 
+          this.localStats[7].last_update && 
+          this.$moment(this.localStats[7].last_update).isValid() &&
+          this.$moment(this.localStats[7].last_update).format("MMM,DD YYYY") !== "Invalid date"
+        ) {
+          return this.$moment(this.localStats[7].last_update).format("MMM,DD YYYY");
+        } else {
+          return "Recently updated";
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return "Recently updated";
+      }
     },
     shouldDisplayButton(index) {
       // Determine whether to display the button based on screen size and specific indexes
@@ -879,9 +908,9 @@ export default {
           setTimeout(() => {
             this.currentIndex = index + i + 1;
             var pop_color = this.gradeColors.pop();
-            var pop_data = this.stats.pop();
+            var pop_data = this.localStats.pop();
             this.gradeColors.unshift(pop_color);
-            this.stats.unshift(pop_data);
+            this.localStats.unshift(pop_data);
 
             // Update URL after the last animation step
             if (i === deltaIndex - 1) {
@@ -896,9 +925,9 @@ export default {
           setTimeout(() => {
             this.currentIndex = index + i - 1;
             var splice_color = this.gradeColors.splice(0, 1);
-            var splice_data = this.stats.splice(0, 1);
+            var splice_data = this.localStats.splice(0, 1);
             this.gradeColors.push(...splice_color);
-            this.stats.push(...splice_data);
+            this.localStats.push(...splice_data);
 
             // Update URL after the last animation step
             if (i === deltaIndex + 1) {
@@ -932,7 +961,7 @@ export default {
         const touchY = event.clientY;
 
         // Loop through the buttons and check if the touch is over a button
-        for (let index = 0; index < this.stats.length; index++) {
+        for (let index = 0; index < this.localStats.length; index++) {
           const buttonRef = this.$refs[`handler${index}`][0];
           const rect = buttonRef.getBoundingClientRect();
 
@@ -950,16 +979,16 @@ export default {
             // Set the index of the touched button
             if (index > this.startIndex) {
               var pop_color = this.gradeColors.pop();
-              var pop_data = this.stats.pop();
+              var pop_data = this.localStats.pop();
               this.gradeColors.unshift(pop_color);
-              this.stats.unshift(pop_data);
+              this.localStats.unshift(pop_data);
             } else if (index < this.startIndex) {
               var splice_color = this.gradeColors.splice(0, 1);
 
-              var splice_data = this.stats.splice(0, 1);
+              var splice_data = this.localStats.splice(0, 1);
 
               this.gradeColors.push(...splice_color);
-              this.stats.push(...splice_data);
+              this.localStats.push(...splice_data);
             }
 
             this.startIndex = index;
@@ -997,7 +1026,7 @@ export default {
       const touchY = event.touches[0].clientY;
 
       // Loop through the buttons and check if the touch is over a button
-      for (let index = 0; index < this.stats.length; index++) {
+      for (let index = 0; index < this.localStats.length; index++) {
         const buttonRef = this.$refs[`handler${index}`][0];
         const rect = buttonRef.getBoundingClientRect();
 
@@ -1015,17 +1044,17 @@ export default {
           // Set the index of the touched button
           if (index > this.startIndex) {
             var pop_color = this.gradeColors.pop();
-            var pop_data = this.stats.pop();
+            var pop_data = this.localStats.pop();
             this.gradeColors.unshift(pop_color);
-            this.stats.unshift(pop_data);
+            this.localStats.unshift(pop_data);
           } else if (index < this.startIndex) {
             console.log(index);
             var splice_color = this.gradeColors.splice(0, 1);
 
-            var splice_data = this.stats.splice(0, 1);
+            var splice_data = this.localStats.splice(0, 1);
 
             this.gradeColors.push(...splice_color);
-            this.stats.push(...splice_data);
+            this.localStats.push(...splice_data);
           }
 
           this.startIndex = index;
@@ -1128,11 +1157,11 @@ export default {
           params.append('section', this.activeBoard.id);
           hasSectionParam = true;
           console.log(`Adding board section ${this.activeBoard.id} to query`);
-        } else if (this.stats && this.stats.length > 7 && this.stats[7].section) {
-          // Fallback to section from stats if no active board
-          params.append('section', this.stats[7].section);
+        } else if (this.localStats && this.localStats.length > 7 && this.localStats[7].section) {
+          // Fallback to section from localStats if no active board
+          params.append('section', this.localStats[7].section);
           hasSectionParam = true;
-          console.log(`Using section ${this.stats[7].section} from stats as fallback`);
+          console.log(`Using section ${this.localStats[7].section} from localStats as fallback`);
         }
         
         // If we have no section parameter, we can't make a valid request
@@ -1142,9 +1171,9 @@ export default {
         }
         
         // Add base (grade) parameter if explicitly selected
-        if (this.hasSelectedGrade && this.stats && this.stats.length > 7 && this.stats[7].base) {
-          params.append('base', this.stats[7].base);
-          console.log(`Adding grade base ${this.stats[7].base} to query`);
+        if (this.hasSelectedGrade && this.localStats && this.localStats.length > 7 && this.localStats[7].base) {
+          params.append('base', this.localStats[7].base);
+          console.log(`Adding grade base ${this.localStats[7].base} to query`);
         }
         
         const requestUrl = `/api/v1/search?${params.toString()}`;
@@ -1177,13 +1206,13 @@ export default {
             this.categoryCounts.files === 0 && 
             this.categoryCounts.exams === 0 && 
             this.categoryCounts.questions === 0) && 
-            this.stats && this.stats.length > 7) {
+            this.localStats && this.localStats.length > 7) {
           console.log('Falling back to stats array for counts');
           this.categoryCounts = {
-            tests: parseInt(this.stats[7].tests) || 0,
-            files: parseInt(this.stats[7].files) || 0,
-            exams: parseInt(this.stats[7].exams) || 0,
-            questions: parseInt(this.stats[7].questions) || 0
+            tests: parseInt(this.localStats[7].tests) || 0,
+            files: parseInt(this.localStats[7].files) || 0,
+            exams: parseInt(this.localStats[7].exams) || 0,
+            questions: parseInt(this.localStats[7].questions) || 0
           };
         }
         
@@ -1212,7 +1241,7 @@ export default {
     // Update URL with selected grade
     updateUrlWithSelectedGrade() {
       // The centered grade (at index 7) is the selected one
-      const selectedGrade = this.stats[7];
+      const selectedGrade = this.localStats[7];
       
       if (!selectedGrade) return;
       
@@ -1223,7 +1252,7 @@ export default {
       if (this.activeBoard && this.activeBoard.id) {
         query.section = this.activeBoard.id;
       } 
-      // Fallback to using the section from stats if needed
+      // Fallback to using the section from localStats if needed
       else if (selectedGrade.section) {
         query.section = selectedGrade.section;
       }
@@ -1296,9 +1325,9 @@ export default {
       if (this.activeBoard && this.activeBoard.id) {
         url += `&section=${this.activeBoard.id}`;
       }
-      // If no active board, but we have stats data with a section, use that
-      else if (this.stats && this.stats.length > 7 && this.stats[7].section) {
-        url += `&section=${this.stats[7].section}`;
+      // If no active board, but we have localStats data with a section, use that
+      else if (this.localStats && this.localStats.length > 7 && this.localStats[7].section) {
+        url += `&section=${this.localStats[7].section}`;
       }
       
       // Only add the base parameter if:
@@ -1306,7 +1335,7 @@ export default {
       // 2. And the grade has a valid base value
       
       // Check if we have a selected grade with a valid base
-      const selectedGrade = this.stats && this.stats.length > 7 ? this.stats[7] : null;
+      const selectedGrade = this.localStats && this.localStats.length > 7 ? this.localStats[7] : null;
       
       // Check if we've explicitly selected a grade (indicated by user interaction)
       const hasUserSelectedGrade = this.hasSelectedGrade;
@@ -1345,6 +1374,126 @@ export default {
         }
       });
     },
+
+    /**
+     * Fetch grades from the API based on selected board
+     */
+    async fetchGrades() {
+      try {
+        // Show loading state
+        this.gradesLoading = true;
+        
+        // Get the section_id from active board
+        let sectionId = null;
+        if (this.activeBoard && this.activeBoard.id) {
+          sectionId = this.activeBoard.id;
+        } else if (this.localStats && this.localStats.length > 0 && this.localStats[0].section) {
+          // Fallback to the first item from localStats if no active board
+          sectionId = this.localStats[0].section;
+        }
+        
+        if (!sectionId) {
+          console.warn('No section ID available for fetching grades');
+          return;
+        }
+        
+        console.log(`Fetching grades for section ID: ${sectionId}`);
+        
+        // Make the API call to get grades for the selected board
+        const response = await this.$axios.$get(`/api/v1/types/list?type=base&section_id=${sectionId}`);
+        
+        if (response && response.status && Array.isArray(response.data)) {
+          console.log('Grades fetched successfully:', response.data);
+          
+          // Format the grades data to match the expected structure
+          const formattedGrades = response.data.map(grade => ({
+            id: grade.id,
+            base: grade.id, // Use ID as base
+            base_title: grade.title || grade.name, // Use title or name for display
+            section: sectionId, // Set the section ID
+            color: this.getGradeColor(grade.id), // Assign a color
+          }));
+          
+          // Replace the localStats array with the new grades
+          this.localStats = [...formattedGrades];
+          
+          // Make sure we have enough items for the wheel
+          this.ensureMinimumGrades();
+          
+          // Re-center the grades wheel to show the middle grade
+          this.centerGradesWheel();
+        } else {
+          console.error('Invalid API response format:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching grades:', error);
+      } finally {
+        this.gradesLoading = false;
+      }
+    },
+    
+    /**
+     * Make sure we have at least 15 items for the grades wheel
+     * This will duplicate existing grades if needed
+     */
+    ensureMinimumGrades() {
+      const requiredLength = 15;
+      
+      // If we don't have enough grades, duplicate the existing ones
+      if (this.localStats.length < requiredLength) {
+        const originalStats = [...this.localStats];
+        while (this.localStats.length < requiredLength) {
+          this.localStats = [...this.localStats, ...originalStats];
+        }
+        
+        // Trim to the exact required length
+        this.localStats = this.localStats.slice(0, requiredLength);
+      }
+    },
+    
+    /**
+     * Center the grades wheel to show a middle grade
+     */
+    centerGradesWheel() {
+      // Move items to ensure the middle item is at index 7
+      if (this.localStats.length > 0) {
+        const midIndex = Math.floor(this.localStats.length / 2);
+        if (midIndex !== 7) {
+          const shift = 7 - midIndex;
+          if (shift > 0) {
+            // Shift right
+            for (let i = 0; i < shift; i++) {
+              const item = this.localStats.pop();
+              this.localStats.unshift(item);
+            }
+          } else {
+            // Shift left
+            for (let i = 0; i < Math.abs(shift); i++) {
+              const item = this.localStats.shift();
+              this.localStats.push(item);
+            }
+          }
+        }
+      }
+    },
+    
+    /**
+     * Get a color for a grade based on its ID
+     * @param {string} id - The grade ID
+     * @returns {string} - A color hex code
+     */
+    getGradeColor(id) {
+      // Array of colors for grades
+      const colors = [
+        "#FF6498", "#FD7DD2", "#FF4DFF", "#C24DFF", "#8649FF", 
+        "#4C4AFF", "#4A87FF", "#49AEFF", "#4AC5FF", "#43D3FF",
+        "#4AF7FF", "#55FFF6", "#5DFFAA", "#66FF5E", "#B1FF4F"
+      ];
+      
+      // Convert ID to a number and use modulo to get an index
+      const numId = parseInt(id) || 0;
+      return colors[numId % colors.length];
+    },
   },
   computed: {
     gradeSizes() {
@@ -1355,19 +1504,25 @@ export default {
   },
 
   mounted() {
-    //tmp to shift until any group have content
-    var splice_data = this.stats.splice(0, 5);
-    this.stats.push(...splice_data);
-    //end tmp
-
+    // Initialize localStats from props if provided
+    if (this.stats && this.stats.length > 0) {
+      this.localStats = [...this.stats];
+    }
+    
+    // Get active board from localStorage
+    this.getActiveBoard();
+    
+    // Fetch grades based on active board (only if not provided as props)
+    if (this.localStats.length === 0) {
+      this.fetchGrades();
+    }
+    
+    // Fetch other data
     this.getQuestions();
     this.getPapers();
     
     // Fetch category counts
     this.fetchCategoryCounts();
-    
-    // Get active board from localStorage
-    this.getActiveBoard();
     
     // Listen for board selection changes from localStorage
     window.addEventListener('storage', (event) => {
@@ -1375,6 +1530,9 @@ export default {
         this.getActiveBoard();
         // Reset grade selection flag when board changes through storage event
         this.hasSelectedGrade = false;
+        
+        // Fetch grades for the new board
+        this.fetchGrades();
       }
     });
     
@@ -1386,6 +1544,9 @@ export default {
       
       // Reset grade selection flag when board changes
       this.hasSelectedGrade = false;
+      
+      // Fetch grades for the new board
+      this.fetchGrades();
       
       // After board change, we should refresh data
       this.refreshData();
