@@ -17,18 +17,20 @@ export default class Camera {
         this.positionY = this.options.cameraYPosition
         this.positionX = this.options.roadSize - (this.options.offsetXStart - this.options.distanceCameraFromCar)
         this.speed = this.options.carBaseSpeed
+        this.positionMiddleRoad = this.options.mountainWidth + (this.options.groundWidth / 2)
+        this.smoothX = null
 
-        // window.addEventListener("keydown", (event) => {
-        //     if (event.key == "ArrowUp") {
-        //         this.positionX -= 0.2
-        //         const z = this.calculatePositionZ(this.positionX);
-        //         this.instance.position.set(this.positionX, this.positionY, z)
-        //     } else if (event.key == "ArrowDown") {
-        //         this.positionX += 0.2
-        //         const z = this.calculatePositionZ(this.positionX);
-        //         this.instance.position.set(this.positionX, this.positionY, z)
-        //     }
-        // })
+        window.addEventListener("keydown", (event) => {
+            if (event.key == "ArrowUp") {
+                this.positionX -= this.speed
+                const z = this.calculatePositionZ(this.positionX);
+                this.instance.position.set(this.positionX, this.positionY, z)
+            } else if (event.key == "ArrowDown") {
+                this.positionX += this.speed
+                const z = this.calculatePositionZ(this.positionX);
+                this.instance.position.set(this.positionX, this.positionY, z)
+            }
+        })
 
         this.setInstance()
         this.setControls()
@@ -36,16 +38,13 @@ export default class Camera {
     }
 
     calculatePositionZ(positionx) {
-        const z = Math.cos(positionx * this.options.roadFrequencyX) * this.options.roadAmplitudeX + this.options.mountainWidth + ((this.options.groundWidth) / 2);
-        return z
+        return Math.cos(positionx * this.options.roadFrequencyX) * this.options.roadAmplitudeX + this.positionMiddleRoad
     }
 
     setInstance() {
         this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 60)
-        this.instance.position.set(this.positionX, this.positionY, this.calculatePositionZ(this.positionX))
 
-        // this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
-        // this.instance.position.set(220, 10, 50)
+        this.instance.position.set(this.positionX, this.positionY, this.calculatePositionZ(this.positionX))
 
         this.scene.add(this.instance)
     }
@@ -74,10 +73,14 @@ export default class Camera {
         this.controls.update()
 
         this.positionX -= this.speed * this.time.delta / 1000
-        const zCloser = this.calculatePositionZ(this.positionX);
-        const z = this.calculatePositionZ(this.positionX - 5);
-        this.instance.position.set(this.positionX, this.positionY, zCloser)
-        this.instance.lookAt(this.positionX - 5, this.positionY, z)
+        if (this.smoothX === null) this.smoothX = this.positionX
+        this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
+        this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
+        this.instance.lookAt(this.smoothX - 5, this.positionY, this.calculatePositionZ(this.smoothX - 5))
+
+
+        const targetFov = 75 + this.options.carBaseSpeed * 0.5
+        this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
 
         this.instance.updateProjectionMatrix();
     }
