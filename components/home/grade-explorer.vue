@@ -88,57 +88,60 @@
                 <v-row class="stats-details d-none d-md-flex">
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
-                      :to="`/search?type=test&section=${stats[7].section}&base=${stats[7].base}`"
+                      :to="generateCategoryLink('test')"
                       class="label"
                     >
                       <span class="stat-icon icon-paper"></span>
                       Past Papers
-
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].tests | numberFormat }}</div>
+                    <div class="stat" v-if="categoryCountsLoading">
+                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                    </div>
+                    <div class="stat" v-else>+{{ categoryCounts.tests | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
-                      :to="`/search?type=learnfiles&section=${stats[7].section}&base=${stats[7].base}`"
+                      :to="generateCategoryLink('learnfiles')"
                       class="label"
                     >
                       <span class="stat-icon icon-multimedia"></span>
                       Multimedia
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].files | numberFormat }}</div>
+                    <div class="stat" v-if="categoryCountsLoading">
+                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                    </div>
+                    <div class="stat" v-else>+{{ categoryCounts.files | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
-                      :to="`/search?type=azmoon&section=${stats[7].section}&base=${stats[7].base}`"
+                      :to="generateCategoryLink('azmoon')"
                       class="label"
                     >
                       <span class="stat-icon icon-exam"></span>
                       QuizHub
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].exams | numberFormat }}</div>
+                    <div class="stat" v-if="categoryCountsLoading">
+                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                    </div>
+                    <div class="stat" v-else>+{{ categoryCounts.exams | numberFormat }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
-                      :to="`/search?type=question&section=${stats[7].section}&base=${stats[7].base}`"
+                      :to="generateCategoryLink('question')"
                       class="label"
                     >
                       <span class="stat-icon icon-q-a"></span>
                       Forum
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
                     </nuxt-link>
-                    <div class="stat">
-                      +{{ stats[7].questions | numberFormat }}
+                    <div class="stat" v-if="categoryCountsLoading">
+                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                    </div>
+                    <div class="stat" v-else>
+                      +{{ categoryCounts.questions | numberFormat }}
                     </div>
                   </v-col>
                 </v-row>
@@ -148,7 +151,7 @@
                     <v-row>
                       <v-col cols="7" class="py-0">
                         <nuxt-link
-                          :to="`/search?type=test&section=${stats[7].section}&base=${stats[7].base}`"
+                          :to="generateCategoryLink('test')"
                           class="label"
                         >
                           <span class="stat-icon icon-paper"></span>
@@ -157,9 +160,10 @@
                         <div class="date-holder">{{ showDate() }}</div>
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ stats[7].tests | numberFormat }}</span
-                        >
+                        <div class="stat" v-if="categoryCountsLoading">
+                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                        </div>
+                        <span class="stat" v-else>+{{ categoryCounts.tests | numberFormat }}</span>
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -171,7 +175,7 @@
                     <v-row>
                       <v-col cols="7" class="py-0">
                         <nuxt-link
-                          :to="`/search?type=learnfiles&section=${stats[7].section}&base=${stats[7].base}`"
+                          :to="generateCategoryLink('learnfiles')"
                           class="label"
                         >
                           <span class="stat-icon icon-multimedia"></span>
@@ -180,9 +184,10 @@
                         <div class="date-holder pb-0">{{ showDate() }}</div>
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ stats[7].files | numberFormat }}</span
-                        >
+                        <div class="stat" v-if="categoryCountsLoading">
+                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                        </div>
+                        <span class="stat" v-else>+{{ categoryCounts.files | numberFormat }}</span>
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -194,7 +199,7 @@
                     <v-row>
                       <v-col cols="7" class="py-0">
                         <nuxt-link
-                          :to="`/search?type=azmoon&section=${stats[7].section}&base=${stats[7].base}`"
+                          :to="generateCategoryLink('azmoon')"
                           class="label"
                         >
                           <span class="stat-icon icon-exam"></span>
@@ -203,9 +208,10 @@
                         <div class="date-holder pb-0">{{ showDate() }}</div>
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ stats[7].exams | numberFormat }}</span
-                        >
+                        <div class="stat" v-if="categoryCountsLoading">
+                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                        </div>
+                        <span class="stat" v-else>+{{ categoryCounts.exams | numberFormat }}</span>
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -218,7 +224,7 @@
                     <v-row>
                       <v-col cols="7" class="py-0">
                         <nuxt-link
-                          :to="`/search?type=question&section=${stats[7].section}&base=${stats[7].base}`"
+                          :to="generateCategoryLink('question')"
                           class="label"
                         >
                           <span class="stat-icon icon-q-a"></span>
@@ -227,9 +233,10 @@
                         <div class="date-holder">{{ showDate() }}</div>
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ stats[7].questions | numberFormat }}</span
-                        >
+                        <div class="stat" v-if="categoryCountsLoading">
+                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                        </div>
+                        <span class="stat" v-else>+{{ categoryCounts.questions | numberFormat }}</span>
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -834,6 +841,16 @@ export default {
       easeSlide: "",
       activeBoard: null,
       activeBoardName: null,
+      hasSelectedGrade: false,
+
+      // Add new data properties for category counts
+      categoryCounts: {
+        tests: 0,
+        files: 0,
+        exams: 0,
+        questions: 0
+      },
+      categoryCountsLoading: true,
     };
   },
   methods: {
@@ -853,6 +870,9 @@ export default {
     handleBtnClick(index) {
       this.stopInterval(); // Clear the interval using the interval ID
 
+      // Mark that the user has explicitly selected a grade
+      this.hasSelectedGrade = true;
+
       const deltaIndex = 7 - index;
       if (deltaIndex > 0) {
         for (let i = 0; i < deltaIndex; i++) {
@@ -866,6 +886,8 @@ export default {
             // Update URL after the last animation step
             if (i === deltaIndex - 1) {
               this.updateUrlWithSelectedGrade();
+              // Ensure category counts are updated with the newly selected grade
+              this.fetchCategoryCounts();
             }
           }, 200 * i + 1);
         }
@@ -881,6 +903,8 @@ export default {
             // Update URL after the last animation step
             if (i === deltaIndex + 1) {
               this.updateUrlWithSelectedGrade();
+              // Ensure category counts are updated with the newly selected grade
+              this.fetchCategoryCounts();
             }
           }, 200 * Math.abs(i) + 1);
         }
@@ -920,6 +944,9 @@ export default {
           ) {
             this.currentIndex = index;
 
+            // Set hasSelectedGrade to true when the wheel is moved
+            this.hasSelectedGrade = true;
+
             // Set the index of the touched button
             if (index > this.startIndex) {
               var pop_color = this.gradeColors.pop();
@@ -936,6 +963,10 @@ export default {
             }
 
             this.startIndex = index;
+            
+            // Refresh category counts when the grade changes
+            this.fetchCategoryCounts();
+            
             return; // Stop checking once a button is found
           }
         }
@@ -978,6 +1009,9 @@ export default {
         ) {
           this.currentIndex = index;
 
+          // Set hasSelectedGrade to true when moving through touch
+          this.hasSelectedGrade = true;
+
           // Set the index of the touched button
           if (index > this.startIndex) {
             var pop_color = this.gradeColors.pop();
@@ -995,6 +1029,10 @@ export default {
           }
 
           this.startIndex = index;
+          
+          // Refresh category counts when the grade changes
+          this.fetchCategoryCounts();
+          
           return; // Stop checking once a button is found
         }
       }
@@ -1070,39 +1108,151 @@ export default {
       else return title;
     },
 
-    // Add new method to update URL with selected grade
-    updateUrlWithSelectedGrade() {
-      // The centered grade (at index 7) is the selected one
-      const selectedGrade = this.stats[7];
-
-      if (selectedGrade && selectedGrade.base) {
-        // Create query with existing params
-        const query = { ...this.$route.query };
-
-        // Update the base parameter for the grade
-        query.base = selectedGrade.base;
-
-        // Also ensure we have the section parameter
-        if (selectedGrade.section) {
-          query.section = selectedGrade.section;
+    /**
+     * Fetch accurate category counts from the API
+     */
+    async fetchCategoryCounts() {
+      this.categoryCountsLoading = true;
+      try {
+        // Build the query parameters
+        const params = new URLSearchParams();
+        
+        // Add required parameters for the search endpoint
+        params.append('type', 'test'); // Any type works, we just need the types_stats
+        params.append('page', '1');
+        
+        // Add section (board) parameter if available
+        let hasSectionParam = false;
+        
+        if (this.activeBoard && this.activeBoard.id) {
+          params.append('section', this.activeBoard.id);
+          hasSectionParam = true;
+          console.log(`Adding board section ${this.activeBoard.id} to query`);
+        } else if (this.stats && this.stats.length > 7 && this.stats[7].section) {
+          // Fallback to section from stats if no active board
+          params.append('section', this.stats[7].section);
+          hasSectionParam = true;
+          console.log(`Using section ${this.stats[7].section} from stats as fallback`);
         }
-
-        // Update the URL without reloading the page
-        this.$router.replace({ query });
-
-        // Refresh data based on the new grade
-        this.refreshData();
+        
+        // If we have no section parameter, we can't make a valid request
+        if (!hasSectionParam) {
+          console.warn('No section parameter available, skipping API call');
+          return;
+        }
+        
+        // Add base (grade) parameter if explicitly selected
+        if (this.hasSelectedGrade && this.stats && this.stats.length > 7 && this.stats[7].base) {
+          params.append('base', this.stats[7].base);
+          console.log(`Adding grade base ${this.stats[7].base} to query`);
+        }
+        
+        const requestUrl = `/api/v1/search?${params.toString()}`;
+        console.log('Fetching category counts from:', requestUrl);
+        
+        // Make the API call with appropriate parameters
+        const response = await this.$axios.$get(requestUrl);
+        
+        // Check if we have valid types_stats in the response
+        if (response && response.status === 1 && response.data && response.data.types_stats) {
+          console.log('Category counts received:', response.data.types_stats);
+          
+          // Map the types_stats values to our categoryCounts object
+          this.categoryCounts = {
+            tests: parseInt(response.data.types_stats.test) || 0,
+            files: parseInt(response.data.types_stats.learnfiles) || 0,
+            exams: parseInt(response.data.types_stats.azmoon) || 0,
+            questions: parseInt(response.data.types_stats.question) || 0
+          };
+          
+          console.log('Updated category counts:', this.categoryCounts);
+        } else {
+          console.warn('Invalid response format:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching category counts:', error);
+      } finally {
+        // If no values were set (API failed or returned unusable data), fallback to stats array
+        if ((this.categoryCounts.tests === 0 && 
+            this.categoryCounts.files === 0 && 
+            this.categoryCounts.exams === 0 && 
+            this.categoryCounts.questions === 0) && 
+            this.stats && this.stats.length > 7) {
+          console.log('Falling back to stats array for counts');
+          this.categoryCounts = {
+            tests: parseInt(this.stats[7].tests) || 0,
+            files: parseInt(this.stats[7].files) || 0,
+            exams: parseInt(this.stats[7].exams) || 0,
+            questions: parseInt(this.stats[7].questions) || 0
+          };
+        }
+        
+        // Delay setting loading to false to prevent UI flicker
+        setTimeout(() => {
+          this.categoryCountsLoading = false;
+        }, 300);
       }
     },
 
-    // Add method to refresh data when grade changes
+    // Update the refreshData method to also refresh category counts
     async refreshData() {
       // Reset loading states
       this.questionLoading = true;
       this.paperLoading = true;
+      this.categoryCountsLoading = true;
 
-      // Reload questions and papers
-      await Promise.all([this.getQuestions(), this.getPapers()]);
+      // Reload questions, papers and category counts
+      await Promise.all([
+        this.getQuestions(), 
+        this.getPapers(),
+        this.fetchCategoryCounts()
+      ]);
+    },
+
+    // Update URL with selected grade
+    updateUrlWithSelectedGrade() {
+      // The centered grade (at index 7) is the selected one
+      const selectedGrade = this.stats[7];
+      
+      if (!selectedGrade) return;
+      
+      // Create query with existing params
+      const query = { ...this.$route.query };
+      
+      // Always update the section parameter if we have a valid board
+      if (this.activeBoard && this.activeBoard.id) {
+        query.section = this.activeBoard.id;
+      } 
+      // Fallback to using the section from stats if needed
+      else if (selectedGrade.section) {
+        query.section = selectedGrade.section;
+      }
+      
+      // Only include the base parameter if the user has explicitly selected a grade
+      if (this.hasSelectedGrade && selectedGrade.base) {
+        query.base = selectedGrade.base;
+      } else {
+        // If no explicit grade selection, remove base parameter
+        delete query.base;
+      }
+      
+      // Update the URL without reloading the page
+      // Handle NavigationDuplicated error
+      this.$router.replace({ query }).catch(err => {
+        if (err && err.name === 'NavigationDuplicated') {
+          // Ignore the NavigationDuplicated error
+          console.log('Navigation to current location skipped');
+        } else {
+          // Otherwise rethrow the error
+          throw err;
+        }
+      });
+      
+      // Refresh data based on the new grade/board
+      this.refreshData();
+      
+      // Also fetch updated category counts
+      this.fetchCategoryCounts();
     },
 
     showBoardSelector() {
@@ -1132,6 +1282,69 @@ export default {
         console.error("Error loading active board:", error);
       }
     },
+
+    /**
+     * Generates a search URL for a specific category type
+     * @param {string} type - The type of content to search for
+     * @returns {string} - The properly formatted search URL with appropriate query parameters
+     */
+    generateCategoryLink(type) {
+      // Start with the base URL and type parameter
+      let url = `/search?type=${type}`;
+      
+      // Add the section parameter from the active board if available
+      if (this.activeBoard && this.activeBoard.id) {
+        url += `&section=${this.activeBoard.id}`;
+      }
+      // If no active board, but we have stats data with a section, use that
+      else if (this.stats && this.stats.length > 7 && this.stats[7].section) {
+        url += `&section=${this.stats[7].section}`;
+      }
+      
+      // Only add the base parameter if:
+      // 1. We've explicitly selected a grade (tracked via an explicit user action)
+      // 2. And the grade has a valid base value
+      
+      // Check if we have a selected grade with a valid base
+      const selectedGrade = this.stats && this.stats.length > 7 ? this.stats[7] : null;
+      
+      // Check if we've explicitly selected a grade (indicated by user interaction)
+      const hasUserSelectedGrade = this.hasSelectedGrade;
+      
+      if (hasUserSelectedGrade && selectedGrade && selectedGrade.base) {
+        url += `&base=${selectedGrade.base}`;
+      }
+      
+      return url;
+    },
+
+    /**
+     * Update the URL with just the board's section parameter
+     */
+    updateUrlWithCurrentBoard() {
+      if (!this.activeBoard || !this.activeBoard.id) return;
+      
+      // Create query with existing params
+      const query = { ...this.$route.query };
+      
+      // Update the section parameter
+      query.section = this.activeBoard.id;
+      
+      // Remove the base parameter
+      delete query.base;
+      
+      // Update the URL without reloading the page
+      // Handle NavigationDuplicated error
+      this.$router.replace({ query }).catch(err => {
+        if (err && err.name === 'NavigationDuplicated') {
+          // Ignore the NavigationDuplicated error
+          console.log('Navigation to current location skipped');
+        } else {
+          // Otherwise rethrow the error
+          throw err;
+        }
+      });
+    },
   },
   computed: {
     gradeSizes() {
@@ -1150,6 +1363,9 @@ export default {
     this.getQuestions();
     this.getPapers();
     
+    // Fetch category counts
+    this.fetchCategoryCounts();
+    
     // Get active board from localStorage
     this.getActiveBoard();
     
@@ -1157,6 +1373,8 @@ export default {
     window.addEventListener('storage', (event) => {
       if (event.key === 'selectedBoard') {
         this.getActiveBoard();
+        // Reset grade selection flag when board changes through storage event
+        this.hasSelectedGrade = false;
       }
     });
     
@@ -1166,8 +1384,14 @@ export default {
       this.activeBoard = board;
       this.activeBoardName = board.title || board.name || board.id;
       
+      // Reset grade selection flag when board changes
+      this.hasSelectedGrade = false;
+      
       // After board change, we should refresh data
       this.refreshData();
+      
+      // Also update the URL to reflect the new board without a grade
+      this.updateUrlWithCurrentBoard();
     });
   },
   beforeDestroy() {
@@ -1182,6 +1406,17 @@ export default {
     
     // Clean up root event listeners
     this.$root.$off('board-changed');
+  },
+  watch: {
+    activeBoard: {
+      handler(newBoard) {
+        if (newBoard) {
+          console.log('Board changed, refreshing category counts');
+          this.fetchCategoryCounts();
+        }
+      },
+      deep: true
+    }
   },
 };
 </script>
