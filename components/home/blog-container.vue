@@ -4,11 +4,15 @@
       <div class="main-card">
         <v-row>
           <v-col cols="6" class="px-md-0">
-            <h2 class="gama-text-h4" id="main-title ">Blog</h2>
+            <h2 class="gama-text-h4" id="main-title ">
+              Blog -Expert Articles on Learning, Teaching, and School Success
+            </h2>
           </v-col>
           <v-col cols="6" class="text-right">
             <div class="d-none d-md-inline">
-              <v-btn rounded outlined large to="/blog" class="gama-btn">Go to blog</v-btn>
+              <v-btn rounded outlined large to="/blog" class="gama-btn"
+                >Go to blog</v-btn
+              >
             </div>
             <v-btn rounded to="/blog" text class="d-inline d-md-none seeAllBtn">
               See all
@@ -46,14 +50,18 @@
                         {{ item.title }}
                       </span>
                       <div v-else class="text-center">
-                        <v-btn text size="small" color="primary"> read more </v-btn>
+                        <v-btn text size="small" color="primary">
+                          read more
+                        </v-btn>
                       </div>
                     </v-card-title>
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
                     <nuxt-link
-                      :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
+                      :to="`/blog/${item.id}/${$slugGenerator.convert(
+                        item.title
+                      )}`"
                       >Read more</nuxt-link
                     >
                   </div>
