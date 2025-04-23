@@ -1,14 +1,25 @@
 <template>
   <div class="board-selector">
     <!-- Board Selection Modal/Dialog -->
-    <v-dialog v-model="showBoardDialog" persistent max-width="600px">
+    <v-dialog v-model="showBoardDialog" :persistent="false" max-width="600px">
       <v-card>
-        <v-card-title class="text-h5">
-          Board
-        </v-card-title>
-        <v-card-subtitle>
-          Search result <span class="search-count">{{ boards.length }}</span>
-        </v-card-subtitle>
+        <div class="d-flex justify-space-between align-center">
+          <v-card-title class="text-h5"> Board </v-card-title>
+          <v-card-subtitle
+            style="
+              margin-top: 0px;
+              padding-top: 0px;
+              padding: 16px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 11px;
+            "
+          >
+            <div class="search-result">Search result</div>
+            <div class="search-count">{{ filteredBoards.length }}</div>
+          </v-card-subtitle>
+        </div>
         <v-card-text>
           <div class="search-container mb-4">
             <v-text-field
@@ -17,25 +28,56 @@
               outlined
               dense
               prepend-inner-icon="mdi-magnify"
+              append-icon="mdi-close"
+              @click:append="searchTerm = ''"
               class="search-field"
               hide-details
+              ref="searchField"
+              @keyup.enter="handleSearch"
+              :loading="isLoading"
             ></v-text-field>
-            <v-btn color="primary" class="ml-2 search-btn" rounded>Search</v-btn>
+            <v-btn
+              color="primary"
+              class="ml-2 search-btn"
+              rounded
+              @click="handleSearch"
+              :loading="isLoading"
+            >
+              Search
+            </v-btn>
           </div>
-          
-          <v-list>
+
+          <v-alert
+            v-if="searchTerm && filteredBoards.length === 0 && !isLoading"
+            type="info"
+            dense
+            class="mb-4"
+          >
+            No boards found matching "{{ searchTerm }}". Try a different search
+            term.
+          </v-alert>
+
+          <v-list v-if="filteredBoards.length > 0">
             <!-- Board options with logos/icons -->
-            <v-list-item 
-              v-for="board in filteredBoards" 
+            <v-list-item
+              v-for="board in filteredBoards"
               :key="board.id"
               @click="selectBoard(board)"
               class="board-item"
             >
               <v-list-item-avatar>
-                <v-img :src="board.logo || getBoardLogo(board.id)" :alt="board.name + ' logo'" />
+                <!-- <v-img :src="board.logo || getBoardLogo(board.id)" :alt="board.name + ' logo'" /> -->
+                <v-icon> mdi-image </v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title>{{ board.name || board.title }}</v-list-item-title>
+                <v-list-item-title v-if="!searchTerm">{{
+                  board.name || board.title
+                }}</v-list-item-title>
+                <div
+                  v-else
+                  class="v-list-item__title"
+                  v-html="highlightMatch(board.name || board.title)"
+                ></div>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -47,40 +89,55 @@
 
 <script>
 export default {
-  name: 'BoardSelector',
-  
+  name: "BoardSelector",
+
   data() {
     return {
       showBoardDialog: false,
-      searchTerm: '',
+      searchTerm: "",
       selectedBoard: null,
       // Will be populated with boards from API
       boards: [],
       isLoading: false,
-      error: null
-    }
+      error: null,
+    };
   },
-  
+
   computed: {
     filteredBoards() {
       if (!this.searchTerm) return this.boards;
-      
+
       const searchLower = this.searchTerm.toLowerCase();
-      return this.boards.filter(board => {
-        const boardName = (board.name || board.title || '').toLowerCase();
+      return this.boards.filter((board) => {
+        const boardName = (board.name || board.title || "").toLowerCase();
         return boardName.includes(searchLower);
       });
-    }
+    },
   },
-  
+  watch: {
+    showBoardDialog(visible) {
+      if (visible) {
+        // When dialog opens, fetch boards and focus the search field
+        this.fetchBoards();
+
+        // Use nextTick to ensure the DOM is updated before focusing
+        this.$nextTick(() => {
+          if (this.$refs.searchField) {
+            this.$refs.searchField.focus();
+          }
+        });
+      }
+    },
+  },
+
   async mounted() {
     // Try to fetch boards first
     await this.fetchBoards();
-    
+
     // Then check for board selection
     this.checkBoardSelection();
   },
-  
+
   methods: {
     /**
      * Fetch available boards from API
@@ -89,33 +146,35 @@ export default {
       try {
         this.isLoading = true;
         this.error = null;
-        
+
         // Fetch boards from the endpoint mentioned in the GitHub issue
-        const response = await this.$axios.get('api/v1/types/list/?type=section');
-        
+        const response = await this.$axios.get(
+          "api/v1/types/list/?type=section"
+        );
+
         if (response.data && Array.isArray(response.data.data)) {
           this.boards = response.data.data;
         }
       } catch (error) {
-        console.error('Error fetching boards:', error);
-        this.error = 'Failed to load boards. Please try again.';
-        
+        console.error("Error fetching boards:", error);
+        this.error = "Failed to load boards. Please try again.";
+
         // Fallback to static boards if API fails
         this.boards = [
-          { id: 'cie', title: 'CIE' },
-          { id: 'edexcel', title: 'Edexcel' },
-          { id: 'aqa', title: 'AQA' },
-          { id: 'ocr', title: 'OCR' },
-          { id: 'academic_events', title: 'Academic Events' },
-          { id: 'turkiye', title: 'Türkiye' },
-          { id: 'iran', title: 'Iran' },
-          { id: 'france', title: 'France' }
+          { id: "cie", title: "CIE" },
+          { id: "edexcel", title: "Edexcel" },
+          { id: "aqa", title: "AQA" },
+          { id: "ocr", title: "OCR" },
+          { id: "academic_events", title: "Academic Events" },
+          { id: "turkiye", title: "Türkiye" },
+          { id: "iran", title: "Iran" },
+          { id: "france", title: "France" },
         ];
       } finally {
         this.isLoading = false;
       }
     },
-    
+
     /**
      * Get logo URL for a board based on its ID
      * @param {string} boardId - The board ID
@@ -124,19 +183,19 @@ export default {
     getBoardLogo(boardId) {
       // Map of board IDs to their logo paths
       const logoMap = {
-        'cie': '/images/boards/cie.png',
-        'edexcel': '/images/boards/edexcel.png',
-        'aqa': '/images/boards/aqa.png',
-        'ocr': '/images/boards/ocr.png',
-        'academic_events': '/images/boards/academic.png',
-        'turkiye': '/images/boards/turkiye.png',
-        'iran': '/images/boards/iran.png',
-        'france': '/images/boards/france.png'
+        cie: "/images/boards/cie.png",
+        edexcel: "/images/boards/edexcel.png",
+        aqa: "/images/boards/aqa.png",
+        ocr: "/images/boards/ocr.png",
+        academic_events: "/images/boards/academic.png",
+        turkiye: "/images/boards/turkiye.png",
+        iran: "/images/boards/iran.png",
+        france: "/images/boards/france.png",
       };
-      
-      return logoMap[boardId] || '/images/boards/default.png';
+
+      return logoMap[boardId] || "/images/boards/default.png";
     },
-    
+
     /**
      * Check if a board has been previously selected and stored in local storage
      */
@@ -146,32 +205,32 @@ export default {
         this.showBoardSelectionDialog();
         return;
       }
-      
+
       // Check for a board in local storage
-      const storedBoard = localStorage.getItem('selectedBoard');
-      
+      const storedBoard = localStorage.getItem("selectedBoard");
+
       if (storedBoard) {
         try {
           // Parse stored board information
           this.selectedBoard = JSON.parse(storedBoard);
-          
+
           // Verify the board still exists in our list
-          const boardExists = this.boards.some(b => 
-            b.id === this.selectedBoard.id || 
-            b.id === this.selectedBoard.id
+          const boardExists = this.boards.some(
+            (b) =>
+              b.id === this.selectedBoard.id || b.id === this.selectedBoard.id
           );
-          
+
           if (boardExists) {
-            this.$emit('board-selected', this.selectedBoard);
+            this.$emit("board-selected", this.selectedBoard);
           } else {
             // Board no longer exists, show selection dialog
-            localStorage.removeItem('selectedBoard');
+            localStorage.removeItem("selectedBoard");
             this.showBoardSelectionDialog();
           }
         } catch (error) {
           // If parsing fails, clear the invalid storage and show dialog
-          console.error('Error parsing stored board', error);
-          localStorage.removeItem('selectedBoard');
+          console.error("Error parsing stored board", error);
+          localStorage.removeItem("selectedBoard");
           this.showBoardSelectionDialog();
         }
       } else {
@@ -179,27 +238,27 @@ export default {
         this.showBoardSelectionDialog();
       }
     },
-    
+
     /**
      * Show the board selection dialog
      */
     showBoardSelectionDialog() {
       this.showBoardDialog = true;
     },
-    
+
     /**
      * Handle board selection
      * @param {Object} board - The selected board
      */
     selectBoard(board) {
       // Log board data for debugging
-      console.log('Raw selected board:', board);
-      
+      console.log("Raw selected board:", board);
+
       // Extract relevant properties, ensuring we have strings for IDs
       // The ID could be a number, so we need to convert it to a string
-      const boardId = board.id !== undefined ? String(board.id) : '';
-      const boardTitle = board.title || board.name || 'Unknown Board';
-      
+      const boardId = board.id !== undefined ? String(board.id) : "";
+      const boardTitle = board.title || board.name || "Unknown Board";
+
       // Make sure we have a complete board object with consistent property names
       this.selectedBoard = {
         id: boardId,
@@ -207,31 +266,83 @@ export default {
         name: boardTitle, // Include both name and title for consistency
         logo: board.logo || this.getBoardLogo(boardId),
         // Keep any original properties that might be needed by the API
-        ...(typeof board === 'object' ? board : {})
+        ...(typeof board === "object" ? board : {}),
       };
-      
-      console.log('Processed board object:', this.selectedBoard);
-      
+
+      console.log("Processed board object:", this.selectedBoard);
+
       // Save to local storage for persistence
-      localStorage.setItem('selectedBoard', JSON.stringify(this.selectedBoard));
-      
+      localStorage.setItem("selectedBoard", JSON.stringify(this.selectedBoard));
+
       // Close the dialog
       this.showBoardDialog = false;
-      
+
       // Emit event to notify parent components
-      this.$emit('board-selected', this.selectedBoard);
+      this.$emit("board-selected", this.selectedBoard);
     },
-    
+
     /**
      * Allow manually clearing board selection
      */
     clearBoardSelection() {
-      localStorage.removeItem('selectedBoard');
+      localStorage.removeItem("selectedBoard");
       this.selectedBoard = null;
       this.showBoardSelectionDialog();
-    }
-  }
-}
+    },
+
+    /**
+     * Handle search button click or enter key press
+     */
+    handleSearch() {
+      console.log("Searching for:", this.searchTerm);
+
+      // If search term is empty, fetch all boards again
+      if (!this.searchTerm.trim()) {
+        this.fetchBoards();
+        return;
+      }
+
+      // If we already have boards loaded, filtering is handled
+      // by the computed property filteredBoards
+
+      // You could also implement server-side search by making
+      // an API call with the search term if needed:
+      // this.isLoading = true;
+      // this.$axios.get(`api/v1/types/list/?type=section&search=${this.searchTerm}`)
+      //   .then(response => {
+      //     this.boards = response.data.data;
+      //   })
+      //   .catch(error => {
+      //     console.error('Search error:', error);
+      //   })
+      //   .finally(() => {
+      //     this.isLoading = false;
+      //   });
+    },
+
+    // Method to highlight search matches in text
+    /**
+     * Highlights the search term within a text string
+     * @param {string} text - The text to search within
+     * @returns {string} - HTML with highlighted search term
+     */
+    highlightMatch(text) {
+      if (!this.searchTerm || !text) return text;
+
+      // Escape special regex characters in the search term
+      const escapedSearchTerm = this.searchTerm.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      // Create a regex that's case insensitive
+      const regex = new RegExp(`(${escapedSearchTerm})`, "gi");
+
+      // Replace matches with highlighted version
+      return text.replace(regex, '<span class="highlighted-text">$1</span>');
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -248,9 +359,20 @@ export default {
   flex-grow: 1;
 }
 
+.search-result {
+  font-family: Inter;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: right;
+  color: rgba(36, 41, 47, 0.3);
+}
+
 .search-count {
-  color: #4CAF50;
-  font-weight: bold;
+  color: #57b947;
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .board-item {
@@ -261,5 +383,13 @@ export default {
 
 .board-item:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Highlighted text styling */
+.highlighted-text {
+  background-color: rgba(255, 179, 0, 0.3);
+  font-weight: bold;
+  border-radius: 2px;
+  padding: 0 2px;
 }
 </style> 
