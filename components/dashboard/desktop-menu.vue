@@ -1,34 +1,32 @@
 <template>
-  <div>
+  <div class="dashboard-menu">
     <!--Desktop dashboard menu-->
-    <v-navigation-drawer
-      permanent
-    >
-      <v-list-item class="px-2 " to="/user">
-        <v-list-item-avatar>
-          <v-img class="mr-2" :src="require('@/assets/images/dashboard-icon.png')"></v-img>
-        </v-list-item-avatar>
+    <div class="dashboard-menu-container">
+      <v-list-item class="px-2" to="/user">
+        <template v-slot:prepend>
+          <v-avatar>
+            <v-img src="@/assets/images/dashboard-icon.png"></v-img>
+          </v-avatar>
+        </template>
 
         <v-list-item-title class="text-h5">Dashboard</v-list-item-title>
-
       </v-list-item>
 
       <v-divider></v-divider>
-      <navigation/>
-    </v-navigation-drawer>
+      <navigation />
+    </div>
     <!--End desktop dashboard menu-->
   </div>
 </template>
 
-<script>
+<script setup>
 import Navigation from "@/components/dashboard/navigation";
-
-export default {
-  name: "dashboard-desktop-menu",
-  components: {Navigation}
-}
 </script>
 
 <style scoped>
-
+.dashboard-menu-container {
+  background-color: #fff;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  height: 100%;
+}
 </style>
