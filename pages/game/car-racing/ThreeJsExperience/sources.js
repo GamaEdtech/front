@@ -39,4 +39,12 @@ export default [
         type: 'gltfModel',
         path: "/images/car-racing/car.glb"
     },
+
+
+    // font
+    {
+        name: 'fontLevel',
+        type: 'font',
+        path: "/images/car-racing/helvetiker_regular.typeface.json"
+    }
 ]
