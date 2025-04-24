@@ -872,6 +872,11 @@ export default {
       gradesLoading: false,
       // Local copy of stats for internal manipulation
       localStats: [],
+
+      // Add spinning state tracking and debounce timer
+      isSpinning: false,
+      debounceTimer: null,
+      debounceDelay: 600, // Wait 600ms after spinning stops before making API calls
     };
   },
   methods: {
@@ -902,6 +907,12 @@ export default {
     },
     handleBtnClick(index) {
       this.stopInterval(); // Clear the interval using the interval ID
+
+      // Make sure spinning state is false for direct clicks
+      this.isSpinning = false;
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
 
       // Mark that the user has explicitly selected a grade
       this.hasSelectedGrade = true;
@@ -947,24 +958,28 @@ export default {
     handleMouseDown(index) {
       this.isMouseDown = true;
       this.startIndex = index;
-      // event.preventDefault();
-      // this.stopInterval(); // Clear the interval using the interval ID
+      // Mark that we're starting to spin
+      this.isSpinning = true;
     },
+
     handleMouseUp(event) {
       this.isMouseDown = false;
       this.startIndex = -1;
       this.currentIndex = -1;
+      // Mark that spinning has ended
+      this.isSpinning = false;
     },
+
     handleMouseMove(event) {
       if (this.isMouseDown) {
         this.stopInterval();
         event.preventDefault();
 
-        // Get the touch coordinates
+        // Get the mouse coordinates
         const touchX = event.clientX;
         const touchY = event.clientY;
 
-        // Loop through the buttons and check if the touch is over a button
+        // Loop through the buttons and check if the mouse is over a button
         for (let index = 0; index < this.localStats.length; index++) {
           const buttonRef = this.$refs[`handler${index}`][0];
           const rect = buttonRef.getBoundingClientRect();
@@ -997,8 +1012,16 @@ export default {
 
             this.startIndex = index;
             
-            // Refresh category counts when the grade changes
-            this.fetchCategoryCounts();
+            // Clear any existing timer to restart the debounce period
+            if (this.debounceTimer) {
+              clearTimeout(this.debounceTimer);
+            }
+            
+            // Set a new debounce timer that will trigger the API calls
+            // only after the user stops spinning for the debounceDelay time
+            this.debounceTimer = setTimeout(() => {
+              this.handleSpinningComplete();
+            }, this.debounceDelay);
             
             return; // Stop checking once a button is found
           }
@@ -1018,12 +1041,20 @@ export default {
     handleTouchEnd(event) {
       this.startIndex = -1;
       this.currentIndex = -1;
-      // this.touchStartY = 0;
+      
+      // Mark that spinning has ended
+      this.isSpinning = false;
+      
+      // If there's an active debounce timer, let it complete
+      // which will trigger the API calls after the debounce period
     },
 
     handleTouchMove(event) {
       this.stopInterval();
       event.preventDefault();
+
+      // Mark that we're currently spinning
+      this.isSpinning = true;
 
       // Get the touch coordinates
       const touchX = event.touches[0].clientX;
@@ -1063,8 +1094,16 @@ export default {
 
           this.startIndex = index;
           
-          // Refresh category counts when the grade changes
-          this.fetchCategoryCounts();
+          // Clear any existing timer to restart the debounce period
+          if (this.debounceTimer) {
+            clearTimeout(this.debounceTimer);
+          }
+          
+          // Set a new debounce timer that will trigger the API calls
+          // only after the user stops spinning for the debounceDelay time
+          this.debounceTimer = setTimeout(() => {
+            this.handleSpinningComplete();
+          }, this.debounceDelay);
           
           return; // Stop checking once a button is found
         }
@@ -1518,6 +1557,24 @@ export default {
       const numId = parseInt(id) || 0;
       return colors[numId % colors.length];
     },
+
+    /**
+     * Handle updates after wheel spinning stops
+     * This method is called after debouncing to prevent excessive API calls
+     */
+    handleSpinningComplete() {
+      if (this.isSpinning) {
+        return; // Don't process if we're still spinning
+      }
+      
+      console.log('Wheel spinning complete, updating data');
+      
+      // Update URL with the selected grade
+      this.updateUrlWithSelectedGrade();
+      
+      // Refresh category counts
+      this.fetchCategoryCounts();
+    },
   },
   computed: {
     gradeSizes() {
@@ -1583,6 +1640,11 @@ export default {
   },
   beforeDestroy() {
     this.stopInterval(); // Stop the interval when the component is about to be unmounted
+    
+    // Clear any pending debounce timers
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
     
     // Clean up event listeners
     window.removeEventListener('storage', (event) => {
