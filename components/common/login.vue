@@ -1,7 +1,11 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { waapi } from 'animejs';
+import {navigateTo } from 'nuxt/app';
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
+import { useAuth } from '~/composables/useAuth';
+
+const { $toast } = useNuxtApp()
 
 
 const props = defineProps({
@@ -25,6 +29,7 @@ const password = useField("password");
 const otp = ref("");
 const otp_loading = ref(false);
 const countDown = ref(60);
+let timerId = ref(null)
 const sendOtpBtnStatus = ref(true);
 
 const google_login_loading = ref(true);
@@ -32,6 +37,13 @@ const identity_holder = ref(true);
 const otp_holder = ref(false);
 const googleLoginBtn = ref(null)
 
+watch(countDown ,(val) => {
+      //When user wait 10 second
+      if (val === 0) sendOtpBtnStatus.value = false;
+
+      //When user request new otp code
+      if (val === 60) countDownTimer();
+    });
 
 async function handleCredentialResponse(response) {
   try {
@@ -45,12 +57,10 @@ async function handleCredentialResponse(response) {
     )
 
     const token = res.data.data.jwtToken
-    const userInfo = res.data.data.info
 
     // Handle auth logic (depending on your auth setup)
-    if (auth?.setUserToken && auth?.setUser) {
+    if (auth?.setUserToken) {
       auth.setUserToken(token)
-      auth.setUser(userInfo)
     }
 
     submitLoginV2(token)
@@ -94,41 +104,113 @@ onMounted(() => {
   }, 4000)
 })
 
+// Resend OTP code
+const sendOtpCodeAgain = async () => {
+  try{
+    const response = await $fetch('/api/v1/users/', {
+      method: 'POST',
+      body: new URLSearchParams({
+        'type' : 'resend_code',
+        'identity' : identity.value,
+      }),
+  });
+    countDown.value = 60;
+    sendOtpBtnStatus.value = true;
+    $toast.success('Otp code sent again');
+  }
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+};
+
 const submit = handleSubmit(async () => {
+  const auth = useAuth();
   login_loading.value = true;
   try {
-    const response = await fetch("/api/v1/users/login", {
-      method: "POST",
+    const response = await auth.login({
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
         identity: identity.value.value,
         pass: password.value.value,
-        type: "request",
-      }),
-    });
-
-    if (!response.ok) throw await response.json()
+      });
     
-
-    const data = await response.json();
-
-    if (data.data.type === "loginByOTP") {
-      //toast.success("Otp code sent");
+    const data = await response;
+    if (data.data.type == "loginByOTP") {
+      $toast.success("Otp code sent");
       identity_holder.value = false;
-      otp_holder.value = true;      
+      otp_holder.value = true; 
+      
     } else {
-      $auth.setUserToken(data.jwtToken);
-      $auth.setUser(data.info);
-      $toast.success("Logged in successfully");
-      model.value = false;
-      if ($route.path === "/") $router.push({ path: "/user" });
+        $toast.success("Logged in successfully");
+        auth.setUserToken(response.data.jwtToken);
+        closeDialog()
+        navigateTo('/user')
     }
   } catch (error) {
-    if (error.status === 400) $toast.error(error.message);
-  } finally {
-    login_loading.value = false;
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
   }
 });
+
+const onFinish = async () => {
+  const auth = useAuth();
+  try{
+    const response = await $fetch(
+      "/api/v1/users/login",{
+      method: 'POST',
+      body: new URLSearchParams({
+        type: "confirm",
+        identity: identity.value.value,
+        pass: password.value.value,
+        code: otp.value,
+        type: "confirm",
+      })
+    });
+    const data = await response.json()
+    if(data.status === 1){
+      $toast.success("Logged in successfully");
+      auth.setUserToken(data.data.jwtToken);
+      closeDialog();
+      navigateTo('/user');
+    }
+    }
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+    }
+  }
+
+const countDownTimer = () => {
+  if (timerId) {
+    clearTimeout(timerId)
+    timerId = null
+  }
+  countDown.value = 60
+  tick()
+}
+
+const tick = () => {
+  if (countDown.value > 0) {
+    timerId = setTimeout(() => {
+      countDown.value -= 1
+      tick()
+    }, 1000)
+  } else {
+    timerId = null 
+  }
+}
 
 const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
 

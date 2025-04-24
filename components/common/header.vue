@@ -83,7 +83,7 @@
                         {{ item.title }}
                       </v-list-item-title>
                     </v-list-item>
-                    <v-list-item class="pointer" @click="$auth.logout()">
+                    <v-list-item class="pointer" @click="auth.logout()">
                       <template v-slot:prepend>
                         <v-icon small class="mr-0"> mdi-logout </v-icon>
                       </template>
@@ -168,7 +168,7 @@
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
 
-            <v-list-item @click="$auth.logout()">
+            <v-list-item @click="auth.logout()">
               <template v-slot:prepend>
                 <v-icon icon="mdi-exit-to-app" />
               </template>
@@ -536,7 +536,7 @@
                 {{ item.title }}
               </v-list-item-title>
             </v-list-item>
-            <v-list-item class="pointer" @click="$auth.logout()">
+            <v-list-item class="pointer" @click="auth.logout()">
               <template v-slot:prepend>
                 <v-icon small class="mr-0"> mdi-logout </v-icon>
               </template>
@@ -596,7 +596,8 @@
 import CommonLogin from '~/components/common/login.vue'
 import CommonRegister from '~/components/common/register.vue'
 import CommonRecover from '~/components/common/pass-recover.vue'
-
+import { useAuth } from '~/composables/useAuth';
+const auth = useAuth()
 const isAuthModalOpen = ref(false);
 const currentAuthComponent = ref('login')
 

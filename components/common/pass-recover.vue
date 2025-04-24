@@ -1,4 +1,7 @@
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const { $toast } = useNuxtApp()
 
 const props = defineProps({
   dialog: Boolean
@@ -20,7 +23,7 @@ let sendOtpBtnStatus = ref(true)
 
 let identityHolder = ref(true)
 let otpHolder = ref(false)
-let select_pass_holder = ref(false)
+let selectPassHolder = ref(false)
 let googleRegisterBtn = ref(null)
 
 
@@ -75,9 +78,8 @@ const handleCredentialResponse = async (response) => {
   } else {
     // Store user data in authentication
     auth.setUserToken(data.value.data.jwtToken);
-    auth.setUser(data.value.data.info);
     passRecoverDialog.value = false;
-    toast.success('Logged in successfully');
+    $toast.success('Logged in successfully');
     router.push('/user');
   }
 };
@@ -86,21 +88,23 @@ const handleCredentialResponse = async (response) => {
 // Handle OTP request
 const requestPassRecover = async ()  => {
   passRecoverLoading.value = true;
+  const auth = useAuth();
   try{
-     await fetch('api/v1/users/recovery',{
-      method: 'POST',
-      body: new URLSearchParams({
-        'type' : 'request',
-        'identity' : identity.value
-      })
+      const response = await auth.forgotPassword({
+        identity : identity.value
     })
-
+    console.log(response)
+    $toast.success("Otp code sent");
     identityHolder.value = false;
     otpHolder.value = true;
     countDownTimer();
-  } catch(err){
-    //if (err.response.status == 400)
-      //toast.error(err.response.data.message);
+  } catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
   }
   finally{
     passRecoverLoading.value = false;
@@ -111,7 +115,7 @@ const requestPassRecover = async ()  => {
 // Handle OTP confirmation
 const onFinish = () => {
   try{
-    fetch('/api/v1/users/recovery', {
+    $fetch('/api/v1/users/recovery', {
     method: 'POST',
     body: new URLSearchParams({
       'type': 'confirm',
@@ -119,41 +123,49 @@ const onFinish = () => {
     'code': otp.value,
     }),
   });
-  }
-  
-
-  catch (err) {
-    //if (err.status === 400) 
-      //toast.error(error.value.data.message);
-  }
-  finally{
     otpHolder.value = false;
     selectPassHolder.value = true;
+  }
+
+  catch (error) {
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+  finally{
+    
     passRecoverLoading.value = false;
   }
 };
 
 // Resend OTP code
-const sendOtpCodeAgain = () => {
-
-  const { data, error } = $fetch('/api/v1/users/recovery', {
-    method: 'POST',
-    body: new URLSearchParams({
-      'type' : 'resend_code',
-      'identity' : identity.value,
-    }),
+const sendOtpCodeAgain = async () => {
+  try{
+    const response = await $fetch('/api/v1/users/recovery', {
+      method: 'POST',
+      body: new URLSearchParams({
+        'type' : 'resend_code',
+        'identity' : identity.value,
+      }),
   });
-
-  if (error.value) {
-    if (error.value.status === 400) {
-      toast.error(error.value.data.message);
-    }
-  } else {
     countDown.value = 60;
     sendOtpBtnStatus.value = true;
-    toast.success('Otp code sent again');
+    $toast.success('Otp code sent again');
   }
-  passRecoverLoading.value = false;
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+  finally{
+    passRecoverLoading.value = false;
+  }
 };
 
 
@@ -179,30 +191,34 @@ const tick = () => {
 }
 
 
-// Final password recovery
-const passRecover = () => {
+//Final register (level 3: receive password from user)
+const passRecover = async () => {
   passRecoverLoading.value = true;
-  const { data, error } = $fetch('/api/v1/users/recovery', {
-    method: 'POST',
-    body: new URLSearchParams({
-      'type' : 'resetpass',
-      'identity' : identity.value,
-      'pass' : password.value
-    }),
-  });
+  try{
+     const response =  await $fetch('/api/v1/users/recovery', {
+      method: 'POST',
+      body: new URLSearchParams({
+        'type' : 'resetpass',
+        'identity' : identity.value,
+        'pass' : password.value
+      }),
+    });
 
-  if (error.value) {
-    if (error.value.status === 400) {
-      toast.error(error.value.data.message);
-    }
-  } else {
-    toast.success('Password reset successfully');
-    passRecoverDialog.value = false;
-    identityHolder.value = true;
-    otpHolder.value = false;
-    selectPassHolder.value = false;
+    $toast.success('Password reset successfully');
+    closeDialog()
+ 
   }
-  passRecoverLoading.value = false;
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+  finally{
+    passRecoverLoading.value = false;
+  }
 };
 
 // Cancel password recovery
@@ -337,7 +353,7 @@ function closeDialog() {
               </v-col>
               <!--End otp holder-->
             </div>
-            <div v-show="select_pass_holder">
+            <div v-show="selectPassHolder">
               <!--Otp holder-->
               <v-col cols="12">
                 <p class="text-h6">Please enter password</p>

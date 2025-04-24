@@ -1,21 +1,20 @@
 // middleware/auth.global.ts
 import { defineNuxtRouteMiddleware, navigateTo } from 'nuxt/app'
-import { useAutha } from '../composables/useAutha'
+import { useAuth } from '../composables/useAuth'
 
-export default defineNuxtRouteMiddleware((to) => {
-  const { isAuthenticated, loadUserFromCookie } = useAutha()
+export default defineNuxtRouteMiddleware(async (to) => {
+  const auth = useAuth()
 
-  // Load token on page refresh
-  loadUserFromCookie()
+  // Ensure auth state is loaded before checking
+  await auth.loadUserFromCookie()
 
-  // Only protect certain routes (like all under /user)
   const protectedRoutes = ['/dashboard', '/user']
 
   const shouldProtect = protectedRoutes.some((route) =>
     to.path.startsWith(route)
   )
 
-  if (shouldProtect && !isAuthenticated.value) {
-    return navigateTo('/') // or your actual login path
+  if (shouldProtect && !auth.isAuthenticated.value) {
+    return navigateTo('/') // redirect to login if not authenticated
   }
 })

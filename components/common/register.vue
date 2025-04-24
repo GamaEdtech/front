@@ -1,5 +1,7 @@
 <script setup>
+import { useAuth } from '~/composables/useAuth';
 
+const { $toast } = useNuxtApp()
 const props = defineProps({
   dialog: Boolean
 })
@@ -75,19 +77,29 @@ const cancelRegister = () => {
 const requestRegister = async () => {
   register_loading.value = true
   try{
-    await fetch('/api/v1/users/register',{
+    const response = await fetch('/api/v1/users/register',{
       method : 'POST',
       body: new URLSearchParams({
       type: "request",
       identity: identity.value,
     })})
-    //toast.success("Otp code sent")
-    identity_holder.value = false
-    otp_holder.value = true
-    countDownTimer();
+    const data = await response.json()
+    if(data.status === 1){
+      $toast.success("Otp code sent")
+      identity_holder.value = false
+      otp_holder.value = true
+      countDownTimer();
+    }else{
+      $toast.error(data.message)
+    }
   }
-    catch (err) {
-    //toast.error(err.response._data.message)
+    catch (error) {
+      const errorData = error?.response?._data;
+
+      if(error?.response?.status === 400)
+        $toast.error(errorData.message);
+      else
+        $toast.error('Something went wrong.')
     }
     finally{
       register_loading.value = false
@@ -110,11 +122,16 @@ const onFinish = async () => {
       otp_holder.value = false
       select_pass_holder.value = true
     }
-    //if(data.error === "incorrectCode")
-      //toast.error(data.message)
+    if(data.error === "incorrectCode")
+      $toast.error(data.message)
   }
-  catch(err) {
-        //toast.error(err.response._data.message)
+  catch(error) {
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
     }
   finally {
       register_loading.value = false
@@ -123,20 +140,28 @@ const onFinish = async () => {
 
 const sendOtpCodeAgain = async () => {
   try {
-    await fetch('/api/v1/users/register',{
+    const response = await fetch('/api/v1/users/register',{
       method : 'POST',
       body: new URLSearchParams({
       type: "resend_code",
       identity: identity.value,
     })
     })
+    const data = await response.json()
     countDownTimer();
     sendOtpBtnStatus.value = true
-    //toast.success("Otp code sent again")
+    $toast.success("Otp code sent again")
+    if (datastatus === 400) 
+        $toast.error(err.response._data.message)
   }
-  catch(err) {
-      //if (err.response.status === 400) 
-        //toast.error(err.response._data.message)
+  catch(error) {
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+      
     }
   finally{
       register_loading.value = false
@@ -165,28 +190,29 @@ const tick = () => {
 
 const finalRegister = async () => {
   register_loading.value = true
+  const auth = useAuth();
   try{
-    await fetch('/api/v1/users/register',{
-      method: 'POST',
-      body: new URLSearchParams({
-        type: "register",
-        identity: identity.value,
-        pass: password.value,
+    await auth.register({
+      identity: identity.value,
+      pass: password.value,
     })
-    })
-    //toast.success("Registered successfully")
+    $toast.success("Registered successfully")
     register_dialog.value = false
     identity_holder.value = true
     otp_holder.value = false
     select_pass_holder.value = false
-  }
-  catch(err) {
-      //if (err.response.status === 400) 
-        //toast.error(err.response._data.message)
-      
+    }
+  catch(error) {
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
     }
   finally{
       register_loading.value = false
+      closeDialog();
     }
 }
 
@@ -200,17 +226,16 @@ const handleCredentialResponse = async(response) => {
       })
     })
     $auth.setUserToken(res.data.data.jwtToken)
-    $auth.setUser(res.data.data.info)
     register_dialog.value = false
-    //toast.success("Logged in successfully")
+    $toast.success("Logged in successfully")
     router.push('/user')
 
   }
   catch(err) {
-      /*if (err.status === 401) 
-        toast.error("Wrong login credentials")
+      if (err.status === 401) 
+        $toast.error("Wrong login credentials")
       else if (err.status === 500 || err.status === 504) 
-        $toast.error("Request failed")*/
+        $toast.error("Request failed")
     }
 }
 
