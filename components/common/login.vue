@@ -1,5 +1,4 @@
 <script setup>
-import { waapi } from 'animejs';
 import {navigateTo } from 'nuxt/app';
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
