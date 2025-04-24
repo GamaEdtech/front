@@ -146,9 +146,8 @@ export default {
       
       // Notify other components about the board change using a custom event
       this.$root.$emit('board-changed', board);
-      
-      // Update route with the selected board
-      this.updateRoute();
+            // Update route with the selected board
+            this.updateRoute();
     },
     
     /**

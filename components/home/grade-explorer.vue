@@ -1731,11 +1731,16 @@ export default {
      * Handle board changed event from board selector
      * This method will be called whenever a board is selected
      */
-    handleBoardChanged(board) {
+    async handleBoardChanged(board) {
       if (board && board.id) {
         this.activeBoard = board;
         this.activeBoardName = this.getBoardDisplayName(board);
         this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
+
+        // Fetch grades for the new board *before* updating URL/refreshing data
+        await this.fetchGrades();
+        
+        // Now update the URL and refresh other data (which uses the new grades)
         this.updateUrlWithCurrentBoard();
       }
     },

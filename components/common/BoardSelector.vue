@@ -245,7 +245,6 @@ export default {
      * Set the default board (CIE)
      */
     setDefaultBoard() {
-      console.log("Setting default board to CIE");
       
       // First look for CIE board in our board list
       const cieBoard = this.boards.find(
@@ -256,16 +255,13 @@ export default {
       );
       
       if (cieBoard) {
-        console.log("Found CIE board in list:", cieBoard);
         this.selectBoard(cieBoard);
       } else {
         // If we can't find CIE board specifically, use the first board in the list
         if (this.boards.length > 0) {
-          console.log("CIE board not found, using first board in list:", this.boards[0]);
           this.selectBoard(this.boards[0]);
         } else {
           // As a last resort, create a default CIE board object
-          console.log("Creating default CIE board object");
           const defaultBoard = {
             id: "6659",
             title: "CIE",
@@ -288,8 +284,6 @@ export default {
      * @param {Object} board - The selected board
      */
     selectBoard(board) {
-      // Log board data for debugging
-      console.log("Raw selected board:", board);
 
       // Extract relevant properties, ensuring we have strings for IDs
       const boardId = board.id !== undefined ? String(board.id) : "";
@@ -317,7 +311,6 @@ export default {
         this.selectedBoard.name = `Board ${boardId}`;
       }
 
-      console.log("Processed board object:", this.selectedBoard);
 
       // Save to local storage for persistence
       localStorage.setItem("selectedBoard", JSON.stringify(this.selectedBoard));
@@ -342,7 +335,6 @@ export default {
      * Handle search button click or enter key press
      */
     handleSearch() {
-      console.log("Searching for:", this.searchTerm);
 
       // If search term is empty, fetch all boards again
       if (!this.searchTerm.trim()) {
