@@ -6,7 +6,7 @@
 
     <main-slider />
 
-    <grade-explorer :stats="stats" />
+    <grade-explorer />
 
     <level-guid-banner :slide-arr="slideArr" />
 
@@ -235,15 +235,6 @@ export default {
       }
       return "#24292F"; // or some default value if colors or carousel_model is not available
     },
-  },
-
-  //Load data
-  async asyncData({ params, $axios }) {
-    // This could also be an action dispatch
-    const response = await $axios.$get("/api/v1/home/stats");
-    var stats = response.data;
-
-    return { stats };
   },
 };
 </script>

@@ -579,7 +579,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
+import TopicSelector from "@/components/Form/topic-selector";
 import "vue-advanced-cropper/dist/style.css";
 
 export default {
