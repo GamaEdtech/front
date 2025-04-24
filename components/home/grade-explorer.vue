@@ -956,6 +956,7 @@ export default {
       isSpinning: false,
       debounceTimer: null,
       debounceDelay: 600, // Wait 600ms after spinning stops before making API calls
+      isUpdating: false,
     };
   },
   methods: {
@@ -1011,9 +1012,8 @@ export default {
 
             // Update URL after the last animation step
             if (i === deltaIndex - 1) {
+              // Call the gatekeeper method to handle updates
               this.updateUrlWithSelectedGrade();
-              // Ensure category counts are updated with the newly selected grade
-              this.fetchCategoryCounts();
             }
           }, 200 * i + 1);
         }
@@ -1028,12 +1028,14 @@ export default {
 
             // Update URL after the last animation step
             if (i === deltaIndex + 1) {
+              // Call the gatekeeper method to handle updates
               this.updateUrlWithSelectedGrade();
-              // Ensure category counts are updated with the newly selected grade
-              this.fetchCategoryCounts();
             }
           }, 200 * Math.abs(i) + 1);
         }
+      } else {
+         // If deltaIndex is 0 (clicking the center item), still trigger update
+         this.updateUrlWithSelectedGrade();
       }
     },
 
@@ -1102,7 +1104,8 @@ export default {
             // Set a new debounce timer that will trigger the API calls
             // only after the user stops spinning for the debounceDelay time
             this.debounceTimer = setTimeout(() => {
-              this.handleSpinningComplete();
+              // Call the gatekeeper method when debounce timer fires
+              this.updateUrlWithSelectedGrade();
             }, this.debounceDelay);
 
             return; // Stop checking once a button is found
@@ -1129,6 +1132,7 @@ export default {
 
       // If there's an active debounce timer, let it complete
       // which will trigger the API calls after the debounce period
+      // No explicit call here, let the timer handle it.
     },
 
     handleTouchMove(event) {
@@ -1183,7 +1187,8 @@ export default {
           // Set a new debounce timer that will trigger the API calls
           // only after the user stops spinning for the debounceDelay time
           this.debounceTimer = setTimeout(() => {
-            this.handleSpinningComplete();
+            // Call the gatekeeper method when debounce timer fires
+            this.updateUrlWithSelectedGrade();
           }, this.debounceDelay);
 
           return; // Stop checking once a button is found
@@ -1356,22 +1361,50 @@ export default {
       // Reset loading states
       this.questionLoading = true;
       this.paperLoading = true;
-      this.categoryCountsLoading = true;
+      this.categoryCountsLoading = true; // Ensure this is set true at the start
 
-      // Reload questions, papers and category counts
-      await Promise.all([
-        this.getQuestions(),
-        this.getPapers(),
-        this.fetchCategoryCounts(),
-      ]);
+      try {
+        // Reload questions, papers and category counts
+        await Promise.all([
+          this.getQuestions(),
+          this.getPapers(),
+          this.fetchCategoryCounts(), // This includes setting categoryCountsLoading to false
+        ]);
+      } catch (error) {
+         console.error("Error during refreshData:", error);
+         // Ensure loading states are reset even on error
+         this.questionLoading = false;
+         this.paperLoading = false;
+         this.categoryCountsLoading = false; // Reset category loading on error too
+      } finally {
+         // Note: isUpdating flag is managed by the caller (updateUrlWithSelectedGrade)
+         // We ensure categoryCountsLoading is false after fetchCategoryCounts runs (success or error)
+      }
     },
 
-    // Update URL with selected grade
+    // Update URL with selected grade - ACTS AS GATEKEEPER
     updateUrlWithSelectedGrade() {
+      // Prevent concurrent updates
+      if (this.isUpdating) {
+        return;
+      }
+
+      // Don't update if still spinning (relevant for debounce timer)
+      if (this.isSpinning) {
+         return;
+      }
+
+      // Set the flag to indicate an update is in progress
+      this.isUpdating = true;
+
       // The centered grade (at index 7) is the selected one
       const selectedGrade = this.localStats[7];
 
-      if (!selectedGrade) return;
+      if (!selectedGrade) {
+        console.warn("Update aborted: No selected grade at index 7.");
+        this.isUpdating = false; // Reset flag if we abort early
+        return;
+      }
 
       // Create query with existing params
       const query = { ...this.$route.query };
@@ -1400,15 +1433,18 @@ export default {
           // Ignore the NavigationDuplicated error
         } else {
           // Otherwise rethrow the error
-          throw err;
+          console.error("Router replace error:", err);
         }
       });
 
       // Refresh data based on the new grade/board
-      this.refreshData();
+      // Use .finally() to ensure the flag is reset regardless of success/error
+      this.refreshData().finally(() => {
+         this.isUpdating = false; // Reset the flag when refreshData completes
+      });
 
-      // Also fetch updated category counts
-      this.fetchCategoryCounts();
+      // Remove redundant fetchCategoryCounts call here, it's in refreshData
+      // this.fetchCategoryCounts();
     },
 
     showBoardSelector() {
@@ -1653,22 +1689,6 @@ export default {
       // Convert ID to a number and use modulo to get an index
       const numId = parseInt(id) || 0;
       return colors[numId % colors.length];
-    },
-
-    /**
-     * Handle updates after wheel spinning stops
-     * This method is called after debouncing to prevent excessive API calls
-     */
-    handleSpinningComplete() {
-      if (this.isSpinning) {
-        return; // Don't process if we're still spinning
-      }
-
-      // Update URL with the selected grade
-      this.updateUrlWithSelectedGrade();
-
-      // Refresh category counts
-      this.fetchCategoryCounts();
     },
 
     /**
