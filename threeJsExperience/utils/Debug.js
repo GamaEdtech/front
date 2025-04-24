@@ -7,7 +7,7 @@ export default class Debug {
         this.ui.close()
         this.stats = new Stats();
         this.stats.showPanel(0);
-        document.body.appendChild(this.stats.dom);
+        // document.body.appendChild(this.stats.dom);
     }
 
     update() {

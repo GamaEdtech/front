@@ -15,7 +15,7 @@
 
 
 <script>
-import Experience from "./ThreeJsExperience/Experience.js";
+import Experience from "@/threeJsExperience/car-racing/Experience.js";
 
 export default {
     auth: false,

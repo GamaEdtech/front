@@ -1,11 +1,11 @@
 import * as THREE from "three"
 import Camera from "./Camera"
-import Sizes from "./utils/Sizes"
-import Time from "./utils/Time"
-import Debug from "./utils/Debug"
+import Sizes from "../utils/Sizes"
+import Time from "../utils/Time"
+import Debug from "../utils/Debug"
 import Renderer from "./Renderer"
 import World from "./world/World"
-import Resources from "./utils/Resources"
+import Resources from "../utils/Resources"
 
 import sources from "./sources"
 
