@@ -89,6 +89,7 @@
                     margin-bottom: 16px;
                     border-bottom: 0px !important;
                     cursor: pointer;
+                    border-top-right-radius: inherit;
                   "
                   v-if="activeBoard"
                 >
@@ -111,7 +112,7 @@
                   </div>
                   <template v-slot:actions>
                     <v-btn color="primary" text @click="showBoardSelector">
-                      <v-icon color="primary" size="20"
+                      <v-icon color="#B2DDFF" size="20"
                         >mdi-chevron-down</v-icon
                       >
                     </v-btn>
@@ -1862,7 +1863,11 @@ export default {
   padding: 1.6rem;
   border-radius: 0rem 2rem 2rem 0rem;
 }
-
+@media screen and (max-width: 600px) {
+  #content-stats-container #grade-details-card {
+    padding-top: 5rem;
+  }
+}
 #content-stats-container #grade-details-card .v-card__text {
   padding: 3rem !important;
 }
