@@ -1463,9 +1463,12 @@ export default {
 
           // Use the board name or title from the stored object, never fall back to the ID
           this.activeBoardName = this.getBoardDisplayName(this.activeBoard);
+          return true;
         }
+        return false;
       } catch (error) {
         console.error("Error loading active board:", error);
+        return false;
       }
     },
 
@@ -1534,26 +1537,45 @@ export default {
     },
 
     /**
-     * Update the URL with just the board's section parameter
+     * Update URL based on current board without including grade
      */
     updateUrlWithCurrentBoard() {
-      if (!this.activeBoard || !this.activeBoard.id) return;
-
+      // Ensure we're not in a concurrent update
+      if (this.isUpdating) {
+        return;
+      }
+      
+      this.isUpdating = true;
+      
+      // Only proceed if we have an active board
+      if (!this.activeBoard || !this.activeBoard.id) {
+        console.warn("Cannot update URL: No active board");
+        this.isUpdating = false;
+        return;
+      }
+      
+      
       // Create query with existing params
       const query = { ...this.$route.query };
-
-      // Update the section parameter
+      
+      // Set section to active board ID
       query.section = this.activeBoard.id;
-
-      // Remove the base parameter
+      
+      // Remove base parameter as we're using the board without a specific grade
       delete query.base;
-
+      
       // Update the URL without reloading the page
-      // Handle NavigationDuplicated error
       this.$router.replace({ query }).catch((err) => {
         if (err && err.name === "NavigationDuplicated") {
-          // Ignore the NavigationDuplicated error
+          // Ignore this specific error
+        } else {
+          console.error("Router replace error:", err);
         }
+      });
+      
+      // Refresh data with the new board
+      this.refreshData().finally(() => {
+        this.isUpdating = false;
       });
     },
 
@@ -1700,8 +1722,22 @@ export default {
         title: "CIE",
         name: "CIE",
       };
+      this.activeBoardName = "CIE"; // Ensure the name is set explicitly
       this.hasSelectedGrade = false;
       this.updateUrlWithCurrentBoard();
+    },
+
+    /**
+     * Handle board changed event from board selector
+     * This method will be called whenever a board is selected
+     */
+    handleBoardChanged(board) {
+      if (board && board.id) {
+        this.activeBoard = board;
+        this.activeBoardName = this.getBoardDisplayName(board);
+        this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
+        this.updateUrlWithCurrentBoard();
+      }
     },
   },
   computed: {
@@ -1712,104 +1748,67 @@ export default {
     },
   },
 
+  created() {
+    // Move the event listener registration to created hook
+    // This ensures it's set up before the component is mounted
+    this.$root.$on("board-changed", this.handleBoardChanged);
+  },
+
+  beforeDestroy() {
+    // Clean up event listener to prevent memory leaks and duplicate listeners
+    this.$root.$off("board-changed", this.handleBoardChanged);
+    
+    // Also clean up any intervals or timers
+    this.stopInterval();
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+
+    // Clean up localStorage event listener
+    window.removeEventListener("storage", this.handleStorageChange);
+  },
+
   mounted() {
-    // Apply stored board from local storage on component mount
-    const storedBoard = localStorage.getItem("selectedBoard");
-    if (storedBoard) {
-      try {
-        // When the board is loaded from localStorage
-        const parsedBoard = JSON.parse(storedBoard);
-        this.activeBoard = parsedBoard;
-        this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
-        this.updateUrlWithCurrentBoard();
-      } catch (error) {
-        console.error("Error parsing stored board:", error);
-        // Fallback to default CIE board
-        this.setDefaultBoard();
-      }
+    // Load active board data on mount
+    this.getActiveBoard();
+    
+    // Initialize data based on the active board
+    if (this.activeBoard) {
+      this.updateUrlWithCurrentBoard();
     } else {
       // If no board in localStorage, use default CIE board
       this.setDefaultBoard();
     }
 
-    // Listen for board selection events from the board selector component
-    this.$nuxt.$on("board-changed", (board) => {
-      this.activeBoard = board;
-      this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
-      this.updateUrlWithCurrentBoard();
-    });
-
-    // Fetch grades based on active board (only if not provided as props)
+    // Fetch grades if needed
     if (this.localStats.length === 0) {
       this.fetchGrades();
     }
 
-    // Fetch other data
+    // Fetch initial data
     this.getQuestions();
     this.getPapers();
-
-    // Fetch category counts
     this.fetchCategoryCounts();
 
-    // Listen for board selection changes from localStorage
-    window.addEventListener("storage", (event) => {
+    // Create a method for the storage event handler so we can properly remove it later
+    this.handleStorageChange = (event) => {
       if (event.key === "selectedBoard") {
+        // Reload the board from localStorage
         this.getActiveBoard();
-        // Reset grade selection flag when board changes through storage event
+        
+        // Reset grade selection when board changes
         this.hasSelectedGrade = false;
-
+        
         // Fetch grades for the new board
         this.fetchGrades();
+        
+        // Update URL and refresh data
+        this.updateUrlWithCurrentBoard();
       }
-    });
+    };
 
-    // Listen for board changes from the boardSelector component
-    this.$root.$on("board-changed", (board) => {
-      this.activeBoard = board;
-
-      // Use the getBoardDisplayName method to get a proper name
-      this.activeBoardName = this.getBoardDisplayName(board);
-
-      // Reset grade selection flag when board changes
-      this.hasSelectedGrade = false;
-
-      // Fetch grades for the new board
-      this.fetchGrades();
-
-      // After board change, we should refresh data
-      this.refreshData();
-
-      // Also update the URL to reflect the new board without a grade
-      this.updateUrlWithCurrentBoard();
-    });
-  },
-  beforeDestroy() {
-    this.stopInterval(); // Stop the interval when the component is about to be unmounted
-
-    // Clear any pending debounce timers
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-    }
-
-    // Clean up event listeners
-    window.removeEventListener("storage", (event) => {
-      if (event.key === "selectedBoard") {
-        this.getActiveBoard();
-      }
-    });
-
-    // Clean up root event listeners
-    this.$root.$off("board-changed");
-  },
-  watch: {
-    activeBoard: {
-      handler(newBoard) {
-        if (newBoard) {
-          this.fetchCategoryCounts();
-        }
-      },
-      deep: true,
-    },
+    // Listen for board selection changes from localStorage
+    window.addEventListener("storage", this.handleStorageChange);
   },
 };
 </script>

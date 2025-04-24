@@ -133,12 +133,16 @@ export default {
         return;
       }
       
+      
       // Ensure we have the required section_id property for API calls
       if (!board.section_id) {
         board.section_id = board.id;
       }
       
       this.selectedBoard = board;
+      
+      // Save to localStorage to ensure persistence across pages
+      localStorage.setItem('selectedBoard', JSON.stringify(board));
       
       // Notify other components about the board change using a custom event
       this.$root.$emit('board-changed', board);
