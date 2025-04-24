@@ -1165,7 +1165,6 @@ export default {
             this.gradeColors.unshift(pop_color);
             this.localStats.unshift(pop_data);
           } else if (index < this.startIndex) {
-            console.log(index);
             var splice_color = this.gradeColors.splice(0, 1);
 
             var splice_data = this.localStats.splice(0, 1);
@@ -1216,9 +1215,7 @@ export default {
         .then((res) => {
           this.questions = res.data;
         })
-        .catch((err) => {
-          console.log(err);
-        })
+        .catch((err) => {})
         .finally(() => {
           this.questionLoading = false;
         });
@@ -1230,9 +1227,7 @@ export default {
         .then((res) => {
           this.papers = res.data;
         })
-        .catch((err) => {
-          console.log(err);
-        })
+        .catch((err) => {})
         .finally(() => {
           this.paperLoading = false;
         });
@@ -1281,7 +1276,6 @@ export default {
         if (this.activeBoard && this.activeBoard.id) {
           params.append("section", this.activeBoard.id);
           hasSectionParam = true;
-          console.log(`Adding board section ${this.activeBoard.id} to query`);
         } else if (
           this.localStats &&
           this.localStats.length > 7 &&
@@ -1290,9 +1284,6 @@ export default {
           // Fallback to section from localStats if no active board
           params.append("section", this.localStats[7].section);
           hasSectionParam = true;
-          console.log(
-            `Using section ${this.localStats[7].section} from localStats as fallback`
-          );
         }
 
         // If we have no section parameter, we can't make a valid request
@@ -1309,11 +1300,9 @@ export default {
           this.localStats[7].base
         ) {
           params.append("base", this.localStats[7].base);
-          console.log(`Adding grade base ${this.localStats[7].base} to query`);
         }
 
         const requestUrl = `/api/v1/search?${params.toString()}`;
-        console.log("Fetching category counts from:", requestUrl);
 
         // Make the API call with appropriate parameters
         const response = await this.$axios.$get(requestUrl);
@@ -1325,8 +1314,6 @@ export default {
           response.data &&
           response.data.types_stats
         ) {
-          console.log("Category counts received:", response.data.types_stats);
-
           // Map the types_stats values to our categoryCounts object
           this.categoryCounts = {
             tests: parseInt(response.data.types_stats.test) || 0,
@@ -1334,8 +1321,6 @@ export default {
             exams: parseInt(response.data.types_stats.azmoon) || 0,
             questions: parseInt(response.data.types_stats.question) || 0,
           };
-
-          console.log("Updated category counts:", this.categoryCounts);
         } else {
           console.warn("Invalid response format:", response);
         }
@@ -1351,7 +1336,6 @@ export default {
           this.localStats &&
           this.localStats.length > 7
         ) {
-          console.log("Falling back to stats array for counts");
           this.categoryCounts = {
             tests: parseInt(this.localStats[7].tests) || 0,
             files: parseInt(this.localStats[7].files) || 0,
@@ -1414,7 +1398,6 @@ export default {
       this.$router.replace({ query }).catch((err) => {
         if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
-          console.log("Navigation to current location skipped");
         } else {
           // Otherwise rethrow the error
           throw err;
@@ -1430,7 +1413,6 @@ export default {
 
     showBoardSelector() {
       // Emit an event that can be caught by the default layout component
-      console.log("Showing board selector");
       this.$root.$emit("show-board-selector");
     },
 
@@ -1445,10 +1427,6 @@ export default {
 
           // Use the board name or title from the stored object, never fall back to the ID
           this.activeBoardName = this.getBoardDisplayName(this.activeBoard);
-
-          console.log("Active board loaded:", this.activeBoard);
-        } else {
-          console.log("No active board found in localStorage");
         }
       } catch (error) {
         console.error("Error loading active board:", error);
@@ -1539,10 +1517,6 @@ export default {
       this.$router.replace({ query }).catch((err) => {
         if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
-          console.log("Navigation to current location skipped");
-        } else {
-          // Otherwise rethrow the error
-          throw err;
         }
       });
     },
@@ -1573,16 +1547,12 @@ export default {
           return;
         }
 
-        console.log(`Fetching grades for section ID: ${sectionId}`);
-
         // Make the API call to get grades for the selected board
         const response = await this.$axios.$get(
           `/api/v1/types/list?type=base&section_id=${sectionId}`
         );
 
         if (response && response.status && Array.isArray(response.data)) {
-          console.log("Grades fetched successfully:", response.data);
-
           // Format the grades data to match the expected structure
           const formattedGrades = response.data.map((grade) => ({
             id: grade.id,
@@ -1694,8 +1664,6 @@ export default {
         return; // Don't process if we're still spinning
       }
 
-      console.log("Wheel spinning complete, updating data");
-
       // Update URL with the selected grade
       this.updateUrlWithSelectedGrade();
 
@@ -1707,11 +1675,10 @@ export default {
      * Set default board to CIE if no board is selected
      */
     setDefaultBoard() {
-      console.log('Setting default CIE board in grade-explorer');
       this.activeBoard = {
-        id: '6659',
-        title: 'CIE',
-        name: 'CIE'
+        id: "6659",
+        title: "CIE",
+        name: "CIE",
       };
       this.hasSelectedGrade = false;
       this.updateUrlWithCurrentBoard();
@@ -1727,7 +1694,7 @@ export default {
 
   mounted() {
     // Apply stored board from local storage on component mount
-    const storedBoard = localStorage.getItem('selectedBoard');
+    const storedBoard = localStorage.getItem("selectedBoard");
     if (storedBoard) {
       try {
         // When the board is loaded from localStorage
@@ -1736,7 +1703,7 @@ export default {
         this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
         this.updateUrlWithCurrentBoard();
       } catch (error) {
-        console.error('Error parsing stored board:', error);
+        console.error("Error parsing stored board:", error);
         // Fallback to default CIE board
         this.setDefaultBoard();
       }
@@ -1746,7 +1713,7 @@ export default {
     }
 
     // Listen for board selection events from the board selector component
-    this.$nuxt.$on('board-changed', (board) => {
+    this.$nuxt.$on("board-changed", (board) => {
       this.activeBoard = board;
       this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
       this.updateUrlWithCurrentBoard();
@@ -1778,7 +1745,6 @@ export default {
 
     // Listen for board changes from the boardSelector component
     this.$root.$on("board-changed", (board) => {
-      console.log("Board changed event received:", board);
       this.activeBoard = board;
 
       // Use the getBoardDisplayName method to get a proper name
@@ -1819,7 +1785,6 @@ export default {
     activeBoard: {
       handler(newBoard) {
         if (newBoard) {
-          console.log("Board changed, refreshing category counts");
           this.fetchCategoryCounts();
         }
       },

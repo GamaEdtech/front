@@ -18,7 +18,6 @@ export default ({ app, store, route }) => {
     // Function to fetch the full board details by ID
     const fetchBoardDetails = async (boardId) => {
       try {
-        console.log('Fetching board details for:', boardId);
         const response = await app.$axios.get(`/api/v1/types/list/?type=section`);
         
         if (response.data && Array.isArray(response.data.data)) {
@@ -35,7 +34,6 @@ export default ({ app, store, route }) => {
             if (cieBoard) {
               // Cache the CIE board details for future use
               boardCache[cieBoard.id] = cieBoard;
-              console.log('Found default CIE board:', cieBoard);
               return cieBoard;
             }
             
@@ -46,13 +44,11 @@ export default ({ app, store, route }) => {
             
             if (defaultBoard) {
               boardCache[DEFAULT_BOARD_ID] = defaultBoard;
-              console.log('Found default board by ID:', defaultBoard);
               return defaultBoard;
             }
             
             // If still no match, return first board in list
             if (boards.length > 0) {
-              console.log('Using first board as default:', boards[0]);
               return boards[0];
             }
           } else {
@@ -64,7 +60,6 @@ export default ({ app, store, route }) => {
             if (boardDetails) {
               // Cache the board details for future use
               boardCache[boardId] = boardDetails;
-              console.log('Found board details:', boardDetails);
               return boardDetails;
             }
           }
@@ -119,7 +114,6 @@ export default ({ app, store, route }) => {
     // Function to set the default board (CIE)
     const setDefaultBoard = async () => {
       try {
-        console.log('Setting default board (CIE)');
         
         // Try to get the CIE board details from API
         const cieBoard = await fetchBoardDetails("default");
@@ -128,8 +122,6 @@ export default ({ app, store, route }) => {
         const defaultBoard = cieBoard ? 
           createBoardObject(cieBoard.id, cieBoard) : 
           createBoardObject("default");
-        
-        console.log('Default board created:', defaultBoard);
         
         // Save to localStorage
         localStorage.setItem('selectedBoard', JSON.stringify(defaultBoard));
@@ -149,15 +141,13 @@ export default ({ app, store, route }) => {
     // Function to apply board from local storage if available
     const applyStoredBoard = async () => {
       try {
-        console.log('Applying stored board selection');
-        
+
         // Check for stored board
         let storedBoard = localStorage.getItem('selectedBoard');
         let board = null;
         
         // If no board exists in localStorage, set default CIE board
         if (!storedBoard) {
-          console.log('No board in localStorage, setting default CIE board');
           board = await setDefaultBoard();
           storedBoard = JSON.stringify(board);
         } else {
@@ -171,14 +161,12 @@ export default ({ app, store, route }) => {
         
         // If board exists and not in query, add it
         if (board && board.id && !query.section) {
-          console.log('Setting section parameter from board:', board.id);
           query.section = String(board.id);
           changed = true;
         }
         
         // If we need to update the route with stored values
         if (changed) {
-          console.log('Updating route with stored selections:', query);
           // Use replace to avoid navigation issues
           app.router.replace({ query });
         }
@@ -195,7 +183,6 @@ export default ({ app, store, route }) => {
     
     // Update local storage when route changes with board params
     app.router.afterEach(async (to) => {
-      console.log('Route changed, updating stored selection:', to.query);
       
       // If section (board) param exists in route, store it
       if (to.query.section) {
@@ -210,7 +197,6 @@ export default ({ app, store, route }) => {
             
             // Only update if the ID changed
             if (parsedBoard.id !== sectionId) {
-              console.log('Board ID changed, fetching new board details:', sectionId);
               
               // Try to get board details from API
               const boardDetails = await fetchBoardDetails(sectionId);
@@ -228,9 +214,6 @@ export default ({ app, store, route }) => {
             localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
           }
         } else {
-          // Create new board object if none exists
-          console.log('Creating new board object:', sectionId);
-          
           // Try to get board details from API
           const boardDetails = await fetchBoardDetails(sectionId);
           boardObj = createBoardObject(sectionId, boardDetails);

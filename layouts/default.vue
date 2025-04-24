@@ -73,12 +73,10 @@ export default {
      * Load selections from route query parameters if available
      */
     async loadSelectionsFromRoute() {
-      console.log('Loading selections from route:', this.$route.query);
       
       // If we have section in the route, use it for board
       if (this.$route.query.section) {
         const sectionId = String(this.$route.query.section);
-        console.log('Found section ID in route:', sectionId);
         
         // Try to fetch board details from API
         try {
@@ -112,8 +110,7 @@ export default {
             section_id: sectionId
           };
         }
-        
-        console.log('Created board object:', this.selectedBoard);
+
         
         // Save to local storage for consistency
         localStorage.setItem('selectedBoard', JSON.stringify(this.selectedBoard));
@@ -130,8 +127,6 @@ export default {
      * @param {Object} board - The selected board
      */
     handleBoardSelected(board) {
-      console.log('Board selected:', board);
-      
       // Validate the board object
       if (!board || !board.id) {
         console.error('Invalid board selected', board);
@@ -161,9 +156,6 @@ export default {
       
       // Add board if selected, ensuring we use the right parameter names
       if (this.selectedBoard && this.selectedBoard.id) {
-        // Log for debugging
-        console.log('Setting section parameter to:', this.selectedBoard.id);
-        
         // Use section as the parameter name
         query.section = this.selectedBoard.id;
         
@@ -176,7 +168,6 @@ export default {
       const needsUpdate = currentQuery.section !== query.section;
         
       if (needsUpdate) {
-        console.log('Updating route with query:', query);
         // Use replace to avoid adding unnecessary history entries
         this.$router.replace({ query });
       }
