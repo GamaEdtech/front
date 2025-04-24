@@ -6,16 +6,24 @@
           <v-col cols="2" sm="2" class="px-0">
             <!-- Show loading spinner when grades are loading -->
             <v-sheet v-if="gradesLoading" class="text-center pa-3">
-              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
               <div class="mt-2 caption">Loading grades...</div>
             </v-sheet>
-            
+
             <!-- Show message if no grades are available -->
-            <v-sheet v-else-if="localStats.length === 0" class="text-center pa-3">
+            <v-sheet
+              v-else-if="localStats.length === 0"
+              class="text-center pa-3"
+            >
               <v-icon color="warning">mdi-alert-circle-outline</v-icon>
-              <div class="mt-2 caption">No grades available for this board.</div>
+              <div class="mt-2 caption">
+                No grades available for this board.
+              </div>
             </v-sheet>
-            
+
             <!-- Show grades wheel if grades are available -->
             <v-sheet
               v-else-if="localStats.length <= 16"
@@ -62,59 +70,76 @@
           </v-col>
           <v-col cols="10" sm="10" class="pl-0">
             <v-card id="grade-details-card">
-              <!--Active Board Banner  -->
-              <v-banner
-                color="#e6f2fe"
-                single-line
-                height="40"
-                max-height="40"
-                style="
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  right: 0;
-                  z-index: 100;
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  margin-bottom: 16px;
-                  border-bottom: 0px !important;
-                "
-                v-if="activeBoard"
-              >
-                <v-icon slot="icon" color="warning" size="20">
-                  mdi-information-outline
-                </v-icon>
-                <div class="d-flex align-center">
-                  <div class="gama-text-h6" style="color: #2e90fa; font-weight: 600;">
-                    {{ activeBoardName }}
+              <div @click="showBoardSelector">
+                <!--Active Board Banner  -->
+                <v-banner
+                  color="#e6f2fe"
+                  single-line
+                  height="40"
+                  max-height="40"
+                  style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    z-index: 100;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 16px;
+                    border-bottom: 0px !important;
+                    cursor: pointer;
+                  "
+                  v-if="activeBoard"
+                >
+                  <v-icon slot="icon" color="warning" size="20">
+                    mdi-information-outline
+                  </v-icon>
+                  <div class="d-flex align-center">
+                    <div
+                      class="gama-text-h6"
+                      style="color: #2e90fa; font-weight: 600"
+                    >
+                      {{ activeBoardName }}
+                    </div>
+                    <div
+                      class="gama-text-caption mx-2"
+                      style="color: #84caff; font-weight: 400"
+                    >
+                      Board
+                    </div>
                   </div>
-                  <div class="gama-text-caption mx-2" style="color: #84caff; font-weight: 400;">
-                    Board
-                  </div>
-                </div>
-                <template v-slot:actions>
-                  <v-btn color="primary" text @click="showBoardSelector">
-                    <v-icon color="primary" size="20">mdi-chevron-down</v-icon>
-                  </v-btn>
-                </template>
-              </v-banner>
-              <!-- Active Board Banner End -->
+                  <template v-slot:actions>
+                    <v-btn color="primary" text @click="showBoardSelector">
+                      <v-icon color="primary" size="20"
+                        >mdi-chevron-down</v-icon
+                      >
+                    </v-btn>
+                  </template>
+                </v-banner>
+                <!-- Active Board Banner End -->
+              </div>
               <div>
                 <v-row class="stats-details d-none d-md-flex">
                   <v-col md="6" class="pb-0 pb-sm-6">
-                    <nuxt-link
-                      :to="generateCategoryLink('test')"
-                      class="label"
-                    >
+                    <nuxt-link :to="generateCategoryLink('test')" class="label">
                       <span class="stat-icon icon-paper"></span>
                       Past Papers
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
+                        >mdi-chevron-right</v-icon
+                      >
                     </nuxt-link>
                     <div class="stat" v-if="categoryCountsLoading">
-                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                      <v-progress-circular
+                        size="16"
+                        width="2"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
                     </div>
-                    <div class="stat" v-else>+{{ categoryCounts.tests | numberFormat }}</div>
+                    <div class="stat" v-else>
+                      +{{ categoryCounts.tests | numberFormat }}
+                    </div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -123,12 +148,21 @@
                     >
                       <span class="stat-icon icon-multimedia"></span>
                       Multimedia
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
+                        >mdi-chevron-right</v-icon
+                      >
                     </nuxt-link>
                     <div class="stat" v-if="categoryCountsLoading">
-                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                      <v-progress-circular
+                        size="16"
+                        width="2"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
                     </div>
-                    <div class="stat" v-else>+{{ categoryCounts.files | numberFormat }}</div>
+                    <div class="stat" v-else>
+                      +{{ categoryCounts.files | numberFormat }}
+                    </div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -137,12 +171,21 @@
                     >
                       <span class="stat-icon icon-exam"></span>
                       QuizHub
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
+                        >mdi-chevron-right</v-icon
+                      >
                     </nuxt-link>
                     <div class="stat" v-if="categoryCountsLoading">
-                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                      <v-progress-circular
+                        size="16"
+                        width="2"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
                     </div>
-                    <div class="stat" v-else>+{{ categoryCounts.exams | numberFormat }}</div>
+                    <div class="stat" v-else>
+                      +{{ categoryCounts.exams | numberFormat }}
+                    </div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -151,10 +194,17 @@
                     >
                       <span class="stat-icon icon-q-a"></span>
                       Forum
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE">mdi-chevron-right</v-icon>
+                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
+                        >mdi-chevron-right</v-icon
+                      >
                     </nuxt-link>
                     <div class="stat" v-if="categoryCountsLoading">
-                      <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                      <v-progress-circular
+                        size="16"
+                        width="2"
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
                     </div>
                     <div class="stat" v-else>
                       +{{ categoryCounts.questions | numberFormat }}
@@ -177,9 +227,16 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <div class="stat" v-if="categoryCountsLoading">
-                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                          <v-progress-circular
+                            size="16"
+                            width="2"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
                         </div>
-                        <span class="stat" v-else>+{{ categoryCounts.tests | numberFormat }}</span>
+                        <span class="stat" v-else
+                          >+{{ categoryCounts.tests | numberFormat }}</span
+                        >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -201,9 +258,16 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <div class="stat" v-if="categoryCountsLoading">
-                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                          <v-progress-circular
+                            size="16"
+                            width="2"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
                         </div>
-                        <span class="stat" v-else>+{{ categoryCounts.files | numberFormat }}</span>
+                        <span class="stat" v-else
+                          >+{{ categoryCounts.files | numberFormat }}</span
+                        >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -225,9 +289,16 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <div class="stat" v-if="categoryCountsLoading">
-                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                          <v-progress-circular
+                            size="16"
+                            width="2"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
                         </div>
-                        <span class="stat" v-else>+{{ categoryCounts.exams | numberFormat }}</span>
+                        <span class="stat" v-else
+                          >+{{ categoryCounts.exams | numberFormat }}</span
+                        >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -250,9 +321,16 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <div class="stat" v-if="categoryCountsLoading">
-                          <v-progress-circular size="16" width="2" indeterminate color="primary"></v-progress-circular>
+                          <v-progress-circular
+                            size="16"
+                            width="2"
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
                         </div>
-                        <span class="stat" v-else>+{{ categoryCounts.questions | numberFormat }}</span>
+                        <span class="stat" v-else
+                          >+{{ categoryCounts.questions | numberFormat }}</span
+                        >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
                         >
@@ -866,7 +944,7 @@ export default {
         tests: 0,
         files: 0,
         exams: 0,
-        questions: 0
+        questions: 0,
       },
       categoryCountsLoading: true,
       gradesLoading: false,
@@ -883,19 +961,22 @@ export default {
     showDate() {
       try {
         if (
-          this.localStats && 
-          this.localStats.length > 7 && 
-          this.localStats[7] && 
-          this.localStats[7].last_update && 
+          this.localStats &&
+          this.localStats.length > 7 &&
+          this.localStats[7] &&
+          this.localStats[7].last_update &&
           this.$moment(this.localStats[7].last_update).isValid() &&
-          this.$moment(this.localStats[7].last_update).format("MMM,DD YYYY") !== "Invalid date"
+          this.$moment(this.localStats[7].last_update).format("MMM,DD YYYY") !==
+            "Invalid date"
         ) {
-          return this.$moment(this.localStats[7].last_update).format("MMM,DD YYYY");
+          return this.$moment(this.localStats[7].last_update).format(
+            "MMM,DD YYYY"
+          );
         } else {
           return "Recently updated";
         }
       } catch (error) {
-        console.error('Error formatting date:', error);
+        console.error("Error formatting date:", error);
         return "Recently updated";
       }
     },
@@ -1011,18 +1092,18 @@ export default {
             }
 
             this.startIndex = index;
-            
+
             // Clear any existing timer to restart the debounce period
             if (this.debounceTimer) {
               clearTimeout(this.debounceTimer);
             }
-            
+
             // Set a new debounce timer that will trigger the API calls
             // only after the user stops spinning for the debounceDelay time
             this.debounceTimer = setTimeout(() => {
               this.handleSpinningComplete();
             }, this.debounceDelay);
-            
+
             return; // Stop checking once a button is found
           }
         }
@@ -1041,10 +1122,10 @@ export default {
     handleTouchEnd(event) {
       this.startIndex = -1;
       this.currentIndex = -1;
-      
+
       // Mark that spinning has ended
       this.isSpinning = false;
-      
+
       // If there's an active debounce timer, let it complete
       // which will trigger the API calls after the debounce period
     },
@@ -1093,18 +1174,18 @@ export default {
           }
 
           this.startIndex = index;
-          
+
           // Clear any existing timer to restart the debounce period
           if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
           }
-          
+
           // Set a new debounce timer that will trigger the API calls
           // only after the user stops spinning for the debounceDelay time
           this.debounceTimer = setTimeout(() => {
             this.handleSpinningComplete();
           }, this.debounceDelay);
-          
+
           return; // Stop checking once a button is found
         }
       }
@@ -1188,77 +1269,96 @@ export default {
       try {
         // Build the query parameters
         const params = new URLSearchParams();
-        
+
         // Add required parameters for the search endpoint
-        params.append('type', 'test'); // Any type works, we just need the types_stats
-        params.append('page', '1');
-        
+        params.append("type", "test"); // Any type works, we just need the types_stats
+        params.append("page", "1");
+
         // Add section (board) parameter if available
         let hasSectionParam = false;
-        
+
         if (this.activeBoard && this.activeBoard.id) {
-          params.append('section', this.activeBoard.id);
+          params.append("section", this.activeBoard.id);
           hasSectionParam = true;
           console.log(`Adding board section ${this.activeBoard.id} to query`);
-        } else if (this.localStats && this.localStats.length > 7 && this.localStats[7].section) {
+        } else if (
+          this.localStats &&
+          this.localStats.length > 7 &&
+          this.localStats[7].section
+        ) {
           // Fallback to section from localStats if no active board
-          params.append('section', this.localStats[7].section);
+          params.append("section", this.localStats[7].section);
           hasSectionParam = true;
-          console.log(`Using section ${this.localStats[7].section} from localStats as fallback`);
+          console.log(
+            `Using section ${this.localStats[7].section} from localStats as fallback`
+          );
         }
-        
+
         // If we have no section parameter, we can't make a valid request
         if (!hasSectionParam) {
-          console.warn('No section parameter available, skipping API call');
+          console.warn("No section parameter available, skipping API call");
           return;
         }
-        
+
         // Add base (grade) parameter if explicitly selected
-        if (this.hasSelectedGrade && this.localStats && this.localStats.length > 7 && this.localStats[7].base) {
-          params.append('base', this.localStats[7].base);
+        if (
+          this.hasSelectedGrade &&
+          this.localStats &&
+          this.localStats.length > 7 &&
+          this.localStats[7].base
+        ) {
+          params.append("base", this.localStats[7].base);
           console.log(`Adding grade base ${this.localStats[7].base} to query`);
         }
-        
+
         const requestUrl = `/api/v1/search?${params.toString()}`;
-        console.log('Fetching category counts from:', requestUrl);
-        
+        console.log("Fetching category counts from:", requestUrl);
+
         // Make the API call with appropriate parameters
         const response = await this.$axios.$get(requestUrl);
-        
+
         // Check if we have valid types_stats in the response
-        if (response && response.status === 1 && response.data && response.data.types_stats) {
-          console.log('Category counts received:', response.data.types_stats);
-          
+        if (
+          response &&
+          response.status === 1 &&
+          response.data &&
+          response.data.types_stats
+        ) {
+          console.log("Category counts received:", response.data.types_stats);
+
           // Map the types_stats values to our categoryCounts object
           this.categoryCounts = {
             tests: parseInt(response.data.types_stats.test) || 0,
             files: parseInt(response.data.types_stats.learnfiles) || 0,
             exams: parseInt(response.data.types_stats.azmoon) || 0,
-            questions: parseInt(response.data.types_stats.question) || 0
+            questions: parseInt(response.data.types_stats.question) || 0,
           };
-          
-          console.log('Updated category counts:', this.categoryCounts);
+
+          console.log("Updated category counts:", this.categoryCounts);
         } else {
-          console.warn('Invalid response format:', response);
+          console.warn("Invalid response format:", response);
         }
       } catch (error) {
-        console.error('Error fetching category counts:', error);
+        console.error("Error fetching category counts:", error);
       } finally {
         // If no values were set (API failed or returned unusable data), fallback to stats array
-        if ((this.categoryCounts.tests === 0 && 
-            this.categoryCounts.files === 0 && 
-            this.categoryCounts.exams === 0 && 
-            this.categoryCounts.questions === 0) && 
-            this.localStats && this.localStats.length > 7) {
-          console.log('Falling back to stats array for counts');
+        if (
+          this.categoryCounts.tests === 0 &&
+          this.categoryCounts.files === 0 &&
+          this.categoryCounts.exams === 0 &&
+          this.categoryCounts.questions === 0 &&
+          this.localStats &&
+          this.localStats.length > 7
+        ) {
+          console.log("Falling back to stats array for counts");
           this.categoryCounts = {
             tests: parseInt(this.localStats[7].tests) || 0,
             files: parseInt(this.localStats[7].files) || 0,
             exams: parseInt(this.localStats[7].exams) || 0,
-            questions: parseInt(this.localStats[7].questions) || 0
+            questions: parseInt(this.localStats[7].questions) || 0,
           };
         }
-        
+
         // Delay setting loading to false to prevent UI flicker
         setTimeout(() => {
           this.categoryCountsLoading = false;
@@ -1275,9 +1375,9 @@ export default {
 
       // Reload questions, papers and category counts
       await Promise.all([
-        this.getQuestions(), 
+        this.getQuestions(),
         this.getPapers(),
-        this.fetchCategoryCounts()
+        this.fetchCategoryCounts(),
       ]);
     },
 
@@ -1285,21 +1385,21 @@ export default {
     updateUrlWithSelectedGrade() {
       // The centered grade (at index 7) is the selected one
       const selectedGrade = this.localStats[7];
-      
+
       if (!selectedGrade) return;
-      
+
       // Create query with existing params
       const query = { ...this.$route.query };
-      
+
       // Always update the section parameter if we have a valid board
       if (this.activeBoard && this.activeBoard.id) {
         query.section = this.activeBoard.id;
-      } 
+      }
       // Fallback to using the section from localStats if needed
       else if (selectedGrade.section) {
         query.section = selectedGrade.section;
       }
-      
+
       // Only include the base parameter if the user has explicitly selected a grade
       if (this.hasSelectedGrade && selectedGrade.base) {
         query.base = selectedGrade.base;
@@ -1307,29 +1407,30 @@ export default {
         // If no explicit grade selection, remove base parameter
         delete query.base;
       }
-      
+
       // Update the URL without reloading the page
       // Handle NavigationDuplicated error
-      this.$router.replace({ query }).catch(err => {
-        if (err && err.name === 'NavigationDuplicated') {
+      this.$router.replace({ query }).catch((err) => {
+        if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
-          console.log('Navigation to current location skipped');
+          console.log("Navigation to current location skipped");
         } else {
           // Otherwise rethrow the error
           throw err;
         }
       });
-      
+
       // Refresh data based on the new grade/board
       this.refreshData();
-      
+
       // Also fetch updated category counts
       this.fetchCategoryCounts();
     },
 
     showBoardSelector() {
       // Emit an event that can be caught by the default layout component
-      this.$root.$emit('show-board-selector');
+      console.log("Showing board selector");
+      this.$root.$emit("show-board-selector");
     },
 
     /**
@@ -1340,10 +1441,10 @@ export default {
         const storedBoard = localStorage.getItem("selectedBoard");
         if (storedBoard) {
           this.activeBoard = JSON.parse(storedBoard);
-          
+
           // Use the board name or title from the stored object, never fall back to the ID
           this.activeBoardName = this.getBoardDisplayName(this.activeBoard);
-          
+
           console.log("Active board loaded:", this.activeBoard);
         } else {
           console.log("No active board found in localStorage");
@@ -1352,7 +1453,7 @@ export default {
         console.error("Error loading active board:", error);
       }
     },
-    
+
     /**
      * Gets a human-readable display name for a board
      * @param {Object} board - The board object
@@ -1360,17 +1461,17 @@ export default {
      */
     getBoardDisplayName(board) {
       if (!board) return "Select Board";
-      
+
       // First try to use the title property
       if (board.title && board.title !== board.id) {
         return board.title;
       }
-      
+
       // Then try to use the name property
       if (board.name && board.name !== board.id) {
         return board.name;
       }
-      
+
       // If we only have the ID, make it more user-friendly
       return `Board ${board.id}`;
     },
@@ -1383,30 +1484,37 @@ export default {
     generateCategoryLink(type) {
       // Start with the base URL and type parameter
       let url = `/search?type=${type}`;
-      
+
       // Add the section parameter from the active board if available
       if (this.activeBoard && this.activeBoard.id) {
         url += `&section=${this.activeBoard.id}`;
       }
       // If no active board, but we have localStats data with a section, use that
-      else if (this.localStats && this.localStats.length > 7 && this.localStats[7].section) {
+      else if (
+        this.localStats &&
+        this.localStats.length > 7 &&
+        this.localStats[7].section
+      ) {
         url += `&section=${this.localStats[7].section}`;
       }
-      
+
       // Only add the base parameter if:
       // 1. We've explicitly selected a grade (tracked via an explicit user action)
       // 2. And the grade has a valid base value
-      
+
       // Check if we have a selected grade with a valid base
-      const selectedGrade = this.localStats && this.localStats.length > 7 ? this.localStats[7] : null;
-      
+      const selectedGrade =
+        this.localStats && this.localStats.length > 7
+          ? this.localStats[7]
+          : null;
+
       // Check if we've explicitly selected a grade (indicated by user interaction)
       const hasUserSelectedGrade = this.hasSelectedGrade;
-      
+
       if (hasUserSelectedGrade && selectedGrade && selectedGrade.base) {
         url += `&base=${selectedGrade.base}`;
       }
-      
+
       return url;
     },
 
@@ -1415,22 +1523,22 @@ export default {
      */
     updateUrlWithCurrentBoard() {
       if (!this.activeBoard || !this.activeBoard.id) return;
-      
+
       // Create query with existing params
       const query = { ...this.$route.query };
-      
+
       // Update the section parameter
       query.section = this.activeBoard.id;
-      
+
       // Remove the base parameter
       delete query.base;
-      
+
       // Update the URL without reloading the page
       // Handle NavigationDuplicated error
-      this.$router.replace({ query }).catch(err => {
-        if (err && err.name === 'NavigationDuplicated') {
+      this.$router.replace({ query }).catch((err) => {
+        if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
-          console.log('Navigation to current location skipped');
+          console.log("Navigation to current location skipped");
         } else {
           // Otherwise rethrow the error
           throw err;
@@ -1445,75 +1553,81 @@ export default {
       try {
         // Show loading state
         this.gradesLoading = true;
-        
+
         // Get the section_id from active board
         let sectionId = null;
         if (this.activeBoard && this.activeBoard.id) {
           sectionId = this.activeBoard.id;
-        } else if (this.localStats && this.localStats.length > 0 && this.localStats[0].section) {
+        } else if (
+          this.localStats &&
+          this.localStats.length > 0 &&
+          this.localStats[0].section
+        ) {
           // Fallback to the first item from localStats if no active board
           sectionId = this.localStats[0].section;
         }
-        
+
         if (!sectionId) {
-          console.warn('No section ID available for fetching grades');
+          console.warn("No section ID available for fetching grades");
           return;
         }
-        
+
         console.log(`Fetching grades for section ID: ${sectionId}`);
-        
+
         // Make the API call to get grades for the selected board
-        const response = await this.$axios.$get(`/api/v1/types/list?type=base&section_id=${sectionId}`);
-        
+        const response = await this.$axios.$get(
+          `/api/v1/types/list?type=base&section_id=${sectionId}`
+        );
+
         if (response && response.status && Array.isArray(response.data)) {
-          console.log('Grades fetched successfully:', response.data);
-          
+          console.log("Grades fetched successfully:", response.data);
+
           // Format the grades data to match the expected structure
-          const formattedGrades = response.data.map(grade => ({
+          const formattedGrades = response.data.map((grade) => ({
             id: grade.id,
             base: grade.id, // Use ID as base
             base_title: grade.title || grade.name, // Use title or name for display
             section: sectionId, // Set the section ID
             color: this.getGradeColor(grade.id), // Assign a color
           }));
-          
+
           // Replace the localStats array with the new grades
           this.localStats = [...formattedGrades];
-          
+
           // Make sure we have enough items for the wheel
           this.ensureMinimumGrades();
-          
+
           // Re-center the grades wheel to show the middle grade
           this.centerGradesWheel();
         } else {
-          console.error('Invalid API response format:', response);
+          console.error("Invalid API response format:", response);
         }
       } catch (error) {
-        console.error('Error fetching grades:', error);
+        console.error("Error fetching grades:", error);
       } finally {
         this.gradesLoading = false;
       }
     },
-    
+
     /**
      * Make sure we have at least 15 items for the grades wheel
      * This will duplicate existing grades if needed
      */
     ensureMinimumGrades() {
       const requiredLength = 15;
-      
+
       // If we don't have enough grades, duplicate the existing ones
       if (this.localStats.length < requiredLength) {
         const originalStats = [...this.localStats];
         while (this.localStats.length < requiredLength) {
           this.localStats = [...this.localStats, ...originalStats];
         }
-        
+
         // Trim to the exact required length
         this.localStats = this.localStats.slice(0, requiredLength);
       }
     },
-    
+
     /**
      * Center the grades wheel to show a middle grade
      */
@@ -1539,7 +1653,7 @@ export default {
         }
       }
     },
-    
+
     /**
      * Get a color for a grade based on its ID
      * @param {string} id - The grade ID
@@ -1548,11 +1662,23 @@ export default {
     getGradeColor(id) {
       // Array of colors for grades
       const colors = [
-        "#FF6498", "#FD7DD2", "#FF4DFF", "#C24DFF", "#8649FF", 
-        "#4C4AFF", "#4A87FF", "#49AEFF", "#4AC5FF", "#43D3FF",
-        "#4AF7FF", "#55FFF6", "#5DFFAA", "#66FF5E", "#B1FF4F"
+        "#FF6498",
+        "#FD7DD2",
+        "#FF4DFF",
+        "#C24DFF",
+        "#8649FF",
+        "#4C4AFF",
+        "#4A87FF",
+        "#49AEFF",
+        "#4AC5FF",
+        "#43D3FF",
+        "#4AF7FF",
+        "#55FFF6",
+        "#5DFFAA",
+        "#66FF5E",
+        "#B1FF4F",
       ];
-      
+
       // Convert ID to a number and use modulo to get an index
       const numId = parseInt(id) || 0;
       return colors[numId % colors.length];
@@ -1566,12 +1692,12 @@ export default {
       if (this.isSpinning) {
         return; // Don't process if we're still spinning
       }
-      
-      console.log('Wheel spinning complete, updating data');
-      
+
+      console.log("Wheel spinning complete, updating data");
+
       // Update URL with the selected grade
       this.updateUrlWithSelectedGrade();
-      
+
       // Refresh category counts
       this.fetchCategoryCounts();
     },
@@ -1589,83 +1715,83 @@ export default {
     if (this.stats && this.stats.length > 0) {
       this.localStats = [...this.stats];
     }
-    
+
     // Get active board from localStorage
     this.getActiveBoard();
-    
+
     // Fetch grades based on active board (only if not provided as props)
     if (this.localStats.length === 0) {
       this.fetchGrades();
     }
-    
+
     // Fetch other data
     this.getQuestions();
     this.getPapers();
-    
+
     // Fetch category counts
     this.fetchCategoryCounts();
-    
+
     // Listen for board selection changes from localStorage
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'selectedBoard') {
+    window.addEventListener("storage", (event) => {
+      if (event.key === "selectedBoard") {
         this.getActiveBoard();
         // Reset grade selection flag when board changes through storage event
         this.hasSelectedGrade = false;
-        
+
         // Fetch grades for the new board
         this.fetchGrades();
       }
     });
-    
+
     // Listen for board changes from the boardSelector component
-    this.$root.$on('board-changed', (board) => {
-      console.log('Board changed event received:', board);
+    this.$root.$on("board-changed", (board) => {
+      console.log("Board changed event received:", board);
       this.activeBoard = board;
-      
+
       // Use the getBoardDisplayName method to get a proper name
       this.activeBoardName = this.getBoardDisplayName(board);
-      
+
       // Reset grade selection flag when board changes
       this.hasSelectedGrade = false;
-      
+
       // Fetch grades for the new board
       this.fetchGrades();
-      
+
       // After board change, we should refresh data
       this.refreshData();
-      
+
       // Also update the URL to reflect the new board without a grade
       this.updateUrlWithCurrentBoard();
     });
   },
   beforeDestroy() {
     this.stopInterval(); // Stop the interval when the component is about to be unmounted
-    
+
     // Clear any pending debounce timers
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
-    
+
     // Clean up event listeners
-    window.removeEventListener('storage', (event) => {
-      if (event.key === 'selectedBoard') {
+    window.removeEventListener("storage", (event) => {
+      if (event.key === "selectedBoard") {
         this.getActiveBoard();
       }
     });
-    
+
     // Clean up root event listeners
-    this.$root.$off('board-changed');
+    this.$root.$off("board-changed");
   },
   watch: {
     activeBoard: {
       handler(newBoard) {
         if (newBoard) {
-          console.log('Board changed, refreshing category counts');
+          console.log("Board changed, refreshing category counts");
           this.fetchCategoryCounts();
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
 };
 </script>
@@ -2003,10 +2129,11 @@ export default {
     margin-left: 3rem;
   }
 }
-.theme--light.v-banner.v-sheet:not(.v-sheet--outlined):not(.v-sheet--shaped) .v-banner__wrapper {
-    border-bottom: 0px !important;
+.theme--light.v-banner.v-sheet:not(.v-sheet--outlined):not(.v-sheet--shaped)
+  .v-banner__wrapper {
+  border-bottom: 0px !important;
 }
 .v-application--is-ltr .v-banner__icon {
-    margin-right: 4px !important;
+  margin-right: 4px !important;
 }
 </style>
