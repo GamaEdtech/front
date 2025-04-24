@@ -1701,6 +1701,20 @@ export default {
       // Refresh category counts
       this.fetchCategoryCounts();
     },
+
+    /**
+     * Set default board to CIE if no board is selected
+     */
+    setDefaultBoard() {
+      console.log('Setting default CIE board in grade-explorer');
+      this.activeBoard = {
+        id: '6659',
+        title: 'CIE',
+        name: 'CIE'
+      };
+      this.hasSelectedGrade = false;
+      this.updateUrlWithCurrentBoard();
+    },
   },
   computed: {
     gradeSizes() {
@@ -1711,13 +1725,31 @@ export default {
   },
 
   mounted() {
-    // Initialize localStats from props if provided
-    if (this.stats && this.stats.length > 0) {
-      this.localStats = [...this.stats];
+    // Apply stored board from local storage on component mount
+    const storedBoard = localStorage.getItem('selectedBoard');
+    if (storedBoard) {
+      try {
+        // When the board is loaded from localStorage
+        const parsedBoard = JSON.parse(storedBoard);
+        this.activeBoard = parsedBoard;
+        this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
+        this.updateUrlWithCurrentBoard();
+      } catch (error) {
+        console.error('Error parsing stored board:', error);
+        // Fallback to default CIE board
+        this.setDefaultBoard();
+      }
+    } else {
+      // If no board in localStorage, use default CIE board
+      this.setDefaultBoard();
     }
 
-    // Get active board from localStorage
-    this.getActiveBoard();
+    // Listen for board selection events from the board selector component
+    this.$nuxt.$on('board-changed', (board) => {
+      this.activeBoard = board;
+      this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
+      this.updateUrlWithCurrentBoard();
+    });
 
     // Fetch grades based on active board (only if not provided as props)
     if (this.localStats.length === 0) {

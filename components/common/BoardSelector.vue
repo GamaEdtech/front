@@ -164,7 +164,7 @@ export default {
 
         // Fallback to static boards if API fails
         this.boards = [
-          { id: "cie", title: "CIE" },
+          { id: "6659", title: "CIE", name: "CIE" },
           { id: "edexcel", title: "Edexcel" },
           { id: "aqa", title: "AQA" },
           { id: "ocr", title: "OCR" },
@@ -226,19 +226,53 @@ export default {
           if (boardExists) {
             this.$emit("board-selected", this.selectedBoard);
           } else {
-            // Board no longer exists, show selection dialog
-            localStorage.removeItem("selectedBoard");
-            this.showBoardSelectionDialog();
+            // Board no longer exists, set default CIE board
+            this.setDefaultBoard();
           }
         } catch (error) {
-          // If parsing fails, clear the invalid storage and show dialog
+          // If parsing fails, clear the invalid storage and set default board
           console.error("Error parsing stored board", error);
           localStorage.removeItem("selectedBoard");
-          this.showBoardSelectionDialog();
+          this.setDefaultBoard();
         }
       } else {
-        // No board selected, show the selection dialog
-        this.showBoardSelectionDialog();
+        // No board selected, set default CIE board
+        this.setDefaultBoard();
+      }
+    },
+
+    /**
+     * Set the default board (CIE)
+     */
+    setDefaultBoard() {
+      console.log("Setting default board to CIE");
+      
+      // First look for CIE board in our board list
+      const cieBoard = this.boards.find(
+        board => 
+          board.title === "CIE" || 
+          board.name === "CIE" || 
+          (board.id === "6659") // CIE ID
+      );
+      
+      if (cieBoard) {
+        console.log("Found CIE board in list:", cieBoard);
+        this.selectBoard(cieBoard);
+      } else {
+        // If we can't find CIE board specifically, use the first board in the list
+        if (this.boards.length > 0) {
+          console.log("CIE board not found, using first board in list:", this.boards[0]);
+          this.selectBoard(this.boards[0]);
+        } else {
+          // As a last resort, create a default CIE board object
+          console.log("Creating default CIE board object");
+          const defaultBoard = {
+            id: "6659",
+            title: "CIE",
+            name: "CIE"
+          };
+          this.selectBoard(defaultBoard);
+        }
       }
     },
 
