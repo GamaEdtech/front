@@ -1,3 +1,487 @@
+<script setup>
+import CommonLogin from '~/components/common/login.vue'
+import CommonRegister from '~/components/common/register.vue'
+import CommonRecover from '~/components/common/pass-recover.vue'
+import { useAuth } from '~/composables/useAuth';
+import { useUser } from '~/composables/useUser'
+import { useCookie } from 'nuxt/app';
+const auth = useAuth()
+const isAuthModalOpen = ref(false);
+const currentAuthComponent = ref('login')
+
+const loginDialogVisible = ref(false)
+
+const currentAuthComponentMap = {
+  'login': CommonLogin,
+  'register': CommonRegister,
+  'recover': CommonRecover
+}
+
+function switchTo(name) {
+  currentAuthComponent.value = name
+}
+const sidebar = ref(false);
+const dialog = ref(false);
+const logo = ref("mainlogo-gamatrain.png");
+const avatar = ref("dexter-morse.png");
+const notificationComponent = ref(null);
+const menuItems = [
+  {
+    title: "About us",
+    link: "/about-us",
+    icon: "mdi-account-multiple",
+    icon_color: "",
+  },
+  {
+    title: "Services",
+    link: "/services",
+    icon: "mdi-view-module",
+    icon_color: "",
+  },
+  {
+    title: "Faq",
+    link: "/faq",
+    icon: "mdi-information",
+    icon_color: "",
+  },
+  // {
+  //   title: "Offers",
+  //   link: "/offers",
+  //   icon: "mdi-wallet-giftcard",
+  //   icon_color: 'primary'
+  // },
+];
+const selectedItem = 1;
+const socialList = [
+  { link: "telegram", icon: "fa-telegram" },
+  { link: "twitter", icon: "fa-twitter" },
+  { link: "instagram", icon: "fa-instagram" },
+  { link: "Youtube", icon: "fa-youtube" },
+];
+
+const menuLink = [
+  {
+    title: "Home",
+    link: "/",
+    icon: "",
+  },
+  {
+    title: "About us",
+    link: "/about-us",
+    icon: "",
+  },
+  {
+    title: "Services",
+    link: "/services",
+    icon: "",
+  },
+  {
+    title: "FAQ",
+    link: "/faq",
+    icon: "",
+  },
+  // {
+  //   title: 'Offers',
+  //   link: '/offers',
+  //   icon: 'mdi-wallet-giftcard'
+  // },
+];
+const currentOpenDialog = ref("");
+const mobileSearchSheet = ref(false);
+const mobileSearchSheetConfig = ref({
+  isDragging: false,
+  startDragY: 0,
+  sheetHeight: 70,
+});
+const searchFilterItems = [
+  {
+    title: "Past Papers",
+    key: "paper",
+  },
+  {
+    title: "Multimedia",
+    key: "multimedia",
+  },
+  {
+    title: "QuizHub",
+    key: "exam",
+  },
+  {
+    title: "Forum",
+    key: "q-a",
+  },
+  {
+    title: "Tutorial",
+    key: "tutorial",
+  },
+  {
+    title: "Teacher",
+    key: "teacher",
+  },
+  {
+    title: "Student",
+    key: "student",
+  },
+];
+const mobileSearchFilter = "exam";
+const keyword = "";
+
+const user_profile_items = [
+  {
+    title: "Dashboard",
+    icon: "mdi-view-dashboard",
+    link: "/user",
+  },
+  {
+    title: "Messages",
+    icon: "mdi-email-outline",
+    link: "/user/ticket",
+  },
+  {
+    title: "Edit Profile",
+    icon: "mdi-account-outline",
+    link: "/user/profile",
+  },
+  {
+    title: "Change Password",
+    icon: "mdi-key",
+    link: "/user/edit-pass",
+  },
+];
+const notificationListDialog = ref(false);
+const notificationItems = [
+  {
+    icon: "mdi-table-furniture",
+    date: "Today, 11:48 am",
+    title: "Sample Question uploded",
+    describe:
+      "Satisfied course question sample has been uploaded for your level of education.",
+  },
+  {
+    icon: "mdi-map-marker-check",
+    date: "Today, 11:48 am",
+    title: "Sample Question uploded",
+    describe:
+      "Satisfied course question sample has been uploaded for your level of education.",
+  },
+];
+
+const menuSetting = ref({
+  logo: "gamatrain-logo-black.svg",
+  bgColor: "#fff",
+  fixedStatus: false,
+  linkColor: "#424A53",
+  class: "",
+});
+
+//Search section
+const searchResults = ref([]);
+const searchCount = ref("...");
+const searchKey = ref("");
+const searchCate = ref("");
+const searchLoading = ref(true);
+const pageNum = ref(1);
+const timer = ref(0);
+const searchResultsSection = ref(false);
+const allDataLoaded = ref(false);
+//End search section
+
+const route = useRoute();
+const router = useRouter();
+
+const cookieToken = useCookie('authToken');
+const { user, setUser,cleanUser } = useUser()
+const userInfo = async () =>{
+  try{
+    const response = await $fetch(`/api/v1/users/info?uid=${cookieToken.value}`,{
+    method: 'GET',
+  })
+  setUser(response.data)
+  }
+  catch(error){
+    const errorData = error?.response?.status
+
+    if(error?.response?.status === 400)
+      console.error(errorData.message)
+    else
+      console.error('Something went wrong.')
+  }
+}
+
+watch(useCookie('authToken'), async (newVal) => {
+  if (newVal) {
+    userInfo()
+  }
+})
+
+const logout = ()=>{
+  cleanUser();
+  auth.logout()
+}
+
+onMounted(() => {
+  // if (window.innerWidth <= 960 && this.$auth.loggedIn) {
+  //   this.$refs["notification-section"].getNotifications();
+  // }
+  if (
+    route.name == "index" ||
+    route.name == "smart-learning" ||
+    route.name == "services" ||
+    route.name == "school-service" ||
+    route.name == "faq" ||
+    route.name == "terms" ||
+    route.name == "about-us" ||
+    route.name == "earn-money"
+  ) {
+    if (window.scrollY > 60) {
+      menuSetting.value = {
+        logo: "gamatrain-logo-black.svg",
+        bgColor: "#fff",
+        fixedStatus: true,
+        linkColor: "#424A53",
+        class: "",
+      };
+    } else {
+      menuSetting.value = {
+        logo: "gamatrain-logo.svg",
+        bgColor: "#000",
+        fixedStatus: true,
+        linkColor: "#fff",
+        class: "transparentMenu",
+      };
+    }
+  }
+  window.addEventListener("scroll", handleScroll.value);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", handleScroll.value);
+});
+const login_modal = ref(null);
+const openLoginDialog = (componentName = 'login') => {
+  currentAuthComponent.value = componentName;
+  isAuthModalOpen.value = true;
+  loginDialogVisible.value = true
+  
+};
+const openRegisterDialog = () => {
+  register_modal.value.register_dialog = true;
+};
+
+const handleScroll = () => {
+  if (
+    route.name == "index" ||
+    route.name == "smart-learning" ||
+    route.name == "services" ||
+    route.name == "school-service" ||
+    route.name == "faq" ||
+    route.name == "terms" ||
+    route.name == "about-us" ||
+    route.name == "earn-money"
+  )
+    if (window.scrollY > 60) {
+      menuSetting = {
+        logo: "gamatrain-logo-black.svg",
+        bgColor: "#fff",
+        fixedStatus: true,
+        linkColor: "#424A53",
+        class: "",
+      };
+    } else {
+      menuSetting = {
+        logo: "gamatrain-logo.svg",
+        bgColor: "#000",
+        fixedStatus: true,
+        linkColor: "#fff",
+        class: "transparentMenu",
+      };
+    }
+};
+const setActiveFilter = (val) => {
+  mobileSearchFilter = val;
+};
+
+//Search section
+const mobileSearchResult = ref(null);
+const checkSearchScroll = () => {
+  const scrollableDiv = mobileSearchResult.value;
+  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
+    pageNum.value++;
+    search();
+  }
+};
+const isScrollAtBottom = (element) => {
+  return element.scrollHeight - element.scrollTop <= element.clientHeight;
+};
+const search = () => {
+  searchLoading = true;
+  if (timer) {
+    clearTimeout(timer.value);
+    timer = null;
+  }
+
+  timer = setTimeout(() => {
+    if (this.searchKey && this.allDataLoaded == false)
+      $fetch("/api/v1/search/text", {
+        params: {
+          query: this.searchKey,
+          page: this.pageNum,
+        },
+      })
+        .then((response) => {
+          searchCount.value = response.data.num;
+          searchResults.push(...response.data.list);
+
+          if (response.data.list.length === 0) this.allDataLoaded = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          this.searchLoading = false;
+        });
+  }, 800);
+};
+
+const closeSearch = () => {
+  searchResultsSection.value = false;
+  searchKey.value = "";
+  mobileKeywordInput.value.blur();
+};
+const calcPath = (type) => {
+  if (type == "gama_tests") return "paper";
+  else if (type == "gama_learnfiles") return "multimedia";
+  else if (type == "gama_azmoons") return "exams";
+  else if (type == "gama_questions") return "qa";
+  else if (type == "gama_dars") return "tutorial";
+  else if (type == "gama_teachers") return "teacher";
+  else if (type == "gama_schools") return "school";
+  else if (type == "gama_live") return "live";
+  else if (type == "gama_students") return "student";
+  else "/";
+};
+
+const startDrag = (e) => {
+  mobileSearchSheetConfig.value.isDragging = true;
+  mobileSearchSheetConfig.value.startDragY = e.touches[0].clientY;
+};
+const handleDrag = () => {
+  if (mobileSearchSheetConfig.value.isDragging) {
+    e.preventDefault();
+
+    const currentY = e.touches[0].clientY;
+    const dragDistance = mobileSearchSheetConfig.value.startDragY - currentY;
+    const viewportHeight = window.innerHeight;
+
+    const currentHeight = mobileSearchSheetConfig.value.sheetHeight;
+    const newHeightVH = currentHeight + (dragDistance / viewportHeight) * 100;
+
+    // Limit the newHeightVH to reasonable values
+    const newHeight = Math.min(Math.max(newHeightVH, 10), 100); // 10vh to 100vh
+
+    mobileSearchSheetConfig.value.sheetHeight = newHeight;
+    mobileSearchSheetConfig.value.startDragY = currentY;
+  }
+};
+const endDrag = (e) => {
+  mobileSearchSheetConfig.value.isDragging = false;
+  if (mobileSearchSheetConfig.value.sheetHeight < 30)
+    mobileSearchSheet.value = false;
+};
+//End search section
+watch(currentOpenDialog , (val) =>{
+    if (val === "login") {
+      register_modal.value.register_dialog = false;
+      pass_recover_modal.value.pass_recover_dialog = false;
+      login_modal.value.login_dialog = true;
+    } else if (val === "register") {
+      login_modal.value.login_dialog = false;
+      pass_recover_modal.value.pass_recover_dialog = false;
+      register_modal.value.register_dialog = true;
+    } else if (val === "pass_recover") {
+      login_modal.value.login_dialog = false;
+      register_modal.value.register_dialog = false;
+      pass_recover_modal.value.pass_recover_dialog = true;
+    } else {
+      login_modal.value.login_dialog = false;
+      login_modal.value.register_dialog = false;
+      pass_recover_modal.value.pass_recover_dialog = false;
+    }
+  }
+);
+
+//Handle auth form from all of section
+watch(
+  () => route.query.auth_form,
+  (val) => {
+    if (val === "login") {
+      login_modal.value.login_dialog = true;
+      router.push({ query: {} });
+    } else if (val == "register") {
+      register_modal.value.register_dialog = true;
+      router.push({ query: {} });
+    }
+  }
+);
+
+watch(
+  () => route.name,
+  (val) => {
+    mobileSearchSheet.value = false;
+
+    if (
+      val == "index" ||
+      val == "smart-learning" ||
+      val == "services" ||
+      val == "school-service" ||
+      val == "faq" ||
+      val == "terms" ||
+      val == "about-us" ||
+      val == "earn-money"
+    ) {
+      menuSetting.value = {
+        logo: "gamatrain-logo.svg",
+        bgColor: "#000",
+        fixedStatus: true,
+        linkColor: "#fff",
+        class: "transparentMenu",
+      };
+    } else {
+      menuSetting.value = {
+        logo: "gamatrain-logo-black.svg",
+        bgColor: "#fff",
+        fixedStatus: false,
+        linkColor: "#424A53",
+        class: "",
+      };
+    }
+  }
+);
+
+watch(
+  () => searchKey.value,
+  (val) => {
+    if (val.trim() === "") {
+      searchResultsSection.value = false;
+    } else {
+      searchResultsSection.value = true;
+    }
+    pageNum.value = 1;
+    searchCount.value = "...";
+    allDataLoaded.value = false;
+    searchResults.value = [];
+    search();
+  }
+);
+
+watch(
+  () => mobileSearchSheet.value,
+  (val) => {
+    if (val == true) mobileSearchSheetConfig.value.sheetHeight = 70;
+  }
+);
+
+</script>
 <template>
   <div>
     <header id="main-header">
@@ -41,7 +525,7 @@
               </div>
             </v-col>
             <v-col cols="4" md="3" lg="3" xl="3" class="text-right mt-md-1">
-              <div class="d-flex text-right" v-if="$auth.loggedIn()">
+              <div class="d-flex text-right" v-if="auth.isAuthenticated.value">
                 <v-spacer />
                 <v-menu
                   transition="slide-x-transition"
@@ -58,10 +542,10 @@
                             : 'header-username-light'
                         "
                       >
-                        {{ userName }}
+                        {{ user?.first_name || user?.last_name || "NO NAME" }}
                       </div>
-                      <v-avatar size="32" v-if="$auth?.user?.avatar">
-                        <v-img :src="$auth.user?.avatar" alt="user avatar" />
+                      <v-avatar size="32" v-if="user?.avatar">
+                        <v-img :src="user?.avatar" alt="user avatar" />
                       </v-avatar>
                       <v-icon v-else :color="menuSetting.linkColor">
                         mdi-account
@@ -83,7 +567,7 @@
                         {{ item.title }}
                       </v-list-item-title>
                     </v-list-item>
-                    <v-list-item class="pointer" @click="auth.logout()">
+                    <v-list-item class="pointer" @click="logout">
                       <template v-slot:prepend>
                         <v-icon small class="mr-0"> mdi-logout </v-icon>
                       </template>
@@ -149,13 +633,13 @@
       >
         <v-list density="compact">
           <!-- Profile Info -->
-          <v-list-group v-if="$auth.loggedIn" active-class="menu_group_active">
+          <v-list-group v-if="auth.isAuthenticated.value" active-class="menu_group_active">
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props">
                 <v-icon icon="mdi-account-outline" />
                 <v-list-item-title>
                   {{
-                    $auth.user?.first_name || $auth.user?.last_name || "No name"
+                    user?.first_name || user?.last_name || "No name"
                   }}
                 </v-list-item-title>
               </v-list-item>
@@ -168,7 +652,7 @@
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
 
-            <v-list-item @click="auth.logout()">
+            <v-list-item @click="logout">
               <template v-slot:prepend>
                 <v-icon icon="mdi-exit-to-app" />
               </template>
@@ -178,7 +662,7 @@
 
           <!-- Notifications -->
           <v-list-item
-            v-if="$auth.loggedIn"
+            v-if="auth.isAuthenticated.value"
             @click="notificationListDialog = true"
           >
             <template v-slot:prepend>
@@ -190,7 +674,7 @@
           </v-list-item>
 
           <!-- Login Button -->
-          <v-list-item @click="openLoginDialog()" v-if="!$auth.loggedIn">
+          <v-list-item @click="openLoginDialog()" v-if="!auth.isAuthenticated.value">
             <template v-slot:prepend>
               <v-icon icon="mdi-account-outline" />
             </template>
@@ -486,9 +970,8 @@
         </div>
 
         <v-btn
-          v-if="!$auth.loggedIn"
-          :small="$vuetify.breakpoint.smAndUp"
-          :x-small="$vuetify.breakpoint.xs"
+          v-if="!auth.isAuthenticated.value"
+          
           rounded
           id="mobile-signin-btn"
           class="primary gama-btn"
@@ -497,21 +980,21 @@
           Sign in
         </v-btn>
         <common-notification-component
-          v-if="$auth.loggedIn"
+          v-if="auth.isAuthenticated.value"
           :menuSetting="menuSetting"
           ref="notificationComponent"
           class="d-block d-lg-none"
         />
         <v-menu
-          v-if="$auth.loggedIn"
+          v-if="auth.isAuthenticated.value"
           transition="slide-x-transition"
           offset-y
           min-width="150"
         >
           <template v-slot:activator="{ props }">
             <div v-bind="props">
-              <v-avatar v-if="$auth?.user?.avatar" class="ml-2">
-                <v-img :src="$auth?.user?.avatar" alt="user avatar" />
+              <v-avatar v-if="auth?.user?.avatar" class="ml-2">
+                <v-img :src="auth?.user?.avatar" alt="user avatar" />
               </v-avatar>
               <v-icon v-else class="ml-2" :color="menuSetting.linkColor">
                 mdi-account
@@ -536,7 +1019,7 @@
                 {{ item.title }}
               </v-list-item-title>
             </v-list-item>
-            <v-list-item class="pointer" @click="auth.logout()">
+            <v-list-item class="pointer" @click="logout">
               <template v-slot:prepend>
                 <v-icon small class="mr-0"> mdi-logout </v-icon>
               </template>
@@ -592,464 +1075,7 @@
     </v-dialog>
   </div>
 </template>
-<script setup>
-import CommonLogin from '~/components/common/login.vue'
-import CommonRegister from '~/components/common/register.vue'
-import CommonRecover from '~/components/common/pass-recover.vue'
-import { useAuth } from '~/composables/useAuth';
-const auth = useAuth()
-const isAuthModalOpen = ref(false);
-const currentAuthComponent = ref('login')
 
-const loginDialogVisible = ref(false)
-
-const currentAuthComponentMap = {
-  'login': CommonLogin,
-  'register': CommonRegister,
-  'recover': CommonRecover
-}
-
-function switchTo(name) {
-  currentAuthComponent.value = name
-}
-const sidebar = ref(false);
-const dialog = ref(false);
-const logo = ref("mainlogo-gamatrain.png");
-const avatar = ref("dexter-morse.png");
-const notificationComponent = ref(null);
-const menuItems = [
-  {
-    title: "About us",
-    link: "/about-us",
-    icon: "mdi-account-multiple",
-    icon_color: "",
-  },
-  {
-    title: "Services",
-    link: "/services",
-    icon: "mdi-view-module",
-    icon_color: "",
-  },
-  {
-    title: "Faq",
-    link: "/faq",
-    icon: "mdi-information",
-    icon_color: "",
-  },
-  // {
-  //   title: "Offers",
-  //   link: "/offers",
-  //   icon: "mdi-wallet-giftcard",
-  //   icon_color: 'primary'
-  // },
-];
-const selectedItem = 1;
-const socialList = [
-  { link: "telegram", icon: "fa-telegram" },
-  { link: "twitter", icon: "fa-twitter" },
-  { link: "instagram", icon: "fa-instagram" },
-  { link: "Youtube", icon: "fa-youtube" },
-];
-
-const menuLink = [
-  {
-    title: "Home",
-    link: "/",
-    icon: "",
-  },
-  {
-    title: "About us",
-    link: "/about-us",
-    icon: "",
-  },
-  {
-    title: "Services",
-    link: "/services",
-    icon: "",
-  },
-  {
-    title: "FAQ",
-    link: "/faq",
-    icon: "",
-  },
-  // {
-  //   title: 'Offers',
-  //   link: '/offers',
-  //   icon: 'mdi-wallet-giftcard'
-  // },
-];
-const currentOpenDialog = ref("");
-const mobileSearchSheet = ref(false);
-const mobileSearchSheetConfig = ref({
-  isDragging: false,
-  startDragY: 0,
-  sheetHeight: 70,
-});
-const searchFilterItems = [
-  {
-    title: "Past Papers",
-    key: "paper",
-  },
-  {
-    title: "Multimedia",
-    key: "multimedia",
-  },
-  {
-    title: "QuizHub",
-    key: "exam",
-  },
-  {
-    title: "Forum",
-    key: "q-a",
-  },
-  {
-    title: "Tutorial",
-    key: "tutorial",
-  },
-  {
-    title: "Teacher",
-    key: "teacher",
-  },
-  {
-    title: "Student",
-    key: "student",
-  },
-];
-const mobileSearchFilter = "exam";
-const keyword = "";
-
-const user_profile_items = [
-  {
-    title: "Dashboard",
-    icon: "mdi-view-dashboard",
-    link: "/user",
-  },
-  {
-    title: "Messages",
-    icon: "mdi-email-outline",
-    link: "/user/ticket",
-  },
-  {
-    title: "Edit Profile",
-    icon: "mdi-account-outline",
-    link: "/user/profile",
-  },
-  {
-    title: "Change Password",
-    icon: "mdi-key",
-    link: "/user/edit-pass",
-  },
-];
-const notificationListDialog = ref(false);
-const notificationItems = [
-  {
-    icon: "mdi-table-furniture",
-    date: "Today, 11:48 am",
-    title: "Sample Question uploded",
-    describe:
-      "Satisfied course question sample has been uploaded for your level of education.",
-  },
-  {
-    icon: "mdi-map-marker-check",
-    date: "Today, 11:48 am",
-    title: "Sample Question uploded",
-    describe:
-      "Satisfied course question sample has been uploaded for your level of education.",
-  },
-];
-
-const menuSetting = ref({
-  logo: "gamatrain-logo-black.svg",
-  bgColor: "#fff",
-  fixedStatus: false,
-  linkColor: "#424A53",
-  class: "",
-});
-
-//Search section
-const searchResults = ref([]);
-const searchCount = ref("...");
-const searchKey = ref("");
-const searchCate = ref("");
-const searchLoading = ref(true);
-const pageNum = ref(1);
-const timer = ref(0);
-const searchResultsSection = ref(false);
-const allDataLoaded = ref(false);
-//End search section
-
-const route = useRoute();
-const router = useRouter();
-
-onMounted(() => {
-  // if (window.innerWidth <= 960 && this.$auth.loggedIn) {
-  //   this.$refs["notification-section"].getNotifications();
-  // }
-
-  if (
-    route.name == "index" ||
-    route.name == "smart-learning" ||
-    route.name == "services" ||
-    route.name == "school-service" ||
-    route.name == "faq" ||
-    route.name == "terms" ||
-    route.name == "about-us" ||
-    route.name == "earn-money"
-  ) {
-    if (window.scrollY > 60) {
-      menuSetting.value = {
-        logo: "gamatrain-logo-black.svg",
-        bgColor: "#fff",
-        fixedStatus: true,
-        linkColor: "#424A53",
-        class: "",
-      };
-    } else {
-      menuSetting.value = {
-        logo: "gamatrain-logo.svg",
-        bgColor: "#000",
-        fixedStatus: true,
-        linkColor: "#fff",
-        class: "transparentMenu",
-      };
-    }
-  }
-  window.addEventListener("scroll", handleScroll.value);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll.value);
-});
-const login_modal = ref(null);
-const openLoginDialog = (componentName = 'login') => {
-  currentAuthComponent.value = componentName;
-  isAuthModalOpen.value = true;
-  loginDialogVisible.value = true
-  
-};
-const openRegisterDialog = () => {
-  register_modal.value.register_dialog = true;
-};
-
-const handleScroll = () => {
-  if (
-    route.name == "index" ||
-    route.name == "smart-learning" ||
-    route.name == "services" ||
-    route.name == "school-service" ||
-    route.name == "faq" ||
-    route.name == "terms" ||
-    route.name == "about-us" ||
-    route.name == "earn-money"
-  )
-    if (window.scrollY > 60) {
-      menuSetting = {
-        logo: "gamatrain-logo-black.svg",
-        bgColor: "#fff",
-        fixedStatus: true,
-        linkColor: "#424A53",
-        class: "",
-      };
-    } else {
-      menuSetting = {
-        logo: "gamatrain-logo.svg",
-        bgColor: "#000",
-        fixedStatus: true,
-        linkColor: "#fff",
-        class: "transparentMenu",
-      };
-    }
-};
-const setActiveFilter = (val) => {
-  mobileSearchFilter = val;
-};
-
-//Search section
-const mobileSearchResult = ref(null);
-const checkSearchScroll = () => {
-  const scrollableDiv = mobileSearchResult.value;
-  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
-    pageNum.value++;
-    search();
-  }
-};
-const isScrollAtBottom = (element) => {
-  return element.scrollHeight - element.scrollTop <= element.clientHeight;
-};
-const search = () => {
-  searchLoading = true;
-  if (timer) {
-    clearTimeout(timer.value);
-    timer = null;
-  }
-
-  timer = setTimeout(() => {
-    if (this.searchKey && this.allDataLoaded == false)
-      $fetch("/api/v1/search/text", {
-        params: {
-          query: this.searchKey,
-          page: this.pageNum,
-        },
-      })
-        .then((response) => {
-          searchCount.value = response.data.num;
-          searchResults.push(...response.data.list);
-
-          if (response.data.list.length === 0) this.allDataLoaded = true;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.searchLoading = false;
-        });
-  }, 800);
-};
-
-const closeSearch = () => {
-  searchResultsSection.value = false;
-  searchKey.value = "";
-  mobileKeywordInput.value.blur();
-};
-const calcPath = (type) => {
-  if (type == "gama_tests") return "paper";
-  else if (type == "gama_learnfiles") return "multimedia";
-  else if (type == "gama_azmoons") return "exams";
-  else if (type == "gama_questions") return "qa";
-  else if (type == "gama_dars") return "tutorial";
-  else if (type == "gama_teachers") return "teacher";
-  else if (type == "gama_schools") return "school";
-  else if (type == "gama_live") return "live";
-  else if (type == "gama_students") return "student";
-  else "/";
-};
-
-const startDrag = (e) => {
-  mobileSearchSheetConfig.value.isDragging = true;
-  mobileSearchSheetConfig.value.startDragY = e.touches[0].clientY;
-};
-const handleDrag = () => {
-  if (mobileSearchSheetConfig.value.isDragging) {
-    e.preventDefault();
-
-    const currentY = e.touches[0].clientY;
-    const dragDistance = mobileSearchSheetConfig.value.startDragY - currentY;
-    const viewportHeight = window.innerHeight;
-
-    const currentHeight = mobileSearchSheetConfig.value.sheetHeight;
-    const newHeightVH = currentHeight + (dragDistance / viewportHeight) * 100;
-
-    // Limit the newHeightVH to reasonable values
-    const newHeight = Math.min(Math.max(newHeightVH, 10), 100); // 10vh to 100vh
-
-    mobileSearchSheetConfig.value.sheetHeight = newHeight;
-    mobileSearchSheetConfig.value.startDragY = currentY;
-  }
-};
-const endDrag = (e) => {
-  mobileSearchSheetConfig.value.isDragging = false;
-  if (mobileSearchSheetConfig.value.sheetHeight < 30)
-    mobileSearchSheet.value = false;
-};
-//End search section
-watch(currentOpenDialog , (val) =>{
-    if (val === "login") {
-      register_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-      login_modal.value.login_dialog = true;
-    } else if (val === "register") {
-      login_modal.value.login_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-      register_modal.value.register_dialog = true;
-    } else if (val === "pass_recover") {
-      login_modal.value.login_dialog = false;
-      register_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = true;
-    } else {
-      login_modal.value.login_dialog = false;
-      login_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-    }
-  }
-);
-
-//Handle auth form from all of section
-watch(
-  () => route.query.auth_form,
-  (val) => {
-    if (val === "login") {
-      login_modal.value.login_dialog = true;
-      router.push({ query: {} });
-    } else if (val == "register") {
-      register_modal.value.register_dialog = true;
-      router.push({ query: {} });
-    }
-  }
-);
-
-watch(
-  () => route.name,
-  (val) => {
-    mobileSearchSheet.value = false;
-
-    if (
-      val == "index" ||
-      val == "smart-learning" ||
-      val == "services" ||
-      val == "school-service" ||
-      val == "faq" ||
-      val == "terms" ||
-      val == "about-us" ||
-      val == "earn-money"
-    ) {
-      menuSetting.value = {
-        logo: "gamatrain-logo.svg",
-        bgColor: "#000",
-        fixedStatus: true,
-        linkColor: "#fff",
-        class: "transparentMenu",
-      };
-    } else {
-      menuSetting.value = {
-        logo: "gamatrain-logo-black.svg",
-        bgColor: "#fff",
-        fixedStatus: false,
-        linkColor: "#424A53",
-        class: "",
-      };
-    }
-  }
-);
-
-watch(
-  () => searchKey.value,
-  (val) => {
-    if (val.trim() === "") {
-      searchResultsSection.value = false;
-    } else {
-      searchResultsSection.value = true;
-    }
-    pageNum.value = 1;
-    searchCount.value = "...";
-    allDataLoaded.value = false;
-    searchResults.value = [];
-    search();
-  }
-);
-
-watch(
-  () => mobileSearchSheet.value,
-  (val) => {
-    if (val == true) mobileSearchSheetConfig.value.sheetHeight = 70;
-  }
-);
-
-const userName = computed(() => {
-  if ($auth.user?.first_name) return $auth.user?.first_name;
-  else if ($auth.user?.last_name) return $auth.user?.last_name;
-  else return "No name";
-});
-</script>
 
 <style>
 .v-application .primary {

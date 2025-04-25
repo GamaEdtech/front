@@ -241,6 +241,9 @@ const switchToRegister = () => {
 };
 
 function closeDialog() {
+  identityHolder.value = true;
+  otpHolder.value = false;
+  selectPassHolder.value = false;
   emit('update:dialog', false)
 }
 
@@ -405,7 +408,7 @@ function closeDialog() {
 
                   <v-row>
                     <v-col cols="6" lg="6">
-                      <v-btn outlined @click="cancelPassRecover()">
+                      <v-btn outlined @click="closeDialog">
                         Cancel
                       </v-btn>
                     </v-col>

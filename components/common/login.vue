@@ -113,7 +113,7 @@ const sendOtpCodeAgain = async () => {
         'identity' : identity.value,
       }),
   });
-    countDown.value = 60;
+    countDownTimer();
     sendOtpBtnStatus.value = true;
     $toast.success('Otp code sent again');
   }
@@ -142,7 +142,7 @@ const submit = handleSubmit(async () => {
       $toast.success("Otp code sent");
       identity_holder.value = false;
       otp_holder.value = true; 
-      
+      countDownTimer();
     } else {
         $toast.success("Logged in successfully");
         auth.setUserToken(response.data.jwtToken);
@@ -157,6 +157,9 @@ const submit = handleSubmit(async () => {
     else
       $toast.error('Something went wrong.')
   }
+  finally{
+    login_loading.value = false
+  }
 });
 
 const onFinish = async () => {
@@ -170,13 +173,11 @@ const onFinish = async () => {
         identity: identity.value.value,
         pass: password.value.value,
         code: otp.value,
-        type: "confirm",
       })
     });
-    const data = await response.json()
-    if(data.status === 1){
+    if(response.status === 1){
       $toast.success("Logged in successfully");
-      auth.setUserToken(data.data.jwtToken);
+      auth.setUserToken(response.data.jwtToken);
       closeDialog();
       navigateTo('/user');
     }
@@ -188,6 +189,9 @@ const onFinish = async () => {
       $toast.error(errorData.message);
     else
       $toast.error('Something went wrong.')
+    }
+    finally{
+      login_loading.value  = false
     }
   }
 
@@ -222,6 +226,11 @@ function goToRecover() {
 }
 
 function closeDialog() {
+  identity_holder.value = true;
+  otp_holder.value = false; 
+  login_loading.value = false;
+  identity.value.value = '';
+  password.value.value = '';
   emit('update:dialog', false)
 }
 

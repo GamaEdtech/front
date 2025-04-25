@@ -59,6 +59,10 @@ const switchToLogin = () => {
   emit('switchToLogin');
 };
 function closeDialog() {
+  register_dialog.value = false
+  identity_holder.value = true
+  otp_holder.value = false
+  select_pass_holder.value = false
   emit('update:dialog', false)
 }
 
@@ -77,20 +81,19 @@ const cancelRegister = () => {
 const requestRegister = async () => {
   register_loading.value = true
   try{
-    const response = await fetch('/api/v1/users/register',{
+    const response = await $fetch('/api/v1/users/register',{
       method : 'POST',
       body: new URLSearchParams({
       type: "request",
       identity: identity.value,
     })})
-    const data = await response.json()
-    if(data.status === 1){
+    if(response.status === 1){
       $toast.success("Otp code sent")
       identity_holder.value = false
       otp_holder.value = true
       countDownTimer();
     }else{
-      $toast.error(data.message)
+      $toast.error(response.message)
     }
   }
     catch (error) {
@@ -109,7 +112,7 @@ const requestRegister = async () => {
 
 const onFinish = async () => {
   try {
-    const response = await fetch('/api/v1/users/register', {
+    const response = await $fetch('/api/v1/users/register', {
       method: 'POST',
       body: new URLSearchParams({
         type: "confirm",
@@ -117,14 +120,10 @@ const onFinish = async () => {
         code: otp.value,
       })
     })
-    const data = await response.json()
-    if(data.status === 1){
+    if(response.status === 1){
       otp_holder.value = false
       select_pass_holder.value = true
-    }
-    if(data.error === "incorrectCode")
-      $toast.error(data.message)
-  }
+    }}
   catch(error) {
     const errorData = error?.response?._data;
 
@@ -133,27 +132,20 @@ const onFinish = async () => {
     else
       $toast.error('Something went wrong.')
     }
-  finally {
-      register_loading.value = false
-    }
 }
 
 const sendOtpCodeAgain = async () => {
   try {
-    const response = await fetch('/api/v1/users/register',{
+    const response = await $fetch('/api/v1/users/register',{
       method : 'POST',
       body: new URLSearchParams({
       type: "resend_code",
       identity: identity.value,
     })
     })
-    const data = await response.json()
     countDownTimer();
     sendOtpBtnStatus.value = true
-    $toast.success("Otp code sent again")
-    if (datastatus === 400) 
-        $toast.error(err.response._data.message)
-  }
+    $toast.success("Otp code sent again")}
   catch(error) {
     const errorData = error?.response?._data;
 
@@ -162,9 +154,6 @@ const sendOtpCodeAgain = async () => {
     else
       $toast.error('Something went wrong.')
       
-    }
-  finally{
-      register_loading.value = false
     }
 }
 
@@ -225,7 +214,7 @@ const handleCredentialResponse = async(response) => {
         id_token: response.credential,
       })
     })
-    $auth.setUserToken(res.data.data.jwtToken)
+    auth.setUserToken(res.data.data.jwtToken)
     register_dialog.value = false
     $toast.success("Logged in successfully")
     router.push('/user')
