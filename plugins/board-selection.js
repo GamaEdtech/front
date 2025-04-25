@@ -141,13 +141,15 @@ export default ({ app, store, route }) => {
     // Function to apply board from local storage if available
     const applyStoredBoard = async () => {
       try {
-
+        console.log('Applying stored board selection');
+        
         // Check for stored board
         let storedBoard = localStorage.getItem('selectedBoard');
         let board = null;
         
         // If no board exists in localStorage, set default CIE board
         if (!storedBoard) {
+          console.log('No board in localStorage, setting default CIE board');
           board = await setDefaultBoard();
           storedBoard = JSON.stringify(board);
         } else {
@@ -161,14 +163,28 @@ export default ({ app, store, route }) => {
         
         // If board exists and not in query, add it
         if (board && board.id && !query.section) {
+          console.log('Setting section parameter from board:', board.id);
           query.section = String(board.id);
           changed = true;
         }
         
+        // Important: Preserve the base parameter if it exists, only update if it doesn't
+        // This ensures we don't override a grade selection that might have been set by other components
+        if (!query.base && route.query.base) {
+          query.base = route.query.base;
+        }
+        
         // If we need to update the route with stored values
         if (changed) {
+          console.log('Updating route with stored selections:', query);
           // Use replace to avoid navigation issues
-          app.router.replace({ query });
+          app.router.replace({ query }).catch((err) => {
+            if (err && err.name === "NavigationDuplicated") {
+              console.log("Ignoring NavigationDuplicated error");
+            } else {
+              console.error("Router replace error:", err);
+            }
+          });
         }
       } catch (error) {
         console.error('Error applying stored board:', error);
@@ -183,12 +199,14 @@ export default ({ app, store, route }) => {
     
     // Update local storage when route changes with board params
     app.router.afterEach(async (to) => {
+      console.log('Route changed, checking parameters:', to.query);
       
       // If section (board) param exists in route, store it
       if (to.query.section) {
         const sectionId = String(to.query.section);
         const currentBoard = localStorage.getItem('selectedBoard');
         let boardObj = null;
+        let shouldUpdateStorage = false;
         
         // Try to use existing board object if available
         if (currentBoard) {
@@ -197,13 +215,16 @@ export default ({ app, store, route }) => {
             
             // Only update if the ID changed
             if (parsedBoard.id !== sectionId) {
+              console.log('Board ID changed, fetching new board details:', sectionId);
               
               // Try to get board details from API
               const boardDetails = await fetchBoardDetails(sectionId);
               boardObj = createBoardObject(sectionId, boardDetails);
               
-              // Save the updated board
-              localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
+              shouldUpdateStorage = true;
+            } else {
+              // Use existing board object, but preserve it for later parameter checks
+              boardObj = parsedBoard;
             }
           } catch (e) {
             console.error('Error parsing current board:', e);
@@ -211,12 +232,22 @@ export default ({ app, store, route }) => {
             // If parsing fails, create a new object
             const boardDetails = await fetchBoardDetails(sectionId);
             boardObj = createBoardObject(sectionId, boardDetails);
-            localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
+            
+            shouldUpdateStorage = true;
           }
         } else {
+          // Create new board object if none exists
+          console.log('Creating new board object:', sectionId);
+          
           // Try to get board details from API
           const boardDetails = await fetchBoardDetails(sectionId);
           boardObj = createBoardObject(sectionId, boardDetails);
+          
+          shouldUpdateStorage = true;
+        }
+        
+        // Update localStorage if the board changed
+        if (shouldUpdateStorage) {
           localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
         }
       }

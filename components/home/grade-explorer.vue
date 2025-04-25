@@ -1253,6 +1253,9 @@ export default {
       return `${firstName} ${lastName}`;
     },
     gradeHandlerTitle(title) {
+      // Check if title is undefined or null before using replace
+      if (!title) return '';
+      
       if (
         this.$vuetify.breakpoint.xs ||
         this.$vuetify.breakpoint.sm ||
@@ -1386,16 +1389,19 @@ export default {
     updateUrlWithSelectedGrade() {
       // Prevent concurrent updates
       if (this.isUpdating) {
+        console.log("Update skipped: Already updating.");
         return;
       }
 
       // Don't update if still spinning (relevant for debounce timer)
       if (this.isSpinning) {
+         console.log("Update skipped: Still spinning.");
          return;
       }
 
       // Set the flag to indicate an update is in progress
       this.isUpdating = true;
+      console.log("Update started: Setting isUpdating to true.");
 
       // The centered grade (at index 7) is the selected one
       const selectedGrade = this.localStats[7];
@@ -1405,6 +1411,9 @@ export default {
         this.isUpdating = false; // Reset flag if we abort early
         return;
       }
+
+      // Log the selected grade for debugging
+      console.log("Selected grade for URL update:", selectedGrade);
 
       // Create query with existing params
       const query = { ...this.$route.query };
@@ -1418,21 +1427,25 @@ export default {
         query.section = selectedGrade.section;
       }
 
-      // Only include the base parameter if the user has explicitly selected a grade
+      // Include the base parameter if hasSelectedGrade is true and selectedGrade has a base
       if (this.hasSelectedGrade && selectedGrade.base) {
+        console.log("Setting base parameter:", selectedGrade.base);
         query.base = selectedGrade.base;
-      } else {
+      } else if (!this.hasSelectedGrade) {
         // If no explicit grade selection, remove base parameter
+        console.log("Removing base parameter - no explicit grade selection");
         delete query.base;
       }
 
       // Update the URL without reloading the page
       // Handle NavigationDuplicated error
+      console.log("Updating URL with query:", query);
       this.$router.replace({ query }).catch((err) => {
         if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
+          console.log("Ignoring NavigationDuplicated error");
         } else {
-          // Otherwise rethrow the error
+          // Otherwise log the error
           console.error("Router replace error:", err);
         }
       });
@@ -1440,11 +1453,9 @@ export default {
       // Refresh data based on the new grade/board
       // Use .finally() to ensure the flag is reset regardless of success/error
       this.refreshData().finally(() => {
+         console.log("Update finished: Setting isUpdating to false.");
          this.isUpdating = false; // Reset the flag when refreshData completes
       });
-
-      // Remove redundant fetchCategoryCounts call here, it's in refreshData
-      // this.fetchCategoryCounts();
     },
 
     showBoardSelector() {
@@ -1580,107 +1591,169 @@ export default {
     },
 
     /**
-     * Fetch grades from the API based on selected board
+     * Fetch grades based on active board
      */
     async fetchGrades() {
       try {
-        // Show loading state
+        console.log("Fetching grades for board:", this.activeBoard?.id);
         this.gradesLoading = true;
-
-        // Get the section_id from active board
-        let sectionId = null;
-        if (this.activeBoard && this.activeBoard.id) {
-          sectionId = this.activeBoard.id;
-        } else if (
-          this.localStats &&
-          this.localStats.length > 0 &&
-          this.localStats[0].section
-        ) {
-          // Fallback to the first item from localStats if no active board
-          sectionId = this.localStats[0].section;
-        }
-
-        if (!sectionId) {
-          console.warn("No section ID available for fetching grades");
-          return;
-        }
-
-        // Make the API call to get grades for the selected board
-        const response = await this.$axios.$get(
-          `/api/v1/types/list?type=base&section_id=${sectionId}`
-        );
-
-        if (response && response.status && Array.isArray(response.data)) {
-          // Format the grades data to match the expected structure
-          const formattedGrades = response.data.map((grade) => ({
+        
+        // Get board ID from active board or fallback to default
+        const boardId = this.activeBoard?.id || "6659"; // Default to CIE
+        
+        // Set the API URL with the boardId as the section parameter
+        // Using the correct endpoint for fetching grades by section
+        const apiUrl = `/api/v1/types/list?type=base&section_id=${boardId}`;
+        
+        // Make the API call
+        const response = await this.$axios.get(apiUrl);
+        
+        if (response.data && Array.isArray(response.data.data)) {
+          // Map the API response to our grade format
+          const grades = response.data.data.map(grade => ({
+            ...grade,
             id: grade.id,
-            base: grade.id, // Use ID as base
-            base_title: grade.title || grade.name, // Use title or name for display
-            section: sectionId, // Set the section ID
-            color: this.getGradeColor(grade.id), // Assign a color
+            base: grade.id, // Add base property for URL updates
+            name: grade.name || grade.title,
+            title: grade.title || grade.name,
+            base_title: grade.title || grade.name, // Ensure base_title is set for the UI
+            section: boardId // Store the section ID on each grade
           }));
-
-          // Replace the localStats array with the new grades
-          this.localStats = [...formattedGrades];
-
-          // Make sure we have enough items for the wheel
-          this.ensureMinimumGrades();
-
-          // Re-center the grades wheel to show the middle grade
-          this.centerGradesWheel();
+          
+          console.log(`Fetched ${grades.length} grades for board ${boardId}`);
+          
+          // Ensure we have a minimum number of grades (15) for the wheel
+          const paddedGrades = this.ensureMinimumGrades(grades);
+          
+          // Reset the wheel with the new grades
+          this.resetGradesWheel(paddedGrades);
+          
+          // Update UI state
+          this.gradesLoading = false;
+          
+          return paddedGrades; // Return the grades
         } else {
-          console.error("Invalid API response format:", response);
+          console.warn("No grades data returned from API");
+          
+          // Create default blank grades if none returned
+          const defaultGrades = this.createDefaultGrades(boardId);
+          this.resetGradesWheel(defaultGrades);
+          
+          this.gradesLoading = false;
+          return defaultGrades;
         }
       } catch (error) {
         console.error("Error fetching grades:", error);
-      } finally {
         this.gradesLoading = false;
+        
+        // Create default grades on error
+        const defaultGrades = this.createDefaultGrades(this.activeBoard?.id || "6659");
+        this.resetGradesWheel(defaultGrades);
+        
+        return defaultGrades;
       }
+    },
+    
+    /**
+     * Reset the grades wheel with new grades
+     */
+    resetGradesWheel(grades) {
+      // Clear existing stats 
+      this.localStats = [];
+      
+      // Center the grades wheel around the middle grade
+      this.centerGradesWheel(grades);
+      
+      // Reset to original color scheme from data function
+      this.resetGradeColors();
+      
+      console.log("Grades wheel reset with", this.localStats.length, "grades");
+    },
+    
+    /**
+     * Reset the grade colors to the original color scheme
+     */
+    resetGradeColors() {
+      // Use the original colors from the data function
+      this.gradeColors = [
+        "#FF6498",
+        "#FD7DD2",
+        "#FF4DFF",
+        "#C24DFF",
+        "#8649FF",
+        "#4C4AFF",
+        "#4A87FF",
+        "#4AC2FF",
+        "#42EDEE",
+        "#49F182",
+        "#43E343",
+        "#76E43D",
+        "#E9E90A",
+        "#EEB23A",
+        "#F8864B",
+        "#FC4F4E",
+      ];
+    },
+    
+    /**
+     * Create default blank grades with the given board ID
+     */
+    createDefaultGrades(boardId) {
+      return Array(15).fill().map((_, index) => ({
+        id: `default-${index}`,
+        base: `default-${index}`,
+        name: `Grade ${index + 1}`,
+        title: `Grade ${index + 1}`,
+        base_title: `Grade ${index + 1}`, // Add base_title for UI rendering
+        section: boardId
+      }));
     },
 
     /**
      * Make sure we have at least 15 items for the grades wheel
      * This will duplicate existing grades if needed
      */
-    ensureMinimumGrades() {
+    ensureMinimumGrades(grades) {
       const requiredLength = 15;
 
       // If we don't have enough grades, duplicate the existing ones
-      if (this.localStats.length < requiredLength) {
-        const originalStats = [...this.localStats];
-        while (this.localStats.length < requiredLength) {
-          this.localStats = [...this.localStats, ...originalStats];
+      if (grades.length < requiredLength) {
+        const originalGrades = [...grades];
+        while (grades.length < requiredLength) {
+          grades = [...grades, ...originalGrades];
         }
 
         // Trim to the exact required length
-        this.localStats = this.localStats.slice(0, requiredLength);
+        grades = grades.slice(0, requiredLength);
       }
+      return grades;
     },
 
     /**
      * Center the grades wheel to show a middle grade
      */
-    centerGradesWheel() {
+    centerGradesWheel(grades) {
       // Move items to ensure the middle item is at index 7
-      if (this.localStats.length > 0) {
-        const midIndex = Math.floor(this.localStats.length / 2);
+      if (grades.length > 0) {
+        const midIndex = Math.floor(grades.length / 2);
         if (midIndex !== 7) {
           const shift = 7 - midIndex;
           if (shift > 0) {
             // Shift right
             for (let i = 0; i < shift; i++) {
-              const item = this.localStats.pop();
-              this.localStats.unshift(item);
+              const item = grades.pop();
+              grades.unshift(item);
             }
           } else {
             // Shift left
             for (let i = 0; i < Math.abs(shift); i++) {
-              const item = this.localStats.shift();
-              this.localStats.push(item);
+              const item = grades.shift();
+              grades.push(item);
             }
           }
         }
       }
+      this.localStats = grades;
     },
 
     /**
@@ -1723,8 +1796,20 @@ export default {
         name: "CIE",
       };
       this.activeBoardName = "CIE"; // Ensure the name is set explicitly
-      this.hasSelectedGrade = false;
-      this.updateUrlWithCurrentBoard();
+      
+      // Check if there's already a base parameter in the URL
+      const hasBaseInUrl = !!this.$route.query.base;
+      
+      // Fetch grades for the default board, then auto-select middle grade
+      this.fetchGrades().then(() => {
+        // Auto-select middle grade if there isn't already a base in the URL
+        this.hasSelectedGrade = true;
+        
+        // Wait a bit to ensure the board-selection.js plugin has had time to run
+        setTimeout(() => {
+          this.updateUrlWithSelectedGrade();
+        }, 500); // Half second delay to avoid collision with the plugin
+      });
     },
 
     /**
@@ -1735,13 +1820,15 @@ export default {
       if (board && board.id) {
         this.activeBoard = board;
         this.activeBoardName = this.getBoardDisplayName(board);
-        this.hasSelectedGrade = false; // Reset hasSelectedGrade when board changes
-
+        
         // Fetch grades for the new board *before* updating URL/refreshing data
         await this.fetchGrades();
         
-        // Now update the URL and refresh other data (which uses the new grades)
-        this.updateUrlWithCurrentBoard();
+        // Auto-select the middle grade after board change
+        this.hasSelectedGrade = true;
+        
+        // Now update the URL with the selected middle grade and refresh other data
+        this.updateUrlWithSelectedGrade();
       }
     },
   },
@@ -1779,15 +1866,19 @@ export default {
     
     // Initialize data based on the active board
     if (this.activeBoard) {
-      this.updateUrlWithCurrentBoard();
+      // Fetch grades first, then select middle grade and update URL
+      this.fetchGrades().then(() => {
+        // Auto-select the middle grade (after grades are fetched)
+        this.hasSelectedGrade = true;
+        
+        // Add a small delay to ensure board-selection plugin has completed
+        setTimeout(() => {
+          this.updateUrlWithSelectedGrade();
+        }, 500);
+      });
     } else {
       // If no board in localStorage, use default CIE board
       this.setDefaultBoard();
-    }
-
-    // Fetch grades if needed
-    if (this.localStats.length === 0) {
-      this.fetchGrades();
     }
 
     // Fetch initial data
@@ -1802,13 +1893,17 @@ export default {
         this.getActiveBoard();
         
         // Reset grade selection when board changes
-        this.hasSelectedGrade = false;
+        // Don't set hasSelectedGrade to false here, as we want to auto-select the middle grade
         
-        // Fetch grades for the new board
-        this.fetchGrades();
-        
-        // Update URL and refresh data
-        this.updateUrlWithCurrentBoard();
+        // Fetch grades for the new board, then auto-select middle grade
+        this.fetchGrades().then(() => {
+          this.hasSelectedGrade = true;
+          
+          // Add a delay to ensure any other processes are complete
+          setTimeout(() => {
+            this.updateUrlWithSelectedGrade();
+          }, 500);
+        });
       }
     };
 
