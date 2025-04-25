@@ -1389,19 +1389,16 @@ export default {
     updateUrlWithSelectedGrade() {
       // Prevent concurrent updates
       if (this.isUpdating) {
-        console.log("Update skipped: Already updating.");
         return;
       }
 
       // Don't update if still spinning (relevant for debounce timer)
       if (this.isSpinning) {
-         console.log("Update skipped: Still spinning.");
          return;
       }
 
       // Set the flag to indicate an update is in progress
       this.isUpdating = true;
-      console.log("Update started: Setting isUpdating to true.");
 
       // The centered grade (at index 7) is the selected one
       const selectedGrade = this.localStats[7];
@@ -1411,9 +1408,6 @@ export default {
         this.isUpdating = false; // Reset flag if we abort early
         return;
       }
-
-      // Log the selected grade for debugging
-      console.log("Selected grade for URL update:", selectedGrade);
 
       // Create query with existing params
       const query = { ...this.$route.query };
@@ -1429,21 +1423,17 @@ export default {
 
       // Include the base parameter if hasSelectedGrade is true and selectedGrade has a base
       if (this.hasSelectedGrade && selectedGrade.base) {
-        console.log("Setting base parameter:", selectedGrade.base);
         query.base = selectedGrade.base;
       } else if (!this.hasSelectedGrade) {
         // If no explicit grade selection, remove base parameter
-        console.log("Removing base parameter - no explicit grade selection");
         delete query.base;
       }
 
       // Update the URL without reloading the page
       // Handle NavigationDuplicated error
-      console.log("Updating URL with query:", query);
       this.$router.replace({ query }).catch((err) => {
         if (err && err.name === "NavigationDuplicated") {
           // Ignore the NavigationDuplicated error
-          console.log("Ignoring NavigationDuplicated error");
         } else {
           // Otherwise log the error
           console.error("Router replace error:", err);
@@ -1453,7 +1443,6 @@ export default {
       // Refresh data based on the new grade/board
       // Use .finally() to ensure the flag is reset regardless of success/error
       this.refreshData().finally(() => {
-         console.log("Update finished: Setting isUpdating to false.");
          this.isUpdating = false; // Reset the flag when refreshData completes
       });
     },
@@ -1595,7 +1584,6 @@ export default {
      */
     async fetchGrades() {
       try {
-        console.log("Fetching grades for board:", this.activeBoard?.id);
         this.gradesLoading = true;
         
         // Get board ID from active board or fallback to default
@@ -1620,7 +1608,6 @@ export default {
             section: boardId // Store the section ID on each grade
           }));
           
-          console.log(`Fetched ${grades.length} grades for board ${boardId}`);
           
           // Ensure we have a minimum number of grades (15) for the wheel
           const paddedGrades = this.ensureMinimumGrades(grades);
@@ -1667,7 +1654,6 @@ export default {
       // Reset to original color scheme from data function
       this.resetGradeColors();
       
-      console.log("Grades wheel reset with", this.localStats.length, "grades");
     },
     
     /**
