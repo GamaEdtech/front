@@ -28,23 +28,28 @@ export default class Experience {
 
         this.options = {
             // rendered
-            clearColor: "#8ec3fb",
+            // clearColor: "#8ec3fb",
+            clearColor: "#112131",
 
             // fog
-            fogColor: "#8ec3fb",
+            // fogColor: "#8ec3fb",
+            fogColor: "#112131",
             near: 20,
             far: 60,
 
             //ground
             groundSize: 200,
             groundWidth: 30,
-            groundColor: "#85d534",
+            // groundColor: "#85d534",
+            groundColor: "#548722",
+
             //road
             roadSize: 200,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
             roadFrequencyX: 0.14,
-            colorRoad: "#8a8a8a",
+            // colorRoad: "#8a8a8a",
+            colorRoad: "#4b4949",
             widthLineArround: 0.034,
             widthLineSeperator: 0.02,
             countLine: 4,
@@ -59,12 +64,18 @@ export default class Experience {
             strength: 70,
             warpFrequency: 0,
             warpStrength: 0,
-            colorWaterDeep: "#02587e",
-            colorWaterSurface: "#83b7fb",
+            // colorWaterDeep: "#02587e",
+            // colorWaterSurface: "#83b7fb",
+            // colorSand: "#f8d559",
+            // colorGrass: "#85d534",
+            // colorSnow: "#ffffff",
+            // colorRock: "#613400",
+            colorWaterDeep: "#011c28",
+            colorWaterSurface: "#4c6b94",
             colorSand: "#f8d559",
-            colorGrass: "#85d534",
-            colorSnow: "#ffffff",
-            colorRock: "#613400",
+            colorGrass: "#548722",
+            colorSnow: "#a3c6ff",
+            colorRock: "#1f1000",
 
 
             // tree

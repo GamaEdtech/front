@@ -22,6 +22,29 @@ export default class Car {
         this.wheelCircumference = 2 * Math.PI * 0.4
         this.laneLerpSpeed = this.options.laneLerpSpeed
 
+        this.currentQuestionIndex = 0
+        this.checkThreshold = 2
+        this.questionPositions = this.options.questions.map((q, index) => {
+            return (this.options.roadSize / (this.options.questions.length + 1)) * (index + 1)
+        })
+
+
+        this.isReversing = false
+        this.reverseStartX = 0
+        this.reverseDistance = 20
+        this.reverseSpeed = 0.5
+        this.reverseRotationSpeed = Math.PI / 20
+        this.wrongAnswerRotationY = 0
+
+
+        this.isJumping = false
+        this.jumpStartY = 0.6
+        this.jumpHeight = 1
+        this.jumpProgress = 0
+        this.jumpDuration = 60
+        this.correctAnswerRotationY = 0
+
+
 
 
         window.addEventListener("keydown", (event) => {
@@ -67,7 +90,7 @@ export default class Car {
         const laneTurnAngle = direction * laneTurnFactor * 0.75
 
         this.wheels.pivotFront.rotation.y = -laneTurnAngle * 0.7 + Math.PI / 2
-        this.mesh.rotation.y = angle - laneTurnAngle
+        this.mesh.rotation.y = angle - laneTurnAngle + this.wrongAnswerRotationY + this.correctAnswerRotationY
     }
 
 
@@ -89,6 +112,8 @@ export default class Car {
         const newLane = this.targetLane + direction
         if (newLane > 0 && newLane <= this.laneCount) {
             this.targetLane = newLane
+            console.log(this.targetLane);
+
         }
     }
 
@@ -112,6 +137,64 @@ export default class Car {
     }
 
 
+    checkQuestionCollision() {
+        if (this.currentQuestionIndex >= this.questionPositions.length) return;
+
+        const targetX = this.questionPositions[this.currentQuestionIndex];
+        const distance = Math.abs(this.positionX - targetX);
+
+
+        if (distance < this.checkThreshold) {
+            const correctLane = this.options.questions[this.currentQuestionIndex].indexAnswer + 1
+
+            if (this.targetLane === correctLane) {
+                if (!this.isJumping) {
+                    this.isJumping = true
+                    this.jumpStartY = 0.6
+                    this.jumpProgress = 0
+                }
+                this.currentQuestionIndex += 1
+            } else {
+                if (!this.isReversing) {
+                    this.reverseStartX = this.positionX
+                    this.isReversing = true
+                    this.wrongAnswerRotationY = 0
+                }
+            }
+        }
+    }
+
+    reverseStep() {
+        if (this.positionX > this.reverseStartX - this.reverseDistance) {
+            this.positionX -= this.reverseSpeed
+            this.wrongAnswerRotationY += this.reverseRotationSpeed
+            if (this.wrongAnswerRotationY >= Math.PI * 2 * 3) {
+                this.wrongAnswerRotationY = 0
+            }
+        } else {
+            this.isReversing = false
+            this.wrongAnswerRotationY = 0
+        }
+    }
+
+    jumpStep() {
+        this.jumpProgress += 1
+
+        const t = this.jumpProgress / this.jumpDuration
+        const jumpCurve = Math.sin(Math.PI * t)
+        this.mesh.position.y = this.jumpStartY + jumpCurve * this.jumpHeight
+        this.correctAnswerRotationY = Math.PI * 2 * t
+
+        if (this.jumpProgress >= this.jumpDuration) {
+            this.isJumping = false
+            this.mesh.position.y = this.jumpStartY
+            this.correctAnswerRotationY = 0
+        }
+    }
+
+
+
+
     update() {
         const distancePerFrame = this.speed * (this.time.delta / 1000)
         this.positionX += distancePerFrame
@@ -124,6 +207,16 @@ export default class Car {
             const rotationAngle = (distancePerFrame / this.wheelCircumference) * Math.PI * 2
             this.wheels.front.rotation.x += rotationAngle
             this.wheels.back.rotation.x += rotationAngle
+        }
+
+        this.checkQuestionCollision()
+
+        if (this.isReversing) {
+            this.reverseStep()
+        }
+
+        if (this.isJumping) {
+            this.jumpStep()
         }
     }
     setDebug() {

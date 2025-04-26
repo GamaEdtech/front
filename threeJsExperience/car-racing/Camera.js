@@ -75,7 +75,8 @@ export default class Camera {
     update() {
         this.controls.update()
 
-        this.positionX += this.speed * this.time.delta / 1000
+        // this.positionX += this.speed * this.time.delta / 1000
+        this.positionX = this.experience.world.car.positionX - this.options.distanceCameraFromCar
         if (this.smoothX === null) this.smoothX = this.positionX
         this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
         this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
