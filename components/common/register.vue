@@ -206,26 +206,29 @@ const finalRegister = async () => {
 }
 
 
-const handleCredentialResponse = async(response) => {
+const handleCredentialResponse = async(value) => {
   try{
-    const res = await fetch('/api/v1/users/googleAuth', {
+    const response = await $fetch('/api/v1/users/googleAuth', {
       method: 'POST',
       body: new URLSearchParams({
-        id_token: response.credential,
+        id_token: value.credential,
       })
     })
-    auth.setUserToken(res.data.data.jwtToken)
-    register_dialog.value = false
-    $toast.success("Logged in successfully")
-    router.push('/user')
-
-  }
-  catch(err) {
-      if (err.status === 401) 
-        $toast.error("Wrong login credentials")
-      else if (err.status === 500 || err.status === 504) 
-        $toast.error("Request failed")
+    if(response.status === 1){
+      $toast.success("Logged in successfully");
+      auth.setUserToken(response.data.jwtToken);
+      closeDialog();
+      navigateTo('/user');
     }
+  } catch (err) {
+    const status = err?.response?.status
+
+    if (status === 401) {
+      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+    } else if (status === 500 || status === 504) {
+      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+    }
+  }
 }
 
 </script>

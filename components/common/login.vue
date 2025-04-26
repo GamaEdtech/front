@@ -44,33 +44,23 @@ watch(countDown ,(val) => {
       if (val === 60) countDownTimer();
     });
 
-async function handleCredentialResponse(response) {
+async function handleCredentialResponse(value) {
   try {
-    const res = await fetch(
+    const response = await $fetch(
       '/api/v1/users/googleAuth',{
         method:'POST',
       body: new URLSearchParams({
-        id_token: response.credential,
+        id_token: value.credential,
       }),
       }
     )
 
-    const token = res.data.data.jwtToken
-
-    // Handle auth logic (depending on your auth setup)
-    if (auth?.setUserToken) {
-      auth.setUserToken(token)
+    if(response.status === 1){
+      $toast.success("Logged in successfully");
+      auth.setUserToken(response.data.jwtToken);
+      closeDialog();
+      navigateTo('/user');
     }
-
-    submitLoginV2(token)
-
-    login_dialog.value = false
-    $toast.success('Logged in successfully')
-
-    if (route.path === '/') {
-      router.push('/user')
-    }
-
   } catch (err) {
     const status = err?.response?.status
 
@@ -189,9 +179,6 @@ const onFinish = async () => {
       $toast.error(errorData.message);
     else
       $toast.error('Something went wrong.')
-    }
-    finally{
-      login_loading.value  = false
     }
   }
 

@@ -219,10 +219,12 @@ const logout = ()=>{
   auth.logout()
 }
 
-onMounted(() => {
+onMounted( async ()  => {
   // if (window.innerWidth <= 960 && this.$auth.loggedIn) {
   //   this.$refs["notification-section"].getNotifications();
   // }
+  if(!user.value && cookieToken.value)
+    await userInfo();
   if (
     route.name == "index" ||
     route.name == "smart-learning" ||

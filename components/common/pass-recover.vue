@@ -1,5 +1,25 @@
 <script setup>
 import { useAuth } from '~/composables/useAuth';
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
+
+// Yup validation for password + confirm password
+const validationSchema = yup.object({
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(4, 'Password must be at least 4 characters'),
+    
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Passwords must match')
+    .required('Confirm password is required'),
+})
+
+// Set up form and fields
+const { handleSubmit, errors } = useForm({
+  validationSchema,
+})
 
 const { $toast } = useNuxtApp()
 
@@ -10,8 +30,8 @@ const props = defineProps({
 let pass_recover_dialog = ref(false)
 let google_register_loading =  ref(true)
 let show1 = ref(false)
-let password = ref("")
-let confirmPassword = ref("")
+const confirmPassword = useField("confirmPassword");
+const password = useField("password");
 let passRecoverLoading = ref(false)
 
 let otp = ref("")
@@ -90,10 +110,9 @@ const requestPassRecover = async ()  => {
   passRecoverLoading.value = true;
   const auth = useAuth();
   try{
-      const response = await auth.forgotPassword({
+        await auth.forgotPassword({
         identity : identity.value
     })
-    console.log(response)
     $toast.success("Otp code sent");
     identityHolder.value = false;
     otpHolder.value = true;
@@ -106,16 +125,13 @@ const requestPassRecover = async ()  => {
     else
       $toast.error('Something went wrong.')
   }
-  finally{
-    passRecoverLoading.value = false;
-  }
 };
 
 
 // Handle OTP confirmation
-const onFinish = () => {
+const onFinish = async() => {
   try{
-    $fetch('/api/v1/users/recovery', {
+    const response = await $fetch('/api/v1/users/recovery', {
     method: 'POST',
     body: new URLSearchParams({
       'type': 'confirm',
@@ -123,8 +139,11 @@ const onFinish = () => {
     'code': otp.value,
     }),
   });
-    otpHolder.value = false;
-    selectPassHolder.value = true;
+    if(response.status ===1){
+      otpHolder.value = false;
+      selectPassHolder.value = true;
+      passRecoverLoading.value = false;
+    }
   }
 
   catch (error) {
@@ -134,10 +153,6 @@ const onFinish = () => {
       $toast.error(errorData.message);
     else
       $toast.error('Something went wrong.')
-  }
-  finally{
-    
-    passRecoverLoading.value = false;
   }
 };
 
@@ -162,9 +177,6 @@ const sendOtpCodeAgain = async () => {
       $toast.error(errorData.message);
     else
       $toast.error('Something went wrong.')
-  }
-  finally{
-    passRecoverLoading.value = false;
   }
 };
 
@@ -192,15 +204,15 @@ const tick = () => {
 
 
 //Final register (level 3: receive password from user)
-const passRecover = async () => {
+const submit = handleSubmit( async () => {
   passRecoverLoading.value = true;
   try{
-     const response =  await $fetch('/api/v1/users/recovery', {
+     await $fetch('/api/v1/users/recovery', {
       method: 'POST',
       body: new URLSearchParams({
         'type' : 'resetpass',
         'identity' : identity.value,
-        'pass' : password.value
+        'pass' : password.value.value
       }),
     });
 
@@ -219,7 +231,7 @@ const passRecover = async () => {
   finally{
     passRecoverLoading.value = false;
   }
-};
+}) 
 
 // Cancel password recovery
 const cancelPassRecover = () => {
@@ -364,7 +376,7 @@ function closeDialog() {
                   ref="final_reg_observer"
                   v-slot="{ invalid }"
                 > -->
-                <form @submit.prevent="passRecover()">
+                <form @submit.prevent="submit()">
                   <v-row>
                     <v-col cols="12">
                       <!-- <validation-provider
@@ -374,11 +386,10 @@ function closeDialog() {
                         > -->
                       <v-text-field
                         label="Password"
-                        v-model="password"
+                        v-model="password.value.value"
                         outlined
-                        :error-messages="errors"
+                        :error-messages="errors.password ? [errors.password] : []"
                         dense
-                        type="password"
                         :type="show1 ? 'text' : 'password'"
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                         @click:append="show1 = !show1"
@@ -394,9 +405,9 @@ function closeDialog() {
                           rules="required|min:4|confirmed:password"
                         > -->
                       <v-text-field
-                        v-model="confirmPassword"
+                        v-model="confirmPassword.value.value"
                         type="password"
-                        :error-messages="errors"
+                        :error-messages="errors.confirmPassword ? [errors.confirmPassword] : []"
                         label="Confirm password"
                         dense
                         outlined
