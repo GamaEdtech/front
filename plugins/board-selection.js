@@ -141,7 +141,7 @@ export default ({ app, store, route }) => {
     // Function to apply board from local storage if available
     const applyStoredBoard = async () => {
       try {
-
+        
         // Check for stored board
         let storedBoard = localStorage.getItem('selectedBoard');
         let board = null;
@@ -165,10 +165,22 @@ export default ({ app, store, route }) => {
           changed = true;
         }
         
+        // Important: Preserve the base parameter if it exists, only update if it doesn't
+        // This ensures we don't override a grade selection that might have been set by other components
+        if (!query.base && route.query.base) {
+          query.base = route.query.base;
+        }
+        
         // If we need to update the route with stored values
         if (changed) {
           // Use replace to avoid navigation issues
-          app.router.replace({ query });
+          app.router.replace({ query }).catch((err) => {
+            if (err && err.name === "NavigationDuplicated") {
+              console.log("Ignoring NavigationDuplicated error");
+            } else {
+              console.error("Router replace error:", err);
+            }
+          });
         }
       } catch (error) {
         console.error('Error applying stored board:', error);
@@ -189,6 +201,7 @@ export default ({ app, store, route }) => {
         const sectionId = String(to.query.section);
         const currentBoard = localStorage.getItem('selectedBoard');
         let boardObj = null;
+        let shouldUpdateStorage = false;
         
         // Try to use existing board object if available
         if (currentBoard) {
@@ -202,8 +215,10 @@ export default ({ app, store, route }) => {
               const boardDetails = await fetchBoardDetails(sectionId);
               boardObj = createBoardObject(sectionId, boardDetails);
               
-              // Save the updated board
-              localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
+              shouldUpdateStorage = true;
+            } else {
+              // Use existing board object, but preserve it for later parameter checks
+              boardObj = parsedBoard;
             }
           } catch (e) {
             console.error('Error parsing current board:', e);
@@ -211,12 +226,19 @@ export default ({ app, store, route }) => {
             // If parsing fails, create a new object
             const boardDetails = await fetchBoardDetails(sectionId);
             boardObj = createBoardObject(sectionId, boardDetails);
-            localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
+            
+            shouldUpdateStorage = true;
           }
         } else {
           // Try to get board details from API
           const boardDetails = await fetchBoardDetails(sectionId);
           boardObj = createBoardObject(sectionId, boardDetails);
+          
+          shouldUpdateStorage = true;
+        }
+        
+        // Update localStorage if the board changed
+        if (shouldUpdateStorage) {
           localStorage.setItem('selectedBoard', JSON.stringify(boardObj));
         }
       }
