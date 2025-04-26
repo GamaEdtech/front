@@ -55,7 +55,8 @@ watch(countDown ,(val) => {
       if (val === 60) countDownTimer();
     });
 
-onMounted(() => {
+
+onMounted(() =>{
   setTimeout(() => {
     if (window.google?.accounts?.id && googleRegisterBtn.value) {
       window.google.accounts.id.initialize({
@@ -77,32 +78,34 @@ onMounted(() => {
 })
 
 
-// Google login callback
-const handleCredentialResponse = async (response) => {
+async function handleCredentialResponse(value) {
+  const auth = useAuth();
+  try {
+    const response = await $fetch(
+      '/api/v1/users/googleAuth',{
+        method:'POST',
+      body: new URLSearchParams({
+        id_token: value.credential,
+      }),
+      }
+    )
 
-  const { data, error } = await $fetch('/api/v1/users/googleAuth', {
-    method: 'POST',
-    body: new URLSearchParams({
-      'id_token' : response.credential
-    }) 
-  });
-
-  if (error.value) {
-    if (error.value.status === 401) {
-      // Show error toast for wrong data
-      $toast.error('LOGIN_WRONG_DATA');
-    } else if ([500, 504].includes(error.value.status)) {
-      // Handle request failure
-      $toast.error('REQUEST_FAILED');
+    if(response.status === 1){
+      $toast.success("Logged in successfully");
+      auth.setUserToken(response.data.jwtToken);
+      closeDialog();
+      navigateTo('/user');
     }
-  } else {
-    // Store user data in authentication
-    auth.setUserToken(data.value.data.jwtToken);
-    passRecoverDialog.value = false;
-    $toast.success('Logged in successfully');
-    router.push('/user');
+  } catch (err) {
+    const status = err?.response?.status
+
+    if (status === 401) {
+      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+    } else if (status === 500 || status === 504) {
+      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+    }
   }
-};
+}
 
 
 // Handle OTP request

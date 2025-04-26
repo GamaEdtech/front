@@ -25,8 +25,10 @@ let otp_holder = ref(false)
 let select_pass_holder = ref(false)
 
 
-onMounted(() => {
+
+onMounted(() =>{
   setTimeout(() => {
+    if (window.google?.accounts?.id && googleRegisterBtn.value) {
       window.google.accounts.id.initialize({
         client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
         callback: handleCredentialResponse,
@@ -41,7 +43,7 @@ onMounted(() => {
       })
 
       google_register_loading.value = false
-    
+    }
   }, 4000)
 })
 
@@ -206,14 +208,18 @@ const finalRegister = async () => {
 }
 
 
-const handleCredentialResponse = async(value) => {
-  try{
-    const response = await $fetch('/api/v1/users/googleAuth', {
-      method: 'POST',
+async function handleCredentialResponse(value) {
+  const auth = useAuth();
+  try {
+    const response = await $fetch(
+      '/api/v1/users/googleAuth',{
+        method:'POST',
       body: new URLSearchParams({
         id_token: value.credential,
-      })
-    })
+      }),
+      }
+    )
+
     if(response.status === 1){
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);

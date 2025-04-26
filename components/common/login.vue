@@ -45,6 +45,7 @@ watch(countDown ,(val) => {
     });
 
 async function handleCredentialResponse(value) {
+  const auth = useAuth();
   try {
     const response = await $fetch(
       '/api/v1/users/googleAuth',{
@@ -57,8 +58,8 @@ async function handleCredentialResponse(value) {
 
     if(response.status === 1){
       $toast.success("Logged in successfully");
-      closeDialog();
       auth.setUserToken(response.data.jwtToken);
+      closeDialog();
       navigateTo('/user');
     }
   } catch (err) {
@@ -72,7 +73,32 @@ async function handleCredentialResponse(value) {
   }
 }
 
-onMounted(() => {
+
+watch(() => props.dialog, (isOpen) => {
+  if (isOpen) {
+    google_login_loading.value = true
+    setTimeout(() => {
+    if (window.google?.accounts?.id && googleLoginBtn.value) {
+      window.google.accounts.id.initialize({
+        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+        auto_select: true
+      })
+
+      window.google.accounts.id.renderButton(googleLoginBtn.value, {
+        text: 'Login',
+        size: 'large',
+        width: '252',
+        theme: 'outline'
+      })
+
+      google_login_loading.value = false
+    }
+  }, 4000)
+  }
+})
+
+onMounted(() =>{
   setTimeout(() => {
     if (window.google?.accounts?.id && googleLoginBtn.value) {
       window.google.accounts.id.initialize({
@@ -92,6 +118,7 @@ onMounted(() => {
     }
   }, 4000)
 })
+
 
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
@@ -216,8 +243,7 @@ function closeDialog() {
   identity_holder.value = true;
   otp_holder.value = false; 
   login_loading.value = false;
-  identity.value.value = '';
-  password.value.value = '';
+  handleReset()
   emit('update:dialog', false)
 }
 
