@@ -15,20 +15,22 @@ export default class Camera {
         this.options = this.experience.options
 
         this.positionY = this.options.cameraYPosition
-        this.positionX = this.options.roadSize - (this.options.offsetXStart - this.options.distanceCameraFromCar)
+        this.positionX = this.options.offsetXStart - this.options.distanceCameraFromCar
         this.speed = this.options.carBaseSpeed
         this.positionMiddleRoad = this.options.mountainWidth + (this.options.groundWidth / 2)
         this.smoothX = null
 
         window.addEventListener("keydown", (event) => {
             if (event.key == "ArrowUp") {
-                this.positionX -= this.speed
-                const z = this.calculatePositionZ(this.positionX);
-                this.instance.position.set(this.positionX, this.positionY, z)
-            } else if (event.key == "ArrowDown") {
                 this.positionX += this.speed
                 const z = this.calculatePositionZ(this.positionX);
                 this.instance.position.set(this.positionX, this.positionY, z)
+                this.instance.lookAt(this.positionX + 5, this.positionY, this.calculatePositionZ(this.positionX + 5))
+            } else if (event.key == "ArrowDown") {
+                this.positionX -= this.speed
+                const z = this.calculatePositionZ(this.positionX);
+                this.instance.position.set(this.positionX, this.positionY, z)
+                this.instance.lookAt(this.positionX + 5, this.positionY, this.calculatePositionZ(this.positionX + 5))
             }
         })
 
@@ -73,11 +75,12 @@ export default class Camera {
     update() {
         this.controls.update()
 
-        this.positionX -= this.speed * this.time.delta / 1000
+        this.positionX += this.speed * this.time.delta / 1000
         if (this.smoothX === null) this.smoothX = this.positionX
         this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
         this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
-        this.instance.lookAt(this.smoothX - 5, this.positionY, this.calculatePositionZ(this.smoothX - 5))
+        this.instance.lookAt(this.smoothX + 5, this.positionY, this.calculatePositionZ(this.smoothX + 5))
+
 
 
         const targetFov = 75 + this.options.carBaseSpeed * 0.5

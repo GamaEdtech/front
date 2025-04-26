@@ -16,7 +16,7 @@ export default class Car {
         this.currentLane = 1
         this.targetLane = this.currentLane
         this.laneWidth = this.options.roadWidth / this.laneCount
-        this.positionX = this.options.roadSize - this.options.offsetXStart
+        this.positionX = this.options.offsetXStart
         this.speed = this.options.carBaseSpeed
         this.positionMiddleRoad = this.options.mountainWidth + (this.options.groundWidth / 2)
         this.wheelCircumference = 2 * Math.PI * 0.4
@@ -42,7 +42,7 @@ export default class Car {
 
     getLaneZOffset(laneNumber) {
         const center = (this.laneCount + 1) / 2;
-        return ((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
+        return -((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
     }
 
     getRoadZOffset(positionX) {
@@ -67,19 +67,19 @@ export default class Car {
         const laneTurnAngle = direction * laneTurnFactor * 0.75
 
         this.wheels.pivotFront.rotation.y = -laneTurnAngle * 0.7 + Math.PI / 2
-        this.mesh.rotation.y = angle - Math.PI - laneTurnAngle
+        this.mesh.rotation.y = angle - laneTurnAngle
     }
 
 
     moveForward() {
-        this.positionX -= this.speed
+        this.positionX += this.speed
         const z = this.getFinalZ(this.positionX, this.currentLane)
         this.mesh.position.set(this.positionX, 0.5, z)
         this.updateRotation()
     }
 
     moveBackward() {
-        this.positionX += this.speed
+        this.positionX -= this.speed
         const z = this.getFinalZ(this.positionX, this.currentLane)
         this.mesh.position.set(this.positionX, 0.5, z)
         this.updateRotation()
@@ -96,7 +96,6 @@ export default class Car {
         this.mesh = this.resourses.items.carGLTFModel.scene
 
         this.mesh.scale.set(0.8, 0.8, 0.8)
-        this.mesh.rotation.y = -Math.PI
         this.mesh.position.x = this.positionX
         this.mesh.position.z = this.getFinalZ(this.positionX, this.currentLane)
         this.mesh.position.y = 0.6
@@ -115,7 +114,7 @@ export default class Car {
 
     update() {
         const distancePerFrame = this.speed * (this.time.delta / 1000)
-        this.positionX -= distancePerFrame
+        this.positionX += distancePerFrame
         this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.targetLane, (this.time.delta / 1000) * this.laneLerpSpeed)
         this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))
 
