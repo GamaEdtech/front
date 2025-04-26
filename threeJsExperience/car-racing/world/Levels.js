@@ -1,0 +1,113 @@
+import * as THREE from "three"
+import { TextGeometry } from 'three/examples/jsm/Addons.js'
+import Experience from '../Experience.js'
+
+
+export default class Levels {
+    constructor() {
+
+        this.experience = new Experience()
+        this.scene = this.experience.scene
+        this.time = this.experience.time
+        this.debug = this.experience.debug
+        this.options = this.experience.options
+
+
+        this.laneCount = this.options.countLine
+        this.laneWidth = this.options.roadWidth / this.laneCount
+        this.positionMiddleRoad = this.options.mountainWidth + (this.options.groundWidth / 2)
+        this.questions = this.options.questions
+        this.positionYNumber = 1.2
+        this.configTextGeometry = {
+            font: this.experience.resources.items.fontLevel,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 6,
+            bevelEnabled: true,
+            bevelThickness: 0.02,
+            bevelSize: 0.02,
+            bevelOffset: 0,
+            bevelSegments: 2
+        }
+        this.predefinedColors = ['#ff4d4d', '#4da6ff', '#4dff88', '#ffff4d']
+        this.floatSpeed = 2
+        this.floatAmplitude = 0.2
+
+
+        this.setMaterial()
+        this.setMesh()
+
+        this.setDebug()
+    }
+
+    getLaneZOffset(laneNumber) {
+        const center = (this.laneCount + 1) / 2;
+        // return ((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
+        return -((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
+    }
+
+    getRoadZOffset(positionX) {
+        return Math.cos(positionX * this.options.roadFrequencyX) * this.options.roadAmplitudeX
+    }
+
+    getFinalZ(positionX, currentLane) {
+        return this.getRoadZOffset(positionX) + this.getLaneZOffset(currentLane)
+    }
+
+    getRotation(positionX, currentLane) {
+        const deltaX = 0.1
+        const currentZ = this.getFinalZ(positionX, currentLane)
+        const nextZ = this.getFinalZ(positionX - deltaX, currentLane)
+
+        const dz = nextZ - currentZ
+        const angle = Math.atan2(dz, deltaX)
+
+        return angle + 3 * Math.PI / 2
+    }
+
+    getRandomColor() {
+        const hue = Math.floor(Math.random() * 360)
+        return new THREE.Color(`hsl(${hue}, 100%, 50%)`)
+    }
+
+    setMaterial() {
+        this.materials = this.predefinedColors.map(color => new THREE.MeshBasicMaterial({ color }))
+    }
+
+
+    setMesh() {
+        this.meshes = []
+
+        this.questions.forEach((question, index) => {
+            // let positionX = (this.options.roadSize / (this.questions.length + 1)) * (this.questions.length - index)
+            let positionX = (this.options.roadSize / (this.questions.length + 1)) * (index + 1)
+            question.choices.forEach((number, jIndex) => {
+                const geometry = new TextGeometry(number, this.configTextGeometry)
+                geometry.center()
+
+                const material = this.materials[Math.floor(Math.random() * this.materials.length)]
+                const mesh = new THREE.Mesh(geometry, material)
+                const laneNumber = jIndex + 1
+                const posZ = this.getFinalZ(positionX, laneNumber)
+                mesh.position.set(positionX, this.positionYNumber, posZ)
+                mesh.rotation.y = this.getRotation(positionX, laneNumber)
+
+                mesh.userData.floatOffset = Math.random() * Math.PI * 2
+
+                this.scene.add(mesh)
+                this.meshes.push(mesh)
+            })
+        })
+    }
+
+
+    update() {
+        const time = this.time.elapsed * 0.001
+        this.meshes.forEach(mesh => {
+            mesh.position.y = this.positionYNumber + Math.sin(time * this.floatSpeed + mesh.userData.floatOffset) * this.floatAmplitude
+        })
+    }
+    setDebug() {
+        const LevelsFolder = this.debug.ui.addFolder("Levels")
+    }
+}

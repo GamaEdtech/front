@@ -80,6 +80,31 @@ export default class Experience {
             laneLerpSpeed: 3,
             distanceCameraFromCar: 7,
             cameraYPosition: 2,
+
+
+            // levels questions
+            questions: [
+                {
+                    question: "10 - 2 =",
+                    choices: ["4", "22", "45", "8"],
+                    indexAnswer: 3
+                },
+                {
+                    question: "22 * 2 =",
+                    choices: ["4", "44", "81", "95"],
+                    indexAnswer: 1
+                },
+                {
+                    question: "1 + 1 =",
+                    choices: ["2", "15", "56", "64"],
+                    indexAnswer: 0
+                },
+                {
+                    question: "9 * 8 =",
+                    choices: ["21", "35", "72", "64"],
+                    indexAnswer: 2
+                },
+            ]
         }
 
 
