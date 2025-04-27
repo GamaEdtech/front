@@ -9,6 +9,9 @@ html {
 .gray--text {
   color: #98a2b3 !important;
 }
+.yellow--text {
+  color: #FFB600 !important;
+}
 
 .primary-gray-100 {
   color: var(--primary-grey-100, #f2f4f7);
@@ -4596,6 +4599,10 @@ body {
   text-overflow: ellipsis;
 }
 
-.flex-grow-1{
+.flex-grow-1 {
   flex-grow: 1;
+}
+
+.h-full{
+  height: 100%;
 }
