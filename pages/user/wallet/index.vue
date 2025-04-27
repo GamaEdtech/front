@@ -14,7 +14,7 @@
               </div>
 
               <div class="balance-amount d-flex align-center">
-                <span class="currency mr-2 mt-3 yellow--text">$GET</span>
+                <span class="currency mr-2 mt-3 yellow--text-darken">$GET</span>
                 <span class="amount text-white">14,235</span>
                 <span class="decimal text-white">.34</span>
                 <v-img
@@ -26,15 +26,19 @@
               <div class="balance-actions d-flex justify-space-between mt-10">
                 <div class="action-btn text-center">
                   <v-icon small class="gray--text">mdi-tray-arrow-up</v-icon>
-                  <div class="text-lg-h6 yellow--text mt-1">Top up</div>
+                  <div class="text-lg-h6 yellow--text-darken mt-2">Top up</div>
                 </div>
                 <div class="action-btn text-center ml-8">
                   <v-icon small class="gray--text">mdi-tray-arrow-down</v-icon>
-                  <div class="text-lg-h6 yellow--text mt-1">Withdraw</div>
+                  <div class="text-lg-h6 yellow--text-darken mt-2">
+                    Withdraw
+                  </div>
                 </div>
                 <div class="action-btn text-center ml-8">
                   <v-icon small class="gray--text">mdi-swap-horizontal</v-icon>
-                  <div class="text-lg-h6 yellow--text mt-1">Transfer</div>
+                  <div class="text-lg-h6 yellow--text-darken mt-2">
+                    Transfer
+                  </div>
                 </div>
               </div>
             </div>
@@ -42,7 +46,6 @@
         </v-col>
 
         <v-col cols="12" sm="6" md="6">
-          <div>Transaction History</div>
           <transaction-chart class="transaction-chart"></transaction-chart>
         </v-col>
       </v-row>
@@ -202,10 +205,12 @@ export default defineComponent({
 }
 
 .balance-card {
-  background: radial-gradient(circle at top left, #2a3040, #1e2631);
+  background: url("~@/assets/images/wallet/wallet-background.png"),
+    radial-gradient(circle at top left, #2a3040, #1e2631);
+  background-size: cover;
+  background-position: center;
   color: white;
   border-radius: 16px !important;
-  background: url("/images/wallet/wallet-background.png");
 }
 
 .balance-card-content {
@@ -261,7 +266,7 @@ export default defineComponent({
 }
 
 .transaction-chart {
-  height: 190px;
+  /* height: 190px; */
   margin-bottom: 16px;
   position: relative;
   width: 100%;
