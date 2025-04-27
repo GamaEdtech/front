@@ -4,23 +4,15 @@
             <v-card-title>
                 <h2>Math Problem</h2>
             </v-card-title>
-            <v-card-subtitle class="font-weight-bold font-size-14" v-if="isMessageShow" :style="{color: isCorrect ? 'green' : 'red'}">
+            <v-card-subtitle class="font-weight-bold font-size-14" v-if="isMessageShow"
+                :style="{ color: isCorrect ? 'green' : 'red' }">
                 {{ isCorrect ? 'Correct' : 'Incorrect' }}
             </v-card-subtitle>
             <v-card-text>
                 <p>Solve the following math problem:</p>
                 <v-form>
-                    <v-text-field
-                        v-model="problem"
-                        label="Problem"
-                        disabled
-                        required
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="interedAnswer"
-                        label="Answer"
-                        required
-                    ></v-text-field>
+                    <v-text-field v-model="problem" label="Problem" disabled required></v-text-field>
+                    <v-text-field v-model="interedAnswer" label="Answer" required></v-text-field>
                 </v-form>
             </v-card-text>
             <v-card-actions>
@@ -32,10 +24,18 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useDoorMathProblem } from '@/store/doorMathProblem';
+import { levels } from '@/store/doorMathProblem';
+import level from "@/store/level"
+import step from "@/store/step"
 import { nearDoor } from '~/store/doorStatus';
+import type { Step } from "@/interfaces/levels.interface"
 
-const { problem, answer } = useDoorMathProblem[nearDoor.value as keyof typeof useDoorMathProblem];
+const stepKey = `step${step.value}` as keyof Step;
+const levelKey = `level${level.value}` as keyof Step;
+
+
+const { problem, answer } = levels.value[levelKey][stepKey as 'step1' | "step2" | "step3" | "step4"][nearDoor.value as "door001" | "door002" | "door003"]
+
 const interedAnswer = ref('');
 const isCorrect = ref(false);
 const isMessageShow = ref(false);

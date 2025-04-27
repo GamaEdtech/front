@@ -1,12 +1,12 @@
-// composables/useCharacterController.ts
 import * as THREE from 'three'
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { shallowRef, ref } from 'vue'
-import { nearDoor, openedDoors} from '@/store/doorStatus'
-import { watch } from 'vue'
+import { shallowRef, ref, watch, computed } from 'vue'
+import { nearDoor, openedDoors, type Step } from '@/store/doorStatus'
 import { doorModels } from '~/store/doorModels'
 import { animate } from 'animejs'
+import step from "@/store/step"
+import level from "@/store/level"
+import createGate from './useGate'
+import useGate from './useGate'
 
 // Define types for better code organization
 interface MoveState {
@@ -44,13 +44,12 @@ interface CastleBoundaries {
     rightWall: BoundaryWall;
     backWall: BoundaryWall;
     frontWall: BoundaryWall;
-    corridorRightWall: BoundaryWall;
-    corridorLeftWall: BoundaryWall;
-    roomLeftWall: BoundaryWall;
-    roomRightWall: BoundaryWall;
+    // corridorRightWall: BoundaryWall;
+    // corridorLeftWall: BoundaryWall;
     door1: DoorBoundary;
     door2: DoorBoundary;
     door3: DoorBoundary;
+    door4: DoorBoundary;
 }
 
 
@@ -64,11 +63,13 @@ export function useCharacterController(
     const characterBox = shallowRef<THREE.Box3 | null>(null)
 
     // Interaction state
+    const isNearGate = ref(false)
     const isNearDoor = ref(false)
     const doorPositions: Record<string, THREE.Vector3> = {
         door001: new THREE.Vector3(43, 55, 248), // Estimated position for Door.001
         door002: new THREE.Vector3(-56, 55, 3), // Estimated position for Door.002
-        door003: new THREE.Vector3(43, 55, -242) // Position of Door.003
+        door003: new THREE.Vector3(43, 55, -242), // Position of Door.003
+        door004: new THREE.Vector3(-18, 55, -485) // Position of Door.003
     }
     const INTERACTION_DISTANCE = 50 // Distance to show interaction prompt
 
@@ -107,34 +108,10 @@ export function useCharacterController(
             rightX: 70
         },
         frontWall: {
-            z: -812,
+            z: -573.8,
             x: 0,
             leftX: -78,
             rightX: 70
-        },
-        corridorRightWall: {
-            leftX: 2.4774,
-            rightX: 85,
-            z: -478.139803,
-            x: 43.7387
-        },
-        corridorLeftWall: {
-            leftX: -160.58,
-            rightX: -31.8965,
-            z: -478.139803,
-            x: -71.2383
-        },
-        roomLeftWall: {
-            x: -145.62,
-            z: -577,
-            leftX: -146,
-            rightX: -145
-        },
-        roomRightWall: {
-            x: 38.5,
-            z: -577,
-            leftX: 38,
-            rightX: 39
         },
         door1: {
             leftX: 24,
@@ -175,10 +152,29 @@ export function useCharacterController(
                 rightX: 72
             }
         },
+        door4: {
+            leftX: -31.8965,
+            rightX: 2.4774,
+            z: -482,
+            leftWall: {
+                leftX: -160.58,
+                rightX: -31.8965,
+            },
+            rightWall: {
+                leftX: 2.4774,
+                rightX: 85,
+            }
+        },
     }
 
+
+    const stepKey = computed(() => `step${step.value}` as keyof Step);
+    const currentStep = computed(() => openedDoors.value[level.value-1].steps[stepKey.value])
+
     watch(openedDoors, (newVal) => {
-        if(newVal.door001 == true) {
+
+
+        if (currentStep.value.door001 == true) {
             if (doorModels.door001.model) {
                 animate(doorModels.door001.model.rotation, {
                     z: -3.2,
@@ -187,7 +183,7 @@ export function useCharacterController(
                 })
             }
         }
-        if(newVal.door002 == true) {
+        if (currentStep.value.door002 == true) {
             if (doorModels.door002.model) {
                 animate(doorModels.door002.model.rotation, {
                     z: -3.2,
@@ -196,7 +192,7 @@ export function useCharacterController(
                 })
             }
         }
-        if(newVal.door003 == true) {
+        if (currentStep.value.door003 == true) {
             if (doorModels.door003.model) {
                 animate(doorModels.door003.model.rotation, {
                     z: -3.2,
@@ -205,14 +201,26 @@ export function useCharacterController(
                 })
             }
         }
-        
+        if (currentStep.value.door004 == true) {
+            if (doorModels.door004.model) {
+                animate(doorModels.door004.model.rotation, {
+                    z: -3.130,
+                    duration: 1000,
+                    easing: 'easeInOutSine'
+                })
+            }
+        }
+
     }, { deep: true })
 
     /**
      * Updates interaction state based on proximity to doors
      */
+    const { gateInteractions } = useGate(scene)
     const updateInteractions = () => {
         if (!character.value) return
+
+        isNearGate.value = gateInteractions(character.value) 
 
         let nearAnyDoor = false;
 
@@ -220,10 +228,13 @@ export function useCharacterController(
         for (const doorKey in doorPositions) {
             const doorPosition = doorPositions[doorKey];
             const distanceToDoor = character.value.position.distanceTo(doorPosition);
-            
-            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors[doorKey as "door001" | "door002" | "door003"]) {
+            console.log(!openedDoors.value[level.value - 1].steps[stepKey.value][doorKey as "door001" | "door002" | "door003"]);
+                       
+            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors.value[level.value-1].steps[stepKey.value][doorKey as "door001" | "door002" | "door003"]) {
                 nearAnyDoor = true;
                 nearDoor.value = doorKey as "door001" | "door002" | "door003";
+                console.log(nearDoor.value);
+                
                 break;
             }
         }
@@ -239,10 +250,12 @@ export function useCharacterController(
 
     /**
      * Creates and sets up the character in the scene
-     */
+    */
+    
+    // Create a character container
+    const characterContainer = new THREE.Object3D()
+
     const createCharacter = () => {
-        // Create a character container
-        const characterContainer = new THREE.Object3D()
 
         // Create character body
         const geometry = new THREE.BoxGeometry(2, 4, 2)
@@ -369,6 +382,8 @@ export function useCharacterController(
      */
     const checkCollision = (position: THREE.Vector3): boolean => {
         const { x, z } = position
+        // console.log("x" + x)
+        // console.log("z" + z)
         const b = boundaries;
 
         // Check main walls
@@ -380,41 +395,38 @@ export function useCharacterController(
         }
 
         // Check corridor walls
-        if ((x < b.corridorRightWall.rightX && x > b.corridorRightWall.leftX) &&
-            (z < b.corridorRightWall.z && z > b.corridorRightWall.z - 100)) {
-            return true;
-        }
+        // if ((x < b.corridorRightWall.rightX && x > b.corridorRightWall.leftX) &&
+        //     (z < b.corridorRightWall.z && z > b.corridorRightWall.z - 100)) {
+        //     return true;
+        // }
 
-        if ((x < b.corridorLeftWall.rightX && x > b.corridorLeftWall.leftX) &&
-            (z < b.corridorLeftWall.z && z > b.corridorLeftWall.z - 100)) {
-            return true;
-        }
-
-        // Check room walls
-        if ((x < b.roomLeftWall.x && z < b.roomLeftWall.z) ||
-            (x > b.roomRightWall.x && z < b.roomRightWall.z)) {
-            return true;
-        }
+        // if ((x < b.corridorLeftWall.rightX && x > b.corridorLeftWall.leftX) &&
+        //     (z < b.corridorLeftWall.z && z > b.corridorLeftWall.z - 100)) {
+        //     return true;
+        // }
 
         // Check doors
-        const checkDoorWalls = (door: DoorBoundary) => {
-            
+        const checkDoorWalls = (door: DoorBoundary, diagonalSize: number = 5) => {
+
             return ((x < door.leftWall.rightX && x > door.leftWall.leftX) &&
-                (z < door.z && z > door.z - 5)) ||
+                (z < door.z && z > door.z - diagonalSize)) ||
                 ((x < door.rightWall.rightX && x > door.rightWall.leftX) &&
-                    (z < door.z && z > door.z - 5));
+                    (z < door.z && z > door.z - diagonalSize));
         };
 
         const checkDoor = (door: DoorBoundary, doorName: string) => {
             return ((x > door.leftX && x < door.rightX) &&
-                (z > door.z && z < door.z + 5)) && !openedDoors[doorName as "door001" | "door002" | "door003"];
+                (z > door.z && z < door.z + 5)) && !currentStep.value[doorName as "door001" | "door002" | "door003" | "door004"]
+             
         };
 
-        if (checkDoorWalls(b.door1) || checkDoorWalls(b.door2) || checkDoorWalls(b.door3)) {
+        if (checkDoorWalls(b.door1) || checkDoorWalls(b.door2) || checkDoorWalls(b.door3) || checkDoorWalls(b.door4, 100)) {
             return true;
         }
 
-        if (checkDoor(b.door1, "door001") || checkDoor(b.door2, "door002") || checkDoor(b.door3, "door003")) {
+        if (checkDoor(b.door1, "door001") || checkDoor(b.door2, "door002") || checkDoor(b.door3, "door003") || checkDoor(b.door4, "door004")) {
+            console.log("gooood");
+            
             return true;
         }
 
@@ -500,12 +512,16 @@ export function useCharacterController(
         document.removeEventListener('click', () => { })
     }
 
+    createGate(scene)
+
     return {
         createCharacter,
         setupControls,
         updateCharacter,
         cleanup,
         character,
-        isNearDoor
+        isNearDoor,
+        isNearGate,
+        characterContainer,
     }
 }

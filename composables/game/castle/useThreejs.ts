@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import { ref, shallowRef } from 'vue'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { doorModels } from '~/store/doorModels'
+import modelesLoaded from '~/store/modelsLoaded'
 
 export function useThreeJS() {
     // Scene elements
@@ -12,9 +12,7 @@ export function useThreeJS() {
 
     // State
     const animationFrameId = ref<number | null>(null)
-    const material2006Objects = shallowRef<THREE.Object3D[]>([])
-    const modelLoaded = ref(false)
-    const castle = shallowRef<THREE.Object3D | null>(null)
+
 
     /**
      * Sets up the Three.js scene with renderer and lighting
@@ -95,7 +93,7 @@ export function useThreeJS() {
 
         // Flickering animation - more subtle
         const flickerLights = () => {
-            if (!modelLoaded.value) return
+            if (!modelesLoaded.value) return
 
             // Subtle random intensity fluctuation
             interiorLight1.intensity = 1.0 + Math.random() * 0.1
@@ -107,79 +105,43 @@ export function useThreeJS() {
 
         // Start flickering when model is loaded
         setTimeout(() => {
-            if (modelLoaded.value) flickerLights()
+            if (modelesLoaded.value) flickerLights()
         }, 2000)
     }
 
     /**
      * Loads the castle model from GLB file
      */
-    const loadCastleModel = () => {
-        const loader = new GLTFLoader()
-        loader.load('/game/castle/castle-v2.glb', (gltf) => {
-            castle.value = gltf.scene
-            castle.value.scale.set(1, 1, 1)
+    // const loadModel = (url: string): Promise<{ model: THREE.Group<THREE.Object3DEventMap>, scene: THREE.Scene }> => {
+    //     return new Promise<{ model: THREE.Group<THREE.Object3DEventMap> , scene: THREE.Scene}>((resolve, reject) => {
+    //         const loader = new GLTFLoader()
 
-            // Debug: Log all mesh names and their hierarchy
-            console.log("--- 3D MODEL MESH NAMES ---");
-            let meshCount = 0;
+    //         loader.load(url, (gltf) => {
+    //             const model = gltf.scene
 
-            castle.value.traverse((object) => {
-                if (object instanceof THREE.Mesh) {
-                    // Print mesh name and path
-                    let path = "";
-                    let current: THREE.Object3D | null = object;
-                    while (current) {
-                        path = current.name + (path ? " > " + path : "");
-                        current = current.parent;
-                    }
+    //             // scene.value.add(model)
+    //             console.log(scene.value);
+                
+    //             modelLoaded.value = true
+    //             resolve({model, scene: scene.value})
+    //         }, undefined, (error) => {
+    //             reject(error)
+    //         })
 
-                    console.log(`Mesh #${meshCount++}: ${object.name} (Full path: ${path})`);
-                    console.log(`Material: ${object.material.name || "unnamed"}`);
-                    console.log("---");
-                    
-                    if (['Door.001', 'Door.002', 'Door.003'].includes(object.material.name)) {
-                        const doorName = object.material.name.toLowerCase().replace('.', '')
-                        
-                        doorModels[doorName as "door001" | "door002" | "door003"].model = object
-                    }
+    //     })
+    // }
 
-                    // Set up normal rendering with shadows
-                    object.castShadow = true;
-                    object.receiveShadow = true;
+    
+    const loadModel = async (url: string): Promise<THREE.Group<THREE.Object3DEventMap>> => {
+        const loader = new GLTFLoader();
+        const gltf = await loader.loadAsync(url)
+        const model = gltf.scene
 
-                    // Slightly adjust materials for mood without making them too dark
-                    if (object.material) {
-                        if (Array.isArray(object.material)) {
-                            object.material.forEach(adjustMaterial)
-                        } else {
-                            adjustMaterial(object.material)
-                        }
-                    }
-                }
-            })
+        console.log(model);
+        
+        
 
-            console.log(`Total meshes found: ${meshCount}`);
-
-            scene.value.add(castle.value)
-            modelLoaded.value = true
-        })
-    }
-
-    /**
-     * Adjusts material for a slightly melancholic look
-     */
-    const adjustMaterial = (material: THREE.Material) => {
-        if (material instanceof THREE.MeshStandardMaterial) {
-            // Slightly desaturate colors but maintain visibility
-            if (material.color) {
-                const color = material.color.getHSL({ h: 0, s: 0, l: 0 })
-                material.color.setHSL(color.h, Math.max(0, color.s - 0.15), Math.max(0.2, color.l - 0.05))
-            }
-
-            // Moderate roughness adjustment
-            material.roughness = Math.min(0.9, material.roughness + 0.1)
-        }
+        return model
     }
 
     /**
@@ -221,11 +183,9 @@ export function useThreeJS() {
         camera,
         renderer,
         setupScene,
-        loadCastleModel,
+        loadModel,
         startAnimationLoop,
-        cleanup,
-        modelLoaded,
-        castle
+        cleanup
     }
 }
 

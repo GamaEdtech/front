@@ -10,6 +10,9 @@ interface DoorModels {
     door003: {
         model: THREE.Object3D | null
     }
+    door004: {
+        model: THREE.Object3D | null
+    }
 }
 
 export const doorModels = reactive<DoorModels>({
@@ -20,6 +23,9 @@ export const doorModels = reactive<DoorModels>({
         model: null,
     },
     door003: {
+        model: null,
+    },
+    door004: {
         model: null,
     }
 })
