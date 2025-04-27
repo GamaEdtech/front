@@ -25,12 +25,12 @@ export default class Camera {
                 this.positionX += this.speed
                 const z = this.calculatePositionZ(this.positionX);
                 this.instance.position.set(this.positionX, this.positionY, z)
-                this.instance.lookAt(this.positionX + 5, this.positionY, this.calculatePositionZ(this.positionX + 5))
+                this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
             } else if (event.key == "ArrowDown") {
                 this.positionX -= this.speed
                 const z = this.calculatePositionZ(this.positionX);
                 this.instance.position.set(this.positionX, this.positionY, z)
-                this.instance.lookAt(this.positionX + 5, this.positionY, this.calculatePositionZ(this.positionX + 5))
+                this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
             }
         })
 
@@ -80,7 +80,7 @@ export default class Camera {
         if (this.smoothX === null) this.smoothX = this.positionX
         this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
         this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
-        this.instance.lookAt(this.smoothX + 5, this.positionY, this.calculatePositionZ(this.smoothX + 5))
+        this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
 
 
 

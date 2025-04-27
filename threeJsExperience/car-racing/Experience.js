@@ -93,8 +93,9 @@ export default class Experience {
             carBaseSpeed: 2,
             offsetXStart: 15,
             laneLerpSpeed: 3,
-            distanceCameraFromCar: 7,
-            cameraYPosition: 2,
+            distanceCameraFromCar: window.innerWidth < 480 ? 12 : 7,
+            cameraYPosition: window.innerWidth < 480 ? 3 : 2,
+            distanceLookAtCamera: window.innerWidth < 480 ? 13 : 5,
 
 
             // levels questions

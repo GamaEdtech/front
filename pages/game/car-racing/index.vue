@@ -4,7 +4,7 @@
 
         <div class="top-items">
             <button class="pause-btn btn" @click="setPlayingStatus(false)">
-                <img class="icon-pause" src="@/assets/images/pause-icon.svg" alt="Pause">
+                <img class="icon-pause highligth" src="@/assets/images/pause-icon.svg" alt="Pause">
             </button>
             <div :class="['question-box', questionStatus]">
                 {{ questions[currentQuestionIndex].text }}
@@ -17,16 +17,16 @@
 
         <div class="overlay-loading-pause" v-if="!isPlayingGame">
             <button class="play-btn btn" @click="setPlayingStatus(true)">
-                <img class="icon-play" src="@/assets/images/play-icon.svg" alt="Play">
+                <img class="icon-play highligth" src="@/assets/images/play-icon.svg" alt="Play">
             </button>
         </div>
 
         <div class="buttons-div">
             <button @click="changeLane(-1)" class="change-lane-btn btn">
-                <img class="icon-play" src="@/assets/images/left-arrow-icon.svg" alt="Left Arrow">
+                <img class="icon-play highligth" src="@/assets/images/left-arrow-icon.svg" alt="Left Arrow">
             </button>
             <button @click="changeLane(1)" class="change-lane-btn btn">
-                <img class="icon-play" src="@/assets/images/right-arrow-icon.svg" alt="Right Arrow">
+                <img class="icon-play highligth" src="@/assets/images/right-arrow-icon.svg" alt="Right Arrow">
             </button>
         </div>
     </div>
@@ -358,27 +358,36 @@ export default {
     filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
 }
 
+.highligth {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
+}
 
 /* responsive mobile */
 @media screen and (max-width: 480px) {
     .change-lane-btn {
-        width: 40px;
-        height: 40px;
+        width: 80px;
+        height: 80px;
     }
 
     .play-btn {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
 
     .pause-btn {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
 
     .timer-box {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
         font-size: 16px;
     }
 
