@@ -19,8 +19,8 @@ export default class Lighting {
 
     setDirectioanlLight() {
         this.directionalLight = new THREE.DirectionalLight('#ffffff', 5)
-        // this.directionalLight.position.set(-100, 400, 200)
-        this.directionalLight.position.set(-100, 7, 30)
+        this.directionalLight.position.set(-100, 400, 200)
+        // this.directionalLight.position.set(-100, 7, 30)
 
         this.directionalLight.castShadow = true
         this.directionalLight.shadow.mapSize.set(1024, 1024)

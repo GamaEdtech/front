@@ -12,7 +12,7 @@ import sources from "./sources"
 
 let instance = null
 export default class Experience {
-    constructor(canvas) {
+    constructor(canvas, questions, callBacks) {
         if (instance) {
             return instance
         }
@@ -20,36 +20,38 @@ export default class Experience {
         instance = this
 
 
+
         // Global access
         window.experience = this
 
         // Options
         this.canvas = canvas
+        this.callBacks = callBacks
 
         this.options = {
             // rendered
-            // clearColor: "#8ec3fb",
-            clearColor: "#112131",
+            clearColor: "#8ec3fb",
+            // clearColor: "#112131",
 
             // fog
-            // fogColor: "#8ec3fb",
-            fogColor: "#112131",
+            fogColor: "#8ec3fb",
+            // fogColor: "#112131",
             near: 20,
             far: 60,
 
             //ground
             groundSize: 200,
             groundWidth: 30,
-            // groundColor: "#85d534",
-            groundColor: "#548722",
+            groundColor: "#85d534",
+            // groundColor: "#548722",
 
             //road
             roadSize: 200,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
             roadFrequencyX: 0.14,
-            // colorRoad: "#8a8a8a",
-            colorRoad: "#4b4949",
+            colorRoad: "#8a8a8a",
+            // colorRoad: "#4b4949",
             widthLineArround: 0.034,
             widthLineSeperator: 0.02,
             countLine: 4,
@@ -64,18 +66,19 @@ export default class Experience {
             strength: 70,
             warpFrequency: 0,
             warpStrength: 0,
-            // colorWaterDeep: "#02587e",
-            // colorWaterSurface: "#83b7fb",
-            // colorSand: "#f8d559",
-            // colorGrass: "#85d534",
-            // colorSnow: "#ffffff",
-            // colorRock: "#613400",
-            colorWaterDeep: "#011c28",
-            colorWaterSurface: "#4c6b94",
+            colorWaterDeep: "#02587e",
+            colorWaterSurface: "#83b7fb",
             colorSand: "#f8d559",
-            colorGrass: "#548722",
-            colorSnow: "#a3c6ff",
-            colorRock: "#1f1000",
+            colorGrass: "#85d534",
+            colorSnow: "#ffffff",
+            colorRock: "#613400",
+
+            // colorWaterDeep: "#011c28",
+            // colorWaterSurface: "#4c6b94",
+            // colorSand: "#f8d559",
+            // colorGrass: "#548722",
+            // colorSnow: "#a3c6ff",
+            // colorRock: "#1f1000",
 
 
             // tree
@@ -94,28 +97,7 @@ export default class Experience {
 
 
             // levels questions
-            questions: [
-                {
-                    question: "10 - 2 =",
-                    choices: ["4", "22", "45", "8"],
-                    indexAnswer: 3
-                },
-                {
-                    question: "22 * 2 =",
-                    choices: ["4", "44", "81", "95"],
-                    indexAnswer: 1
-                },
-                {
-                    question: "1 + 1 =",
-                    choices: ["2", "15", "56", "64"],
-                    indexAnswer: 0
-                },
-                {
-                    question: "9 * 8 =",
-                    choices: ["21", "35", "72", "64"],
-                    indexAnswer: 2
-                },
-            ]
+            questions: questions
         }
 
 
@@ -171,6 +153,7 @@ export default class Experience {
     }
 
     update() {
+        this.callBacks.onTimerUpdate(this.time.delta / 1000)
         this.debug.update()
         if (this.world && this.camera && this.renderer) {
             this.camera.update()

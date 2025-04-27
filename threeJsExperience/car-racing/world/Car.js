@@ -112,8 +112,6 @@ export default class Car {
         const newLane = this.targetLane + direction
         if (newLane > 0 && newLane <= this.laneCount) {
             this.targetLane = newLane
-            console.log(this.targetLane);
-
         }
     }
 
@@ -154,12 +152,15 @@ export default class Car {
                     this.jumpProgress = 0
                 }
                 this.currentQuestionIndex += 1
+                this.experience.callBacks.onQuestionChange()
+                this.experience.callBacks.onQuestionStatusChange("success")
             } else {
                 if (!this.isReversing) {
                     this.reverseStartX = this.positionX
                     this.isReversing = true
                     this.wrongAnswerRotationY = 0
                 }
+                this.experience.callBacks.onQuestionStatusChange("error")
             }
         }
     }

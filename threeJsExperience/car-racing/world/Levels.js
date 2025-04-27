@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { TextGeometry } from 'three/examples/jsm/Addons.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import Experience from '../Experience.js'
 
 
