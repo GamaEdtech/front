@@ -52,8 +52,10 @@
     </div>
 
     <!-- Transaction History Section -->
-    <v-card class="mt-8" elevation="0">
-      <v-card-title class="text-h6 pl-0"> Transaction History </v-card-title>
+    <div class="mt-8" elevation="0">
+      <div class="text-h5 primary-gray-700 font-weight-bold pb-2">
+        Transaction History
+      </div>
 
       <div class="transaction-tabs mb-4">
         <v-tabs
@@ -64,7 +66,6 @@
           <v-tab class="font-weight-regular">All</v-tab>
           <v-tab class="font-weight-regular">Earned</v-tab>
           <v-tab class="font-weight-regular">Spent</v-tab>
-          <v-tab class="font-weight-regular">Converted</v-tab>
         </v-tabs>
       </div>
 
@@ -89,25 +90,26 @@
         </template>
 
         <template v-slot:item.state="{ item }">
-          <v-chip
-            small
-            :color="getStateColor(item.state)"
-            text-color="white"
-            class="px-2"
-          >
-            <v-icon small left>{{ getStateIcon(item.state) }}</v-icon>
-            {{ item.state }}
-          </v-chip>
+          <div class="state-chip d-flex align-center">
+            <div :class="`state-icon-bg ${getStateColorClass(item.state)}`">
+              <v-icon small>{{ getStateIcon(item.state) }}</v-icon>
+            </div>
+            <span :class="`ml-2 ${getStateTextColorClass(item.state)}`">{{
+              item.state
+            }}</span>
+          </div>
         </template>
 
         <template v-slot:item.date="{ item }">
           <div class="d-flex align-center">
-            <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-            <span>{{ item.date }}</span>
+            <v-icon small class="mr-1 primary-gray-300"
+              >mdi-clock-outline</v-icon
+            >
+            <span class="primary-gray-500">{{ item.date }}</span>
           </div>
         </template>
       </v-data-table>
-    </v-card>
+    </div>
   </div>
 </template>
 
@@ -125,10 +127,34 @@ export default defineComponent({
     return {
       activeTab: 0,
       headers: [
-        { text: "Type", value: "type", sortable: true, align: "start" },
-        { text: "Amount", value: "amount", sortable: true, align: "start" },
-        { text: "State", value: "state", sortable: false, align: "start" },
-        { text: "Date", value: "date", sortable: true, align: "start" },
+        {
+          text: "Type",
+          value: "type",
+          sortable: true,
+          align: "start",
+          class: "font-weight-medium",
+        },
+        {
+          text: "Amount",
+          value: "amount",
+          sortable: true,
+          align: "start",
+          class: "font-weight-medium",
+        },
+        {
+          text: "State",
+          value: "state",
+          sortable: true,
+          align: "start",
+          class: "font-weight-medium",
+        },
+        {
+          text: "Date",
+          value: "date",
+          sortable: true,
+          align: "start",
+          class: "font-weight-medium",
+        },
       ],
       transactions: [
         {
@@ -183,10 +209,34 @@ export default defineComponent({
           return "grey";
       }
     },
+    getStateColorClass(state) {
+      switch (state) {
+        case "Pending":
+          return "pending-bg";
+        case "Spent":
+          return "spent-bg";
+        case "Earned":
+          return "earned-bg";
+        default:
+          return "grey-bg";
+      }
+    },
+    getStateTextColorClass(state) {
+      switch (state) {
+        case "Pending":
+          return "amber--text";
+        case "Spent":
+          return "red--text";
+        case "Earned":
+          return "green--text";
+        default:
+          return "grey--text";
+      }
+    },
     getStateIcon(state) {
       switch (state) {
         case "Pending":
-          return "mdi-clock-outline";
+          return "mdi-dots-horizontal";
         case "Spent":
           return "mdi-arrow-down";
         case "Earned":
@@ -255,6 +305,7 @@ export default defineComponent({
   text-transform: none;
   font-weight: 400;
   padding: 0 16px;
+  font-size: 14px;
 }
 
 .transaction-tabs >>> .v-tabs-slider {
@@ -265,10 +316,84 @@ export default defineComponent({
   overflow-x: auto;
 }
 
+.transaction-table >>> thead {
+  background-color: #f5f7fa;
+  border-radius: 8px;
+}
+
+.transaction-table >>> thead th {
+  font-size: 14px !important;
+  color: #4b5563 !important;
+  font-weight: 500 !important;
+  padding: 12px 16px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.transaction-table >>> thead th.sortable .v-data-table-header__icon {
+  color: #9ca3af;
+  margin-left: 4px;
+}
+
+.transaction-table >>> tbody td {
+  padding: 16px !important;
+  height: auto !important;
+}
+
 .transaction-chart {
   /* height: 190px; */
   margin-bottom: 16px;
   position: relative;
   width: 100%;
+}
+
+.state-chip {
+  display: flex;
+  align-items: center;
+}
+
+.state-icon-bg {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pending-bg {
+  background-color: rgba(255, 193, 7, 0.15);
+}
+
+.pending-bg i {
+  color: #ffc107 !important;
+}
+
+.spent-bg {
+  background-color: rgba(255, 82, 82, 0.15);
+}
+
+.spent-bg i {
+  color: #ff5252 !important;
+}
+
+.earned-bg {
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+.earned-bg i {
+  color: #4caf50 !important;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.sort-icon {
+  color: #9ca3af;
+  margin-left: 4px;
 }
 </style>
