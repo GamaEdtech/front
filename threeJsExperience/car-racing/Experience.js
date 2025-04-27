@@ -27,6 +27,7 @@ export default class Experience {
         // Options
         this.canvas = canvas
         this.callBacks = callBacks
+        this.isPlayingGame = false
 
         this.options = {
             // rendered
@@ -132,6 +133,13 @@ export default class Experience {
             this.world = new World()
             this.camera = new Camera()
             this.renderer = new Renderer()
+
+            this.debug.update()
+            if (this.world && this.camera && this.renderer) {
+                this.camera.update()
+                this.renderer.update()
+                this.world.update()
+            }
         })
 
         if (sources.length == 0) {
@@ -147,18 +155,24 @@ export default class Experience {
         }
     }
 
+    setPlayingStatus(statusGame) {
+        this.isPlayingGame = statusGame
+    }
+
     resize() {
         this.camera.resize()
         this.renderer.resize()
     }
 
     update() {
-        this.callBacks.onTimerUpdate(this.time.delta / 1000)
-        this.debug.update()
-        if (this.world && this.camera && this.renderer) {
-            this.camera.update()
-            this.renderer.update()
-            this.world.update()
+        if (this.isPlayingGame) {
+            this.callBacks.onTimerUpdate(this.time.delta / 1000)
+            this.debug.update()
+            if (this.world && this.camera && this.renderer) {
+                this.camera.update()
+                this.renderer.update()
+                this.world.update()
+            }
         }
     }
 
