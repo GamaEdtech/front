@@ -27,7 +27,7 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
-    <div v-else class="chart-wrapper">
+    <div v-else class="chart-wrapper h-full">
       <LineChart :chart-data="chartData" :options="chartOptions" />
     </div>
   </div>
@@ -62,6 +62,7 @@ export default defineComponent({
   components: {
     LineChart,
   },
+
   data() {
     return {
       loading: false,
@@ -267,7 +268,7 @@ export default defineComponent({
 }
 
 .chart-wrapper {
-  height: 250px;
+  /* height: 250px; */
   position: relative;
 }
 
