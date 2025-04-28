@@ -1,37 +1,79 @@
-import { ref } from "vue";
+import { useCookie, navigateTo } from 'nuxt/app';
+import { computed } from 'vue';
 
 export const useAuth = () => {
-  const user = ref(null);
-  const token = ref<string | null>(null);
+  const cookieToken = useCookie<string | null>('authToken', {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+  });
 
   const setUserToken = (newToken: string) => {
-    token.value = newToken;
+    cookieToken.value = newToken;
+  };
 
-    // Save the token in localStorage or cookies if needed
-    if (process.client) {
-      localStorage.setItem("authToken", newToken);
+  const clearAuth = () => {
+    cookieToken.value = null;
+  };
+
+  const logout = () => {
+    clearAuth();
+    navigateTo('/');
+  };
+
+  const login = async (credentials: { identity: string; pass: string }) => {
+    try {
+      const response: any = await $fetch('/api/v1/users/login', {
+        method: 'POST',
+        body: {
+          ...credentials,
+          type: 'request',
+        },
+      });
+      return response;
+    } catch (error) {
+      throw error;
     }
   };
 
-  const setUser = (userData: any) => {
-    user.value = userData;
-  };
-
-  const loadUserFromLocalStorage = () => {
-    if (process.client) {
-      const savedToken = localStorage.getItem("authToken");
-      if (savedToken) {
-        token.value = savedToken;
-        // Optionally fetch user data from the server with this token
-      }
+  const register = async (formData: { identity: string; pass: string }) => {
+    try {
+      await $fetch('/api/v1/users/register', {
+        method: 'POST',
+        body: {
+          ...formData,
+          type: 'register',
+        },
+      });
+    } catch (error) {
+      throw error;
     }
   };
+
+  const forgotPassword = async (passForm: { identity: string }) => {
+    try {
+      const response: any = await $fetch('/api/v1/users/recovery', {
+        method: 'POST',
+        body: {
+          ...passForm,
+          type: 'request',
+        },
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const isAuthenticated = computed(() => !!cookieToken.value);
 
   return {
-    user,
-    token,
+    cookieToken,
     setUserToken,
-    setUser,
-    loadUserFromLocalStorage,
+    clearAuth,
+    logout,
+    login,
+    register,
+    isAuthenticated,
+    forgotPassword,
   };
 };

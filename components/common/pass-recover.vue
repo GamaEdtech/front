@@ -1,8 +1,274 @@
+<script setup>
+import { useAuth } from '~/composables/useAuth';
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
+
+// Yup validation for password + confirm password
+const validationSchema = yup.object({
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(4, 'Password must be at least 4 characters'),
+    
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Passwords must match')
+    .required('Confirm password is required'),
+})
+
+// Set up form and fields
+const { handleSubmit, errors } = useForm({
+  validationSchema,
+})
+
+const { $toast } = useNuxtApp()
+
+const props = defineProps({
+  dialog: Boolean
+})
+
+let pass_recover_dialog = ref(false)
+let google_register_loading =  ref(true)
+let show1 = ref(false)
+const confirmPassword = useField("confirmPassword");
+const password = useField("password");
+let passRecoverLoading = ref(false)
+
+let otp = ref("")
+let identity = ref("")
+let otp_loading = ref(false)
+let countDown = ref(60)
+let timerId = ref(null)
+let sendOtpBtnStatus = ref(true)
+
+let identityHolder = ref(true)
+let otpHolder = ref(false)
+let selectPassHolder = ref(false)
+let googleRegisterBtn = ref(null)
+
+
+watch(countDown ,(val) => {
+      //When user wait 10 second
+      if (val === 0) sendOtpBtnStatus.value = false;
+
+      //When user request new otp code
+      if (val === 60) countDownTimer();
+    });
+
+
+onMounted(() =>{
+  setTimeout(() => {
+    if (window.google?.accounts?.id && googleRegisterBtn.value) {
+      window.google.accounts.id.initialize({
+        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+        auto_select: true
+      })
+
+      window.google.accounts.id.renderButton(googleRegisterBtn.value, {
+        text: 'Login',
+        size: 'large',
+        width: '252',
+        theme: 'outline'
+      })
+
+      google_register_loading.value = false
+    }
+  }, 4000)
+})
+
+
+async function handleCredentialResponse(value) {
+  const auth = useAuth();
+  try {
+    const response = await $fetch(
+      '/api/v1/users/googleAuth',{
+        method:'POST',
+      body: new URLSearchParams({
+        id_token: value.credential,
+      }),
+      }
+    )
+
+    if(response.status === 1){
+      $toast.success("Logged in successfully");
+      auth.setUserToken(response.data.jwtToken);
+      closeDialog();
+      navigateTo('/user');
+    }
+  } catch (err) {
+    const status = err?.response?.status
+
+    if (status === 401) {
+      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+    } else if (status === 500 || status === 504) {
+      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+    }
+  }
+}
+
+
+// Handle OTP request
+const requestPassRecover = async ()  => {
+  passRecoverLoading.value = true;
+  const auth = useAuth();
+  try{
+        await auth.forgotPassword({
+        identity : identity.value
+    })
+    $toast.success("Otp code sent");
+    identityHolder.value = false;
+    otpHolder.value = true;
+    countDownTimer();
+  } catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+};
+
+
+// Handle OTP confirmation
+const onFinish = async() => {
+  try{
+    const response = await $fetch('/api/v1/users/recovery', {
+    method: 'POST',
+    body: new URLSearchParams({
+      'type': 'confirm',
+    'identity': identity.value,
+    'code': otp.value,
+    }),
+  });
+    if(response.status ===1){
+      otpHolder.value = false;
+      selectPassHolder.value = true;
+      passRecoverLoading.value = false;
+    }
+  }
+
+  catch (error) {
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+};
+
+// Resend OTP code
+const sendOtpCodeAgain = async () => {
+  try{
+    const response = await $fetch('/api/v1/users/recovery', {
+      method: 'POST',
+      body: new URLSearchParams({
+        'type' : 'resend_code',
+        'identity' : identity.value,
+      }),
+  });
+    countDown.value = 60;
+    sendOtpBtnStatus.value = true;
+    $toast.success('Otp code sent again');
+  }
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+};
+
+
+// Timer for countdown
+const countDownTimer = () => {
+  if (timerId) {
+    clearTimeout(timerId)
+    timerId = null
+  }
+  countDown.value = 60
+  tick()
+}
+
+const tick = () => {
+  if (countDown.value > 0) {
+    timerId = setTimeout(() => {
+      countDown.value -= 1
+      tick()
+    }, 1000)
+  } else {
+    timerId = null 
+  }
+}
+
+
+//Final register (level 3: receive password from user)
+const submit = handleSubmit( async () => {
+  passRecoverLoading.value = true;
+  try{
+     await $fetch('/api/v1/users/recovery', {
+      method: 'POST',
+      body: new URLSearchParams({
+        'type' : 'resetpass',
+        'identity' : identity.value,
+        'pass' : password.value.value
+      }),
+    });
+
+    $toast.success('Password reset successfully');
+    closeDialog()
+ 
+  }
+  catch(error){
+    const errorData = error?.response?._data;
+
+    if(error?.response?.status === 400)
+      $toast.error(errorData.message);
+    else
+      $toast.error('Something went wrong.')
+  }
+  finally{
+    passRecoverLoading.value = false;
+  }
+}) 
+
+// Cancel password recovery
+const cancelPassRecover = () => {
+  props.dialog = false;
+  identityHolder.value = true;
+  otpHolder.value = false;
+  selectPassHolder.value = false;
+};
+
+const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
+// Switch to login page
+const switchToLogin = () => {
+  emit('switchToLogin');
+};
+
+// Switch to register page
+const switchToRegister = () => {
+  emit('switchToRegister');
+};
+
+function closeDialog() {
+  identityHolder.value = true;
+  otpHolder.value = false;
+  selectPassHolder.value = false;
+  emit('update:dialog', false)
+}
+
+</script>
 <template>
   <v-dialog
-    v-model="pass_recover_dialog"
+    v-model="props.dialog"
     max-width="300px"
     style="z-index: 20001"
+    @click:outside="closeDialog"
   >
     <v-card>
       <v-card-title>
@@ -27,9 +293,9 @@
             <div v-show="!google_register_loading" ref="googleRegisterBtn" />
           </v-col>
           <v-col cols="12">
-            <div v-show="identity_holder">
+            <div v-show="identityHolder">
               <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
-              <form @submit.prevent="requestPassRecover()">
+              <form @submit.prevent="requestPassRecover">
                 <v-row>
                   <v-col cols="12">
                     <!-- <validation-provider
@@ -60,7 +326,7 @@
                 </v-row>
                 <v-row>
                   <v-col cols="6" lg="6">
-                    <v-btn outlined @click="cancelPassRecover()">
+                    <v-btn outlined @click="closeDialog">
                       Cancel
                     </v-btn>
                   </v-col>
@@ -68,7 +334,7 @@
                     <v-btn
                       color="primary"
                       type="submit"
-                      :loading="pass_recover_loading"
+                      :loading="passRecoverLoading"
                       :disabled="invalid"
                     >
                       Recover
@@ -78,7 +344,7 @@
               </form>
               <!-- </validation-observer> -->
             </div>
-            <div v-show="otp_holder">
+            <div v-show="otpHolder">
               <!--Otp holder-->
               <v-col cols="12">
                 <p class="text-h6">
@@ -105,7 +371,7 @@
               </v-col>
               <!--End otp holder-->
             </div>
-            <div v-show="select_pass_holder">
+            <div v-show="selectPassHolder">
               <!--Otp holder-->
               <v-col cols="12">
                 <p class="text-h6">Please enter password</p>
@@ -113,7 +379,7 @@
                   ref="final_reg_observer"
                   v-slot="{ invalid }"
                 > -->
-                <form @submit.prevent="passRecover()">
+                <form @submit.prevent="submit()">
                   <v-row>
                     <v-col cols="12">
                       <!-- <validation-provider
@@ -123,11 +389,10 @@
                         > -->
                       <v-text-field
                         label="Password"
-                        v-model="password"
+                        v-model="password.value.value"
                         outlined
-                        :error-messages="errors"
+                        :error-messages="errors.password ? [errors.password] : []"
                         dense
-                        type="password"
                         :type="show1 ? 'text' : 'password'"
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                         @click:append="show1 = !show1"
@@ -143,9 +408,9 @@
                           rules="required|min:4|confirmed:password"
                         > -->
                       <v-text-field
-                        v-model="confirmPassword"
+                        v-model="confirmPassword.value.value"
                         type="password"
-                        :error-messages="errors"
+                        :error-messages="errors.confirmPassword ? [errors.confirmPassword] : []"
                         label="Confirm password"
                         dense
                         outlined
@@ -157,7 +422,7 @@
 
                   <v-row>
                     <v-col cols="6" lg="6">
-                      <v-btn outlined @click="cancelPassRecover()">
+                      <v-btn outlined @click="closeDialog">
                         Cancel
                       </v-btn>
                     </v-col>
@@ -165,7 +430,7 @@
                       <v-btn
                         color="primary"
                         type="submit"
-                        :loading="pass_recover_loading"
+                        :loading="passRecoverLoading"
                         :disabled="invalid"
                       >
                         Reset
@@ -185,225 +450,7 @@
   </v-dialog>
 </template>
 
-<script>
-// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
-export default {
-  name: "pass-recover",
-  // components: {
-  //   ValidationObserver,
-  //   ValidationProvider,
-  // },
-  data() {
-    return {
-      pass_recover_dialog: false,
-      google_register_loading: true,
-      show1: false,
-      password: "",
-      confirmPassword: "",
-      pass_recover_loading: false,
-
-      otp: "",
-      identity: "",
-      otp_loading: false,
-      countDown: 60,
-      sendOtpBtnStatus: true,
-
-      identity_holder: true,
-      otp_holder: false,
-      select_pass_holder: false,
-    };
-  },
-  watch: {
-    pass_recover_dialog(val) {
-      if (val === true) {
-        //Initialize google login
-        setTimeout(() => {
-          window.google.accounts.id.initialize({
-            client_id:
-              "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-            callback: this.handleCredentialResponse,
-            auto_select: true,
-          });
-
-          window.google.accounts.id.renderButton(this.$refs.googleRegisterBtn, {
-            text: "Login",
-            size: "large",
-            width: "252",
-            theme: "outline", // option : filled_black | outline | filled_blue
-          });
-
-          this.google_register_loading = false;
-        }, 4000);
-      }
-    },
-    countDown(val) {
-      //When user wait 10 second
-      if (val === 0) this.sendOtpBtnStatus = false;
-
-      //When user request new otp code
-      if (val === 60) this.countDownTimer();
-    },
-  },
-  methods: {
-    //Handle google login callback
-    async handleCredentialResponse(response) {
-      const querystring = require("querystring");
-
-      await this.$fetch
-        .post(
-          "/api/v1/users/googleAuth",
-          querystring.stringify({
-            id_token: response.credential,
-          })
-        )
-        .then((response) => {
-          this.$auth.setUserToken(response.data.data.jwtToken);
-          this.$auth.setUser(response.data.data.info);
-          this.pass_recover_dialog = false;
-          this.$toast.success("Logged in successfully");
-
-          this.$router.push({
-            path: "/user",
-          });
-        })
-        .catch(({ response }) => {
-          if (response.status == 401) {
-            this.$toast.error(this.$t(`LOGIN_WRONG_DATA`));
-          } else if (response.status == 500 || response.status == 504) {
-            this.$toast.error(this.$t(`REQUEST_FAILED`));
-          }
-        });
-    },
-    switchToLogin() {
-      this.$emit("update:switchToLogin", "login");
-    },
-    switchToRegister() {
-      this.$emit("update:switchToRegister", "register");
-    },
-    cancelPassRecover() {
-      this.pass_recover_dialog = false;
-      this.identity_holder = true;
-      this.otp_holder = false;
-      this.select_pass_holder = false;
-    },
-    requestPassRecover() {
-      //First level
-      this.pass_recover_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "request",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Otp code sent");
-          this.identity_holder = false;
-          this.otp_holder = true;
-          this.countDownTimer();
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-    onFinish() {
-      //Finish enter otp code--->Second step
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "confirm",
-            identity: this.identity,
-            code: this.otp,
-          })
-        )
-        .then((response) => {
-          this.otp_holder = false;
-          this.select_pass_holder = true;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-    sendOtpCodeAgain() {
-      //Send otp code again
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "resend_code",
-            identity: this.identity,
-          })
-        )
-        .then((response) => {
-          this.countDown = 60;
-          this.sendOtpBtnStatus = true;
-          this.$toast.success("Otp code sent again");
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.register_loading = false;
-        });
-    },
-    countDownTimer() {
-      if (this.countDown > 0) {
-        setTimeout(() => {
-          this.countDown -= 1;
-          this.countDownTimer();
-        }, 1000);
-      }
-    },
-    passRecover() {
-      //Final refister (level 3: receive password from user)
-      this.pass_recover_loading = true;
-      const querystring = require("querystring");
-
-      this.$fetch
-        .$post(
-          "/api/v1/users/recovery",
-          querystring.stringify({
-            type: "resetpass",
-            identity: this.identity,
-            pass: this.password,
-          })
-        )
-        .then((response) => {
-          this.$toast.success("Password reset successfully");
-          this.pass_recover_dialog = false;
-          this.identity_holder = true;
-          this.otp_holder = false;
-          this.select_pass_holder = false;
-        })
-        .catch((err) => {
-          if (err.response.status == 400)
-            this.$toast.error(err.response.data.message);
-        })
-        .finally(() => {
-          this.pass_recover_loading = false;
-        });
-    },
-  },
-};
-</script>
 
 <style scoped>
 .btn-google {
