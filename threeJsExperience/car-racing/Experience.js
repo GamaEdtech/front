@@ -96,6 +96,11 @@ export default class Experience {
             distanceCameraFromCar: window.innerWidth < 480 ? 12 : 7,
             cameraYPosition: window.innerWidth < 480 ? 3 : 2,
             distanceLookAtCamera: window.innerWidth < 480 ? 13 : 5,
+            reverseDistanceWrongAnswer: 15,
+            reverseSpeedWrongAnswer: 0.5,
+            reverseRotationSpeedWrongAnswer: Math.PI / 20,
+            jumpHeightCorrectAnswer: 1,
+            jumpDurationCorrectAnswer: 80, // frame per second
 
 
             // levels questions

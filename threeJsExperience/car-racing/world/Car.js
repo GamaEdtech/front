@@ -31,17 +31,17 @@ export default class Car {
 
         this.isReversing = false
         this.reverseStartX = 0
-        this.reverseDistance = 20
-        this.reverseSpeed = 0.5
-        this.reverseRotationSpeed = Math.PI / 20
+        this.reverseDistance = this.options.reverseDistanceWrongAnswer
+        this.reverseSpeed = this.options.reverseSpeedWrongAnswer
+        this.reverseRotationSpeed = this.options.reverseRotationSpeedWrongAnswer
         this.wrongAnswerRotationY = 0
 
 
         this.isJumping = false
         this.jumpStartY = 0.6
-        this.jumpHeight = 1
+        this.jumpHeight = this.options.jumpHeightCorrectAnswer
         this.jumpProgress = 0
-        this.jumpDuration = 60
+        this.jumpDuration = this.options.jumpDurationCorrectAnswer
         this.correctAnswerRotationY = 0
 
 
