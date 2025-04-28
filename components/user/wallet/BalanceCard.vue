@@ -6,10 +6,19 @@
         <v-icon small class="ml-2 gray--text">mdi-eye</v-icon>
       </div>
 
-      <div class="balance-amount d-flex align-center">
+      <div v-if="loading" class="balance-amount d-flex align-center">
+        <v-skeleton-loader
+          type="text"
+          width="250"
+          height="60"
+          class="mt-2"
+        ></v-skeleton-loader>
+      </div>
+
+      <div v-else class="balance-amount d-flex align-center">
         <span class="currency mr-2 mt-3 yellow--text-darken">$GET</span>
-        <span class="amount text-white">14,235</span>
-        <span class="decimal text-white">.34</span>
+        <span class="amount text-white">{{ Math.floor(balance) }}</span>
+        <span class="decimal text-white">.{{ getDecimal(balance) }}</span>
         <v-img
           class="mr-4 mb-4"
           :src="require('@/assets/images/wallet/wallet-amount.png')"
@@ -39,6 +48,45 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "BalanceCard",
+  data() {
+    return {
+      balance: 0,
+      loading: true,
+    };
+  },
+  created() {
+    this.fetchBalance();
+  },
+  methods: {
+    fetchBalance() {
+      this.loading = true;
+      this.$axios
+        .$get("/api/v2/transactions/balance", {
+          headers: {
+            Authorization: `Bearer 4|CfDJ8Cz+misSx9pPrdOrX4tMKdGanNw5GkZ5Q6YVakgNeecUUIXBYmeyn4LfeoGh4hLhEYy3IM483xASjXAiHtPxZSCzWZhTWEK6iahsRFLPPSlVkaeAgXgrWzu8aKW4vVz6hp1ueenGKVY7REuttLmtdN4+SPhln6+CpeT1UoO69NFGRoMR4KZ02QNhNyp1m+p74M1viE2prGhwQkrq1/Xk1SESwigoI99fBAwHOTEby8Wc`,
+          },
+        })
+        .then((response) => {
+          if (response.succeeded) {
+            this.balance = response.data;
+          }
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 403) {
+            this.$auth.logout();
+          }
+          console.error("Error fetching balance:", err);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    getDecimal(num) {
+      return Math.floor((num % 1) * 100)
+        .toString()
+        .padStart(2, "0");
+    },
+  },
 });
 </script>
 
@@ -87,5 +135,11 @@ export default defineComponent({
 
 .action-btn {
   cursor: pointer;
+}
+
+/* Skeleton Loading Styles */
+::v-deep .v-skeleton-loader__text {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px;
 }
 </style>
