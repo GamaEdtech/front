@@ -6,7 +6,14 @@
         <div class="text-h5 primary-gray-700 font-weight-bold pb-2">
           Transaction History
         </div>
-        <v-icon>mdi-chart-line-variant</v-icon>
+        <v-btn
+          icon
+          @click="toggleChart"
+          class="chart-toggle-icon"
+          :color="isChartVisible ? 'primary' : ''"
+        >
+          <v-icon>mdi-chart-line-variant</v-icon>
+        </v-btn>
       </div>
 
       <div class="transaction-tabs-wrapper mb-4">
@@ -176,6 +183,12 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "TransactionHistory",
+  props: {
+    isChartVisible: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       activeTab: 0,
@@ -312,6 +325,9 @@ export default defineComponent({
         default:
           return "mdi-help-circle-outline";
       }
+    },
+    toggleChart() {
+      this.$emit("toggle-chart");
     },
   },
 });
@@ -495,5 +511,9 @@ export default defineComponent({
 ::v-deep .v-skeleton-loader__list-item-two-line {
   background: rgba(0, 0, 0, 0.05) !important;
   border-radius: 8px;
+}
+
+.chart-toggle-icon {
+  cursor: pointer;
 }
 </style>

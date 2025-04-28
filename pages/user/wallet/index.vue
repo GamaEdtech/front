@@ -7,14 +7,29 @@
           <balance-card></balance-card>
         </v-col>
 
-        <v-col cols="12" sm="6" md="6">
+        <v-col cols="12" sm="6" md="6" class="d-none d-sm-block">
           <transaction-chart class="transaction-chart"></transaction-chart>
         </v-col>
       </v-row>
     </div>
 
+    <!-- Mobile Chart (Initially Hidden) -->
+    <v-expand-transition>
+      <div
+        v-if="showMobileChart"
+        class="d-block d-sm-none mt-6 mobile-chart-container"
+      >
+        <div class="pa-4 rounded-lg bg-primary-gray-100">
+          <transaction-chart class="transaction-chart"></transaction-chart>
+        </div>
+      </div>
+    </v-expand-transition>
+
     <!-- Transaction History Section -->
-    <transaction-history></transaction-history>
+    <transaction-history
+      @toggle-chart="toggleMobileChart"
+      :is-chart-visible="showMobileChart"
+    ></transaction-history>
   </div>
 </template>
 
@@ -32,6 +47,16 @@ export default defineComponent({
     BalanceCard,
     TransactionHistory,
   },
+  data() {
+    return {
+      showMobileChart: false,
+    };
+  },
+  methods: {
+    toggleMobileChart() {
+      this.showMobileChart = !this.showMobileChart;
+    },
+  },
 });
 </script>
 
@@ -44,5 +69,13 @@ export default defineComponent({
   margin-bottom: 16px;
   position: relative;
   width: 100%;
+}
+
+.mobile-chart-container {
+  margin-bottom: 16px;
+}
+
+.mobile-chart-container .transaction-chart {
+  height: 250px;
 }
 </style>

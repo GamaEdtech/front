@@ -268,8 +268,9 @@ export default defineComponent({
 }
 
 .chart-wrapper {
-  /* height: 250px; */
   position: relative;
+  height: 100%;
+  min-height: 200px;
 }
 
 .period-selector {
@@ -281,6 +282,12 @@ export default defineComponent({
 }
 
 .chart-loading {
-  height: 250px;
+  height: 200px;
+}
+
+@media (max-width: 600px) {
+  .chart-wrapper {
+    height: 200px;
+  }
 }
 </style>
