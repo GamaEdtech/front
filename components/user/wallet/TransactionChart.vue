@@ -176,7 +176,7 @@ export default defineComponent({
             Period: this.selectedPeriod,
           },
           headers: {
-            Authorization: `Bearer 4|CfDJ8Cz+misSx9pPrdOrX4tMKdGanNw5GkZ5Q6YVakgNeecUUIXBYmeyn4LfeoGh4hLhEYy3IM483xASjXAiHtPxZSCzWZhTWEK6iahsRFLPPSlVkaeAgXgrWzu8aKW4vVz6hp1ueenGKVY7REuttLmtdN4+SPhln6+CpeT1UoO69NFGRoMR4KZ02QNhNyp1m+p74M1viE2prGhwQkrq1/Xk1SESwigoI99fBAwHOTEby8Wc`,
+            Authorization: `${this.$auth.strategy.token.get()}`,
           },
         })
         .then((response) => {
