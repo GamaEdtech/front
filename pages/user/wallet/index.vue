@@ -1,6 +1,6 @@
 <template>
   <div class="wallet-page">
-    <div class="bg-primary-gray-100 rounded-xl px-7 py-6">
+    <div class="wallet-page-container">
       <!-- Balance Card and Chart Section -->
       <v-row>
         <v-col cols="12" sm="6" md="6">
@@ -12,24 +12,25 @@
         </v-col>
       </v-row>
     </div>
-
-    <!-- Mobile Chart (Initially Hidden) -->
-    <v-expand-transition>
-      <div
-        v-if="showMobileChart"
-        class="d-block d-sm-none mt-6 mobile-chart-container"
-      >
-        <div class="pa-4 rounded-lg bg-primary-gray-100">
-          <transaction-chart class="transaction-chart"></transaction-chart>
+    <div class="px-4">
+      <!-- Mobile Chart (Initially Hidden) -->
+      <v-expand-transition>
+        <div
+          v-if="showMobileChart"
+          class="d-block d-sm-none mt-6 mobile-chart-container"
+        >
+          <div class="pa-4 rounded-lg bg-primary-gray-100">
+            <transaction-chart class="transaction-chart"></transaction-chart>
+          </div>
         </div>
-      </div>
-    </v-expand-transition>
+      </v-expand-transition>
 
-    <!-- Transaction History Section -->
-    <transaction-history
-      @toggle-chart="toggleMobileChart"
-      :is-chart-visible="showMobileChart"
-    ></transaction-history>
+      <!-- Transaction History Section -->
+      <transaction-history
+        @toggle-chart="toggleMobileChart"
+        :is-chart-visible="showMobileChart"
+      ></transaction-history>
+    </div>
   </div>
 </template>
 
@@ -61,8 +62,19 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.wallet-page {
-  padding: 16px;
+.wallet-page-container {
+  background: #f2f4f7 !important;
+  padding: 26px 26px;
+}
+@media only screen and (min-width: 600px) {
+  .wallet-page {
+    padding: 16px;
+  }
+  .wallet-page-container {
+    background: #f2f4f7 !important;
+    border-radius: 16px;
+    padding: 20px 20px;
+  }
 }
 
 .transaction-chart {
