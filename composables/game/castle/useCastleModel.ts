@@ -29,6 +29,10 @@ const useCastleModel = async (scene: Ref<THREE.Scene>) => {
                     doorModels[doorName as "door001" | "door002" | "door003" | "door004"].model = object
     
                 }
+
+                if (object.material.name === 'Planks.004') {
+                    object.position.y = -157.807
+                }
     
                 // Set up normal rendering with shadows
                 object.castShadow = true;

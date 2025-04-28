@@ -1,9 +1,9 @@
 <template>
     <v-fade-transition>
-        <v-card v-if="isNear" class="door-interaction-prompt" elevation="10" color="grey-darken-3" rounded="lg">
+        <v-card v-if="isNear" class="door-interaction-prompt" elevation="10" color="primary" rounded="lg">
             <v-card-text class="pa-4 text-center">
                 <div class="d-flex align-center justify-center mb-2">
-                    <v-icon :icon="currentPrompt.icon" size="large" color="primary" class="mr-2"></v-icon>
+                    <v-icon :icon="currentPrompt.icon" size="large" class="mr-2"></v-icon>
                     <span class="text-h6 font-weight-medium">{{ currentPrompt.name }} Interaction</span>
                 </div>
 
@@ -12,7 +12,8 @@
                 <p v-if="isMobile" class="mb-2">{{ currentPrompt.target.phone.text }}</p>
                 <p v-else class="mb-2">Press <kbd>{{ currentPrompt.key }}</kbd> {{ currentPrompt.target.pc }}</p>
 
-                <v-btn @click="handleKeyPress" variant="tonal" color="primary" block class="mt-2">
+                <v-btn @click="handleKeyPress" variant="flat" color="white"
+                    class="mt-2 text-grey-darken-3 font-weight-bold" block>
                     <v-icon start>mdi-keyboard</v-icon>
                     <span v-if="!isMobile">Press {{ currentPrompt.key }} key</span>
                     <span v-else>{{ currentPrompt.target.phone.button }}</span>
@@ -92,7 +93,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
             emit('gateInteraction');
         }
     } else{
-        if (event.code === 'KeyE' && props.isNear) {
+        if (event.code === 'KeyE' && props.isNear && props.opration === 'door') {
             console.log('Door interaction triggered via E key');
             emit('doorInteraction');
         }else if (event.code === 'KeyN' && props.isNear) {
@@ -120,7 +121,7 @@ watch(() => props.isNear, (newValue) => {
 
 <style>
 .door-interaction-prompt {
-    position: fixed;
+    position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translate(-50%, -120%);
@@ -133,8 +134,8 @@ watch(() => props.isNear, (newValue) => {
 }
 
 kbd {
-    background-color: #444;
-    color: white;
+    background-color: #ffd574;
+    color: black;
     padding: 3px 8px;
     border-radius: 4px;
     font-family: monospace;

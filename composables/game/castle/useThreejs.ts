@@ -37,16 +37,16 @@ export function useThreeJS() {
      */
     const initializeRenderer = (container: HTMLDivElement) => {
         renderer.value = new THREE.WebGLRenderer({
-            antialias: true,
+            antialias: false,
             powerPreference: 'high-performance'
         })
-        renderer.value.setPixelRatio(window.devicePixelRatio)
+        renderer.value.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
         renderer.value.setSize(window.innerWidth, window.innerHeight)
         renderer.value.outputColorSpace = THREE.SRGBColorSpace
 
         // Enable shadows for mood
-        renderer.value.shadowMap.enabled = true
-        renderer.value.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.value.shadowMap.enabled = false
+        // renderer.value.shadowMap.type = THREE.PCFSoftShadowMap
 
         // Brighter but still moody tone mapping
         renderer.value.toneMapping = THREE.ACESFilmicToneMapping
