@@ -16,6 +16,7 @@
             grow
             background-color="transparent"
             slider-color="amber"
+            @change="handleTabChange"
           >
             <v-tab class="text-subtitle-2">All</v-tab>
             <v-tab class="text-subtitle-2">Earned</v-tab>
@@ -25,36 +26,45 @@
         </div>
       </div>
 
-      <v-list class="transaction-list pa-0" flat>
+      <!-- Loading State -->
+      <div v-if="loading" class="py-4">
+        <v-skeleton-loader
+          v-for="i in 3"
+          :key="i"
+          type="list-item-two-line"
+          class="mb-3"
+        ></v-skeleton-loader>
+      </div>
+
+      <!-- Transactions List -->
+      <v-list v-else class="transaction-list pa-0" flat>
         <v-list-item
-          v-for="(transaction, i) in transactions"
+          v-for="(transaction, i) in filteredTransactions"
           :key="i"
           class="transaction-item py-3"
         >
           <v-list-item-content>
             <div class="d-flex flex-column">
-              <div class="transaction-name mb-1">{{ transaction.type }}</div>
+              <div class="transaction-name mb-1">
+                {{ transaction.description }}
+              </div>
               <div class="d-flex align-center">
-                <div class="" v-if="transaction.state === 'Spent'">
+                <div class="" v-if="transaction.isDebit">
                   <div class="state-icon-wrapper spent">
                     <span class="state-icon spent align-center">
                       <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
                     </span>
-                    <span class="state-text spent ml-2">{{
-                      transaction.state
-                    }}</span>
+                    <span class="state-text spent ml-2">Spent</span>
                   </div>
                 </div>
-                <div class="" v-else-if="transaction.state === 'Earned'">
+                <div class="" v-else>
                   <div class="state-icon-wrapper earned">
                     <span class="state-icon earned align-center">
                       <v-icon color="green" size="18"
                         >mdi-tray-arrow-down</v-icon
                       >
                     </span>
-                    <span class="state-text earned ml-2">{{
-                      transaction.state
-                    }}</span>
+                    <span class="state-text earned ml-2">Earned</span>
                   </div>
                 </div>
               </div>
@@ -64,9 +74,7 @@
           <v-list-item-action class="transaction-details">
             <div class="d-flex flex-column align-end">
               <div class="transaction-amount mb-1">
-                <span class="font-weight-medium">{{
-                  transaction.amount.toLocaleString()
-                }}</span>
+                <span class="font-weight-medium">{{ transaction.points }}</span>
                 <span class="ml-1 caption grey--text">$GET</span>
               </div>
               <div class="d-flex align-center">
@@ -74,12 +82,18 @@
                   >mdi-clock-outline</v-icon
                 >
                 <span class="caption grey--text text--darken-1">{{
-                  transaction.date
+                  transaction.creationDate
                 }}</span>
               </div>
             </div>
           </v-list-item-action>
         </v-list-item>
+
+        <!-- Empty State -->
+        <div v-if="filteredTransactions.length === 0" class="text-center py-8">
+          <v-icon size="64" color="grey lighten-2">mdi-wallet-outline</v-icon>
+          <p class="mt-4 grey--text">No transactions found</p>
+        </div>
       </v-list>
     </div>
 
@@ -94,6 +108,7 @@
           v-model="activeTab"
           background-color="transparent"
           color="primary"
+          @change="handleTabChange"
         >
           <v-tab class="font-weight-regular">All</v-tab>
           <v-tab class="font-weight-regular">Earned</v-tab>
@@ -103,51 +118,52 @@
 
       <v-data-table
         :headers="headers"
-        :items="transactions"
+        :items="filteredTransactions"
         :items-per-page="5"
         hide-default-footer
+        :loading="loading"
+        loading-text="Loading transactions..."
+        no-data-text="No transactions found"
         class="elevation-0 transaction-table"
       >
-        <template v-slot:item.type="{ item }">
-          {{ item.type }}
+        <template v-slot:item.description="{ item }">
+          {{ item.description }}
         </template>
 
-        <template v-slot:item.amount="{ item }">
+        <template v-slot:item.points="{ item }">
           <div class="d-flex align-center">
-            <span class="font-weight-bold">{{
-              item.amount.toLocaleString()
-            }}</span>
+            <span class="font-weight-bold">{{ item.points }}</span>
             <span class="ml-1 caption grey--text">$GET</span>
           </div>
         </template>
 
-        <template v-slot:item.state="{ item }">
+        <template v-slot:item.isDebit="{ item }">
           <div class="d-flex align-center">
-            <div v-if="item.state === 'Spent'">
+            <div v-if="item.isDebit">
               <div class="state-icon-wrapper spent">
                 <span class="state-icon spent align-center">
                   <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
                 </span>
-                <span class="state-text spent ml-2">{{ item.state }}</span>
+                <span class="state-text spent ml-2">Spent</span>
               </div>
             </div>
-            <div v-else-if="item.state === 'Earned'">
+            <div v-else>
               <div class="state-icon-wrapper earned">
                 <span class="state-icon earned align-center">
                   <v-icon color="green" size="18">mdi-tray-arrow-down</v-icon>
                 </span>
-                <span class="state-text earned ml-2">{{ item.state }}</span>
+                <span class="state-text earned ml-2">Earned</span>
               </div>
             </div>
           </div>
         </template>
 
-        <template v-slot:item.date="{ item }">
+        <template v-slot:item.creationDate="{ item }">
           <div class="d-flex align-center">
             <v-icon small class="mr-1 primary-gray-300"
               >mdi-clock-outline</v-icon
             >
-            <span class="primary-gray-500">{{ item.date }}</span>
+            <span class="primary-gray-500">{{ item.creationDate }}</span>
           </div>
         </template>
       </v-data-table>
@@ -163,71 +179,92 @@ export default defineComponent({
   data() {
     return {
       activeTab: 0,
+      loading: false,
+      transactions: [],
       headers: [
         {
-          text: "Type",
-          value: "type",
+          text: "Description",
+          value: "description",
           sortable: true,
           align: "start",
           class: "font-weight-medium",
         },
         {
           text: "Amount",
-          value: "amount",
+          value: "points",
           sortable: true,
           align: "start",
           class: "font-weight-medium",
         },
         {
           text: "State",
-          value: "state",
+          value: "isDebit",
           sortable: true,
           align: "start",
           class: "font-weight-medium",
         },
         {
           text: "Date",
-          value: "date",
+          value: "creationDate",
           sortable: true,
           align: "start",
           class: "font-weight-medium",
         },
       ],
-      transactions: [
-        {
-          type: "Created a Quiz",
-          amount: 6000000,
-          state: "Spent",
-          date: "3/15/2024 13:15",
-        },
-        {
-          type: "Commented on School",
-          amount: 6000000,
-          state: "Earned",
-          date: "3/15/2024 13:15",
-        },
-        {
-          type: "Created a Quiz",
-          amount: 6000000,
-          state: "Spent",
-          date: "3/15/2024 13:15",
-        },
-        {
-          type: "Commented on School",
-          amount: 6000000,
-          state: "Earned",
-          date: "3/15/2024 13:15",
-        },
-        {
-          type: "Commented on School",
-          amount: 6000000,
-          state: "Earned",
-          date: "3/15/2024 13:15",
-        },
-      ],
     };
   },
+  created() {
+    this.fetchTransactions();
+  },
+  computed: {
+    filteredTransactions() {
+      if (this.activeTab === 0) {
+        // All transactions
+        return this.transactions;
+      } else if (this.activeTab === 1) {
+        // Earned transactions (isDebit = false)
+        return this.transactions.filter((transaction) => !transaction.isDebit);
+      } else if (this.activeTab === 2) {
+        // Spent transactions (isDebit = true)
+        return this.transactions.filter((transaction) => transaction.isDebit);
+      }
+      return this.transactions;
+    },
+  },
   methods: {
+    fetchTransactions() {
+      this.loading = true;
+
+      this.$axios
+        .$get("/api/v2/transactions", {
+          params: {
+            perpage: 10,
+          },
+          headers: {
+            Authorization: `Bearer 4|CfDJ8Cz+misSx9pPrdOrX4tMKdGanNw5GkZ5Q6YVakgNeecUUIXBYmeyn4LfeoGh4hLhEYy3IM483xASjXAiHtPxZSCzWZhTWEK6iahsRFLPPSlVkaeAgXgrWzu8aKW4vVz6hp1ueenGKVY7REuttLmtdN4+SPhln6+CpeT1UoO69NFGRoMR4KZ02QNhNyp1m+p74M1viE2prGhwQkrq1/Xk1SESwigoI99fBAwHOTEby8Wc`,
+          },
+        })
+        .then((response) => {
+          if (response.succeeded && response.data && response.data.list) {
+            this.transactions = response.data.list;
+          } else {
+            this.transactions = [];
+          }
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 403) {
+            this.$auth.logout();
+          }
+          console.error("Error fetching transactions:", err);
+          this.transactions = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    handleTabChange() {
+      // No need to fetch transactions again, just let the computed property handle filtering
+    },
     getStateColor(state) {
       switch (state) {
         case "Pending":
@@ -452,5 +489,11 @@ export default defineComponent({
 .state-icon-wrapper .state-text.earned {
   color: #4caf50;
   font-size: 14px;
+}
+
+/* Add missing skeleton loading styles at the end of the style section */
+::v-deep .v-skeleton-loader__list-item-two-line {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 8px;
 }
 </style>
