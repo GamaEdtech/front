@@ -154,6 +154,7 @@ export default class Car {
                 this.currentQuestionIndex += 1
                 this.experience.callBacks.onQuestionChange()
                 this.experience.callBacks.onQuestionStatusChange("success")
+                this.experience.callBacks.onScoreChange(1)
             } else {
                 if (!this.isReversing) {
                     this.reverseStartX = this.positionX

@@ -10,9 +10,16 @@
                 {{ questions[currentQuestionIndex].text }}
             </div>
 
-            <div :class="['timer-box', { 'danger': timerDanger }]">
-                {{ Math.ceil(timer) }}
+            <div class="container-timer-score">
+                <div class="score-div">
+                    <span class="score-text">{{ score }}</span>
+                    <img class="icon-score" src="@/assets/images/star-icon.svg" alt="Score">
+                </div>
+                <div :class="['timer-box', { 'danger': timerDanger }]">
+                    {{ Math.ceil(timer) }}
+                </div>
             </div>
+
         </div>
 
         <div class="overlay-loading-pause" v-if="!isPlayingGame">
@@ -88,7 +95,8 @@ export default {
             currentQuestionIndex: 0,
             timer: 30,
             timerDanger: false,
-            isPlayingGame: false
+            isPlayingGame: false,
+            score: 0
         };
     },
     mounted() {
@@ -96,7 +104,8 @@ export default {
             {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
-                onTimerUpdate: (delta) => this.onTimerUpdate(delta)
+                onTimerUpdate: (delta) => this.onTimerUpdate(delta),
+                onScoreChange: (bonus) => this.onScoreChange(bonus)
             }
         )
     },
@@ -134,6 +143,9 @@ export default {
                 this.timer = 0;
                 this.timerDanger = false
             }
+        },
+        onScoreChange(bonus) {
+            this.score += bonus
         }
     }
 };
@@ -262,6 +274,39 @@ export default {
     }
 }
 
+
+
+.container-timer-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 6px;
+}
+
+/* score section */
+.score-div {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+}
+
+.score-text {
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+    position: absolute;
+    transform: translate(-2px, 2px);
+}
+
+.icon-score {
+    width: 90%;
+    height: 90%;
+
+}
 
 /* timer section */
 .timer-box {
