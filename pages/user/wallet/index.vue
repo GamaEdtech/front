@@ -51,8 +51,90 @@
       </v-row>
     </div>
 
-    <!-- Transaction History Section -->
-    <div class="mt-8" elevation="0">
+    <div class="transaction-history-section mt-8 d-block d-sm-none">
+      <div class="d-flex justify-space-between align-center mb-2">
+        <div class="text-h5 primary-gray-700 font-weight-bold pb-2">
+          Transaction History
+        </div>
+        <v-icon>mdi-chart-line-variant</v-icon>
+      </div>
+
+      <div class="transaction-tabs-wrapper mb-4">
+        <div class="d-flex align-center justify-space-between">
+          <v-tabs
+            v-model="activeTab"
+            grow
+            background-color="transparent"
+            slider-color="amber"
+          >
+            <v-tab class="text-subtitle-2">All</v-tab>
+            <v-tab class="text-subtitle-2">Earned</v-tab>
+            <v-tab class="text-subtitle-2">Spent</v-tab>
+          </v-tabs>
+          <v-icon class="ml-1">mdi-tune-vertical</v-icon>
+        </div>
+      </div>
+
+      <v-list class="transaction-list pa-0" flat>
+        <v-list-item
+          v-for="(transaction, i) in transactions"
+          :key="i"
+          class="transaction-item py-3"
+        >
+          <v-list-item-content>
+            <div class="d-flex flex-column">
+              <div class="transaction-name mb-1">{{ transaction.type }}</div>
+              <div class="d-flex align-center">
+                <div class="" v-if="transaction.state === 'Spent'">
+                  <div class="state-icon-wrapper spent">
+                    <span class="state-icon spent align-center">
+                      <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
+                    </span>
+                    <span class="state-text spent ml-2">{{
+                      transaction.state
+                    }}</span>
+                  </div>
+                </div>
+                <div class="" v-else-if="transaction.state === 'Earned'">
+                  <div class="state-icon-wrapper earned">
+                    <span class="state-icon earned align-center">
+                      <v-icon color="green" size="18"
+                        >mdi-tray-arrow-down</v-icon
+                      >
+                    </span>
+                    <span class="state-text earned ml-2">{{
+                      transaction.state
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </v-list-item-content>
+
+          <v-list-item-action class="transaction-details">
+            <div class="d-flex flex-column align-end">
+              <div class="transaction-amount mb-1">
+                <span class="font-weight-medium">{{
+                  transaction.amount.toLocaleString()
+                }}</span>
+                <span class="ml-1 caption grey--text">$GET</span>
+              </div>
+              <div class="d-flex align-center">
+                <v-icon x-small class="mr-1 grey--text text--lighten-1"
+                  >mdi-clock-outline</v-icon
+                >
+                <span class="caption grey--text text--darken-1">{{
+                  transaction.date
+                }}</span>
+              </div>
+            </div>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </div>
+
+    <!-- Transaction History Section - DESKTOP VIEW -->
+    <div class="mt-8 d-none d-sm-block" elevation="0">
       <div class="text-h5 primary-gray-700 font-weight-bold pb-2">
         Transaction History
       </div>
@@ -90,13 +172,23 @@
         </template>
 
         <template v-slot:item.state="{ item }">
-          <div class="state-chip d-flex align-center">
-            <div :class="`state-icon-bg ${getStateColorClass(item.state)}`">
-              <v-icon small>{{ getStateIcon(item.state) }}</v-icon>
+          <div class="d-flex align-center">
+            <div v-if="item.state === 'Spent'">
+              <div class="state-icon-wrapper spent">
+                <span class="state-icon spent align-center">
+                  <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
+                </span>
+                <span class="state-text spent ml-2">{{ item.state }}</span>
+              </div>
             </div>
-            <span :class="`ml-2 ${getStateTextColorClass(item.state)}`">{{
-              item.state
-            }}</span>
+            <div v-else-if="item.state === 'Earned'">
+              <div class="state-icon-wrapper earned">
+                <span class="state-icon earned align-center">
+                  <v-icon color="green" size="18">mdi-tray-arrow-down</v-icon>
+                </span>
+                <span class="state-text earned ml-2">{{ item.state }}</span>
+              </div>
+            </div>
           </div>
         </template>
 
@@ -157,12 +249,6 @@ export default defineComponent({
         },
       ],
       transactions: [
-        {
-          type: "Uploaded School Photo",
-          amount: 6000000,
-          state: "Pending",
-          date: "3/15/2024 13:15",
-        },
         {
           type: "Created a Quiz",
           amount: 6000000,
@@ -300,6 +386,55 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.transaction-history-section {
+}
+
+.transaction-tabs-wrapper {
+  border-bottom: 1px solid #f0f0f0;
+  width: 100%;
+}
+.transaction-tabs-wrapper .v-tabs {
+  width: 80%;
+}
+
+.transaction-list {
+  margin-top: 8px;
+}
+
+.transaction-item {
+  border-bottom: 1px solid #f5f5f5;
+  padding: 12px 0;
+}
+
+.transaction-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.transaction-amount {
+  font-size: 14px;
+}
+
+.state-icon-bg {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state-icon-bg-desktop {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Desktop Transaction History Styles */
 .transaction-tabs >>> .v-tab {
   min-width: 0;
   text-transform: none;
@@ -341,59 +476,86 @@ export default defineComponent({
 }
 
 .transaction-chart {
-  /* height: 190px; */
   margin-bottom: 16px;
   position: relative;
   width: 100%;
 }
 
-.state-chip {
+/* State Colors */
+.pending-bg {
+  background-color: #ffc107;
+}
+
+.spent-bg {
+  background-color: #ff5252;
+}
+
+.earned-bg {
+  background-color: #4caf50;
+}
+
+.pending-bg-desktop {
+  background-color: rgba(255, 193, 7, 0.15);
+}
+
+.pending-bg-desktop i {
+  color: #ffc107 !important;
+}
+
+.spent-bg-desktop {
+  background-color: rgba(255, 82, 82, 0.15);
+}
+
+.spent-bg-desktop i {
+  color: #ff5252 !important;
+}
+
+.earned-bg-desktop {
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+.earned-bg-desktop i {
+  color: #4caf50 !important;
+}
+
+.state-icon-wrapper {
   display: flex;
   align-items: center;
 }
 
-.state-icon-bg {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+.state-icon-wrapper .state-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.pending-bg {
-  background-color: rgba(255, 193, 7, 0.15);
+.state-icon-wrapper .state-icon.pending {
+  background-color: rgba(255, 193, 7, 0.1);
 }
 
-.pending-bg i {
-  color: #ffc107 !important;
+.state-icon-wrapper .state-icon.spent {
+  background-color: rgba(255, 82, 82, 0.1);
 }
 
-.spent-bg {
-  background-color: rgba(255, 82, 82, 0.15);
+.state-icon-wrapper .state-icon.earned {
+  background-color: rgba(76, 175, 80, 0.1);
 }
 
-.spent-bg i {
-  color: #ff5252 !important;
+.state-icon-wrapper .state-text.pending {
+  color: #ffc107;
+  font-size: 14px;
 }
 
-.earned-bg {
-  background-color: rgba(76, 175, 80, 0.15);
+.state-icon-wrapper .state-text.spent {
+  color: #ff5252;
+  font-size: 14px;
 }
 
-.earned-bg i {
-  color: #4caf50 !important;
-}
-
-.header-cell {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  color: #4b5563;
-}
-
-.sort-icon {
-  color: #9ca3af;
-  margin-left: 4px;
+.state-icon-wrapper .state-text.earned {
+  color: #4caf50;
+  font-size: 14px;
 }
 </style>
