@@ -71,6 +71,7 @@ export default defineComponent({
         { text: "Monthly", value: "MonthOfYear" },
         { text: "Weekly", value: "DayOfWeek" },
       ],
+      token: "",
       chartData: {
         labels: [],
         datasets: [
@@ -164,9 +165,15 @@ export default defineComponent({
     };
   },
   created() {
+    this.getToken();
     this.fetchChartData();
   },
   methods: {
+    getToken() {
+      if (process.client) {
+        this.token = localStorage.getItem("v2_token") || "";
+      }
+    },
     fetchChartData() {
       this.loading = true;
 
@@ -176,7 +183,7 @@ export default defineComponent({
             Period: this.selectedPeriod,
           },
           headers: {
-            Authorization: `${this.$auth.strategy.token.get()}`,
+            Authorization: `Bearer ${this.token}`,
           },
         })
         .then((response) => {

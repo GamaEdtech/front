@@ -194,6 +194,7 @@ export default defineComponent({
       activeTab: 0,
       loading: false,
       transactions: [],
+      token: "",
       headers: [
         {
           text: "Description",
@@ -227,6 +228,7 @@ export default defineComponent({
     };
   },
   created() {
+    this.getToken();
     this.fetchTransactions();
   },
   computed: {
@@ -245,6 +247,11 @@ export default defineComponent({
     },
   },
   methods: {
+    getToken() {
+      if (process.client) {
+        this.token = localStorage.getItem("v2_token") || "";
+      }
+    },
     fetchTransactions() {
       this.loading = true;
 
@@ -254,7 +261,7 @@ export default defineComponent({
             perpage: 10,
           },
           headers: {
-            Authorization: `${this.$auth.strategy.token.get()}`,
+            Authorization: `Bearer ${this.token}`,
           },
         })
         .then((response) => {

@@ -64,18 +64,27 @@ export default defineComponent({
       balance: 0,
       loading: true,
       showBalance: true,
+      token: "",
     };
   },
   created() {
+    // Safely get token during component creation
+    this.getToken();
     this.fetchBalance();
   },
   methods: {
+    getToken() {
+      // Check if we're in browser environment
+      if (process.client) {
+        this.token = localStorage.getItem("v2_token") || "";
+      }
+    },
     fetchBalance() {
       this.loading = true;
       this.$axios
         .$get("/api/v2/transactions/balance", {
           headers: {
-            Authorization: `${this.$auth.strategy.token.get()}`,
+            Authorization: `Bearer ${this.token}`,
           },
         })
         .then((response) => {
