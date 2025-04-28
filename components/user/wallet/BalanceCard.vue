@@ -1,9 +1,14 @@
 <template>
   <div class="balance-card rounded-lg h-full" dark>
     <div class="balance-card-content pb-5 pt-12">
-      <div class="balance-title d-flex align-center mb-4 cursor-pointer">
+      <div
+        class="balance-title d-flex align-center mb-4 cursor-pointer"
+        @click="toggleBalanceVisibility"
+      >
         <span class="text-xl-h4 gray--text">Main balance</span>
-        <v-icon small class="ml-2 gray--text">mdi-eye</v-icon>
+        <v-icon small class="ml-2 gray--text">{{
+          showBalance ? "mdi-eye" : "mdi-eye-off"
+        }}</v-icon>
       </div>
 
       <div v-if="loading" class="balance-amount d-flex align-center">
@@ -13,6 +18,12 @@
           height="60"
           class="mt-2"
         ></v-skeleton-loader>
+      </div>
+
+      <div v-else-if="!showBalance" class="balance-amount d-flex align-center">
+        <div class="hidden-balance">
+          <span v-for="n in 4" :key="n" class="dot mx-1"></span>
+        </div>
       </div>
 
       <div v-else class="balance-amount d-flex align-center">
@@ -52,6 +63,7 @@ export default defineComponent({
     return {
       balance: 0,
       loading: true,
+      showBalance: true,
     };
   },
   created() {
@@ -85,6 +97,9 @@ export default defineComponent({
       return Math.floor((num % 1) * 100)
         .toString()
         .padStart(2, "0");
+    },
+    toggleBalanceVisibility() {
+      this.showBalance = !this.showBalance;
     },
   },
 });
@@ -135,6 +150,21 @@ export default defineComponent({
 
 .action-btn {
   cursor: pointer;
+}
+
+/* Hidden Balance Style */
+.hidden-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+}
+
+.hidden-balance .dot {
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
 }
 
 /* Skeleton Loading Styles */
