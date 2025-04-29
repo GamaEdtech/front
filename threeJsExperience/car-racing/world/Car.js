@@ -45,6 +45,9 @@ export default class Car {
         this.correctAnswerRotationY = 0
 
 
+        this.laneChangeProgress = 0;
+        this.laneChangeDirection = 0;
+        this.isChangingLane = false;
 
 
         window.addEventListener("keydown", (event) => {
@@ -84,12 +87,20 @@ export default class Car {
         const dz = nextZ - currentZ
         const angle = Math.atan2(dz, deltaX)
 
-        const laneChangeProgress = Math.abs(this.targetLane - this.currentLane)
-        const direction = Math.sign(this.targetLane - this.currentLane)
-        const laneTurnFactor = Math.sin(laneChangeProgress * Math.PI)
-        const laneTurnAngle = direction * laneTurnFactor * 0.75
+        if (this.isChangingLane) {
+            const targetProgress = Math.abs(this.targetLane - this.currentLane);
+            this.laneChangeProgress = THREE.MathUtils.lerp(this.laneChangeProgress, targetProgress, 0.1);
+            if (Math.abs(this.currentLane - this.targetLane) < 0.01) {
+                this.currentLane = this.targetLane;
+                this.isChangingLane = false;
+                this.laneChangeProgress = 0;
+            }
+        }
 
-        this.wheels.pivotFront.rotation.y = -laneTurnAngle * 0.7 + Math.PI / 2
+        const smoothProgress = this.laneChangeProgress * this.laneChangeProgress * (3 - 2 * this.laneChangeProgress);
+        const laneTurnAngle = this.laneChangeDirection * smoothProgress * 0.75;
+
+        this.wheels.pivotFront.rotation.y = -laneTurnAngle * 0.9 + Math.PI / 2
         this.mesh.rotation.y = angle - laneTurnAngle + this.wrongAnswerRotationY + this.correctAnswerRotationY
     }
 
@@ -109,9 +120,12 @@ export default class Car {
     }
 
     changeLane(direction) {
-        const newLane = this.targetLane + direction
+        const newLane = this.targetLane + direction;
         if (newLane > 0 && newLane <= this.laneCount) {
-            this.targetLane = newLane
+            this.targetLane = newLane;
+            this.laneChangeDirection = direction;
+            this.isChangingLane = true;
+            this.laneChangeProgress = 0;
         }
     }
 
@@ -212,6 +226,8 @@ export default class Car {
         const distancePerFrame = this.speed * (this.time.delta / 1000)
         this.positionX += distancePerFrame
         this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.targetLane, (this.time.delta / 1000) * this.laneLerpSpeed)
+
+
         this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))
 
         this.updateRotation()

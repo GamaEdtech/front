@@ -90,7 +90,7 @@ export default class Experience {
 
 
             // car
-            carBaseSpeed: 2,
+            carBaseSpeed: 3,
             offsetXStart: 15,
             laneLerpSpeed: 3,
             distanceCameraFromCar: window.innerWidth < 480 ? 12 : 7,
@@ -174,6 +174,10 @@ export default class Experience {
     resize() {
         this.camera.resize()
         this.renderer.resize()
+
+        // this.camera.update()
+        // this.renderer.update()
+        // this.world.update()
     }
 
     update() {
