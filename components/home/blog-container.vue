@@ -3,10 +3,10 @@
     <v-card flat>
       <div class="main-card">
         <v-row>
-          <v-col cols="6" class="px-md-0">
+          <v-col cols="9" class="px-md-0">
             <h2 class="gama-text-h4" id="main-title ">Study Tips Blog</h2>
           </v-col>
-          <v-col cols="6" class="text-right">
+          <v-col cols="3" class="text-right">
             <div class="d-none d-md-inline">
               <v-btn rounded outlined large to="/blog" class="gama-btn"
                 >Go to blog</v-btn
