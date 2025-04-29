@@ -3,9 +3,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <h2 class="gama-text-h4">
-            All-in-One Education Platform Trusted by Millions
-          </h2>
+          <h2 class="gama-text-h4">Millions Trust Us</h2>
           <div id="stats-section">
             <v-row>
               <v-col
@@ -31,10 +29,7 @@
 
           <p class="describe gama-text-h6">
             <v-icon>mdi-science</v-icon>
-            With over 130,000 schools, 500,000 teachers, and 3 million students,
-            GamaTrain is your go-to platform for trusted educational data.
-            Access thousands of quizzes, forum discussions, and multimedia
-            resources — all in one place.
+            The smart choice for teachers, students, and schools
           </p>
         </v-col>
       </v-row>
@@ -237,7 +232,7 @@ export default {
         <v-container>
             <v-row>
                 <v-col cols="12">
-                    <h2 class="gama-text-h4">All-in-One Education Platform Trusted by Millions</h2>
+                    <h2 class="gama-text-h4">Millions Trust Us</h2>
                     <v-row>
                         <v-col cols="6" sm="4" md="2" v-for="(item,index) in stats"
                         :key="index" class="text-center">
@@ -250,10 +245,7 @@ export default {
                             </div>
                         </v-col>
                     </v-row>
-                    <p class="describe">
-                        With over 130,000 schools, 500,000 teachers, and 3 million students, GamaTrain is your go-to platform for trusted educational data.
-Access thousands of quizzes, forum discussions, and multimedia resources — all in one place.
-                    </p>
+                    <p class="describe">The smart choice for teachers, students, and schools </p>
                 </v-col>
             </v-row>
         </v-container>

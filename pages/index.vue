@@ -45,9 +45,7 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h2 class="gama-text-h4">
-              Study Smarter, Not Harder – Your Learning Hub Is Here
-            </h2>
+            <h2 class="gama-text-h4">Study Smarter, Not Harder</h2>
           </v-col>
           <v-col cols="12" sm="6">
             <v-card class="fill-height float-sm-right" to="/search?type=test">
@@ -128,7 +126,7 @@
         <v-row>
           <v-col cols="12" sm="12" md="12" class="text-md-right">
             <h2 class="gama-text-h6 text-center">
-              Monetize Your Teaching Skills – Join GamaTrain Today
+              Monetize Your Teaching Skills
             </h2>
           </v-col>
           <v-col cols="12" sm="12" md="12" class="text-center">
