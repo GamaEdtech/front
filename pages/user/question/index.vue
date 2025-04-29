@@ -143,8 +143,9 @@
                               :to="`/qa/${item.id}`"
                               target="_blank"
                               v-bind="props"
-                              class="mx-1"
-                              variant="plain"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
                               <v-icon> mdi-eye </v-icon>
                             </v-btn>
@@ -157,8 +158,9 @@
                               icon
                               v-bind="props"
                               :to="`/user/question/edit/${item.id}`"
-                              class="mx-1"
-                              variant="plain"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
                               <v-icon> mdi-note-edit-outline </v-icon>
                             </v-btn>
@@ -172,8 +174,9 @@
                               color="error"
                               @click="openDeleteConfirmDialog(item.id, index)"
                               v-bind="props"
-                              class="mx-1"
-                              variant="plain"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
                               <v-icon> mdi-delete </v-icon>
                             </v-btn>
