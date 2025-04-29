@@ -3,13 +3,12 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-qa text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Q & A </span>
+          <span class="text-h4" style="color: #009688"> My Forum List </span>
         </v-col>
       </v-row>
 
       <!-- Filter section -->
-      <v-row class="d-none d-md-flex">
+      <!-- <v-row class="d-none d-md-flex">
         <v-col cols="12" md="3">
           <v-autocomplete
             density="compact"
@@ -49,20 +48,22 @@
             @update:model-value="filterChanged('lesson')"
           />
         </v-col>
-      </v-row>
+      </v-row> -->
       <!-- End filter section -->
 
       <v-card class="mt-3">
         <v-card-title class="text-h4">
-          <v-row>
+          <v-row class="py-2">
             <v-col cols="12" class="text-left">
               <v-btn
                 to="/user/question/create"
                 color="teal"
-                variant="flat"
-                class="text-white"
+                density="default"
+                exact
+                class="text-white py-2"
+                style="font-size: 1.2rem; text-transform: none"
               >
-                New question
+                Add Forum
               </v-btn>
             </v-col>
           </v-row>
@@ -73,12 +74,42 @@
               <v-table class="content_table">
                 <thead>
                   <tr>
-                    <th class="text-left text-h5">#</th>
-                    <th class="text-center text-h5">Title</th>
-                    <th class="text-center text-h5">Unread reply</th>
-                    <th class="text-center text-h5">Status</th>
-                    <th class="text-center text-h5">Date</th>
-                    <th class="text-center text-h5">Actions</th>
+                    <th
+                      class="text-left text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      #
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Title
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Unread reply
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Date
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,9 +245,6 @@
 </template>
 
 <script setup>
-// Core imports
-import { useAuth } from "#imports";
-
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
@@ -463,5 +491,16 @@ onMounted(() => {
 <style scoped>
 p {
   font-size: 1.4rem;
+}
+table > thead > tr > th {
+  color: rgba(0, 0, 0, 0.6);
+}
+.v-table > .v-table__wrapper > table > tbody > tr > td,
+.v-table > .v-table__wrapper > table > tbody > tr > th,
+.v-table > .v-table__wrapper > table > thead > tr > td,
+.v-table > .v-table__wrapper > table > thead > tr > th,
+.v-table > .v-table__wrapper > table > tfoot > tr > td,
+.v-table > .v-table__wrapper > table > tfoot > tr > th {
+  padding: 14px 6px !important;
 }
 </style>
