@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <v-col cols="12" class="px-0 px-sm-2">
+    <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688"> Forum Edit Form </span>

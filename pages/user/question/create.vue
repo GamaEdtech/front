@@ -1,8 +1,8 @@
 <template>
   <div id="question-submit-form" class="mt-4">
-    <v-col cols="12" class="px-0 px-sm-2">
+    <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
-        <v-col cols="12" class="pl-5">
+        <v-col cols="12" class="pl-5 ">
           <span class="text-h4" style="color: #009688">
             Forum Submission Form</span
           >
@@ -30,6 +30,7 @@
                       item-title="title"
                       item-value="id"
                       label="Board"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -43,6 +44,7 @@
                       item-value="id"
                       item-title="title"
                       label="Grade"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -56,6 +58,7 @@
                       item-title="title"
                       v-model="formData.lesson"
                       label="Subject"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -70,6 +73,7 @@
                       v-model="formData.topics"
                       @update:model-value="changeOption('topic', $event)"
                       label="Topics"
+                      color="#FFB300"
                     />
                   </v-col>
 
@@ -86,6 +90,7 @@
                           'Title must be at least 20 characters',
                       ]"
                       label="Summary of the question"
+                      color="#FFB300"
                     />
                   </v-col>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <v-col cols="12" class="px-0 px-sm-2">
+    <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688"> My Forum List </span>
@@ -51,8 +51,8 @@
       </v-row> -->
       <!-- End filter section -->
 
-      <v-card class="mt-3">
-        <v-card-title class="text-h4">
+      <v-card class="mt-3 px-4  px-md-0">
+        <v-card-title class="text-h4 px-0 px-md-4">
           <v-row class="py-2">
             <v-col cols="12" class="text-left">
               <v-btn
@@ -228,14 +228,14 @@
         <v-card-actions class="pt-4">
           <v-spacer></v-spacer>
 
-          <v-btn variant="text" style="font-size: 1.4rem !important; letter-spacing: inherit !important;"  @click="deleteConfirmDialog = false">
+          <v-btn variant="text" style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"  @click="deleteConfirmDialog = false">
             No
           </v-btn>
 
           <v-btn
             color="green-darken-1"
             variant="text"
-            style="font-size: 1.4rem !important; letter-spacing: inherit !important;"
+            style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"
             :loading="delete_loading"
             @click="deleteQuestion()"
           >
