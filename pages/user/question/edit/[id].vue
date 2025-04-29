@@ -3,7 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="text-h4" style="color: #009688;"> Forum Edit Form </span>
+          <span class="text-h4" style="color: #009688"> Forum Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -16,7 +16,7 @@
                 @submit.prevent="onSubmit"
                 lazy-validation
               >
-                <v-row>
+                <v-row class="py-1">
                   <v-col cols="12" md="3">
                     <v-autocomplete
                       required
@@ -59,13 +59,18 @@
                       label="Subject"
                     />
                   </v-col>
-                  <v-col cols="12" md="12">
-                    <form-topic-selector
-                      ref="topicSelectorRef"
-                      :topic-list="topic_list"
-                      :selectedTopics="formData.topics"
-                      @selectTopic="selectTopic"
-                      v-if="topic_list.length > 0"
+                  <v-col cols="12" md="3">
+                    <v-autocomplete
+                      required
+                      density="compact"
+                      variant="outlined"
+                      :items="topic_list"
+                      :rules="[(v) => !!v || 'This field is required']"
+                      item-value="id"
+                      item-title="title"
+                      v-model="formData.topics"
+                      @update:model-value="changeOption('topic', $event)"
+                      label="Topics"
                     />
                   </v-col>
 
@@ -179,7 +184,7 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const { $toast } = useNuxtApp();
-const userToken = ref("")
+const userToken = ref("");
 
 // Page title
 useHead({
@@ -193,7 +198,6 @@ const isFormValid = ref(false);
 const onSubmit = () => {
   updateContent();
 };
-
 
 const { data: questionData } = await useFetch(
   `/api/v1/questions/${route.params.id}`,
@@ -367,7 +371,6 @@ const updateContent = async () => {
     for (let key in formData.topics)
       formSubmitData.append("topics[]", formData.topics[key]);
 
-
   try {
     const response = await $fetch(`/api/v1/questions/${formData.id}`, {
       method: "PUT",
@@ -409,12 +412,10 @@ const urlencodeFormData = (fd) => {
 const encode = (s) => {
   return encodeURIComponent(s).replace(/%20/g, "+");
 };
-
 const uploadFile = async (value) => {
   if (!value) return;
 
   loading.file = true;
-  loading.form = true;
 
   let fileFormData = new FormData();
   fileFormData.append("file", value);
@@ -434,7 +435,6 @@ const uploadFile = async (value) => {
     $toast.error("An error occurred during file upload");
   } finally {
     loading.file = false;
-    loading.form = false;
   }
 };
 
