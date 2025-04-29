@@ -170,7 +170,11 @@ const userState = useState("user", () => ({
   lastSelectedSubject: "",
   lastSelectedHoldingLevel: 4,
 }));
-const { $toast, $auth } = useNuxtApp();
+const { $toast } = useNuxtApp();
+
+// User token
+const userToken = ref("");
+
 
 // Form validation
 const form = ref(null);
@@ -227,15 +231,13 @@ const getTypeList = async (type, parent = "") => {
     loading.topic = true;
   }
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
 
   try {
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     });
 
@@ -287,15 +289,13 @@ const submitQuestion = async () => {
     for (let key in formData.topics)
       formSubmitData.append("topics[]", formData.topics[key]);
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
 
   try {
     const response = await $fetch("/api/v1/questions", {
       method: "POST",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -337,9 +337,6 @@ const uploadFile = async (value) => {
 
   loading.file = true;
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
-
   let fileFormData = new FormData();
   fileFormData.append("file", value);
 
@@ -348,7 +345,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     });
 
@@ -413,6 +410,7 @@ watch(
 
 // Initialize on mount
 onMounted(() => {
+  userToken.value = localStorage.getItem("auth._token.local");
   getTypeList("section");
 });
 </script>

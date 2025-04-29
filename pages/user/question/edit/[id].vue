@@ -3,8 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Q & A edit </span>
+          <span class="text-h4" style="color: #009688;"> Forum Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -26,10 +25,10 @@
                       v-model="formData.section"
                       @update:model-value="changeOption('section', $event)"
                       :items="section_list"
-                      :rules="[(v) => !!v || 'Curriculum is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-title="title"
                       item-value="id"
-                      label="Curriculum"
+                      label="Board"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -39,7 +38,7 @@
                       variant="outlined"
                       v-model="formData.base"
                       :items="grade_list"
-                      :rules="[(v) => !!v || 'Grade is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-value="id"
                       item-title="title"
                       @update:model-value="changeOption('base', $event)"
@@ -52,7 +51,7 @@
                       density="compact"
                       variant="outlined"
                       :items="lesson_list"
-                      :rules="[(v) => !!v || 'Subject is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-value="id"
                       item-title="title"
                       v-model="formData.lesson"
@@ -77,10 +76,10 @@
                       variant="outlined"
                       v-model="formData.title"
                       :rules="[
-                        (v) => !!v || 'Title is required',
+                        (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 20) ||
-                          'Title must be at least 20 characters',
+                          'This field must be at least 20 characters',
                       ]"
                       label="Summary of the question"
                     />
@@ -93,10 +92,10 @@
                       variant="outlined"
                       v-model="formData.question"
                       :rules="[
-                        (v) => !!v || 'Question is required',
+                        (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 70) ||
-                          'Question must be at least 70 characters',
+                          'This field must be at least 70 characters',
                       ]"
                       label="Question"
                       hint="You must enter at least 70 characters."
@@ -180,6 +179,7 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 const { $toast } = useNuxtApp();
+const userToken = ref("")
 
 // Page title
 useHead({
@@ -194,14 +194,12 @@ const onSubmit = () => {
   updateContent();
 };
 
-// Data fetching
-const token = localStorage.getItem("auth._token.local");
 
 const { data: questionData } = await useFetch(
   `/api/v1/questions/${route.params.id}`,
   {
     headers: {
-      Authorization: token,
+      Authorization: userToken.value,
     },
     transform: (response) => {
       return response.status === 1 ? response.data : {};
@@ -258,15 +256,12 @@ const getTypeList = async (type, parent = "") => {
     loading.topic = true;
   }
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
-
   try {
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     });
 
@@ -372,15 +367,13 @@ const updateContent = async () => {
     for (let key in formData.topics)
       formSubmitData.append("topics[]", formData.topics[key]);
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
 
   try {
     const response = await $fetch(`/api/v1/questions/${formData.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -423,9 +416,6 @@ const uploadFile = async (value) => {
   loading.file = true;
   loading.form = true;
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
-
   let fileFormData = new FormData();
   fileFormData.append("file", value);
 
@@ -434,7 +424,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     });
 
@@ -450,6 +440,7 @@ const uploadFile = async (value) => {
 
 // Initialize data on load
 onMounted(async () => {
+  userToken.value = localStorage.getItem("auth._token.local");
   await getTypeList("section");
   initData();
 

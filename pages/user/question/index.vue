@@ -253,7 +253,7 @@ definePageMeta({
 // Use services
 const router = useRouter();
 const auth = useAuth();
-const { $toast, $auth } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 // Page title
 useHead({
@@ -263,6 +263,9 @@ useHead({
 // Reactive state
 const question_list = ref([]);
 const initialLoading = ref(true);
+
+// User token
+const userToken = ref("");
 
 // Filter section
 const filter = reactive({
@@ -292,9 +295,6 @@ const getQuestionList = () => {
   if (!all_files_loaded.value) {
     page_loading.value = true;
 
-    // Get the auth token
-    const token = localStorage.getItem("auth._token.local");
-
     $fetch("/api/v1/questions", {
       method: "GET",
       params: {
@@ -305,7 +305,7 @@ const getQuestionList = () => {
         lesson: filter.lesson,
       },
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     })
       .then((response) => {
@@ -351,14 +351,12 @@ const getTypeList = (type, parent = "") => {
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
 
   $fetch("/api/v1/types/list", {
     method: "GET",
     params,
     headers: {
-      Authorization: token,
+      Authorization: userToken.value,
     },
   })
     .then((response) => {
@@ -452,14 +450,13 @@ const openDeleteConfirmDialog = (item_id, index) => {
 const deleteQuestion = async () => {
   delete_loading.value = true;
 
-  // Get the auth token
-  const token = localStorage.getItem("auth._token.local");
+
 
   try {
     await $fetch(`/api/v1/questions/${delete_question_id.value}`, {
       method: "DELETE",
       headers: {
-        Authorization: token,
+        Authorization: userToken.value,
       },
     });
     question_list.value.splice(delete_question_index.value, 1);
@@ -482,6 +479,7 @@ const deleteQuestion = async () => {
 
 // Initialize on mount
 onMounted(() => {
+  userToken.value = localStorage.getItem("auth._token.local");
   getQuestionList();
   getTypeList("section");
   scroll();
