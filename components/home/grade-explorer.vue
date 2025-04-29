@@ -345,7 +345,7 @@
               <div class="d-none d-md-block">
                 <v-row>
                   <v-col cols="6" md="6">
-                    <h4 class="section-title gama-text-h5">Last questions</h4>
+                    <h4 class="section-title gama-text-h5">Newest Questions</h4>
                     <div v-if="questionLoading">
                       <v-row class="latest-card" v-for="i in 3" :key="i">
                         <v-col cols="12">
@@ -405,7 +405,7 @@
                   </v-col>
                   <v-col cols="6" md="6">
                     <h4 class="section-title gama-text-h5">
-                      Last Uploaded File
+                      Newest Past Papers & Resources
                     </h4>
                     <div v-if="paperLoading">
                       <v-row class="latest-card" v-for="i in 3" :key="i">

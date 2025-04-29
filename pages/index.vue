@@ -16,7 +16,7 @@
         <v-col cols="12" id="ai-learn-banner">
           <img id="img-top" alt="AI Learn" src="/images/ai-learn-bg1.webp" />
           <v-card flat>
-            <h2 class="gama-text-h2">AI Learn</h2>
+            <h2 class="gama-text-h2">Your AI Assistant</h2>
             <p class="gama-text-subtitle1">
               Discover Your Full Potential with AI-based Education
             </p>
@@ -45,7 +45,9 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h2 class="gama-text-h4">Are you a student?</h2>
+            <h2 class="gama-text-h4">
+              Study Smarter, Not Harder – Your Learning Hub Is Here
+            </h2>
           </v-col>
           <v-col cols="12" sm="6">
             <v-card class="fill-height float-sm-right" to="/search?type=test">
@@ -87,11 +89,13 @@
           />
         </v-col>
         <v-col cols="12" sm="8">
-          <h2 class="gama-text-h4">Find school service</h2>
+          <h2 class="gama-text-h4">
+            Search Nearby Schools by Location, Ratings & Reviews
+          </h2>
           <p class="gama-text-body1 describe">
-            You don't have to try the hardest ways anymore. GamaTrain has
-            provided you with access to school information. Just filter and
-            GamaTrain will find it for you.
+            Stop searching blindly. With GamaTrain, discovering the best schools
+            near you is just a few clicks away. Filter by location, ratings,
+            reviews, and facilities – and let us do the rest.
           </p>
           <!-- <v-btn
                      :large="$vuetify.breakpoint.mdAndUp"
@@ -124,7 +128,7 @@
         <v-row>
           <v-col cols="12" sm="12" md="12" class="text-md-right">
             <h2 class="gama-text-h6 text-center">
-              Why wait? Earn money with us in minutes with just a few clicks!
+              Monetize Your Teaching Skills – Join GamaTrain Today
             </h2>
           </v-col>
           <v-col cols="12" sm="12" md="12" class="text-center">
