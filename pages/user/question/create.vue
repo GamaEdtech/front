@@ -18,7 +18,7 @@
                 @submit.prevent="onSubmit"
                 lazy-validation
               >
-                <v-row class="py-1">
+                <v-row class="py-3">
                   <v-col cols="12" md="3">
                     <v-autocomplete
                       required
@@ -429,4 +429,5 @@ onMounted(() => {
   font-weight: bolder !important;
   color: blue !important;
 }
+
 </style>

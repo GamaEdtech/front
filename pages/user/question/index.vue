@@ -218,23 +218,24 @@
 
     <!-- Delete dialog -->
     <v-dialog v-model="deleteConfirmDialog" max-width="290" >
-      <v-card class="py-2">
+      <v-card class="py-2 px-2">
         <v-card-title class="px-4" style="font-size: 1.4rem;"> Are you sure? </v-card-title>
 
-        <v-card-text class="px-4">
+        <v-card-text class="px-4 pt-0 pb-1" style="color: rgba(0, 0, 0, .6)">
           <p>If you are sure to delete, click Yes.</p>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions class="pt-4">
           <v-spacer></v-spacer>
 
-          <v-btn variant="text" @click="deleteConfirmDialog = false">
+          <v-btn variant="text" style="font-size: 1.4rem !important; letter-spacing: inherit !important;"  @click="deleteConfirmDialog = false">
             No
           </v-btn>
 
           <v-btn
             color="green-darken-1"
             variant="text"
+            style="font-size: 1.4rem !important; letter-spacing: inherit !important;"
             :loading="delete_loading"
             @click="deleteQuestion()"
           >
@@ -497,11 +498,12 @@ table > thead > tr > th {
   color: rgba(0, 0, 0, 0.6);
 }
 .v-table > .v-table__wrapper > table > tbody > tr > td,
-.v-table > .v-table__wrapper > table > tbody > tr > th,
-.v-table > .v-table__wrapper > table > thead > tr > td,
 .v-table > .v-table__wrapper > table > thead > tr > th,
-.v-table > .v-table__wrapper > table > tfoot > tr > td,
 .v-table > .v-table__wrapper > table > tfoot > tr > th {
   padding: 14px 6px !important;
+}
+
+.v-table > .v-table__wrapper > table > tbody > tr:hover {
+  background-color: #eeeeeeb1 !important;
 }
 </style>
