@@ -40,6 +40,19 @@
             </div>
         </div>
 
+
+        <div class="overlay-loading" v-if="isLoading">
+            Loading ...
+        </div>
+
+        <div class="counter-container" v-if="showCounterFirstPlay">
+            <transition name="zoom-fade" @after-enter="nextCount">
+                <div class="counter-number" v-if="currentCountFirstPlay !== 0" :key="currentCountFirstPlay">
+                    {{ currentCountFirstPlay }}
+                </div>
+            </transition>
+        </div>
+
         <div class="buttons-div">
             <button @click="changeLane(-1)" class="change-lane-btn btn">
                 <img class="icon-play highligth" src="@/assets/images/left-arrow-icon.svg" alt="Left Arrow">
@@ -105,11 +118,15 @@ export default {
                 // },
             ],
             currentQuestionIndex: 0,
-            timer: 30,
+            timer: 15,
             timerDanger: false,
             isPlayingGame: false,
             score: 0,
-            resultGame: 'pending'
+            resultGame: 'pending',
+            isLoading: false,
+            currentCountFirstPlay: 3,
+            showCounterFirstPlay: false,
+            isFirstTimePlayingGame: true
         };
     },
     mounted() {
@@ -132,8 +149,19 @@ export default {
         },
 
         setPlayingStatus(status) {
-            this.isPlayingGame = status
-            this.experience.setPlayingStatus(status)
+            if (this.isFirstTimePlayingGame) {
+                this.isFirstTimePlayingGame = false
+                this.showCounterFirstPlay = true
+                this.nextCount()
+                this.isPlayingGame = status
+
+                setTimeout(() => {
+                    this.experience.setPlayingStatus(status)
+                }, 3000);
+            } else {
+                this.isPlayingGame = status
+                this.experience.setPlayingStatus(status)
+            }
         },
         onQuestionChange() {
             if (this.currentQuestionIndex < this.questions.length - 1) {
@@ -171,14 +199,35 @@ export default {
             }
         },
         resetGame() {
+            this.isLoading = true
+            this.experience.resetGame()
             this.currentQuestionIndex = 0
-            this.timer = 30
+            this.timer = 15
             this.questionStatus = "normal"
             this.timerDanger = false
             this.score = 0
             this.resultGame = 'pending'
-            this.experience.resetGame()
             this.setPlayingStatus(true)
+            this.currentCountFirstPlay = 3
+
+            setTimeout(() => {
+                this.setPlayingStatus(false)
+                this.isLoading = false
+                this.isFirstTimePlayingGame = true
+            }, 1000);
+        },
+
+        nextCount() {
+            if (this.currentCountFirstPlay > 1) {
+                setTimeout(() => {
+                    this.currentCountFirstPlay--;
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    this.currentCountFirstPlay = 0;
+                    this.showCounterFirstPlay = false;
+                }, 500);
+            }
         }
 
     }
@@ -403,7 +452,7 @@ export default {
 }
 
 
-/* overlay menu , laading */
+/* overlay menu  */
 .overlay-pause {
     position: absolute;
     z-index: 4;
@@ -513,6 +562,66 @@ export default {
     width: 50%;
     height: 50%;
     filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
+}
+
+/* overlay loading */
+.overlay-loading {
+    position: absolute;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    font-weight: bold;
+    color: white;
+    font-size: 30px;
+    transition: all 0.5s;
+}
+
+
+/* counter start */
+.counter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    z-index: 4;
+}
+
+.counter-number {
+    font-size: 10rem;
+    color: #ff3c00;
+    font-weight: bold;
+}
+
+.zoom-fade-enter-active {
+    animation: zoomFade 0.5s ease;
+}
+
+.zoom-fade-leave-active {
+    opacity: 0;
+}
+
+@keyframes zoomFade {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* responsive mobile */

@@ -131,6 +131,7 @@ export default class Car {
 
     reset() {
         this.positionX = this.options.offsetXStart
+        this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))
         this.currentQuestionIndex = 0
     }
 
