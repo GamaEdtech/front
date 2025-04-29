@@ -104,12 +104,13 @@ export default defineComponent({
             labels: {
               usePointStyle: true,
               pointStyle: "circle",
-              padding: 15,
+              padding: 25,
+              boxWidth: 10,
+              boxHeight: 10,
               color: "#666",
               font: {
                 size: 12,
               },
-              boxWidth: 8,
             },
           },
           tooltip: {
