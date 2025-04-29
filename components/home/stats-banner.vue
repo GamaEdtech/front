@@ -29,7 +29,7 @@
 
           <p class="describe gama-text-h6">
             <v-icon>mdi-science</v-icon>
-            The smart choice for teachers, students, and schools
+            Gamatrain-the smart choice for teachers, students, and schools
           </p>
         </v-col>
       </v-row>

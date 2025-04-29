@@ -42,7 +42,7 @@
                     @mouseleave="toggleHover('leave', n)"
                     class="ma-1"
                   >
-                    <v-img :src="item.pic" />
+                    <v-img :src="item.pic" height="150" />
                     <v-card-title>
                       <span class="gama-text-button" v-if="!isHovered[n]">
                         {{ item.title }}
