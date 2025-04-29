@@ -258,7 +258,7 @@ export default defineComponent({
       this.$axios
         .$get("/api/v2/transactions", {
           params: {
-            perpage: 10,
+            "PagingDto.PageFilter.Size": 50,
           },
           headers: {
             Authorization: `Bearer ${this.token}`,

@@ -20,7 +20,9 @@
           class="d-block d-sm-none mt-6 mobile-chart-container"
         >
           <div class="pa-4 rounded-lg bg-primary-gray-100">
-            <transaction-chart class="transaction-chart"></transaction-chart>
+            <transaction-chart
+              class="transaction-chart h-full"
+            ></transaction-chart>
           </div>
         </div>
       </v-expand-transition>
@@ -81,10 +83,8 @@ export default defineComponent({
   margin-bottom: 16px;
   position: relative;
   width: 100%;
-}
-
-.mobile-chart-container {
-  margin-bottom: 16px;
+  /* height: 100%; */
+  height: max-content;
 }
 
 .mobile-chart-container .transaction-chart {

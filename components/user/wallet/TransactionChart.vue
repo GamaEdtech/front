@@ -3,22 +3,6 @@
     <div class="text-h5 primary-gray-700 font-weight-bold pb-2">
       Transaction History
     </div>
-    <div class="chart-header d-flex justify-space-between align-center">
-      <!-- <div class="chart-legend d-flex">
-        <div class="legend-item d-flex align-center mr-4">
-          <v-icon small color="rgb(235, 77, 75)" class="mr-1"
-            >mdi-circle</v-icon
-          >
-          <span class="caption">Spent</span>
-        </div>
-        <div class="legend-item d-flex align-center">
-          <v-icon small color="rgb(46, 213, 115)" class="mr-1"
-            >mdi-circle</v-icon
-          >
-          <span class="caption">Earned</span>
-        </div>
-      </div> -->
-    </div>
 
     <div
       v-if="loading"
@@ -27,8 +11,12 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
-    <div v-else class="chart-wrapper h-full">
-      <LineChart :chart-data="chartData" :options="chartOptions" />
+    <div v-else class="chart-wrapper">
+      <LineChart
+        :data="chartData"
+        :options="chartOptions"
+        style="min-height: 240px"
+      />
     </div>
   </div>
 </template>
@@ -37,30 +25,30 @@
 import { defineComponent } from "vue";
 import {
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
   Title,
   Tooltip,
   Legend,
+  LineElement,
+  LinearScale,
+  CategoryScale,
+  PointElement,
 } from "chart.js";
-import { Line as LineChart } from "vue-chartjs";
+import { Line } from "vue-chartjs";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  LineElement,
+  LinearScale,
+  CategoryScale,
+  PointElement
 );
 
 export default defineComponent({
   name: "TransactionChart",
   components: {
-    LineChart,
+    LineChart: Line,
   },
 
   data() {
@@ -79,7 +67,7 @@ export default defineComponent({
             label: "Spent",
             data: [],
             borderColor: "rgb(235, 77, 75)",
-            backgroundColor: "rgba(235, 77, 75, 0.1)",
+            backgroundColor: "rgb(235, 77, 75)",
             tension: 0.4,
             pointRadius: 0,
             borderWidth: 2,
@@ -89,7 +77,7 @@ export default defineComponent({
             label: "Earned",
             data: [],
             borderColor: "rgb(46, 213, 115)",
-            backgroundColor: "rgba(46, 213, 115, 0.1)",
+            backgroundColor: "rgb(46, 213, 115)",
             tension: 0.4,
             pointRadius: 0,
             borderWidth: 2,
@@ -101,14 +89,28 @@ export default defineComponent({
         responsive: true,
         maintainAspectRatio: false,
         layout: {
-          padding: {
-            left: 10,
-            right: 10,
-          },
+          // padding: {
+          //   left: 10,
+          //   right: 30,
+          //   top: 20,
+          //   bottom: 30,
+          // },
         },
         plugins: {
           legend: {
-            display: false,
+            display: true,
+            position: "top",
+            align: "end",
+            labels: {
+              usePointStyle: true,
+              pointStyle: "circle",
+              padding: 15,
+              color: "#666",
+              font: {
+                size: 12,
+              },
+              boxWidth: 8,
+            },
           },
           tooltip: {
             backgroundColor: "white",
@@ -140,6 +142,7 @@ export default defineComponent({
               font: {
                 size: 12,
               },
+              padding: 10,
             },
           },
           y: {
@@ -153,6 +156,7 @@ export default defineComponent({
               font: {
                 size: 12,
               },
+              padding: 10,
             },
             grid: {
               color: "rgba(0, 0, 0, 0.05)",
@@ -225,7 +229,7 @@ export default defineComponent({
             label: "Spent",
             data: debitValues,
             borderColor: "rgb(235, 77, 75)",
-            backgroundColor: "rgba(235, 77, 75, 0.1)",
+            backgroundColor: "rgb(235, 77, 75)",
             tension: 0.4,
             pointRadius: 0,
             borderWidth: 2,
@@ -235,7 +239,7 @@ export default defineComponent({
             label: "Earned",
             data: creditValues,
             borderColor: "rgb(46, 213, 115)",
-            backgroundColor: "rgba(46, 213, 115, 0.1)",
+            backgroundColor: "rgb(46, 213, 115)",
             tension: 0.4,
             pointRadius: 0,
             borderWidth: 2,
@@ -266,17 +270,20 @@ export default defineComponent({
   width: 100%;
 }
 
-.chart-header {
-  margin-bottom: 16px;
-}
-
 .transaction-title {
   font-size: 16px;
 }
 
 .chart-wrapper {
   position: relative;
+  width: 100%;
   height: 100%;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 200px;
 }
 
@@ -287,14 +294,10 @@ export default defineComponent({
 .legend-item {
   font-size: 12px;
 }
-
+.transaction-chart {
+  margin-bottom: 0 !important;
+}
 .chart-loading {
   height: 200px;
-}
-
-@media (max-width: 600px) {
-  .chart-wrapper {
-    height: 200px;
-  }
 }
 </style>

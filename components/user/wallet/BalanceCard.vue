@@ -1,6 +1,6 @@
 <template>
   <div class="balance-card rounded-lg h-full" dark>
-    <div class="balance-card-content pb-5 pt-12">
+    <div class="balance-card-content pb-5 pt-6">
       <div
         class="balance-title d-flex align-center mb-4 cursor-pointer"
         @click="toggleBalanceVisibility"
@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div v-else class="balance-amount d-flex align-center">
+      <div v-else class="balance-amount d-flex align-center mb-8">
         <span class="currency mr-2 mt-3 yellow--text-darken">$GET</span>
         <span class="amount text-white">{{ Math.floor(balance) }}</span>
         <span class="decimal text-white">.{{ getDecimal(balance) }}</span>
@@ -36,7 +36,7 @@
         ></v-img>
       </div>
 
-      <div class="balance-actions d-flex justify-space-between mt-10">
+      <div class="balance-actions d-flex justify-space-between">
         <div class="action-btn text-center">
           <v-icon small class="gray--text">mdi-tray-arrow-up</v-icon>
           <div class="text-lg-h6 yellow--text-darken mt-2">Top up</div>
@@ -122,6 +122,11 @@ export default defineComponent({
   background-position: center;
   color: white;
   border-radius: 16px !important;
+  max-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .balance-card-content {
