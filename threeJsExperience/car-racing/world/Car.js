@@ -115,6 +115,11 @@ export default class Car {
         }
     }
 
+    reset() {
+        this.positionX = this.options.offsetXStart
+        this.currentQuestionIndex = 0
+    }
+
     setMesh() {
         this.mesh = this.resourses.items.carGLTFModel.scene
 
@@ -136,7 +141,13 @@ export default class Car {
 
 
     checkQuestionCollision() {
-        if (this.currentQuestionIndex >= this.questionPositions.length) return;
+        if (this.currentQuestionIndex >= this.questionPositions.length) {
+            const result = {
+                status: "success"
+            }
+            this.experience.callBacks.onResultGameChange(result)
+            return
+        };
 
         const targetX = this.questionPositions[this.currentQuestionIndex];
         const distance = Math.abs(this.positionX - targetX);

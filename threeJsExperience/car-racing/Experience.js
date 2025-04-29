@@ -165,6 +165,12 @@ export default class Experience {
         this.isPlayingGame = statusGame
     }
 
+    resetGame() {
+        if (this.world && this.world.car) {
+            this.world.car.reset()
+        }
+    }
+
     resize() {
         this.camera.resize()
         this.renderer.resize()

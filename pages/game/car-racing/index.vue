@@ -22,10 +22,22 @@
 
         </div>
 
-        <div class="overlay-loading-pause" v-if="!isPlayingGame">
+        <div class="overlay-pause" v-if="!isPlayingGame && resultGame == `pending`">
             <button class="play-btn btn" @click="setPlayingStatus(true)">
                 <img class="icon-play highligth" src="@/assets/images/play-icon.svg" alt="Play">
             </button>
+        </div>
+
+        <div class="overlay-result-game" v-if="resultGame != `pending`">
+            <div :class="`modal-status ${resultGame}-modal`">
+                <span :class="`status-text ${resultGame}-text`">
+                    {{ resultGame == "failed" ? "Game Over!" : "Great!" }}
+                </span>
+
+                <button class="reset-btn btn" @click="resetGame">
+                    <img class="icon-reset highligth" src="@/assets/images/refresh-icon.svg" alt="Reset Arrow">
+                </button>
+            </div>
         </div>
 
         <div class="buttons-div">
@@ -96,7 +108,8 @@ export default {
             timer: 30,
             timerDanger: false,
             isPlayingGame: false,
-            score: 0
+            score: 0,
+            resultGame: 'pending'
         };
     },
     mounted() {
@@ -105,7 +118,8 @@ export default {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
-                onScoreChange: (bonus) => this.onScoreChange(bonus)
+                onScoreChange: (bonus) => this.onScoreChange(bonus),
+                onResultGameChange: (result) => this.onResultGameChange(result)
             }
         )
     },
@@ -142,11 +156,31 @@ export default {
             } else {
                 this.timer = 0;
                 this.timerDanger = false
+
+                this.setPlayingStatus(false)
+                this.resultGame = "failed"
             }
         },
         onScoreChange(bonus) {
             this.score += bonus
+        },
+        onResultGameChange(result) {
+            if (result.status == "success") {
+                this.setPlayingStatus(false)
+                this.resultGame = "success"
+            }
+        },
+        resetGame() {
+            this.currentQuestionIndex = 0
+            this.timer = 30
+            this.questionStatus = "normal"
+            this.timerDanger = false
+            this.score = 0
+            this.resultGame = 'pending'
+            this.experience.resetGame()
+            this.setPlayingStatus(true)
         }
+
     }
 };
 </script>
@@ -155,8 +189,7 @@ export default {
 <style scoped>
 .main-div-car-racing {
     width: 100%;
-    height: 100%;
-    min-height: 100vh;
+    height: calc(100vh - 56px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -371,7 +404,7 @@ export default {
 
 
 /* overlay menu , laading */
-.overlay-loading-pause {
+.overlay-pause {
     position: absolute;
     z-index: 4;
     width: 100%;
@@ -411,6 +444,75 @@ export default {
     /* IE 10 and IE 11 */
     user-select: none;
     /* Standard syntax */
+}
+
+
+
+/* overlay result game */
+.overlay-result-game {
+    position: absolute;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(0 0 0 / 64%);
+}
+
+.modal-status {
+    width: 90%;
+    max-width: 260px;
+    height: 90%;
+    max-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    row-gap: 10px;
+    background-color: white;
+    border-radius: 16px;
+}
+
+.failed-modal {
+    border: 4px solid red;
+}
+
+.success-modal {
+    border: 4px solid rgb(88, 233, 88);
+}
+
+.status-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.failed-text {
+    color: red;
+}
+
+.success-text {
+    color: rgb(88, 233, 88);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #ffeaa7, #ff8400);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.icon-reset {
+    width: 50%;
+    height: 50%;
+    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
 }
 
 /* responsive mobile */
