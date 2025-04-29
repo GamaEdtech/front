@@ -3,7 +3,9 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="text-h4 teal--text"> Q & A submission form </span>
+          <span class="text-h4" style="color: #009688">
+            Forum Submission Form</span
+          >
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -16,7 +18,7 @@
                 @submit.prevent="onSubmit"
                 lazy-validation
               >
-                <v-row>
+                <v-row class="py-1">
                   <v-col cols="12" md="3">
                     <v-autocomplete
                       required
@@ -24,7 +26,7 @@
                       variant="outlined"
                       v-model="formData.section"
                       :items="section_list"
-                      :rules="[(v) => !!v || 'Board is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-title="title"
                       item-value="id"
                       label="Board"
@@ -37,7 +39,7 @@
                       variant="outlined"
                       v-model="formData.base"
                       :items="grade_list"
-                      :rules="[(v) => !!v || 'Grade is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-value="id"
                       item-title="title"
                       label="Grade"
@@ -49,19 +51,25 @@
                       density="compact"
                       variant="outlined"
                       :items="lesson_list"
-                      :rules="[(v) => !!v || 'Subject is required']"
+                      :rules="[(v) => !!v || 'This field is required']"
                       item-value="id"
                       item-title="title"
                       v-model="formData.lesson"
                       label="Subject"
                     />
                   </v-col>
-                  <v-col cols="12" md="12">
-                    <form-topic-selector
-                      ref="topicSelectorRef"
-                      :topic-list="topic_list"
-                      @selectTopic="selectTopic"
-                      v-if="topic_list.length > 0"
+                  <v-col cols="12" md="3">
+                    <v-autocomplete
+                      required
+                      density="compact"
+                      variant="outlined"
+                      :items="topic_list"
+                      :rules="[(v) => !!v || 'This field is required']"
+                      item-value="id"
+                      item-title="title"
+                      v-model="formData.topics"
+                      @update:model-value="changeOption('topic', $event)"
+                      label="Topics"
                     />
                   </v-col>
 
@@ -72,7 +80,7 @@
                       variant="outlined"
                       v-model="formData.title"
                       :rules="[
-                        (v) => !!v || 'Title is required',
+                        (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 20) ||
                           'Title must be at least 20 characters',
@@ -88,7 +96,7 @@
                       variant="outlined"
                       v-model="formData.question"
                       :rules="[
-                        (v) => !!v || 'Question is required',
+                        (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 70) ||
                           'Question must be at least 70 characters',
@@ -175,7 +183,6 @@ const { $toast } = useNuxtApp();
 // User token
 const userToken = ref("");
 
-
 // Form validation
 const form = ref(null);
 const isFormValid = ref(false);
@@ -230,7 +237,6 @@ const getTypeList = async (type, parent = "") => {
     params.lesson_id = parent;
     loading.topic = true;
   }
-
 
   try {
     const response = await $fetch("/api/v1/types/list", {
@@ -288,7 +294,6 @@ const submitQuestion = async () => {
   )
     for (let key in formData.topics)
       formSubmitData.append("topics[]", formData.topics[key]);
-
 
   try {
     const response = await $fetch("/api/v1/questions", {
