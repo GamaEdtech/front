@@ -65,7 +65,12 @@
                       density="compact"
                       variant="outlined"
                       :items="topic_list"
-                      :rules="[(v) => !!v || 'This field is required']"
+                      :rules="[
+                        (v) =>
+                          topic_list.length === 0 ||
+                          !!v ||
+                          'This field is required',
+                      ]"
                       item-value="id"
                       item-title="title"
                       v-model="formData.topics"
@@ -291,10 +296,10 @@ const initData = () => {
   formData.section = questionData.value?.section || "";
   formData.base = questionData.value?.base || "";
   formData.lesson = questionData.value?.lesson || "";
-  
+
   // Set topic directly (not as array)
   formData.topics = questionData.value?.topic || "";
-  
+
   formData.title = questionData.value?.title || "";
   formData.question = questionData.value?.question || "";
 };
@@ -303,7 +308,7 @@ const changeOption = async (optionName, optionVal) => {
   if (optionName === "section") {
     formData.base = "";
     formData.lesson = "";
-    formData.topics = "";  // Reset as string, not array
+    formData.topics = ""; // Reset as string, not array
     grade_list.value = [];
     lesson_list.value = [];
     topic_list.value = [];
@@ -320,7 +325,7 @@ const changeOption = async (optionName, optionVal) => {
     if (optionVal) {
       await getTypeList("topic", optionVal);
     } else {
-      formData.topics = "";  // Reset as string, not array
+      formData.topics = ""; // Reset as string, not array
       topic_list.value = [];
     }
   } else if (optionName === "topic") {
@@ -334,12 +339,11 @@ const updateContent = async () => {
 
   // Prepare form data
   let formSubmitData = new FormData();
-  
+
   // Directly append all form fields - no special handling for topics
   for (let key in formData) {
     formSubmitData.append(key, formData[key]);
   }
-
 
   try {
     const response = await $fetch(`/api/v1/questions/${route.params.id}`, {
