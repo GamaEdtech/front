@@ -40,12 +40,22 @@
           </l-map>
         </client-only>
 
-        <div v-if="contentData.tour">
+        <div
+          class="position-relative under-image-right"
+          v-if="contentData.tour && !tourImgPreview"
+        >
           <img
+            @click="openTourImgInput"
             class="pointer schoolDetailsImg"
             :src="contentData.tour"
-            alt="School image"
+            alt="School image Preview"
           />
+
+          <div class="upload-overlay">
+            <v-btn @click="openTourImgInput" class="" icon color="white">
+              <v-icon small> mdi-pencil </v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else-if="tourImgPreview"
@@ -111,7 +121,7 @@
             <v-carousel-item
               v-for="(image, index) in galleryImages"
               :key="index"
-              :src="image"
+              :src="image?.fileUri"
               eager
               cover
               class="pointer"
@@ -206,12 +216,21 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <template v-if="contentData.tour">
-          <img
-            class="pointer schoolDetailsImg"
-            :src="contentData.tour"
-            alt="School image"
-          />
+        <template v-if="contentData.tour && !tourImgPreview">
+          <div class="position-relative">
+            <img
+              class="pointer schoolDetailsImg"
+              :src="contentData.tour"
+              alt="School image Preview"
+            />
+            <div class="upload-overlay px-3">
+              <div class="px-3 d-flex justify-center align-center">
+                <v-btn @click="openTourImgInput" class="" icon color="white">
+                  <v-icon small> mdi-pencil </v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
         </template>
         <template v-else>
           <template v-if="tourImgPreview">
@@ -317,7 +336,40 @@
         <v-row>
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
-              {{ contentData.name }}
+              <div class="d-flex align-center flex-wrap">
+                <div v-show="!generalDataEditMode.name">
+                  {{ contentData.name }}
+                </div>
+                <v-btn
+                  v-if="!generalDataEditMode.name"
+                  @click="editGeneralInfo('name')"
+                  class="ml-4"
+                  icon
+                  color="blue-grey"
+                >
+                  <v-icon small> mdi-pencil </v-icon>
+                </v-btn>
+                <v-text-field
+                  v-model="form.name"
+                  v-if="generalDataEditMode.name"
+                  placeholder="Name"
+                  :rules="nameRule"
+                >
+                  <template slot="append-outer">
+                    <v-btn
+                      :loading="nameSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('name')"
+                      fab
+                      depressed
+                      x-small
+                    >
+                      <v-icon> mdi-check </v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </div>
+
               <span v-show="contentData.school_type_title"
                 >,
                 {{ contentData.school_type_title }}
@@ -465,22 +517,37 @@
               <div class="info-sign">
                 <v-icon color="primary"> mdi-web </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data overflow-hidden">
                 <a
-                  v-show="contentData.webSite"
+                  v-show="contentData.webSite && !generalDataEditMode.website"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
-                  class="blue--text"
+                  class="blue--text overflow-hidden text-ellipsis flex-grow-1"
                 >
                   {{ contentData.webSite }}
                 </a>
-                <span
-                  v-show="!(contentData.webSite || generalDataEditMode.website)"
-                  @click="editGeneralInfo('website')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+                <template v-if="contentData.webSite">
+                  <v-btn
+                    v-if="!generalDataEditMode.website"
+                    @click="editGeneralInfo('website')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="
+                      !(contentData.webSite || generalDataEditMode.website)
+                    "
+                    @click="editGeneralInfo('website')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.web"
@@ -510,18 +577,34 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.email"
+                  class="flex-grow-1"
+                  v-show="contentData.email && !generalDataEditMode.email"
                   :href="`mailto:${contentData.email}`"
                 >
                   {{ contentData.email }}
                 </a>
-                <span
-                  v-show="!(contentData.email || generalDataEditMode.email)"
-                  @click="editGeneralInfo('email')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.email">
+                  <v-btn
+                    v-if="!generalDataEditMode.email"
+                    @click="editGeneralInfo('email')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="!(contentData.email || generalDataEditMode.email)"
+                    @click="editGeneralInfo('email')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
                   :rules="emailRule"
                   v-model="form.email"
@@ -550,22 +633,39 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phoneNumber"
+                  class="flex-grow-1"
+                  v-show="
+                    contentData.phoneNumber && !generalDataEditMode.phone1
+                  "
                   :href="`tel: ${contentData.phoneNumber}`"
                 >
                   {{ contentData.phoneNumber }}
                 </a>
-                <span
-                  @click="editGeneralInfo('phone')"
-                  v-show="
-                    !(contentData.phoneNumber || generalDataEditMode.phone1)
-                  "
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.phoneNumber">
+                  <v-btn
+                    v-if="!generalDataEditMode.phone1"
+                    @click="editGeneralInfo('phone')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('phone')"
+                    v-show="
+                      !(contentData.phoneNumber || generalDataEditMode.phone1)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
-                  type="number"
                   :rules="phoneRule"
                   v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
@@ -592,21 +692,40 @@
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
               <div class="info-data info-data-address">
-                <span v-show="contentData.address">{{
-                  contentData.address
-                }}</span>
                 <span
-                  @click="editGeneralInfo('address')"
-                  v-show="!(contentData.address || generalDataEditMode.address)"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  class="flex-grow-1"
+                  v-show="contentData.address && !generalDataEditMode.address"
+                  >{{ contentData.address }}</span
                 >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.address">
+                  <v-btn
+                    v-if="!generalDataEditMode.address"
+                    @click="editGeneralInfo('address')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('address')"
+                    v-show="
+                      !(contentData.address || generalDataEditMode.address)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.address"
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
+                  :rules="addressRule"
                 >
                   <template slot="append-outer">
                     <v-btn
@@ -1471,6 +1590,7 @@ export default {
         email: null,
         phone: null,
         address: null,
+        name: null,
       },
 
       mapMarkerData: {},
@@ -1511,7 +1631,7 @@ export default {
       webSubmitLoader: false,
       emailSubmitLoader: false,
       phoneSubmitLoader: false,
-
+      nameSubmitLoader: false,
       commentList: [],
 
       generalDataEditMode: {
@@ -1520,6 +1640,7 @@ export default {
         phone1: false,
         address: false,
         map: false,
+        name: false,
       },
 
       webUrlRule: [
@@ -1538,6 +1659,8 @@ export default {
           "Please enter a valid email address",
       ],
       phoneRule: [(v) => !!v || "Phone number is required"],
+      nameRule: [(v) => !!v || "Name is required"],
+      addressRule: [(v) => !!v || "Address is required"],
     };
   },
   head() {
@@ -1789,7 +1912,7 @@ export default {
             // Change the slide to 'tour' if on mobile view
             if (this.$vuetify.breakpoint.smAndDown) {
               this.slideToggler = "tour";
-              this.changeSlide();
+              // this.changeSlide();
             }
           }, 500);
         })
@@ -1993,10 +2116,9 @@ export default {
       this.$axios
         .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
         .then((response) => {
-          // Reverse the order of the gallery images array so newest images appear first
           this.galleryImages = [...response.data].reverse();
           if (this.galleryImages.length >= 1) {
-            this.$set(this.contentData, "pic", this.galleryImages[0]);
+            this.$set(this.contentData, "pic", this.galleryImages[0].fileUri);
           } else {
             this.$set(this.contentData, "pic", null);
           }
@@ -2010,11 +2132,14 @@ export default {
           this.tourPanoramas = response.data;
           if (this.tourPanoramas.length >= 1) {
             // Use Vue's $set to ensure reactivity
-            this.$set(this.contentData, "tour", this.tourPanoramas[0]);
+            this.$set(
+              this.contentData,
+              "tour",
+              this.tourPanoramas[this.tourPanoramas.length - 1].fileUri
+            );
           } else {
             this.$set(this.contentData, "tour", null);
           }
-          console.log("this.contentData.tour", this.contentData.tour);
         })
         .catch((err) => {});
     },
@@ -2031,7 +2156,12 @@ export default {
       } else if (value == "address") {
         this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
-      } else if (value == "map") this.generalDataEditMode.map = true;
+      } else if (value == "map") {
+        this.generalDataEditMode.map = true;
+      } else if (value == "name") {
+        this.form.name = this.contentData.name || "";
+        this.generalDataEditMode.name = true;
+      }
     },
     updateGeneralInfo(value) {
       if (value == "website") {
@@ -2041,7 +2171,6 @@ export default {
         }
         this.generalDataEditMode.website = false;
       }
-
       if (value == "email") {
         if (!this.isValidEmail(this.form.email)) {
           this.$toast.error("Please enter a valid Email");
@@ -2056,12 +2185,23 @@ export default {
         }
         this.generalDataEditMode.phone1 = false;
       }
-      // else if (value == "email") this.generalDataEditMode.email = false;
-      // else if (value == "phone") this.generalDataEditMode.phone1 = false;
-      else if (value == "address") this.generalDataEditMode.address = false;
-
+      if (value == "address") {
+        if (!this.isRequired(this.form.address)) {
+          this.$toast.error(
+            "Please enter a valid address (minimum 10 characters)"
+          );
+          return;
+        }
+        this.generalDataEditMode.address = false;
+      }
+      if (value == "name") {
+        if (!this.isRequired(this.form.name)) {
+          this.$toast.error("Please enter a valid Name");
+          return;
+        }
+        this.generalDataEditMode.name = false;
+      }
       var formData = {};
-
       switch (value) {
         case "website":
           this.webSubmitLoader = true;
@@ -2087,6 +2227,12 @@ export default {
             address: this.form.address ?? null,
           };
           break;
+        case "name":
+          this.nameSubmitLoader = true;
+          formData = {
+            name: this.form.name ?? null,
+          };
+          break;
         case "map":
           this.mapSubmitLoader = true;
           formData = {
@@ -2097,7 +2243,6 @@ export default {
         default:
           break;
       }
-
       this.$axios
         .$post(
           `/api/v2/schools/${this.$route.params.id}/contributions`,
@@ -2108,8 +2253,27 @@ export default {
             },
           }
         )
-        .then((response) => {
+        .then(async (response) => {
           if (response.succeeded) {
+            switch (value) {
+              case "name":
+                this.contentData.name = this.form.name;
+                break;
+              case "website":
+                this.contentData.webSite = this.form.web;
+                break;
+              case "phone":
+                this.contentData.phoneNumber = this.form.phone;
+                break;
+              case "address":
+                this.contentData.address = this.form.address;
+                break;
+              case "email":
+                this.contentData.email = this.form.email;
+                break;
+              default:
+                break;
+            }
             this.$toast.success(
               "Your contribution has been successfully submitted"
             );
@@ -2122,12 +2286,18 @@ export default {
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
+          this.form.web = null;
+          this.form.email = null;
+          this.form.phone = null;
+          this.form.address = null;
+          this.form.name = null;
           this.mapSubmitLoader = false;
           this.selectLocationDialog = false;
           this.webSubmitLoader = false;
           this.emailSubmitLoader = false;
           this.phoneSubmitLoader = false;
           this.addressSubmitLoader = false;
+          this.nameSubmitLoader = false;
         });
     },
   },
@@ -2171,9 +2341,7 @@ export default {
 
   .upload-overlay .v-btn {
     margin: 0.25rem 0;
-    height: auto !important;
-    padding: 0.5rem 1rem !important;
-    font-size: 0.9rem !important;
+    flex-shrink: 0;
   }
 
   .upload-overlay .v-icon {

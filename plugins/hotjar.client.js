@@ -1,5 +1,5 @@
 export default () => {
-  // if (process.env.NODE_ENV !== "production") return;
+  if (process.env.NODE_ENV !== "production") return;
 
   (function (h, o, t, j, a, r) {
     h.hj =
