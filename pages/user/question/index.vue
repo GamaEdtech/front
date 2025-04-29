@@ -214,11 +214,11 @@
     </v-col>
 
     <!-- Delete dialog -->
-    <v-dialog v-model="deleteConfirmDialog" max-width="290">
-      <v-card>
-        <v-card-title class="text-h5"> Are you sure? </v-card-title>
+    <v-dialog v-model="deleteConfirmDialog" max-width="290" >
+      <v-card class="py-2">
+        <v-card-title class="px-4" style="font-size: 1.4rem;"> Are you sure? </v-card-title>
 
-        <v-card-text>
+        <v-card-text class="px-4">
           <p>If you are sure to delete, click Yes.</p>
         </v-card-text>
 
@@ -293,7 +293,7 @@ const getQuestionList = () => {
     page_loading.value = true;
 
     // Get the auth token
-    const token = $auth.getUserToken();
+    const token = localStorage.getItem("auth._token.local");
 
     $fetch("/api/v1/questions", {
       method: "GET",
@@ -305,7 +305,7 @@ const getQuestionList = () => {
         lesson: filter.lesson,
       },
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token,
       },
     })
       .then((response) => {
@@ -352,13 +352,13 @@ const getTypeList = (type, parent = "") => {
   if (type === "lesson") params.base_id = parent;
 
   // Get the auth token
-  const token = $auth.getUserToken();
+  const token = localStorage.getItem("auth._token.local");
 
   $fetch("/api/v1/types/list", {
     method: "GET",
     params,
     headers: {
-      Authorization: token ? `Bearer ${token}` : "",
+      Authorization: token,
     },
   })
     .then((response) => {
@@ -453,13 +453,13 @@ const deleteQuestion = async () => {
   delete_loading.value = true;
 
   // Get the auth token
-  const token = $auth.getUserToken();
+  const token = localStorage.getItem("auth._token.local");
 
   try {
     await $fetch(`/api/v1/questions/${delete_question_id.value}`, {
       method: "DELETE",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token,
       },
     });
     question_list.value.splice(delete_question_index.value, 1);
