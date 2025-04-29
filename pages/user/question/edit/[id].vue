@@ -179,7 +179,7 @@ definePageMeta({
 // Get route params
 const route = useRoute();
 const router = useRouter();
-const { $toast, $auth } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 // Page title
 useHead({
@@ -195,13 +195,13 @@ const onSubmit = () => {
 };
 
 // Data fetching
-const token = $auth.getUserToken();
+const token = localStorage.getItem("auth._token.local");
 
 const { data: questionData } = await useFetch(
   `/api/v1/questions/${route.params.id}`,
   {
     headers: {
-      Authorization: token ? `Bearer ${token}` : "",
+      Authorization: token,
     },
     transform: (response) => {
       return response.status === 1 ? response.data : {};
@@ -259,14 +259,14 @@ const getTypeList = async (type, parent = "") => {
   }
 
   // Get the auth token
-  const token = $auth.getUserToken();
+  const token = localStorage.getItem("auth._token.local");
 
   try {
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token,
       },
     });
 
@@ -373,14 +373,14 @@ const updateContent = async () => {
       formSubmitData.append("topics[]", formData.topics[key]);
 
   // Get the auth token
-  const token = $auth.getUserToken();
+  const token = localStorage.getItem("auth._token.local");
 
   try {
     const response = await $fetch(`/api/v1/questions/${formData.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -424,7 +424,7 @@ const uploadFile = async (value) => {
   loading.form = true;
 
   // Get the auth token
-  const token = $auth.getUserToken();
+  const token = localStorage.getItem("auth._token.local");
 
   let fileFormData = new FormData();
   fileFormData.append("file", value);
@@ -434,7 +434,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token,
       },
     });
 
