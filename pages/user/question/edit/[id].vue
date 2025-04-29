@@ -217,7 +217,7 @@ const formData = reactive({
   section: "",
   base: "",
   lesson: "",
-  topics: [],
+  topics: "",
   title: "",
   question: "",
   file: "",
@@ -228,7 +228,6 @@ const section_list = ref([]);
 const grade_list = ref([]);
 const lesson_list = ref([]);
 const topic_list = ref([]);
-const topicSelectorRef = ref(null);
 
 // Handle loading states
 const loading = reactive({
@@ -277,9 +276,6 @@ const getTypeList = async (type, parent = "") => {
       lesson_list.value = response.data;
     } else if (type === "topic") {
       topic_list.value = response.data;
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = true;
-      }
     }
   } catch (err) {
     $toast.error(err.message || "Error loading data");
@@ -295,28 +291,19 @@ const initData = () => {
   formData.section = questionData.value?.section || "";
   formData.base = questionData.value?.base || "";
   formData.lesson = questionData.value?.lesson || "";
-
-  // Handle topic as array
-  if (questionData.value?.topic) {
-    const topics = questionData.value.topic.split
-      ? questionData.value.topic.split("+")
-      : [];
-    formData.topics = topics.filter((t) => t);
-  }
-
+  
+  // Set topic directly (not as array)
+  formData.topics = questionData.value?.topic || "";
+  
   formData.title = questionData.value?.title || "";
   formData.question = questionData.value?.question || "";
-};
-
-const selectTopic = (event) => {
-  formData.topics = event;
 };
 
 const changeOption = async (optionName, optionVal) => {
   if (optionName === "section") {
     formData.base = "";
     formData.lesson = "";
-    formData.topics = [];
+    formData.topics = "";  // Reset as string, not array
     grade_list.value = [];
     lesson_list.value = [];
     topic_list.value = [];
@@ -324,32 +311,21 @@ const changeOption = async (optionName, optionVal) => {
     if (optionVal) {
       await getTypeList("base", optionVal);
     }
-
-    if (topicSelectorRef.value) {
-      topicSelectorRef.value.lesson_selected = false;
-    }
   } else if (optionName === "base") {
     formData.lesson = "";
     if (optionVal) {
       await getTypeList("lesson", optionVal);
     }
-
-    if (topicSelectorRef.value) {
-      topicSelectorRef.value.lesson_selected = false;
-    }
   } else if (optionName === "lesson") {
     if (optionVal) {
       await getTypeList("topic", optionVal);
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = true;
-      }
     } else {
-      formData.topics = [];
+      formData.topics = "";  // Reset as string, not array
       topic_list.value = [];
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = false;
-      }
     }
+  } else if (optionName === "topic") {
+    // When topic is directly selected
+    formData.topics = optionVal;
   }
 };
 
@@ -358,21 +334,15 @@ const updateContent = async () => {
 
   // Prepare form data
   let formSubmitData = new FormData();
+  
+  // Directly append all form fields - no special handling for topics
   for (let key in formData) {
-    if (!(key == "topics" || key == "file_extra"))
-      formSubmitData.append(key, formData[key]);
+    formSubmitData.append(key, formData[key]);
   }
 
-  if (
-    formData.topics &&
-    Array.isArray(formData.topics) &&
-    formData.topics.length
-  )
-    for (let key in formData.topics)
-      formSubmitData.append("topics[]", formData.topics[key]);
 
   try {
-    const response = await $fetch(`/api/v1/questions/${formData.id}`, {
+    const response = await $fetch(`/api/v1/questions/${route.params.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
@@ -388,10 +358,13 @@ const updateContent = async () => {
       router.push("/user/question");
     }
   } catch (err) {
+    console.error("Update error:", err);
     if (err.response?.status === 403) {
       router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || "Error updating question");
+    } else {
+      $toast.error("An error occurred while updating the question");
     }
   } finally {
     loading.form = false;
@@ -455,9 +428,6 @@ onMounted(async () => {
 
   if (formData.lesson) {
     await getTypeList("topic", formData.lesson);
-    if (topicSelectorRef.value) {
-      topicSelectorRef.value.lesson_selected = true;
-    }
   }
 });
 </script>
