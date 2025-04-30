@@ -1,11 +1,9 @@
 <template>
-  <div id="question-submit-form" class="mt-4">
+  <div class="mt-4">
     <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
-        <v-col cols="12" class="pl-5 ">
-          <span class="text-h4" style="color: #009688">
-            Forum Submission Form</span
-          >
+        <v-col cols="12" class="pl-5">
+          <span class="text-h4" style="color: #009688"> Forum Edit Form </span>
         </v-col>
       </v-row>
       <v-card class="mt-3">
@@ -18,19 +16,19 @@
                 @submit.prevent="onSubmit"
                 lazy-validation
               >
-                <v-row class="py-3">
+                <v-row class="py-2">
                   <v-col cols="12" md="3">
                     <v-autocomplete
                       required
                       density="compact"
                       variant="outlined"
                       v-model="formData.section"
+                      @update:model-value="changeOption('section', $event)"
                       :items="section_list"
                       :rules="[(v) => !!v || 'This field is required']"
                       item-title="title"
                       item-value="id"
                       label="Board"
-                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -43,8 +41,8 @@
                       :rules="[(v) => !!v || 'This field is required']"
                       item-value="id"
                       item-title="title"
+                      @update:model-value="changeOption('base', $event)"
                       label="Grade"
-                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -57,8 +55,8 @@
                       item-value="id"
                       item-title="title"
                       v-model="formData.lesson"
+                      @update:model-value="changeOption('lesson', $event)"
                       label="Subject"
-                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -67,13 +65,17 @@
                       density="compact"
                       variant="outlined"
                       :items="topic_list"
-                      :rules="[(v) => !!v || 'This field is required']"
+                      :rules="[
+                        (v) =>
+                          topic_list.length === 0 ||
+                          !!v ||
+                          'This field is required',
+                      ]"
                       item-value="id"
                       item-title="title"
                       v-model="formData.topics"
                       @update:model-value="changeOption('topic', $event)"
                       label="Topics"
-                      color="#FFB300"
                     />
                   </v-col>
 
@@ -87,10 +89,9 @@
                         (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 20) ||
-                          'Title must be at least 20 characters',
+                          'This field must be at least 20 characters',
                       ]"
                       label="Summary of the question"
-                      color="#FFB300"
                     />
                   </v-col>
 
@@ -104,7 +105,7 @@
                         (v) => !!v || 'This field is required',
                         (v) =>
                           (v && v.length >= 70) ||
-                          'Question must be at least 70 characters',
+                          'This field must be at least 70 characters',
                       ]"
                       label="Question"
                       hint="You must enter at least 70 characters."
@@ -131,7 +132,20 @@
                       color="red"
                       prepend-inner-icon="mdi-file"
                       append-icon="mdi-folder-open"
-                    />
+                    >
+                      <template v-slot:append>
+                        <v-btn
+                          icon
+                          size="small"
+                          variant="plain"
+                          :href="questionData.files?.url"
+                          target="_blank"
+                          v-if="questionData.files?.exist"
+                        >
+                          <v-icon size="22">mdi-download</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-file-input>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -143,7 +157,7 @@
                       color="success"
                       block
                     >
-                      Submit
+                      Update
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -167,42 +181,49 @@
 </template>
 
 <script setup>
+// Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
 
-useHead({
-  title: "Q & A submission form",
-});
-
-// Get services
+// Get route params
+const route = useRoute();
 const router = useRouter();
-const userState = useState("user", () => ({
-  lastSelectedCurriculum: "",
-  lastSelectedGrade: "",
-  lastSelectedSubject: "",
-  lastSelectedHoldingLevel: 4,
-}));
 const { $toast } = useNuxtApp();
-
-// User token
 const userToken = ref("");
+
+// Page title
+useHead({
+  title: "Q & A edit form",
+});
 
 // Form validation
 const form = ref(null);
 const isFormValid = ref(false);
 
 const onSubmit = () => {
-  submitQuestion();
+  updateContent();
 };
 
-const topicSelectorRef = ref(null);
+const { data: questionData } = await useFetch(
+  `/api/v1/questions/${route.params.id}`,
+  {
+    headers: {
+      Authorization: userToken.value,
+    },
+    transform: (response) => {
+      return response.status === 1 ? response.data : {};
+    },
+  }
+);
 
+// Form data
 const formData = reactive({
+  id: route.params.id,
   section: "",
   base: "",
   lesson: "",
-  topics: [],
+  topics: "",
   title: "",
   question: "",
   file: "",
@@ -220,10 +241,11 @@ const loading = reactive({
   base: false,
   lesson: false,
   topic: false,
-  file: false, // Upload file
-  form: false, // Submit form
+  file: false,
+  form: false,
 });
 
+// Methods
 const getTypeList = async (type, parent = "") => {
   const params = { type };
 
@@ -254,19 +276,12 @@ const getTypeList = async (type, parent = "") => {
 
     if (type === "section") {
       section_list.value = response.data;
-      formData.section = userState.value.lastSelectedCurriculum || "";
     } else if (type === "base") {
       grade_list.value = response.data;
-      formData.base = userState.value.lastSelectedGrade || "";
     } else if (type === "lesson") {
       lesson_list.value = response.data;
-      formData.lesson = userState.value.lastSelectedSubject || "";
     } else if (type === "topic") {
       topic_list.value = response.data;
-
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = true;
-      }
     }
   } catch (err) {
     $toast.error(err.message || "Error loading data");
@@ -278,31 +293,62 @@ const getTypeList = async (type, parent = "") => {
   }
 };
 
-const selectTopic = (event) => {
-  formData.topics = event;
+const initData = () => {
+  formData.section = questionData.value?.section || "";
+  formData.base = questionData.value?.base || "";
+  formData.lesson = questionData.value?.lesson || "";
+
+  // Set topic directly (not as array)
+  formData.topics = questionData.value?.topic || "";
+
+  formData.title = questionData.value?.title || "";
+  formData.question = questionData.value?.question || "";
 };
 
-const submitQuestion = async () => {
+const changeOption = async (optionName, optionVal) => {
+  if (optionName === "section") {
+    formData.base = "";
+    formData.lesson = "";
+    formData.topics = ""; // Reset as string, not array
+    grade_list.value = [];
+    lesson_list.value = [];
+    topic_list.value = [];
+
+    if (optionVal) {
+      await getTypeList("base", optionVal);
+    }
+  } else if (optionName === "base") {
+    formData.lesson = "";
+    if (optionVal) {
+      await getTypeList("lesson", optionVal);
+    }
+  } else if (optionName === "lesson") {
+    if (optionVal) {
+      await getTypeList("topic", optionVal);
+    } else {
+      formData.topics = ""; // Reset as string, not array
+      topic_list.value = [];
+    }
+  } else if (optionName === "topic") {
+    // When topic is directly selected
+    formData.topics = optionVal;
+  }
+};
+
+const updateContent = async () => {
   loading.form = true;
 
   // Prepare form data
   let formSubmitData = new FormData();
+
+  // Directly append all form fields - no special handling for topics
   for (let key in formData) {
-    if (!(key == "topics" || key == "file_extra"))
-      formSubmitData.append(key, formData[key]);
+    formSubmitData.append(key, formData[key]);
   }
 
-  if (
-    formData.topics &&
-    Array.isArray(formData.topics) &&
-    formData.topics.length
-  )
-    for (let key in formData.topics)
-      formSubmitData.append("topics[]", formData.topics[key]);
-
   try {
-    const response = await $fetch("/api/v1/questions", {
-      method: "POST",
+    const response = await $fetch(`/api/v1/questions/${route.params.id}`, {
+      method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
         Authorization: userToken.value,
@@ -313,14 +359,17 @@ const submitQuestion = async () => {
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The question is duplicated");
     } else {
-      $toast.success("Submitted successfully");
+      $toast.success("Updated successfully");
       router.push("/user/question");
     }
   } catch (err) {
+    console.error("Update error:", err);
     if (err.response?.status === 403) {
       router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
-      $toast.error(err.response.data.message || "Error submitting question");
+      $toast.error(err.response.data.message || "Error updating question");
+    } else {
+      $toast.error("An error occurred while updating the question");
     }
   } finally {
     loading.form = false;
@@ -341,7 +390,6 @@ const urlencodeFormData = (fd) => {
 const encode = (s) => {
   return encodeURIComponent(s).replace(/%20/g, "+");
 };
-
 const uploadFile = async (value) => {
   if (!value) return;
 
@@ -368,71 +416,30 @@ const uploadFile = async (value) => {
   }
 };
 
-// Set up watchers
-watch(
-  () => formData.section,
-  (val) => {
-    userState.value.lastSelectedCurriculum = val;
-    formData.base = "";
-    formData.lesson = "";
-    formData.topics = [];
-    grade_list.value = [];
-    lesson_list.value = [];
-    topic_list.value = [];
-
-    if (val) {
-      getTypeList("base", val);
-    }
-  }
-);
-
-watch(
-  () => formData.base,
-  (val) => {
-    userState.value.lastSelectedGrade = val;
-    formData.lesson = "";
-
-    if (val) {
-      getTypeList("lesson", val);
-    }
-  }
-);
-
-watch(
-  () => formData.lesson,
-  (val) => {
-    userState.value.lastSelectedSubject = val;
-
-    if (val) {
-      getTypeList("topic", val);
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = true;
-      }
-    } else {
-      formData.topics = [];
-      topic_list.value = [];
-      if (topicSelectorRef.value) {
-        topicSelectorRef.value.lesson_selected = false;
-      }
-    }
-  }
-);
-
-// Initialize on mount
-onMounted(() => {
+// Initialize data on load
+onMounted(async () => {
   userToken.value = localStorage.getItem("auth._token.local");
-  getTypeList("section");
+  await getTypeList("section");
+  initData();
+
+  // Load dependent type lists
+  if (formData.section) {
+    await getTypeList("base", formData.section);
+  }
+
+  if (formData.base) {
+    await getTypeList("lesson", formData.base);
+  }
+
+  if (formData.lesson) {
+    await getTypeList("topic", formData.lesson);
+  }
 });
 </script>
 
 <style>
-#question-submit-form .text-h4 {
-  line-height: 4rem;
-}
-
 .topic_season {
   font-weight: bolder !important;
   color: blue !important;
 }
-
-</style>
+</style> 

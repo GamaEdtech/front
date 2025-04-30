@@ -1,22 +1,69 @@
 <template>
-  <div>
-    <v-col cols="12" class="px-0 px-sm-2">
+  <div class="mt-4">
+    <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-qa text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Q & A </span>
+          <span class="text-h4" style="color: #009688"> My Forum List </span>
         </v-col>
       </v-row>
-      <v-card class="mt-3">
-        <v-card-title class="text-h4">
-          <v-row>
+
+      <!-- Filter section -->
+      <!-- <v-row class="d-none d-md-flex">
+        <v-col cols="12" md="3">
+          <v-autocomplete
+            density="compact"
+            variant="outlined"
+            v-model="filter.level"
+            clearable
+            :items="level_list"
+            item-title="title"
+            item-value="id"
+            label="Curriculum"
+            @update:model-value="filterChanged('level')"
+          />
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-autocomplete
+            density="compact"
+            variant="outlined"
+            v-model="filter.grade"
+            clearable
+            :items="grade_list"
+            item-value="id"
+            item-title="title"
+            label="Grade"
+            @update:model-value="filterChanged('grade')"
+          />
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-autocomplete
+            density="compact"
+            variant="outlined"
+            :items="lesson_list"
+            item-value="id"
+            item-title="title"
+            v-model="filter.lesson"
+            clearable
+            label="Subject"
+            @update:model-value="filterChanged('lesson')"
+          />
+        </v-col>
+      </v-row> -->
+      <!-- End filter section -->
+
+      <v-card class="mt-3 px-4  px-md-0">
+        <v-card-title class="text-h4 px-0 px-md-4">
+          <v-row class="py-2">
             <v-col cols="12" class="text-left">
               <v-btn
                 to="/user/question/create"
                 color="teal"
-                class="white--text"
+                density="default"
+                exact
+                class="text-white py-2"
+                style="font-size: 1.2rem; text-transform: none"
               >
-                New question
+                Add Forum
               </v-btn>
             </v-col>
           </v-row>
@@ -24,293 +71,439 @@
         <v-card-text class="px-sm-8 px-md-4">
           <v-row>
             <v-col cols="12" class="px-0 px-sm-4 px-md-4">
-              <v-simple-table class="exams_table">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left text-h5">#</th>
-                      <th class="text-center text-h5">Title</th>
-                      <th class="text-center text-h5">Unread reply</th>
-                      <th class="text-center text-h5">Status</th>
-                      <th class="text-center text-h5">Date</th>
-                      <th class="text-center text-h5">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-show="question_list.length > 0"
-                      v-for="item in question_list"
-                      :key="item.id"
+              <v-table class="content_table">
+                <thead>
+                  <tr>
+                    <th
+                      class="text-left text-h5"
+                      style="min-width: fit-content !important"
                     >
-                      <td>{{ item.id }}</td>
-                      <td class="text-center" style="max-width: 20rem">
-                        <a
-                          :href="`/qa/${item.id}/${item.title}`"
-                          target="_blank"
-                        >
-                          {{ item.title }}
-                        </a>
-                      </td>
-                      <td class="text-center">
-                        {{ item.unread_reply }}
-                      </td>
-                      <td class="text-center">
-                        {{ calcStatus(item.status) }}
-                      </td>
-                      <td class="text-center">
-                        {{ item.subdate }}
-                      </td>
-                      <td class="text-center">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
+                      #
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Title
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Unread reply
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Date
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="min-width: fit-content !important"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-show="question_list.length > 0"
+                    v-for="(item, index) in question_list"
+                    :key="item.id"
+                  >
+                    <td>{{ item.id }}</td>
+                    <td class="text-center" style="max-width: 20rem">
+                      <a :href="`/qa/${item.id}/${item.title}`" target="_blank">
+                        {{ item.title }}
+                      </a>
+                    </td>
+                    <td class="text-center">
+                      {{ item.unread_reply }}
+                    </td>
+                    <td class="text-center">
+                      {{ calcStatus(item.status) }}
+                    </td>
+                    <td class="text-center">
+                      {{ item.subdate }}
+                    </td>
+                    <td class="text-center">
+                      <div class="d-flex justify-center">
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
                             <v-btn
                               icon
                               color="green"
                               :to="`/qa/${item.id}`"
                               target="_blank"
-                              small
-                              v-bind="attrs"
-                              v-on="on"
+                              v-bind="props"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
-                              <v-icon small> mdi-eye </v-icon>
+                              <v-icon> mdi-eye </v-icon>
                             </v-btn>
                           </template>
                           <span>View</span>
                         </v-tooltip>
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
                             <v-btn
                               icon
-                              small
-                              v-bind="attrs"
-                              v-on="on"
+                              v-bind="props"
                               :to="`/user/question/edit/${item.id}`"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
-                              <v-icon small> mdi-note-edit-outline </v-icon>
+                              <v-icon> mdi-note-edit-outline </v-icon>
                             </v-btn>
                           </template>
                           <span>Edit</span>
                         </v-tooltip>
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
+                        <v-tooltip location="bottom">
+                          <template v-slot:activator="{ props }">
                             <v-btn
                               icon
                               color="error"
-                              @click="openDeleteConfirmDialog(item.id)"
-                              small
-                              v-bind="attrs"
-                              v-on="on"
+                              @click="openDeleteConfirmDialog(item.id, index)"
+                              v-bind="props"
+                              variant="icon"
+                              class="mx-2"
+                              density
                             >
-                              <v-icon small> mdi-delete </v-icon>
+                              <v-icon> mdi-delete </v-icon>
                             </v-btn>
                           </template>
                           <span>Delete</span>
                         </v-tooltip>
-                      </td>
-                    </tr>
-                    <tr
-                      v-show="
-                        page_loading === false && question_list.length === 0
-                      "
-                    >
-                      <td colspan="7" class="text-center">
-                        <p>Oops! no data found</p>
-                      </td>
-                    </tr>
-                    <tr v-show="page_loading">
-                      <td colspan="7" class="text-center">
-                        <v-progress-circular
-                          :size="30"
-                          :width="3"
-                          class="mt-12 mb-12"
-                          color="orange"
-                          indeterminate
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    v-show="
+                      !initialLoading &&
+                      page_loading === false &&
+                      question_list.length === 0
+                    "
+                  >
+                    <td colspan="7" class="text-center">
+                      <p>Oops! no data found</p>
+                    </td>
+                  </tr>
+                  <tr v-show="page_loading || initialLoading">
+                    <td colspan="7" class="text-center">
+                      <v-progress-circular
+                        :size="30"
+                        :width="3"
+                        class="mt-12 mb-12"
+                        color="orange"
+                        indeterminate
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
             </v-col>
           </v-row>
         </v-card-text>
       </v-card>
     </v-col>
+
+    <!-- Delete dialog -->
+    <v-dialog v-model="deleteConfirmDialog" max-width="290" >
+      <v-card class="py-2 px-2">
+        <v-card-title class="px-4" style="font-size: 1.4rem;"> Are you sure? </v-card-title>
+
+        <v-card-text class="px-4 pt-0 pb-1" style="color: rgba(0, 0, 0, .6)">
+          <p>If you are sure to delete, click Yes.</p>
+        </v-card-text>
+
+        <v-card-actions class="pt-4">
+          <v-spacer></v-spacer>
+
+          <v-btn variant="text" style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"  @click="deleteConfirmDialog = false">
+            No
+          </v-btn>
+
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"
+            :loading="delete_loading"
+            @click="deleteQuestion()"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- End delete dialog -->
   </div>
 </template>
 
-<script>
-export default {
-  layout: "dashboard_layout",
-  name: "qa-manage",
-  data() {
-    return {
-      question_list: [],
+<script setup>
+// Define layout and page metadata
+definePageMeta({
+  layout: "dashboard-layout",
+});
 
-      //Filter section
-      filter: {
-        level: "",
-        grade: "",
-        lesson: "",
+// Use services
+const router = useRouter();
+const auth = useAuth();
+const { $toast } = useNuxtApp();
+
+// Page title
+useHead({
+  title: "Q & A manage",
+});
+
+// Reactive state
+const question_list = ref([]);
+const initialLoading = ref(true);
+
+// User token
+const userToken = ref("");
+
+// Filter section
+const filter = reactive({
+  level: "",
+  grade: "",
+  lesson: "",
+});
+
+const level_list = ref([]);
+const grade_list = ref([]);
+const lesson_list = ref([]);
+
+// Paginate section
+const page_loading = ref(false);
+const page = ref(1);
+const all_files_loaded = ref(false);
+const timer = ref(null);
+
+// Delete section
+const deleteConfirmDialog = ref(false);
+const delete_question_id = ref(null);
+const delete_question_index = ref(null);
+const delete_loading = ref(false);
+
+// Methods
+const getQuestionList = () => {
+  if (!all_files_loaded.value) {
+    page_loading.value = true;
+
+    $fetch("/api/v1/questions", {
+      method: "GET",
+      params: {
+        perpage: 20,
+        page: page.value,
+        section: filter.level,
+        base: filter.grade,
+        lesson: filter.lesson,
       },
-      level_list: [],
-      grade_list: [],
-      field_list: [],
-      lesson_list: [],
-      //End filter section
+      headers: {
+        Authorization: userToken.value,
+      },
+    })
+      .then((response) => {
+        question_list.value.push(...response.data.list);
 
-      //Paginate section
-      page_loading: false,
-      page: 1,
-      all_files_loaded: false,
-      //End paginate section
-    };
-  },
-  head() {
-    return {
-      title: "Q & A manage",
-    };
-  },
-  mounted() {
-    this.getQuestionList();
-    this.getTypeList("section");
-    this.scroll();
-  },
-  methods: {
-    getQuestionList() {
-      if (!this.all_files_loaded) {
-        this.page_loading = true;
-        this.$fetch
-          .$get("/api/v1/questions", {
-            params: {
-              perpage: 20,
-              page: this.page,
-              section: this.filter.level,
-              base: this.filter.grade,
-              lesson: this.filter.lesson,
-            },
-          })
-          .then((response) => {
-            this.question_list.push(...response.data.list);
-
-            if (response.data.list.length === 0)
-              //For terminate auto load request
-              this.all_files_loaded = true;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => {
-            this.page_loading = false;
-          });
-      }
-    },
-    calcStatus(val) {
-      let title = "";
-      if (val == 0) title = "Unreviewed";
-      else if (val == 1) title = "Confirmed";
-      else if (val == 2) title = "Reference to type unit";
-      else if (val == 3) title = "Has a message";
-      else if (val == 4) title = "Inactive";
-      else if (val == 5) title = "Edited";
-      return title;
-    },
-    getTypeList(type, parent = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
-      }
-
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            this.level_list = res.data;
-          } else if (type === "base") {
-            this.grade_list = res.data;
-          } else if (type === "lesson") {
-            this.lesson_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-
-    scroll() {
-      //For infinite loading
-      window.onscroll = () => {
-        //Scroll position
-        var scrollPosition =
-          Math.max(
-            window.pageYOffset,
-            document.documentElement.scrollTop,
-            document.body.scrollTop
-          ) +
-          window.innerHeight +
-          50;
-        let bottomOfWindow =
-          scrollPosition >= document.documentElement.offsetHeight;
-
-        //Avoid the number of requests
-        if (this.timer) {
-          clearTimeout(this.timer);
-          this.timer = null;
+        if (
+          response.data.num &&
+          question_list.value.length >= Number(response.data.num)
+        ) {
+          all_files_loaded.value = true;
         }
 
-        //Load next page
-        if (bottomOfWindow && this.all_files_loaded === false) {
-          this.page_loading = true;
-          this.timer = setTimeout(() => {
-            this.page++;
-            this.getQuestionList();
-          }, 800);
+        // Handle case where no more items are returned
+        if (response.data.list.length === 0) {
+          all_files_loaded.value = true;
         }
-      };
-    },
-
-    filterChanged(type) {
-      if (type == "level") {
-        this.filter.grade = "";
-        this.filter.lesson = "";
-        if (this.filter.level) this.getTypeList("base", this.filter.level);
-
-        this.page = 1;
-        this.all_files_loaded = false;
-
-        this.grade_list = [];
-        this.lesson_list = [];
-        this.question_list = [];
-
-        this.getQuestionList();
-      } else if (type == "grade") {
-        this.filter.lesson = "";
-        if (this.filter.grade) this.getTypeList("lesson", this.filter.grade);
-
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.question_list = [];
-        this.lesson_list = [];
-        this.getQuestionList();
-      } else if (type == "lesson") {
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.question_list = [];
-        this.getQuestionList();
-      }
-    },
-  },
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.response?.status === 403) auth.logout();
+      })
+      .finally(() => {
+        page_loading.value = false;
+        initialLoading.value = false;
+      });
+  }
 };
+
+const calcStatus = (val) => {
+  let title = "";
+  if (val == 0) title = "Unreviewed";
+  else if (val == 1) title = "Confirmed";
+  else if (val == 2) title = "Reference to type unit";
+  else if (val == 3) title = "Has a message";
+  else if (val == 4) title = "Inactive";
+  else if (val == 5) title = "Edited";
+  return title;
+};
+
+const getTypeList = (type, parent = "") => {
+  const params = { type };
+
+  if (type === "base") params.section_id = parent;
+  if (type === "lesson") params.base_id = parent;
+
+
+  $fetch("/api/v1/types/list", {
+    method: "GET",
+    params,
+    headers: {
+      Authorization: userToken.value,
+    },
+  })
+    .then((response) => {
+      if (type === "section") {
+        level_list.value = response.data;
+      } else if (type === "base") {
+        grade_list.value = response.data;
+      } else if (type === "lesson") {
+        lesson_list.value = response.data;
+      }
+    })
+    .catch((err) => {
+      $toast.error(err.message || "Error loading data");
+    });
+};
+
+const scroll = () => {
+  // For infinite loading
+  window.onscroll = () => {
+    // Don't proceed if all files are loaded
+    if (all_files_loaded.value) {
+      return;
+    }
+
+    // Scroll position
+    const scrollPosition =
+      Math.max(
+        window.pageYOffset,
+        document.documentElement.scrollTop,
+        document.body.scrollTop
+      ) +
+      window.innerHeight +
+      50;
+    const bottomOfWindow =
+      scrollPosition >= document.documentElement.offsetHeight;
+
+    // Avoid the number of requests
+    if (timer.value) {
+      clearTimeout(timer.value);
+      timer.value = null;
+    }
+
+    // Load next page
+    if (bottomOfWindow && !all_files_loaded.value) {
+      page_loading.value = true;
+      timer.value = setTimeout(() => {
+        page.value++;
+        getQuestionList();
+      }, 800);
+    }
+  };
+};
+
+const filterChanged = (type) => {
+  if (type == "level") {
+    filter.grade = "";
+    filter.lesson = "";
+    if (filter.level) getTypeList("base", filter.level);
+
+    page.value = 1;
+    all_files_loaded.value = false;
+
+    grade_list.value = [];
+    lesson_list.value = [];
+    question_list.value = [];
+
+    getQuestionList();
+  } else if (type == "grade") {
+    filter.lesson = "";
+    if (filter.grade) getTypeList("lesson", filter.grade);
+
+    page.value = 1;
+    all_files_loaded.value = false;
+    question_list.value = [];
+    lesson_list.value = [];
+    getQuestionList();
+  } else if (type == "lesson") {
+    page.value = 1;
+    all_files_loaded.value = false;
+    question_list.value = [];
+    getQuestionList();
+  }
+};
+
+const openDeleteConfirmDialog = (item_id, index) => {
+  delete_question_id.value = item_id;
+  delete_question_index.value = index;
+  deleteConfirmDialog.value = true;
+};
+
+const deleteQuestion = async () => {
+  delete_loading.value = true;
+
+
+
+  try {
+    await $fetch(`/api/v1/questions/${delete_question_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: userToken.value,
+      },
+    });
+    question_list.value.splice(delete_question_index.value, 1);
+    delete_question_id.value = null;
+    delete_question_index.value = null;
+    deleteConfirmDialog.value = false;
+    $toast.success("Deleted successfully");
+  } catch (e) {
+    if (e.response?.status == 400) {
+      $toast.error(e.response.data.message || "Error deleting question");
+    }
+
+    delete_question_id.value = null;
+    delete_question_index.value = null;
+    deleteConfirmDialog.value = false;
+  } finally {
+    delete_loading.value = false;
+  }
+};
+
+// Initialize on mount
+onMounted(() => {
+  userToken.value = localStorage.getItem("auth._token.local");
+  getQuestionList();
+  getTypeList("section");
+  scroll();
+});
 </script>
 
 <style scoped>
 p {
   font-size: 1.4rem;
+}
+table > thead > tr > th {
+  color: rgba(0, 0, 0, 0.6);
+}
+.v-table > .v-table__wrapper > table > tbody > tr > td,
+.v-table > .v-table__wrapper > table > thead > tr > th,
+.v-table > .v-table__wrapper > table > tfoot > tr > th {
+  padding: 14px 6px !important;
+}
+
+.v-table > .v-table__wrapper > table > tbody > tr:hover {
+  background-color: #eeeeeeb1 !important;
 }
 </style>

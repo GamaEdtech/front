@@ -992,7 +992,7 @@ const textAreaHeight = ref(10);
 const emoji_box = ref(false);
 const breads = ref([
   {
-    title: "Forum",
+    text: "Forum",
     disabled: false,
     href: "/search?type=question",
   },
@@ -1030,22 +1030,27 @@ function increaseTextAreaHeight() {
 }
 
 function initBreadCrumb() {
+  // Clear any existing breadcrumbs except the first "Forum" item
+  while (breads.value.length > 1) {
+    breads.value.pop();
+  }
+  
   if (contentData.value && Object.keys(contentData.value).length > 0) {
     breads.value.push(
       {
-        title: contentData.value.section_title,
+        text: contentData.value.section_title,
         disabled: false,
-        href: `/search?type=question&section=${contentData.value.section_title}`,
+        href: `/search?type=question&section=${contentData.value.section}`,
       },
       {
-        title: contentData.value.base_title,
+        text: contentData.value.base_title,
         disabled: false,
-        href: `/search?type=question&section=${contentData.value.section_title}&base=${contentData.value.base_title}`,
+        href: `/search?type=question&section=${contentData.value.section}&base=${contentData.value.base}`,
       },
       {
-        title: contentData.value.lesson_title,
+        text: contentData.value.lesson_title,
         disabled: false,
-        href: `/search?type=question&section=${contentData.value.section_title}&base=${contentData.value.base_title}&lesson=${contentData.value.lesson_title}`,
+        href: `/search?type=question&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
       }
     );
   }
