@@ -748,6 +748,11 @@ export default {
           link: "/user",
         },
         {
+          title: "Wallet",
+          icon: "mdi-wallet",
+          link: "/user/wallet",
+        },
+        {
           title: "Messages",
           icon: "mdi-email-outline",
           link: "/user/ticket",

@@ -9,6 +9,9 @@ html {
 .gray--text {
   color: #98a2b3 !important;
 }
+.yellow--text-darken {
+  color: #ffb600 !important;
+}
 
 .primary-gray-100 {
   color: var(--primary-grey-100, #f2f4f7);
@@ -24,6 +27,10 @@ html {
 
 .primary-gray-400 {
   color: var(--Primary-Grey-400, #98a2b3);
+}
+
+.primary-gray-500 {
+  color: var(--Primary-Grey-500, #667085);
 }
 
 .primary-gray-600 {
@@ -4596,6 +4603,10 @@ body {
   text-overflow: ellipsis;
 }
 
-.flex-grow-1{
+.flex-grow-1 {
   flex-grow: 1;
+}
+
+.h-full {
+  height: 100% !important;
 }
