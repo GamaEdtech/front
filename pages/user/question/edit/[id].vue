@@ -16,7 +16,7 @@
                 @submit.prevent="onSubmit"
                 lazy-validation
               >
-                <v-row class="py-1">
+                <v-row class="py-2">
                   <v-col cols="12" md="3">
                     <v-autocomplete
                       required
