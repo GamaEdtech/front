@@ -141,7 +141,7 @@ export default class Car {
         this.mesh.scale.set(0.8, 0.8, 0.8)
         this.mesh.position.x = this.positionX
         this.mesh.position.z = this.getFinalZ(this.positionX, this.currentLane)
-        this.mesh.position.y = 0.6
+        this.mesh.position.y = 0.5
         this.scene.add(this.mesh)
         this.wheels = {}
         this.mesh.traverse((child) => {

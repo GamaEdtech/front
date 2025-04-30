@@ -165,6 +165,10 @@ export default class Experience {
         this.isPlayingGame = statusGame
     }
 
+    changeCameraMode(mode) {
+        this.camera.cameraMode = mode
+    }
+
     resetGame() {
         if (this.world && this.world.car) {
             this.world.car.reset()

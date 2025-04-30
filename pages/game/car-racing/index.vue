@@ -18,6 +18,12 @@
                 <div :class="['timer-box', { 'danger': timerDanger }]">
                     {{ Math.ceil(timer) }}
                 </div>
+                <button class="camera-btn btn" @click="changeCameraMode">
+                    <img class="icon-mode highligth"
+                        :src="`${cameraMode == `default` ? require(`@/assets/images/webcam-icon.svg`) : require(`@/assets/images/camera-icon.svg`)}`"
+                        alt="Camera Mode">
+                </button>
+
             </div>
 
         </div>
@@ -118,7 +124,7 @@ export default {
                 // },
             ],
             currentQuestionIndex: 0,
-            timer: 15,
+            timer: 30,
             timerDanger: false,
             isPlayingGame: false,
             score: 0,
@@ -126,7 +132,8 @@ export default {
             isLoading: false,
             currentCountFirstPlay: 3,
             showCounterFirstPlay: false,
-            isFirstTimePlayingGame: true
+            isFirstTimePlayingGame: true,
+            cameraMode: 'default'
         };
     },
     mounted() {
@@ -202,7 +209,7 @@ export default {
             this.isLoading = true
             this.experience.resetGame()
             this.currentQuestionIndex = 0
-            this.timer = 15
+            this.timer = 30
             this.questionStatus = "normal"
             this.timerDanger = false
             this.score = 0
@@ -227,6 +234,15 @@ export default {
                     this.currentCountFirstPlay = 0;
                     this.showCounterFirstPlay = false;
                 }, 500);
+            }
+        },
+        changeCameraMode() {
+            if (this.cameraMode == "default") {
+                this.experience.changeCameraMode("close")
+                this.cameraMode = "close"
+            } else {
+                this.experience.changeCameraMode("default")
+                this.cameraMode = "default"
             }
         }
 
@@ -427,6 +443,24 @@ export default {
 }
 
 
+/* mode camera */
+.camera-btn {
+    background: linear-gradient(135deg, #ffeaa7, #ff8400);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.icon-mode {
+    width: 50%;
+    height: 50%;
+    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
+}
 
 /* pause icon */
 .pause-btn {
@@ -439,6 +473,17 @@ export default {
     justify-content: center;
     cursor: pointer;
     transition: all 0.5s;
+}
+
+.btn {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
+    border: none;
 }
 
 .btn:active {
@@ -636,6 +681,11 @@ export default {
         height: 60px;
     }
 
+    .camera-btn {
+        width: 60px;
+        height: 60px;
+    }
+
     .pause-btn {
         width: 60px;
         height: 60px;
@@ -650,6 +700,16 @@ export default {
     .question-box {
         padding: 10px 15px;
         font-size: 30px;
+    }
+
+    .container-timer-score {
+        column-gap: 6px;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+
+    .top-items {
+        align-items: flex-start;
     }
 }
 </style>

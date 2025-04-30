@@ -20,6 +20,9 @@ export default class Camera {
         this.positionMiddleRoad = this.options.mountainWidth + (this.options.groundWidth / 2)
         this.smoothX = null
 
+        this.cameraMode = 'default'
+
+
         window.addEventListener("keydown", (event) => {
             if (event.key == "ArrowUp") {
                 this.positionX += this.speed
@@ -68,24 +71,35 @@ export default class Camera {
         CameraFolder.add(this.instance.position, "x").name("x Camera").min(-100).max(200).step(1)
         CameraFolder.add(this.instance.position, "y").name("y Camera").min(-100).max(200).step(1)
         CameraFolder.add(this.instance.position, "z").name("z Camera").min(-100).max(200).step(1)
-
     }
 
 
     update() {
         this.controls.update()
 
-        // this.positionX += this.speed * this.time.delta / 1000
-        this.positionX = this.experience.world.car.positionX - this.options.distanceCameraFromCar
-        if (this.smoothX === null) this.smoothX = this.positionX
-        this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
-        this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
-        this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
+        if (this.cameraMode == "default") {
+            this.positionX = this.experience.world.car.positionX - this.options.distanceCameraFromCar
+
+            if (this.smoothX === null) this.smoothX = this.positionX
+            this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
+            this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
+            this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
+
+            const targetFov = 75 + this.options.carBaseSpeed * 0.5
+            this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
+        } else {
+            this.positionX = this.experience.world.car.positionX - 0.85
+
+            if (this.smoothX === null) this.smoothX = this.positionX
+            this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
+            this.instance.position.set(this.smoothX, 2, this.experience.world.car.mesh.position.z)
+            this.instance.lookAt(this.smoothX + 15, 1, this.calculatePositionZ(this.smoothX + 15))
 
 
+            const targetFov = 100 + this.options.carBaseSpeed * 0.5
+            this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
 
-        const targetFov = 75 + this.options.carBaseSpeed * 0.5
-        this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
+        }
 
         this.instance.updateProjectionMatrix();
     }
