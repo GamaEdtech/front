@@ -346,7 +346,9 @@ export default defineComponent({
       if (this.loading || (loadMore && !this.hasMoreItems)) return;
 
       this.loading = true;
-      const skip = loadMore ? this.mobileTransactions.length : 0;
+      const skip = loadMore
+        ? this.mobileTransactions.length
+        : (this.currentPage - 1) * this.pageSize;
 
       try {
         const response = await this.$axios.$get("/api/v2/transactions", {
