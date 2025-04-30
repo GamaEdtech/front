@@ -13,11 +13,10 @@ import {
   Tooltip,
   ArcElement,
   CategoryScale,
-  Legend,
 } from "chart.js";
 import { Pie } from "vue-chartjs";
 
-ChartJS.register(Title, Tooltip, ArcElement, CategoryScale, Legend);
+ChartJS.register(Title, Tooltip, ArcElement, CategoryScale);
 
 export default {
   name: "PieChart",
@@ -45,7 +44,7 @@ export default {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: "top",
+            display: false,
           },
         },
       },
