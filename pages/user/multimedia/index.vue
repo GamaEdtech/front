@@ -3,8 +3,7 @@
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
         <v-col cols="12" class="pl-5">
-          <span class="icon icong-test text-h3 teal--text"></span>
-          <span class="text-h4 teal--text"> Multimedia </span>
+          <span class="text-h4" style="color: #009688">Multimedia</span>
         </v-col>
       </v-row>
 
@@ -12,41 +11,41 @@
       <v-row class="d-none d-md-flex">
         <v-col cols="12" md="3">
           <v-autocomplete
-            dense
+            density="compact"
+            variant="outlined"
             v-model="filter.level"
             clearable
             :items="level_list"
-            item-text="title"
+            item-title="title"
             item-value="id"
             label="Curriculum"
-            outlined
-            @change="filterChanged('level')"
+            @update:model-value="filterChanged('level')"
           />
         </v-col>
         <v-col cols="12" md="3">
           <v-autocomplete
-            dense
+            density="compact"
+            variant="outlined"
             v-model="filter.grade"
             clearable
             :items="grade_list"
             item-value="id"
-            item-text="title"
+            item-title="title"
             label="Grade"
-            outlined
-            @change="filterChanged('grade')"
+            @update:model-value="filterChanged('grade')"
           />
         </v-col>
         <v-col cols="12" md="3">
           <v-autocomplete
-            dense
+            density="compact"
+            variant="outlined"
             :items="lesson_list"
             item-value="id"
-            item-text="title"
+            item-title="title"
             v-model="filter.lesson"
             clearable
             label="Subject"
-            outlined
-            @change="filterChanged('lesson')"
+            @update:model-value="filterChanged('lesson')"
           />
         </v-col>
       </v-row>
@@ -59,7 +58,7 @@
               <v-btn
                 to="/user/multimedia/create"
                 color="teal"
-                class="white--text"
+                class="text-white"
               >
                 New Multimedia
               </v-btn>
@@ -69,293 +68,355 @@
         <v-card-text class="px-sm-8 px-md-4">
           <v-row>
             <v-col cols="12" class="px-0 px-sm-4 px-md-4">
-              <v-simple-table class="content_table">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left text-h5">#</th>
-                      <th class="text-center text-h5">Title</th>
-                      <th class="text-center text-h5">Score</th>
-                      <th class="text-center text-h5">Download</th>
-                      <th class="text-center text-h5">Date</th>
-                      <th class="text-center text-h5">Status</th>
-                      <th class="text-center text-h5">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-show="multimedia_list.length > 0"
-                      v-for="item in multimedia_list"
-                      :key="item.id"
-                    >
-                      <td>{{ item.id }}</td>
-                      <td class="text-center" style="max-width: 20rem">
-                        <a
-                          :href="`/multimedia/${item.id}/${item.title}`"
-                          target="_blank"
-                        >
-                          {{ item.title }}
-                        </a>
-                      </td>
-                      <td class="text-center">
-                        {{ item.teacher_score }}
-                      </td>
-                      <td class="text-center">
-                        {{ item.downloads }}
-                      </td>
-                      <td class="text-center">
-                        {{ item.subdate }}
-                      </td>
-                      <td class="text-center">
-                        {{ calcStatus(item.status) }}
-                      </td>
-                      <td class="text-center">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                              icon
-                              color="green"
-                              :to="`/multimedia/${item.id}`"
-                              target="_blank"
-                              small
-                              v-bind="attrs"
-                              v-on="on"
-                            >
-                              <v-icon small> mdi-eye </v-icon>
-                            </v-btn>
-                          </template>
-                          <span>View</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                              icon
-                              small
-                              v-bind="attrs"
-                              v-on="on"
-                              :to="`/user/multimedia/edit/${item.id}`"
-                            >
-                              <v-icon small> mdi-note-edit-outline </v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Edit</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                              icon
-                              color="error"
-                              @click="openDeleteConfirmDialog(item.id)"
-                              small
-                              v-bind="attrs"
-                              v-on="on"
-                            >
-                              <v-icon small> mdi-delete </v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Delete</span>
-                        </v-tooltip>
-                      </td>
-                    </tr>
-                    <tr
-                      v-show="
-                        page_loading === false && multimedia_list.length === 0
-                      "
-                    >
-                      <td colspan="7" class="text-center">
-                        <p>Oops! no data found</p>
-                      </td>
-                    </tr>
-                    <tr v-show="page_loading">
-                      <td colspan="7" class="text-center">
-                        <v-progress-circular
-                          :size="30"
-                          :width="3"
-                          class="mt-12 mb-12"
-                          color="orange"
-                          indeterminate
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+              <v-table class="content_table">
+                <thead>
+                  <tr>
+                    <th class="text-left text-h5">#</th>
+                    <th class="text-center text-h5">Title</th>
+                    <th class="text-center text-h5">Score</th>
+                    <th class="text-center text-h5">Download</th>
+                    <th class="text-center text-h5">Date</th>
+                    <th class="text-center text-h5">Status</th>
+                    <th class="text-center text-h5">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-show="multimedia_list.length > 0"
+                    v-for="item in multimedia_list"
+                    :key="item.id"
+                  >
+                    <td>{{ item.id }}</td>
+                    <td class="text-center" style="max-width: 20rem">
+                      <a
+                        :href="`/multimedia/${item.id}/${item.title}`"
+                        target="_blank"
+                      >
+                        {{ item.title }}
+                      </a>
+                    </td>
+                    <td class="text-center">
+                      {{ item.teacher_score }}
+                    </td>
+                    <td class="text-center">
+                      {{ item.downloads }}
+                    </td>
+                    <td class="text-center">
+                      {{ item.subdate }}
+                    </td>
+                    <td class="text-center">
+                      {{ calcStatus(item.status) }}
+                    </td>
+                    <td class="text-center">
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <v-btn
+                            icon
+                            color="green"
+                            :to="`/multimedia/${item.id}`"
+                            target="_blank"
+                            size="small"
+                            v-bind="props"
+                          >
+                            <v-icon size="small">mdi-eye</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>View</span>
+                      </v-tooltip>
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <v-btn
+                            icon
+                            size="small"
+                            v-bind="props"
+                            :to="`/user/multimedia/edit/${item.id}`"
+                          >
+                            <v-icon size="small">mdi-note-edit-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Edit</span>
+                      </v-tooltip>
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <v-btn
+                            icon
+                            color="error"
+                            @click="confirmDelete(item.id)"
+                            size="small"
+                            v-bind="props"
+                          >
+                            <v-icon size="small">mdi-delete</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Delete</span>
+                      </v-tooltip>
+                    </td>
+                  </tr>
+                  <tr
+                    v-show="
+                      page_loading === false && multimedia_list.length === 0
+                    "
+                  >
+                    <td colspan="7" class="text-center">
+                      <p>Oops! no data found</p>
+                    </td>
+                  </tr>
+                  <tr v-show="page_loading">
+                    <td colspan="7" class="text-center">
+                      <v-progress-circular
+                        :size="30"
+                        :width="3"
+                        class="mt-12 mb-12"
+                        color="orange"
+                        indeterminate
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
             </v-col>
           </v-row>
         </v-card-text>
       </v-card>
     </v-col>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="500px">
+      <v-card>
+        <v-card-title>Delete Multimedia</v-card-title>
+        <v-card-text>Are you sure you want to delete this multimedia?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" variant="text" @click="deleteMultimedia">Delete</v-btn>
+          <v-btn color="primary" variant="text" @click="deleteDialog = false">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
-<script>
-export default {
-  layout: "dashboard_layout",
-  name: "multimedia-manage",
-  data() {
-    return {
-      multimedia_list: [],
+<script setup>
+definePageMeta({
+  layout: "dashboard-layout",
+});
 
-      //Filter section
-      filter: {
-        level: "",
-        grade: "",
-        lesson: "",
-      },
-      level_list: [],
-      grade_list: [],
-      field_list: [],
-      lesson_list: [],
-      //End filter section
+useHead({
+  title: "Multimedia Management",
+});
 
-      //Paginate section
-      page_loading: false,
-      page: 1,
-      all_files_loaded: false,
-      //End paginate section
-    };
-  },
-  head() {
-    return {
-      title: "Multimedia manage",
-    };
-  },
-  mounted() {
-    this.getMultimediaList();
-    this.getTypeList("section");
-    this.scroll();
-  },
-  methods: {
-    getMultimediaList() {
-      if (!this.all_files_loaded) {
-        this.page_loading = true;
-        this.$fetch
-          .$get("/api/v1/files", {
-            params: {
-              perpage: 20,
-              page: this.page,
-              section: this.filter.level,
-              base: this.filter.grade,
-              lesson: this.filter.lesson,
-            },
-          })
-          .then((response) => {
-            this.multimedia_list.push(...response.data.list);
+// Services
+const { $toast } = useNuxtApp();
+import { useAuth } from '~/composables/useAuth';
 
-            if (response.data.list.length === 0)
-              //For terminate auto load request
-              this.all_files_loaded = true;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => {
-            this.page_loading = false;
-          });
+const router = useRouter();
+
+// User token
+const auth = useAuth();
+const userToken = ref('');
+
+// Data
+const multimedia_list = ref([]);
+
+// Delete dialog
+const deleteDialog = ref(false);
+const deleteId = ref(null);
+
+// Filter section
+const filter = reactive({
+  level: "",
+  grade: "",
+  lesson: "",
+});
+
+const level_list = ref([]);
+const grade_list = ref([]);
+const lesson_list = ref([]);
+
+// Pagination
+const page_loading = ref(false);
+const page = ref(1);
+const all_files_loaded = ref(false);
+const timer = ref(null);
+
+// Methods
+const getMultimediaList = async () => {
+  if (!all_files_loaded.value) {
+    page_loading.value = true;
+    
+    try {
+      const response = await $fetch("/api/v1/files", {
+        method: "GET",
+        params: {
+          perpage: 20,
+          page: page.value,
+          section: filter.level,
+          base: filter.grade,
+          lesson: filter.lesson,
+        },
+        headers: {
+          Authorization: userToken.value,
+        },
+      });
+      
+      multimedia_list.value.push(...response.data.list);
+      
+      // For terminate auto load request
+      if (response.data.list.length === 0) {
+        all_files_loaded.value = true;
       }
-    },
-    calcStatus(val) {
-      let title = "";
-      if (val == 0) title = "Unreviewed";
-      else if (val == 1) title = "Confirmed";
-      else if (val == 2) title = "Reference to type unit";
-      else if (val == 3) title = "Has a message";
-      else if (val == 4) title = "Inactive";
-      else if (val == 5) title = "Edited";
-      return title;
-    },
-    getTypeList(type, parent = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
-      }
-
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            this.level_list = res.data;
-          } else if (type === "base") {
-            this.grade_list = res.data;
-          } else if (type === "lesson") {
-            this.lesson_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-
-    scroll() {
-      //For infinite loading
-      window.onscroll = () => {
-        //Scroll position
-        var scrollPosition =
-          Math.max(
-            window.pageYOffset,
-            document.documentElement.scrollTop,
-            document.body.scrollTop
-          ) +
-          window.innerHeight +
-          50;
-        let bottomOfWindow =
-          scrollPosition >= document.documentElement.offsetHeight;
-
-        //Avoid the number of requests
-        if (this.timer) {
-          clearTimeout(this.timer);
-          this.timer = null;
-        }
-
-        //Load next page
-        if (bottomOfWindow && this.all_files_loaded === false) {
-          this.page_loading = true;
-          this.timer = setTimeout(() => {
-            this.page++;
-            this.getMultimediaList();
-          }, 800);
-        }
-      };
-    },
-
-    filterChanged(type) {
-      if (type == "level") {
-        this.filter.grade = "";
-        this.filter.lesson = "";
-        if (this.filter.level) this.getTypeList("base", this.filter.level);
-
-        this.page = 1;
-        this.all_files_loaded = false;
-
-        this.grade_list = [];
-        this.lesson_list = [];
-        this.multimedia_list = [];
-
-        this.getMultimediaList();
-      } else if (type == "grade") {
-        this.filter.lesson = "";
-        if (this.filter.grade) this.getTypeList("lesson", this.filter.grade);
-
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.multimedia_list = [];
-        this.lesson_list = [];
-        this.getMultimediaList();
-      } else if (type == "lesson") {
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.multimedia_list = [];
-        this.getMultimediaList();
-      }
-    },
-  },
+    } catch (err) {
+      console.error(err);
+      $toast.error("Error loading multimedia");
+    } finally {
+      page_loading.value = false;
+    }
+  }
 };
+
+const calcStatus = (val) => {
+  let title = "";
+  if (val == 0) title = "Unreviewed";
+  else if (val == 1) title = "Confirmed";
+  else if (val == 2) title = "Reference to type unit";
+  else if (val == 3) title = "Has a message";
+  else if (val == 4) title = "Inactive";
+  else if (val == 5) title = "Edited";
+  return title;
+};
+
+const getTypeList = async (type, parent = "") => {
+  const params = { type };
+  
+  if (type === "base") params.section_id = parent;
+  if (type === "lesson") params.base_id = parent;
+  
+  try {
+    const response = await $fetch("/api/v1/types/list", {
+      method: "GET",
+      params,
+      headers: {
+        Authorization: userToken.value,
+      },
+    });
+    
+    if (type === "section") {
+      level_list.value = response.data;
+    } else if (type === "base") {
+      grade_list.value = response.data;
+    } else if (type === "lesson") {
+      lesson_list.value = response.data;
+    }
+  } catch (err) {
+    $toast.error(err.message || "Error loading data");
+  }
+};
+
+const setupInfiniteScroll = () => {
+  window.onscroll = () => {
+    // Scroll position
+    const scrollPosition =
+      Math.max(
+        window.pageYOffset,
+        document.documentElement.scrollTop,
+        document.body.scrollTop
+      ) +
+      window.innerHeight +
+      50;
+    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight;
+    
+    // Avoid the number of requests
+    if (timer.value) {
+      clearTimeout(timer.value);
+      timer.value = null;
+    }
+    
+    // Load next page
+    if (bottomOfWindow && !all_files_loaded.value) {
+      page_loading.value = true;
+      timer.value = setTimeout(() => {
+        page.value++;
+        getMultimediaList();
+      }, 800);
+    }
+  };
+};
+
+const filterChanged = (type) => {
+  if (type == "level") {
+    filter.grade = "";
+    filter.lesson = "";
+    
+    if (filter.level) getTypeList("base", filter.level);
+    
+    page.value = 1;
+    all_files_loaded.value = false;
+    
+    grade_list.value = [];
+    lesson_list.value = [];
+    multimedia_list.value = [];
+    
+    getMultimediaList();
+  } else if (type == "grade") {
+    filter.lesson = "";
+    
+    if (filter.grade) getTypeList("lesson", filter.grade);
+    
+    page.value = 1;
+    all_files_loaded.value = false;
+    multimedia_list.value = [];
+    lesson_list.value = [];
+    
+    getMultimediaList();
+  } else if (type == "lesson") {
+    page.value = 1;
+    all_files_loaded.value = false;
+    multimedia_list.value = [];
+    
+    getMultimediaList();
+  }
+};
+
+const confirmDelete = (id) => {
+  deleteId.value = id;
+  deleteDialog.value = true;
+};
+
+const deleteMultimedia = async () => {
+  try {
+    await $fetch(`/api/v1/files/${deleteId.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: userToken.value,
+      },
+    });
+    
+    $toast.success("Multimedia deleted successfully");
+    
+    // Remove the item from the list
+    multimedia_list.value = multimedia_list.value.filter(item => item.id !== deleteId.value);
+    
+    // Close the dialog
+    deleteDialog.value = false;
+  } catch (err) {
+    $toast.error(err.message || "Error deleting multimedia");
+  }
+};
+
+// Initialize
+onMounted(() => {
+  userToken.value = auth.getUserToken();
+  getMultimediaList();
+  getTypeList("section");
+  setupInfiniteScroll();
+});
+
+// Cleanup
+onUnmounted(() => {
+  window.onscroll = null;
+  if (timer.value) {
+    clearTimeout(timer.value);
+  }
+});
 </script>
 
 <style scoped>
