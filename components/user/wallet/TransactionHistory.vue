@@ -34,7 +34,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="py-4">
+      <div v-if="loading && !hasMoreItems" class="py-4">
         <v-skeleton-loader
           v-for="i in 3"
           :key="i"
@@ -43,63 +43,114 @@
         ></v-skeleton-loader>
       </div>
 
-      <!-- Transactions List -->
+      <!-- Transactions List with Infinite Scroll -->
       <v-list v-else class="transaction-list pa-0" flat>
-        <v-list-item
-          v-for="(transaction, i) in filteredTransactions"
-          :key="i"
-          class="transaction-item py-3"
+        <div
+          ref="infiniteContainer"
+          class="infinite-container"
+          @scroll="handleScroll"
         >
-          <v-list-item-content>
-            <div class="d-flex flex-column">
-              <div class="transaction-name mb-1">
-                {{ transaction.description }}
-              </div>
-              <div class="d-flex align-center">
-                <div class="" v-if="transaction.isDebit">
-                  <div class="state-icon-wrapper spent">
-                    <span class="state-icon spent align-center">
-                      <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
-                    </span>
-                    <span class="state-text spent ml-2">Spent</span>
+          <v-list-item
+            v-for="(transaction, i) in filteredMobileTransactions"
+            :key="i"
+            class="transaction-item py-3"
+          >
+            <v-list-item-content>
+              <div class="d-flex flex-column">
+                <div class="transaction-name mb-1">
+                  {{ transaction.description }}
+                </div>
+                <div class="d-flex align-center">
+                  <div class="" v-if="transaction.isDebit">
+                    <div class="state-icon-wrapper spent">
+                      <span class="state-icon spent align-center">
+                        <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
+                      </span>
+                      <span class="state-text spent ml-2">Spent</span>
+                    </div>
+                  </div>
+                  <div class="" v-else>
+                    <div class="state-icon-wrapper earned">
+                      <span class="state-icon earned align-center">
+                        <v-icon color="green" size="18"
+                          >mdi-tray-arrow-down</v-icon
+                        >
+                      </span>
+                      <span class="state-text earned ml-2">Earned</span>
+                    </div>
                   </div>
                 </div>
-                <div class="" v-else>
-                  <div class="state-icon-wrapper earned">
-                    <span class="state-icon earned align-center">
-                      <v-icon color="green" size="18"
-                        >mdi-tray-arrow-down</v-icon
-                      >
-                    </span>
-                    <span class="state-text earned ml-2">Earned</span>
-                  </div>
+              </div>
+            </v-list-item-content>
+
+            <v-list-item-action class="transaction-details">
+              <div class="d-flex flex-column align-end">
+                <div class="transaction-amount mb-1">
+                  <span class="font-weight-medium">{{
+                    transaction.points
+                  }}</span>
+                  <span class="ml-1 caption grey--text">$GET</span>
+                </div>
+                <div class="d-flex align-center">
+                  <v-icon x-small class="mr-1 grey--text text--lighten-1"
+                    >mdi-clock-outline</v-icon
+                  >
+                  <span class="caption grey--text text--darken-1">{{
+                    transaction.creationDate
+                  }}</span>
                 </div>
               </div>
-            </div>
-          </v-list-item-content>
+            </v-list-item-action>
+          </v-list-item>
 
-          <v-list-item-action class="transaction-details">
-            <div class="d-flex flex-column align-end">
-              <div class="transaction-amount mb-1">
-                <span class="font-weight-medium">{{ transaction.points }}</span>
-                <span class="ml-1 caption grey--text">$GET</span>
-              </div>
-              <div class="d-flex align-center">
-                <v-icon x-small class="mr-1 grey--text text--lighten-1"
-                  >mdi-clock-outline</v-icon
-                >
-                <span class="caption grey--text text--darken-1">{{
-                  transaction.creationDate
-                }}</span>
-              </div>
-            </div>
-          </v-list-item-action>
-        </v-list-item>
+          <!-- Loading More Indicator -->
+          <div v-if="loading && hasMoreItems" class="pa-4 text-center">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+              size="24"
+            ></v-progress-circular>
+          </div>
 
-        <!-- Empty State -->
-        <div v-if="filteredTransactions.length === 0" class="text-center py-8">
-          <v-icon size="64" color="grey lighten-2">mdi-wallet-outline</v-icon>
-          <p class="mt-4 grey--text">No transactions found</p>
+          <!-- End of List Message -->
+          <div
+            v-if="!hasMoreItems && filteredMobileTransactions.length > 0"
+            class="pa-4 text-center"
+          >
+            <span class="caption grey--text">No more transactions</span>
+          </div>
+
+          <!-- Empty States for Different Tabs -->
+          <div
+            v-if="filteredMobileTransactions.length === 0 && !loading"
+            class="text-center py-8"
+          >
+            <!-- All Transactions Empty State -->
+            <template v-if="activeTab === 0">
+              <v-icon size="64" color="grey lighten-2"
+                >mdi-wallet-outline</v-icon
+              >
+              <p class="mt-4 grey--text">No transactions found</p>
+            </template>
+
+            <!-- Earned Transactions Empty State -->
+            <template v-if="activeTab === 1">
+              <v-icon size="64" color="green lighten-4">mdi-cash-plus</v-icon>
+              <p class="mt-4 grey--text">No earned transactions yet</p>
+              <p class="caption grey--text text--darken-1">
+                Complete tasks to earn $GET
+              </p>
+            </template>
+
+            <!-- Spent Transactions Empty State -->
+            <template v-if="activeTab === 2">
+              <v-icon size="64" color="red lighten-4">mdi-cash-minus</v-icon>
+              <p class="mt-4 grey--text">No spent transactions yet</p>
+              <p class="caption grey--text text--darken-1">
+                Your spending history will appear here
+              </p>
+            </template>
+          </div>
         </div>
       </v-list>
     </div>
@@ -203,10 +254,13 @@ export default defineComponent({
       activeTab: 0,
       loading: false,
       transactions: [],
+      mobileTransactions: [], // Separate array for mobile view
       token: "",
       currentPage: 1,
       pageSize: 10,
       totalRecords: 0,
+      hasMoreItems: true,
+      loadingMore: false,
       headers: [
         {
           text: "Description",
@@ -257,6 +311,30 @@ export default defineComponent({
       }
       return this.transactions;
     },
+    filteredMobileTransactions() {
+      if (this.activeTab === 0) {
+        // All transactions
+        return this.mobileTransactions;
+      } else if (this.activeTab === 1) {
+        // Earned transactions (isDebit = false)
+        return this.mobileTransactions.filter(
+          (transaction) => !transaction.isDebit
+        );
+      } else if (this.activeTab === 2) {
+        // Spent transactions (isDebit = true)
+        return this.mobileTransactions.filter(
+          (transaction) => transaction.isDebit
+        );
+      }
+      return this.mobileTransactions;
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.pageSize + 1;
+    },
+    endIndex() {
+      const end = this.currentPage * this.pageSize;
+      return end > this.totalRecords ? this.totalRecords : end;
+    },
   },
   methods: {
     getToken() {
@@ -264,12 +342,14 @@ export default defineComponent({
         this.token = localStorage.getItem("v2_token") || "";
       }
     },
-    fetchTransactions() {
-      this.loading = true;
-      const skip = (this.currentPage - 1) * this.pageSize;
+    async fetchTransactions(loadMore = false) {
+      if (this.loading || (loadMore && !this.hasMoreItems)) return;
 
-      this.$axios
-        .$get("/api/v2/transactions", {
+      this.loading = true;
+      const skip = loadMore ? this.mobileTransactions.length : 0;
+
+      try {
+        const response = await this.$axios.$get("/api/v2/transactions", {
           params: {
             "PagingDto.PageFilter.Size": this.pageSize,
             "PagingDto.PageFilter.Skip": skip,
@@ -278,30 +358,46 @@ export default defineComponent({
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
-        })
-        .then((response) => {
-          if (response.succeeded && response.data) {
-            this.transactions = response.data.list;
-            this.totalRecords = response.data.totalRecordsCount;
-          } else {
-            this.transactions = [];
-            this.totalRecords = 0;
-          }
-        })
-        .catch((err) => {
-          if (err.response && err.response.status == 403) {
-            this.$auth.logout();
-          }
-          console.error("Error fetching transactions:", err);
-          this.transactions = [];
-          this.totalRecords = 0;
-        })
-        .finally(() => {
-          this.loading = false;
         });
+
+        if (response.succeeded && response.data) {
+          if (loadMore) {
+            this.mobileTransactions = [
+              ...this.mobileTransactions,
+              ...response.data.list,
+            ];
+          } else {
+            this.mobileTransactions = response.data.list;
+            this.transactions = response.data.list; // Keep desktop view updated
+          }
+          this.totalRecords = response.data.totalRecordsCount;
+          this.hasMoreItems =
+            this.mobileTransactions.length < this.totalRecords;
+        }
+      } catch (err) {
+        if (err.response && err.response.status == 403) {
+          this.$auth.logout();
+        }
+        console.error("Error fetching transactions:", err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleScroll(event) {
+      const container = event.target;
+      const scrollPosition = container.scrollTop + container.clientHeight;
+      const scrollThreshold = container.scrollHeight - 100; // Load more when within 100px of bottom
+
+      if (
+        scrollPosition >= scrollThreshold &&
+        !this.loading &&
+        this.hasMoreItems
+      ) {
+        this.fetchTransactions(true);
+      }
     },
     handleTabChange() {
-      // No need to fetch transactions again, just let the computed property handle filtering
+      // No need to reset or fetch, just let the computed property handle filtering
     },
     getStateColor(state) {
       switch (state) {
@@ -583,5 +679,95 @@ export default defineComponent({
 ::v-deep .v-data-footer__icons-before,
 ::v-deep .v-data-footer__icons-after {
   font-size: 18px !important;
+}
+
+.mobile-pagination {
+  border-top: 1px solid #f0f0f0;
+  margin-top: 16px;
+  background: white;
+}
+
+.mobile-rows-select {
+  min-width: 140px;
+}
+
+::v-deep .mobile-select {
+  max-width: 65px;
+}
+
+::v-deep .mobile-select .v-input__slot {
+  min-height: 24px !important;
+  padding: 0 !important;
+}
+
+::v-deep .mobile-select .v-select__selection {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+::v-deep .mobile-select .v-input__append-inner {
+  margin-top: 2px !important;
+}
+
+::v-deep .mobile-select .v-icon {
+  font-size: 16px;
+}
+
+::v-deep .mobile-pagination .v-btn.v-btn--icon.v-size--x-small {
+  width: 20px;
+  height: 20px;
+}
+
+::v-deep .mobile-pagination .v-btn.v-btn--icon.v-size--x-small .v-icon {
+  font-size: 16px;
+}
+
+.caption {
+  font-size: 12px !important;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.infinite-container {
+  height: calc(100vh - 300px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.transaction-list {
+  margin-top: 8px;
+  height: 100%;
+}
+
+/* Add smooth scrolling behavior */
+.infinite-container {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.infinite-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.infinite-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.empty-state-icon {
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 8px;
+}
+
+.empty-state-subtext {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.38);
 }
 </style>

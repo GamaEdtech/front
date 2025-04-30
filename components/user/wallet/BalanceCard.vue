@@ -6,7 +6,7 @@
         @click="toggleBalanceVisibility"
       >
         <span class="text-xl-h4 gray--text">Main balance</span>
-        <v-icon small class="ml-2 gray--text">{{
+        <v-icon class="ml-2 gray--text">{{
           showBalance ? "mdi-eye" : "mdi-eye-off"
         }}</v-icon>
       </div>
