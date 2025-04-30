@@ -1,16 +1,16 @@
 <template>
     <div class="mx-4">
         <h1>Related {{ pageName }} </h1>
-        <nuxt-link :to="`/${pageName}/${id}`">
-            <v-slide-group>
-                <v-slide-item
-                    v-for="item in data"
-                    :key="item.id"
-                >
+        <v-slide-group>
+            <v-slide-item
+                v-for="item in data"
+                :key="item.id"
+            >
+                <nuxt-link :to="`/${pageName}/${item.id}`">
                     <common-related-portrait-content-card :cardPicture="item.thumb_pic" :cardTitle="item.title" :score="item.referee_score" />
-                </v-slide-item>
-            </v-slide-group>
-        </nuxt-link>
+                </nuxt-link>
+            </v-slide-item>
+        </v-slide-group>
     </div>
 </template>
 <script>
@@ -19,7 +19,7 @@ export default {
     data(){
         return {
             data:null,
-            id : this.$route.params.id
+            id : this.$route.params.id,
         }
     },
     props:{
@@ -43,6 +43,7 @@ export default {
                 }})
                 .then(response => {
                     this.data = response.data.tests
+                    console.log(this.data)
                 })
                 .catch(error => {
                     console.error('Search error:', error);

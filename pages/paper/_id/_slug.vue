@@ -628,8 +628,9 @@
           <!--  End:  Azmoon test album card   -->
         </v-col>
       </v-row>
+      <common-related-portrait-content pageName="paper" source="test" request="test"/>
     </v-container>
-    <common-related-portrait-content pageName="paper" source="test" request="test"/>
+    
     <!-- Start : Past Papers -->
     <related-content
       class="mt-8"
