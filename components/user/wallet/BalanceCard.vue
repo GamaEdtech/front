@@ -41,11 +41,13 @@
           <v-icon small class="gray--text">mdi-tray-arrow-up</v-icon>
           <div class="text-lg-h6 yellow--text-darken mt-2">Top up</div>
         </div>
-        <div class="action-btn text-center ml-8">
+        <div class="vertical-divider"></div>
+        <div class="action-btn text-center">
           <v-icon small class="gray--text">mdi-tray-arrow-down</v-icon>
           <div class="text-lg-h6 yellow--text-darken mt-2">Withdraw</div>
         </div>
-        <div class="action-btn text-center ml-8">
+        <div class="vertical-divider"></div>
+        <div class="action-btn text-center">
           <v-icon small class="gray--text">mdi-swap-horizontal</v-icon>
           <div class="text-lg-h6 yellow--text-darken mt-2">Transfer</div>
         </div>
@@ -185,5 +187,22 @@ export default defineComponent({
 ::v-deep .v-skeleton-loader__text {
   background: rgba(255, 255, 255, 0.1) !important;
   border-radius: 8px;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 40px;
+  background-color: #101828;
+  margin: 0 10px;
+}
+
+.balance-actions {
+  width: 100%;
+  align-items: center;
+}
+
+.action-btn {
+  cursor: pointer;
+  flex: 1;
 }
 </style>
