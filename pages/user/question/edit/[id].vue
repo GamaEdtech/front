@@ -137,11 +137,12 @@
                         <v-btn
                           icon
                           size="small"
+                          variant="plain"
                           :href="questionData.files?.url"
                           target="_blank"
                           v-if="questionData.files?.exist"
                         >
-                          <v-icon>mdi-download</v-icon>
+                          <v-icon size="22">mdi-download</v-icon>
                         </v-btn>
                       </template>
                     </v-file-input>
