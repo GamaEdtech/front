@@ -126,9 +126,18 @@
       <v-data-table
         :headers="headers"
         :items="filteredTransactions"
-        :items-per-page="5"
-        hide-default-footer
+        :items-per-page="pageSize"
+        :page.sync="currentPage"
+        :server-items-length="totalRecords"
         :loading="loading"
+        :footer-props="{
+          'items-per-page-options': [10, 25, 50],
+          'items-per-page-text': 'Rows per page:',
+          showFirstLastPage: true,
+          class: 'custom-table-footer',
+        }"
+        @update:page="handlePageChange"
+        @update:items-per-page="handlePageSizeChange"
         loading-text="Loading transactions..."
         no-data-text="No transactions found"
         class="elevation-0 transaction-table"
@@ -195,6 +204,9 @@ export default defineComponent({
       loading: false,
       transactions: [],
       token: "",
+      currentPage: 1,
+      pageSize: 10,
+      totalRecords: 0,
       headers: [
         {
           text: "Description",
@@ -254,21 +266,26 @@ export default defineComponent({
     },
     fetchTransactions() {
       this.loading = true;
+      const skip = (this.currentPage - 1) * this.pageSize;
 
       this.$axios
         .$get("/api/v2/transactions", {
           params: {
-            "PagingDto.PageFilter.Size": 50,
+            "PagingDto.PageFilter.Size": this.pageSize,
+            "PagingDto.PageFilter.Skip": skip,
+            "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
           },
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
         })
         .then((response) => {
-          if (response.succeeded && response.data && response.data.list) {
+          if (response.succeeded && response.data) {
             this.transactions = response.data.list;
+            this.totalRecords = response.data.totalRecordsCount;
           } else {
             this.transactions = [];
+            this.totalRecords = 0;
           }
         })
         .catch((err) => {
@@ -277,6 +294,7 @@ export default defineComponent({
           }
           console.error("Error fetching transactions:", err);
           this.transactions = [];
+          this.totalRecords = 0;
         })
         .finally(() => {
           this.loading = false;
@@ -335,6 +353,15 @@ export default defineComponent({
     },
     toggleChart() {
       this.$emit("toggle-chart");
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
+      this.fetchTransactions();
+    },
+    handlePageSizeChange(size) {
+      this.pageSize = size;
+      this.currentPage = 1; // Reset to first page when changing page size
+      this.fetchTransactions();
     },
   },
 });
@@ -522,5 +549,39 @@ export default defineComponent({
 
 .chart-toggle-icon {
   cursor: pointer;
+}
+
+/* Pagination Styles */
+::v-deep .custom-table-footer {
+  font-size: 14px !important;
+}
+
+::v-deep .v-data-footer__select {
+  font-size: 14px !important;
+}
+
+::v-deep .v-data-footer__pagination {
+  font-size: 14px !important;
+}
+
+::v-deep .v-data-footer__select .v-select {
+  margin: 0 10px !important;
+}
+
+::v-deep .v-data-footer__select .v-select__selection {
+  font-size: 14px !important;
+}
+
+::v-deep .v-data-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  margin-top: 15px;
+}
+
+::v-deep .v-data-footer__icons-before,
+::v-deep .v-data-footer__icons-after {
+  font-size: 18px !important;
 }
 </style>
