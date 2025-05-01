@@ -2,8 +2,8 @@
   <div>
     <v-col cols="12" class="px-0 px-sm-2">
       <v-row>
-        <v-col cols="12" class="pl-5">
-          <span class="text-h4" style="color: #009688">Multimedia</span>
+        <v-col cols="12" class="mt-2 pl-4">
+          <span class="text-h4" style="color: #009688">My Multimedia List</span>
         </v-col>
       </v-row>
 
@@ -18,8 +18,9 @@
             :items="level_list"
             item-title="title"
             item-value="id"
-            label="Curriculum"
+            label="Board"
             @update:model-value="filterChanged('level')"
+            color="orange"
           />
         </v-col>
         <v-col cols="12" md="3">
@@ -33,6 +34,7 @@
             item-title="title"
             label="Grade"
             @update:model-value="filterChanged('grade')"
+            color="orange"
           />
         </v-col>
         <v-col cols="12" md="3">
@@ -46,21 +48,23 @@
             clearable
             label="Subject"
             @update:model-value="filterChanged('lesson')"
+            color="orange"
           />
         </v-col>
       </v-row>
       <!--End filter section-->
 
-      <v-card class="mt-3">
-        <v-card-title class="text-h4">
+      <v-card class="mt-3 py-2" elevation="2">
+        <v-card-title class="text-h5">
           <v-row>
             <v-col cols="12" class="text-left">
               <v-btn
                 to="/user/multimedia/create"
                 color="teal"
-                class="text-white"
+                class="text-white text-h5 ma-2"
+                style="text-transform: none"
               >
-                New Multimedia
+                Add Multimedia
               </v-btn>
             </v-col>
           </v-row>
@@ -71,13 +75,48 @@
               <v-table class="content_table">
                 <thead>
                   <tr>
-                    <th class="text-left text-h5">#</th>
-                    <th class="text-center text-h5">Title</th>
-                    <th class="text-center text-h5">Score</th>
-                    <th class="text-center text-h5">Download</th>
-                    <th class="text-center text-h5">Date</th>
-                    <th class="text-center text-h5">Status</th>
-                    <th class="text-center text-h5">Actions</th>
+                    <th
+                      class="text-left text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      #
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Title
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Score
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Download
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Date
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="text-center text-h5"
+                      style="color: rgba(0, 0, 0, 0.6) !important"
+                    >
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -115,10 +154,12 @@
                             color="green"
                             :to="`/multimedia/${item.id}`"
                             target="_blank"
-                            size="small"
+                            variant="icon"
+                            class="mx-2"
+                            density
                             v-bind="props"
                           >
-                            <v-icon size="small">mdi-eye</v-icon>
+                            <v-icon>mdi-eye</v-icon>
                           </v-btn>
                         </template>
                         <span>View</span>
@@ -127,11 +168,13 @@
                         <template v-slot:activator="{ props }">
                           <v-btn
                             icon
-                            size="small"
                             v-bind="props"
                             :to="`/user/multimedia/edit/${item.id}`"
+                            variant="icon"
+                            class="mx-2"
+                            density
                           >
-                            <v-icon size="small">mdi-note-edit-outline</v-icon>
+                            <v-icon>mdi-note-edit-outline</v-icon>
                           </v-btn>
                         </template>
                         <span>Edit</span>
@@ -142,10 +185,12 @@
                             icon
                             color="error"
                             @click="confirmDelete(item.id)"
-                            size="small"
                             v-bind="props"
+                            variant="icon"
+                            class="mx-2"
+                            density
                           >
-                            <v-icon size="small">mdi-delete</v-icon>
+                            <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </template>
                         <span>Delete</span>
@@ -184,11 +229,17 @@
     <v-dialog v-model="deleteDialog" max-width="500px">
       <v-card>
         <v-card-title>Delete Multimedia</v-card-title>
-        <v-card-text>Are you sure you want to delete this multimedia?</v-card-text>
+        <v-card-text
+          >Are you sure you want to delete this multimedia?</v-card-text
+        >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="error" variant="text" @click="deleteMultimedia">Delete</v-btn>
-          <v-btn color="primary" variant="text" @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="error" variant="text" @click="deleteMultimedia"
+            >Delete</v-btn
+          >
+          <v-btn color="primary" variant="text" @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -196,7 +247,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 
@@ -215,7 +266,7 @@ const { $toast } = useNuxtApp();
 const router = useRouter();
 
 // User token
-const userToken = ref('');
+const userToken = ref("");
 
 // Data
 const multimedia_list = ref([]);
@@ -245,7 +296,7 @@ const timer = ref(null);
 const getMultimediaList = async () => {
   if (!all_files_loaded.value) {
     page_loading.value = true;
-    
+
     try {
       const response = await $fetch("/api/v1/files", {
         method: "GET",
@@ -260,9 +311,9 @@ const getMultimediaList = async () => {
           Authorization: `Bearer ${userToken.value}`,
         },
       });
-      
+
       multimedia_list.value.push(...response.data.list);
-      
+
       // For terminate auto load request
       if (response.data.list.length === 0) {
         all_files_loaded.value = true;
@@ -289,10 +340,10 @@ const calcStatus = (val) => {
 
 const getTypeList = async (type, parent = "") => {
   const params = { type };
-  
+
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
-  
+
   try {
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
@@ -301,7 +352,7 @@ const getTypeList = async (type, parent = "") => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     if (type === "section") {
       level_list.value = response.data;
     } else if (type === "base") {
@@ -325,14 +376,15 @@ const setupInfiniteScroll = () => {
       ) +
       window.innerHeight +
       50;
-    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight;
-    
+    const bottomOfWindow =
+      scrollPosition >= document.documentElement.offsetHeight;
+
     // Avoid the number of requests
     if (timer.value) {
       clearTimeout(timer.value);
       timer.value = null;
     }
-    
+
     // Load next page
     if (bottomOfWindow && !all_files_loaded.value) {
       page_loading.value = true;
@@ -348,33 +400,33 @@ const filterChanged = (type) => {
   if (type == "level") {
     filter.grade = "";
     filter.lesson = "";
-    
+
     if (filter.level) getTypeList("base", filter.level);
-    
+
     page.value = 1;
     all_files_loaded.value = false;
-    
+
     grade_list.value = [];
     lesson_list.value = [];
     multimedia_list.value = [];
-    
+
     getMultimediaList();
   } else if (type == "grade") {
     filter.lesson = "";
-    
+
     if (filter.grade) getTypeList("lesson", filter.grade);
-    
+
     page.value = 1;
     all_files_loaded.value = false;
     multimedia_list.value = [];
     lesson_list.value = [];
-    
+
     getMultimediaList();
   } else if (type == "lesson") {
     page.value = 1;
     all_files_loaded.value = false;
     multimedia_list.value = [];
-    
+
     getMultimediaList();
   }
 };
@@ -392,12 +444,14 @@ const deleteMultimedia = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     $toast.success("Multimedia deleted successfully");
-    
+
     // Remove the item from the list
-    multimedia_list.value = multimedia_list.value.filter(item => item.id !== deleteId.value);
-    
+    multimedia_list.value = multimedia_list.value.filter(
+      (item) => item.id !== deleteId.value
+    );
+
     // Close the dialog
     deleteDialog.value = false;
   } catch (err) {
