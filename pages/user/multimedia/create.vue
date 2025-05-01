@@ -213,6 +213,11 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
+
+// Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
@@ -469,7 +474,7 @@ watch(
 
 // Initialize on mount
 onMounted(() => {
-  userToken.value = authSync.getAuthToken();
+  userToken.value = auth.getUserToken();
   getTypeList("section");
   getTypeList("content_type");
 });
