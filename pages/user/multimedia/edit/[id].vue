@@ -4,11 +4,11 @@
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688">
-            Edit Multimedia
+            Multimedia Edit Form
           </span>
         </v-col>
       </v-row>
-      <v-card class="mt-3">
+      <v-card class="ma-2" elevation="3">
         <v-card-text class="px-0 px-sm-8 px-md-4">
           <v-card-text>
             <v-card flat class="mt-3">
@@ -18,7 +18,7 @@
                 @submit.prevent="updateContent"
                 lazy-validation
               >
-                <v-row>
+                <v-row class="py-3">
                   <v-col cols="12" md="4">
                     <v-autocomplete
                       required
@@ -29,8 +29,8 @@
                       :rules="[(v) => !!v || 'This field is required']"
                       item-title="title"
                       item-value="id"
-                      label="Curriculum"
-                      color="#FFB300"
+                      label="Board"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -44,7 +44,7 @@
                       item-value="id"
                       item-title="title"
                       label="Grade"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -58,7 +58,7 @@
                       item-title="title"
                       v-model="formData.lesson"
                       label="Subject"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12" v-if="topic_list.length">
@@ -74,7 +74,7 @@
                       @update:model-value="changeOption('topic', $event)"
                       label="Topics"
                       multiple
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -87,7 +87,7 @@
                         (v) => !!v || 'This field is required',
                       ]"
                       label="Title"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -106,6 +106,7 @@
                       hint="You must enter at least 70 characters."
                       persistent-hint
                       placeholder="Write a brief description about the files to help the user make an informed choice"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -119,7 +120,7 @@
                       item-title="title"
                       v-model="formData.content_type"
                       label="Content type"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -138,7 +139,7 @@
                       ]"
                       :loading="loading.file"
                       :prepend-icon="null"
-                      color="red"
+                      color="orange"
                       prepend-inner-icon="mdi-play-box"
                       append-icon="mdi-folder-open"
                     >
@@ -170,6 +171,7 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.from_page"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -180,13 +182,7 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.to_page"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="12">
-                    <v-checkbox
-                      density="compact"
-                      v-model="formData.free_available"
-                      label="I would like the file to be freely available to others."
+                      color="orange"
                     />
                   </v-col>
 
@@ -248,6 +244,9 @@ const { $toast } = useNuxtApp();
 // User token
 const userToken = ref("");
 
+// Loading flag to prevent watchers from firing during initial load
+const isInitialLoad = ref(true);
+
 // Form validation
 const form = ref(null);
 const isFormValid = ref(false);
@@ -300,6 +299,8 @@ const fetchMultimediaData = async () => {
   if (!multimediaData.id) return;
   
   loading.multimedia = true;
+  // Ensure initial load flag is set during the whole loading process
+  isInitialLoad.value = true;
   
   try {
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
@@ -311,12 +312,61 @@ const fetchMultimediaData = async () => {
     
     // Set multimedia data
     const data = response.data;
+    console.log('Multimedia data loaded:', data);
     
-    // Populate form data with fetched values
+    // First load all dropdowns sequentially
+    if (data.section) {
+      await getTypeList("base", data.section);
+    }
+    
+    if (data.base) {
+      await getTypeList("lesson", data.base);
+    }
+    
+    if (data.lesson) {
+      await getTypeList("topic", data.lesson);
+    }
+    
+    // Process topics data based on its format
+    let topicsData = [];
+    
+    if (data.topics) {
+      // If topics is already an array, use it directly
+      if (Array.isArray(data.topics)) {
+        topicsData = data.topics;
+      } 
+      // If topics is a string (possibly comma or plus separated), convert to array
+      else if (typeof data.topics === 'string') {
+        // Try different separators, checking for + first as it's used in the old version
+        if (data.topics.includes('+')) {
+          topicsData = data.topics.split('+');
+        } else if (data.topics.includes(',')) {
+          topicsData = data.topics.split(',');
+        } else {
+          // Single value case
+          topicsData = [data.topics];
+        }
+      }
+    } else if (data.topic) {
+      // Backward compatibility with old API that uses 'topic' instead of 'topics'
+      if (typeof data.topic === 'string') {
+        if (data.topic.includes('+')) {
+          topicsData = data.topic.split('+');
+        } else if (data.topic.includes(',')) {
+          topicsData = data.topic.split(',');
+        } else {
+          topicsData = [data.topic];
+        }
+      } else if (Array.isArray(data.topic)) {
+        topicsData = data.topic;
+      }
+    }
+    
+    // Now set all form values at once
     formData.section = data.section;
     formData.base = data.base;
     formData.lesson = data.lesson;
-    formData.topics = data.topics || [];
+    formData.topics = topicsData.map(t => t.trim()).filter(t => t); // Clean up topic IDs
     formData.title = data.title;
     formData.description = data.description;
     formData.content_type = data.content_type;
@@ -328,24 +378,30 @@ const fetchMultimediaData = async () => {
     // Check if file exists
     multimediaData.files.exist = !!data.file;
     
-    // Load dependent dropdowns
-    if (formData.section) {
-      await getTypeList("base", formData.section);
-    }
-    
-    if (formData.base) {
-      await getTypeList("lesson", formData.base);
-    }
-    
-    if (formData.lesson) {
-      await getTypeList("topic", formData.lesson);
-    }
+    // Debug: Log the form data after setting values
+    console.log('Form data after setting:', { 
+      section: formData.section,
+      base: formData.base,
+      lesson: formData.lesson,
+      topics: formData.topics
+    });
     
   } catch (err) {
     $toast.error(err.message || "Error loading multimedia data");
     router.push("/user/multimedia");
   } finally {
     loading.multimedia = false;
+    // Reset the initial load flag when we're done
+    setTimeout(() => {
+      isInitialLoad.value = false;
+      // Debug: Check final state
+      console.log('Initial load complete. Form data:', { 
+        section: formData.section,
+        base: formData.base,
+        lesson: formData.lesson,
+        topics: formData.topics
+      });
+    }, 100); // Small delay to ensure Vue has finished processing all reactivity
   }
 };
 
@@ -369,6 +425,8 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
+    console.log(`Fetching ${type} list with params:`, params);
+    
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
@@ -379,16 +437,22 @@ const getTypeList = async (type, parent = "") => {
 
     if (type === "section") {
       section_list.value = response.data;
+      console.log('Section list loaded:', section_list.value);
     } else if (type === "base") {
       grade_list.value = response.data;
+      console.log('Grade list loaded:', grade_list.value);
     } else if (type === "lesson") {
       lesson_list.value = response.data;
+      console.log('Lesson list loaded:', lesson_list.value);
     } else if (type === "topic") {
       topic_list.value = response.data;
+      console.log('Topic list loaded:', topic_list.value);
     } else if (type === "content_type") {
       content_type_list.value = response.data;
+      console.log('Content type list loaded:', content_type_list.value);
     }
   } catch (err) {
+    console.error(`Error loading ${type} list:`, err);
     $toast.error(err.message || "Error loading data");
   } finally {
     loading.section = false;
@@ -399,8 +463,12 @@ const getTypeList = async (type, parent = "") => {
 };
 
 const changeOption = (type, value) => {
+  // Skip if we're in initial load
+  if (isInitialLoad.value) return;
+  
   if (type === "topic") {
-    formData.topics = value;
+    console.log('Topic selection changed to:', value);
+    formData.topics = Array.isArray(value) ? value : [value];
   }
 };
 
@@ -415,9 +483,16 @@ const updateContent = async () => {
     }
   }
 
-  if (formData.topics && Array.isArray(formData.topics) && formData.topics.length) {
-    for (let key in formData.topics) {
-      formSubmitData.append("topics[]", formData.topics[key]);
+  // Handle topics array
+  if (formData.topics && Array.isArray(formData.topics)) {
+    if (formData.topics.length > 0) {
+      console.log('Appending topics to form:', formData.topics);
+      formData.topics.forEach(topic => {
+        formSubmitData.append("topics[]", topic);
+      });
+    } else {
+      // Ensure we send an empty topics array to clear existing topics
+      formSubmitData.append("topics[]", "");
     }
   }
 
@@ -425,6 +500,8 @@ const updateContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
+    console.log('Submitting form data:', Object.fromEntries(formSubmitData.entries()));
+    
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
@@ -505,7 +582,9 @@ const startDownload = () => {
 watch(
   () => formData.section,
   (val) => {
-    userState.value.lastSelectedCurriculum = val;
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+    
     formData.base = "";
     formData.lesson = "";
     formData.topics = [];
@@ -522,6 +601,9 @@ watch(
 watch(
   () => formData.base,
   (val) => {
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+    
     userState.value.lastSelectedGrade = val;
     formData.lesson = "";
     formData.topics = [];
@@ -537,8 +619,18 @@ watch(
 watch(
   () => formData.lesson,
   (val) => {
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+    
     userState.value.lastSelectedSubject = val;
-    formData.topics = [];
+    
+    // Only clear topics if we're not in edit mode or if we've explicitly changed the lesson
+    // This prevents losing topics when editing an existing record
+    if (!isEditMode.value || val === "") {
+      formData.topics = [];
+    }
+    
+    // Always clear topic list when lesson changes to force reload
     topic_list.value = [];
 
     if (val) {
@@ -549,13 +641,21 @@ watch(
 
 // Initialize on mount
 onMounted(async () => {
+  // Set initial load flag
+  isInitialLoad.value = true;
+  
   userToken.value = auth.getUserToken();
+  
+  // Load initial dropdown data
   await getTypeList("section");
   await getTypeList("content_type");
   
   // Fetch multimedia data if in edit mode
   if (isEditMode.value) {
     await fetchMultimediaData();
+  } else {
+    // If not in edit mode, we can turn off the initial load flag
+    isInitialLoad.value = false;
   }
 });
 </script>
