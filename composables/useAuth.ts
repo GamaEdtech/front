@@ -11,6 +11,10 @@ export const useAuth = () => {
     cookieToken.value = newToken;
   };
 
+  const getUserToken = () => {
+    return cookieToken?.value;
+  };
+
   const clearAuth = () => {
     cookieToken.value = null;
   };
@@ -75,5 +79,6 @@ export const useAuth = () => {
     register,
     isAuthenticated,
     forgotPassword,
+    getUserToken,
   };
 };
