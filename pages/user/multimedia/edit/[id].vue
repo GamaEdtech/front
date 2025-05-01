@@ -140,15 +140,21 @@
                       color="orange"
                       prepend-inner-icon="mdi-play-box"
                       append-icon="mdi-folder-open"
+                      persistent-hint
                     >
-                      <template #append-outer>
+                      <template v-slot:append>
                         <v-btn
-                          small
                           icon
-                          @click="startDownload()"
-                          v-show="multimediaData.files.exist"
+                          size="small"
+                          variant="plain"
+                          :href="multimediaData.files.url"
+                          target="_blank"
+                          v-if="multimediaData.files.exist"
+                          title="Download file"
                         >
-                          <v-icon>mdi-download</v-icon>
+                          <v-icon size="18" style="margin-left: 0.5rem"
+                            >mdi-download</v-icon
+                          >
                         </v-btn>
                       </template>
                     </v-file-input>
@@ -256,6 +262,7 @@ const multimediaData = reactive({
   id: route.params.id || null,
   files: {
     exist: false,
+    url: null,
   },
 });
 
@@ -372,10 +379,21 @@ const fetchMultimediaData = async () => {
     formData.from_page = data.from_page;
     formData.to_page = data.to_page;
     formData.free_available = !!data.free_available;
-    formData.file = data.file || "";
 
-    // Check if file exists
-    multimediaData.files.exist = !!data.file;
+    // Handle file information - API returns it in a 'files' object
+    // Check if files object exists and has exist property set to true
+    const hasFile = data.files && data.files.exist === true;
+
+    // Store file information
+    formData.file = hasFile ? data.files.name || data.title : "";
+
+    // Set files information for download button
+    multimediaData.files = {
+      exist: hasFile,
+      url: hasFile ? `/api/v1/files/download/${multimediaData.id}` : null,
+      size: hasFile ? data.files.size : null,
+      ext: hasFile ? data.files.ext : null,
+    };
   } catch (err) {
     $toast.error(err.message || "Error loading multimedia data");
     router.push("/user/multimedia");
@@ -534,20 +552,27 @@ const uploadFile = async (value) => {
       },
     });
 
-    formData.file = response.data[0].file.name;
+    // Get file information from the upload response
+    const fileInfo = response.data[0].file;
+    formData.file = fileInfo.name;
+
+    // Update files object for download button
+    multimediaData.files = {
+      exist: true,
+      url: multimediaData.id
+        ? `/api/v1/files/download/${multimediaData.id}`
+        : `/api/v1/download/${fileInfo.name}`,
+      size: fileInfo.size || null,
+      ext: fileInfo.ext || null,
+    };
+
     $toast.success("File uploaded successfully");
   } catch (err) {
     $toast.error("An error occurred during file upload");
+    console.error("Upload error:", err);
   } finally {
     loading.file = false;
   }
-};
-
-const startDownload = () => {
-  if (!formData.file) return;
-
-  // Create a download link for the file
-  window.open(`/api/v1/download/${formData.file}`, "_blank");
 };
 
 // Set up watchers
