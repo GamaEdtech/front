@@ -196,6 +196,11 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
+
+// Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
@@ -206,12 +211,10 @@ useHead({
 
 // Services
 const { $toast } = useNuxtApp();
-import { useAuth } from '~/composables/useAuth';
 
 const router = useRouter();
 
 // User token
-const auth = useAuth();
 const userToken = ref('');
 
 // Data
@@ -254,7 +257,7 @@ const getMultimediaList = async () => {
           lesson: filter.lesson,
         },
         headers: {
-          Authorization: userToken.value,
+          Authorization: `Bearer ${userToken.value}`,
         },
       });
       
@@ -295,7 +298,7 @@ const getTypeList = async (type, parent = "") => {
       method: "GET",
       params,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
     
@@ -386,7 +389,7 @@ const deleteMultimedia = async () => {
     await $fetch(`/api/v1/files/${deleteId.value}`, {
       method: "DELETE",
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
     
