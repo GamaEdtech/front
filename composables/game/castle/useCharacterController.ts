@@ -1,12 +1,11 @@
 import * as THREE from 'three'
-import { shallowRef, ref, watch, computed } from 'vue'
-import { nearDoor, openedDoors, type Step } from '@/store/doorStatus'
-import { doorModels } from '~/store/doorModels'
+import { shallowRef, ref, watch, computed, Ref } from 'vue'
+// import { doorModels } from '~/store/doorModels'
 import { animate } from 'animejs'
-import step from "@/store/step"
-import level from "@/store/level"
 import createGate from './useGate'
 import useGate from './useGate'
+import { DoorModels } from '~/interfaces/DoorModels.interface'
+import { Doors, Level, Step } from '~/interfaces/DoorStatus'
 
 // Define types for better code organization
 interface MoveState {
@@ -57,7 +56,12 @@ interface CastleBoundaries {
 export function useCharacterController(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
-    container: HTMLDivElement
+    container: HTMLDivElement,
+    doorModels: DoorModels,
+    openedDoors: Level[],
+    nearDoor: Ref<"door001" | "door002" | "door003" | "door004" | null>,
+    level: Ref<number>,
+    step: Ref<number>
 ) {
     // Character references
     const character = shallowRef<THREE.Object3D | null>(null)
@@ -177,7 +181,7 @@ export function useCharacterController(
 
 
     const stepKey = computed(() => `step${step.value}` as keyof Step);
-    const currentStep = computed(() => openedDoors.value[level.value - 1].steps[stepKey.value])
+    const currentStep = computed(() => openedDoors[level.value - 1].steps[stepKey.value])
 
     watch(openedDoors, (newVal) => {
         if (currentStep.value.door001 == true) {
@@ -242,7 +246,7 @@ export function useCharacterController(
             const doorPosition = doorPositions[doorKey];
             const distanceToDoor = character.value.position.distanceTo(doorPosition);
 
-            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors.value[level.value - 1].steps[stepKey.value][doorKey as "door001" | "door002" | "door003"]) {
+            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors[level.value - 1].steps[stepKey.value][doorKey as "door001" | "door002" | "door003"]) {
                 nearAnyDoor = true;
                 nearDoor.value = doorKey as "door001" | "door002" | "door003";
                 break;

@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, computed } from 'vue';
-import { useDeviceDetection } from '@/store/device';
+import { useDisplay } from 'vuetify/lib/composables/display';
 
 interface Opration {
     icon: string,
@@ -46,7 +46,7 @@ interface Oprations {
     door: Opration
 }
 
-const { isMobile } = useDeviceDetection();
+const isMobile = useDisplay().mobile.value;
 
 const props = defineProps<{
     isNear: boolean;
@@ -86,7 +86,7 @@ const emit = defineEmits(['doorInteraction', 'gateInteraction']);
 
 // Handle keyboard interaction
 const handleKeyPress = (event: KeyboardEvent) => {
-    if (isMobile.value && props.isNear) {
+    if (isMobile && props.isNear) {
         if (props.opration === 'door') {
             emit('doorInteraction');
         } else if (props.opration === 'gate' ){

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import step from '~/store/step';
 
+const props = defineProps<{
+    step: number
+}>()
+
+const step = computed(() => props.step)
 const progress = computed(() => ((step.value-1) / 4) * 100); // درصد پیشرفت
 </script>
 

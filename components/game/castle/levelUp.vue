@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import level from "@/store/level"
 
 const props = defineProps<{
-    levelUpModal: boolean
+    levelUpModal: boolean,
+    level: number
 }>()
 
 const isModalShow = computed(() => props.levelUpModal) 

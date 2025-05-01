@@ -1,11 +1,11 @@
-import modelesLoaded from "~/store/modelsLoaded"
 import useCastleModel from "./useCastleModel"
 import * as THREE from "three"
 import { Ref } from "@vue/runtime-dom"
+import { DoorModels } from "~/interfaces/DoorModels.interface"
 
-const useModels = (scene: Ref<THREE.Scene>) => {
+const useModels = (scene: Ref<THREE.Scene>, doorModels: DoorModels, modelesLoaded: Ref<boolean>) => {
     Promise.all(
-        [useCastleModel(scene)]
+        [useCastleModel(scene, doorModels)]
     ).then(() => {
         modelesLoaded.value = true
     })

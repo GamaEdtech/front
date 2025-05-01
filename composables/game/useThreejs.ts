@@ -1,8 +1,7 @@
 // composables/useThreejs.ts
 import * as THREE from 'three'
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, Ref } from 'vue'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import modelesLoaded from '~/store/modelsLoaded'
 
 export function useThreeJS() {
     // Scene elements
@@ -17,7 +16,7 @@ export function useThreeJS() {
     /**
      * Sets up the Three.js scene with renderer and lighting
      */
-    const setupScene = (container: HTMLDivElement) => {
+    const setupScene = (container: HTMLDivElement, modelesLoaded: Ref<boolean>) => {
         // Configure scene with a slightly somber atmosphere
         scene.value.background = new THREE.Color(0x0b1220) // A bit brighter but still moody blue
         scene.value.fog = new THREE.FogExp2(0x0c1323, 0.001) // Lighter fog, less dense
@@ -26,7 +25,7 @@ export function useThreeJS() {
         initializeRenderer(container)
 
         // Add lighting to the scene
-        addLights()
+        addLights(modelesLoaded)
 
         // Handle window resize
         window.addEventListener('resize', onWindowResize)
@@ -58,7 +57,7 @@ export function useThreeJS() {
     /**
      * Adds moderately somber lighting to the scene
      */
-    const addLights = () => {
+    const addLights = (modelesLoaded: Ref<boolean>) => {
         // Ambient light - brighter but still cool-toned for mood
         const ambientLight = new THREE.AmbientLight(0x8090a5, 0.7)
         scene.value.add(ambientLight)
@@ -93,7 +92,7 @@ export function useThreeJS() {
 
         // Flickering animation - more subtle
         const flickerLights = () => {
-            if (!modelesLoaded.value) return
+            if (!modelesLoaded) return
 
             // Subtle random intensity fluctuation
             interiorLight1.intensity = 1.0 + Math.random() * 0.1
@@ -105,7 +104,7 @@ export function useThreeJS() {
 
         // Start flickering when model is loaded
         setTimeout(() => {
-            if (modelesLoaded.value) flickerLights()
+            if (modelesLoaded) flickerLights()
         }, 2000)
     }
 
