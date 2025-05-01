@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <v-col cols="12" class="px-0 px-sm-2">
+  <div class="mt-4">
+    <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
-        <v-col cols="12" class="mt-2 pl-4">
+        <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688">My Multimedia List</span>
         </v-col>
       </v-row>
@@ -61,7 +61,9 @@
               <v-btn
                 to="/user/multimedia/create"
                 color="teal"
-                class="text-white text-h5 ma-2"
+                density="default"
+                exact
+                class="text-white text-h5 md-ma-2"
                 style="text-transform: none"
               >
                 Add Multimedia
@@ -77,7 +79,7 @@
                   <tr>
                     <th
                       class="text-left text-h5"
-                      style="color: rgba(0, 0, 0, 0.6) !important"
+                      style="color: rgba(0, 0, 0, 0.6) !important; "
                     >
                       #
                     </th>

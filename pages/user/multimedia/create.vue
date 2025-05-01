@@ -1,14 +1,14 @@
 <template>
-  <div id="multimedia-submit-form">
+  <div id="multimedia-submit-form" class="mt-4">
     <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688">
-            Multimedia submission form
+            Multimedia Submission Form
           </span>
         </v-col>
       </v-row>
-      <v-card class="ma-2" elevation="3">
+      <v-card class="mt-3" :elevation="3">
         <v-card-text class="px-0 px-sm-8 px-md-4">
           <v-card-text>
             <v-card flat class="mt-3">
@@ -536,7 +536,8 @@ onMounted(() => {
 
 .v-selection-control .v-label {
   font-weight: 300;
-  font-size: 1.4em;
+  font-size: 1.4rem;
   color: rgba(0, 0, 0, 0.6);
 }
 </style>
+
