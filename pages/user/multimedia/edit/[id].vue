@@ -8,7 +8,7 @@
           </span>
         </v-col>
       </v-row>
-      <v-card class="ma-2" elevation="3">
+      <v-card class="mt-3" :elevation="3">
         <v-card-text class="px-0 px-sm-8 px-md-4">
           <v-card-text>
             <v-card flat class="mt-3">
@@ -83,9 +83,7 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.title"
-                      :rules="[
-                        (v) => !!v || 'This field is required',
-                      ]"
+                      :rules="[(v) => !!v || 'This field is required']"
                       label="Title"
                       color="orange"
                     />
@@ -193,6 +191,7 @@
                       :disabled="!isFormValid"
                       color="success"
                       block
+                      style="font-size: 1.2rem; text-transform: none"
                     >
                       Update
                     </v-btn>
@@ -203,6 +202,7 @@
                       color="error"
                       to="/user/multimedia"
                       block
+                      style="font-size: 1.2rem; text-transform: none"
                     >
                       Discard
                     </v-btn>
@@ -218,7 +218,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 // Define layout and page metadata
@@ -297,11 +297,11 @@ const loading = reactive({
 // Fetch multimedia data
 const fetchMultimediaData = async () => {
   if (!multimediaData.id) return;
-  
+
   loading.multimedia = true;
   // Ensure initial load flag is set during the whole loading process
   isInitialLoad.value = true;
-  
+
   try {
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
       method: "GET",
@@ -309,38 +309,38 @@ const fetchMultimediaData = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     // Set multimedia data
     const data = response.data;
-    
+
     // First load all dropdowns sequentially
     if (data.section) {
       await getTypeList("base", data.section);
     }
-    
+
     if (data.base) {
       await getTypeList("lesson", data.base);
     }
-    
+
     if (data.lesson) {
       await getTypeList("topic", data.lesson);
     }
-    
+
     // Process topics data based on its format
     let topicsData = [];
-    
+
     if (data.topics) {
       // If topics is already an array, use it directly
       if (Array.isArray(data.topics)) {
         topicsData = data.topics;
-      } 
+      }
       // If topics is a string (possibly comma or plus separated), convert to array
-      else if (typeof data.topics === 'string') {
+      else if (typeof data.topics === "string") {
         // Try different separators, checking for + first as it's used in the old version
-        if (data.topics.includes('+')) {
-          topicsData = data.topics.split('+');
-        } else if (data.topics.includes(',')) {
-          topicsData = data.topics.split(',');
+        if (data.topics.includes("+")) {
+          topicsData = data.topics.split("+");
+        } else if (data.topics.includes(",")) {
+          topicsData = data.topics.split(",");
         } else {
           // Single value case
           topicsData = [data.topics];
@@ -348,11 +348,11 @@ const fetchMultimediaData = async () => {
       }
     } else if (data.topic) {
       // Backward compatibility with old API that uses 'topic' instead of 'topics'
-      if (typeof data.topic === 'string') {
-        if (data.topic.includes('+')) {
-          topicsData = data.topic.split('+');
-        } else if (data.topic.includes(',')) {
-          topicsData = data.topic.split(',');
+      if (typeof data.topic === "string") {
+        if (data.topic.includes("+")) {
+          topicsData = data.topic.split("+");
+        } else if (data.topic.includes(",")) {
+          topicsData = data.topic.split(",");
         } else {
           topicsData = [data.topic];
         }
@@ -360,12 +360,12 @@ const fetchMultimediaData = async () => {
         topicsData = data.topic;
       }
     }
-    
+
     // Now set all form values at once
     formData.section = data.section;
     formData.base = data.base;
     formData.lesson = data.lesson;
-    formData.topics = topicsData.map(t => t.trim()).filter(t => t); // Clean up topic IDs
+    formData.topics = topicsData.map((t) => t.trim()).filter((t) => t); // Clean up topic IDs
     formData.title = data.title;
     formData.description = data.description;
     formData.content_type = data.content_type;
@@ -373,11 +373,9 @@ const fetchMultimediaData = async () => {
     formData.to_page = data.to_page;
     formData.free_available = !!data.free_available;
     formData.file = data.file || "";
-    
+
     // Check if file exists
     multimediaData.files.exist = !!data.file;
-    
-    
   } catch (err) {
     $toast.error(err.message || "Error loading multimedia data");
     router.push("/user/multimedia");
@@ -410,7 +408,6 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
@@ -444,7 +441,7 @@ const getTypeList = async (type, parent = "") => {
 const changeOption = (type, value) => {
   // Skip if we're in initial load
   if (isInitialLoad.value) return;
-  
+
   if (type === "topic") {
     formData.topics = Array.isArray(value) ? value : [value];
   }
@@ -464,7 +461,7 @@ const updateContent = async () => {
   // Handle topics array
   if (formData.topics && Array.isArray(formData.topics)) {
     if (formData.topics.length > 0) {
-      formData.topics.forEach(topic => {
+      formData.topics.forEach((topic) => {
         formSubmitData.append("topics[]", topic);
       });
     } else {
@@ -477,7 +474,6 @@ const updateContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
-    
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
@@ -549,9 +545,9 @@ const uploadFile = async (value) => {
 
 const startDownload = () => {
   if (!formData.file) return;
-  
+
   // Create a download link for the file
-  window.open(`/api/v1/download/${formData.file}`, '_blank');
+  window.open(`/api/v1/download/${formData.file}`, "_blank");
 };
 
 // Set up watchers
@@ -560,7 +556,7 @@ watch(
   (val) => {
     // Skip watchers during initial load
     if (isInitialLoad.value) return;
-    
+
     formData.base = "";
     formData.lesson = "";
     formData.topics = [];
@@ -579,7 +575,7 @@ watch(
   (val) => {
     // Skip watchers during initial load
     if (isInitialLoad.value) return;
-    
+
     userState.value.lastSelectedGrade = val;
     formData.lesson = "";
     formData.topics = [];
@@ -597,15 +593,15 @@ watch(
   (val) => {
     // Skip watchers during initial load
     if (isInitialLoad.value) return;
-    
+
     userState.value.lastSelectedSubject = val;
-    
+
     // Only clear topics if we're not in edit mode or if we've explicitly changed the lesson
     // This prevents losing topics when editing an existing record
     if (!isEditMode.value || val === "") {
       formData.topics = [];
     }
-    
+
     // Always clear topic list when lesson changes to force reload
     topic_list.value = [];
 
@@ -619,13 +615,13 @@ watch(
 onMounted(async () => {
   // Set initial load flag
   isInitialLoad.value = true;
-  
+
   userToken.value = auth.getUserToken();
-  
+
   // Load initial dropdown data
   await getTypeList("section");
   await getTypeList("content_type");
-  
+
   // Fetch multimedia data if in edit mode
   if (isEditMode.value) {
     await fetchMultimediaData();
