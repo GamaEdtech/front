@@ -1,5 +1,5 @@
 <template>
-  <div id="multimedia-submit-form" class="mt-4">
+  <div id="multimedia-submit-form">
     <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
@@ -8,7 +8,7 @@
           </span>
         </v-col>
       </v-row>
-      <v-card class="mt-3">
+      <v-card class="ma-2" elevation="3">
         <v-card-text class="px-0 px-sm-8 px-md-4">
           <v-card-text>
             <v-card flat class="mt-3">
@@ -18,7 +18,7 @@
                 @submit.prevent="submitContent"
                 lazy-validation
               >
-                <v-row>
+                <v-row class="py-3">
                   <v-col cols="12" md="4">
                     <v-autocomplete
                       required
@@ -29,8 +29,8 @@
                       :rules="[(v) => !!v || 'This field is required']"
                       item-title="title"
                       item-value="id"
-                      label="Curriculum"
-                      color="#FFB300"
+                      label="Board"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -44,7 +44,7 @@
                       item-value="id"
                       item-title="title"
                       label="Grade"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -58,7 +58,7 @@
                       item-title="title"
                       v-model="formData.lesson"
                       label="Subject"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -74,7 +74,7 @@
                       @update:model-value="changeOption('topic', $event)"
                       label="Topics"
                       multiple
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -83,11 +83,9 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.title"
-                      :rules="[
-                        (v) => !!v || 'This field is required',
-                      ]"
+                      :rules="[(v) => !!v || 'This field is required']"
                       label="Title"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -106,6 +104,7 @@
                       hint="You must enter at least 70 characters."
                       persistent-hint
                       placeholder="Write a brief description about the files to help the user make an informed choice"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -119,7 +118,7 @@
                       item-title="title"
                       v-model="formData.content_type"
                       label="Content type"
-                      color="#FFB300"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -140,7 +139,7 @@
                       ]"
                       :loading="loading.file"
                       :prepend-icon="null"
-                      color="red"
+                      color="orange"
                       prepend-inner-icon="mdi-play-box"
                       append-icon="mdi-folder-open"
                     />
@@ -161,6 +160,7 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.from_page"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -171,6 +171,7 @@
                       density="compact"
                       variant="outlined"
                       v-model="formData.to_page"
+                      color="orange"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -178,6 +179,8 @@
                       density="compact"
                       v-model="formData.free_available"
                       label="I would like the file to be freely available to others."
+                      color="orange"
+                      style="font-weight: 500; font-size: 1.2rem"
                     />
                   </v-col>
 
@@ -188,6 +191,11 @@
                       :disabled="!isFormValid"
                       color="success"
                       block
+                      style="
+                        text-transform: none;
+                        font-weight: 500;
+                        font-size: 1.2rem;
+                      "
                     >
                       Submit
                     </v-btn>
@@ -198,6 +206,11 @@
                       color="error"
                       to="/user/multimedia"
                       block
+                      style="
+                        text-transform: none;
+                        font-weight: 500;
+                        font-size: 1.2rem;
+                      "
                     >
                       Discard
                     </v-btn>
@@ -213,7 +226,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 
@@ -347,7 +360,11 @@ const submitContent = async () => {
     }
   }
 
-  if (formData.topics && Array.isArray(formData.topics) && formData.topics.length) {
+  if (
+    formData.topics &&
+    Array.isArray(formData.topics) &&
+    formData.topics.length
+  ) {
     for (let key in formData.topics) {
       formSubmitData.append("topics[]", formData.topics[key]);
     }
@@ -515,5 +532,11 @@ onMounted(() => {
   color: #ffc700ff;
   content: "\f0a4";
   font-weight: 900;
+}
+
+.v-selection-control .v-label {
+  font-weight: 300;
+  font-size: 1.4em;
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>
