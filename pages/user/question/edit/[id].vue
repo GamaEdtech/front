@@ -181,6 +181,9 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
@@ -209,7 +212,7 @@ const { data: questionData } = await useFetch(
   `/api/v1/questions/${route.params.id}`,
   {
     headers: {
-      Authorization: userToken.value,
+      Authorization: `Bearer ${userToken.value}`,
     },
     transform: (response) => {
       return response.status === 1 ? response.data : {};
@@ -270,7 +273,7 @@ const getTypeList = async (type, parent = "") => {
       method: "GET",
       params,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -351,7 +354,7 @@ const updateContent = async () => {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -403,7 +406,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -418,7 +421,7 @@ const uploadFile = async (value) => {
 
 // Initialize data on load
 onMounted(async () => {
-  userToken.value = localStorage.getItem("auth._token.local");
+  userToken.value = auth.getUserToken();
   await getTypeList("section");
   initData();
 
