@@ -222,6 +222,10 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
+// Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
@@ -301,7 +305,7 @@ const fetchMultimediaData = async () => {
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
       method: "GET",
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
     
@@ -369,7 +373,7 @@ const getTypeList = async (type, parent = "") => {
       method: "GET",
       params,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -425,7 +429,7 @@ const updateContent = async () => {
       method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -477,7 +481,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -545,7 +549,7 @@ watch(
 
 // Initialize on mount
 onMounted(async () => {
-  userToken.value = localStorage.getItem("auth._token.local");
+  userToken.value = auth.getUserToken();
   await getTypeList("section");
   await getTypeList("content_type");
   
