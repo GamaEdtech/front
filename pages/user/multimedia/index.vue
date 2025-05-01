@@ -480,4 +480,7 @@ onUnmounted(() => {
 p {
   font-size: 1.4rem;
 }
+.v-table > .v-table__wrapper > table > tbody > tr:hover {
+  background-color: #eeeeeeb1 !important;
+}
 </style>

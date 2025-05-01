@@ -312,7 +312,6 @@ const fetchMultimediaData = async () => {
     
     // Set multimedia data
     const data = response.data;
-    console.log('Multimedia data loaded:', data);
     
     // First load all dropdowns sequentially
     if (data.section) {
@@ -378,13 +377,6 @@ const fetchMultimediaData = async () => {
     // Check if file exists
     multimediaData.files.exist = !!data.file;
     
-    // Debug: Log the form data after setting values
-    console.log('Form data after setting:', { 
-      section: formData.section,
-      base: formData.base,
-      lesson: formData.lesson,
-      topics: formData.topics
-    });
     
   } catch (err) {
     $toast.error(err.message || "Error loading multimedia data");
@@ -394,13 +386,6 @@ const fetchMultimediaData = async () => {
     // Reset the initial load flag when we're done
     setTimeout(() => {
       isInitialLoad.value = false;
-      // Debug: Check final state
-      console.log('Initial load complete. Form data:', { 
-        section: formData.section,
-        base: formData.base,
-        lesson: formData.lesson,
-        topics: formData.topics
-      });
     }, 100); // Small delay to ensure Vue has finished processing all reactivity
   }
 };
@@ -425,8 +410,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    console.log(`Fetching ${type} list with params:`, params);
-    
+
     const response = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
@@ -437,19 +421,14 @@ const getTypeList = async (type, parent = "") => {
 
     if (type === "section") {
       section_list.value = response.data;
-      console.log('Section list loaded:', section_list.value);
     } else if (type === "base") {
       grade_list.value = response.data;
-      console.log('Grade list loaded:', grade_list.value);
     } else if (type === "lesson") {
       lesson_list.value = response.data;
-      console.log('Lesson list loaded:', lesson_list.value);
     } else if (type === "topic") {
       topic_list.value = response.data;
-      console.log('Topic list loaded:', topic_list.value);
     } else if (type === "content_type") {
       content_type_list.value = response.data;
-      console.log('Content type list loaded:', content_type_list.value);
     }
   } catch (err) {
     console.error(`Error loading ${type} list:`, err);
@@ -467,7 +446,6 @@ const changeOption = (type, value) => {
   if (isInitialLoad.value) return;
   
   if (type === "topic") {
-    console.log('Topic selection changed to:', value);
     formData.topics = Array.isArray(value) ? value : [value];
   }
 };
@@ -486,7 +464,6 @@ const updateContent = async () => {
   // Handle topics array
   if (formData.topics && Array.isArray(formData.topics)) {
     if (formData.topics.length > 0) {
-      console.log('Appending topics to form:', formData.topics);
       formData.topics.forEach(topic => {
         formSubmitData.append("topics[]", topic);
       });
@@ -500,7 +477,6 @@ const updateContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
-    console.log('Submitting form data:', Object.fromEntries(formSubmitData.entries()));
     
     const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
       method: "PUT",
