@@ -152,7 +152,7 @@
                           <v-btn
                             icon
                             color="green"
-                            :to="`/multimedia/${item.id}`"
+                            :to="`/multimedia/${item.id}/${item.title}`"
                             target="_blank"
                             variant="icon"
                             class="mx-2"
