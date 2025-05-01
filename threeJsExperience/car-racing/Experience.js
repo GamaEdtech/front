@@ -104,7 +104,8 @@ export default class Experience {
 
 
             // levels questions
-            questions: questions
+            questions: questions,
+            distanceFromEndRoadQuestion: 40
         }
 
 

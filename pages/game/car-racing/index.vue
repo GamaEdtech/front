@@ -124,7 +124,7 @@ export default {
                 // },
             ],
             currentQuestionIndex: 0,
-            timer: 30,
+            timer: 40,
             timerDanger: false,
             isPlayingGame: false,
             score: 0,
@@ -209,7 +209,7 @@ export default {
             this.isLoading = true
             this.experience.resetGame()
             this.currentQuestionIndex = 0
-            this.timer = 30
+            this.timer = 40
             this.questionStatus = "normal"
             this.timerDanger = false
             this.score = 0

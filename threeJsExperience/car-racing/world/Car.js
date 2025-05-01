@@ -25,7 +25,7 @@ export default class Car {
         this.currentQuestionIndex = 0
         this.checkThreshold = 2
         this.questionPositions = this.options.questions.map((q, index) => {
-            return (this.options.roadSize / (this.options.questions.length + 1)) * (index + 1)
+            return ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.options.questions.length + 1)) * (index + 1)
         })
 
 
@@ -48,6 +48,12 @@ export default class Car {
         this.laneChangeProgress = 0;
         this.laneChangeDirection = 0;
         this.isChangingLane = false;
+
+
+        this.isIncreaseSpeedPhase = false
+        this.UpperSpeed = this.options.carBaseSpeed + 8
+        this.isDecreasingPhase = false
+        this.directionLastSuccessRotation = 1
 
 
         window.addEventListener("keydown", (event) => {
@@ -130,6 +136,11 @@ export default class Car {
     }
 
     reset() {
+        this.currentLane = this.targetLane
+        this.wrongAnswerRotationY = 0
+        this.speed = this.options.carBaseSpeed
+        this.isIncreaseSpeedPhase = false
+        this.isDecreasingPhase = false
         this.positionX = this.options.offsetXStart
         this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))
         this.currentQuestionIndex = 0
@@ -157,10 +168,15 @@ export default class Car {
 
     checkQuestionCollision() {
         if (this.currentQuestionIndex >= this.questionPositions.length) {
-            const result = {
-                status: "success"
+            if (this.isIncreaseSpeedPhase) {
+                this.increseSpeedSuccessPhase()
             }
-            this.experience.callBacks.onResultGameChange(result)
+            if (this.isDecreasingPhase) {
+                this.decreaseSpeedAndDriftSuccessPhase()
+                return
+            }
+
+            this.isIncreaseSpeedPhase = true
             return
         };
 
@@ -172,7 +188,7 @@ export default class Car {
             const correctLane = this.options.questions[this.currentQuestionIndex].indexAnswer + 1
 
             if (this.targetLane === correctLane) {
-                if (!this.isJumping) {
+                if (!this.isJumping && this.currentQuestionIndex + 1 != this.options.questions.length) {
                     this.isJumping = true
                     this.jumpStartY = 0.6
                     this.jumpProgress = 0
@@ -191,6 +207,32 @@ export default class Car {
             }
         }
     }
+
+    increseSpeedSuccessPhase() {
+        this.speed = THREE.MathUtils.lerp(this.speed, this.UpperSpeed, 0.06)
+
+        if (Math.ceil(this.speed) == this.UpperSpeed) {
+            this.isIncreaseSpeedPhase = false
+            this.isDecreasingPhase = true
+            this.directionLastSuccessRotation = this.targetLane <= (this.laneCount / 2) ? 1 : -1
+        }
+    }
+
+    decreaseSpeedAndDriftSuccessPhase() {
+        this.speed = THREE.MathUtils.lerp(this.speed, this.options.carBaseSpeed, 0.01)
+        this.wrongAnswerRotationY = this.wrongAnswerRotationY + -1 * this.directionLastSuccessRotation * 0.02
+        this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.currentLane + this.directionLastSuccessRotation, 0.02)
+        if (this.wrongAnswerRotationY <= -Math.PI || this.wrongAnswerRotationY >= Math.PI) {
+
+            this.wrongAnswerRotationY = 0
+            const result = {
+                status: "success"
+            };
+            this.experience.callBacks.onResultGameChange(result);
+        }
+    }
+
+
 
     reverseStep() {
         if (this.positionX > this.reverseStartX - this.reverseDistance) {
@@ -219,9 +261,6 @@ export default class Car {
             this.correctAnswerRotationY = 0
         }
     }
-
-
-
 
     update() {
         const distancePerFrame = this.speed * (this.time.delta / 1000)

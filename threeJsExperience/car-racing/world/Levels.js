@@ -42,7 +42,6 @@ export default class Levels {
 
     getLaneZOffset(laneNumber) {
         const center = (this.laneCount + 1) / 2;
-        // return ((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
         return -((center - laneNumber) * this.laneWidth) + this.positionMiddleRoad;
     }
 
@@ -79,8 +78,7 @@ export default class Levels {
         this.meshes = []
 
         this.questions.forEach((question, index) => {
-            // let positionX = (this.options.roadSize / (this.questions.length + 1)) * (this.questions.length - index)
-            let positionX = (this.options.roadSize / (this.questions.length + 1)) * (index + 1)
+            let positionX = ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.questions.length + 1)) * (index + 1)
             question.choices.forEach((number, jIndex) => {
                 const geometry = new TextGeometry(number, this.configTextGeometry)
                 geometry.center()
