@@ -249,6 +249,9 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
@@ -256,7 +259,6 @@ definePageMeta({
 
 // Use services
 const router = useRouter();
-const auth = useAuth();
 const { $toast } = useNuxtApp();
 
 // Page title
@@ -309,7 +311,7 @@ const getQuestionList = () => {
         lesson: filter.lesson,
       },
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     })
       .then((response) => {
@@ -360,7 +362,7 @@ const getTypeList = (type, parent = "") => {
     method: "GET",
     params,
     headers: {
-      Authorization: userToken.value,
+      Authorization: `Bearer ${userToken.value}`,
     },
   })
     .then((response) => {
@@ -460,7 +462,7 @@ const deleteQuestion = async () => {
     await $fetch(`/api/v1/questions/${delete_question_id.value}`, {
       method: "DELETE",
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
     question_list.value.splice(delete_question_index.value, 1);
@@ -483,7 +485,7 @@ const deleteQuestion = async () => {
 
 // Initialize on mount
 onMounted(() => {
-  userToken.value = localStorage.getItem("auth._token.local");
+  userToken.value = auth.getUserToken();
   getQuestionList();
   getTypeList("section");
   scroll();
