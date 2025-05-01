@@ -7,7 +7,7 @@
             
             <h1 style="font-size:14px !important;font-weight: 600;color: #344054;">Related {{ pageName }} </h1>
         </div>
-        <v-slide-group show-arrows >
+        <v-slide-group show-arrows class="related-content" >
             <v-slide-item
                 v-for="item in data"
                 :key="item.id"
@@ -67,26 +67,26 @@ export default {
 </script>
 <style>
 
-.v-slide-group {
+.related-content {
   display: flex !important;
   flex-direction: column !important;
   align-items: center; 
 }
-.v-slide-group:hover > .v-slide-group__prev,
-.v-slide-group:hover > .v-slide-group__next {
+.related-content:hover > .v-slide-group__prev,
+.related-content:hover > .v-slide-group__next {
     opacity: 1;
     visibility: visible;
 }
 
-.v-slide-group__wrapper {
+.related-content > .v-slide-group__wrapper {
   order: 1;
   width: 100%;
   height: 260px;
   align-items: center;
 }
 
-.v-slide-group__prev,
-.v-slide-group__next {
+.related-content > .v-slide-group__prev,
+.related-content > .v-slide-group__next {
   order: 2;
   margin-top: 12px;
   background-color: #344054CC;
@@ -100,28 +100,28 @@ export default {
   visibility: hidden;
   transition: opacity 300ms ease, visibility 300ms ease;
 }
-.v-slide-group__prev > i,
-.v-slide-group__next > i{
+.related-content > .v-slide-group__prev > i,
+.related-content > .v-slide-group__next > i{
     color:white !important;
 }
 
-.v-slide-group__prev > .theme--light.v-icon.v-icon.v-icon--disabled ,
-.v-slide-group__next > .theme--light.v-icon.v-icon.v-icon--disabled {
+.related-content > .v-slide-group__prev > .theme--light.v-icon.v-icon.v-icon--disabled ,
+.related-content > .v-slide-group__next > .theme--light.v-icon.v-icon.v-icon--disabled {
     color:rgba(255, 255, 255, 0.544) !important;
 }
 
-.v-slide-group__prev > .v-slide-group__prev--disabled, .v-slide-group__prev--disabled,
-.v-slide-group__next > .v-slide-group__next--disabled, .v-slide-group__next--disabled {
+.related-content > .v-slide-group__prev > .v-slide-group__prev--disabled, .v-slide-group__prev--disabled,
+.related-content > .v-slide-group__next > .v-slide-group__next--disabled, .v-slide-group__next--disabled {
     pointer-events: unset !important;
 }
 
-.v-slide-group__prev {
+.related-content > .v-slide-group__prev {
     position: absolute;
     margin-top: 90px;
     left: 15px;
     z-index: 10;
 }
-.v-slide-group__next {
+.related-content > .v-slide-group__next {
     position: absolute;
     margin-top: 90px;
     right: 15px;
