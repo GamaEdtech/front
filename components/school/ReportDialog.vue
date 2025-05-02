@@ -132,12 +132,13 @@ export default {
         })
         .then((response) => {
           if (response.succeeded) {
-            this.$toast.success("Your report has been submitted successfully");
+            this.$toast.success("Thanks for your report!");
             this.dialogVisible = false;
             this.reportForm.description = "";
           } else {
             this.$toast.error(
-              response?.errors?.[0]?.message || "Failed to submit report"
+              response?.errors?.[0]?.message ||
+                "Something went wrong, please try again."
             );
           }
         })
@@ -149,7 +150,7 @@ export default {
             this.$emit("open-auth-dialog", "login");
             this.$toast.error("Please login to submit a report");
           } else {
-            this.$toast.error("There was an error submitting your report");
+            this.$toast.error("Something went wrong, please try again.");
           }
           console.error("Error submitting report:", err);
         })
