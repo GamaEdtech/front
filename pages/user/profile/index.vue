@@ -340,7 +340,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import LocationField from "@/components/Form/LocationField";
+import LocationField from "@/components/form/LocationField";
 // import "vue-advanced-cropper/dist/style.css";
 
 export default {

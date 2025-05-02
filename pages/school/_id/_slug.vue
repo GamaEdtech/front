@@ -1366,7 +1366,7 @@
 </template>
 
 <script>
-import locationSearch from "@/components/Form/LocationSearch";
+import locationSearch from "@/components/form/LocationSearch";
 
 export default {
   name: "school-details",

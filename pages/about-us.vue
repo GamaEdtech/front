@@ -369,46 +369,46 @@ import stepAnimation from "../public/images/about-vision-step.json"; // Adjust t
 import LottieAnimation from "~/components/common/lottie-animation.vue";
 
 export default {
-  auth: false,
-  head() {
-    return {
-      titleTemplate: "%s",
-      title:
-        "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
+  // auth: false,
+  // head() {
+  //   return {
+  //     titleTemplate: "%s",
+  //     title:
+  //       "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
 
-      meta: [
-        {
-          hid: "apple-mobile-web-app-title",
-          name: "apple-mobile-web-app-title",
-          content:
-            "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
-        },
-        {
-          hid: "og:title",
-          name: "og:title",
-          content:
-            "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
-        },
-        {
-          hid: "og:site_name",
-          name: "og:site_name",
-          content: "GamaTrain",
-        },
-        {
-          hid: "description",
-          name: "description",
-          content:
-            "Embark on an educational journey with GamaTrain's exceptional team of K12 experts, passionate about empowering students through innovative learning solutions.",
-        },
-        {
-          hid: "og:description",
-          name: "og:description",
-          content:
-            "Embark on an educational journey with GamaTrain's exceptional team of K12 experts, passionate about empowering students through innovative learning solutions.",
-        },
-      ],
-    };
-  },
+  //     meta: [
+  //       {
+  //         hid: "apple-mobile-web-app-title",
+  //         name: "apple-mobile-web-app-title",
+  //         content:
+  //           "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
+  //       },
+  //       {
+  //         hid: "og:title",
+  //         name: "og:title",
+  //         content:
+  //           "About GamaTrain | Meet the Team Dedicated to Transforming K12 Education",
+  //       },
+  //       {
+  //         hid: "og:site_name",
+  //         name: "og:site_name",
+  //         content: "GamaTrain",
+  //       },
+  //       {
+  //         hid: "description",
+  //         name: "description",
+  //         content:
+  //           "Embark on an educational journey with GamaTrain's exceptional team of K12 experts, passionate about empowering students through innovative learning solutions.",
+  //       },
+  //       {
+  //         hid: "og:description",
+  //         name: "og:description",
+  //         content:
+  //           "Embark on an educational journey with GamaTrain's exceptional team of K12 experts, passionate about empowering students through innovative learning solutions.",
+  //       },
+  //     ],
+  //   };
+  // },
   mounted() {
     // Initialize the Intersection Observer
     this.initIntersectionObserver();
