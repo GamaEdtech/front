@@ -383,8 +383,19 @@
             </h1>
           </v-col>
           <v-col cols="1" md="4">
-            <div class="float-right d-flex mt-1">
+            <div class="float-right d-flex align-center mt-1">
+              <span class="mr-3">
+                <v-icon
+                  @click="reportDialog = true"
+                  size="20"
+                  color="primary"
+                  plain
+                  class=""
+                  >mdi-alert-circle-outline</v-icon
+                >
+              </span>
               <v-icon size="20" class="primary-gray-300">mdi-heart</v-icon>
+
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
@@ -1558,12 +1569,21 @@
       </v-card>
     </v-dialog>
     <!-- End select facilites dialog -->
+
+    <!-- Report School Issue Dialog -->
+    <ReportDialog
+      v-model="reportDialog"
+      :school-id="$route.params.id"
+      @open-auth-dialog="openAuthDialog"
+    />
+    <!-- End Report School Issue Dialog -->
   </v-container>
 </template>
 
 <script>
 import locationSearch from "@/components/Form/LocationSearch";
 import GalleryDialog from "@/components/school/GalleryDialog.vue";
+import ReportDialog from "@/components/school/ReportDialog.vue";
 
 export default {
   name: "school-details",
@@ -1661,6 +1681,8 @@ export default {
       phoneRule: [(v) => !!v || "Phone number is required"],
       nameRule: [(v) => !!v || "Name is required"],
       addressRule: [(v) => !!v || "Address is required"],
+
+      reportDialog: false,
     };
   },
   head() {
@@ -1688,6 +1710,7 @@ export default {
   components: {
     locationSearch,
     GalleryDialog,
+    ReportDialog,
   },
   async asyncData({ params, $axios }) {
     const baseURL = process.server
