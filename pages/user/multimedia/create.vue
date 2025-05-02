@@ -62,19 +62,11 @@
                     />
                   </v-col>
                   <v-col cols="12" md="12">
-                    <v-autocomplete
-                      required
-                      density="compact"
-                      variant="outlined"
-                      :items="topic_list"
-                      :rules="[(v) => !!v || 'This field is required']"
-                      item-value="id"
-                      item-title="title"
-                      v-model="formData.topics"
-                      @update:model-value="changeOption('topic', $event)"
-                      label="Topics"
-                      multiple
-                      color="orange"
+                    <form-topic-selector
+                      ref="topicSelectorRef"
+                      :topic-list="topic_list"
+                      @selectTopic="selectTopic"
+                      v-if="formData.lesson !== ''"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -227,6 +219,7 @@
 
 <script setup>
 import { useAuth } from "~/composables/useAuth";
+import FormTopicSelector from "~/components/Form/topic-selector.vue";
 
 const auth = useAuth();
 
@@ -255,6 +248,9 @@ const userToken = ref("");
 // Form validation
 const form = ref(null);
 const isFormValid = ref(false);
+
+// Reference to the topic selector component
+const topicSelectorRef = ref(null);
 
 const onSubmit = () => {
   submitContent();
@@ -417,6 +413,10 @@ const encode = (s) => {
   return encodeURIComponent(s).replace(/%20/g, "+");
 };
 
+const selectTopic = (event) => {
+  formData.topics = event;
+};
+
 const uploadFile = async (value) => {
   if (!value) return;
 
@@ -485,6 +485,13 @@ watch(
 
     if (val) {
       getTypeList("topic", val);
+      if (topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = true;
+      }
+    } else {
+      if (topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = false;
+      }
     }
   }
 );

@@ -62,19 +62,12 @@
                     />
                   </v-col>
                   <v-col cols="12" md="12" v-if="topic_list.length">
-                    <v-autocomplete
-                      required
-                      density="compact"
-                      variant="outlined"
-                      :items="topic_list"
-                      :rules="[(v) => !!v || 'This field is required']"
-                      item-value="id"
-                      item-title="title"
-                      v-model="formData.topics"
-                      @update:model-value="changeOption('topic', $event)"
-                      label="Topics"
-                      multiple
-                      color="orange"
+                    <form-topic-selector
+                      ref="topicSelectorRef"
+                      :topic-list="topic_list"
+                      :selectedTopics="formData.topics"
+                      @selectTopic="selectTopic"
+                      v-if="formData.lesson !== ''"
                     />
                   </v-col>
                   <v-col cols="12" md="12">
@@ -225,6 +218,7 @@
 
 <script setup>
 import { useAuth } from "~/composables/useAuth";
+import FormTopicSelector from "~/components/Form/topic-selector.vue";
 
 const auth = useAuth();
 // Define layout and page metadata
@@ -301,6 +295,9 @@ const loading = reactive({
   form: false, // Submit form
 });
 
+// Reference to topic selector component
+const topicSelectorRef = ref(null);
+
 // Fetch multimedia data
 const fetchMultimediaData = async () => {
   if (!multimediaData.id) return;
@@ -352,6 +349,12 @@ const fetchMultimediaData = async () => {
           // Single value case
           topicsData = [data.topics];
         }
+      } else if (
+        typeof data.topics === "object" &&
+        !Array.isArray(data.topics)
+      ) {
+        // Handle case where topics might be an object with keys
+        topicsData = Object.values(data.topics).filter((t) => t);
       }
     } else if (data.topic) {
       // Backward compatibility with old API that uses 'topic' instead of 'topics'
@@ -368,11 +371,15 @@ const fetchMultimediaData = async () => {
       }
     }
 
+    // Clean up topic IDs and ensure they're strings (if they're numeric values)
+    topicsData = topicsData
+      .map((t) => (typeof t === "object" ? t.id : t.toString().trim()))
+      .filter((t) => t);
     // Now set all form values at once
     formData.section = data.section;
     formData.base = data.base;
     formData.lesson = data.lesson;
-    formData.topics = topicsData.map((t) => t.trim()).filter((t) => t); // Clean up topic IDs
+    formData.topics = topicsData;
     formData.title = data.title;
     formData.description = data.description;
     formData.content_type = data.content_type;
@@ -442,11 +449,24 @@ const getTypeList = async (type, parent = "") => {
       lesson_list.value = response.data;
     } else if (type === "topic") {
       topic_list.value = response.data;
+
+      // If we have topics data and the topic selector exists, set lesson_selected
+      if (topic_list.value.length > 0 && topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = true;
+
+        // If we have saved topics, set them after a short delay to ensure component is mounted
+        if (formData.topics && formData.topics.length > 0) {
+          setTimeout(() => {
+            if (topicSelectorRef.value) {
+              topicSelectorRef.value.topic = [...formData.topics];
+            }
+          }, 100);
+        }
+      }
     } else if (type === "content_type") {
       content_type_list.value = response.data;
     }
   } catch (err) {
-    console.error(`Error loading ${type} list:`, err);
     $toast.error(err.message || "Error loading data");
   } finally {
     loading.section = false;
@@ -535,6 +555,10 @@ const encode = (s) => {
   return encodeURIComponent(s).replace(/%20/g, "+");
 };
 
+const selectTopic = (event) => {
+  formData.topics = event;
+};
+
 const uploadFile = async (value) => {
   if (!value) return;
 
@@ -569,7 +593,6 @@ const uploadFile = async (value) => {
     $toast.success("File uploaded successfully");
   } catch (err) {
     $toast.error("An error occurred during file upload");
-    console.error("Upload error:", err);
   } finally {
     loading.file = false;
   }
@@ -632,6 +655,23 @@ watch(
 
     if (val) {
       getTypeList("topic", val);
+      if (topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = true;
+      }
+    } else {
+      if (topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = false;
+      }
+    }
+  }
+);
+
+watch(
+  () => formData.topics,
+  (val) => {
+    // Ensure topic selector gets updated with current topics
+    if (topicSelectorRef.value && val && val.length > 0) {
+      topicSelectorRef.value.topic = val;
     }
   }
 );
@@ -659,7 +699,6 @@ const startDownload = async () => {
     } else if (err.response?.status == 403) {
       router.push({ query: { auth_form: "login" } });
     }
-    console.log(err);
   } finally {
     download_loading.value = false;
   }
