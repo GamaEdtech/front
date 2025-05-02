@@ -383,17 +383,17 @@
             </h1>
           </v-col>
           <v-col cols="1" md="4">
-            <div class="float-right d-flex mt-1">
-              <v-btn
-                small
-                rounded
-                color="primary"
-                class="mr-3"
-                @click="reportDialog = true"
-              >
-                <v-icon size="16" class="mr-1">mdi-alert-circle-outline</v-icon>
-                Report Issue
-              </v-btn>
+            <div class="float-right d-flex align-center mt-1">
+              <span class="mr-3">
+                <v-icon
+                  @click="reportDialog = true"
+                  size="20"
+                  color="primary"
+                  plain
+                  class=""
+                  >mdi-alert-circle-outline</v-icon
+                >
+              </span>
               <v-icon size="20" class="primary-gray-300">mdi-heart</v-icon>
 
               <div

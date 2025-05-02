@@ -17,12 +17,9 @@
 
           <div class="">
             <div class="d-flex align-center justify-center">
-              <img
-                :src="require('@/assets/images/issue-warning.png')"
-                alt=""
-                class=""
-                width="80"
-              />
+              <div class="report-icon-alert">
+                <v-icon size="60" color="primary" class="">mdi-alert</v-icon>
+              </div>
             </div>
             <div
               class="mt-4 primary-gray-700 font-weight-bold font-size-18 text-center"
@@ -33,7 +30,7 @@
         </div>
 
         <div class="mt-4 bg-primary-gray-100 px-6 pb-3 pt-7">
-          <div class="w-md-70 mx-md-auto">
+          <div class="w-md-80 mx-md-auto">
             <div class="mb-3 primary-gray-900 font-size-16">Description</div>
             <v-textarea
               background-color="white"
@@ -50,7 +47,7 @@
           </div>
         </div>
 
-        <v-card-actions class="bg-primary-gray-100 py-5">
+        <v-card-actions class="bg-primary-gray-100 pt-5 pb-8">
           <div class="w-md-50 w-80 mx-auto d-flex justify-center">
             <v-btn
               block
@@ -162,4 +159,15 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.report-icon-alert {
+  background: #f2f4f7;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+</style>
