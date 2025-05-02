@@ -1,10 +1,10 @@
 <template>
-  <div id="multimedia-submit-form" class="mt-4">
+  <div id="multimedia-edit-form" class="mt-4">
     <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
         <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688">
-            Multimedia Submission Form
+            Multimedia Edit Form
           </span>
         </v-col>
       </v-row>
@@ -15,7 +15,7 @@
               <VForm
                 ref="form"
                 v-model="isFormValid"
-                @submit.prevent="submitContent"
+                @submit.prevent="updateContent"
                 lazy-validation
               >
                 <v-row class="py-3">
@@ -61,10 +61,11 @@
                       color="orange"
                     />
                   </v-col>
-                  <v-col cols="12" md="12">
+                  <v-col cols="12" md="12" v-if="topic_list.length">
                     <form-topic-selector
                       ref="topicSelectorRef"
                       :topic-list="topic_list"
+                      :selectedTopics="formData.topics"
                       @selectTopic="selectTopic"
                       v-if="formData.lesson !== ''"
                     />
@@ -115,7 +116,6 @@
                   </v-col>
                   <v-col cols="12" md="4">
                     <v-file-input
-                      required
                       density="compact"
                       variant="outlined"
                       v-model="file"
@@ -123,7 +123,6 @@
                       accept=".mp4,.avi,.m4a,.mpg,.flv,.docx,.pptx,.pdf,.exe,.apk,.mp3,.wave,.acc,.swf,.gif,.zip"
                       @update:model-value="uploadFile($event)"
                       :rules="[
-                        (v) => !!v || 'This field is required',
                         (v) =>
                           !v ||
                           v.size < 20000000 ||
@@ -134,7 +133,24 @@
                       color="orange"
                       prepend-inner-icon="mdi-play-box"
                       append-icon="mdi-folder-open"
-                    />
+                      persistent-hint
+                    >
+                      <template v-slot:append>
+                        <v-btn
+                          icon
+                          size="small"
+                          variant="plain"
+                          @click="startDownload('multimedia')"
+                          v-if="multimediaData.files.exist"
+                          title="Download file"
+                          :loading="download_loading"
+                        >
+                          <v-icon size="18" style="margin-left: 0.5rem">
+                            mdi-download
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                    </v-file-input>
                   </v-col>
 
                   <v-col cols="12">
@@ -166,15 +182,6 @@
                       color="orange"
                     />
                   </v-col>
-                  <v-col cols="12" md="12">
-                    <v-checkbox
-                      density="compact"
-                      v-model="formData.free_available"
-                      label="I would like the file to be freely available to others."
-                      color="orange"
-                      style="font-weight: 500; font-size: 1.2rem"
-                    />
-                  </v-col>
 
                   <v-col cols="12" md="6" class="pb-0">
                     <v-btn
@@ -183,13 +190,9 @@
                       :disabled="!isFormValid"
                       color="success"
                       block
-                      style="
-                        text-transform: none;
-                        font-weight: 500;
-                        font-size: 1.2rem;
-                      "
+                      style="font-size: 1.2rem; text-transform: none"
                     >
-                      Submit
+                      Update
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -198,11 +201,7 @@
                       color="error"
                       to="/user/multimedia"
                       block
-                      style="
-                        text-transform: none;
-                        font-weight: 500;
-                        font-size: 1.2rem;
-                      "
+                      style="font-size: 1.2rem; text-transform: none"
                     >
                       Discard
                     </v-btn>
@@ -222,17 +221,17 @@ import { useAuth } from "~/composables/useAuth";
 import FormTopicSelector from "~/components/Form/topic-selector.vue";
 
 const auth = useAuth();
-
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
 
 useHead({
-  title: "Multimedia submission form",
+  title: "Edit Multimedia",
 });
 
 // Get services
+const route = useRoute();
 const router = useRouter();
 const userState = useState("user", () => ({
   lastSelectedCurriculum: "",
@@ -245,16 +244,24 @@ const { $toast } = useNuxtApp();
 // User token
 const userToken = ref("");
 
+// Loading flag to prevent watchers from firing during initial load
+const isInitialLoad = ref(true);
+
 // Form validation
 const form = ref(null);
 const isFormValid = ref(false);
 
-// Reference to the topic selector component
-const topicSelectorRef = ref(null);
+// Multimedia data
+const multimediaData = reactive({
+  id: route.params.id || null,
+  files: {
+    exist: false,
+    url: null,
+  },
+});
 
-const onSubmit = () => {
-  submitContent();
-};
+// Check if we're in edit mode
+const isEditMode = computed(() => !!multimediaData.id);
 
 const formData = reactive({
   section: "",
@@ -279,6 +286,7 @@ const content_type_list = ref([]);
 
 // Handle loading states
 const loading = reactive({
+  multimedia: false, // Loading multimedia data
   section: false,
   base: false,
   lesson: false,
@@ -286,6 +294,124 @@ const loading = reactive({
   file: false, // Upload file
   form: false, // Submit form
 });
+
+// Reference to topic selector component
+const topicSelectorRef = ref(null);
+
+// Fetch multimedia data
+const fetchMultimediaData = async () => {
+  if (!multimediaData.id) return;
+
+  loading.multimedia = true;
+  // Ensure initial load flag is set during the whole loading process
+  isInitialLoad.value = true;
+
+  try {
+    const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    // Set multimedia data
+    const data = response.data;
+
+    // First load all dropdowns sequentially
+    if (data.section) {
+      await getTypeList("base", data.section);
+    }
+
+    if (data.base) {
+      await getTypeList("lesson", data.base);
+    }
+
+    if (data.lesson) {
+      await getTypeList("topic", data.lesson);
+    }
+
+    // Process topics data based on its format
+    let topicsData = [];
+
+    if (data.topics) {
+      // If topics is already an array, use it directly
+      if (Array.isArray(data.topics)) {
+        topicsData = data.topics;
+      }
+      // If topics is a string (possibly comma or plus separated), convert to array
+      else if (typeof data.topics === "string") {
+        // Try different separators, checking for + first as it's used in the old version
+        if (data.topics.includes("+")) {
+          topicsData = data.topics.split("+");
+        } else if (data.topics.includes(",")) {
+          topicsData = data.topics.split(",");
+        } else {
+          // Single value case
+          topicsData = [data.topics];
+        }
+      } else if (
+        typeof data.topics === "object" &&
+        !Array.isArray(data.topics)
+      ) {
+        // Handle case where topics might be an object with keys
+        topicsData = Object.values(data.topics).filter((t) => t);
+      }
+    } else if (data.topic) {
+      // Backward compatibility with old API that uses 'topic' instead of 'topics'
+      if (typeof data.topic === "string") {
+        if (data.topic.includes("+")) {
+          topicsData = data.topic.split("+");
+        } else if (data.topic.includes(",")) {
+          topicsData = data.topic.split(",");
+        } else {
+          topicsData = [data.topic];
+        }
+      } else if (Array.isArray(data.topic)) {
+        topicsData = data.topic;
+      }
+    }
+
+    // Clean up topic IDs and ensure they're strings (if they're numeric values)
+    topicsData = topicsData
+      .map((t) => (typeof t === "object" ? t.id : t.toString().trim()))
+      .filter((t) => t);
+    // Now set all form values at once
+    formData.section = data.section;
+    formData.base = data.base;
+    formData.lesson = data.lesson;
+    formData.topics = topicsData;
+    formData.title = data.title;
+    formData.description = data.description;
+    formData.content_type = data.content_type;
+    formData.from_page = data.from_page;
+    formData.to_page = data.to_page;
+    formData.free_available = !!data.free_available;
+
+    // Handle file information - API returns it in a 'files' object
+    // Check if files object exists and has exist property set to true
+    const hasFile = data.files && data.files.exist === true;
+
+    // Store file information
+    formData.file = hasFile ? data.files.name || data.title : "";
+
+    // Set files information for download button
+    multimediaData.files = {
+      exist: hasFile,
+      url: hasFile ? `/api/v1/files/download/${multimediaData.id}` : null,
+      size: hasFile ? data.files.size : null,
+      ext: hasFile ? data.files.ext : null,
+    };
+  } catch (err) {
+    $toast.error(err.message || "Error loading multimedia data");
+    router.push("/user/multimedia");
+  } finally {
+    loading.multimedia = false;
+    // Reset the initial load flag when we're done
+    setTimeout(() => {
+      isInitialLoad.value = false;
+    }, 100); // Small delay to ensure Vue has finished processing all reactivity
+  }
+};
 
 const getTypeList = async (type, parent = "") => {
   const params = { type };
@@ -317,15 +443,26 @@ const getTypeList = async (type, parent = "") => {
 
     if (type === "section") {
       section_list.value = response.data;
-      formData.section = userState.value.lastSelectedCurriculum || "";
     } else if (type === "base") {
       grade_list.value = response.data;
-      formData.base = userState.value.lastSelectedGrade || "";
     } else if (type === "lesson") {
       lesson_list.value = response.data;
-      formData.lesson = userState.value.lastSelectedSubject || "";
     } else if (type === "topic") {
       topic_list.value = response.data;
+
+      // If we have topics data and the topic selector exists, set lesson_selected
+      if (topic_list.value.length > 0 && topicSelectorRef.value) {
+        topicSelectorRef.value.lesson_selected = true;
+
+        // If we have saved topics, set them after a short delay to ensure component is mounted
+        if (formData.topics && formData.topics.length > 0) {
+          setTimeout(() => {
+            if (topicSelectorRef.value) {
+              topicSelectorRef.value.topic = [...formData.topics];
+            }
+          }, 100);
+        }
+      }
     } else if (type === "content_type") {
       content_type_list.value = response.data;
     }
@@ -340,12 +477,15 @@ const getTypeList = async (type, parent = "") => {
 };
 
 const changeOption = (type, value) => {
+  // Skip if we're in initial load
+  if (isInitialLoad.value) return;
+
   if (type === "topic") {
-    formData.topics = value;
+    formData.topics = Array.isArray(value) ? value : [value];
   }
 };
 
-const submitContent = async () => {
+const updateContent = async () => {
   loading.form = true;
 
   // Prepare form data
@@ -356,13 +496,15 @@ const submitContent = async () => {
     }
   }
 
-  if (
-    formData.topics &&
-    Array.isArray(formData.topics) &&
-    formData.topics.length
-  ) {
-    for (let key in formData.topics) {
-      formSubmitData.append("topics[]", formData.topics[key]);
+  // Handle topics array
+  if (formData.topics && Array.isArray(formData.topics)) {
+    if (formData.topics.length > 0) {
+      formData.topics.forEach((topic) => {
+        formSubmitData.append("topics[]", topic);
+      });
+    } else {
+      // Ensure we send an empty topics array to clear existing topics
+      formSubmitData.append("topics[]", "");
     }
   }
 
@@ -370,8 +512,8 @@ const submitContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
-    const response = await $fetch("/api/v1/files", {
-      method: "POST",
+    const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
+      method: "PUT",
       body: urlencodeFormData(formSubmitData),
       headers: {
         Authorization: `Bearer ${userToken.value}`,
@@ -382,16 +524,16 @@ const submitContent = async () => {
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The multimedia is duplicated");
     } else {
-      $toast.success("Submitted successfully");
+      $toast.success("Updated successfully");
       router.push("/user/multimedia");
     }
   } catch (err) {
     if (err.response?.status === 403) {
       router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
-      $toast.error(err.response.data.message || "Error submitting multimedia");
+      $toast.error(err.response.data.message || "Error updating multimedia");
     } else {
-      $toast.error(err.message || "Error submitting multimedia");
+      $toast.error(err.message || "Error updating multimedia");
     }
   } finally {
     loading.form = false;
@@ -434,7 +576,20 @@ const uploadFile = async (value) => {
       },
     });
 
-    formData.file = response.data[0].file.name;
+    // Get file information from the upload response
+    const fileInfo = response.data[0].file;
+    formData.file = fileInfo.name;
+
+    // Update files object for download button
+    multimediaData.files = {
+      exist: true,
+      url: multimediaData.id
+        ? `/api/v1/files/download/${multimediaData.id}`
+        : `/api/v1/download/${fileInfo.name}`,
+      size: fileInfo.size || null,
+      ext: fileInfo.ext || null,
+    };
+
     $toast.success("File uploaded successfully");
   } catch (err) {
     $toast.error("An error occurred during file upload");
@@ -447,7 +602,9 @@ const uploadFile = async (value) => {
 watch(
   () => formData.section,
   (val) => {
-    userState.value.lastSelectedCurriculum = val;
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+
     formData.base = "";
     formData.lesson = "";
     formData.topics = [];
@@ -464,6 +621,9 @@ watch(
 watch(
   () => formData.base,
   (val) => {
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+
     userState.value.lastSelectedGrade = val;
     formData.lesson = "";
     formData.topics = [];
@@ -479,8 +639,18 @@ watch(
 watch(
   () => formData.lesson,
   (val) => {
+    // Skip watchers during initial load
+    if (isInitialLoad.value) return;
+
     userState.value.lastSelectedSubject = val;
-    formData.topics = [];
+
+    // Only clear topics if we're not in edit mode or if we've explicitly changed the lesson
+    // This prevents losing topics when editing an existing record
+    if (!isEditMode.value || val === "") {
+      formData.topics = [];
+    }
+
+    // Always clear topic list when lesson changes to force reload
     topic_list.value = [];
 
     if (val) {
@@ -496,16 +666,67 @@ watch(
   }
 );
 
+watch(
+  () => formData.topics,
+  (val) => {
+    // Ensure topic selector gets updated with current topics
+    if (topicSelectorRef.value && val && val.length > 0) {
+      topicSelectorRef.value.topic = val;
+    }
+  }
+);
+
+const download_loading = ref(false);
+
+const startDownload = async () => {
+  download_loading.value = true;
+  try {
+    const response = await $fetch(`/api/v1/files/download/${route.params.id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    const FileSaver = await import("file-saver");
+    FileSaver.saveAs(response.data.url, response.data.name);
+  } catch (err) {
+    if (err.response?.status == 400) {
+      if (
+        err.response.data.status == 0 &&
+        err.response.data.error == "creditNotEnough"
+      ) {
+        useToast().info("No enough credit");
+      }
+    } else if (err.response?.status == 403) {
+      router.push({ query: { auth_form: "login" } });
+    }
+  } finally {
+    download_loading.value = false;
+  }
+};
+
 // Initialize on mount
-onMounted(() => {
+onMounted(async () => {
+  // Set initial load flag
+  isInitialLoad.value = true;
+
   userToken.value = auth.getUserToken();
-  getTypeList("section");
-  getTypeList("content_type");
+
+  // Load initial dropdown data
+  await getTypeList("section");
+  await getTypeList("content_type");
+
+  // Fetch multimedia data if in edit mode
+  if (isEditMode.value) {
+    await fetchMultimediaData();
+  } else {
+    // If not in edit mode, we can turn off the initial load flag
+    isInitialLoad.value = false;
+  }
 });
 </script>
 
 <style>
-#multimedia-submit-form .text-h4 {
+#multimedia-edit-form .text-h4 {
   line-height: 4rem;
 }
 
@@ -540,11 +761,4 @@ onMounted(() => {
   content: "\f0a4";
   font-weight: 900;
 }
-
-.v-selection-control .v-label {
-  font-weight: 300;
-  font-size: 1.4rem;
-  color: rgba(0, 0, 0, 0.6);
-}
-</style>
-
+</style> 

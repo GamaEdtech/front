@@ -167,6 +167,11 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
+const auth = useAuth();
+
+// Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
 });
@@ -248,7 +253,7 @@ const getTypeList = async (type, parent = "") => {
       method: "GET",
       params,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -305,7 +310,7 @@ const submitQuestion = async () => {
       method: "POST",
       body: urlencodeFormData(formSubmitData),
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
@@ -355,7 +360,7 @@ const uploadFile = async (value) => {
       method: "POST",
       body: fileFormData,
       headers: {
-        Authorization: userToken.value,
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -420,7 +425,7 @@ watch(
 
 // Initialize on mount
 onMounted(() => {
-  userToken.value = localStorage.getItem("auth._token.local");
+  userToken.value = auth.getUserToken();
   getTypeList("section");
 });
 </script>
