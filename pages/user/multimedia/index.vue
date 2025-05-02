@@ -79,7 +79,7 @@
                   <tr>
                     <th
                       class="text-left text-h5"
-                      style="color: rgba(0, 0, 0, 0.6) !important; "
+                      style="color: rgba(0, 0, 0, 0.6) !important"
                     >
                       #
                     </th>
@@ -124,7 +124,7 @@
                 <tbody>
                   <tr
                     v-show="multimedia_list.length > 0"
-                    v-for="item in multimedia_list"
+                    v-for="(item, index) in multimedia_list"
                     :key="item.id"
                   >
                     <td>{{ item.id }}</td>
@@ -186,7 +186,7 @@
                           <v-btn
                             icon
                             color="error"
-                            @click="confirmDelete(item.id)"
+                            @click="confirmDelete(item.id, index)"
                             v-bind="props"
                             variant="icon"
                             class="mx-2"
@@ -227,24 +227,49 @@
       </v-card>
     </v-col>
 
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="500px">
-      <v-card>
-        <v-card-title>Delete Multimedia</v-card-title>
-        <v-card-text
-          >Are you sure you want to delete this multimedia?</v-card-text
-        >
-        <v-card-actions>
+    <!-- Delete dialog -->
+    <v-dialog v-model="deleteConfirmDialog" max-width="290">
+      <v-card class="py-2 px-2">
+        <v-card-title class="px-4" style="font-size: 1.4rem">
+          Are you sure?
+        </v-card-title>
+
+        <v-card-text class="px-4 pt-0 pb-1" style="color: rgba(0, 0, 0, 0.6)">
+          <p>If you are sure to delete, click Yes.</p>
+        </v-card-text>
+
+        <v-card-actions class="pt-4">
           <v-spacer></v-spacer>
-          <v-btn color="error" variant="text" @click="deleteMultimedia"
-            >Delete</v-btn
+
+          <v-btn
+            variant="text"
+            style="
+              font-size: 1.4rem !important;
+              letter-spacing: inherit !important;
+              text-transform: none !important;
+            "
+            @click="deleteConfirmDialog = false"
           >
-          <v-btn color="primary" variant="text" @click="deleteDialog = false"
-            >Cancel</v-btn
+            No
+          </v-btn>
+
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            style="
+              font-size: 1.4rem !important;
+              letter-spacing: inherit !important;
+              text-transform: none !important;
+            "
+            :loading="delete_loading"
+            @click="deleteMultimedia()"
           >
+            Yes
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- End delete dialog -->
   </div>
 </template>
 
@@ -274,8 +299,10 @@ const userToken = ref("");
 const multimedia_list = ref([]);
 
 // Delete dialog
-const deleteDialog = ref(false);
+const deleteConfirmDialog = ref(false);
 const deleteId = ref(null);
+const delete_multimedia_index = ref(null);
+const delete_loading = ref(false);
 
 // Filter section
 const filter = reactive({
@@ -433,12 +460,15 @@ const filterChanged = (type) => {
   }
 };
 
-const confirmDelete = (id) => {
+const confirmDelete = (id, index) => {
   deleteId.value = id;
-  deleteDialog.value = true;
+  delete_multimedia_index.value = index;
+  deleteConfirmDialog.value = true;
 };
 
 const deleteMultimedia = async () => {
+  delete_loading.value = true;
+
   try {
     await $fetch(`/api/v1/files/${deleteId.value}`, {
       method: "DELETE",
@@ -447,17 +477,24 @@ const deleteMultimedia = async () => {
       },
     });
 
+    multimedia_list.value.splice(delete_multimedia_index.value, 1);
+    deleteId.value = null;
+    delete_multimedia_index.value = null;
+    deleteConfirmDialog.value = false;
     $toast.success("Multimedia deleted successfully");
+  } catch (e) {
+    if (e.response?.status === 400) {
+      $toast.error(e.response.data.message || "Error deleting multimedia");
+    } else {
+      $toast.error("Error deleting multimedia");
+    }
 
-    // Remove the item from the list
-    multimedia_list.value = multimedia_list.value.filter(
-      (item) => item.id !== deleteId.value
-    );
-
-    // Close the dialog
-    deleteDialog.value = false;
-  } catch (err) {
-    $toast.error(err.message || "Error deleting multimedia");
+    // Reset state variables even on error
+    deleteId.value = null;
+    delete_multimedia_index.value = null;
+    deleteConfirmDialog.value = false;
+  } finally {
+    delete_loading.value = false;
   }
 };
 
