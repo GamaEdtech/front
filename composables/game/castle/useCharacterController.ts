@@ -1,12 +1,11 @@
-// composables/useCharacterController.ts
 import * as THREE from 'three'
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { shallowRef, ref } from 'vue'
-import { nearDoor, openedDoors} from '@/store/doorStatus'
-import { watch } from 'vue'
-import { doorModels } from '~/store/doorModels'
+import { shallowRef, ref, watch, computed, Ref } from 'vue'
+// import { doorModels } from '~/store/doorModels'
 import { animate } from 'animejs'
+import createGate from './useGate'
+import useGate from './useGate'
+import { DoorModels } from '~/interfaces/DoorModels.interface'
+import { Doors, Level, Step } from '~/interfaces/DoorStatus'
 
 // Define types for better code organization
 interface MoveState {
@@ -16,6 +15,9 @@ interface MoveState {
     right: boolean;
     mouseX: number;
     mouseY: number;
+    isTouching: boolean;
+    lastTouchX: number;
+    lastTouchY: number;
 }
 
 interface BoundaryWall {
@@ -44,37 +46,42 @@ interface CastleBoundaries {
     rightWall: BoundaryWall;
     backWall: BoundaryWall;
     frontWall: BoundaryWall;
-    corridorRightWall: BoundaryWall;
-    corridorLeftWall: BoundaryWall;
-    roomLeftWall: BoundaryWall;
-    roomRightWall: BoundaryWall;
     door1: DoorBoundary;
     door2: DoorBoundary;
     door3: DoorBoundary;
+    door4: DoorBoundary;
 }
 
 
 export function useCharacterController(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
-    container: HTMLDivElement
+    container: HTMLDivElement,
+    doorModels: DoorModels,
+    openedDoors: Level[],
+    nearDoor: Ref<"door001" | "door002" | "door003" | "door004" | null>,
+    level: Ref<number>,
+    step: Ref<number>
 ) {
     // Character references
     const character = shallowRef<THREE.Object3D | null>(null)
     const characterBox = shallowRef<THREE.Box3 | null>(null)
 
     // Interaction state
+    const isNearGate = ref(false)
     const isNearDoor = ref(false)
     const doorPositions: Record<string, THREE.Vector3> = {
         door001: new THREE.Vector3(43, 55, 248), // Estimated position for Door.001
         door002: new THREE.Vector3(-56, 55, 3), // Estimated position for Door.002
-        door003: new THREE.Vector3(43, 55, -242) // Position of Door.003
+        door003: new THREE.Vector3(43, 55, -242), // Position of Door.003
+        door004: new THREE.Vector3(-18, 55, -485) // Position of Door.003
     }
     const INTERACTION_DISTANCE = 50 // Distance to show interaction prompt
 
     // Movement constants
     const MOVE_SPEED = 1.5
     const ROTATION_SPEED = 0.02
+    const TOUCH_SENSITIVITY = 0.5 // Control sensitivity for touch
 
     // Movement state
     const moveState: MoveState = {
@@ -83,8 +90,14 @@ export function useCharacterController(
         left: false,
         right: false,
         mouseX: 0,
-        mouseY: 0
+        mouseY: 0,
+        isTouching: false,
+        lastTouchX: 0,
+        lastTouchY: 0
     }
+
+    // Device detection
+    const isMobile = ref(false)
 
     // Castle boundaries for collision detection
     const boundaries: CastleBoundaries = {
@@ -107,34 +120,10 @@ export function useCharacterController(
             rightX: 70
         },
         frontWall: {
-            z: -812,
+            z: -573.8,
             x: 0,
             leftX: -78,
             rightX: 70
-        },
-        corridorRightWall: {
-            leftX: 2.4774,
-            rightX: 85,
-            z: -478.139803,
-            x: 43.7387
-        },
-        corridorLeftWall: {
-            leftX: -160.58,
-            rightX: -31.8965,
-            z: -478.139803,
-            x: -71.2383
-        },
-        roomLeftWall: {
-            x: -145.62,
-            z: -577,
-            leftX: -146,
-            rightX: -145
-        },
-        roomRightWall: {
-            x: 38.5,
-            z: -577,
-            leftX: 38,
-            rightX: 39
         },
         door1: {
             leftX: 24,
@@ -175,10 +164,27 @@ export function useCharacterController(
                 rightX: 72
             }
         },
+        door4: {
+            leftX: -31.8965,
+            rightX: 2.4774,
+            z: -482,
+            leftWall: {
+                leftX: -160.58,
+                rightX: -31.8965,
+            },
+            rightWall: {
+                leftX: 2.4774,
+                rightX: 85,
+            }
+        },
     }
 
+
+    const stepKey = computed(() => `step${step.value}` as keyof Step);
+    const currentStep = computed(() => openedDoors[level.value - 1].steps[stepKey.value])
+
     watch(openedDoors, (newVal) => {
-        if(newVal.door001 == true) {
+        if (currentStep.value.door001 == true) {
             if (doorModels.door001.model) {
                 animate(doorModels.door001.model.rotation, {
                     z: -3.2,
@@ -187,7 +193,7 @@ export function useCharacterController(
                 })
             }
         }
-        if(newVal.door002 == true) {
+        if (currentStep.value.door002 == true) {
             if (doorModels.door002.model) {
                 animate(doorModels.door002.model.rotation, {
                     z: -3.2,
@@ -196,7 +202,7 @@ export function useCharacterController(
                 })
             }
         }
-        if(newVal.door003 == true) {
+        if (currentStep.value.door003 == true) {
             if (doorModels.door003.model) {
                 animate(doorModels.door003.model.rotation, {
                     z: -3.2,
@@ -205,14 +211,33 @@ export function useCharacterController(
                 })
             }
         }
-        
+        if (currentStep.value.door004 == true) {
+            if (doorModels.door004.model) {
+                animate(doorModels.door004.model.rotation, {
+                    z: -3.130,
+                    duration: 1000,
+                    easing: 'easeInOutSine'
+                })
+            }
+        }
+
     }, { deep: true })
+
+    /**
+     * Detect if user is on a mobile device
+     */
+    const detectMobileDevice = () => {
+        isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
 
     /**
      * Updates interaction state based on proximity to doors
      */
+    const { gateInteractions } = useGate(scene)
     const updateInteractions = () => {
         if (!character.value) return
+
+        isNearGate.value = gateInteractions(character.value)
 
         let nearAnyDoor = false;
 
@@ -220,8 +245,8 @@ export function useCharacterController(
         for (const doorKey in doorPositions) {
             const doorPosition = doorPositions[doorKey];
             const distanceToDoor = character.value.position.distanceTo(doorPosition);
-            
-            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors[doorKey as "door001" | "door002" | "door003"]) {
+
+            if ((distanceToDoor < INTERACTION_DISTANCE) && !openedDoors[level.value - 1].steps[stepKey.value][doorKey as "door001" | "door002" | "door003"]) {
                 nearAnyDoor = true;
                 nearDoor.value = doorKey as "door001" | "door002" | "door003";
                 break;
@@ -239,10 +264,14 @@ export function useCharacterController(
 
     /**
      * Creates and sets up the character in the scene
-     */
+    */
+
+    // Create a character container
+    const characterContainer = new THREE.Object3D()
+
     const createCharacter = () => {
-        // Create a character container
-        const characterContainer = new THREE.Object3D()
+        // Detect if on mobile device
+        detectMobileDevice()
 
         // Create character body
         const geometry = new THREE.BoxGeometry(2, 4, 2)
@@ -280,9 +309,16 @@ export function useCharacterController(
         // Mouse events for rotation
         window.addEventListener('mousemove', onMouseMove)
 
-        // Lock pointer for better control
+        // Touch events for mobile rotation
+        container.addEventListener('touchstart', onTouchStart)
+        container.addEventListener('touchmove', onTouchMove)
+        container.addEventListener('touchend', onTouchEnd)
+
+        // Lock pointer for better control on desktop
         container.addEventListener('click', () => {
-            container.requestPointerLock()
+            if (!isMobile.value) {
+                container.requestPointerLock()
+            }
         })
     }
 
@@ -346,6 +382,58 @@ export function useCharacterController(
     }
 
     /**
+     * Handles touch start event for mobile rotation
+     */
+    const onTouchStart = (event: TouchEvent) => {
+        if (event.touches.length === 1) {
+            event.preventDefault()
+            moveState.isTouching = true
+            moveState.lastTouchX = event.touches[0].clientX
+            moveState.lastTouchY = event.touches[0].clientY
+        }
+    }
+
+    /**
+     * Handles touch move event for mobile rotation
+     */
+    const onTouchMove = (event: TouchEvent) => {
+        if (!moveState.isTouching || !character.value) return
+
+        if (event.touches.length === 1) {
+            event.preventDefault()
+
+            const touchX = event.touches[0].clientX
+            const touchY = event.touches[0].clientY
+
+            // Calculate the movement delta
+            const deltaX = touchX - moveState.lastTouchX
+            const deltaY = touchY - moveState.lastTouchY
+
+            // Update the rotation based on touch deltas
+            moveState.mouseX += deltaX * TOUCH_SENSITIVITY
+            moveState.mouseY += deltaY * TOUCH_SENSITIVITY
+
+            // Limit vertical rotation
+            moveState.mouseY = Math.max(-45, Math.min(45, moveState.mouseY))
+
+            // Apply rotation to character and camera
+            character.value.rotation.y = -moveState.mouseX * ROTATION_SPEED
+            camera.rotation.x = -moveState.mouseY * ROTATION_SPEED * 0.5
+
+            // Store current position for next move
+            moveState.lastTouchX = touchX
+            moveState.lastTouchY = touchY
+        }
+    }
+
+    /**
+     * Handles touch end event
+     */
+    const onTouchEnd = () => {
+        moveState.isTouching = false
+    }
+
+    /**
      * Calculates movement direction based on input
      */
     const calculateMovementDirection = (): THREE.Vector3 => {
@@ -379,61 +467,29 @@ export function useCharacterController(
             return true;
         }
 
-        // Check corridor walls
-        if ((x < b.corridorRightWall.rightX && x > b.corridorRightWall.leftX) &&
-            (z < b.corridorRightWall.z && z > b.corridorRightWall.z - 100)) {
-            return true;
-        }
-
-        if ((x < b.corridorLeftWall.rightX && x > b.corridorLeftWall.leftX) &&
-            (z < b.corridorLeftWall.z && z > b.corridorLeftWall.z - 100)) {
-            return true;
-        }
-
-        // Check room walls
-        if ((x < b.roomLeftWall.x && z < b.roomLeftWall.z) ||
-            (x > b.roomRightWall.x && z < b.roomRightWall.z)) {
-            return true;
-        }
-
         // Check doors
-        const checkDoorWalls = (door: DoorBoundary) => {
-            
+        const checkDoorWalls = (door: DoorBoundary, diagonalSize: number = 5) => {
             return ((x < door.leftWall.rightX && x > door.leftWall.leftX) &&
-                (z < door.z && z > door.z - 5)) ||
+                (z < door.z && z > door.z - diagonalSize)) ||
                 ((x < door.rightWall.rightX && x > door.rightWall.leftX) &&
-                    (z < door.z && z > door.z - 5));
+                    (z < door.z && z > door.z - diagonalSize));
         };
 
         const checkDoor = (door: DoorBoundary, doorName: string) => {
             return ((x > door.leftX && x < door.rightX) &&
-                (z > door.z && z < door.z + 5)) && !openedDoors[doorName as "door001" | "door002" | "door003"];
+                (z > door.z && z < door.z + 5)) && !currentStep.value[doorName as "door001" | "door002" | "door003" | "door004"]
         };
 
-        if (checkDoorWalls(b.door1) || checkDoorWalls(b.door2) || checkDoorWalls(b.door3)) {
+        if (checkDoorWalls(b.door1) || checkDoorWalls(b.door2) || checkDoorWalls(b.door3) || checkDoorWalls(b.door4, 100)) {
             return true;
         }
 
-        if (checkDoor(b.door1, "door001") || checkDoor(b.door2, "door002") || checkDoor(b.door3, "door003")) {
+        if (checkDoor(b.door1, "door001") || checkDoor(b.door2, "door002") || checkDoor(b.door3, "door003") || checkDoor(b.door4, "door004")) {
             return true;
         }
 
         return false;
     }
-
-    /**
-     * Checks collisions for a single component (x or z)
-     */
-    // const checkComponentCollision = (currentPos: THREE.Vector3, newPos: THREE.Vector3): boolean => {
-    //     // Create a test position that only moves in one component
-    //     const testPosX = currentPos.clone();
-    //     testPosX.x = newPos.x;
-
-    //     const testPosZ = currentPos.clone();
-    //     testPosZ.z = newPos.z;
-
-    //     return checkCollision(testPosX) || checkCollision(testPosZ);
-    // }
 
     /**
      * Updates character position with collision detection and wall sliding
@@ -497,8 +553,13 @@ export function useCharacterController(
         window.removeEventListener('keydown', onKeyDown)
         window.removeEventListener('keyup', onKeyUp)
         window.removeEventListener('mousemove', onMouseMove)
+        container.removeEventListener('touchstart', onTouchStart)
+        container.removeEventListener('touchmove', onTouchMove)
+        container.removeEventListener('touchend', onTouchEnd)
         document.removeEventListener('click', () => { })
     }
+
+    createGate(scene)
 
     return {
         createCharacter,
@@ -506,6 +567,10 @@ export function useCharacterController(
         updateCharacter,
         cleanup,
         character,
-        isNearDoor
+        isNearDoor,
+        isNearGate,
+        characterContainer,
+        isMobile,
+        moveState,
     }
 }
