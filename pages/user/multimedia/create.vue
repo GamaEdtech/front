@@ -219,7 +219,7 @@
 
 <script setup>
 import { useAuth } from "~/composables/useAuth";
-import FormTopicSelector from "~/components/Form/topic-selector.vue";
+import FormTopicSelector from "~/components/form/topic-selector.vue";
 
 const auth = useAuth();
 
@@ -547,4 +547,3 @@ onMounted(() => {
   color: rgba(0, 0, 0, 0.6);
 }
 </style>
-

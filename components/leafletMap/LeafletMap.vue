@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import LocationSearch from "@/components/Form/LocationSearch";
+import LocationSearch from "@/components/form/LocationSearch";
 
 export default {
   name: "LeafletMap",

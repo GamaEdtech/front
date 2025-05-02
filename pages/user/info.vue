@@ -1,91 +1,91 @@
 <template>
   <v-container>
-    <validation-observer ref="observer" v-slot="{ invalid }">
-      <form @submit.prevent="updateInfo()">
-        <v-row class="mt-8">
-          <v-col cols="12">
-            <p class="text-h4 text-md-h3">Personal info</p>
-            <v-divider class="my-4" />
-            <p class="text-h5 text-md-h4">
-              So that we can remember you more easily :)
-            </p>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+    <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+    <form @submit.prevent="updateInfo()">
+      <v-row class="mt-8">
+        <v-col cols="12">
+          <p class="text-h4 text-md-h3">Personal info</p>
+          <v-divider class="my-4" />
+          <p class="text-h5 text-md-h4">
+            So that we can remember you more easily :)
+          </p>
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="first_name"
               rules="required"
-            >
-              <v-text-field
-                dense
-                label="First name"
-                :error-messages="errors"
-                v-model="info.first_name"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-text-field
+            dense
+            label="First name"
+            :error-messages="errors"
+            v-model="info.first_name"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="last_name"
               rules="required"
-            >
-              <v-text-field
-                dense
-                label="Last name"
-                :error-messages="errors"
-                v-model="info.last_name"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-text-field
+            dense
+            label="Last name"
+            :error-messages="errors"
+            v-model="info.last_name"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="sex"
               rules="required"
-            >
-              <v-select
-                dense
-                :items="sex_list"
-                label="Gender"
-                item-text="title"
-                item-value="id"
-                :error-messages="errors"
-                v-model="info.sex"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-btn
-              type="submit"
-              block
-              :loading="update_loading"
-              :disabled="invalid"
-              outlined
-              class="green--text"
-            >
-              Update
-            </v-btn>
-          </v-col>
-        </v-row>
-      </form>
-    </validation-observer>
+            > -->
+          <v-select
+            dense
+            :items="sex_list"
+            label="Gender"
+            item-text="title"
+            item-value="id"
+            :error-messages="errors"
+            v-model="info.sex"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-btn
+            type="submit"
+            block
+            :loading="update_loading"
+            :disabled="invalid"
+            outlined
+            class="green--text"
+          >
+            Update
+          </v-btn>
+        </v-col>
+      </v-row>
+    </form>
+    <!-- </validation-observer> -->
   </v-container>
 </template>
 <script>
-import { ValidationProvider, ValidationObserver } from "vee-validate";
+// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
 export default {
   layout: "dashboard_layout",
   name: "user-info",
   role: "user_type",
-  components: {
-    ValidationObserver,
-    ValidationProvider,
-  },
+  // components: {
+  //   ValidationObserver,
+  //   ValidationProvider,
+  // },
   data() {
     return {
       info: {

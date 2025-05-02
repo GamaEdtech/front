@@ -30,37 +30,34 @@
       <!--Choose username-->
       <v-row v-if="userData.username === '0'">
         <v-col cols="12" md="12" class="pa-0 pa-md-3">
-          <validation-observer ref="observer" v-slot="{ invalid }">
-            <form @submit.prevent="updateUsername()">
-              <validation-provider
-                name="username"
-                v-slot="{ errors }"
-                rules="required|min:6"
-              >
-                <v-text-field
-                  v-model="username"
-                  filled
-                  dense
-                  :error-messages="errors"
-                  class="mt-4 mb-0"
-                  label="Choose username"
-                  type="text"
+          <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+          <form @submit.prevent="updateUsername()">
+            <!-- <validation-provider -->
+            name="username" v-slot="{ errors }" rules="required|min:6" >
+            <v-text-field
+              v-model="username"
+              filled
+              dense
+              :error-messages="errors"
+              class="mt-4 mb-0"
+              label="Choose username"
+              type="text"
+            >
+              <template slot="append">
+                <v-btn
+                  class="default"
+                  type="submit"
+                  :disabled="invalid"
+                  absolute
+                  style="right: 0; height: 80%; top: 10%; bottom: 0"
                 >
-                  <template slot="append">
-                    <v-btn
-                      class="default"
-                      type="submit"
-                      :disabled="invalid"
-                      absolute
-                      style="right: 0; height: 80%; top: 10%; bottom: 0"
-                    >
-                      choose
-                    </v-btn>
-                  </template>
-                </v-text-field>
-              </validation-provider>
-            </form>
-          </validation-observer>
+                  choose
+                </v-btn>
+              </template>
+            </v-text-field>
+            <!-- </validation-provider> -->
+          </form>
+          <!-- </validation-observer> -->
         </v-col>
       </v-row>
       <!--End choose username-->
@@ -89,7 +86,7 @@
 </template>
 
 <script>
-import { ValidationProvider, ValidationObserver } from "vee-validate";
+// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
 export default {
   name: "general-info-dashboard",
@@ -100,10 +97,10 @@ export default {
       username: "",
     };
   },
-  components: {
-    ValidationProvider,
-    ValidationObserver,
-  },
+  // components: {
+  //   ValidationProvider,
+  //   ValidationObserver,
+  // },
   methods: {
     updateUsername() {
       this.$fetch

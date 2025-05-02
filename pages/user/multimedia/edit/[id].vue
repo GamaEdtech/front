@@ -218,7 +218,7 @@
 
 <script setup>
 import { useAuth } from "~/composables/useAuth";
-import FormTopicSelector from "~/components/Form/topic-selector.vue";
+import FormTopicSelector from "~/components/form/topic-selector.vue";
 
 const auth = useAuth();
 // Define layout and page metadata
@@ -761,4 +761,4 @@ onMounted(async () => {
   content: "\f0a4";
   font-weight: 900;
 }
-</style> 
+</style>

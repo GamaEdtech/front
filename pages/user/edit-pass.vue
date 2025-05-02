@@ -16,89 +16,81 @@
         </p>
       </v-card-title>
       <v-card-text>
-        <validation-observer ref="observer" v-slot="{ invalid }">
-          <form @submit.prevent="updatePass()">
-            <v-row>
-              <v-col cols="12" md="3">
-                <validation-provider
-                  v-slot="{ errors }"
-                  name="oldpass"
-                  rules="required|min:4"
-                >
-                  <v-text-field
-                    type="password"
-                    :append-icon="show_oldpass ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="show_oldpass ? 'text' : 'password'"
-                    @click:append="show_oldpass = !show_oldpass"
-                    dense
-                    label="Current password"
-                    :error-messages="errors"
-                    v-model="info.oldpass"
-                    outlined
-                  />
-                </validation-provider>
-              </v-col>
-              <v-col cols="12" md="3">
-                <validation-provider
-                  v-slot="{ errors }"
-                  name="newpass"
-                  rules="required|min:4"
-                >
-                  <v-text-field
-                    type="password"
-                    :append-icon="show_newpass ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="show_newpass ? 'text' : 'password'"
-                    @click:append="show_newpass = !show_newpass"
-                    dense
-                    label="New password"
-                    :error-messages="errors"
-                    v-model="info.newpass"
-                    outlined
-                  />
-                </validation-provider>
-              </v-col>
-              <v-col cols="12" md="3">
-                <validation-provider
+        <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+        <form @submit.prevent="updatePass()">
+          <v-row>
+            <v-col cols="12" md="3">
+              <!-- <validation-provider -->
+              v-slot="{ errors }" name="oldpass" rules="required|min:4" >
+              <v-text-field
+                type="password"
+                :append-icon="show_oldpass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show_oldpass ? 'text' : 'password'"
+                @click:append="show_oldpass = !show_oldpass"
+                dense
+                label="Current password"
+                :error-messages="errors"
+                v-model="info.oldpass"
+                outlined
+              />
+              <!-- </validation-provider> -->
+            </v-col>
+            <v-col cols="12" md="3">
+              <!-- <validation-provider -->
+              v-slot="{ errors }" name="newpass" rules="required|min:4" >
+              <v-text-field
+                type="password"
+                :append-icon="show_newpass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show_newpass ? 'text' : 'password'"
+                @click:append="show_newpass = !show_newpass"
+                dense
+                label="New password"
+                :error-messages="errors"
+                v-model="info.newpass"
+                outlined
+              />
+              <!-- </validation-provider> -->
+            </v-col>
+            <v-col cols="12" md="3">
+              <!-- <validation-provider
                   v-slot="{ errors }"
                   name="repeat_newpass"
                   rules="required|min:4|confirmed:newpass"
-                >
-                  <v-text-field
-                    type="password"
-                    :append-icon="
-                      show_repeat_newpass ? 'mdi-eye' : 'mdi-eye-off'
-                    "
-                    :type="show_repeat_newpass ? 'text' : 'password'"
-                    @click:append="show_repeat_newpass = !show_repeat_newpass"
-                    dense
-                    label="Repeat new password"
-                    :error-messages="errors"
-                    v-model="info.repeat_newpass"
-                    outlined
-                  />
-                </validation-provider>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-btn
-                  type="submit"
-                  block
-                  :loading="update_loading"
-                  :disabled="invalid"
-                  outlined
-                  class="green--text"
-                >
-                  Update
-                </v-btn>
-              </v-col>
-            </v-row>
-          </form>
-        </validation-observer>
+                > -->
+              <v-text-field
+                type="password"
+                :append-icon="show_repeat_newpass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show_repeat_newpass ? 'text' : 'password'"
+                @click:append="show_repeat_newpass = !show_repeat_newpass"
+                dense
+                label="Repeat new password"
+                :error-messages="errors"
+                v-model="info.repeat_newpass"
+                outlined
+              />
+              <!-- </validation-provider> -->
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-btn
+                type="submit"
+                block
+                :loading="update_loading"
+                :disabled="invalid"
+                outlined
+                class="green--text"
+              >
+                Update
+              </v-btn>
+            </v-col>
+          </v-row>
+        </form>
+        <!-- </validation-observer> -->
       </v-card-text>
     </v-card>
   </div>
 </template>
 <script>
-import { ValidationProvider, ValidationObserver } from "vee-validate";
+// import { ValidationProvider, ValidationObserver } from "vee-validate";
 
 export default {
   layout: "dashboard_layout",
@@ -109,10 +101,10 @@ export default {
     };
   },
   role: "user_type",
-  components: {
-    ValidationObserver,
-    ValidationProvider,
-  },
+  // components: {
+  //   ValidationObserver,
+  //   ValidationProvider,
+  // },
   data() {
     return {
       info: {
