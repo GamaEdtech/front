@@ -1560,6 +1560,13 @@
     hookable "^5.5.3"
     unhead "2.0.8"
 
+"@vee-validate/rules@^4.15.0":
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/@vee-validate/rules/-/rules-4.15.0.tgz#4f71b35faf53cb7d5e7636b7ba73b6bec2867420"
+  integrity sha512-Cvll7r98O5tU6ew2AUifVpdhNnTkMTY7+D9N++J7apQXRXWfHMe4tNvjo4TJpKUPCtfLHbdTY/DCquDRc+uH4w==
+  dependencies:
+    vee-validate "4.15.0"
+
 "@vercel/nft@0.27.7":
   version "0.27.7"
   resolved "https://registry.yarnpkg.com/@vercel/nft/-/nft-0.27.7.tgz#92e27ef1860f1a1d1838b76098996aae165d9b98"
@@ -7136,7 +7143,7 @@ validate-npm-package-license@^3.0.1, validate-npm-package-license@^3.0.4:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vee-validate@^4.15.0:
+vee-validate@4.15.0, vee-validate@^4.15.0:
   version "4.15.0"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.15.0.tgz#eb77a9c867669d34abbc33ca5e16f2a991eb7ad5"
   integrity sha512-PGJh1QCFwCBjbHu5aN6vB8macYVWrajbDvgo1Y/8fz9n/RVIkLmZCJDpUgu7+mUmCOPMxeyq7vXUOhbwAqdXcA==
