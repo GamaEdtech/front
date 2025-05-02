@@ -3,14 +3,30 @@
         <canvas id="canvas" class="wrbgl"></canvas>
 
         <div class="top-items">
-            <button class="pause-btn btn" @click="setPlayingStatus(false)">
+            <button :disabled="isShowGuidMenu"
+                :class="`pause-btn ${stepGuidMenu == `pause` || !isShowGuidMenu ? `` : `fade`}`"
+                @click="setPlayingStatus(false)">
                 <img class="icon-pause highligth" src="@/assets/images/pause-icon.svg" alt="Pause">
+
+
+                <div class="description-guid" v-if="stepGuidMenu == `pause`">
+                    You Can Stop The Game
+
+                    <button class="btn-next-guid btn" @click="changeStepGuid($event, `questionBox`)">Next</button>
+                </div>
             </button>
-            <div :class="['question-box', questionStatus]">
+            <div
+                :class="['question-box', questionStatus, stepGuidMenu == `questionBox` || !isShowGuidMenu ? `` : `fade`]">
                 {{ questions[currentQuestionIndex].text }}
+
+                <div class="description-guid" v-if="stepGuidMenu == `questionBox`">
+                    You Can See The Current Question
+
+                    <button class="btn-next-guid btn" @click="changeStepGuid($event, `timerScore`)">Next</button>
+                </div>
             </div>
 
-            <div class="container-timer-score">
+            <div :class="`container-timer-score ${stepGuidMenu == `timerScore` || !isShowGuidMenu ? `` : `fade`}`">
                 <div class="score-div">
                     <span class="score-text">{{ score }}</span>
                     <img class="icon-score" src="@/assets/images/star-icon.svg" alt="Score">
@@ -18,20 +34,35 @@
                 <div :class="['timer-box', { 'danger': timerDanger }]">
                     {{ Math.ceil(timer) }}
                 </div>
-                <button class="camera-btn btn" @click="changeCameraMode">
+                <button :disabled="isShowGuidMenu" class="camera-btn btn" @click="changeCameraMode">
                     <img class="icon-mode highligth"
                         :src="`${cameraMode == `default` ? require(`@/assets/images/webcam-icon.svg`) : require(`@/assets/images/camera-icon.svg`)}`"
                         alt="Camera Mode">
                 </button>
 
+
+                <div class="description-guid score-time" v-if="stepGuidMenu == `timerScore`">
+                    You Can See The Remainin time , Score and changing Mode Camera.
+
+                    <button class="btn-next-guid btn" @click="changeStepGuid($event, `play`)">Next</button>
+                </div>
             </div>
 
         </div>
 
-        <div class="overlay-pause" v-if="!isPlayingGame && resultGame == `pending`">
-            <button class="play-btn btn" @click="setPlayingStatus(true)">
+        <div :class="`overlay-pause ${isShowGuidMenu ? `zindex-less` : ``}`"
+            v-if="!isPlayingGame && resultGame == `pending`">
+            <button :disabled="isShowGuidMenu"
+                :class="`play-btn btn ${stepGuidMenu == `play` || !isShowGuidMenu ? `` : `fade`}`"
+                @click="setPlayingStatus(true)">
                 <img class="icon-play highligth" src="@/assets/images/play-icon.svg" alt="Play">
             </button>
+
+            <div class="description-guid play-game" v-if="stepGuidMenu == `play`">
+                You Can see Play the game
+
+                <button class="btn-next-guid btn" @click="changeStepGuid($event, `ChangeLaneBtn`)">Next</button>
+            </div>
         </div>
 
         <div class="overlay-result-game" v-if="resultGame != `pending`">
@@ -59,13 +90,19 @@
             </transition>
         </div>
 
-        <div class="buttons-div">
-            <button @click="changeLane(-1)" class="change-lane-btn btn">
+        <div :class="`buttons-div ${stepGuidMenu == `ChangeLaneBtn` || !isShowGuidMenu ? `` : `fade`}`">
+            <button :disabled="isShowGuidMenu" @click="changeLane(-1)" class="change-lane-btn btn">
                 <img class="icon-play highligth" src="@/assets/images/left-arrow-icon.svg" alt="Left Arrow">
             </button>
-            <button @click="changeLane(1)" class="change-lane-btn btn">
+            <button :disabled="isShowGuidMenu" @click="changeLane(1)" class="change-lane-btn btn">
                 <img class="icon-play highligth" src="@/assets/images/right-arrow-icon.svg" alt="Right Arrow">
             </button>
+
+            <div class="description-guid guid-btn-change-lane" v-if="stepGuidMenu == `ChangeLaneBtn`">
+                You Can Change Lane the car
+
+                <button class="btn-next-guid btn" @click="changeStepGuid($event, `Finish`)">Finish</button>
+            </div>
         </div>
     </div>
 </template>
@@ -129,21 +166,30 @@ export default {
             isPlayingGame: false,
             score: 0,
             resultGame: 'pending',
-            isLoading: false,
+            isLoading: true,
             currentCountFirstPlay: 3,
             showCounterFirstPlay: false,
             isFirstTimePlayingGame: true,
-            cameraMode: 'default'
+            cameraMode: 'default',
+            isShowGuidMenu: false,
+            stepGuidMenu: "Finish"
         };
     },
     mounted() {
+        const hasSeenGuide = localStorage.getItem('hasSeenGuideMenu')
+        if (!hasSeenGuide) {
+            this.stepGuidMenu = "pause"
+            this.isShowGuidMenu = true
+            localStorage.setItem('hasSeenGuideMenu', 'true')
+        }
         this.experience = new Experience(document.getElementById("canvas"), this.questions,
             {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
                 onScoreChange: (bonus) => this.onScoreChange(bonus),
-                onResultGameChange: (result) => this.onResultGameChange(result)
+                onResultGameChange: (result) => this.onResultGameChange(result),
+                onChangeSceneReady: this.onChangeSceneReady
             }
         )
     },
@@ -151,6 +197,16 @@ export default {
         this.experience.destroy()
     },
     methods: {
+        onChangeSceneReady() {
+            this.isLoading = false
+        },
+        changeStepGuid(event, step) {
+            event.stopImmediatePropagation()
+            this.stepGuidMenu = step
+            if (step == "Finish") {
+                this.isShowGuidMenu = false
+            }
+        },
         changeLane(direction) {
             this.experience.changeLane(direction)
         },
@@ -320,7 +376,7 @@ export default {
     color: white;
     text-align: center;
     transition: all 0.3s ease;
-    -webkit-text-stroke: 1px #ffffff;
+    position: relative;
 }
 
 .question-box.normal {
@@ -379,6 +435,7 @@ export default {
     align-items: center;
     justify-content: center;
     column-gap: 6px;
+    position: relative;
 }
 
 /* score section */
@@ -509,6 +566,10 @@ export default {
     align-items: center;
     justify-content: center;
     background-color: rgb(0 0 0 / 64%);
+}
+
+.zindex-less {
+    z-index: 2;
 }
 
 .play-btn {
@@ -669,6 +730,67 @@ export default {
     }
 }
 
+
+
+/* guid overlay */
+.guid-overlay {
+    position: absolute;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fade {
+    opacity: 0.5;
+}
+
+.description-guid {
+    border-radius: 12px;
+    background-color: white;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    position: absolute;
+    top: 100px;
+    padding: 10px;
+    left: 40px;
+    row-gap: 20px;
+    z-index: 10;
+}
+
+.btn-next-guid {
+    width: 80px;
+    height: 30px;
+    background-color: #ff9e00;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.play-game {
+    top: unset;
+    left: unset;
+    transform: translateY(100px);
+}
+
+.guid-btn-change-lane {
+    top: unset;
+    left: unset;
+    transform: translateY(-100px);
+}
+
 /* responsive mobile */
 @media screen and (max-width: 480px) {
     .change-lane-btn {
@@ -710,6 +832,11 @@ export default {
 
     .top-items {
         align-items: flex-start;
+    }
+
+    .score-time {
+        left: -100px;
+        top: 220px;
     }
 }
 </style>

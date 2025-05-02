@@ -147,13 +147,8 @@ export default class Experience {
                 this.renderer.update()
                 this.world.update()
             }
+            this.callBacks.onChangeSceneReady()
         })
-
-        if (sources.length == 0) {
-            this.world = new World()
-        }
-
-
     }
 
     changeLane(direction) {
