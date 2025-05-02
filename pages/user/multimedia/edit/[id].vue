@@ -147,14 +147,14 @@
                           icon
                           size="small"
                           variant="plain"
-                          :href="multimediaData.files.url"
-                          target="_blank"
+                          @click="startDownload('multimedia')"
                           v-if="multimediaData.files.exist"
                           title="Download file"
+                          :loading="download_loading"
                         >
-                          <v-icon size="18" style="margin-left: 0.5rem"
-                            >mdi-download</v-icon
-                          >
+                          <v-icon size="18" style="margin-left: 0.5rem">
+                            mdi-download
+                          </v-icon>
                         </v-btn>
                       </template>
                     </v-file-input>
@@ -635,6 +635,35 @@ watch(
     }
   }
 );
+
+const download_loading = ref(false);
+
+const startDownload = async () => {
+  download_loading.value = true;
+  try {
+    const response = await $fetch(`/api/v1/files/download/${route.params.id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    const FileSaver = await import("file-saver");
+    FileSaver.saveAs(response.data.url, response.data.name);
+  } catch (err) {
+    if (err.response?.status == 400) {
+      if (
+        err.response.data.status == 0 &&
+        err.response.data.error == "creditNotEnough"
+      ) {
+        useToast().info("No enough credit");
+      }
+    } else if (err.response?.status == 403) {
+      router.push({ query: { auth_form: "login" } });
+    }
+    console.log(err);
+  } finally {
+    download_loading.value = false;
+  }
+};
 
 // Initialize on mount
 onMounted(async () => {
