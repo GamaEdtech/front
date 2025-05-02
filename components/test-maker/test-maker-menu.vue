@@ -63,9 +63,9 @@ export default {
           icon: 'mdi-format-list-checkbox',
           link: '',
           subMenuList: [
-            {title: "My Exams", link: "/user/exam", icon: 'mdi-clipboard-list-outline', icon_type: 'custom',status:(this.$auth.user.group_id == '5' ? false : true)},
-            {title: "Albums", link: "/test-maker", icon: 'mdi-image-album', icon_type: 'custom',status:(this.$auth.user.group_id == '5' ? false : true)},
-            {title: "Results", link: "/exam/results", icon: 'mdi-list-status', icon_type: 'custom'}
+            {title: "My Exams", link: "/user/exam", icon: 'mdi-clipboard-list-outline', icon_type: 'custom',status:true},
+            {title: "Albums", link: "/test-maker", icon: 'mdi-image-album', icon_type: 'custom',status:true},
+            {title: "Results", link: "/exam/results", icon: 'mdi-list-status', icon_type: 'custom',status:true}
           ]
 
         },
