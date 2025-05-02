@@ -6,25 +6,24 @@
         v-model="dialog"
         fullscreen
         hide-overlay
-        transition="dialog-bottom-transition "
+        transition="dialog-bottom-transition"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template v-slot:activator="{ props }">
           <v-btn
-            v-bind="attrs"
-            v-on="on"
+            v-bind="props"
             class="d-block d-md-none"
             min-width="40"
             fixed
             right
             style="z-index: 10; bottom: 8rem"
-            x-large
+            size="x-large"
             color="teal"
-            dark
+            variant="flat"
             rounded
           >
-            <v-icon> mdi-filter </v-icon>
+            <v-icon>mdi-filter</v-icon>
             <v-slide-x-reverse-transition>
-              <span v-show="expandFilterMenu" class="text-h6"> filter </span>
+              <span v-show="expandFilterMenu" class="text-h6">filter</span>
             </v-slide-x-reverse-transition>
           </v-btn>
         </template>
@@ -34,7 +33,7 @@
               <v-toolbar-items>
                 <v-btn
                   class="text-h5 font-weight-bold"
-                  text
+                  variant="text"
                   @click="dialog = false"
                 >
                   Search in albums
@@ -51,38 +50,38 @@
             <v-row class="mt-4">
               <v-col cols="12" md="3">
                 <v-autocomplete
-                  dense
+                  density="compact"
                   v-model="filter.level"
                   clearable
                   :items="level_list"
-                  item-text="title"
+                  item-title="title"
                   item-value="id"
                   label="Curriculum"
-                  outlined
+                  variant="outlined"
                 />
               </v-col>
               <v-col cols="12" md="3">
                 <v-autocomplete
-                  dense
+                  density="compact"
                   v-model="filter.grade"
                   clearable
                   :items="grade_list"
                   item-value="id"
-                  item-text="title"
+                  item-title="title"
                   label="Grade"
-                  outlined
+                  variant="outlined"
                 />
               </v-col>
               <v-col cols="12" md="3">
                 <v-autocomplete
-                  dense
+                  density="compact"
                   :items="lesson_list"
                   item-value="id"
-                  item-text="title"
+                  item-title="title"
                   v-model="filter.lesson"
                   clearable
                   label="Subject"
-                  outlined
+                  variant="outlined"
                 />
               </v-col>
             </v-row>
@@ -92,7 +91,7 @@
             style="position: sticky; bottom: 0; left: 0; right: 0"
           >
             <v-btn
-              medium
+              size="medium"
               block
               class="filter-show-result mr-4"
               @click="dialog = !dialog"
@@ -106,8 +105,8 @@
 
     <v-row>
       <v-col cols="12" class="pl-5">
-        <span class="text-h4 teal--text">
-          <v-icon color="teal" large> mdi-image-album </v-icon>
+        <span class="text-h4 text-teal">
+          <v-icon color="teal" size="large">mdi-image-album</v-icon>
           Albums
         </span>
       </v-col>
@@ -118,38 +117,38 @@
         <v-row class="d-none d-md-flex">
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               v-model="filter.level"
               clearable
               :items="level_list"
-              item-text="title"
+              item-title="title"
               item-value="id"
               label="Curriculum"
-              outlined
+              variant="outlined"
             />
           </v-col>
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               v-model="filter.grade"
               clearable
               :items="grade_list"
               item-value="id"
-              item-text="title"
+              item-title="title"
               label="Grade"
-              outlined
+              variant="outlined"
             />
           </v-col>
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               :items="lesson_list"
               item-value="id"
-              item-text="title"
+              item-title="title"
               v-model="filter.lesson"
               clearable
               label="Subject"
-              outlined
+              variant="outlined"
             />
           </v-col>
         </v-row>
@@ -174,14 +173,14 @@
           >
             <v-card class="album-card">
               <v-card-title class="text-h4">
-                <nuxt-link :to="`/albums/${album.lesson}`">
+                <NuxtLink :to="`/albums/${album.lesson}`">
                   {{ album.lesson_title }} album
-                </nuxt-link>
+                </NuxtLink>
               </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col cols="7">
-                    <nuxt-link :to="`/albums/${album.lesson}`">
+                    <NuxtLink :to="`/albums/${album.lesson}`">
                       <v-img
                         class="album-img"
                         v-if="album.lesson_pic"
@@ -200,21 +199,21 @@
                           <a href="https://gamatrain.com">Gamatrain.com</a>
                         </v-card-text>
                       </v-card>
-                    </nuxt-link>
+                    </NuxtLink>
                   </v-col>
                   <v-col
                     cols="5"
                     class="d-flex align-center justify-center pr-0"
                   >
                     <p
-                      class="price_label green--text"
+                      class="price_label text-green"
                       v-show="album.price === '0'"
                     >
                       Free
                     </p>
                     <p class="price_label" v-show="album.price !== '0'">
-                      <span class="red--text">
-                        ${{ album.price | numberFormat }}
+                      <span class="text-red">
+                        ${{ formatNumber(album.price) }}
                       </span>
                       <br />
                       <br />
@@ -231,9 +230,7 @@
               <v-card-actions>
                 <v-chip label class="test-count-label">
                   <span class="label-text">Test count:&nbsp; </span>
-                  <span class="label-val">{{
-                    $numberFormat(album.tests_num)
-                  }}</span>
+                  <span class="label-val">{{ formatNumber(album.tests_num) }}</span>
                 </v-chip>
               </v-card-actions>
             </v-card>
@@ -258,187 +255,200 @@
   </v-container>
 </template>
 
-<script>
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
+<script setup>
+import FormTopicSelector from "~/components/form/topic-selector.vue";
 
-export default {
+// Define layout and page metadata
+definePageMeta({
   layout: "test-maker-layout",
-  name: "test-maker",
-  head() {
-    return {
-      title: "Online exam albums",
-    };
-  },
-  components: {
-    ValidationObserver,
-    ValidationProvider,
-    TopicSelector,
-  },
-  data() {
-    return {
-      test_step: 1,
-      page_loading: false,
-      page: 1,
-      all_files_loaded: false,
+});
 
-      filter: {
-        level: "",
-        grade: "",
-        lesson: "",
-      },
-      timepicker_menu: false,
+useHead({
+  title: "Online exam albums",
+});
 
-      level_list: [],
-      grade_list: [],
-      field_list: [],
-      lesson_list: [],
-      album_list: [],
-      dialog: false,
-      expandFilterMenu: true,
-    };
-  },
-  mounted() {
-    this.getTypeList("section");
-    this.getAlbumList();
-    this.scroll();
-  },
-  watch: {
-    "filter.level"(val) {
-      this.filter.grade = "";
-      this.filter.lesson = "";
-      if (val) {
-        this.getTypeList("base", val);
-      }
-      this.page = 1;
-      this.all_files_loaded = false;
-      this.album_list = [];
-      this.getAlbumList();
-    },
-    "filter.grade"(val) {
-      this.filter.lesson = "";
-      if (val) {
-        this.album_list = [];
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.getAlbumList();
-        this.getTypeList("lesson", val);
-      }
-    },
-    "filter.lesson"(val) {
-      if (val) {
-        this.page = 1;
-        this.all_files_loaded = false;
-        this.album_list = [];
-        this.getAlbumList();
-      }
-    },
-  },
-  methods: {
-    getTypeList(type, parent = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
-      }
+// Services
+const { $toast, $fetch } = useNuxtApp();
 
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            this.level_list = res.data;
-          } else if (type === "base") {
-            this.grade_list = res.data;
-          } else if (type === "lesson") {
-            this.lesson_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-    getAlbumList() {
-      if (this.all_files_loaded === false) {
-        this.page_loading = true;
-        this.$fetch
-          .$get("/api/v1/albums", {
-            params: {
-              perpage: 12,
-              page: this.page,
-              section: this.filter.level,
-              base: this.filter.grade,
-              lesson: this.filter.lesson,
-            },
-          })
-          .then((response) => {
-            let result = response.data.list;
-            for (var index in result) {
-              if (
-                this.album_list.findIndex((x) => x.id === result[index].id) ==
-                -1
-              )
-                this.album_list.push(result[index]);
-            }
+// Core data
+const test_step = ref(1);
+const page_loading = ref(false);
+const page = ref(1);
+const all_files_loaded = ref(false);
+const timer = ref(null);
 
-            console.log("Length" + result.length);
-            if (result.length === 0)
-              //For terminate auto load request
-              this.all_files_loaded = true;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => {
-            this.page_loading = false;
-          });
-      }
-    },
-    scroll() {
-      //For infinite loading
-      window.onscroll = () => {
-        //Scroll position
-        var scrollPosition =
-          Math.max(
-            window.pageYOffset,
-            document.documentElement.scrollTop,
-            document.body.scrollTop
-          ) +
-          window.innerHeight +
-          50;
-        let bottomOfWindow =
-          scrollPosition >= document.documentElement.offsetHeight;
+// Filter section
+const filter = reactive({
+  level: "",
+  grade: "",
+  lesson: "",
+});
 
-        //Avoid the number of requests
-        if (this.timer) {
-          clearTimeout(this.timer);
-          this.timer = null;
-        }
+// UI State
+const dialog = ref(false);
+const expandFilterMenu = ref(true);
 
-        //Section for control filter menu button on mobile device
-        if (window.scrollY > 1000) this.expandFilterMenu = false;
-        else this.expandFilterMenu = true;
-        //End section for control filter menu button on mobile device
+// Data lists
+const level_list = ref([]);
+const grade_list = ref([]);
+const field_list = ref([]);
+const lesson_list = ref([]);
+const album_list = ref([]);
 
-        //Load next page
-        if (bottomOfWindow && this.all_files_loaded === false) {
-          this.page_loading = true;
-          this.timer = setTimeout(() => {
-            this.page++;
-            this.getAlbumList();
-          }, 800);
-        }
-      };
-    },
-    imgErrorHandler(item, key) {
-      this.album_list[key].lesson_pic = "";
-    },
-  },
+// Utility Functions
+const formatNumber = (value) => {
+  if (!value) return "0";
+  
+  const val = parseInt(value, 10);
+  return val.toLocaleString();
 };
+
+// Methods
+const getTypeList = async (type, parent = "") => {
+  const params = { type };
+  
+  if (type === "base") params.section_id = parent;
+  if (type === "lesson") params.base_id = parent;
+
+  try {
+    const res = await $fetch("/api/v1/types/list", {
+      method: "GET",
+      params,
+    });
+    
+    if (type === "section") {
+      level_list.value = res.data;
+    } else if (type === "base") {
+      grade_list.value = res.data;
+    } else if (type === "lesson") {
+      lesson_list.value = res.data;
+    }
+  } catch (err) {
+    $toast.error(err.message || "Error loading data");
+  }
+};
+
+const getAlbumList = async () => {
+  if (all_files_loaded.value === false) {
+    page_loading.value = true;
+    
+    try {
+      const response = await $fetch("/api/v1/albums", {
+        method: "GET",
+        params: {
+          perpage: 12,
+          page: page.value,
+          section: filter.level,
+          base: filter.grade,
+          lesson: filter.lesson,
+        },
+      });
+      
+      let result = response.data.list;
+      for (const item of result) {
+        if (album_list.value.findIndex(x => x.id === item.id) === -1) {
+          album_list.value.push(item);
+        }
+      }
+
+      // For terminate auto load request
+      if (result.length === 0) {
+        all_files_loaded.value = true;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      page_loading.value = false;
+    }
+  }
+};
+
+const setupInfiniteScroll = () => {
+  window.onscroll = () => {
+    // Scroll position
+    const scrollPosition = Math.max(
+      window.pageYOffset,
+      document.documentElement.scrollTop,
+      document.body.scrollTop
+    ) + window.innerHeight + 50;
+    
+    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight;
+
+    // Avoid the number of requests
+    if (timer.value) {
+      clearTimeout(timer.value);
+      timer.value = null;
+    }
+
+    // Control filter menu button on mobile device
+    expandFilterMenu.value = window.scrollY <= 1000;
+
+    // Load next page
+    if (bottomOfWindow && all_files_loaded.value === false) {
+      page_loading.value = true;
+      timer.value = setTimeout(() => {
+        page.value++;
+        getAlbumList();
+      }, 800);
+    }
+  };
+};
+
+const imgErrorHandler = (item, key) => {
+  album_list.value[key].lesson_pic = "";
+};
+
+// Watchers
+watch(() => filter.level, (val) => {
+  filter.grade = "";
+  filter.lesson = "";
+  
+  if (val) {
+    getTypeList("base", val);
+  }
+  
+  page.value = 1;
+  all_files_loaded.value = false;
+  album_list.value = [];
+  getAlbumList();
+});
+
+watch(() => filter.grade, (val) => {
+  filter.lesson = "";
+  
+  if (val) {
+    album_list.value = [];
+    page.value = 1;
+    all_files_loaded.value = false;
+    getAlbumList();
+    getTypeList("lesson", val);
+  }
+});
+
+watch(() => filter.lesson, (val) => {
+  if (val) {
+    page.value = 1;
+    all_files_loaded.value = false;
+    album_list.value = [];
+    getAlbumList();
+  }
+});
+
+// Lifecycle hooks
+onMounted(() => {
+  getTypeList("section");
+  getAlbumList();
+  setupInfiniteScroll();
+});
+
+onUnmounted(() => {
+  window.onscroll = null;
+  if (timer.value) {
+    clearTimeout(timer.value);
+  }
+});
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Responsive styles can be added here */
+</style>
