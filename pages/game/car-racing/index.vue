@@ -6,8 +6,9 @@
             <button :disabled="isShowGuidMenu"
                 :class="`pause-btn ${stepGuidMenu == `pause` || !isShowGuidMenu ? `` : `fade`}`"
                 @click="setPlayingStatus(false)">
-                <img class="icon-pause highligth" src="@/assets/images/pause-icon.svg" alt="Pause">
-
+                <v-icon class="highligth" large color="white">
+                    mdi-pause
+                </v-icon>
 
                 <div class="description-guid" v-if="stepGuidMenu == `pause`">
                     You Can Stop The Game
@@ -29,15 +30,21 @@
             <div :class="`container-timer-score ${stepGuidMenu == `timerScore` || !isShowGuidMenu ? `` : `fade`}`">
                 <div class="score-div">
                     <span class="score-text">{{ score }}</span>
-                    <img class="icon-score" src="@/assets/images/star-icon.svg" alt="Score">
+                    <v-icon class="icon-score highligth" color="#ed8a19">
+                        mdi-star
+                    </v-icon>
                 </div>
                 <div :class="['timer-box', { 'danger': timerDanger }]">
                     {{ Math.ceil(timer) }}
                 </div>
                 <button :disabled="isShowGuidMenu" class="camera-btn btn" @click="changeCameraMode">
-                    <img class="icon-mode highligth"
-                        :src="`${cameraMode == `default` ? require(`@/assets/images/webcam-icon.svg`) : require(`@/assets/images/camera-icon.svg`)}`"
-                        alt="Camera Mode">
+                    <v-icon class="highligth" large color="white" v-if="cameraMode == `default`">
+                        mdi-webcam
+                    </v-icon>
+
+                    <v-icon class="highligth" large color="white" v-if="cameraMode == `close`">
+                        mdi-camera
+                    </v-icon>
                 </button>
 
 
@@ -55,7 +62,9 @@
             <button :disabled="isShowGuidMenu"
                 :class="`play-btn btn ${stepGuidMenu == `play` || !isShowGuidMenu ? `` : `fade`}`"
                 @click="setPlayingStatus(true)">
-                <img class="icon-play highligth" src="@/assets/images/play-icon.svg" alt="Play">
+                <v-icon class="highligth" large color="white">
+                    mdi-play
+                </v-icon>
             </button>
 
             <div class="description-guid play-game" v-if="stepGuidMenu == `play`">
@@ -72,7 +81,9 @@
                 </span>
 
                 <button class="reset-btn btn" @click="resetGame">
-                    <img class="icon-reset highligth" src="@/assets/images/refresh-icon.svg" alt="Reset Arrow">
+                    <v-icon class="highligth" large color="white">
+                        mdi-refresh
+                    </v-icon>
                 </button>
             </div>
         </div>
@@ -92,10 +103,14 @@
 
         <div :class="`buttons-div ${stepGuidMenu == `ChangeLaneBtn` || !isShowGuidMenu ? `` : `fade`}`">
             <button :disabled="isShowGuidMenu" @click="changeLane(-1)" class="change-lane-btn btn">
-                <img class="icon-play highligth" src="@/assets/images/left-arrow-icon.svg" alt="Left Arrow">
+                <v-icon class="highligth" large color="white">
+                    mdi-arrow-left-bold
+                </v-icon>
             </button>
             <button :disabled="isShowGuidMenu" @click="changeLane(1)" class="change-lane-btn btn">
-                <img class="icon-play highligth" src="@/assets/images/right-arrow-icon.svg" alt="Right Arrow">
+                <v-icon class="highligth" large color="white">
+                    mdi-arrow-right-bold
+                </v-icon>
             </button>
 
             <div class="description-guid guid-btn-change-lane" v-if="stepGuidMenu == `ChangeLaneBtn`">
@@ -463,12 +478,11 @@ export default {
     color: white;
     position: absolute;
     transform: translate(-2px, 2px);
+    z-index: 2;
 }
 
 .icon-score {
-    width: 90%;
-    height: 90%;
-
+    font-size: 86px;
 }
 
 /* timer section */
@@ -521,12 +535,6 @@ export default {
     transition: all 0.5s;
 }
 
-.icon-mode {
-    width: 50%;
-    height: 50%;
-    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
-}
-
 /* pause icon */
 .pause-btn {
     background: linear-gradient(135deg, #ffeaa7, #ff8400);
@@ -538,6 +546,16 @@ export default {
     justify-content: center;
     cursor: pointer;
     transition: all 0.5s;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
+    border: none;
 }
 
 .btn {
@@ -549,18 +567,13 @@ export default {
     user-select: none;
     /* Standard syntax */
     border: none;
+    border: none;
+    outline: none;
 }
 
 .btn:active {
     transform: scale(0.9);
 }
-
-.icon-pause {
-    width: 50%;
-    height: 50%;
-    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
-}
-
 
 /* overlay menu  */
 .overlay-pause {
@@ -590,13 +603,6 @@ export default {
     justify-content: center;
     cursor: pointer;
     transition: all 0.5s;
-}
-
-
-.icon-play {
-    width: 50%;
-    height: 50%;
-    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
 }
 
 .highligth {
@@ -672,11 +678,6 @@ export default {
     transition: all 0.5s;
 }
 
-.icon-reset {
-    width: 50%;
-    height: 50%;
-    filter: brightness(0) saturate(100%) invert(100%) sepia(99%) saturate(3%) hue-rotate(24deg) brightness(106%) contrast(100%);
-}
 
 /* overlay loading */
 .overlay-loading {
