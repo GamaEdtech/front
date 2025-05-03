@@ -4,7 +4,7 @@
       <v-col cols="12">
         <div id="general-data-holder">
           <div id="general-data">
-            <h1 class="gama-text-h1">
+            <h1 class="gama-text-h3 font-weight-bold">
               {{ contentData.title }}
             </h1>
             <v-chip
@@ -15,26 +15,35 @@
               {{ contentData.cat_title }}
             </v-chip>
 
-            <img id="blog-img" :src="contentData.pic" :alt="contentData.title" />
+            <img
+              id="blog-img"
+              :src="contentData.pic"
+              :alt="contentData.title"
+            />
             <figcaption id="general-data-footer">
-                <div id="autor-holder">
-                  <img :src="contentData.avatar" />
-                  <span class="gama-text-overline"
-                    >{{ contentData.first_name }} {{ contentData.last_name }}</span
-                  >
-                </div>
-                <div id="date-holder">
-                  <v-icon @click="share()" class="pr-6"> mdi-share-variant </v-icon>
-                  <v-icon> mdi-calendar-blank-outline </v-icon>
-                  <span class="gama-text-overline">
-                    {{ $moment(contentData.subdate).format("YYYY-MM-DD") }}
-                  </span>
-                </div>
+              <div id="autor-holder">
+                <img :src="contentData.avatar" />
+                <span class="gama-text-overline"
+                  >{{ contentData.first_name }}
+                  {{ contentData.last_name }}</span
+                >
+              </div>
+              <div id="date-holder">
+                <v-icon @click="share()" class="pr-6">
+                  mdi-share-variant
+                </v-icon>
+                <v-icon> mdi-eye </v-icon>
+                <span class="gama-text-overline pr-6">
+                  {{ contentData.views }}
+                </span>
+                <v-icon> mdi-calendar-blank-outline </v-icon>
+                <span class="gama-text-overline">
+                  {{ $moment(contentData.subdate).format("YYYY-MM-DD") }}
+                </span>
+              </div>
             </figcaption>
           </div>
         </div>
-        
-        
       </v-col>
     </v-row>
     <v-row>
@@ -114,6 +123,28 @@ export default {
 <style>
 #blog {
   max-width: 79.4rem !important;
+
+  h2 {
+    font-size: 2rem !important;
+  }
+  h3 {
+    font-size: 1.8rem !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e1e2e3;
+  }
+  h4 {
+    font-size: 1.5rem !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.4rem !important;
+    line-height: 2.5rem !important;
+  }
+
   #general-data-holder {
     /* margin-top: 5.6rem; */
     padding-bottom: 8.7rem;
@@ -152,7 +183,7 @@ export default {
   }
 
   #general-data-footer {
-    padding: 0.8rem .2rem 2.9rem .2rem;
+    padding: 0.8rem 0.2rem 2.9rem 0.2rem;
     width: 100%;
     height: 4.4rem;
     margin-bottom: 3.4rem;
@@ -239,7 +270,7 @@ export default {
     > p {
       color: rgba(36, 41, 47, 0.8);
       font-family: Inter;
-      font-size: 1.4rem !important;
+      /* font-size: 1.4rem !important; */
       font-style: normal;
       font-weight: 400 !important;
       line-height: 2.4rem;
@@ -322,6 +353,24 @@ export default {
 
 @media (min-width: 600px) {
   #blog {
+    h2 {
+      font-size: 3rem !important;
+    }
+    h3 {
+      font-size: 2.5rem !important;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h4 {
+      font-size: 2rem !important;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.7rem !important;
+      line-height: 2.5rem !important;
+    }
     #general-data-holder {
       padding-bottom: 16rem;
 
@@ -391,7 +440,7 @@ export default {
     #blog-describe {
       margin-bottom: 6.4rem;
       width: 98%;
-      display:block;
+      display: block;
       margin: auto auto 6.8rem auto;
 
       > h2 {
@@ -434,7 +483,7 @@ export default {
       }
 
       > p {
-        font-size: 1.6rem !important;
+        /* font-size: 1.6rem !important; */
         font-style: normal;
         font-weight: 400 !important;
         line-height: 2.4rem;
@@ -615,7 +664,7 @@ export default {
       }
 
       > p {
-        font-size: 2rem !important;
+        /* font-size: 2rem !important; */
         font-style: normal;
         font-weight: 400 !important;
         line-height: 3.2rem;

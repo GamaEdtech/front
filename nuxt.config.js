@@ -5,8 +5,7 @@ export default {
 
   head: {
     titleTemplate: "%s | Gamatrain",
-    title:
-      "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+    title: "Free Past Papers, Quiz, Powerpoint and Study Guid",
     htmlAttrs: {
       lang: "en",
     },
@@ -28,14 +27,13 @@ export default {
       {
         hid: "apple-mobile-web-app-title",
         name: "apple-mobile-web-app-title",
-        content:
-          "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+        content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
       },
       {
         hid: "og:title",
         name: "og:title",
         content:
-          "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          "Free Past Papers, Quiz, Powerpoint and Study Guid | GamaTrain",
       },
       {
         hid: "og:site_name",
@@ -82,6 +80,8 @@ export default {
     { src: "plugins/vuedraggable", ssr: false },
     { src: "plugins/gtag.js", mode: "client" },
     { src: "plugins/mathjax.js", mode: "client" },
+    { src: "plugins/hotjar.client.js", mode: "client" },
+    { src: "plugins/board-selection.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -242,16 +242,21 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "three", "lil-gui"],
+build: {
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", 'chart.js', "three", "lil-gui"],
     extend(config, ctx) {
       config.module.rules.push({
+        test: /\.js$/,
+        exclude: /node_modules\/(?!(chart\.js)\/).*/,
+        loader: 'babel-loader'
+      },{
         test: /\.(glsl|vs|fs|vert|frag)$/,
         loader: 'raw-loader',
         exclude: /node_modules/
       })
     }
   },
+  
 
   pwa: {
     manifest: {

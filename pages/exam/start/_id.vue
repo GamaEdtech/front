@@ -56,7 +56,10 @@
                 <div>{{ key + 1 }})&nbsp;</div>
                 <div ref="mathJaxEl" v-html="`${item.question}`" />
               </div>
-              <img :src="item.q_file" />
+              <img
+                v-show="item.q_file & (item.q_file != 0)"
+                :src="item.q_file"
+              />
             </div>
 
             <v-radio-group
@@ -72,6 +75,7 @@
                       ref="mathJaxEl"
                       v-html="item.answer_a"
                     ></span>
+                    <img v-show="item.a_file" :src="item.a_file" />
                   </div>
                 </template>
               </v-radio>
@@ -80,6 +84,7 @@
                   <div class="answer">
                     <span>2)</span>
                     <span ref="mathJaxEl" v-html="item.answer_b"></span>
+                    <img v-show="item.b_file" :src="item.b_file" />
                   </div>
                 </template>
               </v-radio>
@@ -88,6 +93,7 @@
                   <div class="answer">
                     <span>3)</span>
                     <span ref="mathJaxEl" v-html="item.answer_c"></span>
+                    <img v-show="item.c_file" :src="item.c_file" />
                   </div>
                 </template>
               </v-radio>
@@ -96,6 +102,7 @@
                   <div class="answer">
                     <span>4)</span>
                     <span ref="mathJaxEl" v-html="item.answer_d" />
+                    <img v-show="item.d_file" :src="item.d_file" />
                   </div>
                 </template>
               </v-radio>
@@ -177,8 +184,8 @@ export default {
       return { contentData };
     } catch (error) {
       if (error.response.status == 400) {
-        if (error.response.data)
-          redirect(`/exam/result/${error.response.data.data.id}`);
+        // if (error.response.data)
+        //   redirect(`/exam/result/${error.response.data.data.id}`);
       } else if (error.response.status == 401 || error.response.status == 403)
         redirect(`/exam/${params.id}`);
       else console.log(error.response.data);

@@ -6,15 +6,15 @@
           v-if="contentData.pic"
           class="schoolDetailsImg"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
-          src="/images/school-default.png"
+          @click="openGalleryDialog"
+          :src="contentData.pic"
           alt="School image"
         />
         <div
           v-else
           class="enter-img-holder pointer"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
+          @click="openGalleryDialog"
         >
           <div class="text-center">
             <v-icon
@@ -22,7 +22,7 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
         <client-only>
@@ -36,20 +36,58 @@
             id="schoolDetailsMap"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker
-              @click="$router.push(`/school/1`)"
-              :lat-lng="map.latLng"
-              :icon="map.schoolIcon"
-            ></l-marker>
+            <l-marker :lat-lng="map.latLng" :icon="map.schoolIcon"></l-marker>
           </l-map>
         </client-only>
 
-        <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr" :class="topSlideClass.tour">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
+        <div
+          class="position-relative under-image-right"
+          v-if="contentData.tour && !tourImgPreview"
+        >
+          <img
+            @click="openTourImgInput"
+            class="pointer schoolDetailsImg"
+            :src="contentData.tour"
+            alt="School image Preview"
+          />
+
+          <div class="upload-overlay">
+            <v-btn @click="openTourImgInput" class="" icon color="white">
+              <v-icon small> mdi-pencil </v-icon>
+            </v-btn>
+          </div>
+        </div>
+        <div
+          v-else-if="tourImgPreview"
+          class="position-relative"
+          :class="topSlideClass.tour"
+        >
+          <img
+            class="pointer schoolDetailsImg"
+            :src="tourImgPreview"
+            alt="School image Preview"
+          />
+          <div class="upload-overlay">
+            <v-btn
+              color="primary"
+              small
+              fab
+              @click="uploadTourImage"
+              :loading="loading.uploadTour"
+              class="text-transform-none gtext-t6 font-weight-medium"
+            >
+              <v-icon small>mdi-cloud-upload</v-icon>
+            </v-btn>
+            <v-btn
+              color="error"
+              small
+              fab
+              @click="clearTourImage"
+              class="text-transform-none gtext-t6 font-weight-medium ml-sm-1"
+            >
+              <v-icon small>mdi-delete</v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else
@@ -63,7 +101,56 @@
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
+          </div>
+        </div>
+
+        <div
+          v-if="galleryImages && galleryImages.length > 0"
+          :class="topSlideClass.image"
+        >
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="26.4rem"
+            class="gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image?.fileUri"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.image"
+          @click="openGalleryDialog"
+        >
+          <div class="text-center">
+            <v-icon
+              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-panorama-outline</v-icon
+            >
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
       </div>
@@ -71,23 +158,45 @@
 
     <v-row class="d-none d-md-flex">
       <v-col cols="12" md="4">
-        <img
-          v-if="contentData.pic"
-          @click="galleryDialog = true"
-          class="pointer schoolDetailsImg"
-          src="/images/school-default.png"
-          alt="School image"
-        />
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          @click="galleryDialog = true"
-        >
+        <div v-if="galleryImages && galleryImages.length > 0">
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="28.1rem"
+            class="rounded-lg gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image.fileUri"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
           <div class="text-center">
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
             >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
+            <div class="mt-2 gtext-t6 primary-gray-400">
+              Accepted formats: JPG, PNG, WebP
+            </div>
           </div>
         </div>
       </v-col>
@@ -107,26 +216,79 @@
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
-        </div>
-        <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
-          <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10"
-              >mdi-rotate-360</v-icon
-            >
-            <p class="gtext-t4 primary-blue-500">Contribute</p>
+        <template v-if="contentData.tour && !tourImgPreview">
+          <div class="position-relative">
+            <img
+              class="pointer schoolDetailsImg"
+              :src="contentData.tour"
+              alt="School image Preview"
+            />
+            <div class="upload-overlay px-3">
+              <div class="px-3 d-flex justify-center align-center">
+                <v-btn @click="openTourImgInput" class="" icon color="white">
+                  <v-icon small> mdi-pencil </v-icon>
+                </v-btn>
+              </div>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <template v-if="tourImgPreview">
+            <div class="position-relative">
+              <img
+                class="pointer schoolDetailsImg"
+                :src="tourImgPreview"
+                alt="School image Preview"
+              />
+              <div class="upload-overlay px-3">
+                <div class="px-3 d-flex justify-center align-center">
+                  <v-btn
+                    small
+                    fab
+                    color="primary"
+                    @click="uploadTourImage"
+                    :loading="loading.uploadTour"
+                    class="text-transform-none gtext-t4 font-weight-medium mr-3"
+                  >
+                    <v-icon small>mdi-cloud-upload</v-icon>
+                    <!-- Upload Tour Image -->
+                  </v-btn>
+                  <v-btn
+                    small
+                    fab
+                    color="error"
+                    @click="clearTourImage"
+                    class="text-transform-none gtext-t4 font-weight-medium"
+                  >
+                    <v-icon small>mdi-delete</v-icon>
+                    <!-- Delete -->
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="enter-img-holder pointer" @click="openTourImgInput">
+              <div class="text-center">
+                <v-icon size="48" class="primary-gray-300 mb-10"
+                  >mdi-rotate-360</v-icon
+                >
+                <div class="gtext-t4 primary-blue-500">Contribute</div>
+                <div class="mt-2 gtext-t6 primary-gray-400">
+                  Accepted formats: JPG, PNG, WebP
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+
         <v-file-input
           class="d-none"
           v-model="tourImg"
           ref="tourImgRef"
+          accept="image/jpeg, image/png, image/jpg, image/webp"
           hide-details
+          @change="validateAndProcessImage"
         ></v-file-input>
       </v-col>
     </v-row>
@@ -174,7 +336,40 @@
         <v-row>
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
-              {{ contentData.name }}
+              <div class="d-flex align-center flex-wrap">
+                <div v-show="!generalDataEditMode.name">
+                  {{ contentData.name }}
+                </div>
+                <v-btn
+                  v-if="!generalDataEditMode.name"
+                  @click="editGeneralInfo('name')"
+                  class="ml-4"
+                  icon
+                  color="blue-grey"
+                >
+                  <v-icon small> mdi-pencil </v-icon>
+                </v-btn>
+                <v-text-field
+                  v-model="form.name"
+                  v-if="generalDataEditMode.name"
+                  placeholder="Name"
+                  :rules="nameRule"
+                >
+                  <template slot="append-outer">
+                    <v-btn
+                      :loading="nameSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('name')"
+                      fab
+                      depressed
+                      x-small
+                    >
+                      <v-icon> mdi-check </v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </div>
+
               <span v-show="contentData.school_type_title"
                 >,
                 {{ contentData.school_type_title }}
@@ -188,8 +383,19 @@
             </h1>
           </v-col>
           <v-col cols="1" md="4">
-            <div class="float-right d-flex mt-1">
+            <div class="float-right d-flex align-center mt-1">
+              <span class="mr-3">
+                <v-icon
+                  @click="reportDialog = true"
+                  size="20"
+                  color="primary"
+                  plain
+                  class=""
+                  >mdi-alert-circle-outline</v-icon
+                >
+              </span>
               <v-icon size="20" class="primary-gray-300">mdi-heart</v-icon>
+
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
@@ -322,22 +528,37 @@
               <div class="info-sign">
                 <v-icon color="primary"> mdi-web </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data overflow-hidden">
                 <a
-                  v-show="contentData.webSite"
+                  v-show="contentData.webSite && !generalDataEditMode.website"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
-                  class="blue--text"
+                  class="blue--text overflow-hidden text-ellipsis flex-grow-1"
                 >
                   {{ contentData.webSite }}
                 </a>
-                <span
-                  v-show="!(contentData.webSite || generalDataEditMode.website)"
-                  @click="editGeneralInfo('website')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+                <template v-if="contentData.webSite">
+                  <v-btn
+                    v-if="!generalDataEditMode.website"
+                    @click="editGeneralInfo('website')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="
+                      !(contentData.webSite || generalDataEditMode.website)
+                    "
+                    @click="editGeneralInfo('website')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.web"
@@ -367,18 +588,34 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.email"
+                  class="flex-grow-1"
+                  v-show="contentData.email && !generalDataEditMode.email"
                   :href="`mailto:${contentData.email}`"
                 >
                   {{ contentData.email }}
                 </a>
-                <span
-                  v-show="!(contentData.email || generalDataEditMode.email)"
-                  @click="editGeneralInfo('email')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.email">
+                  <v-btn
+                    v-if="!generalDataEditMode.email"
+                    @click="editGeneralInfo('email')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="!(contentData.email || generalDataEditMode.email)"
+                    @click="editGeneralInfo('email')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
                   :rules="emailRule"
                   v-model="form.email"
@@ -407,22 +644,39 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phoneNumber"
+                  class="flex-grow-1"
+                  v-show="
+                    contentData.phoneNumber && !generalDataEditMode.phone1
+                  "
                   :href="`tel: ${contentData.phoneNumber}`"
                 >
                   {{ contentData.phoneNumber }}
                 </a>
-                <span
-                  @click="editGeneralInfo('phone')"
-                  v-show="
-                    !(contentData.phoneNumber || generalDataEditMode.phone1)
-                  "
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.phoneNumber">
+                  <v-btn
+                    v-if="!generalDataEditMode.phone1"
+                    @click="editGeneralInfo('phone')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('phone')"
+                    v-show="
+                      !(contentData.phoneNumber || generalDataEditMode.phone1)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
-                  type="number"
                   :rules="phoneRule"
                   v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
@@ -449,21 +703,40 @@
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
               <div class="info-data info-data-address">
-                <span v-show="contentData.address">{{
-                  contentData.address
-                }}</span>
                 <span
-                  @click="editGeneralInfo('address')"
-                  v-show="!(contentData.address || generalDataEditMode.address)"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  class="flex-grow-1"
+                  v-show="contentData.address && !generalDataEditMode.address"
+                  >{{ contentData.address }}</span
                 >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.address">
+                  <v-btn
+                    v-if="!generalDataEditMode.address"
+                    @click="editGeneralInfo('address')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                  >
+                    <v-icon small> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('address')"
+                    v-show="
+                      !(contentData.address || generalDataEditMode.address)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
                   v-model="form.address"
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
+                  :rules="addressRule"
                 >
                   <template slot="append-outer">
                     <v-btn
@@ -1152,7 +1425,12 @@
     </v-dialog>
     <!-- End leave comment dialog -->
 
-    <gallery-dialog v-model="galleryDialog" :contentData="contentData" />
+    <gallery-dialog
+      v-model="galleryDialog"
+      :contentData="contentData"
+      :images="galleryImages"
+      @refresh-gallery="loadGalleryImages"
+    />
 
     <!-- Select Location dialog -->
     <v-dialog
@@ -1199,6 +1477,12 @@
             label="Search anything"
           />
         </div>
+        <a
+          :href="`https://www.google.com/maps?q=${contentData.latitude}, ${contentData.longitude}`"
+          target="blank"
+          class="ml-1 blue--text"
+          >See on Google Map</a
+        >
         <v-card-actions class="justify-center pb-13">
           <v-btn
             :loading="mapSubmitLoader"
@@ -1285,12 +1569,21 @@
       </v-card>
     </v-dialog>
     <!-- End select facilites dialog -->
+
+    <!-- Report School Issue Dialog -->
+    <ReportDialog
+      v-model="reportDialog"
+      :school-id="$route.params.id"
+      @open-auth-dialog="openAuthDialog"
+    />
+    <!-- End Report School Issue Dialog -->
   </v-container>
 </template>
 
 <script>
 import locationSearch from "@/components/Form/LocationSearch";
 import GalleryDialog from "@/components/school/GalleryDialog.vue";
+import ReportDialog from "@/components/school/ReportDialog.vue";
 
 export default {
   name: "school-details",
@@ -1308,12 +1601,16 @@ export default {
         boundingBox: {},
         schoolIcon: null,
       },
-
+      tourImgPreview: null,
+      galleryImages: [],
+      activeGalleryIndex: 0,
+      tourPanoramas: [],
       form: {
         web: null,
         email: null,
         phone: null,
         address: null,
+        name: null,
       },
 
       mapMarkerData: {},
@@ -1346,6 +1643,7 @@ export default {
 
       loading: {
         submitComment: false,
+        uploadTour: false,
       },
 
       mapSubmitLoader: false,
@@ -1353,7 +1651,7 @@ export default {
       webSubmitLoader: false,
       emailSubmitLoader: false,
       phoneSubmitLoader: false,
-
+      nameSubmitLoader: false,
       commentList: [],
 
       generalDataEditMode: {
@@ -1362,6 +1660,7 @@ export default {
         phone1: false,
         address: false,
         map: false,
+        name: false,
       },
 
       webUrlRule: [
@@ -1380,6 +1679,10 @@ export default {
           "Please enter a valid email address",
       ],
       phoneRule: [(v) => !!v || "Phone number is required"],
+      nameRule: [(v) => !!v || "Name is required"],
+      addressRule: [(v) => !!v || "Address is required"],
+
+      reportDialog: false,
     };
   },
   head() {
@@ -1407,14 +1710,15 @@ export default {
   components: {
     locationSearch,
     GalleryDialog,
+    ReportDialog,
   },
   async asyncData({ params, $axios }) {
     const baseURL = process.server
-      ? `https://api.gamaedtech.com/api/v1/`
-      : "/api/v2/";
+      ? `${process.env.API2_BASE_URL}/api/v1`
+      : "/api/v2";
 
-    const content = await $axios.$get(`${baseURL}schools/${params.id}`);
-    const rating = await $axios.$get(`${baseURL}schools/${params.id}/rate`);
+    const content = await $axios.$get(`${baseURL}/schools/${params.id}`);
+    const rating = await $axios.$get(`${baseURL}/schools/${params.id}/rate`);
 
     var contentData = [];
     var ratingData = [];
@@ -1441,6 +1745,11 @@ export default {
 
     //Load comments
     this.loadComments();
+    this.loadGalleryImages();
+    this.loadTourPanorama();
+  },
+  watch: {
+    // Remove the tourImg watch as it's now handled in validateAndProcessImage
   },
   methods: {
     convertRateToString(value) {
@@ -1448,6 +1757,30 @@ export default {
       else if (value > 2) return "Average";
       else if (value <= 2) return "Poor";
       else return "Unknown";
+    },
+    openGalleryDialog() {
+      // Ensure the GalleryDialog shows the currently selected image
+      if (this.galleryImages && this.galleryImages.length > 0) {
+        const currentIndex = this.activeGalleryIndex;
+        if (currentIndex >= 0 && currentIndex < this.galleryImages.length) {
+          this.$set(this.contentData, "pic", this.galleryImages[currentIndex]);
+        }
+      }
+      this.galleryDialog = true;
+    },
+    updateMainGalleryImage(index) {
+      this.activeGalleryIndex = index;
+      if (this.galleryImages && this.galleryImages.length > index) {
+        this.$set(this.contentData, "pic", this.galleryImages[index]);
+      }
+    },
+    refreshTourContent() {
+      // Force the tour image to refresh by setting it to null and back
+      const currentTour = this.contentData.tour;
+      this.$set(this.contentData, "tour", null);
+      this.$nextTick(() => {
+        this.$set(this.contentData, "tour", currentTour);
+      });
     },
     normalizeURL(url) {
       if (!url) return "";
@@ -1516,7 +1849,112 @@ export default {
       }, 500);
     },
     openTourImgInput() {
-      this.$refs.tourImgRef.$el.querySelector("input").click();
+      // Make sure the mobile file input activates
+      if (this.$refs.tourImgRef) {
+        this.$refs.tourImgRef.$el.querySelector("input").click();
+      }
+    },
+
+    validateAndProcessImage(file) {
+      if (!file) return;
+
+      // Check file type
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
+        this.tourImg = null;
+        return;
+      }
+
+      // Check file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.$toast.error("File too large. Maximum size is 5MB.");
+        this.tourImg = null;
+        return;
+      }
+
+      // Create the preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.tourImgPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+    uploadTourImage() {
+      if (!this.tourImg) {
+        this.$toast.error("Please select an image to upload");
+        return;
+      }
+
+      // Validate file type again before upload
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+      if (!validTypes.includes(this.tourImg.type)) {
+        this.$toast.error(
+          "Invalid file type. Please use JPG, PNG or WebP images."
+        );
+        return;
+      }
+
+      this.loading.uploadTour = true;
+
+      // Create FormData to send the file
+      let formData = new FormData();
+      formData.append("File", this.tourImg);
+      formData.append("FileType", "Tour360");
+
+      this.$axios
+        .$post(
+          `/api/v2/schools/${this.$route.params.id}/images/Tour360`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          this.$toast.success(
+            "Your 360° tour image has been successfully uploaded"
+          );
+
+          // Load the new tour panorama data from the server
+          this.loadTourPanorama();
+
+          // Clear preview and input
+          this.tourImg = null;
+          this.tourImgPreview = null;
+
+          // Force Vue to update the template after a short delay
+          setTimeout(() => {
+            this.refreshTourContent();
+            // Change the slide to 'tour' if on mobile view
+            if (this.$vuetify.breakpoint.smAndDown) {
+              this.slideToggler = "tour";
+              // this.changeSlide();
+            }
+          }, 500);
+        })
+        .catch((err) => {
+          if (err.response?.status == 401 || err.response?.status == 403) {
+            this.openAuthDialog("login");
+          } else {
+            this.$toast.error(err.response?.data?.message || "Upload failed");
+          }
+        })
+        .finally(() => {
+          this.loading.uploadTour = false;
+        });
+    },
+
+    clearTourImage() {
+      this.tourImg = null;
+      this.tourImgPreview = null;
+      this.$toast.info("Image removed");
     },
 
     isValidUrl(url) {
@@ -1697,6 +2135,37 @@ export default {
         })
         .catch((err) => {});
     },
+    loadGalleryImages() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/SimpleImage`)
+        .then((response) => {
+          this.galleryImages = [...response.data].reverse();
+          if (this.galleryImages.length >= 1) {
+            this.$set(this.contentData, "pic", this.galleryImages[0].fileUri);
+          } else {
+            this.$set(this.contentData, "pic", null);
+          }
+        })
+        .catch((err) => {});
+    },
+    loadTourPanorama() {
+      this.$axios
+        .$get(`/api/v2/schools/${this.$route.params.id}/images/Tour360`)
+        .then((response) => {
+          this.tourPanoramas = response.data;
+          if (this.tourPanoramas.length >= 1) {
+            // Use Vue's $set to ensure reactivity
+            this.$set(
+              this.contentData,
+              "tour",
+              this.tourPanoramas[this.tourPanoramas.length - 1].fileUri
+            );
+          } else {
+            this.$set(this.contentData, "tour", null);
+          }
+        })
+        .catch((err) => {});
+    },
     editGeneralInfo(value) {
       if (value == "website") {
         this.form.web = this.contentData.webSite || "";
@@ -1710,7 +2179,12 @@ export default {
       } else if (value == "address") {
         this.form.address = this.contentData.address || "";
         this.generalDataEditMode.address = true;
-      } else if (value == "map") this.generalDataEditMode.map = true;
+      } else if (value == "map") {
+        this.generalDataEditMode.map = true;
+      } else if (value == "name") {
+        this.form.name = this.contentData.name || "";
+        this.generalDataEditMode.name = true;
+      }
     },
     updateGeneralInfo(value) {
       if (value == "website") {
@@ -1720,7 +2194,6 @@ export default {
         }
         this.generalDataEditMode.website = false;
       }
-
       if (value == "email") {
         if (!this.isValidEmail(this.form.email)) {
           this.$toast.error("Please enter a valid Email");
@@ -1735,12 +2208,23 @@ export default {
         }
         this.generalDataEditMode.phone1 = false;
       }
-      // else if (value == "email") this.generalDataEditMode.email = false;
-      // else if (value == "phone") this.generalDataEditMode.phone1 = false;
-      else if (value == "address") this.generalDataEditMode.address = false;
-
+      if (value == "address") {
+        if (!this.isRequired(this.form.address)) {
+          this.$toast.error(
+            "Please enter a valid address (minimum 10 characters)"
+          );
+          return;
+        }
+        this.generalDataEditMode.address = false;
+      }
+      if (value == "name") {
+        if (!this.isRequired(this.form.name)) {
+          this.$toast.error("Please enter a valid Name");
+          return;
+        }
+        this.generalDataEditMode.name = false;
+      }
       var formData = {};
-
       switch (value) {
         case "website":
           this.webSubmitLoader = true;
@@ -1766,6 +2250,12 @@ export default {
             address: this.form.address ?? null,
           };
           break;
+        case "name":
+          this.nameSubmitLoader = true;
+          formData = {
+            name: this.form.name ?? null,
+          };
+          break;
         case "map":
           this.mapSubmitLoader = true;
           formData = {
@@ -1776,7 +2266,6 @@ export default {
         default:
           break;
       }
-
       this.$axios
         .$post(
           `/api/v2/schools/${this.$route.params.id}/contributions`,
@@ -1787,8 +2276,27 @@ export default {
             },
           }
         )
-        .then((response) => {
+        .then(async (response) => {
           if (response.succeeded) {
+            switch (value) {
+              case "name":
+                this.contentData.name = this.form.name;
+                break;
+              case "website":
+                this.contentData.webSite = this.form.web;
+                break;
+              case "phone":
+                this.contentData.phoneNumber = this.form.phone;
+                break;
+              case "address":
+                this.contentData.address = this.form.address;
+                break;
+              case "email":
+                this.contentData.email = this.form.email;
+                break;
+              default:
+                break;
+            }
             this.$toast.success(
               "Your contribution has been successfully submitted"
             );
@@ -1801,12 +2309,18 @@ export default {
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
+          this.form.web = null;
+          this.form.email = null;
+          this.form.phone = null;
+          this.form.address = null;
+          this.form.name = null;
           this.mapSubmitLoader = false;
           this.selectLocationDialog = false;
           this.webSubmitLoader = false;
           this.emailSubmitLoader = false;
           this.phoneSubmitLoader = false;
           this.addressSubmitLoader = false;
+          this.nameSubmitLoader = false;
         });
     },
   },
@@ -1825,6 +2339,39 @@ export default {
   z-index: 0;
 }
 
+.position-relative {
+  position: relative;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 0.6rem;
+  padding: 1rem;
+}
+
+@media (max-width: 600px) {
+  .upload-overlay {
+    flex-direction: column;
+  }
+
+  .upload-overlay .v-btn {
+    margin: 0.25rem 0;
+    flex-shrink: 0;
+  }
+
+  .upload-overlay .v-icon {
+    font-size: 1.2rem !important;
+  }
+}
+
 .data-container {
   position: relative;
   z-index: 1;
@@ -1841,14 +2388,15 @@ export default {
   margin: auto;
   z-index: 3;
   right: 0 !important;
-  width: 80% !important;
+  width: 70% !important;
   max-height: 26.4rem;
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
 
-.center-image.enter-img-holder {
+.center-image.enter-img-holder,
+.center-image.position-relative {
   border-right: 1px solid white;
   border-left: 1px solid white;
 }
@@ -1862,28 +2410,23 @@ export default {
 }
 
 .under-image-left {
-  left: -35%;
+  left: -32%;
   z-index: 1;
 }
 
-.under-image-left.enter-img-holder p {
+.under-image-left.enter-img-holder p,
+.under-image-left.position-relative p {
   max-width: 2rem;
 }
 
 .under-image-right {
-  right: -35%;
+  right: -32%;
   z-index: 2;
 }
 
-.under-image-right.enter-img-holder p {
+.under-image-right.enter-img-holder p,
+.under-image-right.position-relative p {
   max-width: 2rem;
-}
-
-.schoolThumbImg {
-  width: 100%;
-  height: 6.4247rem;
-  max-height: 6.4247rem;
-  border-radius: 0.4rem;
 }
 
 #schoolDetailsVr {
@@ -2114,5 +2657,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.gallery-carousel {
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+/* Target the carousel navigation arrows */
+.gallery-carousel .v-window__prev,
+.gallery-carousel .v-window__next {
+  z-index: 10;
 }
 </style>

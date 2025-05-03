@@ -1205,7 +1205,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
+import TopicSelector from "@/components/Form/topic-selector";
 import { min } from "vee-validate/dist/rules";
 import CreateTestForm from "@/components/test-maker/create-test-form";
 

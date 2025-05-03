@@ -117,7 +117,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
+import TopicSelector from "@/components/Form/topic-selector";
 
 export default {
   layout: "dashboard_layout",
