@@ -170,6 +170,7 @@ export default class Car {
         if (this.currentQuestionIndex >= this.questionPositions.length) {
             if (this.isIncreaseSpeedPhase) {
                 this.increseSpeedSuccessPhase()
+                return
             }
             if (this.isDecreasingPhase) {
                 this.decreaseSpeedAndDriftSuccessPhase()
@@ -177,6 +178,7 @@ export default class Car {
             }
 
             this.isIncreaseSpeedPhase = true
+            this.experience.callBacks.onChangeIsUpdateTimer(false)
             return
         };
 
@@ -220,10 +222,10 @@ export default class Car {
 
     decreaseSpeedAndDriftSuccessPhase() {
         this.speed = THREE.MathUtils.lerp(this.speed, this.options.carBaseSpeed, 0.01)
-        this.wrongAnswerRotationY = this.wrongAnswerRotationY + -1 * this.directionLastSuccessRotation * 0.02
+        this.wrongAnswerRotationY = this.wrongAnswerRotationY + (-1 * this.directionLastSuccessRotation * 0.02)
         this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.currentLane + this.directionLastSuccessRotation, 0.02)
-        if (this.wrongAnswerRotationY <= -Math.PI || this.wrongAnswerRotationY >= Math.PI) {
 
+        if (this.wrongAnswerRotationY <= -Math.PI || this.wrongAnswerRotationY >= Math.PI) {
             this.wrongAnswerRotationY = 0
             const result = {
                 status: "success"

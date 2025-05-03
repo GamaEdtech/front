@@ -136,8 +136,8 @@ export default {
                 },
                 {
                     text: "9 * 8 =",
-                    choices: ["21", "35", "72", "64"],
-                    indexAnswer: 2
+                    choices: ["72", "35", "12", "64"],
+                    indexAnswer: 0
                 },
                 // {
                 //     text: "6 * 5 =",
@@ -172,7 +172,8 @@ export default {
             isFirstTimePlayingGame: true,
             cameraMode: 'default',
             isShowGuidMenu: false,
-            stepGuidMenu: "Finish"
+            stepGuidMenu: "Finish",
+            isUpdateTimer: true,
         };
     },
     mounted() {
@@ -189,7 +190,8 @@ export default {
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
                 onScoreChange: (bonus) => this.onScoreChange(bonus),
                 onResultGameChange: (result) => this.onResultGameChange(result),
-                onChangeSceneReady: this.onChangeSceneReady
+                onChangeSceneReady: this.onChangeSceneReady,
+                onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
             }
         )
     },
@@ -237,12 +239,17 @@ export default {
                 this.questionStatus = 'normal'
             }, 3000)
         },
+        onChangeIsUpdateTimer(state) {
+            this.isUpdateTimer = state
+        },
         onTimerUpdate(delta) {
             if (this.timer > 0) {
-                this.timer -= delta;
+                if (this.isUpdateTimer) {
+                    this.timer -= delta;
 
-                if (this.timer <= 10 && !this.timerDanger) {
-                    this.timerDanger = true;
+                    if (this.timer <= 10 && !this.timerDanger) {
+                        this.timerDanger = true;
+                    }
                 }
             } else {
                 this.timer = 0;
@@ -262,6 +269,7 @@ export default {
             }
         },
         resetGame() {
+            this.isUpdateTimer = true
             this.isLoading = true
             this.experience.resetGame()
             this.currentQuestionIndex = 0
