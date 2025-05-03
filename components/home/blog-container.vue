@@ -3,12 +3,14 @@
     <v-card flat>
       <div class="main-card">
         <v-row>
-          <v-col cols="6" class="px-md-0">
-            <h2 class="gama-text-h4" id="main-title ">Blog</h2>
+          <v-col cols="9" class="px-md-0">
+            <h2 class="gama-text-h4" id="main-title ">Study Tips Blog</h2>
           </v-col>
-          <v-col cols="6" class="text-right">
+          <v-col cols="3" class="text-right">
             <div class="d-none d-md-inline">
-              <v-btn rounded outlined large to="/blog" class="gama-btn">Go to blog</v-btn>
+              <v-btn rounded outlined large to="/blog" class="gama-btn"
+                >Go to blog</v-btn
+              >
             </div>
             <v-btn rounded to="/blog" text class="d-inline d-md-none seeAllBtn">
               See all
@@ -40,20 +42,24 @@
                     @mouseleave="toggleHover('leave', n)"
                     class="ma-1"
                   >
-                    <v-img :src="item.pic" />
+                    <v-img :src="item.pic" height="150" />
                     <v-card-title>
                       <span class="gama-text-button" v-if="!isHovered[n]">
                         {{ item.title }}
                       </span>
                       <div v-else class="text-center">
-                        <v-btn text size="small" color="primary"> read more </v-btn>
+                        <v-btn text size="small" color="primary">
+                          read more
+                        </v-btn>
                       </div>
                     </v-card-title>
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
                     <nuxt-link
-                      :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
+                      :to="`/blog/${item.id}/${$slugGenerator.convert(
+                        item.title
+                      )}`"
                       >Read more</nuxt-link
                     >
                   </div>

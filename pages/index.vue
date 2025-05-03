@@ -1,12 +1,12 @@
 <template>
   <v-container fluid class="px-0 py-0 mt-md-0">
     <h1 class="d-none">
-      Free Past Papers, Quiz, Powerpoint and Study Guid | GsamaTrain
+      Free Past Papers, Quiz, Powerpoint and Study Guid | GamaTrain
     </h1>
 
     <main-slider />
 
-    <grade-explorer :stats="stats" />
+    <grade-explorer />
 
     <level-guid-banner :slide-arr="slideArr" />
 
@@ -14,9 +14,9 @@
     <v-container>
       <v-row>
         <v-col cols="12" id="ai-learn-banner">
-          <img id="img-top" alt="AI Learn" src="/images/ai-learn-bg1.png" />
+          <img id="img-top" alt="AI Learn" src="/images/ai-learn-bg1.webp" />
           <v-card flat>
-            <h2 class="gama-text-h2">AI Learn</h2>
+            <h2 class="gama-text-h2">Your AI Assistant</h2>
             <p class="gama-text-subtitle1">
               Discover Your Full Potential with AI-based Education
             </p>
@@ -32,7 +32,7 @@
             <img
               id="img-bottom"
               alt="AI Learn"
-              src="/images/ai-learn-bg2.png"
+              src="/images/ai-learn-bg2.webp"
             />
           </v-card>
         </v-col>
@@ -45,7 +45,7 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h2 class="gama-text-h4">Are you a student?</h2>
+            <h2 class="gama-text-h4">Study Smarter, Not Harder</h2>
           </v-col>
           <v-col cols="12" sm="6">
             <v-card class="fill-height float-sm-right" to="/search?type=test">
@@ -87,11 +87,13 @@
           />
         </v-col>
         <v-col cols="12" sm="8">
-          <h2 class="gama-text-h4">Find school service</h2>
+          <h2 class="gama-text-h4">
+            Search Nearby Schools by Location, Ratings & Reviews
+          </h2>
           <p class="gama-text-body1 describe">
-            You don't have to try the hardest ways anymore. GamaTrain has
-            provided you with access to school information. Just filter and
-            GamaTrain will find it for you.
+            Stop searching blindly. With GamaTrain, discovering the best schools
+            near you is just a few clicks away. Filter by location, ratings,
+            reviews, and facilities – and let us do the rest.
           </p>
           <!-- <v-btn
                      :large="$vuetify.breakpoint.mdAndUp"
@@ -124,7 +126,7 @@
         <v-row>
           <v-col cols="12" sm="12" md="12" class="text-md-right">
             <h2 class="gama-text-h6 text-center">
-              Why wait? Earn money with us in minutes with just a few clicks!
+              Monetize Your Teaching Skills
             </h2>
           </v-col>
           <v-col cols="12" sm="12" md="12" class="text-center">
@@ -156,8 +158,7 @@ export default {
   head() {
     return {
       titleTemplate: "%s",
-      title:
-        "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+      title: "Free Past Papers, Quiz, Powerpoint and Study Guid",
       meta: [
         {
           hid: "description",
@@ -168,14 +169,12 @@ export default {
         {
           hid: "apple-mobile-web-app-title",
           name: "apple-mobile-web-app-title",
-          content:
-            "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
         },
         {
           hid: "og:title",
           name: "og:title",
-          content:
-            "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
+          content: "Free Past Papers, Quiz, Powerpoint and Study Guid",
         },
         {
           hid: "og:site_name",
@@ -209,22 +208,22 @@ export default {
       ],
       slideArr: [
         {
-          img: "guid-banner1.svg",
+          img: "guid-banner1.webp",
           caption: "Sign Up",
           describe: "Register and Create Your Content Creator Profile",
         },
         {
-          img: "guid-banner2.png",
+          img: "guid-banner2.webp",
           caption: "Upload Your Content",
           describe: "Share Your Lesson Plans, Study Guides, and More.",
         },
         {
-          img: "guid-banner3.svg",
+          img: "guid-banner3.webp",
           caption: "Reach Students",
           describe: "Gain Exposure through Our Platform and Network.",
         },
         {
-          img: "guid-banner4.svg",
+          img: "guid-banner4.webp",
           caption: "Earn Big",
           describe: "Reap the Rewards as Students Purchase Your Content.",
         },
@@ -238,15 +237,6 @@ export default {
       }
       return "#24292F"; // or some default value if colors or carousel_model is not available
     },
-  },
-
-  //Load data
-  async asyncData({ params, $axios }) {
-    // This could also be an action dispatch
-    const response = await $axios.$get("/api/v1/home/stats");
-    var stats = response.data;
-
-    return { stats };
   },
 };
 </script>

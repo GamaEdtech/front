@@ -215,7 +215,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "~/components/form/topic-selector.vue";
+import TopicSelector from "@/components/Form/topic-selector";
 import ticket from "../index.vue";
 
 export default {

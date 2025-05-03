@@ -3,7 +3,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <h2 class="gama-text-h4">The best are here.</h2>
+          <h2 class="gama-text-h4">Millions Trust Us</h2>
           <div id="stats-section">
             <v-row>
               <v-col
@@ -27,7 +27,10 @@
             </v-row>
           </div>
 
-          <p class="describe gama-text-h6">These are professional numbers</p>
+          <p class="describe gama-text-h6">
+            <v-icon>mdi-science</v-icon>
+            Gamatrain-the smart choice for teachers, students, and schools
+          </p>
         </v-col>
       </v-row>
     </v-container>
@@ -229,7 +232,7 @@ export default {
         <v-container>
             <v-row>
                 <v-col cols="12">
-                    <h2 class="gama-text-h4">The best are here.</h2>
+                    <h2 class="gama-text-h4">Millions Trust Us</h2>
                     <v-row>
                         <v-col cols="6" sm="4" md="2" v-for="(item,index) in stats"
                         :key="index" class="text-center">
@@ -242,9 +245,7 @@ export default {
                             </div>
                         </v-col>
                     </v-row>
-                    <p class="describe">
-                        These are professional numbers
-                    </p>
+                    <p class="describe">The smart choice for teachers, students, and schools </p>
                 </v-col>
             </v-row>
         </v-container>
