@@ -629,6 +629,7 @@
         </v-col>
       </v-row>
       <common-related-portrait-content pageName="paper" source="test" request="test"/>
+      <common-related-landscape-content pageName="paper" source="test" request="file"/>
     </v-container>
     
     <!-- Start : Past Papers -->
