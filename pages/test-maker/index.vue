@@ -268,7 +268,7 @@ useHead({
 });
 
 // Services
-const { $toast, $fetch } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 // Core data
 const test_step = ref(1);

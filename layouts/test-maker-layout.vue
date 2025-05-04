@@ -3,7 +3,7 @@
     <main_header />
     <div class="mt-16 mt-md-0">
       <test-maker-menu/>
-       <Nuxt />
+       <NuxtPage />
     </div>
   </v-app>
 </template>
