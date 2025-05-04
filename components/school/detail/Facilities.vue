@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex">
       <div class="gtext-h5 primary-gray-600">
-        <div class="mb-4">Sports facilities</div>
+        <div class="mb-4">Facilities</div>
         <div>
           <v-btn
             v-for="(facility, index) in displayFacilities"
