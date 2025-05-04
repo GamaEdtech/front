@@ -34,7 +34,7 @@
       </VStepperStep>
       <VStepperContent step="1">
         <v-card flat class="mt-3 pb-10">
-          <VForm ref="observer" @submit.prevent="updateQuestion" v-model="isFormValid">
+          <VForm ref="observer" @submit="submitQuestion" v-model="isFormValid">
             <v-row>
               <v-col cols="12" md="4">
                 <v-autocomplete
@@ -951,8 +951,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAuth } from "~/composables/useAuth";
 import { defineRule } from 'vee-validate';
 import { required } from '@vee-validate/rules';
 import draggable from 'vuedraggable';
@@ -965,7 +965,7 @@ defineRule('required', required);
 // Define layout and page metadata
 definePageMeta({
   middleware: "auth",
-  layout: "dashboard",
+  layout: "dashboard-layout",
 });
 
 useHead({
@@ -973,8 +973,10 @@ useHead({
 });
 
 // Get services
+const auth = useAuth();
 const route = useRoute();
 const router = useRouter();
+const userToken = ref("");
 
 // Core data
 const test_step = ref(2);
@@ -996,9 +998,9 @@ const isFormValid = ref(false);
 
 // Form data
 const form = reactive({
-  section: "",
-  base: "",
-  lesson: "",
+  section: route.query.board ? route.query.board : "",
+  base: route.query.grade ? route.query.grade : "",
+  lesson: route.query.subject ? route.query.subject : "",
   topics: "",
   exam_type: "",
   level: "2",
@@ -1008,10 +1010,12 @@ const form = reactive({
   school: "",
   duration: 3,
   title: "",
-  paperID: "",
+  paperID: route.query.paperId ? route.query.paperId : "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
+  edu_year: "",
+  edu_month: "",
 });
 
 // Form errors for validation
@@ -1025,7 +1029,8 @@ const formErrors = reactive({
   title: "",
 });
 
-const file_original = ref("");
+const file_original = ref(null);
+const file_original_path = ref("");
 
 // Filter data
 const filter = reactive({
@@ -1045,7 +1050,7 @@ const confirmDeleteDialog = ref(false);
 const deleteLoading = ref(false);
 const previewTestList = ref([]);
 const topicTitleArr = ref([]);
-const testListSwitch = ref(true);
+const testListSwitch = ref(false);
 const lastCreatedTest = ref("");
 
 // Delete exam test section
@@ -1091,226 +1096,139 @@ const holding_level_list = [
 ];
 
 // Compute the test share link based on the route params
-const test_share_link = computed(() => 
-  `${window.location.origin}/exam/${route.params.id}`
-);
-
-// Get the user token for API requests
-const userToken = computed(() => {
-  return localStorage.getItem('auth._token.local');
+const test_share_link = computed(() => {
+  if (process.server) {
+    // Return a consistent value during SSR to avoid hydration mismatch
+    return `/exam/${exam_id.value || ""}`;
+  }
+  // Only use window.location on client side
+  return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
 
-// Methods
-const getCurrentExamInfo = async () => {
-  exam_id.value = route.params.id;
-  
-  try {
-    const response = await fetch(`${process.env.apiBase}/api/v1/onlineexam/exams/${route.params.id}`, {
-      headers: {
-        Authorization: userToken.value
-      }
-    });
-    
-    if (!response.ok) throw new Error('Failed to fetch exam info');
-    
-    const data = await response.json();
-    
-    if (data && data.data) {
-      tests.value = data.data.tests ? data.data.tests.map(test => test.id) : [];
-      exam_code.value = data.data.code;
-      form.section = data.data.section_id;
-      form.base = data.data.grade_id;
-      form.lesson = data.data.lesson_id;
-      
-      selected_topics.value = data.data.topics || []; 
-      form.topics = data.data.topics ? data.data.topics.map(topic => topic.id) : [];
-      
-      form.exam_type = data.data.exam_type_id;
-      form.paperID = data.data.paper_id || '';
-      form.duration = data.data.duration || 3;
-      form.title = data.data.title || '';
-      form.level = data.data.level || '2';
-      form.state = data.data.state_id;
-      form.area = data.data.area_id;
-      form.school = data.data.school_id;
-      form.holding_level = data.data.holding_level || 4;
-      
-      getExamCurrentTests();
-    }
-  } catch (err) {
-    showError('Failed to fetch exam information');
-    console.error(err);
-  }
-};
-
-const getTypeList = async (type, parent = "", trigger = "") => {
-  try {
-    let url = '';
-    
-    switch (type) {
-      case 'section':
-        url = `${process.env.apiBase}/api/v1/section/list`;
-        break;
-      case 'base':
-        url = `${process.env.apiBase}/api/v1/grade/list/${parent}`;
-        break;
-      case 'lesson':
-        url = `${process.env.apiBase}/api/v1/lesson/list/${form.section}/${parent}`;
-        break;
-      case 'topic':
-        url = `${process.env.apiBase}/api/v1/topic/list/${form.section}/${form.base}/${parent}`;
-        break;
-      case 'exam_type':
-        url = `${process.env.apiBase}/api/v1/onlineexam/exams/type-list`;
-        break;
-      case 'state':
-        url = `${process.env.apiBase}/api/v1/state/list/${form.section}`;
-        break;
-      case 'area':
-        url = `${process.env.apiBase}/api/v1/area/list/${form.section}/${parent}`;
-        break;
-      case 'school':
-        url = `${process.env.apiBase}/api/v1/school/list/${form.section}/${form.state}/${form.area}`;
-        break;
-      default:
-        return;
-    }
-    
-    const response = await fetch(url, {
-      headers: {
-        Authorization: userToken.value
-      }
-    });
-    
-    if (!response.ok) throw new Error(`Failed to fetch ${type} list`);
-    
-    const data = await response.json();
-    
-    if (data && data.data) {
-      switch (type) {
-        case 'section':
-          if (trigger === "filter") {
-            filter_level_list.value = data.data;
-          } else {
-            level_list.value = data.data;
-            filter_level_list.value = data.data;
-          }
-          break;
-        case 'base':
-          if (trigger === "filter") {
-            filter_grade_list.value = data.data;
-          } else {
-            grade_list.value = data.data;
-            filter_grade_list.value = data.data;
-          }
-          break;
-        case 'lesson':
-          if (trigger === "filter") {
-            filter_lesson_list.value = data.data;
-          } else {
-            lesson_list.value = data.data;
-            filter_lesson_list.value = data.data;
-          }
-          break;
-        case 'topic':
-          topic_list.value = data.data;
-          break;
-        case 'exam_type':
-          test_type_list.value = data.data;
-          break;
-        case 'state':
-          state_list.value = data.data;
-          break;
-        case 'area':
-          area_list.value = data.data;
-          break;
-        case 'school':
-          school_list.value = data.data;
-          break;
-      }
-    }
-  } catch (err) {
-    showError(`Error loading ${type} data`);
-    console.error(err);
-  }
-};
-
-const selectTopic = (topics) => {
-  selected_topics.value = topics;
-  form.topics = topics.map(item => item.id);
-  
-  if (form.topics.length) {
-    getTopicTitleList();
-  }
-};
-
-const getTopicTitleList = () => {
-  topicTitleArr.value = selected_topics.value.map(topic => topic.title);
-};
-
+// Add the missing updateQuestion function - this is referenced in the template but was missing
 const updateQuestion = async () => {
   submit_loading.value = true;
   
-  if (!selected_topics.value.length) {
-    submit_loading.value = false;
-    showError('Please select at least one topic');
-    return;
+  // Arrange form data
+  let formData = new FormData();
+  for (let key in form) {
+    if (key !== "topics") formData.append(key, form[key]);
+  }
+  
+  if (form.topics.length) {
+    for (let key in form.topics) {
+      formData.append("topics[]", form.topics[key]);
+    }
   }
   
   try {
-    const formData = new FormData();
-    
-    formData.append('_method', 'PUT');
-    formData.append('title', form.title);
-    formData.append('section_id', form.section);
-    formData.append('grade_id', form.base);
-    formData.append('lesson_id', form.lesson);
-    formData.append('exam_type_id', form.exam_type);
-    formData.append('level', form.level);
-    formData.append('duration', form.duration);
-    formData.append('paper_id', form.paperID || '');
-    formData.append('state_id', form.state || '');
-    formData.append('area_id', form.area || '');
-    formData.append('school_id', form.school || '');
-    formData.append('holding_level', form.holding_level);
-    
-    for (const topicId of form.topics) {
-      formData.append('topics[]', topicId);
-    }
-    
-    const response = await fetch(`${process.env.apiBase}/api/v1/onlineexam/exams/${exam_id.value}`, {
-      method: 'POST',
+    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "PUT",
+      body: urlencodeFormData(formData),
       headers: {
-        Authorization: userToken.value
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${userToken.value}`,
       },
-      body: formData
     });
     
-    if (!response.ok) throw new Error('Failed to update exam');
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Updated successfully");
     
-    const data = await response.json();
+    test_step.value = 2;
     
-    if (data && data.success) {
-      showSuccess('Exam updated successfully');
-      test_step.value = 2;
-    }
-  } catch (err) {
-    showError('Failed to update exam');
-    console.error(err);
+  } catch (error) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(error.response?.data?.message || "Error updating exam");
   } finally {
     submit_loading.value = false;
   }
 };
 
-const generateTitle = () => {
-  if (!form.section || !form.base || !form.lesson) return;
-  
-  const section = level_list.value.find(x => x.id == form.section);
-  const base = grade_list.value.find(x => x.id == form.base);
-  const lesson = lesson_list.value.find(x => x.id == form.lesson);
-  
-  if (section && base && lesson) {
-    form.title = `${section.title} ${base.title} ${lesson.title} Test`;
+// Methods
+const getTypeList = async (type, parent = "", trigger = "") => {
+  try {
+    const params = {
+      type: type,
+    };
+    
+    if (type === "base") params.section_id = parent;
+    if (type === "lesson") params.base_id = parent;
+    if (type === "topic") params.lesson_id = parent;
+    if (type === "area") params.state_id = parent;
+    
+    if (type === "school") {
+      params.section_id = form.section;
+      params.area_id = form.area;
+    }
+    
+    const res = await $fetch("/api/v1/types/list", {
+      method: "GET",
+      params: params,
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    if (res && res.data) {
+      if (type === "section") {
+        if (trigger === "filter") {
+          filter_level_list.value = res.data;
+        } else {
+          level_list.value = res.data;
+          filter_level_list.value = res.data;
+        }
+      } else if (type === "base") {
+        if (trigger === "filter") {
+          filter_grade_list.value = res.data;
+        } else {
+          grade_list.value = res.data;
+          filter_grade_list.value = res.data;
+        }
+      } else if (type === "lesson") {
+        if (trigger === "filter") {
+          filter_lesson_list.value = res.data;
+        } else {
+          lesson_list.value = res.data;
+          filter_lesson_list.value = res.data;
+        }
+      } else if (type === "topic") {
+        topic_list.value = res.data;
+      } else if (type === "exam_type") {
+        test_type_list.value = res.data;
+      } else if (type === "state") {
+        state_list.value = res.data;
+      } else if (type === "area") {
+        area_list.value = res.data;
+      } else if (type === "school") {
+        school_list.value = res.data;
+      }
+      
+      generateTitle();
+    }
+  } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error loading data");
+    console.error(err);
+  }
+};
+
+const selectTopic = (event) => {
+  const numbers = [];
+  for (let i = 0; i < event.length; i++) {
+    numbers[i] = parseInt(event[i]);
+  }
+  form.topics = numbers;
+  if (form.topics.length) getTopicTitleList();
+};
+
+const getTopicTitleList = () => {
+  topicTitleArr.value = [];
+  let title = "";
+  for (const index in form.topics) {
+    title = topic_list.value.find(
+      (x) => x.id == form.topics[index]
+    ).title;
+    topicTitleArr.value.push(title);
   }
 };
 
@@ -1318,201 +1236,238 @@ const getExamTests = async () => {
   test_loading.value = true;
   
   try {
-    const queryParams = new URLSearchParams();
+    const response = await $fetch("/api/v1/examTests", {
+      method: "GET",
+      params: {
+        lesson: filter.lesson,
+        topic: filter.topic,
+        myTests: filter.myTests,
+        testsHasVideo: filter.testsHasVideo,
+        page: filter.page,
+        perpage: filter.perpage,
+      },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
     
-    if (filter.section) queryParams.set('section', filter.section);
-    if (filter.base) queryParams.set('base', filter.base);
-    if (filter.lesson) queryParams.set('lesson', filter.lesson);
-    if (filter.topic) queryParams.set('topic', filter.topic);
-    if (filter.testsHasVideo) queryParams.set('hasVideo', filter.testsHasVideo);
-    if (filter.myTests) queryParams.set('myTests', 'yes');
-    
-    queryParams.set('perpage', filter.perpage.toString());
-    queryParams.set('page', filter.page.toString());
-    
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/test/list?${queryParams.toString()}`,
-      {
-        headers: {
-          Authorization: userToken.value
-        }
-      }
-    );
-    
-    if (!response.ok) throw new Error('Failed to fetch test list');
-    
-    const data = await response.json();
-    
-    if (data && data.data) {
-      if (filter.page === 1) {
-        test_list.value = data.data.data || [];
-      } else {
-        test_list.value = [...test_list.value, ...(data.data.data || [])];
+    if (response && response.data && response.data.list) {
+      test_list.value.push(...response.data.list);
+      
+      if (test_list.value.length) {
+        await nextTick();
+        renderMathJax();
       }
       
-      all_tests_loaded.value = !data.data.data || data.data.data.length === 0 || test_list.value.length >= data.data.total;
+      if (createForm.value) {
+        createForm.value.examTestListLenght = tests.value.length;
+      }
       
-      await nextTick();
-      renderMathJax();
+      // For terminate auto load request
+      all_tests_loaded.value = response.data.list.length === 0;
     }
   } catch (err) {
-    showError('Failed to load tests');
     console.error(err);
   } finally {
     test_loading.value = false;
   }
 };
 
-const getExamCurrentTests = async () => {
-  if (!tests.value.length) {
-    previewTestList.value = [];
-    return;
-  }
-  
-  try {
-    const formData = new FormData();
-    tests.value.forEach(id => {
-      formData.append('test_ids[]', id);
-    });
-    
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/test/get-tests`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: userToken.value
-        },
-        body: formData
-      }
-    );
-    
-    if (!response.ok) throw new Error('Failed to fetch current tests');
-    
-    const data = await response.json();
-    
-    if (data && data.data) {
-      previewTestList.value = data.data;
-      
-      await nextTick();
-      renderMathJax();
-    }
-  } catch (err) {
-    showError('Failed to load test preview');
-    console.error(err);
-  }
-};
-
 const renderMathJax = () => {
   if (window.MathJax) {
-    nextTick(() => {
-      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
-    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
   }
 };
 
 const onScroll = () => {
-  if (!testList.value || all_tests_loaded.value) return;
+  if (!testList.value) return;
   
-  const { scrollTop, clientHeight, scrollHeight } = testList.value;
+  const scrollPosition = testList.value.$el.scrollTop;
+  let contentHeight = 0;
+  if (testListContent.value) {
+    contentHeight = testListContent.value.clientHeight;
+  }
   
-  if (scrollTop + clientHeight >= scrollHeight - 100) {
-    filter.page++;
-    getExamTests();
+  // Avoid the number of requests
+  if (timer.value) {
+    clearTimeout(timer.value);
+    timer.value = null;
+  }
+  
+  if (scrollPosition > contentHeight - 1000 && all_tests_loaded.value === false) {
+    timer.value = setTimeout(() => {
+      test_loading.value = true;
+      filter.page++;
+      getExamTests();
+    }, 800);
   }
 };
 
 const applyTest = (item, type) => {
-  if (type === 'add' && !tests.value.includes(item.id)) {
+  if (tests.value.find(x => x == item.id) && type === "remove") {
+    tests.value.splice(tests.value.indexOf(item.id), 1);
+    submitTest();
+  }
+  
+  if (!tests.value.find(x => x == item.id) && type === "add") {
     tests.value.push(item.id);
     submitTest();
-  } else if (type === 'remove' && tests.value.includes(item.id)) {
-    const index = tests.value.indexOf(item.id);
-    if (index !== -1) {
-      tests.value.splice(index, 1);
-      submitTest();
-    }
   }
 };
 
 const submitTest = async () => {
   if (!tests.value.length) return;
   
+  let formData = new FormData();
+  for (let i = 0; i < tests.value.length; i++) {
+    formData.append("tests[]", tests.value[i]);
+  }
+  
   try {
-    const formData = new FormData();
-    
-    tests.value.forEach((id, index) => {
-      formData.append(`test_ids[${index}]`, id);
+    await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+      method: "PUT",
+      body: urlencodeFormData(formData),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
-    
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/exams/tests/${exam_id.value}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: userToken.value
-        },
-        body: formData
-      }
-    );
-    
-    if (!response.ok) throw new Error('Failed to update test list');
     
     getExamCurrentTests();
   } catch (err) {
-    showError('Failed to update test list');
+    console.error(err);
+  }
+};
+
+const getExamCurrentTests = async () => {
+  test_loading.value = true;
+  
+  try {
+    const response = await $fetch("/api/v1/examTests", {
+      method: "GET",
+      params: {
+        exam_id: exam_id.value,
+      },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    if (response && response.data) {
+      previewTestList.value = response.data.list;
+      
+      if (createForm.value) {
+        createForm.value.examTestListLenght = tests.value.length;
+      }
+      
+      if (previewTestList.value.length) {
+        await nextTick();
+        renderMathJax();
+      }
+    }
+  } catch (err) {
     console.error(err);
   }
 };
 
 const publishTest = async () => {
-  if (tests.value.length < 5) {
-    showError('Please select at least 5 tests');
-    return;
-  }
-  
   publish_loading.value = true;
   
   try {
-    const formData = new FormData();
-    
-    tests.value.forEach((id, index) => {
-      formData.append(`test_ids[${index}]`, id);
+    const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
     
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/exams/publish/${exam_id.value}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: userToken.value
-        },
-        body: formData
-      }
-    );
-    
-    if (!response.ok) throw new Error('Failed to publish test');
-    
-    const data = await response.json();
-    
-    if (data && data.success) {
-      showSuccess('Test published successfully');
+    if (response.data.message === "done") {
+      test_share_link.value = `${process.client ? window.location.origin : ''}/exam/${exam_id.value}`;
+      
+      // Reset values
+      exam_id.value = "";
+      exam_code.value = "";
+      
+      // Set in store
+      useState('user').value = {
+        ...useState('user').value,
+        currentExamId: "",
+        currentExamCode: ""
+      };
+      
+      previewTestList.value = [];
+      tests.value = [];
+      
+      // Reset form
+      form.section = "";
+      grade_list.value = [];
+      lesson_list.value = [];
+      topic_list.value = [];
+      
+      form.exam_type = "";
+      form.duration = 3;
+      form.title = "";
+      form.file_original = "";
+      
       test_step.value = 4;
     }
   } catch (err) {
-    showError('Failed to publish test');
     console.error(err);
   } finally {
     publish_loading.value = false;
   }
 };
 
-const copyUrl = () => {
-  const el = document.getElementById('share_link');
-  if (el) {
-    el.select();
-    document.execCommand('copy');
-    showSuccess('Link copied to clipboard');
+const getCurrentExamInfo = async () => {
+  const userState = useState('user');
+  
+  if (userState.value?.examId) {
+    exam_id.value = userState.value.examId;
+    exam_code.value = userState.value.examCode;
+    test_step.value = 2;
+    
+    try {
+      const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${userToken.value}`,
+        },
+      });
+      
+      if (response && response.data) {
+        tests.value = response.data.tests.length ? response.data.tests : [];
+        
+        form.section = response.data.section;
+        form.base = response.data.base;
+        form.lesson = response.data.lesson;
+        file_original_path.value = response.data.file_original;
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
+};
+
+// Convert form data from multipart to urlencode
+const urlencodeFormData = (fd) => {
+  let s = "";
+  
+  for (const pair of fd.entries()) {
+    if (typeof pair[1] == "string") {
+      s += (s ? "&" : "") + encode(pair[0]) + "=" + encode(pair[1]);
+    }
+  }
+  return s;
+};
+
+const encode = (s) => {
+  return encodeURIComponent(s).replace(/%20/g, "+");
+};
+
+const copyUrl = () => {
+  navigator.clipboard.writeText(test_share_link.value);
+  const { $toast } = useNuxtApp();
+  if ($toast) $toast.success("Copied");
 };
 
 const previewDragEnd = () => {
@@ -1520,40 +1475,71 @@ const previewDragEnd = () => {
     renderMathJax();
   });
   
-  // Update test order
-  tests.value = previewTestList.value.map(item => item.id);
+  const new_list = [];
+  for (const index in previewTestList.value) {
+    new_list.push(previewTestList.value[index].id);
+  }
+  tests.value = new_list;
   submitTest();
 };
 
 // Return title of level for show in preview list
 const calcLevel = (level) => {
-  if (!level) return '';
-  
-  const levelItem = test_level_list.find(x => x.id === level);
-  return levelItem ? levelItem.title : '';
+  if (level) {
+    const levelItem = test_level_list.find(x => x.id === level);
+    return levelItem ? levelItem.title : '';
+  }
+  return '';
 };
 
 const deleteOnlineExam = async () => {
   deleteLoading.value = true;
   
   try {
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/exams/${exam_id.value}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: userToken.value
-        }
-      }
-    );
+    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
     
-    if (!response.ok) throw new Error('Failed to delete exam');
+    // Reset values
+    exam_id.value = "";
+    exam_code.value = "";
     
-    showSuccess('Exam deleted successfully');
-    router.push('/user/exam');
+    // Set in store
+    useState('user').value = {
+      ...useState('user').value,
+      currentExamId: "",
+      currentExamCode: ""
+    };
+    
+    previewTestList.value = [];
+    
+    if (createForm.value) {
+      createForm.value.file_original_path = "";
+    }
+    
+    tests.value = [];
+    
+    // Reset form
+    form.section = "";
+    grade_list.value = [];
+    lesson_list.value = [];
+    topic_list.value = [];
+    
+    form.exam_type = "";
+    form.duration = 3;
+    form.title = "";
+    
+    test_step.value = 1;
+    
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Deleted successfully");
+    
   } catch (err) {
-    showError('Failed to delete exam');
-    console.error(err);
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error("An error occurred");
   } finally {
     deleteLoading.value = false;
     confirmDeleteDialog.value = false;
@@ -1567,120 +1553,83 @@ const openTestDeleteConfirmDialog = (item_id) => {
 };
 
 const deleteExamTest = async () => {
-  if (!delete_exam_test_id.value) return;
-  
   delete_exam_test_loading.value = true;
   
   try {
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/onlineexam/test/${delete_exam_test_id.value}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: userToken.value
-        }
-      }
-    );
+    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
     
-    if (!response.ok) throw new Error('Failed to delete test');
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Deleted successfully");
     
-    showSuccess('Test deleted successfully');
-    
-    // Remove from test list if it exists
-    const index = test_list.value.findIndex(item => item.id === delete_exam_test_id.value);
-    if (index !== -1) {
-      test_list.value.splice(index, 1);
-    }
-    
-    // Remove from tests array if it exists
-    const testIndex = tests.value.indexOf(delete_exam_test_id.value);
-    if (testIndex !== -1) {
-      tests.value.splice(testIndex, 1);
-      getExamCurrentTests();
-    }
+    filter.page = 1;
+    test_list.value = [];
+    await getExamTests();
   } catch (err) {
-    showError('Failed to delete test');
     console.error(err);
   } finally {
     delete_exam_test_loading.value = false;
-    deleteTestConfirmDialog.value = false;
     delete_exam_test_id.value = null;
+    deleteTestConfirmDialog.value = false;
   }
 };
 
-const uploadFile = async () => {
-  if (!file_original.value) return;
+const uploadFile = async (file) => {
+  if (!file) return;
   
-  const formData = new FormData();
-  formData.append('file', file_original.value);
+  file_original.value = file;
+  
+  let formData = new FormData();
+  formData.append("file", file_original.value);
   
   try {
-    const response = await fetch(
-      `${process.env.apiBase}/api/v1/upload`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: userToken.value
-        },
-        body: formData
-      }
-    );
+    const response = await $fetch("/api/v1/upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        accept: "*/*",
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
     
-    if (!response.ok) throw new Error('Failed to upload file');
-    
-    const data = await response.json();
-    
-    if (data && data.data && data.data[0] && data.data[0].file) {
-      form.file_original = data.data[0].file.name;
+    if (response && response.data && response.data[0] && response.data[0].file) {
+      form.file_original = response.data[0].file.name;
     }
   } catch (err) {
-    showError('Failed to upload file');
     console.error(err);
   }
 };
 
-// Toast notifications
-const showSuccess = (message) => {
-  const { $toast } = useNuxtApp();
-  if ($toast) {
-    $toast.success(message);
-  } else {
-    console.log('Success:', message);
-  }
-};
-
-const showError = (message) => {
-  const { $toast } = useNuxtApp();
-  if ($toast) {
-    $toast.error(message);
-  } else {
-    console.error('Error:', message);
-  }
-};
-
-// Watchers
+// Set up watchers
 watch(() => route.query, (val) => {
   if (val && val.active === "test_list") {
     test_step.value = 2;
     testListSwitch.value = true;
+  } else if (val && val.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
   }
 });
 
 watch(() => form.section, async (val) => {
   if (val) {
     await getTypeList("base", val);
-    await getTypeList("state");
-    filter.section = val;
-    
-    form.base = "";
-    form.lesson = "";
-    form.state = "";
-    form.area = "";
-    form.school = "";
-    selected_topics.value = [];
+    filter.section = val; // Init second level filter
     
     if (createForm.value) {
       createForm.value.form.section = val;
+    }
+    
+    if (form.area) {
+      await getTypeList("school");
     }
   }
 });
@@ -1690,22 +1639,20 @@ watch(() => filter.section, async (val) => {
     await getTypeList("base", val, "filter");
   }
   
+  all_tests_loaded.value = true;
   filter_grade_list.value = [];
   filter_lesson_list.value = [];
-  filter.base = "";
-  filter.lesson = "";
   filter.page = 1;
   test_list.value = [];
-  all_tests_loaded.value = false;
+  
+  filter.base = "";
+  filter.lesson = "";
 });
 
 watch(() => form.base, async (val) => {
   if (val) {
     await getTypeList("lesson", val);
-    filter.base = val;
-    
-    form.lesson = "";
-    selected_topics.value = [];
+    filter.base = val; // Init second level filter
     
     if (createForm.value) {
       createForm.value.form.base = val;
@@ -1720,34 +1667,36 @@ watch(() => filter.base, async (val) => {
     await getTypeList("lesson", val, "filter");
   }
   
+  all_tests_loaded.value = true;
   filter_lesson_list.value = [];
   filter.lesson = "";
   filter.page = 1;
   test_list.value = [];
-  all_tests_loaded.value = false;
 });
 
 watch(() => form.lesson, async (val) => {
   if (val) {
     await getTypeList("topic", val);
-    filter.lesson = val;
-    
-    selected_topics.value = [];
-    
-    if (createForm.value) {
-      createForm.value.form.lesson = val;
-    }
     
     if (topicSelector.value) {
       topicSelector.value.lesson_selected = true;
     }
-    
-    generateTitle();
   } else {
+    form.topic = [];
+    topic_list.value = [];
+    
     if (topicSelector.value) {
       topicSelector.value.lesson_selected = false;
     }
   }
+  
+  filter.lesson = val; // Init second level filter
+  
+  if (createForm.value) {
+    createForm.value.form.lesson = val;
+  }
+  
+  generateTitle();
 });
 
 watch(() => filter.lesson, async (val) => {
@@ -1755,68 +1704,86 @@ watch(() => filter.lesson, async (val) => {
     await getTypeList("topic", val, "filter");
   }
   
+  all_tests_loaded.value = false;
   filter.page = 1;
   test_list.value = [];
-  all_tests_loaded.value = false;
   await getExamTests();
 });
 
 watch(() => form.state, async (val) => {
   if (val) {
     await getTypeList("area", val);
-    
-    form.area = "";
-    form.school = "";
   }
 });
 
 watch(() => form.area, async (val) => {
-  if (val && form.section && form.state) {
+  if (form.section && val) {
     await getTypeList("school");
-    
-    form.school = "";
   }
 });
 
-watch([() => filter.topic, () => filter.testsHasVideo, () => filter.myTests], async () => {
+watch(() => filter.topic, async () => {
   filter.page = 1;
   test_list.value = [];
-  all_tests_loaded.value = false;
   await getExamTests();
 });
 
-watch(() => selected_topics.value, () => {
-  getTopicTitleList();
+watch(() => filter.testsHasVideo, async () => {
+  filter.page = 1;
+  test_list.value = [];
+  await getExamTests();
+});
+
+watch(() => filter.myTests, async () => {
+  filter.page = 1;
+  test_list.value = [];
+  await getExamTests();
 });
 
 watch(() => lastCreatedTest.value, (val) => {
-  if (val && val.id && !tests.value.includes(val.id)) {
-    tests.value.push(val.id);
+  if (val && !tests.value.find(x => x == val)) {
+    tests.value.push(val);
     submitTest();
   }
 });
 
 // Initialize on mount
 onMounted(async () => {
-  if (!userToken.value) {
-    showError('Authentication token not found. Please log in again.');
-    router.push('/login?redirect=/test-maker/create');
-    return;
+  userToken.value = auth.getUserToken();
+  
+  // Check if route has active query param
+  if (route.query && route.query.active === "test_list") {
+    test_step.value = 2;
+    testListSwitch.value = true;
+  } else if (route.query && route.query.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
   }
   
+  await getCurrentExamInfo();
   await getTypeList("section");
-  await getTypeList("exam_type");
   
-  if (route.params.id) {
-    exam_id.value = route.params.id;
-    await getCurrentExamInfo();
+  if (form.base) {
+    await getTypeList("base", form.section);
   }
+  
+  if (form.lesson) {
+    await getTypeList("lesson", form.base);
+    await getTypeList("topic", form.lesson);
+  }
+  
+  await getTypeList("exam_type");
+  await getTypeList("state");
+  
+  renderMathJax();
   
   await getExamTests();
   
-  // Enable edit mode in create test form
-  if (createForm.value) {
-    createForm.value.examEditMode = true;
+  if (exam_id.value) {
+    await getExamCurrentTests();
   }
 });
 </script>
