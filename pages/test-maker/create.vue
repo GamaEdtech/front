@@ -112,6 +112,28 @@
                 />
               </v-col>
 
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  density="compact"
+                  v-model="form.edu_year"
+                  :items="year_list"
+                  label="Year"
+                  variant="outlined"
+                />
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  density="compact"
+                  v-model="form.edu_month"
+                  :items="month_list"
+                  item-value="id"
+                  item-title="title"
+                  label="Month"
+                  variant="outlined"
+                />
+              </v-col>
+
               <v-col
                 cols="12"
                 md="4"
@@ -172,6 +194,9 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
                 />
+                <div class="text-caption text-grey">
+                  Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A Level MSCO
+                </div>
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
@@ -180,6 +205,17 @@
                   v-model="form.paperID"
                   variant="outlined"
                 />
+              </v-col>
+
+              <v-col cols="12" md="12">
+                <v-file-input
+                  density="compact"
+                  label="Source file"
+                  variant="outlined"
+                  prepend-icon="mdi-paperclip"
+                  @change="uploadFile($event)"
+                  accept="application/pdf,image/*"
+                ></v-file-input>
               </v-col>
 
               <v-col cols="12">
@@ -630,14 +666,6 @@
                           <v-btn icon="mdi-cursor-move" color="blue" />
                         </v-col>
                         <v-col cols="6" class="text-right">
-                          <v-btn
-                            size="small"
-                            v-show="item.owner == true"
-                            :to="`/test-maker/create-test/edit/${item.id}`"
-                          >
-                            <v-icon size="small"> mdi-pencil </v-icon>
-                            Edit
-                          </v-btn>
                           <v-btn
                             color="blue"
                             variant="flat"
@@ -1105,43 +1133,21 @@ const test_share_link = computed(() => {
   return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
 
-// Add the missing updateQuestion function - this is referenced in the template but was missing
-const updateQuestion = async () => {
-  submit_loading.value = true;
-  
-  // Arrange form data
-  let formData = new FormData();
-  for (let key in form) {
-    if (key !== "topics") formData.append(key, form[key]);
+// Generate title function - Moving this BEFORE getTypeList
+const generateTitle = () => {
+  let lesson_title = "";
+  if (form.lesson && lesson_list.value.length > 0) {
+    const lessonItem = lesson_list.value.find(x => x.id === form.lesson);
+    lesson_title = lessonItem?.title || "";
   }
   
-  if (form.topics.length) {
-    for (let key in form.topics) {
-      formData.append("topics[]", form.topics[key]);
-    }
+  let base_title = "";
+  if (form.base && grade_list.value.length > 0) {
+    const baseItem = grade_list.value.find(x => x.id === form.base);
+    base_title = baseItem?.title || "";
   }
   
-  try {
-    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
-      method: "PUT",
-      body: urlencodeFormData(formData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-    
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Updated successfully");
-    
-    test_step.value = 2;
-    
-  } catch (error) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(error.response?.data?.message || "Error updating exam");
-  } finally {
-    submit_loading.value = false;
-  }
+  form.title = `${lesson_title} Test ${base_title} Grade`;
 };
 
 // Methods
