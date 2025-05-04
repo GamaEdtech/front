@@ -326,7 +326,12 @@
           </v-col>
           <v-col cols="3" class="text-right d-block d-md-none">
             <div class="rate-section gtext-t4 font-weight-semibold ml-1">
-              {{ contentData.score ? contentData.score : "New" }}
+              <!-- {{ contentData.score ? contentData.score : "New" }} -->
+              {{
+                ratingData.averageRate
+                  ? ratingData.averageRate.toFixed(1)
+                  : "New"
+              }}
               <v-icon size="20" color="primary"> mdi-star </v-icon>
             </div>
           </v-col>
@@ -399,7 +404,12 @@
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                {{ contentData.score ? contentData.score : "New" }}
+                <!-- {{ contentData.score ? contentData.score : "New" }} -->
+                {{
+                  ratingData.averageRate
+                    ? ratingData.averageRate.toFixed(1)
+                    : "New"
+                }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
             </div>
