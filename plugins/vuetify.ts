@@ -1,9 +1,9 @@
 import '@mdi/font/css/materialdesignicons.css'
-
+import { VStepperVertical } from 'vuetify/labs/VStepperVertical'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
-export default defineNuxtPlugin((app) => {
+export default defineNuxtPlugin((app: any) => {
   const vuetify = createVuetify({
     theme: {
       defaultTheme: "light",
@@ -30,6 +30,9 @@ export default defineNuxtPlugin((app) => {
         },
       },
     },
-   })
+    components: {
+      VStepperVertical,
+    },
+  })
   app.vueApp.use(vuetify)
 })
