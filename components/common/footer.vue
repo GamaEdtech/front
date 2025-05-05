@@ -120,7 +120,7 @@ export default {
               link: "/school",
             },
             {
-              title: "GET Token",
+              title: "$GET Token",
               link: "/get-token",
             },
           ],
