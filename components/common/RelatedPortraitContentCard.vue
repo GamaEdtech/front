@@ -1,20 +1,23 @@
 <template>
     <v-card
       class="mx-1 relative overflow-hidden"
-      height="230"
       width="160"
-      style="border-radius: 8px !important;"
+      :style="{ height: `${CardHeight}`, borderRadius: '8px' }"
     >
       <v-img
         class="white--text align-end"
-        height="230px"
+        :height="CardHeight"
         :src="cardPicture"
       >
       </v-img>
-      <div class="circle-cnotainer">
-            <div class="text-center">
-                <p class="" style="font-size: 10px !important; text-wrap: nowrap; font-weight: 700 !important; color: white;">{{ score }}</p>
-                <p class="" style="font-size:9px !important; text-wrap: nowrap; font-weight: 400 !important; color: white;line-height: 1;">score</p>
+      <div class="circle-container">
+            <div class="text-center" v-if="showScoreLabel">
+                <p style="font-size: 10px !important; text-wrap: nowrap; font-weight: 700 !important; color: white;">{{ score }}</p>
+                <p style="font-size:9px !important; text-wrap: nowrap; font-weight: 400 !important; color: white;line-height: 1;">score</p>
+            </div>
+            <div class="text-center" v-else style="margin-top:3px">
+              <p v-if="score == 'pp'">pp</p>
+              <p v-else>film</p>
             </div>
       </div>
       
@@ -33,20 +36,19 @@ export default{
     name: "related-portrait-content-card",
     data(){
         return{
-            
         }
     },
     props:{
-        cardPicture:{
-            type:String
-        },
-        cardTitle:{
-            type:String
-        },
-        score:{
-            type:String
-        }
-    }
+        cardPicture:String,
+        cardTitle:String,
+        score:[String, Number],
+        showScoreLabel:Boolean
+    },
+    computed: {
+      CardHeight() {
+        return this.showScoreLabel ? '230px' : '107px';
+      }
+  }
 }
 </script>
 <style>
@@ -76,7 +78,7 @@ export default{
       #0000 100%,#000 calc(100% + 1px)) 0 calc(var(--r)*(1 - sin(var(--a)))) no-repeat,
     linear-gradient(90deg,#000 calc(var(--p) - var(--_d)),#0000 0 calc(var(--p) + var(--_d)),#000 0);
 }
-.circle-cnotainer{
+.circle-container{
 border-radius: 50%;
 border: 1px solid #E4E7EC;
 background: #344054CC;

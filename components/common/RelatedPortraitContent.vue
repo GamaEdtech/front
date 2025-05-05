@@ -12,8 +12,8 @@
                 v-for="item in data"
                 :key="item.id"
             >
-                <nuxt-link :to="`/${pageName}/${item.id}`">
-                    <common-related-portrait-content-card :cardPicture="item.thumb_pic" :cardTitle="item.title" :score="item.referee_score" />
+                <nuxt-link :to="`/${pageName}/${item.id}/${item.title_url}`">
+                    <common-related-portrait-content-card :cardPicture="item.thumb_pic" :cardTitle="item.title" :score="item.referee_score || item.type_title" :showScoreLabel="!!item.referee_score" />
                 </nuxt-link>
             </v-slide-item>
         </v-slide-group>
@@ -45,11 +45,21 @@ export default {
                 params: {
                 source: this.source,
                 request: this.request,
-                id: this.id,
+                id: '236',
                 }})
                 .then(response => {
-                    this.data = response.data.tests
-                    console.log(this.data)
+                    const arrays = response.data
+                    for (const key in arrays) {
+                        if (Array.isArray(arrays[key]) && arrays[key].length > 0) {
+                            this.data = arrays[key]; // Assign the first non-empty array
+                            break;
+                        }
+                    }
+
+                    // Optional: handle case where all arrays are empty
+                    if (!this.data) {
+                    this.data = []; // or null
+                    }
                 })
                 .catch(error => {
                     console.error('Search error:', error);
