@@ -18,7 +18,7 @@
         :value="index"
         class="mt-1"
       >
-        <template v-slot:prepend> 
+        <template #prepend> 
           <v-icon size="24px" color="white" class="bg-transparent">{{ item.icon }}</v-icon>
         </template>
         <template #default>
@@ -35,7 +35,7 @@
           :key="sub_item.title"
           @click="sheet = false"
         >
-          <template v-slot:prepend>
+          <template #prepend>
             <v-icon>{{ sub_item.icon }}</v-icon>
           </template>
           <v-list-item-title class="text-h6">{{ sub_item.title }}</v-list-item-title>
