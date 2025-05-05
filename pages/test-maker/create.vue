@@ -992,12 +992,11 @@ defineRule('required', required);
 
 // Define layout and page metadata
 definePageMeta({
-  middleware: "auth",
-  layout: "dashboard-layout",
+  layout: "test-maker-layout",
 });
 
 useHead({
-  title: "Update online exam",
+  title: "New Exam",
 });
 
 // Get services
