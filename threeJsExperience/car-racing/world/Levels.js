@@ -1,5 +1,4 @@
-import * as THREE from "three"
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { Color, MeshBasicMaterial, Mesh } from "three"
 import Experience from '../Experience.js'
 
 
@@ -33,10 +32,10 @@ export default class Levels {
         this.floatSpeed = 2
         this.floatAmplitude = 0.2
 
-
+        this.TextGeometry = this.experience.resources.items.TextGeometry
         this.setMaterial()
-        this.setMesh()
 
+        this.setMesh()
         this.setDebug()
     }
 
@@ -66,11 +65,11 @@ export default class Levels {
 
     getRandomColor() {
         const hue = Math.floor(Math.random() * 360)
-        return new THREE.Color(`hsl(${hue}, 100%, 50%)`)
+        return new Color(`hsl(${hue}, 100%, 50%)`)
     }
 
     setMaterial() {
-        this.materials = this.predefinedColors.map(color => new THREE.MeshBasicMaterial({ color }))
+        this.materials = this.predefinedColors.map(color => new MeshBasicMaterial({ color }))
     }
 
 
@@ -80,11 +79,11 @@ export default class Levels {
         this.questions.forEach((question, index) => {
             let positionX = ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.questions.length + 1)) * (index + 1)
             question.choices.forEach((number, jIndex) => {
-                const geometry = new TextGeometry(number, this.configTextGeometry)
+                const geometry = new this.TextGeometry(number, this.configTextGeometry)
                 geometry.center()
 
                 const material = this.materials[Math.floor(Math.random() * this.materials.length)]
-                const mesh = new THREE.Mesh(geometry, material)
+                const mesh = new Mesh(geometry, material)
                 const laneNumber = jIndex + 1
                 const posZ = this.getFinalZ(positionX, laneNumber)
                 mesh.position.set(positionX, this.positionYNumber, posZ)

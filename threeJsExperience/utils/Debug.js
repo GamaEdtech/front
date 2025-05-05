@@ -5,6 +5,7 @@ export default class Debug {
     constructor() {
         this.ui = new GUI()
         this.ui.close()
+        this.ui.hide()
         this.stats = new Stats();
         this.stats.showPanel(0);
         // document.body.appendChild(this.stats.dom);

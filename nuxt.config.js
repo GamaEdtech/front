@@ -242,21 +242,18 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", 'chart.js', "three", "lil-gui"],
+  build: {
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", 'chart.js', "lil-gui"],
     extend(config, ctx) {
-      config.module.rules.push({
-        test: /\.js$/,
-        exclude: /node_modules\/(?!(chart\.js)\/).*/,
-        loader: 'babel-loader'
-      },{
-        test: /\.(glsl|vs|fs|vert|frag)$/,
-        loader: 'raw-loader',
-        exclude: /node_modules/
-      })
+      config.module.rules.push(
+        {
+          test: /\.(glsl|vs|fs|vert|frag)$/,
+          loader: 'raw-loader',
+          exclude: /node_modules/
+        })
     }
   },
-  
+
 
   pwa: {
     manifest: {

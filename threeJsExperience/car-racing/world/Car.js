@@ -57,15 +57,18 @@ export default class Car {
 
 
         window.addEventListener("keydown", (event) => {
-            if (event.code === "ArrowUp") {
-                this.moveForward()
-            } else if (event.code === "ArrowLeft") {
+            // if (event.code === "ArrowUp") {
+            //     this.moveForward()
+            // } 
+            if (event.code === "ArrowLeft") {
                 this.changeLane(-1)
-            } else if (event.code === "ArrowRight") {
-                this.changeLane(1)
-            } else if (event.code === "ArrowDown") {
-                this.moveBackward()
             }
+            else if (event.code === "ArrowRight") {
+                this.changeLane(1)
+            }
+            // else if (event.code === "ArrowDown") {
+            //     this.moveBackward()
+            // }
         })
 
         this.setMesh()

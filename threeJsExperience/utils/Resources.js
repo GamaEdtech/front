@@ -1,6 +1,4 @@
-import * as THREE from 'three'
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"
+import { TextureLoader, CubeTextureLoader } from 'three'
 import EventEmitter from './EventEmitter.js'
 
 export default class Resources extends EventEmitter {
@@ -13,17 +11,30 @@ export default class Resources extends EventEmitter {
         this.toLoad = this.sources.length
         this.loaded = 0
 
-        this.setLoaders()
-        this.startLoading()
+        this.setLoaders().then(() => {
+            this.startLoading()
+        })
     }
 
-    setLoaders() {
+    async setLoaders() {
         this.loaders = {}
-        this.loaders.gltfLoader = new GLTFLoader()
-        this.loaders.textureLoader = new THREE.TextureLoader()
-        this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
-        this.loaders.fontLoader = new FontLoader();
+        this.loaders.textureLoader = new TextureLoader()
+        this.loaders.cubeTextureLoader = new CubeTextureLoader()
+
+        if (process.client) {
+            const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+            const { FontLoader } = await import('three/examples/jsm/loaders/FontLoader.js')
+            const { TextGeometry } = await import('three/examples/jsm/geometries/TextGeometry.js')
+            const module = await import('three-custom-shader-material/vanilla')
+
+            this.loaders.gltfLoader = new GLTFLoader()
+            this.loaders.fontLoader = new FontLoader()
+
+            this.items.TextGeometry = TextGeometry
+            this.items.CustomShaderMaterial = module.default
+        }
     }
+
 
     startLoading() {
         // Load each source

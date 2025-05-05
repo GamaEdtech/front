@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Experience from './Experience.js'
 
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 
 export default class Camera {
@@ -23,19 +23,19 @@ export default class Camera {
         this.cameraMode = 'default'
 
 
-        window.addEventListener("keydown", (event) => {
-            if (event.key == "ArrowUp") {
-                this.positionX += this.speed
-                const z = this.calculatePositionZ(this.positionX);
-                this.instance.position.set(this.positionX, this.positionY, z)
-                this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
-            } else if (event.key == "ArrowDown") {
-                this.positionX -= this.speed
-                const z = this.calculatePositionZ(this.positionX);
-                this.instance.position.set(this.positionX, this.positionY, z)
-                this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
-            }
-        })
+        // window.addEventListener("keydown", (event) => {
+        //     if (event.key == "ArrowUp") {
+        //         this.positionX += this.speed
+        //         const z = this.calculatePositionZ(this.positionX);
+        //         this.instance.position.set(this.positionX, this.positionY, z)
+        //         this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
+        //     } else if (event.key == "ArrowDown") {
+        //         this.positionX -= this.speed
+        //         const z = this.calculatePositionZ(this.positionX);
+        //         this.instance.position.set(this.positionX, this.positionY, z)
+        //         this.instance.lookAt(this.positionX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.positionX + this.options.distanceLookAtCamera))
+        //     }
+        // })
 
         this.setInstance()
         this.setControls()
@@ -56,8 +56,8 @@ export default class Camera {
     }
 
     setControls() {
-        this.controls = new OrbitControls(this.instance, this.canvas)
-        this.controls.enableDamping = true
+        // this.controls = new OrbitControls(this.instance, this.canvas)
+        // this.controls.enableDamping = true
     }
 
 
@@ -75,7 +75,7 @@ export default class Camera {
 
 
     update() {
-        this.controls.update()
+        // this.controls.update()
 
         if (this.cameraMode == "default") {
             this.positionX = this.experience.world.car.positionX - this.options.distanceCameraFromCar

@@ -1,6 +1,4 @@
-import * as THREE from "three"
-import CustomShaderMaterial from "three-custom-shader-material/vanilla"
-
+import { PlaneGeometry, RepeatWrapping, MeshStandardMaterial, Uniform, Color, Mesh } from "three"
 import Experience from '../Experience.js'
 
 
@@ -16,6 +14,8 @@ export default class Mountain {
         this.debug = this.experience.debug
         this.options = this.experience.options
 
+        this.CustomShaderMaterial = this.experience.resources.items.CustomShaderMaterial
+
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
@@ -24,7 +24,7 @@ export default class Mountain {
     }
 
     setGeometry() {
-        this.geometry = new THREE.PlaneGeometry(this.options.mountainSize, this.options.mountainWidth, 128, 128)
+        this.geometry = new PlaneGeometry(this.options.mountainSize, this.options.mountainWidth, 128, 128)
         this.geometry.deleteAttribute("uv")
         this.geometry.deleteAttribute("normal")
         this.geometry.rotateX(-Math.PI / 2)
@@ -32,10 +32,10 @@ export default class Mountain {
 
     setMaterial() {
         this.noiseTexture = this.experience.resources.items.perlinNoiseTexture
-        this.noiseTexture.wrapS = THREE.RepeatWrapping;
-        this.noiseTexture.wrapT = THREE.RepeatWrapping;
-        this.material = new CustomShaderMaterial({
-            baseMaterial: THREE.MeshStandardMaterial,
+        this.noiseTexture.wrapS = RepeatWrapping;
+        this.noiseTexture.wrapT = RepeatWrapping;
+        this.material = new this.CustomShaderMaterial({
+            baseMaterial: MeshStandardMaterial,
             vertexShader: vertex,
             fragmentShader: fragment,
             silent: true,
@@ -45,17 +45,17 @@ export default class Mountain {
             color: "#85d534",
 
             uniforms: {
-                uPositionFrequency: new THREE.Uniform(this.options.positionFrequency),
-                uStrength: new THREE.Uniform(this.options.strength),
-                uWarpFrequency: new THREE.Uniform(this.options.warpFrequency),
-                uWarpStrength: new THREE.Uniform(this.options.warpStrength),
-                uColorWaterDeep: new THREE.Uniform(new THREE.Color(this.options.colorWaterDeep)),
-                uColorWaterSurface: new THREE.Uniform(new THREE.Color(this.options.colorWaterSurface)),
-                uColorSand: new THREE.Uniform(new THREE.Color(this.options.colorSand)),
-                uColorGrass: new THREE.Uniform(new THREE.Color(this.options.colorGrass)),
-                uColorSnow: new THREE.Uniform(new THREE.Color(this.options.colorSnow)),
-                uColorRock: new THREE.Uniform(new THREE.Color(this.options.colorRock)),
-                uPerlinTexture: new THREE.Uniform(this.noiseTexture)
+                uPositionFrequency: new Uniform(this.options.positionFrequency),
+                uStrength: new Uniform(this.options.strength),
+                uWarpFrequency: new Uniform(this.options.warpFrequency),
+                uWarpStrength: new Uniform(this.options.warpStrength),
+                uColorWaterDeep: new Uniform(new Color(this.options.colorWaterDeep)),
+                uColorWaterSurface: new Uniform(new Color(this.options.colorWaterSurface)),
+                uColorSand: new Uniform(new Color(this.options.colorSand)),
+                uColorGrass: new Uniform(new Color(this.options.colorGrass)),
+                uColorSnow: new Uniform(new Color(this.options.colorSnow)),
+                uColorRock: new Uniform(new Color(this.options.colorRock)),
+                uPerlinTexture: new Uniform(this.noiseTexture)
             }
         })
 
@@ -70,7 +70,7 @@ export default class Mountain {
     }
 
     setMesh() {
-        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.mesh = new Mesh(this.geometry, this.material)
         this.mesh.position.set(
             this.options.mountainSize / 2,
             0,
@@ -86,7 +86,7 @@ export default class Mountain {
         this.scene.add(this.mesh)
 
 
-        this.meshLeftMesh = new THREE.Mesh(this.geometry, this.material)
+        this.meshLeftMesh = new Mesh(this.geometry, this.material)
         this.meshLeftMesh.position.set(
             this.options.mountainSize / 2,
             0,
@@ -123,26 +123,26 @@ export default class Mountain {
         })
 
         MountainFolder.addColor(this.options, "colorWaterDeep").name("colorWaterDeep").onChange(() => {
-            this.material.uniforms.uColorWaterDeep.value = new THREE.Color(this.options.colorWaterDeep)
+            this.material.uniforms.uColorWaterDeep.value = new Color(this.options.colorWaterDeep)
         })
 
         MountainFolder.addColor(this.options, "colorWaterSurface").name("colorWaterSurface").onChange(() => {
-            this.material.uniforms.uColorWaterSurface.value = new THREE.Color(this.options.colorWaterSurface)
+            this.material.uniforms.uColorWaterSurface.value = new Color(this.options.colorWaterSurface)
         })
 
         MountainFolder.addColor(this.options, "colorSand").name("colorSand").onChange(() => {
-            this.material.uniforms.uColorSand.value = new THREE.Color(this.options.colorSand)
+            this.material.uniforms.uColorSand.value = new Color(this.options.colorSand)
         })
 
         MountainFolder.addColor(this.options, "colorGrass").name("colorGrass").onChange(() => {
-            this.material.uniforms.uColorGrass.value = new THREE.Color(this.options.colorGrass)
+            this.material.uniforms.uColorGrass.value = new Color(this.options.colorGrass)
         })
 
         MountainFolder.addColor(this.options, "colorSnow").name("colorSnow").onChange(() => {
-            this.material.uniforms.uColorSnow.value = new THREE.Color(this.options.colorSnow)
+            this.material.uniforms.uColorSnow.value = new Color(this.options.colorSnow)
         })
         MountainFolder.addColor(this.options, "colorRock").name("colorRock").onChange(() => {
-            this.material.uniforms.uColorRock.value = new THREE.Color(this.options.colorRock)
+            this.material.uniforms.uColorRock.value = new Color(this.options.colorRock)
         })
     }
 }
