@@ -16,8 +16,8 @@
                 <p style="font-size:9px !important; text-wrap: nowrap; font-weight: 400 !important; color: white;line-height: 1;">score</p>
             </div>
             <div class="text-center" v-else style="margin-top:3px">
-              <p v-if="score == 'pp'">pp</p>
-              <p v-else>film</p>
+              <v-icon v-if="score == 'pp'" style="color: #D24625;background-color: white;border-radius: 50%; font-size: 18px;" >mdi-microsoft-powerpoint</v-icon>
+              <v-icon v-else style="color: white;" >mdi-play-circle-outline</v-icon>
             </div>
       </div>
       

@@ -45,7 +45,7 @@ export default {
                 params: {
                 source: this.source,
                 request: this.request,
-                id: '236',
+                id: this.id,
                 }})
                 .then(response => {
                     const arrays = response.data
@@ -91,7 +91,6 @@ export default {
 .related-content > .v-slide-group__wrapper {
   order: 1;
   width: 100%;
-  height: 260px;
   align-items: center;
 }
 

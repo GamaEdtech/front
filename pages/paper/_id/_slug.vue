@@ -628,7 +628,7 @@
           <!--  End:  Azmoon test album card   -->
         </v-col>
       </v-row>
-      <common-related-portrait-content pageName="paper" source="file" request="file"/>
+      <common-related-portrait-content pageName="paper" source="test" request="test"/>
     </v-container>
     
     <!-- Start : Past Papers -->
