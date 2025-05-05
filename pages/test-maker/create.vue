@@ -1,5 +1,5 @@
 <template>
-  <v-container class="create-test-container"   >
+  <v-container class="create-test-container">
     <v-row class="mt-4">
       <v-col cols="6">
         <h1 class="text-h4 text-teal">New Exam</h1>
@@ -20,17 +20,18 @@
       </v-col>
     </v-row>
 
-    <v-stepper-vertical 
-      v-model="test_step"
+    <v-stepper-vertical
       :items="[
         { title: 'Header', value: 1 },
         { title: 'Tests', value: 2 },
         { title: 'Review', value: 3 },
         { title: 'Publish', value: 4 },
       ]"
-      alt-labels
+      editable
+      color="teal"
+      hide-actions
     >
-      <template #item.1>
+      <template #[`item.1`]>
         <v-card flat class="mt-4 pb-10">
           <v-form
             ref="observer"
@@ -186,7 +187,7 @@
         </v-card>
       </template>
 
-      <template #item.2>
+      <template #[`item.2`]>
         <v-card flat class="mt-3 pb-10">
           <v-row>
             <v-col cols="12">
@@ -239,7 +240,7 @@
         </v-card>
       </template>
 
-      <template #item.3>
+      <template #[`item.3`]>
         <v-card flat class="mt-3 pb-10">
           <v-row>
             <v-col cols="12">
@@ -294,7 +295,7 @@
         </v-card>
       </template>
 
-      <template #item.4>
+      <template #[`item.4`]>
         <v-card flat class="mt-3 pb-10">
           <v-card-text class="text-center">
             <p class="text-h5 mb-4">Your test is ready to use!</p>
@@ -338,7 +339,7 @@
     </v-stepper-vertical>
 
     <v-dialog v-model="confirmDeleteDialog" max-width="500">
-      <v-card >
+      <v-card>
         <v-card-title class="text-h5">
           Are you sure of deleting the online exam?
         </v-card-title>
@@ -396,7 +397,7 @@
     >
       <v-card>
         <v-toolbar color="teal" dark>
-          <v-btn icon @click="printPreviewDialog = false">
+          <v-btn icon @click="printPrevipreviousewDialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>Preview</v-toolbar-title>
@@ -860,6 +861,10 @@ const publishTest = async () => {
   } finally {
     publish_loading.value = false;
   }
+};
+
+const testFunction = (item) => {
+  console.log(item);
 };
 
 // Other methods you had defined...
