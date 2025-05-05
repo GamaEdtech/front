@@ -7,7 +7,7 @@
         <v-row>
           <v-col cols="12">
             <div id="main-title-holder">
-              <h1 class="gama-text-h2">GET Token is Comming Soon</h1>
+              <h1 class="gama-text-h2">$GET Token</h1>
             </div>
           </v-col>
         </v-row>
@@ -19,7 +19,7 @@
         <v-col cols="12">
           <v-card flat>
             <v-card-text>
-              <h2 class="gama-text-h4">GET Tokenomics</h2>
+              <h2 class="gama-text-h4">$GET Tokenomics</h2>
               <ul class="gama-text-body1">
                 <li class="font-weight-bold">10 billion GET</li>
                 <li>
@@ -73,7 +73,7 @@
                     href="https://solscan.io/token/GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
                     target="_blank"
                   >
-                    See GET on SolScan
+                    See $GET on SolScan
                   </a>
                 </li>
               </ul>
