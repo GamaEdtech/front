@@ -658,6 +658,12 @@ export default {
           icon: "mdi-information",
           icon_color: "",
         },
+        {
+          title: "$GET Token",
+          link: "/get-token",
+          icon: "mdi-currency-usd",
+          icon_color: "",
+        },
         // {
         //   title: "Offers",
         //   link: "/offers",
@@ -693,6 +699,11 @@ export default {
         {
           title: "FAQ",
           link: "/faq",
+          icon: "",
+        },
+        {
+          title: "$GET Token",
+          link: "/get-token",
           icon: "",
         },
         // {
