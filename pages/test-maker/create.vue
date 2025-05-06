@@ -590,9 +590,6 @@ const test_share_link = computed(() => {
   return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
 
-// Functions included here (you had these defined in your code)
-// These are kept from your original script
-
 // Generate title function
 const generateTitle = () => {
   let lesson_title = "";
@@ -863,11 +860,18 @@ const publishTest = async () => {
   }
 };
 
-const testFunction = (item) => {
-  console.log(item);
+// Helper functions for URL query handling
+const checkActiveParam = () => {
+  if (route.query.active) {
+    if (route.query.active === "test_list") {
+      testListSwitch.value = true;
+      test_step.value = 2;
+    } else if (route.query.active === "add_test") {
+      testListSwitch.value = false;
+      test_step.value = 2;
+    }
+  }
 };
-
-// Other methods you had defined...
 
 // Watchers
 watch(
@@ -949,6 +953,9 @@ onMounted(async () => {
 
   await getTypeList("exam_type");
   await getTypeList("state");
+  
+  // Handle active query parameter for test list / add test
+  checkActiveParam();
 });
 </script>
 
