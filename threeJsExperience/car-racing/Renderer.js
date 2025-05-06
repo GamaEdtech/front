@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { WebGLRenderer } from 'three'
 import Experience from './Experience.js'
 
 export default class Renderer {
@@ -16,7 +16,7 @@ export default class Renderer {
     }
 
     setInstance() {
-        this.instance = new THREE.WebGLRenderer({
+        this.instance = new WebGLRenderer({
             canvas: this.canvas,
             antialias: true
         })

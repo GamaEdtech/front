@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { SRGBColorSpace, MeshBasicMaterial, InstancedMesh, DynamicDrawUsage, Object3D } from "three"
 import Experience from '../Experience.js'
 
 export default class Clouds {
@@ -31,16 +31,16 @@ export default class Clouds {
 
     setMaterial() {
         this.resources.items.cloudBakedTexture.flipY = false
-        this.resources.items.cloudBakedTexture.colorSpace = THREE.SRGBColorSpace
-        this.material = new THREE.MeshBasicMaterial({
+        this.resources.items.cloudBakedTexture.colorSpace = SRGBColorSpace
+        this.material = new MeshBasicMaterial({
             map: this.resources.items.cloudBakedTexture
         })
     }
 
     setMesh() {
-        this.meshes = new THREE.InstancedMesh(this.geometry, this.material, this.cloudCount)
-        this.meshes.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
-        this.dummy = new THREE.Object3D()
+        this.meshes = new InstancedMesh(this.geometry, this.material, this.cloudCount)
+        this.meshes.instanceMatrix.setUsage(DynamicDrawUsage)
+        this.dummy = new Object3D()
 
         for (let i = 0; i < this.cloudCount; i++) {
             const x = Math.random() * this.options.roadSize

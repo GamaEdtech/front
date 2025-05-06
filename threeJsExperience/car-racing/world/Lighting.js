@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { DirectionalLight, Fog, Color } from "three"
 import Experience from '../Experience.js'
 
 
@@ -18,7 +18,7 @@ export default class Lighting {
     }
 
     setDirectioanlLight() {
-        this.directionalLight = new THREE.DirectionalLight('#ffffff', 5)
+        this.directionalLight = new DirectionalLight('#ffffff', 5)
         this.directionalLight.position.set(-100, 400, 200)
         // this.directionalLight.position.set(-100, 7, 30)
 
@@ -31,12 +31,12 @@ export default class Lighting {
         this.directionalLight.shadow.camera.bottom = -8
         this.directionalLight.shadow.camera.left = -8
         this.scene.add(this.directionalLight)
-        this.helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
-        this.scene.add(this.helper);
+        // this.helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
+        // this.scene.add(this.helper);
     }
 
     setFog() {
-        this.scene.fog = new THREE.Fog(
+        this.scene.fog = new Fog(
             this.options.fogColor,
             this.options.near,
             this.options.far
@@ -53,7 +53,7 @@ export default class Lighting {
 
         const FogFolder = this.debug.ui.addFolder("fog")
         FogFolder.addColor(this.options, "fogColor").name("color fog").onChange(() => {
-            this.scene.fog.color = new THREE.Color(this.options.fogColor)
+            this.scene.fog.color = new Color(this.options.fogColor)
         })
 
         FogFolder.add(this.options, "near").min(0).max(200).step(0.1).name("near fog").onChange(() => {

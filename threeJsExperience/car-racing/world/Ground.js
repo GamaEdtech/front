@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { PlaneGeometry, MeshStandardMaterial, Mesh, Color } from "three"
 import Experience from '../Experience.js'
 
 
@@ -23,17 +23,17 @@ export default class Ground {
     }
 
     setGeometry() {
-        this.geometry = new THREE.PlaneGeometry(this.options.groundSize, this.options.groundWidth)
+        this.geometry = new PlaneGeometry(this.options.groundSize, this.options.groundWidth)
     }
 
     setMaterial() {
-        this.material = new THREE.MeshStandardMaterial({
+        this.material = new MeshStandardMaterial({
             color: this.groundColor
         })
     }
 
     setMesh() {
-        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.mesh = new Mesh(this.geometry, this.material)
         this.mesh.rotation.x = -Math.PI / 2
         this.mesh.position.x = this.options.groundSize / 2
         this.mesh.position.z = this.options.mountainWidth + (this.options.groundWidth / 2) - 0.1
@@ -46,7 +46,7 @@ export default class Ground {
     setDebug() {
         const GroundFolder = this.debug.ui.addFolder("Ground")
         GroundFolder.addColor(this, "groundColor").name("ground Color").onChange((value) => {
-            this.material.color = new THREE.Color(value)
+            this.material.color = new Color(value)
         })
         // GroundFolder.add(this.texture.repeat, "x").name("x reapet").min(1).max(100).step(1)
         // GroundFolder.add(this.texture.repeat, "y").name("y reapet").min(1).max(100).step(1)

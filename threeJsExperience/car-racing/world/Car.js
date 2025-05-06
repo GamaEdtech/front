@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { MathUtils } from "three"
 import Experience from '../Experience.js'
 
 
@@ -98,7 +98,7 @@ export default class Car {
 
         if (this.isChangingLane) {
             const targetProgress = Math.abs(this.targetLane - this.currentLane);
-            this.laneChangeProgress = THREE.MathUtils.lerp(this.laneChangeProgress, targetProgress, 0.1);
+            this.laneChangeProgress = MathUtils.lerp(this.laneChangeProgress, targetProgress, 0.1);
             if (Math.abs(this.currentLane - this.targetLane) < 0.01) {
                 this.currentLane = this.targetLane;
                 this.isChangingLane = false;
@@ -214,7 +214,7 @@ export default class Car {
     }
 
     increseSpeedSuccessPhase() {
-        this.speed = THREE.MathUtils.lerp(this.speed, this.UpperSpeed, 0.06)
+        this.speed = MathUtils.lerp(this.speed, this.UpperSpeed, 0.06)
 
         if (Math.ceil(this.speed) == this.UpperSpeed) {
             this.isIncreaseSpeedPhase = false
@@ -224,9 +224,9 @@ export default class Car {
     }
 
     decreaseSpeedAndDriftSuccessPhase() {
-        this.speed = THREE.MathUtils.lerp(this.speed, this.options.carBaseSpeed, 0.01)
+        this.speed = MathUtils.lerp(this.speed, this.options.carBaseSpeed, 0.01)
         this.wrongAnswerRotationY = this.wrongAnswerRotationY + (-1 * this.directionLastSuccessRotation * 0.02)
-        this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.currentLane + this.directionLastSuccessRotation, 0.02)
+        this.currentLane = MathUtils.lerp(this.currentLane, this.currentLane + this.directionLastSuccessRotation, 0.02)
 
         if (this.wrongAnswerRotationY <= -Math.PI || this.wrongAnswerRotationY >= Math.PI) {
             this.wrongAnswerRotationY = 0
@@ -270,7 +270,7 @@ export default class Car {
     update() {
         const distancePerFrame = this.speed * (this.time.delta / 1000)
         this.positionX += distancePerFrame
-        this.currentLane = THREE.MathUtils.lerp(this.currentLane, this.targetLane, (this.time.delta / 1000) * this.laneLerpSpeed)
+        this.currentLane = MathUtils.lerp(this.currentLane, this.targetLane, (this.time.delta / 1000) * this.laneLerpSpeed)
 
 
         this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))

@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { Scene, Mesh } from "three"
 import Camera from "./Camera"
 import Sizes from "../utils/Sizes"
 import Time from "../utils/Time"
@@ -114,14 +114,14 @@ export default class Experience {
         this.sizes = new Sizes()
         this.time = new Time()
         this.resources = new Resources(sources)
-        this.scene = new THREE.Scene()
+        this.scene = new Scene()
         // this.camera = new Camera()
         // this.renderer = new Renderer()
 
 
         // axes helper
-        const axesHelper = new THREE.AxesHelper(5)
-        this.scene.add(axesHelper)
+        // const axesHelper = new THREE.AxesHelper(5)
+        // this.scene.add(axesHelper)
 
 
         // Resize event
@@ -200,7 +200,7 @@ export default class Experience {
         // Traverse the whole scene
         this.scene.traverse((child) => {
             // Test if it's a mesh
-            if (child instanceof THREE.Mesh) {
+            if (child instanceof Mesh) {
                 child.geometry.dispose()
 
                 // Loop through the material properties
