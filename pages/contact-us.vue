@@ -2,20 +2,20 @@
   <v-container>
     <div style="display: flex;gap: 50px;">
       <form @submit.prevent="handleSubmit" style="width: 380px;height: 601px;">
-        <div style="margin-bottom: 16px;">
+        <div style="margin-bottom: 16px; margin-top: 16px;">
           <label for="name" style="margin-bottom: 4px;">Name*</label>
           <input style="padding-left: 20px;padding-right: 20px;padding-top: 15px;padding-bottom: 15px;border: 1px solid #E4E7EC;border-radius: 30px; width: 380px; height: 48px;" v-model="form.name" type="text" id="name" placeholder="ui.lib.drive@gmail.com" required />
         </div>
         
-        <div style="margin-bottom: 16px;">
+        <div style="margin-bottom: 24px;">
           <label for="email" style="margin-bottom: 4px;">Email* </label>
           <input style="padding-left: 20px;padding-right: 20px;padding-top: 15px;padding-bottom: 15px;border: 1px solid #E4E7EC;border-radius: 30px; width: 380px; height: 48px;" v-model="form.email" type="email" id="email" placeholder="ui.lib.drive@gmail.com" required />
         </div>
         
-        <div style="margin-bottom: 50px;">
+        <div style="margin-bottom: 50px;padding-top: 16px;">
           <label for="message" style="margin-bottom: 4px;">Message*</label>
           <textarea style="padding-left: 12px;padding-right: 12px;padding-top: 8px;padding-bottom: 12px;resize: none; width: 380px; height: 155px; border-radius: 16px;border: 1px solid #E4E7EC;" v-model="form.message" placeholder="Enter here.............." id="message" required></textarea>
-          <p style="font-size: 14px;font-weight: 400; color: #98A2B3;">Enter at least 25 characters.</p>
+          <p style="font-size: 14px;font-weight: 400; color: #98A2B3; margin-top: 4px;">Enter at least 25 characters.</p>
         </div>
 
 
@@ -54,16 +54,21 @@
       </form>
       
         <!-- Map -->
-      <client-only>
-        <div style="width: 601px; height: 683px;" id="map" ref="mapContainer"></div>
-      </client-only>
+      
+        <div style="display: flex; flex-direction: column;">
+          <client-only>
+          <div style="width: 683px; height: 565px;border-top-left-radius:16px;border-top-right-radius: 16px;" id="map" ref="mapContainer"></div>
+        </client-only>
+          <div style="display: flex;flex-direction: row; width: 683px;height: 36px;background-color: #F2F4F7;gap: 8px;border-bottom-right-radius: 16px;border-bottom-left-radius: 16px; align-items: center; padding-left: 16px; padding-top: 10px;padding-bottom: 10px;">
+            <v-icon style="font-size: 16px;color: #98A2B3;">mdi-map-marker</v-icon>
+            <p style="color: #344054;font-size: 14px;font-weight: 500;">2419 West 53rd Street, Apt 5B, New York, NY 10019</p>
+          </div>
+        </div>
     </div>
   </v-container>
 </template>
   
 <script>
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 
 export default {
   data() {
@@ -98,8 +103,12 @@ export default {
     triggerFileSelect() {
     this.$refs.fileInput.click()
   },
-  initMap() {
-      // Fix marker icons (Nuxt/Webpack)
+  },
+  async mounted() {
+    if (process.client) {
+      const L = await import('leaflet') // ✅ dynamic import
+
+      // Fix icon paths
       delete L.Icon.Default.prototype._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -107,7 +116,7 @@ export default {
         shadowUrl: require('leaflet/dist/images/marker-shadow.png')
       })
 
-      // Initialize the map
+      // Create the map
       this.map = L.map(this.$refs.mapContainer, {
         center: this.officeCoords,
         zoom: 15,
@@ -121,12 +130,6 @@ export default {
 
       L.marker(this.officeCoords).addTo(this.map)
     }
-  },
-  mounted() {
-    // Only run Leaflet in the browser
-    if (process.client) {
-      this.initMap()
-    }
-  },
+  }
 }
 </script>
