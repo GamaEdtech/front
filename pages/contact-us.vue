@@ -1,69 +1,117 @@
 <template>
   <v-container>
-    <div style="display: flex;gap: 50px;">
-      <form @submit.prevent="handleSubmit" style="width: 380px;height: 601px;">
-        <div style="margin-bottom: 16px; margin-top: 16px;">
-          <label for="name" style="margin-bottom: 4px;">Name*</label>
-          <input style="padding-left: 20px;padding-right: 20px;padding-top: 15px;padding-bottom: 15px;border: 1px solid #E4E7EC;border-radius: 30px; width: 380px; height: 48px;" v-model="form.name" type="text" id="name" placeholder="ui.lib.drive@gmail.com" required />
-        </div>
-        
-        <div style="margin-bottom: 24px;">
-          <label for="email" style="margin-bottom: 4px;">Email* </label>
-          <input style="padding-left: 20px;padding-right: 20px;padding-top: 15px;padding-bottom: 15px;border: 1px solid #E4E7EC;border-radius: 30px; width: 380px; height: 48px;" v-model="form.email" type="email" id="email" placeholder="ui.lib.drive@gmail.com" required />
-        </div>
-        
-        <div style="margin-bottom: 50px;padding-top: 16px;">
-          <label for="message" style="margin-bottom: 4px;">Message*</label>
-          <textarea style="padding-left: 12px;padding-right: 12px;padding-top: 8px;padding-bottom: 12px;resize: none; width: 380px; height: 155px; border-radius: 16px;border: 1px solid #E4E7EC;" v-model="form.message" placeholder="Enter here.............." id="message" required></textarea>
-          <p style="font-size: 14px;font-weight: 400; color: #98A2B3; margin-top: 4px;">Enter at least 25 characters.</p>
-        </div>
+    <div class="d-flex flex-column flex-md-row justify-center align-center">
+      <div
+        class="pt-4  mb-6 mb-md-0 mr-0 mr-md-12"
+        :style="$vuetify.breakpoint.smAndDown ? 'width: 347px' : 'width: 380px; height: 601px;'"
+      >
+      <v-form v-model="valid">
+        <!--Name Input-->
+        <v-text-field
+            label="Name*"
+            placeholder="ui.lib.drive@gmail.com"
+            outlined
+            class="rounded-pill mb-5"
+            height="48"
+            :rules="[rules.required]"
+            v-model="form.name"
+          ></v-text-field>
+
+        <!--Email Input-->
+        <v-text-field
+            label="Email*"
+            placeholder="ui.lib.drive@gmail.com"
+            outlined
+            class="rounded-pill mb-5"
+            height="48"
+            :rules="[rules.required, rules.email]"
+            v-model="form.email"
+        ></v-text-field>
 
 
-              <!-- Show Selected Files -->
-        <div v-if="form.files.length" style="margin-bottom: 24px;">
-          <ul style="padding: 0;">
-            <li v-for="(file, index) in form.files" :key="index" style="display: flex; justify-content: space-between; width: 380px;list-style: none; font-size: 16px; font-weight: 500; color: #667085;">
-              {{ file.name }}
-              <button type="button" @click="removeFile(index)">
-                <v-icon style="background-color: white;color: #F04438; border-radius: 50%;">mdi mdi-minus-circle</v-icon>
-              </button>
-            </li>
-          </ul>
-        </div>
-        <!-- File Upload Field -->
-        <div style="display: flex; align-items: center;margin-bottom: 56px;">
-          <input
-            ref="fileInput"
-            type="file"
-            id="files"
-            multiple
-            @change="handleFileChange"
-            style="display: none;"
-          />
-          <div style="width: 110px;height: 30px; border-radius: 30px; border:1px solid #E4E7EC;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;margin-right: 6px;" @click="triggerFileSelect">
-            <v-icon style="font-size: 14px;color: #2E90FA;">mdi-paperclip</v-icon>
-            <p style="color: #2E90FA; font-size: 14px; font-weight: 500;"> Attach Files </p>
+        <!--Message textarea-->
+        <v-textarea
+          outlined
+          name="input-7-4"
+          label="Message*"
+          hint="Enter at least 25 characters."
+          placeholder="Enter here.............."
+          no-resize
+          class="rounded-xl mb-5"
+          height="155"
+          :rules="[rules.required, rules.min25]"
+          v-model="form.message"
+        ></v-textarea>
+
+        <!--File Input & Preview(delete) File-->
+        <div class="d-flex flex-column-reverse mb-10" style="gap: 12px;">
+          <!--File Input-->
+          <div class="d-flex" style="gap: 10px;">
+            <!-- Hidden file input (no multiple) -->
+            <input
+              type="file"
+              ref="fileInput"
+              @change="handleFile"
+              class="d-none"
+            />
+
+            <!-- Custom trigger -->
+            <v-btn
+              color="#2E90FA"
+              outlined
+              rounded
+              @click="triggerFileSelect"
+              class="d-flex align-center gtext-t5 font-weight-medium"
+            >
+              <v-icon class="gtext-t4 font-weight-medium">mdi-paperclip</v-icon>
+              Attach File
+
+            </v-btn>
+
+            <!-- Hint -->
+            <p class="gtext-t6 d-flex align-center" style="color: #98A2B3;">
+              Max size: 2MB (jpeg, png, webp)
+            </p>
+
           </div>
-          <p style="color: #98A2B3; font-size: 12px; font-weight: 400;">2 MB max size (*.jpeg, *.webp, *.png)</p>
+          
+          <!-- File display with remove option -->
+          <div>
+            <div v-if="file" class="d-flex align-center justify-space-between">
+              <span>{{ file.name }}</span>
+              <v-btn icon small @click="removeFile">
+                <v-icon color="error">mdi-minus-circle</v-icon>
+              </v-btn>
+            </div>
+          </div>
         </div>
 
+        <v-btn
+          color="primary"
+          type="submit"
+          style="border-radius: 30px;color: black;"
+          height="42"
+          block
+          :disabled="!valid"
+          @click="submitForm"
+        >
+          Send
+        </v-btn>
+      </v-form>
+    </div>
+      
 
-        
-          <button style="border: 1px solid #E4E7EC;border-radius: 30px; width: 380px; height: 42px; background-color: #FFB600;color: #1D2939;" type="submit">Send</button>
-      </form>
-      
-        <!-- Map -->
-      
-        <div style="display: flex; flex-direction: column;">
-          <client-only>
-          <div style="width: 683px; height: 565px;border-top-left-radius:16px;border-top-right-radius: 16px;" id="map" ref="mapContainer"></div>
+      <!-- Map -->
+      <div class="d-flex flex-column">
+        <client-only>
+          <div class="rounded-t-xl" :style="mapStyles" id="map" ref="mapContainer"></div>
         </client-only>
-          <div style="display: flex;flex-direction: row; width: 683px;height: 36px;background-color: #F2F4F7;gap: 8px;border-bottom-right-radius: 16px;border-bottom-left-radius: 16px; align-items: center; padding-left: 16px; padding-top: 10px;padding-bottom: 10px;">
-            <v-icon style="font-size: 16px;color: #98A2B3;">mdi-map-marker</v-icon>
-            <p style="color: #344054;font-size: 14px;font-weight: 500;">2419 West 53rd Street, Apt 5B, New York, NY 10019</p>
-          </div>
+        <div class="d-flex flex-row rounded-b-xl align-center py-2 pl-4" :style="infoBoxStyles" style="background-color: #F2F4F7;gap: 8px;">
+          <v-icon class="gtext-t4" style="color: #98A2B3;">mdi-map-marker</v-icon>
+          <p :class="[textSizeClass, 'font-weight-medium']" style="color: #344054;">2419 West 53rd Street, Apt 5B, New York, NY 10019</p>
         </div>
+      </div>
+
     </div>
   </v-container>
 </template>
@@ -80,56 +128,143 @@ export default {
         files: []
       },
       map: null,
-      officeCoords: [25.276987, 55.296249]
+      officeCoords: [40.764064, -73.988577],
+      file: null,
+      rules: {
+        required: v => !!v || 'This field is required.',
+        email: v => /.+@.+\..+/.test(v) || 'E-mail must be valid.',
+        min25: v => (v && v.length >= 25) || 'Minimum 25 characters required.',
+      },
+      valid: false, // track form validity
     }
   },
   methods: {
-    handleSubmit() {
-      // You can send data to an API or use $axios if installed
-      console.log('Form submitted:', this.form)
-
-      // Optional: Reset the form
-      this.form = { name: '', email: '', message: '' }
-    },
-    handleFileChange(event) {
-      const selectedFiles = Array.from(event.target.files)
-      this.form.files = this.form.files.concat(selectedFiles)
-      // Clear input value so same file can be re-selected if removed
-      event.target.value = null
-    },
-    removeFile(index) {
-      this.form.files.splice(index, 1)
-    },
-    triggerFileSelect() {
-    this.$refs.fileInput.click()
+    submitForm() {
+    const isValid = this.$refs.form.validate()
+    if (isValid) {
+      console.log('Submit form', this.name, this.email, this.message)
+    }
   },
+    triggerFileSelect() {
+      this.$refs.fileInput.click();
+    },
+    handleFile(event) {
+      const selectedFile = event.target.files[0];
+
+      if (
+        selectedFile &&
+        ['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type) &&
+        selectedFile.size <= 2 * 1024 * 1024
+      ) {
+        this.file = selectedFile;
+      } else {
+        alert('Invalid file. Only jpeg, png, or webp under 2MB allowed.');
+        this.$refs.fileInput.value = null; // Reset input
+      }
+    },
+    removeFile() {
+      this.file = null;
+      this.$refs.fileInput.value = null;
+    }
   },
   async mounted() {
     if (process.client) {
       const L = await import('leaflet') // ✅ dynamic import
 
-      // Fix icon paths
-      delete L.Icon.Default.prototype._getIconUrl
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-        iconUrl: require('leaflet/dist/images/marker-icon.png'),
-        shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-      })
+      // Remove default icon paths
+      delete L.Icon.Default.prototype._getIconUrl;
 
-      // Create the map
+      // Define a custom MDI icon marker
+      const customMarker = L.divIcon({
+        className: "", // don't use default styles
+        html: `
+          <div style="
+            color: #FFB600;
+            font-size: 50px;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          ">
+            <i class="mdi mdi-map-marker"></i>
+          </div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+      });
+
+      // Initialize the map
       this.map = L.map(this.$refs.mapContainer, {
         center: this.officeCoords,
         zoom: 15,
         zoomControl: false,
-        attributionControl: false
-      })
+        attributionControl: false,
+      });
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(this.map)
 
-      L.marker(this.officeCoords).addTo(this.map)
+      // Add custom MDI icon marker
+      L.marker(this.officeCoords, { icon: customMarker }).addTo(this.map);
     }
-  }
+  },
+  computed: {
+    textSizeClass() {
+    if (this.$vuetify.breakpoint.smAndDown) {
+      return 'gtext-t7'; // Mobile
+    } else if (this.$vuetify.breakpoint.mdOnly) {
+      return 'gtext-t6'; // Tablet
+    } else {
+      return 'gtext-t5'; // Desktop
+    }
+  },
+    mapStyles() {
+      const { md, xs , sm } = this.$vuetify.breakpoint;
+
+      if (xs) {
+        return {
+          width: '379px',
+          height: '118px',
+        };
+      } else if (sm) {
+        return {
+          width: '348px',
+          height: '377px',
+        };
+      }else if (md) {
+        return {
+          width: '348px',
+          height: '577px',
+        };
+      } else {
+        return {
+          width: '683px',
+          height: '601px',
+        };
+      }
+    },
+    infoBoxStyles() {
+      const { sm,md, xs } = this.$vuetify.breakpoint;
+
+      let width = '683px';
+      if (xs) width = '379px';
+      else if (sm||md) width = '348px';
+
+      return {
+        width,
+        height: '36px',
+        backgroundColor: '#F2F4F7',
+        gap: '8px',
+      };
+    },
+  },
 }
 </script>
+<style scoped>
+.theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
+  background-color: #FFE3B5 !important; /* Keep your yellow color */
+  color: #98A2B3 !important; /* Custom text color */
+  pointer-events: none; /* still disables clicks */
+}
+</style>
