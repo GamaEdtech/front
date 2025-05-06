@@ -124,9 +124,6 @@
 
 
 <script>
-// import Experience from "@/threeJsExperience/car-racing/Experience.js";
-
-
 export default {
     auth: false,
     data() {
@@ -211,8 +208,9 @@ export default {
             });
         });
     },
-    onUnmounted() {
+    destroyed() {
         this.experience.destroy()
+        this.experience = null
     },
     methods: {
         onChangeSceneReady() {
