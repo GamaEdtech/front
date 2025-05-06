@@ -124,7 +124,7 @@
 
 
 <script>
-import Experience from "@/threeJsExperience/car-racing/Experience.js";
+// import Experience from "@/threeJsExperience/car-racing/Experience.js";
 
 
 export default {
@@ -198,8 +198,9 @@ export default {
             this.isShowGuidMenu = true
             localStorage.setItem('hasSeenGuideMenu', 'true')
         }
-        this.experience = new Experience(document.getElementById("canvas"), this.questions,
-            {
+        import('@/threeJsExperience/car-racing/Experience.js').then((module) => {
+            const Experience = module.default;
+            this.experience = new Experience(document.getElementById("canvas"), this.questions, {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
@@ -207,8 +208,8 @@ export default {
                 onResultGameChange: (result) => this.onResultGameChange(result),
                 onChangeSceneReady: this.onChangeSceneReady,
                 onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
-            }
-        )
+            });
+        });
     },
     onUnmounted() {
         this.experience.destroy()
