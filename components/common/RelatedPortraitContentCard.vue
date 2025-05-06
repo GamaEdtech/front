@@ -12,12 +12,12 @@
       </v-img>
       <div class="circle-container">
             <div class="text-center" v-if="showScoreLabel">
-                <p style="font-size: 10px !important; text-wrap: nowrap; font-weight: 700 !important; color: white;">{{ score }}</p>
-                <p style="font-size:9px !important; text-wrap: nowrap; font-weight: 400 !important; color: white;line-height: 1;">score</p>
+                <p class="text-subtitle-1 font-weight-bold white--text text-no-wrap" style="line-height: 1.5;">{{ score }}</p>
+                <p class="text-subtitle-2 white--text font-weight-regular text-no-wrap" style="line-height: 1;">score</p>
             </div>
             <div class="text-center" v-else style="margin-top:3px">
-              <v-icon v-if="score == 'pp'" style="color: #D24625;background-color: white;border-radius: 50%; font-size: 18px;" >mdi-microsoft-powerpoint</v-icon>
-              <v-icon v-else style="color: white;" >mdi-play-circle-outline</v-icon>
+              <v-icon v-if="score == 'pp'" class="rounded-circle gtext-t2" style="color: #D24625;background-color: white;" >mdi-microsoft-powerpoint</v-icon>
+              <v-icon v-else class="white--text" >mdi-play-circle-outline</v-icon>
             </div>
       </div>
       

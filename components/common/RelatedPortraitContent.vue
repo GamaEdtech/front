@@ -1,19 +1,19 @@
 <template>
     <div class="mx-4">
-        <div class="d-flex mb-4" style="gap: 8px;">
-            <div style="background-color: #2E90FA; width: 20px; height: 20px; display: flex;justify-content: center; align-items: center; border-radius: 50%;">
-                <span style="color: white;" class="icon icon-paper"></span>
+        <div class="d-flex mb-3" style="gap: 8px;">
+            <div class="d-flex justify-center align-center rounded-circle" style="background-color: #2E90FA; width: 20px; height: 20px;">
+                <span class="icon icon-paper white--text gtext-t5"></span>
             </div>
             
-            <h1 style="font-size:14px !important;font-weight: 600;color: #344054;">Related {{ pageName }} </h1>
+            <h1 class="gtext-t5 font-weight-semibold" style="color: #344054;">Related {{ pageName }} </h1>
         </div>
-        <v-slide-group show-arrows class="related-content" >
+        <v-slide-group show-arrows class="related-content" :style="{height: `${CardHeight}`}">
             <v-slide-item
                 v-for="item in data"
                 :key="item.id"
             >
                 <nuxt-link :to="`/${pageName}/${item.id}/${item.title_url}`">
-                    <common-related-portrait-content-card :cardPicture="item.thumb_pic" :cardTitle="item.title" :score="item.referee_score || item.type_title" :showScoreLabel="!!item.referee_score" />
+                    <common-related-portrait-content-card :cardPicture="item.thumb_pic || fallbackImage" :cardTitle="item.title" :score="item.referee_score || item.type_title" :showScoreLabel="!!item.referee_score" />
                 </nuxt-link>
             </v-slide-item>
         </v-slide-group>
@@ -26,6 +26,7 @@ export default {
         return {
             data:null,
             id : this.$route.params.id,
+            fallbackImage: require('@/assets/images/GamaBag.webp')
         }
     },
     props:{
@@ -71,7 +72,16 @@ export default {
     },
     mounted(){
         this.getRelatedContent();
-    }
+    },
+    computed: {
+        CardHeight() {
+            if (this.pageName === 'paper') {
+                return '243px' ;
+            } else if (this.pageName === 'multimedia') {
+                return '120px';
+            } 
+            }
+  }
 }
 
 </script>
