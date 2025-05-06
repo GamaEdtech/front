@@ -72,7 +72,10 @@ export default class Car {
         })
 
         this.setMesh()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     getLaneZOffset(laneNumber) {

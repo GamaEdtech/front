@@ -12,7 +12,9 @@ export default class Renderer {
         this.clearColor = this.experience.options.clearColor
 
         this.setInstance()
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setInstance() {

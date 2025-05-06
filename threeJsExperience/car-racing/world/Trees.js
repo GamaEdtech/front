@@ -15,7 +15,9 @@ export default class Trees {
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {

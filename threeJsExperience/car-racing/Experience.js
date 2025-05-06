@@ -2,7 +2,6 @@ import { Scene, Mesh } from "three"
 import Camera from "./Camera"
 import Sizes from "../utils/Sizes"
 import Time from "../utils/Time"
-import Debug from "../utils/Debug"
 import Renderer from "./Renderer"
 import World from "./world/World"
 import Resources from "../utils/Resources"
@@ -105,18 +104,22 @@ export default class Experience {
 
             // levels questions
             questions: questions,
-            distanceFromEndRoadQuestion: 40
+            distanceFromEndRoadQuestion: 40,
+
+            isDevelopeMent: false
         }
 
 
         // Setup
-        this.debug = new Debug()
+        if (this.options.isDevelopeMent) {
+            import('../utils/Debug').then(({ default: Debug }) => {
+                this.debug = new Debug()
+            })
+        }
         this.sizes = new Sizes()
         this.time = new Time()
         this.resources = new Resources(sources)
         this.scene = new Scene()
-        // this.camera = new Camera()
-        // this.renderer = new Renderer()
 
 
         // axes helper
@@ -141,7 +144,9 @@ export default class Experience {
             this.camera = new Camera()
             this.renderer = new Renderer()
 
-            this.debug.update()
+            if (this.debug) {
+                this.debug.update()
+            }
             if (this.world && this.camera && this.renderer) {
                 this.camera.update()
                 this.renderer.update()
@@ -183,7 +188,9 @@ export default class Experience {
     update() {
         if (this.isPlayingGame) {
             this.callBacks.onTimerUpdate(this.time.delta / 1000)
-            this.debug.update()
+            if (this.debug) {
+                this.debug.update()
+            }
             if (this.world && this.camera && this.renderer) {
                 this.camera.update()
                 this.renderer.update()

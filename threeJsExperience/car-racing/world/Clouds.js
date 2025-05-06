@@ -21,7 +21,10 @@ export default class Clouds {
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {

@@ -19,7 +19,9 @@ export default class Road {
         this.setMaterial()
         this.setMesh()
 
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {

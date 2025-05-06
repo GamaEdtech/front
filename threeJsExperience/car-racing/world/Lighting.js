@@ -14,7 +14,10 @@ export default class Lighting {
 
         this.setDirectioanlLight()
         this.setFog()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setDirectioanlLight() {

@@ -19,7 +19,9 @@ export default class Ground {
         this.setMesh()
 
 
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {

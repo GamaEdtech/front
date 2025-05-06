@@ -39,7 +39,10 @@ export default class Camera {
 
         this.setInstance()
         this.setControls()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     calculatePositionZ(positionx) {
