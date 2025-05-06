@@ -199,7 +199,7 @@
 export default {
   head() {
     return {
-      title: "GET Token",
+      title: "$GET Token",
       script: [
         {
           src: `https://terminal.jup.ag/main-v3.js`,
