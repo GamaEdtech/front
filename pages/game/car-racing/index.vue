@@ -846,5 +846,9 @@ export default {
         left: -100px;
         top: 220px;
     }
+
+    .buttons-div {
+        bottom: 60px;
+    }
 }
 </style>

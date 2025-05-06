@@ -106,7 +106,7 @@ export default class Experience {
             questions: questions,
             distanceFromEndRoadQuestion: 40,
 
-            isDevelopeMent: false
+            isDevelopeMent: true
         }
 
 
@@ -195,6 +195,10 @@ export default class Experience {
                 this.camera.update()
                 this.renderer.update()
                 this.world.update()
+            }
+        } else {
+            if (this.renderer) {
+                this.renderer.update()
             }
         }
     }
