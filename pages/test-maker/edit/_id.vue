@@ -380,7 +380,7 @@
         class="pointer"
         color="teal"
       >
-        <p>Tests</p>
+        Tests
       </v-stepper-step>
       <v-stepper-content step="2">
         <v-card flat class="mt-3 pb-10">
@@ -1123,728 +1123,680 @@
   </v-container>
 </template>
 
-<script>
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
-import { min } from "vee-validate/dist/rules";
-import CreateTestForm from "@/components/test-maker/create-test-form";
+<script setup>
+import { ref, reactive, watch, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuth } from '~/composables/useAuth';
+import draggable from 'vuedraggable';
+import TopicSelector from "~/components/form/topic-selector.vue";
 
-export default {
+// Define layout and page metadata
+definePageMeta({
   layout: "test-maker-layout",
-  name: "test-maker-edit",
-  head() {
-    return {
-      title: "Update online exam",
-      script: [
-        {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-          defer: true,
-        },
-      ],
+});
+
+useHead({
+  title: "Update online exam",
+});
+
+// Get services
+const auth = useAuth();
+const route = useRoute();
+const router = useRouter();
+const userToken = ref("");
+
+// Core data
+const test_step = ref(1);
+const exam_id = ref(route.params.id);
+const exam_code = ref("");
+const submit_loading = ref(false);
+const update_loading = ref(false);
+const publish_loading = ref(false);
+const test_loading = ref(false);
+const all_tests_loaded = ref(false);
+const tests = ref([]);
+const timer = ref(null);
+const observer = ref(null);
+const topicSelector = ref(null);
+const mathJaxEl = ref(null);
+
+// Form data
+const form = reactive({
+  section: "",
+  base: "",
+  lesson: "",
+  topics: [],
+  exam_type: "",
+  level: "2",
+  holding_time: false,
+  holding_level: 4,
+  state: "",
+  area: "",
+  school: "",
+  duration: 3,
+  title: "",
+  negative_point: false,
+  file_original: "",
+  question_num: 50,
+  edu_year: "",
+  edu_month: "",
+});
+
+const file_original = ref(null);
+const file_original_path = ref("");
+
+// Filter data for test search
+const filter = reactive({
+  section: "",
+  base: "",
+  lesson: "",
+  topic: "",
+  page: 1,
+  perpage: 40,
+  testsHasVideo: "",
+  myTests: false,
+});
+
+// UI State
+const printPreviewDialog = ref(false);
+const confirmDeleteDialog = ref(false);
+const deleteLoading = ref(false);
+const previewTestList = ref([]);
+const topicTitleArr = ref([]);
+const testListSwitch = ref(false);
+
+// Delete exam test section
+const deleteTestConfirmDialog = ref(false);
+const delete_exam_test_id = ref("");
+const delete_exam_test_loading = ref(false);
+
+// Data lists
+const level_list = ref([]);
+const filter_level_list = ref([]);
+const grade_list = ref([]);
+const filter_grade_list = ref([]);
+const field_list = ref([]);
+const lesson_list = ref([]);
+const filter_lesson_list = ref([]);
+const topic_list = ref([]);
+const test_type_list = ref([]);
+const test_list = ref([]);
+const selected_topics = ref([]);
+
+// Static data
+const year_list = ref([
+  2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013,
+]);
+
+const month_list = ref([
+  { id: 1, title: "January" },
+  { id: 2, title: "February" },
+  { id: 3, title: "March" },
+  { id: 4, title: "April" },
+  { id: 5, title: "May" },
+  { id: 6, title: "June" },
+  { id: 7, title: "July" },
+  { id: 8, title: "August" },
+  { id: 9, title: "September" },
+  { id: 10, title: "October" },
+  { id: 11, title: "November" },
+  { id: 12, title: "December" },
+]);
+
+const test_level_list = [
+  { id: "1", title: "Simple" },
+  { id: "2", title: "Medium" },
+  { id: "3", title: "Hard" },
+];
+
+const video_analysis_options = [
+  { value: 0, title: "All" },
+  { value: 1, title: "Have" },
+  { value: -1, title: "Do not have" },
+];
+
+const state_list = ref([]);
+const area_list = ref([]);
+const school_list = ref([]);
+
+const holding_level_list = [
+  { id: 1, title: "School" },
+  { id: 2, title: "District" },
+  { id: 3, title: "State" },
+  { id: 4, title: "Country" },
+];
+
+// Compute the test share link based on the route params
+const test_share_link = computed(() => {
+  if (process.server) {
+    // Return a consistent value during SSR to avoid hydration mismatch
+    return `/exam/${exam_id.value || ""}`;
+  }
+  // Only use window.location on client side
+  return `${window.location.origin}/exam/${exam_id.value || ""}`;
+});
+
+// Generate title function
+const generateTitle = () => {
+  let lesson_title = "";
+  if (form.lesson && lesson_list.value.length > 0) {
+    const lessonItem = lesson_list.value.find((x) => x.id === form.lesson);
+    lesson_title = lessonItem?.title || "";
+  }
+
+  let base_title = "";
+  if (form.base && grade_list.value.length > 0) {
+    const baseItem = grade_list.value.find((x) => x.id === form.base);
+    base_title = baseItem?.title || "";
+  }
+
+  form.title = `${lesson_title} Test ${base_title} Grade`;
+};
+
+// Return title of level for show in preview list
+const calcLevel = (level) => {
+  if (level) {
+    const levelItem = test_level_list.find((x) => x.id === level);
+    return levelItem ? levelItem.title : "";
+  }
+  return "";
+};
+
+// API methods
+const getTypeList = async (type, parent = "", trigger = "") => {
+  try {
+    const params = {
+      type: type,
     };
-  },
-  components: {
-    CreateTestForm,
-    ValidationObserver,
-    ValidationProvider,
-    TopicSelector,
-  },
-  data() {
-    return {
-      test_step: 2,
-      exam_id: "",
-      exam_code: "",
-      form: {
-        section: "",
-        base: "",
-        lesson: "",
-        topics: "",
-        exam_type: "",
-        level: "2",
-        holding_time: false,
-        state: "",
-        area: "",
-        school: "",
-        duration: 3,
-        // start_date: parseInt(this.$moment().format('x') / 1000),
-        title: "",
-        paperID: "",
-        negative_point: false,
-        file_original: "",
+
+    if (type === "base") params.section_id = parent;
+    if (type === "lesson") params.base_id = parent;
+    if (type === "topic") params.lesson_id = parent;
+    if (type === "area") params.state_id = parent;
+
+    if (type === "school") {
+      params.section_id = form.section;
+      params.area_id = form.area;
+    }
+
+    const res = await $fetch("/api/v1/types/list", {
+      method: "GET",
+      params: params,
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
       },
-      file_original: "",
-      filter: {
-        section: "",
-        base: "",
-        lesson: "",
-        topic: "",
-        page: 1,
-        perpage: 40,
+    });
+
+    if (res && res.data) {
+      if (type === "section") {
+        if (trigger === "filter") {
+          filter_level_list.value = res.data;
+        } else {
+          level_list.value = res.data;
+          filter_level_list.value = res.data;
+        }
+      } else if (type === "base") {
+        if (trigger === "filter") {
+          filter_grade_list.value = res.data;
+        } else {
+          grade_list.value = res.data;
+          filter_grade_list.value = res.data;
+        }
+      } else if (type === "lesson") {
+        if (trigger === "filter") {
+          filter_lesson_list.value = res.data;
+        } else {
+          lesson_list.value = res.data;
+          filter_lesson_list.value = res.data;
+        }
+      } else if (type === "topic") {
+        topic_list.value = res.data;
+      } else if (type === "exam_type") {
+        test_type_list.value = res.data;
+      } else if (type === "state") {
+        state_list.value = res.data;
+      } else if (type === "area") {
+        area_list.value = res.data;
+      } else if (type === "school") {
+        school_list.value = res.data;
+      }
+
+      generateTitle();
+    }
+  } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error loading data");
+    console.error(err);
+  }
+};
+
+const selectTopic = (event) => {
+  selected_topics.value = event;
+  const numbers = [];
+  for (let i = 0; i < event.length; i++) {
+    numbers[i] = parseInt(event[i]);
+  }
+  form.topics = numbers;
+  if (form.topics.length) getTopicTitleList();
+};
+
+const getTopicTitleList = () => {
+  topicTitleArr.value = [];
+  let title = "";
+  for (const index in form.topics) {
+    title =
+      topic_list.value.find((x) => x.id == form.topics[index])?.title || "";
+    topicTitleArr.value.push(title);
+  }
+};
+
+// Update online exam info
+const updateQuestion = async () => {
+  update_loading.value = true;
+  
+  // Arrange to form data
+  let formData = new FormData();
+  for (let key in form) {
+    if (key !== "topics") formData.append(key, form[key]);
+  }
+
+  if (form.topics.length) {
+    for (let key in form.topics) {
+      formData.append("topics[]", form.topics[key]);
+    }
+  }
+  
+  try {
+    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "PUT",
+      body: urlencodeFormData(formData),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${userToken.value}`,
       },
-      // teaching_time: '',
-      // teaching_time_seconds: 0,
-      // teaching_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      // teaching_date_time: '',
+    });
+    
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Updated successfully");
+    
+    test_step.value = 2;
+  } catch (error) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(error.response?.data?.message || "Error updating exam");
+  } finally {
+    update_loading.value = false;
+  }
+};
 
-      // timepicker_menu: false,
+// Convert form data from multipart to urlencode
+const urlencodeFormData = (fd) => {
+  let s = "";
 
-      level_list: [],
-      filter_level_list: [],
+  for (const pair of fd.entries()) {
+    if (typeof pair[1] == "string") {
+      s += (s ? "&" : "") + encode(pair[0]) + "=" + encode(pair[1]);
+    }
+  }
+  return s;
+};
 
-      grade_list: [],
-      filter_grade_list: [],
+const encode = (s) => {
+  return encodeURIComponent(s).replace(/%20/g, "+");
+};
 
-      field_list: [],
+const copyUrl = () => {
+  navigator.clipboard.writeText(test_share_link.value);
+  const { $toast } = useNuxtApp();
+  if ($toast) $toast.success("Copied");
+};
 
-      lesson_list: [],
-      filter_lesson_list: [],
+const uploadFile = (file) => {
+  if (!file) return;
 
-      topic_list: [],
-      test_type_list: [],
-      test_level_list: [
-        {
-          id: "1",
-          title: "Simple",
-        },
-        {
-          id: "2",
-          title: "Medium",
-        },
-        {
-          id: "3",
-          title: "Hard",
-        },
-      ],
-      video_analysis_options: [
-        {
-          value: 0,
-          title: "All",
-        },
-        {
-          value: 1,
-          title: "Have",
-        },
-        {
-          value: -1,
-          title: "Do not have",
-        },
-      ],
-      state_list: [],
-      area_list: [],
-      school_list: [],
-      holding_level_list: [
-        { id: 1, title: "School" },
-        { id: 2, title: "District" },
-        { id: 3, title: "State" },
-        { id: 4, title: "Country" },
-      ],
-      submit_loading: false,
-      publish_loading: false,
-      test_list: [],
-      test_loading: false,
-      all_tests_loaded: false,
-      tests: [],
-      test_share_link: `https://gamatrain.com/exam/${this.$route.params.id}`,
-      printPreviewDialog: false,
-      confirmDeleteDialog: false,
-      deleteLoading: false,
-      previewTestList: [],
-      topicTitleArr: [],
+  file_original.value = file;
 
-      testListSwitch: true,
-      lastCreatedTest: "",
+  let formData = new FormData();
+  formData.append("file", file_original.value);
 
-      //Delete exam test section
-      deleteTestConfirmDialog: false,
-      delete_exam_test_id: "",
-      delete_exam_test_loading: false,
-      //End Delete exam test section
-
-      selected_topics: [],
-    };
-  },
-  mounted() {
-    this.getTypeList("section");
-    this.getTypeList("exam_type");
-    this.getTypeList("state");
-
-    this.getCurrentExamInfo();
-
-    this.getExamTests();
-
-    this.getExamCurrentTests();
-
-    this.renderMathJax();
-
-    this.$refs["create-form"].examEditMode = true; //Enable edit mode in create test form
-  },
-
-  watch: {
-    "$route.query"(val) {
-      if (val && val.active === "test_list") {
-        this.test_step = 2;
-        this.testListSwitch = true;
-      }
-    },
-
-    // "teaching_date"(val) {//Convert date to secounds
-    //   this.form.start_date = this.teaching_time_seconds;
-    //   this.teaching_date_time = (this.$moment(val).format('x') / 1000);
-    //   this.form.start_date = parseInt(this.teaching_date_time + this.teaching_time_seconds);
-    // },
-    // "teaching_time"(val) {//Convert hour and minute to seconds
-    //   var val_split = val.split(':');
-    //   var hour = val_split[0] * 3600;
-    //   var minute = val_split[1] * 60;
-    //   var final_time = (hour + minute);
-    //
-    //   this.teaching_time_seconds = final_time;
-    //   this.form.start_date = parseInt(this.teaching_date_time + this.teaching_time_seconds);
-    // },
-
-    "form.section"(val) {
-      if (val) {
-        this.getTypeList("base", val);
-        this.filter.section = val; //Init second level filter
-        this.$refs["create-form"].form.section = val;
-
-        if (this.form.area) this.getTypeList("school");
-      }
-    },
-
-    "filter.section"(val) {
-      if (val) {
-        this.getTypeList("base", val, "filter");
-      }
-      this.all_tests_loaded = true;
-      this.filter_grade_list = [];
-      this.filter_lesson_list = [];
-      this.filter.page = 1;
-      this.test_list = [];
-
-      this.filter.base = "";
-      this.filter.lesson = "";
-    },
-
-    "form.base"(val) {
-      this.getTypeList("lesson", val);
-      this.filter.base = val; //Init second level filter
-      this.$refs["create-form"].form.base = val;
-
-      this.generateTitle();
-    },
-    "filter.base"(val) {
-      if (val) {
-        this.getTypeList("lesson", val, "filter");
-      }
-      this.all_tests_loaded = true;
-
-      this.filter_lesson_list = [];
-
-      this.filter.lesson = "";
-      this.filter.page = 1;
-      this.test_list = [];
-    },
-
-    "form.lesson"(val) {
-      if (val) {
-        this.getTypeList("topic", val);
-        this.$refs["topic-selector"].lesson_selected = true;
-      } else {
-        this.$refs["topic-selector"].lesson_selected = false;
-      }
-
-      this.filter.lesson = val; //Init second level filter
-      this.$refs["create-form"].form.lesson = val;
-
-      this.generateTitle();
-    },
-
-    "filter.lesson"(val) {
-      if (val) {
-        this.getTypeList("topic", val, "filter");
-      }
-      this.all_tests_loaded = false;
-
-      this.filter.page = 1;
-      this.test_list = [];
-      this.getExamTests();
-    },
-
-    "form.state"(val) {
-      this.getTypeList("area", val);
-    },
-    "form.area"(val) {
-      if (this.form.section) this.getTypeList("school");
-    },
-
-    "filter.topic"(val) {
-      this.filter.page = 1;
-      this.test_list = [];
-      this.getExamTests();
-    },
-
-    "filter.testsHasVideo"(val) {
-      this.filter.page = 1;
-      this.test_list = [];
-      this.getExamTests();
-    },
-
-    "filter.myTests"(val) {
-      this.filter.page = 1;
-      this.test_list = [];
-      this.getExamTests();
-    },
-    lastCreatedTest(val) {
-      if (val && !this.tests.find((x) => x == val)) {
-        this.tests.push(val);
-        this.submitTest();
-      }
-    },
-  },
-  methods: {
-    //Load exam info for edit
-    getCurrentExamInfo() {
-      this.exam_id = this.$route.params.id;
-      this.$axios
-        .$get(`/api/v1/exams/info/${this.$route.params.id}`)
-        .then((response) => {
-          console.log(response);
-          this.tests = response.data.tests.length ? response.data.tests : [];
-          this.exam_code = response.data.code;
-          this.test_share_link = `https://gamatrain.com/exam/${this.$route.params.id}`;
-          this.form.section = response.data.section;
-          this.form.base = response.data.base;
-          this.form.lesson = response.data.lesson;
-
-          this.selected_topics = response.data.topics; //Pass to topic selector when form load
-          this.form.topics = response.data.topics;
-
-          this.form.exam_type = response.data.azmoon_type;
-          this.form.paperID = response.data.paperID;
-          this.form.duration = response.data.azmoon_time;
-          this.form.file_original = response.data.file_original;
-          setTimeout(() => {
-            this.form.title = response.data.title;
-          }, 2000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    getTypeList(type, parent = "", trigger = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
-      }
-      if (type === "topic") {
-        params.lesson_id = parent;
-      }
-      if (type === "area") {
-        params.state_id = parent;
-      }
-
-      if (type === "school") {
-        params.section_id = this.form.section;
-        params.area_id = this.form.area;
-      }
-
-      this.$axios
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            if (trigger === "filter") {
-              this.filter_level_list = res.data;
-            } else {
-              this.level_list = res.data;
-              this.filter_level_list = res.data;
-            }
-          } else if (type === "base") {
-            if (trigger === "filter") {
-              this.filter_grade_list = res.data;
-            } else {
-              this.grade_list = res.data;
-              this.filter_grade_list = res.data;
-            }
-          } else if (type === "lesson") {
-            if (trigger === "filter") {
-              this.filter_lesson_list = res.data;
-            } else {
-              this.lesson_list = res.data;
-              this.filter_lesson_list = res.data;
-            }
-          } else if (type === "topic") {
-            this.topic_list = res.data;
-          } else if (type === "exam_type") {
-            this.test_type_list = res.data;
-          } else if (type === "state") {
-            this.state_list = res.data;
-          } else if (type === "area") {
-            this.area_list = res.data;
-          } else if (type === "school") {
-            this.school_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-
-    selectTopic(event) {
-      var numbers = [];
-      for (var i = 0; i < event.length; i++) {
-        numbers[i] = parseInt(event[i]);
-      }
-      this.form.topics = numbers;
-      if (this.form.topics.length) this.getTopicTitleList();
-    },
-
-    getTopicTitleList() {
-      this.topicTitleArr = [];
-      var title = "";
-      for (var index in this.form.topics) {
-        title = this.topic_list.find(
-          (x) => x.id == this.form.topics[index]
-        ).title;
-        this.topicTitleArr.push(title);
-      }
-    },
-
-    updateQuestion() {
-      this.submit_loading = true;
-
-      //Arrange to form data
-      let formData = new FormData();
-      for (let key in this.form) {
-        if (key != "topics") formData.append(key, this.form[key]);
-      }
-
-      if (this.form.topics.length)
-        for (let key in this.form.topics)
-          formData.append("topics[]", this.form.topics[key]);
-
-      //End arrange to form data
-
-      this.$axios
-        .$put(
-          `/api/v1/exams/${this.$route.params.id}`,
-          this.urlencodeFormData(formData),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        )
-        .then((response) => {
-          this.$toast.success("Updated successfully");
-          this.test_step = 2;
-        })
-        .catch((error) => {
-          this.$toast.error(error.response.data.message);
-        })
-        .finally(() => {
-          this.submit_loading = false;
-        });
-    },
-
-    generateTitle() {
-      var lesson_title = "";
-      if (this.form.lesson && this.lesson_list.length > 0) {
-        lesson_title = this.lesson_list.find(
-          (x) => x.id === this.form.lesson
-        ).title;
-      }
-
-      var base_title = "";
-      if (this.form.base && this.grade_list.length > 0)
-        base_title = this.grade_list.find((x) => x.id === this.form.base).title;
-
-      this.form.title = `${lesson_title} Test ${base_title} Grade`;
-    },
-
-    getExamTests() {
-      this.test_loading = true;
-      this.$axios
-        .$get("/api/v1/examTests", {
-          params: {
-            lesson: this.filter.lesson,
-            topic: this.filter.topic,
-            myTests: this.filter.myTests,
-            testsHasVideo: this.filter.testsHasVideo,
-            page: this.filter.page,
-            perpage: this.filter.perpage,
-          },
-        })
-        .then((response) => {
-          this.test_list.push(...response.data.list);
-
-          if (this.test_list.length) {
-            this.$nextTick(function () {
-              MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            });
-          }
-          this.$refs["create-form"].examTestListLenght = this.tests.length;
-
-          if (response.data.list.length === 0)
-            //For terminate auto load request
-            this.all_tests_loaded = true;
-          else this.all_tests_loaded = false;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.test_loading = false;
-        });
-    },
-    getExamCurrentTests() {
-      this.test_loading = true;
-      this.$axios
-        .$get("/api/v1/examTests", {
-          params: {
-            exam_id: this.$route.params.id,
-          },
-        })
-        .then((response) => {
-          this.previewTestList = response.data.list;
-          this.$refs["create-form"].examTestListLenght = this.tests.length;
-
-          if (this.previewTestList.length) {
-            this.$nextTick(function () {
-              MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {});
-    },
-
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
-            ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
-          },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-          },
-        });
-        MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
-    },
-
-    onScroll() {
-      var scrollPosition = this.$refs.testList.$el.scrollTop;
-      let contentHeight = this.$refs.testListContent.clientHeight;
-
-      //Avoid the number of requests
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
+  try {
+    $fetch("/api/v1/upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        accept: "*/*",
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    }).then((response) => {
       if (
-        scrollPosition > contentHeight - 1000 &&
-        this.all_tests_loaded === false
-      )
-        this.timer = setTimeout(() => {
-          this.test_loading = true;
-          this.filter.page++;
-          // this.getExamTests();
-        }, 800);
-    },
-
-    applyTest(item, type) {
-      if (this.tests.find((x) => x == item.id) && type === "remove") {
-        this.tests.splice(this.tests.indexOf(item.id), 1);
-
-        this.submitTest();
+        response &&
+        response.data &&
+        response.data[0] &&
+        response.data[0].file
+      ) {
+        form.file_original = response.data[0].file.name;
       }
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-      if (!this.tests.find((x) => x == item.id) && type === "add") {
-        this.tests.push(item.id);
+const publishTest = async () => {
+  publish_loading.value = true;
 
-        this.submitTest();
-      }
-    },
+  try {
+    const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
 
-    submitTest() {
-      let formData = new FormData();
-      for (var i = 0; i < this.tests.length; i++) {
-        formData.append("tests[]", this.tests[i]);
-      }
+    if (response.data.message === "done") {
+      test_step.value = 4;
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    publish_loading.value = false;
+  }
+};
 
-      if (this.tests.length) {
-        this.$axios
-          .$put(
-            `/api/v1/exams/tests/${this.$route.params.id}`,
-            this.urlencodeFormData(formData),
-            {
-              headers: {
-                "Content-Type":
-                  "application/x-www-form-urlencoded; charset=UTF-8",
-              },
-            }
-          )
-          .then((response) => {
-            this.getExamCurrentTests();
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    },
+const deleteOnlineExam = async () => {
+  deleteLoading.value = true;
+  
+  try {
+    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    router.push('/test-maker');
+  } catch (err) {
+    console.error(err);
+  } finally {
+    deleteLoading.value = false;
+    confirmDeleteDialog.value = false;
+  }
+};
 
-    /**
-     * @brief publish test
-     */
-    publishTest() {
-      this.publish_loading = true;
-      this.$axios
-        .$put(`/api/v1/exams/publish/${this.$route.params.id}`)
-        .then((response) => {
-          if (response.data.message === "done") {
-            this.test_step = 4;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.publish_loading = false;
-        });
-    },
+const deleteExamTest = async () => {
+  delete_exam_test_loading.value = true;
+  
+  try {
+    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    tests.value = tests.value.filter(item => item !== delete_exam_test_id.value);
+    getCurrentExamTestsInfo();
+    
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Test removed successfully");
+  } catch (err) {
+    console.error(err);
+  } finally {
+    delete_exam_test_loading.value = false;
+    deleteTestConfirmDialog.value = false;
+  }
+};
 
-    //Convert form data from multipart to urlencode
-    urlencodeFormData(fd) {
-      var s = "";
+const getCurrentExamInfo = async () => {
+  try {
+    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    if (response && response.data) {
+      form.section = response.data.section;
+      form.base = response.data.base;
+      form.lesson = response.data.lesson;
+      form.exam_type = response.data.exam_type;
+      form.level = response.data.level;
+      form.holding_level = response.data.holding_level;
+      form.holding_time = response.data.holding_time;
+      form.state = response.data.state;
+      form.area = response.data.area;
+      form.school = response.data.school;
+      form.duration = response.data.duration;
+      form.title = response.data.title;
+      form.negative_point = response.data.negative_point;
+      form.file_original = response.data.file_original;
+      form.edu_year = response.data.edu_year;
+      form.edu_month = response.data.edu_month;
+      file_original_path.value = response.data.file_original;
+      exam_code.value = response.data.code;
+      tests.value = response.data.tests;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-      for (var pair of fd.entries()) {
-        if (typeof pair[1] == "string") {
-          s +=
-            (s ? "&" : "") + this.encode(pair[0]) + "=" + this.encode(pair[1]);
+const getCurrentExamTestsInfo = async () => {
+  try {
+    await getCurrentExamInfo();
+    
+    if (form.topics && form.topics.length > 0) {
+      selected_topics.value = form.topics;
+      getTopicTitleList();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getTestPreview = async () => {
+  test_loading.value = true;
+  previewTestList.value = [];
+  
+  try {
+    const response = await $fetch("/api/v1/tests", {
+      method: "GET",
+      params: {
+        section: filter.section,
+        base: filter.base,
+        lesson: filter.lesson,
+        topic: filter.topic,
+        testsHasVideo: filter.testsHasVideo,
+        page: filter.page,
+        perpage: filter.perpage,
+        my_tests: filter.myTests,
+      },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    if (response && response.data) {
+      let result = response.data.list;
+      for (const item of result) {
+        if (previewTestList.value.findIndex(x => x.id === item.id) === -1) {
+          previewTestList.value.push(item);
         }
       }
-      return s;
-    },
-    encode(s) {
-      return encodeURIComponent(s).replace(/%20/g, "+");
-    },
-    //End convert form data from multipart to urlencode
-
-    copyUrl() {
-      navigator.clipboard.writeText(this.test_share_link);
-      this.$toast.success("Copied");
-    },
-
-    previewDragEnd() {
-      this.$nextTick(function () {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      });
-
-      var new_list = [];
-      for (var index in this.previewTestList) {
-        new_list.push(this.previewTestList[index].id);
+      
+      if (result.length === 0) {
+        all_tests_loaded.value = true;
       }
-      this.tests = new_list;
-      this.submitTest();
-    },
-
-    //Return title of level for show in preview list
-    calcLevel(level) {
-      if (level) return this.test_level_list.find((x) => x.id === level).title;
-    },
-
-    deleteOnlineExam() {
-      this.deleteLoading = true;
-      this.$axios
-        .$delete(`/api/v1/exams/${this.exam_id}`)
-        .then((response) => {
-          this.$toast.success("Deleted successfully");
-          this.$router.push({
-            path: "/user/exam",
-          });
-        })
-        .catch((err) => {
-          this.$toast.error("An error occurred");
-        })
-        .finally(() => {
-          this.deleteLoading = false;
-          this.confirmDeleteDialog = false;
-        });
-    },
-
-    //Delete exam test
-    openTestDeleteConfirmDialog(item_id) {
-      this.delete_exam_test_id = item_id;
-      this.deleteTestConfirmDialog = true;
-    },
-    async deleteExamTest() {
-      this.delete_exam_test_loading = true;
-      await this.$axios
-        .$delete(`/api/v1/examTests/${this.delete_exam_test_id}`)
-        .then((response) => {
-          this.$toast.success("Deleted successfully");
-          this.filter.page = 1;
-          this.test_list = [];
-          // this.getExamTests();
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.delete_exam_test_loading = false;
-          this.delete_exam_test_id = null;
-          this.deleteTestConfirmDialog = false;
-        });
-    },
-
-    //End delete exam test
-
-    uploadFile(file_name) {
-      let formData = new FormData();
-      formData.append("file", this.file_original);
-      this.$axios
-        .$post("/api/v1/upload", formData, {
-          headers: {
-            accept: "*/*",
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          this.form.file_original = response.data[0].file.name;
-        })
-        .catch((err) => {});
-      // }
-    },
-  },
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    test_loading.value = false;
+  }
 };
+
+const previewDragEnd = (event) => {
+  // Handle test reordering if needed
+};
+
+const applyTest = (item, type) => {
+  if (type === 'add') {
+    // Add the test to the exam
+    $fetch(`/api/v1/exams/${exam_id.value}/tests/${item.id}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    }).then(() => {
+      tests.value.push(item.id);
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.success("Test added successfully");
+    });
+  } else if (type === 'remove') {
+    // Remove the test from the exam
+    $fetch(`/api/v1/exams/${exam_id.value}/tests/${item.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    }).then(() => {
+      tests.value = tests.value.filter(id => id !== item.id);
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.success("Test removed successfully");
+    });
+  }
+};
+
+// Watchers
+watch(
+  () => form.section,
+  async (val) => {
+    if (val) {
+      await getTypeList("base", val);
+      filter.section = val;
+      
+      if (form.area) {
+        await getTypeList("school");
+      }
+    }
+  }
+);
+
+watch(
+  () => form.base,
+  async (val) => {
+    if (val) {
+      await getTypeList("lesson", val);
+      filter.base = val;
+      generateTitle();
+    }
+  }
+);
+
+watch(
+  () => form.lesson,
+  async (val) => {
+    if (val) {
+      await getTypeList("topic", val);
+      
+      if (topicSelector.value) {
+        topicSelector.value.lesson_selected = true;
+      }
+    } else {
+      form.topic = "";
+      topic_list.value = [];
+      
+      if (topicSelector.value) {
+        topicSelector.value.lesson_selected = false;
+      }
+    }
+    
+    filter.lesson = val;
+    generateTitle();
+  }
+);
+
+watch(
+  () => filter.section,
+  async (val) => {
+    if (val) {
+      await getTypeList("base", val, "filter");
+      filter.base = "";
+      filter.lesson = "";
+      filter.topic = "";
+      
+      filter.page = 1;
+      all_tests_loaded.value = false;
+      
+      getTestPreview();
+    }
+  }
+);
+
+watch(
+  () => filter.base,
+  async (val) => {
+    if (val) {
+      await getTypeList("lesson", val, "filter");
+      filter.lesson = "";
+      filter.topic = "";
+      
+      filter.page = 1;
+      all_tests_loaded.value = false;
+      
+      getTestPreview();
+    }
+  }
+);
+
+watch(
+  () => filter.lesson,
+  async (val) => {
+    if (val) {
+      await getTypeList("topic", val, "filter");
+      filter.topic = "";
+      
+      filter.page = 1;
+      all_tests_loaded.value = false;
+      
+      getTestPreview();
+    }
+  }
+);
+
+watch(
+  () => filter.topic,
+  (val) => {
+    if (val !== undefined) {
+      filter.page = 1;
+      all_tests_loaded.value = false;
+      
+      getTestPreview();
+    }
+  }
+);
+
+watch(
+  () => filter.testsHasVideo,
+  (val) => {
+    filter.page = 1;
+    all_tests_loaded.value = false;
+    
+    getTestPreview();
+  }
+);
+
+// Initialize on mount
+onMounted(async () => {
+  userToken.value = auth.getUserToken();
+  
+  await getTypeList("section");
+  await getTypeList("exam_type");
+  await getTypeList("state");
+  
+  await getCurrentExamTestsInfo();
+});
 </script>
 
 <style scoped></style>
