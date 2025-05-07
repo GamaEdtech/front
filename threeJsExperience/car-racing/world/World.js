@@ -1,4 +1,3 @@
-import * as THREE from "three"
 import Experience from '../Experience.js'
 import Ground from './Ground.js'
 import Road from "./Road.js"

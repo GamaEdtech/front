@@ -360,7 +360,7 @@
                         block
                         color="teal accent-3"
                       >
-                        Mark Sheme
+                        Mark Scheme
                         {{
                           contentData.files.word.price > 0
                             ? "| $" + contentData.files.word.price
@@ -463,7 +463,7 @@
                 block
                 color="teal accent-3"
               >
-                Mark Sheme
+                Mark Scheme
                 {{
                   contentData.files.word.price > 0
                     ? "| $" + contentData.files.word.price
@@ -628,9 +628,13 @@
           <!--  End:  Azmoon test album card   -->
         </v-col>
       </v-row>
-      <common-related-portrait-content pageName="paper" source="test" request="test"/>
+      <common-related-portrait-content
+        pageName="paper"
+        source="test"
+        request="test"
+      />
     </v-container>
-    
+
     <!-- Start : Past Papers -->
     <related-content
       class="mt-8"
