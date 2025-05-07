@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { SRGBColorSpace, MeshBasicMaterial, InstancedMesh, DynamicDrawUsage, Object3D } from "three"
 import Experience from '../Experience.js'
 
 export default class Trees {
@@ -15,7 +15,9 @@ export default class Trees {
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {
@@ -25,16 +27,16 @@ export default class Trees {
 
     setMaterial() {
         this.resources.items.treeBakedTexture.flipY = false
-        this.resources.items.treeBakedTexture.colorSpace = THREE.SRGBColorSpace
-        this.material = new THREE.MeshBasicMaterial({
+        this.resources.items.treeBakedTexture.colorSpace = SRGBColorSpace
+        this.material = new MeshBasicMaterial({
             map: this.resources.items.treeBakedTexture
         })
     }
 
     setMesh() {
-        this.meshes = new THREE.InstancedMesh(this.geometry, this.material, this.treeCount)
-        this.meshes.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
-        this.dummy = new THREE.Object3D()
+        this.meshes = new InstancedMesh(this.geometry, this.material, this.treeCount)
+        this.meshes.instanceMatrix.setUsage(DynamicDrawUsage)
+        this.dummy = new Object3D()
 
         for (let i = 0; i < this.treeCount; i++) {
             const x = Math.random() * this.options.roadSize

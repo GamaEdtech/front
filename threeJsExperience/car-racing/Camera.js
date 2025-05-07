@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { PerspectiveCamera, MathUtils } from 'three'
 import Experience from './Experience.js'
 
 // import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
@@ -39,7 +39,10 @@ export default class Camera {
 
         this.setInstance()
         this.setControls()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     calculatePositionZ(positionx) {
@@ -47,7 +50,7 @@ export default class Camera {
     }
 
     setInstance() {
-        this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 70)
+        this.instance = new PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 70)
         // this.instance = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
 
         this.instance.position.set(this.positionX, this.positionY, this.calculatePositionZ(this.positionX))
@@ -81,23 +84,23 @@ export default class Camera {
             this.positionX = this.experience.world.car.positionX - this.options.distanceCameraFromCar
 
             if (this.smoothX === null) this.smoothX = this.positionX
-            this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
+            this.smoothX = MathUtils.lerp(this.smoothX, this.positionX, 0.1)
             this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
             this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
 
             const targetFov = 75 + this.options.carBaseSpeed * 0.5
-            this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
+            this.instance.fov = MathUtils.lerp(this.instance.fov, targetFov, 0.1)
         } else {
             this.positionX = this.experience.world.car.positionX - 0.85
 
             if (this.smoothX === null) this.smoothX = this.positionX
-            this.smoothX = THREE.MathUtils.lerp(this.smoothX, this.positionX, 0.1)
+            this.smoothX = MathUtils.lerp(this.smoothX, this.positionX, 0.1)
             this.instance.position.set(this.smoothX, 2, this.experience.world.car.mesh.position.z)
             this.instance.lookAt(this.smoothX + 15, 1, this.calculatePositionZ(this.smoothX + 15))
 
 
             const targetFov = 100 + this.options.carBaseSpeed * 0.5
-            this.instance.fov = THREE.MathUtils.lerp(this.instance.fov, targetFov, 0.1)
+            this.instance.fov = MathUtils.lerp(this.instance.fov, targetFov, 0.1)
 
         }
 

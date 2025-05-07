@@ -36,7 +36,10 @@ export default class Levels {
         this.setMaterial()
 
         this.setMesh()
-        this.setDebug()
+
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     getLaneZOffset(laneNumber) {

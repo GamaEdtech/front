@@ -20,7 +20,9 @@ export default class Mountain {
         this.setMaterial()
         this.setMesh()
 
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {

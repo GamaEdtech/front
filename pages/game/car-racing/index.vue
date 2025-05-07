@@ -124,9 +124,6 @@
 
 
 <script>
-import Experience from "@/threeJsExperience/car-racing/Experience.js";
-
-
 export default {
     auth: false,
     data() {
@@ -198,8 +195,9 @@ export default {
             this.isShowGuidMenu = true
             localStorage.setItem('hasSeenGuideMenu', 'true')
         }
-        this.experience = new Experience(document.getElementById("canvas"), this.questions,
-            {
+        import('@/threeJsExperience/car-racing/Experience.js').then((module) => {
+            const Experience = module.default;
+            this.experience = new Experience(document.getElementById("canvas"), this.questions, {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
@@ -207,11 +205,12 @@ export default {
                 onResultGameChange: (result) => this.onResultGameChange(result),
                 onChangeSceneReady: this.onChangeSceneReady,
                 onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
-            }
-        )
+            });
+        });
     },
-    onUnmounted() {
+    destroyed() {
         this.experience.destroy()
+        this.experience = null
     },
     methods: {
         onChangeSceneReady() {
@@ -846,6 +845,10 @@ export default {
     .score-time {
         left: -100px;
         top: 220px;
+    }
+
+    .buttons-div {
+        bottom: 60px;
     }
 }
 </style>

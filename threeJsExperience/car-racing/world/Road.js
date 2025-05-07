@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { PlaneGeometry, ShaderMaterial, Uniform, Color, Vector2, Mesh } from "three"
 import Experience from '../Experience.js'
 
 import vertex from "../shaders/road/vertex.glsl"
@@ -19,31 +19,33 @@ export default class Road {
         this.setMaterial()
         this.setMesh()
 
-        this.setDebug()
+        if (this.debug) {
+            this.setDebug()
+        }
     }
 
     setGeometry() {
-        this.geometry = new THREE.PlaneGeometry(this.options.roadSize, this.options.roadWidth, this.options.roadSize, this.options.roadWidth)
+        this.geometry = new PlaneGeometry(this.options.roadSize, this.options.roadWidth, this.options.roadSize, this.options.roadWidth)
     }
 
     setMaterial() {
-        this.material = new THREE.ShaderMaterial({
+        this.material = new ShaderMaterial({
             vertexShader: vertex,
             fragmentShader: fragment,
             uniforms: {
-                uColor: new THREE.Uniform(new THREE.Color(this.options.colorRoad)),
-                uDistortionX: new THREE.Uniform(new THREE.Vector2(this.options.roadAmplitudeX, this.options.roadFrequencyX)),
-                uWidthLineArround: new THREE.Uniform(this.options.widthLineArround),
-                uWidthLineSeperator: new THREE.Uniform(this.options.widthLineSeperator),
-                uCountLine: new THREE.Uniform(this.options.countLine),
-                uColorLineSeperator: new THREE.Uniform(new THREE.Color(this.options.colorLineSeperator)),
-                uColorLineArround: new THREE.Uniform(new THREE.Color(this.options.colorLineArround))
+                uColor: new Uniform(new Color(this.options.colorRoad)),
+                uDistortionX: new Uniform(new Vector2(this.options.roadAmplitudeX, this.options.roadFrequencyX)),
+                uWidthLineArround: new Uniform(this.options.widthLineArround),
+                uWidthLineSeperator: new Uniform(this.options.widthLineSeperator),
+                uCountLine: new Uniform(this.options.countLine),
+                uColorLineSeperator: new Uniform(new Color(this.options.colorLineSeperator)),
+                uColorLineArround: new Uniform(new Color(this.options.colorLineArround))
             }
         })
     }
 
     setMesh() {
-        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.mesh = new Mesh(this.geometry, this.material)
         this.mesh.rotation.x = -Math.PI / 2
         this.mesh.position.set(
             this.options.roadSize / 2,
@@ -67,15 +69,15 @@ export default class Road {
         })
 
         RoadFolder.addColor(this.options, "colorRoad").name("Road color").onChange(() => {
-            this.material.uniforms.uColor.value = new THREE.Color(this.options.colorRoad)
+            this.material.uniforms.uColor.value = new Color(this.options.colorRoad)
         })
 
         RoadFolder.addColor(this.options, "colorLineSeperator").name("Line Seperator color").onChange(() => {
-            this.material.uniforms.uColorLineSeperator.value = new THREE.Color(this.options.colorLineSeperator)
+            this.material.uniforms.uColorLineSeperator.value = new Color(this.options.colorLineSeperator)
         })
 
         RoadFolder.addColor(this.options, "colorLineArround").name("Line Arround color").onChange(() => {
-            this.material.uniforms.uColorLineArround.value = new THREE.Color(this.options.colorLineArround)
+            this.material.uniforms.uColorLineArround.value = new Color(this.options.colorLineArround)
         })
 
         RoadFolder.add(this.options, "widthLineArround").min(-1).max(1).step(0.001).name("Width Line Arround").onChange(() => {
