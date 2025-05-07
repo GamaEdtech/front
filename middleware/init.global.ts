@@ -16,19 +16,13 @@ interface ErrorResponse {
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  // Skip for public routes
-  const publicRoutes = ["/login", "/register", "/forgot-password"];
-  if (publicRoutes.includes(to.path)) {
-    return;
-  }
-
   const auth = useAuth();
   const authToken = auth.getUserToken();
 
   // Skip if no token
   if (!authToken) {
     if (to.path.startsWith("/user")) {
-      return navigateTo("/login");
+      return navigateTo("/");
     }
     return;
   }
