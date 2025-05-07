@@ -204,6 +204,7 @@
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
+                style=" font-weight: 500; color: #009688;"
               ></v-switch>
             </v-col>
           </v-row>

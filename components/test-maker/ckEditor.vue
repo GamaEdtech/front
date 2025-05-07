@@ -3,6 +3,8 @@
       v-model="data"
       :editor="ClassicEditor"
       :config="config"
+      style="height: 500px;"
+      class="ck-editor"
   />
 </template>
 
@@ -22,3 +24,11 @@ const config = computed( () => {
   };
 } );
 </script>
+
+<style >
+.ck-content{
+  min-height: 500px !important;
+  height: 500px !important;
+}
+</style>
+
