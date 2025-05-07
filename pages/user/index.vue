@@ -55,7 +55,11 @@
 
 <script setup>
 import { useDisplay } from "vuetify";
+import { useAuth } from "@/composables/useAuth";
+
 const { $toast } = useNuxtApp();
+const auth = useAuth();
+const authToken = auth.getUserToken();
 
 definePageMeta({
   layout: "dashboard-layout",
@@ -77,11 +81,15 @@ const getUserInfo = async () => {
   try {
     loader.value = true;
     const apiUrl =
-      userType.value === "5"
+      userType.value == "5"
         ? "/api/v1/teachers/dashboard"
         : "/api/v1/students/dashboard";
 
-    const data = await $fetch(apiUrl);
+    const data = await $fetch(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
 
     if (data.data) {
       userInfo.value = data.data;
