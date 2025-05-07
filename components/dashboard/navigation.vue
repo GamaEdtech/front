@@ -47,9 +47,8 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useNuxtApp } from "#app";
-
-const { $auth } = useNuxtApp();
-
+import { useUser } from "~/composables/useUser";
+const { user, setUser, cleanUser } = useUser();
 const openGroups = ref({});
 
 const toggleGroup = (index) => {
@@ -67,14 +66,14 @@ const items = ref([
         link: "/user/paper",
         icon: "icong-test",
         icon_type: "custom",
-        status: $auth.user?.group_id == "5" ? false : true,
+        status: user?.group_id == "5" ? false : true,
       },
       {
         title: "Multimedia",
         link: "/user/multimedia",
         icon: "icong-test",
         icon_type: "custom",
-        status: $auth.user?.group_id == "5" ? false : true,
+        status: user?.group_id == "5" ? false : true,
       },
       {
         title: "Q & A",

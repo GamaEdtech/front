@@ -1,83 +1,77 @@
 <template>
-  <v-row v-if="progressData.num < 10 || userData.username === '0'">
+  <v-row v-if="progressInfoData?.num < 10 || userInfoData?.username === '0'">
     <v-col cols="12" md="8">
-      <div class="d-flex pb-0" v-if="progressData.num < 10">
-        <nuxt-link to="/user/edit-profile">
+      <div class="d-flex pb-0" v-if="progressInfoData?.num < 10">
+        <NuxtLink to="/user/edit-profile">
           <img
             width="72"
             height="72"
-            v-if="userData.avatar"
-            :src="userData.avatar"
+            v-if="userInfoData?.avatar"
+            :src="userInfoData?.avatar"
           />
           <v-btn v-else class="d-flex" outlined fab x-large>
             <v-icon> mdi-account-outline </v-icon>
           </v-btn>
-        </nuxt-link>
+        </NuxtLink>
         <div class="pa-3">
           <p class="text-h4">
-            <strong v-if="$auth.user?.first_name || $auth.user.last_name">
-              {{ $auth.user?.first_name }} {{ $auth.user.last_name }}
+            <strong v-if="user?.first_name || user?.last_name">
+              {{ user?.first_name }} {{ user?.last_name }}
             </strong>
             <strong v-else> No name </strong>
           </p>
           <p class="text-h5">
-            {{ userData.section_title }} {{ userData.school_name }}
+            {{ userInfoData?.section_title }} {{ userInfoData?.school_name }}
           </p>
         </div>
       </div>
     </v-col>
     <v-col cols="12" md="4" class="text-right pb-0">
       <!--Choose username-->
-      <v-row v-if="userData.username === '0'">
+      <v-row v-if="userInfoData.username && userInfoData.username === '0'">
         <v-col cols="12" md="12" class="pa-0 pa-md-3">
-          <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
-          <form @submit.prevent="updateUsername()">
-            <!-- <validation-provider -->
-            name="username" v-slot="{ errors }" rules="required|min:6" >
+          <v-form @submit="updateUsername">
             <v-text-field
               v-model="username"
               filled
               dense
-              :error-messages="errors"
+              :rules="usernameRules"
               class="mt-4 mb-0"
               label="Choose username"
               type="text"
             >
-              <template slot="append">
+              <template #append-inner>
                 <v-btn
                   class="default"
-                  type="submit"
-                  :disabled="invalid"
+                  @click="updateUsername"
+                  :disabled="!username || username.length < 6"
                   absolute
-                  style="right: 0; height: 80%; top: 10%; bottom: 0"
                 >
                   choose
                 </v-btn>
               </template>
             </v-text-field>
-            <!-- </validation-provider> -->
-          </form>
-          <!-- </validation-observer> -->
+          </v-form>
         </v-col>
       </v-row>
       <!--End choose username-->
     </v-col>
 
     <!--Profile complete progress-->
-    <v-col cols="12" class="pt-0" v-if="progressData.num < 10">
-      <nuxt-link to="/user/edit-profile">
+    <v-col cols="12" class="pt-0" v-if="progressInfoData?.num < 10">
+      <NuxtLink to="/user/edit-profile">
         <p class="text-h5 font-weight-bold mt-3 mb-3">
-          Profile complete: {{ progressData.num * 10 }}% | Now complete
-          <span class="text-capitalize green--text">
-            {{ progressData.notComplete[0] }}
+          Profile complete: {{ progressInfoData?.num * 10 }}% | Now complete
+          <span class="text-capitalize text-green">
+            {{ progressInfoData?.notComplete?.[0] || "" }}
           </span>
         </p>
-      </nuxt-link>
+      </NuxtLink>
       <v-progress-linear
         color="teal"
         height="8"
         buffer-value="0"
-        :value="progressData.num * 10"
+        :model-value="progressInfoData?.num * 10"
         stream
       ></v-progress-linear>
     </v-col>
@@ -85,35 +79,82 @@
   </v-row>
 </template>
 
-<script>
-// import { ValidationProvider, ValidationObserver } from "vee-validate";
+<script setup>
+import { useUser } from "~/composables/useUser";
+import { ref, watch, onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
+const auth = useAuth();
 
-export default {
-  name: "general-info-dashboard",
-  data() {
-    return {
-      userData: {},
-      progressData: {},
-      username: "",
-    };
+// Define props using defineProps
+const props = defineProps({
+  userData: {
+    type: Object,
+    default: () => ({}),
   },
-  // components: {
-  //   ValidationProvider,
-  //   ValidationObserver,
-  // },
-  methods: {
-    updateUsername() {
-      this.$fetch
-        .$put("/api/v1/users/username", { username: this.username })
-        .then((response) => {
-          this.userData.username = this.username;
-        })
-        .catch((err) => {
-          this.$toast.error(err.response.data.message);
-        });
-    },
+  progressData: {
+    type: Object,
+    default: () => ({}),
   },
+});
+
+// Get auth user
+const { user } = useUser();
+
+// Reactive state
+const userInfoData = ref({});
+const progressInfoData = ref({});
+const username = ref("");
+const errors = ref([]);
+
+// Vuetify validation rules
+const usernameRules = [
+  (v) => !!v || "Username is required",
+  (v) => (v && v.length >= 6) || "Username must be at least 6 characters",
+];
+
+// Watch for props changes
+watch(
+  () => props.userData,
+  (newValue) => {
+    if (newValue) {
+      userInfoData.value = newValue;
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+watch(
+  () => props.progressData,
+  (newValue) => {
+    if (newValue) {
+      progressInfoData.value = newValue;
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+// Methods
+const updateUsername = async () => {
+  if (!username.value || username.value.length < 6) return;
+  try {
+    const { data } = await $fetch("/api/v1/users/username", {
+      method: "PUT",
+      body: { username: username.value },
+      headers: {
+        Authorization: `Bearer ${auth.getUserToken()}`,
+      },
+    });
+    userInfoData.value.username = username.value;
+    errors.value = [];
+  } catch (error) {
+    errors.value = [error.response?.data?.message || "An error occurred"];
+  }
 };
+
+// Lifecycle hook
+onMounted(() => {
+  // Initialize component
+});
 </script>
 
 <style scoped></style>
