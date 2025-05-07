@@ -138,7 +138,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
 import { useDisplay } from "vuetify";
 const { $toast } = useNuxtApp();
 

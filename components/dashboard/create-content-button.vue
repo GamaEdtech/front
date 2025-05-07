@@ -31,7 +31,7 @@
               </v-btn>
             </v-col>
             <v-col cols="6" class="text-right counter">
-              <question-statistics
+              <dashboard-question-statistics
                 ref="questionStatisticsRef"
                 v-if="button_list[index].class === 'question_answer'"
                 :statistics="statistics"
@@ -57,10 +57,6 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from "vue";
-import QuestionStatistics from "./question-statistics.vue";
-import { useUser } from "~/composables/useUser";
-
 const { user } = useUser();
 
 const props = defineProps({

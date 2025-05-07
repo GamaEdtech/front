@@ -80,11 +80,7 @@
 </template>
 
 <script setup>
-import { useUser } from "~/composables/useUser";
-import { ref, watch, onMounted } from "vue";
-import { useAuth } from "~/composables/useAuth";
 const auth = useAuth();
-
 // Define props using defineProps
 const props = defineProps({
   userData: {
