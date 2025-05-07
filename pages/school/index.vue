@@ -21,7 +21,7 @@
           <l-marker
             v-for="(marker, index) in map.markers"
             :key="index"
-            @click="$router.push(`/school/${marker.id}/${marker.slug}`)"
+            @click="openSchool(marker.id, marker.slug)"
             :lat-lng="marker.latLng"
             :icon="map.schoolIcon"
           ></l-marker>
@@ -659,6 +659,10 @@ export default {
   },
 
   methods: {
+    openSchool(id, slug) {
+      const url = `/school/${id}/${slug}`;
+      window.open(url, "_blank");
+    },
     handleResize() {
       this.screenWidth = window.innerWidth;
     },
