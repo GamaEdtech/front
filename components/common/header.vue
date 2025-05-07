@@ -1,24 +1,24 @@
 <script setup>
-import CommonLogin from '~/components/common/login.vue'
-import CommonRegister from '~/components/common/register.vue'
-import CommonRecover from '~/components/common/pass-recover.vue'
-import { useAuth } from '~/composables/useAuth';
-import { useUser } from '~/composables/useUser'
-import { useCookie } from 'nuxt/app';
-const auth = useAuth()
+import CommonLogin from "~/components/common/login.vue";
+import CommonRegister from "~/components/common/register.vue";
+import CommonRecover from "~/components/common/pass-recover.vue";
+import { useAuth } from "~/composables/useAuth";
+import { useUser } from "~/composables/useUser";
+import { useCookie } from "nuxt/app";
+const auth = useAuth();
 const isAuthModalOpen = ref(false);
-const currentAuthComponent = ref('login')
+const currentAuthComponent = ref("login");
 
-const loginDialogVisible = ref(false)
+const loginDialogVisible = ref(false);
 
 const currentAuthComponentMap = {
-  'login': CommonLogin,
-  'register': CommonRegister,
-  'recover': CommonRecover
-}
+  login: CommonLogin,
+  register: CommonRegister,
+  recover: CommonRecover,
+};
 
 function switchTo(name) {
-  currentAuthComponent.value = name
+  currentAuthComponent.value = name;
 }
 const sidebar = ref(false);
 const dialog = ref(false);
@@ -189,70 +189,47 @@ const allDataLoaded = ref(false);
 const route = useRoute();
 const router = useRouter();
 
-const cookieToken = useCookie('authToken');
-const { user, setUser,cleanUser } = useUser()
-const userInfo = async () =>{
-  try{
-    const response = await $fetch(`/api/v1/users/info?uid=${cookieToken.value}`,{
-    method: 'GET',
-  })
-  setUser(response.data)
-  }
-  catch(error){
-    const errorData = error?.response?.status
+const cookieToken = useCookie("authToken");
+const { user, setUser, cleanUser } = useUser();
 
-    if(error?.response?.status === 400)
-      console.error(errorData.message)
-    else
-      console.error('Something went wrong.')
-  }
-}
-
-watch(useCookie('authToken'), async (newVal) => {
-  if (newVal) {
-    userInfo()
-  }
-})
-
-const logout = ()=>{
+const logout = () => {
   cleanUser();
-  auth.logout()
-}
+  auth.logout();
+};
 
-onMounted( async ()  => {
+onMounted(async () => {
   // if (window.innerWidth <= 960 && this.$auth.loggedIn) {
   //   this.$refs["notification-section"].getNotifications();
   // }
-  if(!user.value && cookieToken.value)
-    await userInfo();
-  if (
-    route.name == "index" ||
-    route.name == "smart-learning" ||
-    route.name == "services" ||
-    route.name == "school-service" ||
-    route.name == "faq" ||
-    route.name == "terms" ||
-    route.name == "about-us" ||
-    route.name == "earn-money"
-  ) {
-    if (window.scrollY > 60) {
-      menuSetting.value = {
-        logo: "gamatrain-logo-black.svg",
-        bgColor: "#fff",
-        fixedStatus: true,
-        linkColor: "#424A53",
-        class: "",
-      };
-    } else {
-      menuSetting.value = {
-        logo: "gamatrain-logo.svg",
-        bgColor: "#000",
-        fixedStatus: true,
-        linkColor: "#fff",
-        class: "transparentMenu",
-      };
+  if (!user.value && cookieToken.value)
+    if (
+      route.name == "index" ||
+      route.name == "smart-learning" ||
+      route.name == "services" ||
+      route.name == "school-service" ||
+      route.name == "faq" ||
+      route.name == "terms" ||
+      route.name == "about-us" ||
+      route.name == "earn-money"
+    ) {
+      if (window.scrollY > 60) {
+        menuSetting.value = {
+          logo: "gamatrain-logo-black.svg",
+          bgColor: "#fff",
+          fixedStatus: true,
+          linkColor: "#424A53",
+          class: "",
+        };
+      } else {
+        menuSetting.value = {
+          logo: "gamatrain-logo.svg",
+          bgColor: "#000",
+          fixedStatus: true,
+          linkColor: "#fff",
+          class: "transparentMenu",
+        };
+      }
     }
-  }
   window.addEventListener("scroll", handleScroll.value);
 });
 
@@ -260,11 +237,10 @@ onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll.value);
 });
 const login_modal = ref(null);
-const openLoginDialog = (componentName = 'login') => {
+const openLoginDialog = (componentName = "login") => {
   currentAuthComponent.value = componentName;
   isAuthModalOpen.value = true;
-  loginDialogVisible.value = true
-  
+  loginDialogVisible.value = true;
 };
 const openRegisterDialog = () => {
   register_modal.value.register_dialog = true;
@@ -391,26 +367,25 @@ const endDrag = (e) => {
     mobileSearchSheet.value = false;
 };
 //End search section
-watch(currentOpenDialog , (val) =>{
-    if (val === "login") {
-      register_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-      login_modal.value.login_dialog = true;
-    } else if (val === "register") {
-      login_modal.value.login_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-      register_modal.value.register_dialog = true;
-    } else if (val === "pass_recover") {
-      login_modal.value.login_dialog = false;
-      register_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = true;
-    } else {
-      login_modal.value.login_dialog = false;
-      login_modal.value.register_dialog = false;
-      pass_recover_modal.value.pass_recover_dialog = false;
-    }
+watch(currentOpenDialog, (val) => {
+  if (val === "login") {
+    register_modal.value.register_dialog = false;
+    pass_recover_modal.value.pass_recover_dialog = false;
+    login_modal.value.login_dialog = true;
+  } else if (val === "register") {
+    login_modal.value.login_dialog = false;
+    pass_recover_modal.value.pass_recover_dialog = false;
+    register_modal.value.register_dialog = true;
+  } else if (val === "pass_recover") {
+    login_modal.value.login_dialog = false;
+    register_modal.value.register_dialog = false;
+    pass_recover_modal.value.pass_recover_dialog = true;
+  } else {
+    login_modal.value.login_dialog = false;
+    login_modal.value.register_dialog = false;
+    pass_recover_modal.value.pass_recover_dialog = false;
   }
-);
+});
 
 //Handle auth form from all of section
 watch(
@@ -482,7 +457,6 @@ watch(
     if (val == true) mobileSearchSheetConfig.value.sheetHeight = 70;
   }
 );
-
 </script>
 <template>
   <div>
@@ -635,14 +609,15 @@ watch(
       >
         <v-list density="compact">
           <!-- Profile Info -->
-          <v-list-group v-if="auth.isAuthenticated.value" active-class="menu_group_active">
+          <v-list-group
+            v-if="auth.isAuthenticated.value"
+            active-class="menu_group_active"
+          >
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props">
                 <v-icon icon="mdi-account-outline" />
                 <v-list-item-title>
-                  {{
-                    user?.first_name || user?.last_name || "No name"
-                  }}
+                  {{ user?.first_name || user?.last_name || "No name" }}
                 </v-list-item-title>
               </v-list-item>
             </template>
@@ -676,7 +651,10 @@ watch(
           </v-list-item>
 
           <!-- Login Button -->
-          <v-list-item @click="openLoginDialog()" v-if="!auth.isAuthenticated.value">
+          <v-list-item
+            @click="openLoginDialog()"
+            v-if="!auth.isAuthenticated.value"
+          >
             <template v-slot:prepend>
               <v-icon icon="mdi-account-outline" />
             </template>
@@ -973,7 +951,6 @@ watch(
 
         <v-btn
           v-if="!auth.isAuthenticated.value"
-          
           rounded
           id="mobile-signin-btn"
           class="primary gama-btn"
@@ -1077,7 +1054,6 @@ watch(
     </v-dialog>
   </div>
 </template>
-
 
 <style>
 .v-application .primary {

@@ -34,12 +34,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   try {
-    const response = await $fetch<UserResponse>(
-      `/api/v1/users/info?uid=${authToken}`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await $fetch<UserResponse>(`/api/v1/users/info`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
 
     if (response && response.data) {
       const { setUser } = useUser();
