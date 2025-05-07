@@ -128,10 +128,10 @@
                   name="question"
                   rules="required"
                 >
-                  <ckeditor-nuxt
+                  <!-- <ckeditor-nuxt
                     v-model="form.question"
                     :config="editorConfig"
-                  />
+                  /> -->
                 </validation-provider>
               </client-only>
               <img
@@ -206,10 +206,10 @@
                       v-show="form.testImgAnswers == false"
                     >
                       <client-only placeholder="loading...">
-                        <ckeditor-nuxt
+                        <!-- <ckeditor-nuxt
                           v-model="form.answer_a"
                           :config="editorConfig"
-                        />
+                        /> -->
                       </client-only>
                     </v-col>
                     <v-col
@@ -259,10 +259,10 @@
                       v-show="form.testImgAnswers == false"
                     >
                       <client-only placeholder="loading...">
-                        <ckeditor-nuxt
+                        <!-- <ckeditor-nuxt
                           v-model="form.answer_b"
                           :config="editorConfig"
-                        />
+                        /> -->
                       </client-only>
                     </v-col>
                     <v-col
@@ -310,10 +310,10 @@
                       v-show="form.testImgAnswers == false"
                     >
                       <client-only placeholder="loading...">
-                        <ckeditor-nuxt
+                        <!-- <ckeditor-nuxt
                           v-model="form.answer_c"
                           :config="editorConfig"
-                        />
+                        /> -->
                       </client-only>
                     </v-col>
                     <v-col
@@ -361,10 +361,10 @@
                       v-show="form.testImgAnswers == false"
                     >
                       <client-only placeholder="loading...">
-                        <ckeditor-nuxt
+                        <!-- <ckeditor-nuxt
                           v-model="form.answer_d"
                           :config="editorConfig"
-                        />
+                        /> -->
                       </client-only>
                     </v-col>
                     <v-col
@@ -420,10 +420,10 @@
             >
               <p>Solution:</p>
               <client-only placeholder="loading...">
-                <ckeditor-nuxt
+                <!-- <ckeditor-nuxt
                   v-model="form.answer_full"
                   :config="editorConfig"
-                />
+                /> -->
               </client-only>
 
               <img
@@ -602,11 +602,6 @@ defineComponent({
     ValidationProvider,
     TopicSelector,
     Cropper,
-    'ckeditor-nuxt': () => {
-      if (process.client) {
-        return import('@blowstack/ckeditor-nuxt')
-      }
-    }
   }
 })
 
