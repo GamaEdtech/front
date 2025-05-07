@@ -56,18 +56,18 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 const props = defineProps({
   userInfo: {
     type: Object,
     required: true,
   },
 });
+
 const { user } = useUser();
 const userType = computed(() => user.value?.group_id);
-const formatNumber = (value) => {
-  if (!value) return "0";
-  return new Intl.NumberFormat().format(value);
-};
+const { formatNumber } = useFormatNumber();
 </script>
 
 <style scoped>

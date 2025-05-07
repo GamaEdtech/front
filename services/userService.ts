@@ -1,5 +1,4 @@
 import { useCookie } from "nuxt/app";
-import { useUser } from "~/composables/useUser";
 
 interface UserResponse {
   data: any;
@@ -16,7 +15,6 @@ interface ErrorResponse {
 
 export const userInfo = async () => {
   const cookieToken = useCookie("authToken");
-  const { setUser } = useUser();
 
   try {
     const response = await $fetch<UserResponse>(
@@ -25,7 +23,7 @@ export const userInfo = async () => {
         method: "GET",
       }
     );
-    setUser(response.data);
+    return response.data;
   } catch (error) {
     const errorData = (error as ErrorResponse)?.response?.status;
 
@@ -34,6 +32,7 @@ export const userInfo = async () => {
     } else {
       console.error("Something went wrong.");
     }
+    throw error;
   }
 };
 
