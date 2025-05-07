@@ -267,6 +267,7 @@
       <!-- Data list -->
       <list-holder @updatePage="checkSchoolScroll">
         <schoolDataList
+          :isExpanded="isExpanded"
           :schoolLoading="schoolLoading"
           :schoolList="schoolList"
           :resultCount="resultCount"

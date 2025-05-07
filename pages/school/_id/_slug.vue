@@ -114,6 +114,8 @@
             show-arrows-on-hover
             height="26.4rem"
             class="gallery-carousel"
+            cycle
+            interval="3000"
             @click="openGalleryDialog"
             v-model="activeGalleryIndex"
             @change="updateMainGalleryImage"
@@ -421,21 +423,21 @@
             <div class="d-flex">
               <v-sheet class="chips-container">
                 <v-chip
-                  v-if="contentData.countryTitle"
+                  v-show="contentData.countryTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.countryTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.stateTitle"
+                  v-show="contentData.stateTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.stateTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.cityTitle"
+                  v-show="contentData.cityTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
