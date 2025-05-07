@@ -8,11 +8,12 @@
           :key="item.id"
           class="list-item"
           v-show="item.name"
+          min-height="200"
           :to="`/school/${item.id}/${item.slug}`"
         >
           <v-card-text>
             <div class="item-info">
-              <div class="main-data d-flex">
+              <div style="min-height: 130px" class="main-data d-flex">
                 <div>
                   <div class="d-flex">
                     <h2 class="gtext-t4 font-weight-semibold mb-4">
@@ -65,11 +66,17 @@
 
              </v-chip> -->
                 </div>
-                <!-- <div class="item-img" v-if="!$parent.isExpanded">
-                  <img :src="require('assets/images/default-school.png')" />
-                </div> -->
+                <div class="item-img mb-1" v-show="isExpanded">
+                  <v-img
+                    max-height="130"
+                    height="130"
+                    class="rounded"
+                    v-show="item.coverImage"
+                    :src="item.coverImage"
+                  />
+                </div>
               </div>
-              <v-divider class="mb-3" />
+              <v-divider class="mb-2" />
               <div class="item-footer">
                 <div class="float-left">
                   <v-btn :disabled="!item.hasLocation" icon>
@@ -101,7 +108,7 @@
               </div>
             </div>
 
-            <!-- <div class="item-img" v-if="$parent.isExpanded">
+            <!-- <div class="item-img" v-show="!isExpanded">
               <img
                 class="float-right"
                 :src="require('assets/images/default-school.png')"
@@ -144,6 +151,7 @@
 export default {
   name: "school-data-list",
   props: {
+    isExpanded: true,
     schoolList: [],
     schoolLoading: true,
     resultCount: 0,
