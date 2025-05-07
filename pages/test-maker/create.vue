@@ -49,6 +49,7 @@
                   label="Board"
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -60,6 +61,7 @@
                   label="Grade"
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -71,6 +73,7 @@
                   label="Subject"
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
 
@@ -83,7 +86,7 @@
                 />
               </v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-autocomplete
                   v-model="form.exam_type"
                   :items="test_type_list"
@@ -91,28 +94,31 @@
                   item-value="id"
                   label="Exam type"
                   variant="outlined"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-text-field
                   v-model="form.duration"
                   type="number"
                   label="Test duration"
                   variant="outlined"
+                  color="orange"
                 ></v-text-field>
               </v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-autocomplete
                   v-model="form.edu_year"
                   :items="year_list"
                   label="Year"
                   variant="outlined"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-autocomplete
                   v-model="form.edu_month"
                   :items="month_list"
@@ -120,10 +126,22 @@
                   item-value="id"
                   label="Month"
                   variant="outlined"
+                  color="orange"
                 ></v-autocomplete>
               </v-col>
 
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="4">
+                <v-file-input
+                  v-model="file_original"
+                  label="Source file"
+                  variant="outlined"
+                  prepend-icon="mdi-paperclip"
+                  @change="uploadFile"
+                  accept="application/pdf,image/*"
+                ></v-file-input>
+              </v-col>
+
+              <v-col cols="12" md="8">
                 <v-text-field
                   v-model="form.title"
                   label="Title"
@@ -136,23 +154,12 @@
                 </div>
               </v-col>
 
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="4">
                 <v-text-field
                   v-model="form.paperID"
                   label="Past Paper Id"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
-
-              <v-col cols="12">
-                <v-file-input
-                  v-model="file_original"
-                  label="Source file"
-                  variant="outlined"
-                  prepend-icon="mdi-paperclip"
-                  @change="uploadFile"
-                  accept="application/pdf,image/*"
-                ></v-file-input>
               </v-col>
 
               <v-col cols="12">
@@ -165,6 +172,7 @@
                       size="large"
                       type="submit"
                       :loading="submit_loading"
+                      style="text-transform: none; font-size: 13px; font-weight: 500;"
                     >
                       Next step
                     </v-btn>
@@ -176,6 +184,7 @@
                       color="red"
                       size="large"
                       to="/user/exam"
+                      style="text-transform: none; font-size: 13px; font-weight: 500;"
                     >
                       Discard
                     </v-btn>
@@ -953,7 +962,7 @@ onMounted(async () => {
 
   await getTypeList("exam_type");
   await getTypeList("state");
-  
+
   // Handle active query parameter for test list / add test
   checkActiveParam();
 });
