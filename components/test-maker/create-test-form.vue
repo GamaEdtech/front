@@ -96,11 +96,7 @@
                 >
                 <div class="d-flex">
                   <div class="flex-grow-1">
-                    <CkEditor
-                      v-model="form.question"
-                      placeholder="Enter your question here..."
-                      style="min-height: 500px !important;"
-                    />
+                    <RickEditor v-model:modelValue="form.question"  />
                   </div>
                 </div>
               </div>
@@ -183,23 +179,7 @@
                     <v-col cols="12">
                       <div class="d-flex">
                         <div class="flex-grow-1">
-                          <CkEditor
-                            v-model="form.answer_full"
-                            placeholder="Enter the full answer here..."
-                            height="120px"
-                            :toolbar="[
-                              'undo',
-                              'redo',
-                              '|',
-                              'bold',
-                              'italic',
-                              'underline',
-                              '|',
-                              'alignment:left',
-                              'alignment:center',
-                              'alignment:right',
-                            ]"
-                          />
+                          <RickEditor v-model:modelValue="form.answer_full"  />
                         </div>
                         <div class="ml-2 d-flex align-start mt-2">
                           <v-btn
@@ -316,12 +296,7 @@
                             >
                               <div class="d-flex">
                                 <div class="flex-grow-1">
-                                  <CkEditor
-                                    v-model="form.answer_a"
-                                    placeholder="Enter choice A..."
-                                    height="80px"
-                                    :toolbar="['bold', 'italic', 'underline']"
-                                  />
+                             
                                 </div>
                                 <div class="ml-2 d-flex align-start mt-2">
                                   <v-btn
@@ -387,12 +362,7 @@
                             >
                               <div class="d-flex">
                                 <div class="flex-grow-1">
-                                  <CkEditor
-                                    v-model="form.answer_b"
-                                    placeholder="Enter choice B..."
-                                    height="80px"
-                                    :toolbar="['bold', 'italic', 'underline']"
-                                  />
+                                  <RickEditor v-model:modelValue="form.answer_b"  />
                                 </div>
                                 <div class="ml-2 d-flex align-start mt-2">
                                   <v-btn
@@ -458,12 +428,7 @@
                             >
                               <div class="d-flex">
                                 <div class="flex-grow-1">
-                                  <CkEditor
-                                    v-model="form.answer_c"
-                                    placeholder="Enter choice C..."
-                                    height="80px"
-                                    :toolbar="['bold', 'italic', 'underline']"
-                                  />
+                                  <RickEditor v-model:modelValue="form.answer_c"  />
                                 </div>
                                 <div class="ml-2 d-flex align-start mt-2">
                                   <v-btn
@@ -529,12 +494,7 @@
                             >
                               <div class="d-flex">
                                 <div class="flex-grow-1">
-                                  <CkEditor
-                                    v-model="form.answer_d"
-                                    placeholder="Enter choice D..."
-                                    height="80px"
-                                    :toolbar="['bold', 'italic', 'underline']"
-                                  />
+                                  <RickEditor v-model:modelValue="form.answer_d"  />
                                 </div>
                                 <div class="ml-2 d-flex align-start mt-2">
                                   <v-btn
@@ -1073,7 +1033,7 @@ import { required } from "@vee-validate/rules";
 import { defineRule } from "vee-validate";
 import TopicSelector from "~/components/form/topic-selector";
 import { useNuxtApp } from "#app";
-import CkEditor from "./ckEditor.vue";
+// import CkEditor from "./ckEditor.vue";";
 import * as yup from "yup";
 
 // Define validation rules

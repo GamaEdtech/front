@@ -10,8 +10,9 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@blowstack/ckeditor-nuxt": "^0.6.0",
+    "@ckeditor/ckeditor5-build-classic": "^43.3.1",
     "@ckeditor/ckeditor5-vue": "^7.3.0",
+    "ckeditor5": "^43.3.1",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/moment": "^1.6.1",
     "@nuxtjs/toast": "^3.3.1",
@@ -20,7 +21,6 @@
     "animejs": "^4.0.1",
     "axios": "^1.8.3",
     "chart.js": "4.4.7",
-    "ckeditor5": "^45.0.0",
     "core-js": "3.40.0",
     "dayjs-nuxt": "2.1.11",
     "defu": "^6.1.4",
