@@ -13,21 +13,27 @@
         outlined
         class="px-2"
         :disabled="
-          $auth.user.group_id === '6' &&
-          button_list[index].class !== 'question_answer'
+          user.group_id == 6 && button_list[index].class !== 'question_answer'
         "
       >
         <v-card-text class="px-0 px-md-4">
           <v-row>
             <v-col cols="6" class="text-left">
-              <v-btn class="icon_btn" size="10" fab :to="`${item.manage_link}`">
+              <v-btn
+                class="icon_btn"
+                rounded="circle"
+                size="56"
+                fab
+                :to="`${item.manage_link}`"
+              >
                 <span :class="`icon icon-${item.icon} group-icon`"></span>
               </v-btn>
             </v-col>
             <v-col cols="6" class="text-right counter">
-              <question-statistics
-                ref="question-statistics"
+              <dashboard-question-statistics
+                ref="questionStatisticsRef"
                 v-if="button_list[index].class === 'question_answer'"
+                :statistics="statistics"
               />
               <span v-else>
                 {{ item.count }}
@@ -49,51 +55,77 @@
   <!--End content type-->
 </template>
 
-<script>
-import QuestionStatistics from "@/components/dashboard/question-statistics";
-export default {
-  name: "create-content-button",
-  components: { QuestionStatistics },
-  data() {
-    return {
-      stats: [],
-      button_list: [
-        {
-          class: "sample_exam",
-          title: "Past Papers",
-          count: 0,
-          link: "/user/paper/create",
-          manage_link: "/user/paper",
-          icon: "paper",
-        },
-        {
-          class: "training_content",
-          title: "Multimedia",
-          count: 0,
-          link: "/user/multimedia/create",
-          manage_link: "/user/multimedia",
-          icon: "multimedia",
-        },
-        {
-          class: "question_answer",
-          title: "Forum",
-          count: 0,
-          link: "/user/question/create",
-          manage_link: "/user/question",
-          icon: "q-a",
-        },
-        {
-          class: "online_exam",
-          title: "QuizHub",
-          count: 0,
-          link: "/test-maker/create",
-          manage_link: "/test-maker",
-          icon: "exam",
-        },
-      ],
-    };
+<script setup>
+const { user } = useUser();
+
+const props = defineProps({
+  statistics: {
+    type: Object,
+    default: () => ({}),
   },
+});
+
+const questionStatisticsRef = ref(null);
+
+const updateButtonCount = (className, count) => {
+  const index = button_list.findIndex((x) => x.class === className);
+  if (index !== -1) {
+    button_list[index].count = count;
+  }
 };
+
+const button_list = reactive([
+  {
+    class: "sample_exam",
+    title: "Past Papers",
+    count: 0,
+    link: "/user/paper/create",
+    manage_link: "/user/paper",
+    icon: "paper",
+  },
+  {
+    class: "training_content",
+    title: "Multimedia",
+    count: 0,
+    link: "/user/multimedia/create",
+    manage_link: "/user/multimedia",
+    icon: "multimedia",
+  },
+  {
+    class: "question_answer",
+    title: "Forum",
+    count: 0,
+    link: "/user/question/create",
+    manage_link: "/user/question",
+    icon: "q-a",
+  },
+  {
+    class: "online_exam",
+    title: "QuizHub",
+    count: 0,
+    link: "/test-maker/create",
+    manage_link: "/test-maker",
+    icon: "exam",
+  },
+]);
+
+watch(
+  () => props.statistics,
+  (newStats) => {
+    if (newStats) {
+      // Update button counts based on statistics
+      updateButtonCount("sample_exam", newStats?.test?.total || 0);
+      updateButtonCount("training_content", newStats?.file?.total || 0);
+      updateButtonCount("question_answer", newStats?.question?.total || 0);
+      updateButtonCount("online_exam", newStats?.test?.total || 0);
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+defineExpose({
+  button_list,
+});
 </script>
 
 <style scoped></style>
