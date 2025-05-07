@@ -49,7 +49,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   } catch (error) {
     const status = (error as ErrorResponse)?.response?.status;
     if ((status === 401 || status === 403) && to.path.startsWith("/user")) {
-      // return navigateTo("/login");
+      return navigateTo("/");
     }
   }
 });
