@@ -125,7 +125,6 @@
               <p>Question:</p>
               <client-only placeholder="loading...">
                 <validation-provider
-                  v-slot="{ errors }"
                   name="question"
                   rules="required"
                 >
@@ -187,7 +186,6 @@
                 </v-col>
               </v-row>
               <validation-provider
-                v-slot="{ errors }"
                 name="true_answer"
                 rules="required"
               >
@@ -492,7 +490,7 @@
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('q_file')"
         v-model="form_hidden_data.q_file"
-        ref="question-input"
+        ref="questionInput"
       />
 
       <v-file-input
@@ -500,35 +498,35 @@
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('answer_full_file')"
         v-model="form_hidden_data.answer_full_file"
-        ref="answer-full-input"
+        ref="answerFullInput"
       />
       <v-file-input
         class="d-none"
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('a_file')"
         v-model="form_hidden_data.a_file"
-        ref="a-input"
+        ref="aInput"
       />
       <v-file-input
         class="d-none"
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('b_file')"
         v-model="form_hidden_data.b_file"
-        ref="b-input"
+        ref="bInput"
       />
       <v-file-input
         class="d-none"
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('c_file')"
         v-model="form_hidden_data.c_file"
-        ref="c-input"
+        ref="cInput"
       />
       <v-file-input
         class="d-none"
         accept="image/png,image/webp,image/jpeg,image/jpg"
         @change="uploadFile('d_file')"
         v-model="form_hidden_data.d_file"
-        ref="d-input"
+        ref="dInput"
       />
     </div>
 
@@ -539,7 +537,7 @@
         max-width="600"
         v-model="cropper_dialog"
       >
-        <template v-slot:default="dialog">
+        <template v-slot:default>
           <v-card id="img-cropper-dialog">
             <v-card-text class="pa-0">
               <v-col v-if="crop_file_loading" cols="12" class="text-center">
@@ -583,460 +581,592 @@
   </v-container>
 </template>
 
-<script>
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from "@/components/form/topic-selector";
-// import "vue-advanced-cropper/dist/style.css";
+<script setup>
+import { ref, reactive, onMounted, watch, defineComponent } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuth } from '~/composables/auth'
+import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import TopicSelector from "~/components/form/topic-selector.vue"
+import Cropper from 'vue-advanced-cropper'
+import 'vue-advanced-cropper/dist/style.css'
 
-export default {
-  layout: "test-maker-layout",
-  name: "edit-test-form",
-  head() {
-    return {
-      title: "Edit test",
-      script: [
-        //MathType to Latex
-        // {
-        //   type: 'text/javascript',
-        //   src: '/MathType.js'
-        // },
-        // {
-        //   type: 'text/javascript',
-        //   src: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=MML_HTMLorMML',
-        //   async: true,
-        // }
-        //End MathType to Latex
-      ],
-    };
-  },
+definePageMeta({
+  layout: 'test-maker-layout',
+  middleware: ['auth-admin']
+})
 
+// Define the component with client-only dependencies
+defineComponent({
   components: {
     ValidationObserver,
     ValidationProvider,
     TopicSelector,
-    "ckeditor-nuxt": () => {
+    Cropper,
+    'ckeditor-nuxt': () => {
       if (process.client) {
-        return import("@blowstack/ckeditor-nuxt");
+        return import('@blowstack/ckeditor-nuxt')
       }
-    },
+    }
+  }
+})
 
-    cropper_dialog: false,
-  },
-  data() {
-    return {
-      path_panel_expand: true,
-      create_loading: false,
-      test_step: 1,
-      editorConfig: {
-        toolbar: [
-          "bold",
-          "underline",
-          "alignment",
-          // , 'mathType', 'chemType'
-        ],
-        plugins: [
-          "Autoformat",
-          "Essentials",
-          "MathType",
-          "Alignment",
-          "Bold",
-          "Underline",
-          "PasteFromOffice",
-          "Paragraph",
-          "WordCount",
-        ],
-        mathType: {
-          wiriseditorparselatex: false,
-        },
-      },
+const route = useRoute()
+const router = useRouter()
+const { getAuthToken } = useAuth()
 
-      form: {
-        section: "",
-        base: "",
-        level: "",
-        grade: "",
-        lesson: "",
-        topic: "",
-        type: "fourchoice",
-        direction: "ltr",
-        true_answer: "",
-        question: "",
-        q_file_base64: "",
-        answer_full: "",
-        answer_full_file_base64: "",
-        a_file_base64: "",
-        b_file_base64: "",
-        c_file_base64: "",
-        d_file_base64: "",
-        testImgAnswers: false,
-      },
-      file_original_path: "",
-      form_hidden_data: {
-        q_file: "",
-        answer_full_file: "",
-        a_file: "",
-        b_file: "",
-        c_file: "",
-        d_file: "",
-      },
-      timepicker_menu: false,
+// Core data
+const userToken = ref(getAuthToken())
+const path_panel_expand = ref(false)
+const create_loading = ref(false)
+const text_answer = ref(true)
+const photo_answer = ref(false)
+const observer = ref(null)
+const file_original_path = ref('')
 
-      level_list: [],
-      grade_list: [],
-      field_list: [],
-      lesson_list: [],
-      topic_list: [],
-      txt_direction_list: [
-        {
-          value: "ltr",
-          title: "LTR",
-        },
-        {
-          value: "rtl",
-          title: "RTL",
-        },
-      ],
+// File upload refs
+const questionInput = ref(null)
+const answerFullInput = ref(null)
+const aInput = ref(null)
+const bInput = ref(null)
+const cInput = ref(null)
+const dInput = ref(null)
 
-      crop_file_url: "",
-      crop_file_loading: false,
-      cropper_dialog: false,
-      current_crop_file: "",
+// Cropper related data
+const crop_file_url = ref('')
+const crop_file_type = ref('')
+const cropper_dialog = ref(false)
+const crop_file_loading = ref(false)
+const update_file_loading = ref(false)
+const cropped_image = ref(null)
 
-      stencil_props: {
-        width: 180,
-        height: 180,
-      },
-      text_answer: true,
-      photo_answer: false,
-      update_file_loading: false,
-      target_file: "", //Current file to crop, change and upload
-      typeList: [
-        { value: "fourchoice", title: "Multiple choice(4)" },
-        { value: "twochoice", title: "Multiple choice(2)" },
-        { value: "descriptive", title: "Open-Ended" },
-        { value: "tf", title: "True/False" },
-        { value: "blank", title: "Blank" },
-        { value: "shortanswer", title: "Short answer" },
-      ],
-    };
-  },
-  mounted() {
-    this.getCurrentExamTestsInfo();
-    this.getTypeList("section");
-    this.getTypeList("test_type");
-    this.getTypeList("state");
-  },
-  watch: {
-    "form.section"(val) {
-      this.getTypeList("base", val);
-    },
-    "form.base"(val) {
-      this.getTypeList("lesson", val);
-    },
-    "form.lesson"(val) {
-      this.getTypeList("topic", val);
-    },
-  },
-  methods: {
-    getTypeList(type, parent = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
+const stencil_props = {
+  aspectRatio: 1
+}
+
+// Editor config
+const editorConfig = {
+  toolbar: [
+    'heading',
+    '|',
+    'bold',
+    'italic',
+    'link',
+    '|',
+    'bulletedList',
+    'numberedList',
+    '|',
+    'outdent',
+    'indent',
+    '|',
+    'insertTable',
+    'mediaEmbed',
+    'undo',
+    'redo'
+  ]
+}
+
+// Form data
+const form = reactive({
+  id: 0,
+  section: null,
+  base: null,
+  lesson: null,
+  topic: null,
+  type: '',
+  question: '',
+  q_file: null,
+  q_file_base64: '',
+  true_answer: '1',
+  answer_a: '',
+  a_file: null,
+  a_file_base64: '',
+  answer_b: '',
+  b_file: null,
+  b_file_base64: '',
+  answer_c: '',
+  c_file: null,
+  c_file_base64: '',
+  answer_d: '',
+  d_file: null,
+  d_file_base64: '',
+  answer_full: '',
+  answer_full_file: null,
+  answer_full_file_base64: '',
+  testImgAnswers: false
+})
+
+const form_hidden_data = reactive({
+  q_file: null,
+  answer_full_file: null,
+  a_file: null,
+  b_file: null,
+  c_file: null,
+  d_file: null
+})
+
+// Data lists
+const level_list = ref([])
+const grade_list = ref([])
+const lesson_list = ref([])
+const topic_list = ref([])
+const typeList = ref([
+  { title: 'Fill in the Blanks', value: 'fillblanks' },
+  { title: 'True or False', value: 'tf' },
+  { title: 'Four choice', value: 'fourchoice' },
+  { title: 'Two choice', value: 'twochoice' },
+  { title: 'Short answer', value: 'shortanswer' },
+  { title: 'Passage reading', value: 'passagereading' }
+])
+
+// Methods
+const resetForm = () => {
+  form.id = 0
+  form.section = null
+  form.base = null
+  form.lesson = null
+  form.topic = null
+  form.type = ''
+  form.question = ''
+  form.q_file = null
+  form.q_file_base64 = ''
+  form.true_answer = '1'
+  form.answer_a = ''
+  form.a_file = null
+  form.a_file_base64 = ''
+  form.answer_b = ''
+  form.b_file = null
+  form.b_file_base64 = ''
+  form.answer_c = ''
+  form.c_file = null
+  form.c_file_base64 = ''
+  form.answer_d = ''
+  form.d_file = null
+  form.d_file_base64 = ''
+  form.answer_full = ''
+  form.answer_full_file = null
+  form.answer_full_file_base64 = ''
+  form.testImgAnswers = false
+}
+
+const fetchData = async () => {
+  try {
+    create_loading.value = true
+
+    // Get all sections
+    const sections = await $fetch('/api/sections', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
       }
-      if (type === "topic") {
-        params.lesson_id = parent;
-      }
-      if (type === "area") {
-        params.state_id = parent;
-      }
+    })
+    level_list.value = sections
 
-      if (type === "school") {
-        params.section_id = this.form.level;
-        params.area_id = this.form.area;
+    // Get all bases
+    const bases = await $fetch('/api/bases', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
       }
+    })
+    grade_list.value = bases
 
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            this.level_list = res.data;
-          } else if (type === "base") {
-            this.grade_list = res.data;
-          } else if (type === "lesson") {
-            this.lesson_list = res.data;
-          } else if (type === "topic") {
-            this.topic_list = res.data;
-          } else if (type === "test_type") {
-            this.test_type_list = res.data;
-          } else if (type === "state") {
-            this.state_list = res.data;
-          } else if (type === "area") {
-            this.area_list = res.data;
-          } else if (type === "school") {
-            this.school_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-    updateQuestion() {
-      this.create_loading = true;
-      const querystring = require("querystring");
-      this.$fetch
-        .$put(
-          `/api/v1/examTests/${this.$route.params.id}`,
-          querystring.stringify(this.form)
-        )
-        .then((response) => {
-          if (response.status == 1) {
-            this.$toast.success("Updated successfully");
-            this.$router.push({
-              path: "/test-maker/create",
-            });
-          } else {
-            this.$toast.error("An error occurred, try again");
-          }
-        })
-        .catch((err) => {
-          if (err.response.status === 400)
-            this.$toast.error(err.response.data.message);
-          console.log(err);
-        })
-        .finally(() => {
-          this.create_loading = false;
-        });
-    },
-
-    selectFile(file_name) {
-      if (file_name === "q_file") {
-        this.$refs["question-input"].$refs.input.click();
-        this.target_file = "q_file_base64";
-      } else if (file_name === "answer_full_file") {
-        this.$refs["answer-full-input"].$refs.input.click();
-        this.target_file = "answer_full_file_base64";
-      } else if (file_name === "a_file") {
-        this.$refs["a-input"].$refs.input.click();
-        this.target_file = "a_file_base64";
-      } else if (file_name === "b_file") {
-        this.$refs["b-input"].$refs.input.click();
-        this.target_file = "b_file_base64";
-      } else if (file_name === "c_file") {
-        this.$refs["c-input"].$refs.input.click();
-        this.target_file = "c_file_base64";
-      } else if (file_name === "d_file") {
-        this.$refs["d-input"].$refs.input.click();
-        this.target_file = "d_file_base64";
+    // Get all lessons
+    const lessons = await $fetch('/api/lessons', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
       }
-    },
-    uploadFile(file_name) {
-      var file = "";
-      if (file_name === "q_file") {
-        file = this.form_hidden_data.q_file;
-        this.current_crop_file = "q_file";
-      } else if (file_name === "answer_full_file") {
-        file = this.form_hidden_data.answer_full_file;
-        this.current_crop_file = "answer_full_file";
-      } else if (file_name === "a_file") {
-        file = this.form_hidden_data.a_file;
-        this.current_crop_file = "a_file";
-      } else if (file_name === "b_file") {
-        file = this.form_hidden_data.b_file;
-        this.current_crop_file = "b_file";
-      } else if (file_name === "c_file") {
-        file = this.form_hidden_data.c_file;
-        this.current_crop_file = "c_file";
-      } else if (file_name === "d_file") {
-        file = this.form_hidden_data.d_file;
-        this.current_crop_file = "d_file";
+    })
+    lesson_list.value = lessons
+
+    // Get topics
+    const topics = await $fetch('/api/topics', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
+      }
+    })
+    topic_list.value = topics
+
+    // Get question data
+    const questionId = route.params.id
+    const questionData = await $fetch(`/api/questions/${questionId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
+      }
+    })
+
+    if (questionData) {
+      form.id = questionData.id
+      form.section = questionData.section_id
+      form.base = questionData.base_id
+      form.lesson = questionData.lesson_id
+      form.topic = questionData.topic_id
+      form.type = questionData.type
+      form.question = questionData.question
+      form.true_answer = questionData.true_answer
+      form.answer_a = questionData.answer_a
+      form.answer_b = questionData.answer_b
+      form.answer_c = questionData.answer_c
+      form.answer_d = questionData.answer_d
+      form.answer_full = questionData.answer_full
+      form.testImgAnswers = questionData.testImgAnswers
+
+      if (questionData.original_path) {
+        file_original_path.value = process.env.BASE_URL + questionData.original_path
       }
 
-      if (file) {
-        if (file_name === "q_file")
-          this.form.q_file_base64 = URL.createObjectURL(file);
-        else if (file_name === "answer_full_file")
-          this.form.answer_full_file_base64 = URL.createObjectURL(file);
-        else if (file_name === "a_file")
-          this.form.a_file_base64 = URL.createObjectURL(file);
-        else if (file_name === "b_file")
-          this.form.b_file_base64 = URL.createObjectURL(file);
-        else if (file_name === "c_file")
-          this.form.c_file_base64 = URL.createObjectURL(file);
-        else if (file_name === "d_file")
-          this.form.d_file_base64 = URL.createObjectURL(file);
-
-        this.crop_file_url = URL.createObjectURL(file);
+      if (questionData.q_file) {
+        form.q_file_base64 = process.env.BASE_URL + questionData.q_file
       }
 
-      if (this.crop_file_url) this.cropper_dialog = true;
-    },
-    cropFile({ coordinates, canvas, image }) {
-      if (this.current_crop_file === "q_file")
-        this.form.q_file_base64 = canvas.toDataURL();
-      else if (this.current_crop_file === "answer_full_file")
-        this.form.answer_full_file_base64 = canvas.toDataURL();
-      else if (this.current_crop_file === "a_file")
-        this.form.a_file_base64 = canvas.toDataURL();
-      else if (this.current_crop_file === "b_file")
-        this.form.b_file_base64 = canvas.toDataURL();
-      else if (this.current_crop_file === "c_file")
-        this.form.c_file_base64 = canvas.toDataURL();
-      else if (this.current_crop_file === "d_file")
-        this.form.d_file_base64 = canvas.toDataURL();
-    },
-    deleteFile(file_name) {
-      if (file_name === "q_file") {
-        this.form.q_file_base64 = "";
-        this.$refs["question-input"].$refs.input.value = null;
-        this.current_crop_file = "";
-      } else if (file_name === "answer_full_file") {
-        this.form.answer_full_file_base64 = "";
-        this.$refs["answer-full-input"].$refs.input.value = null;
-        this.current_crop_file = "";
-      } else if (file_name === "a_file") {
-        this.form.a_file_base64 = "";
-        this.$refs["a-input"].$refs.input.value = null;
-        this.current_crop_file = "";
-      } else if (file_name === "b_file") {
-        this.form.b_file_base64 = "";
-        this.$refs["b-input"].$refs.input.value = null;
-        this.current_crop_file = "";
-      } else if (file_name === "c_file") {
-        this.form.c_file_base64 = "";
-        this.$refs["c-input"].$refs.input.value = null;
-        this.current_crop_file = "";
-      } else if (file_name === "d_file") {
-        this.form.d_file_base64 = "";
-        this.$refs["d-input"].$refs.input.value = null;
-        this.current_crop_file = "";
+      if (questionData.a_file) {
+        form.a_file_base64 = process.env.BASE_URL + questionData.a_file
+        form.testImgAnswers = true
+        text_answer.value = false
+        photo_answer.value = true
       }
 
-      this.$fetch.$delete(
-        `/api/v1/examTests/${this.$route.params.id}/files/${file_name}`
-      );
-    },
-
-    answerTypeChanged(type) {
-      if (type === "txt") {
-        if (this.text_answer === true) {
-          this.photo_answer = false;
-          this.form.testImgAnswers = false;
-        } else {
-          this.photo_answer = true;
-          this.form.testImgAnswers = true;
-        }
-      } else {
-        if (this.photo_answer === true) {
-          this.text_answer = false;
-          this.form.testImgAnswers = true;
-        } else {
-          this.text_answer = true;
-          this.form.testImgAnswers = false;
-        }
+      if (questionData.b_file) {
+        form.b_file_base64 = process.env.BASE_URL + questionData.b_file
       }
-    },
 
-    getCurrentExamTestsInfo() {
-      this.$fetch
-        .$get(`/api/v1/examTests/${this.$route.params.id}`)
-        .then((response) => {
-          this.form.section = response.data.section;
-          this.form.base = response.data.base;
-          this.form.lesson = response.data.lesson;
-          this.form.topic = response.data.topic;
-          this.form.type = response.data.type;
-          this.form.question = response.data.question;
-          this.form.q_file_base64 = response.data.q_file;
-          this.form.testImgAnswers = response.data.testImgAnswers;
-
-          if (this.form.testImgAnswers == true) {
-            this.photo_answer = true;
-            this.text_answer = false;
-          }
-
-          this.form.true_answer = response.data.true_answer;
-          this.form.answer_a = response.data.answer_a;
-          this.form.answer_b = response.data.answer_b;
-          this.form.answer_c = response.data.answer_c;
-          this.form.answer_d = response.data.answer_d;
-          this.form.a_file_base64 = response.data.a_file;
-          this.form.b_file_base64 = response.data.b_file;
-          this.form.c_file_base64 = response.data.c_file;
-          this.form.d_file_base64 = response.data.d_file;
-          this.form.answer_full = response.data.answer_full;
-          this.form.answer_full_file_base64 = response.data.answer_full_file;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    //Convert form data from multipart to urlencode
-    urlencodeFormData(fd) {
-      var s = "";
-
-      for (var pair of fd.entries()) {
-        if (typeof pair[1] == "string") {
-          s +=
-            (s ? "&" : "") + this.encode(pair[0]) + "=" + this.encode(pair[1]);
-        }
+      if (questionData.c_file) {
+        form.c_file_base64 = process.env.BASE_URL + questionData.c_file
       }
-      return s;
-    },
-    encode(s) {
-      return encodeURIComponent(s).replace(/%20/g, "+");
-    },
-    //End convert form data from multipart to urlencode
 
-    updateFile() {
-      this.update_file_loading = true;
-      let formData = new FormData();
-      if (this.target_file == "a_file_base64")
-        formData.append("a_file_base64", this.form.a_file_base64);
-      else if (this.target_file == "b_file_base64")
-        formData.append("b_file_base64", this.form.b_file_base64);
-      else if (this.target_file == "c_file_base64")
-        formData.append("c_file_base64", this.form.c_file_base64);
-      else if (this.target_file == "d_file_base64")
-        formData.append("d_file_base64", this.form.d_file_base64);
-      else if (this.target_file == "q_file_base64")
-        formData.append("q_file_base64", this.form.q_file_base64);
-      else if (this.target_file == "answer_full_file_base64")
-        formData.append(
-          "answer_full_file_base64",
-          this.form.answer_full_file_base64
-        );
+      if (questionData.d_file) {
+        form.d_file_base64 = process.env.BASE_URL + questionData.d_file
+      }
 
-      this.$fetch
-        .$post(`/api/v1/examTests/${this.$route.params.id}/files`, formData, {
+      if (questionData.answer_full_file) {
+        form.answer_full_file_base64 = process.env.BASE_URL + questionData.answer_full_file
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    create_loading.value = false
+  }
+}
+
+const updateQuestion = async () => {
+  try {
+    create_loading.value = true
+
+    if (observer.value) {
+      const isValid = await observer.value.validate()
+      if (!isValid) {
+        create_loading.value = false
+        return
+      }
+    }
+
+    const formData = new FormData()
+    formData.append('id', form.id)
+    formData.append('section_id', form.section)
+    formData.append('base_id', form.base)
+    formData.append('lesson_id', form.lesson)
+    formData.append('topic_id', form.topic)
+    formData.append('type', form.type)
+    formData.append('question', form.question)
+    formData.append('true_answer', form.true_answer)
+    formData.append('answer_a', form.answer_a)
+    formData.append('answer_b', form.answer_b)
+    formData.append('answer_c', form.answer_c)
+    formData.append('answer_d', form.answer_d)
+    formData.append('answer_full', form.answer_full)
+    formData.append('testImgAnswers', form.testImgAnswers)
+
+    // Add files if they exist
+    if (form.q_file_base64 && form.q_file_base64.includes('data:image')) {
+      formData.append('q_file', form.q_file_base64)
+    }
+
+    if (form.a_file_base64 && form.a_file_base64.includes('data:image')) {
+      formData.append('a_file', form.a_file_base64)
+    }
+
+    if (form.b_file_base64 && form.b_file_base64.includes('data:image')) {
+      formData.append('b_file', form.b_file_base64)
+    }
+
+    if (form.c_file_base64 && form.c_file_base64.includes('data:image')) {
+      formData.append('c_file', form.c_file_base64)
+    }
+
+    if (form.d_file_base64 && form.d_file_base64.includes('data:image')) {
+      formData.append('d_file', form.d_file_base64)
+    }
+
+    if (form.answer_full_file_base64 && form.answer_full_file_base64.includes('data:image')) {
+      formData.append('answer_full_file', form.answer_full_file_base64)
+    }
+
+    await $fetch(`/api/questions/${form.id}`, {
+      method: 'PUT',
           headers: {
-            accept: "*/*",
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .finally(() => {
-          this.update_file_loading = false;
-          this.cropper_dialog = false;
-        });
-    },
-  },
-};
+        Authorization: `Bearer ${userToken.value}`
+      },
+      body: formData
+    })
+
+    router.push('/test-maker')
+  } catch (error) {
+    console.error('Error updating question:', error)
+  } finally {
+    create_loading.value = false
+  }
+}
+
+const selectFile = (fileType) => {
+  switch (fileType) {
+    case 'q_file':
+      questionInput.value.click()
+      break
+    case 'answer_full_file':
+      answerFullInput.value.click()
+      break
+    case 'a_file':
+      aInput.value.click()
+      break
+    case 'b_file':
+      bInput.value.click()
+      break
+    case 'c_file':
+      cInput.value.click()
+      break
+    case 'd_file':
+      dInput.value.click()
+      break
+  }
+}
+
+const uploadFile = (fileType) => {
+  if (form_hidden_data[fileType]) {
+    crop_file_loading.value = true
+    cropper_dialog.value = true
+    crop_file_type.value = fileType
+
+    // Create a URL for the file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      crop_file_url.value = e.target.result
+      crop_file_loading.value = false
+    }
+    reader.readAsDataURL(form_hidden_data[fileType])
+  }
+}
+
+const cropFile = (cropperData) => {
+  cropped_image.value = cropperData
+}
+
+const updateFile = async () => {
+  try {
+    update_file_loading.value = true
+
+    if (cropped_image.value && cropped_image.value.canvas) {
+      const canvas = cropped_image.value.canvas
+      const fileType = crop_file_type.value
+      const base64Data = canvas.toDataURL('image/jpeg')
+
+      // Update the appropriate file based on the selected type
+      switch (fileType) {
+        case 'q_file':
+          form.q_file_base64 = base64Data
+          break
+        case 'answer_full_file':
+          form.answer_full_file_base64 = base64Data
+          break
+        case 'a_file':
+          form.a_file_base64 = base64Data
+          break
+        case 'b_file':
+          form.b_file_base64 = base64Data
+          break
+        case 'c_file':
+          form.c_file_base64 = base64Data
+          break
+        case 'd_file':
+          form.d_file_base64 = base64Data
+          break
+      }
+
+      // Reset form hidden data
+      form_hidden_data[fileType] = null
+      cropper_dialog.value = false
+    }
+  } catch (error) {
+    console.error('Error updating file:', error)
+  } finally {
+    update_file_loading.value = false
+  }
+}
+
+const deleteFile = (fileType) => {
+  switch (fileType) {
+    case 'q_file':
+      form.q_file_base64 = ''
+      break
+    case 'answer_full_file':
+      form.answer_full_file_base64 = ''
+      break
+    case 'a_file':
+      form.a_file_base64 = ''
+      break
+    case 'b_file':
+      form.b_file_base64 = ''
+      break
+    case 'c_file':
+      form.c_file_base64 = ''
+      break
+    case 'd_file':
+      form.d_file_base64 = ''
+      break
+  }
+}
+
+const answerTypeChanged = (type) => {
+  if (type === 'txt') {
+    text_answer.value = true
+    photo_answer.value = false
+    form.testImgAnswers = false
+  } else {
+    text_answer.value = false
+    photo_answer.value = true
+    form.testImgAnswers = true
+  }
+}
+
+// Watchers
+watch([() => form.section], () => {
+  if (form.section) {
+    // Filter grades based on section
+    const filteredGrades = grade_list.value.filter(
+      (grade) => grade.section_id === form.section
+    )
+    if (filteredGrades.length > 0) {
+      form.base = filteredGrades[0].id
+    }
+  }
+})
+
+watch([() => form.base], () => {
+  if (form.base) {
+    // Filter lessons based on grade
+    const filteredLessons = lesson_list.value.filter(
+      (lesson) => lesson.base_id === form.base
+    )
+    if (filteredLessons.length > 0) {
+      form.lesson = filteredLessons[0].id
+    }
+  }
+})
+
+watch([() => form.lesson], () => {
+  if (form.lesson) {
+    // Filter topics based on lesson
+    const filteredTopics = topic_list.value.filter(
+      (topic) => topic.lesson_id === form.lesson
+    )
+    if (filteredTopics.length > 0) {
+      form.topic = filteredTopics[0].id
+    }
+  }
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  resetForm()
+  fetchData()
+})
 </script>
 
-<style scoped>
+<style>
+.pointer {
+  cursor: pointer;
+}
+
+#test-image-options img {
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
+}
+
+.answer_label {
+  position: absolute;
+  bottom: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #26a69a;
+}
+
+.image-input {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  border: 1px dashed #9e9e9e;
+  overflow: hidden;
+  height: 70px;
+  width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-clear-btn {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -4px;
+  background-color: white !important;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
+}
+
 .topic_list_item {
-  font-size: 1.4rem;
-  line-height: 2rem;
+  margin-bottom: 0;
 }
 
 .topic_season {
-  font-weight: bolder !important;
-  color: blue !important;
+  font-weight: bold;
+  color: teal;
+}
+
+#create-test .image-holder {
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+#test-maker-question,
+#test-maker-answer,
+#test-maker-answer-alternative {
+  margin-top: 32px;
+}
+
+#test-maker-question p,
+#test-maker-answer p,
+#test-maker-answer-alternative p {
+  font-size: 16px;
+  font-weight: bold;
+  color: teal;
+  margin-bottom: 8px;
+}
+
+/* Cropper related styles */
+#img-cropper-dialog .vue-advanced-cropper {
+  height: 500px;
+}
+
+.vue-advanced-cropper {
+  background-color: white;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 </style>
