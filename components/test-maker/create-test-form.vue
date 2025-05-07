@@ -111,23 +111,27 @@
         <VeeForm @submit="submitQuestion">
           <v-row>
             <v-col cols="12">
-              <v-text-field
-                v-model="form.question"
-                label="Question"
-                type="text"
-                variant="outlined"
-                density="compact"
-                :rules="[v => !!v || 'Question is required']"
-              >
-                <template v-slot:append-inner>
-                  <v-icon
-                    color="teal"
-                    class="mr-3"
-                    @click="selectFile('q_file')"
-                    icon="mdi-camera-outline"
-                  ></v-icon>
-                </template>
-              </v-text-field>
+              <div class="mb-3">
+                <label class="text-subtitle-1 font-weight-medium mb-2 d-block">Question:</label>
+                <div class="d-flex">
+                  <div class="flex-grow-1">
+                    <CkEditor 
+                      v-model="form.question"
+                      placeholder="Enter your question here..."
+                      height="120px"
+                    />
+                  </div>
+                  <div class="ml-2 d-flex align-start mt-2">
+                    <v-btn
+                      icon="mdi-camera-outline"
+                      color="teal"
+                      size="small"
+                      variant="text"
+                      @click="selectFile('q_file')"
+                    ></v-btn>
+                  </div>
+                </div>
+              </div>
               <input
                 ref="questionInput"
                 type="file"
@@ -204,14 +208,25 @@
 
             <v-row v-if="text_answer">
               <v-col cols="12">
-                <v-text-field
-                  v-model="form.answer_full"
-                  label="Full answer"
-                  type="text"
-                  variant="outlined"
-                  density="compact"
-                  :rules="text_answer_rules ? [v => !!v || 'Full answer is required'] : []"
-                ></v-text-field>
+                <div class="d-flex">
+                  <div class="flex-grow-1">
+                    <CkEditor 
+                      v-model="form.answer_full"
+                      placeholder="Enter the full answer here..."
+                      height="120px"
+                      :toolbar="['undo', 'redo', '|', 'bold', 'italic', 'underline', '|', 'alignment:left', 'alignment:center', 'alignment:right']"
+                    />
+                  </div>
+                  <div class="ml-2 d-flex align-start mt-2">
+                    <v-btn
+                      icon="mdi-camera-outline"
+                      color="teal"
+                      size="small"
+                      variant="text"
+                      @click="selectFile('answer_full_file')"
+                    ></v-btn>
+                  </div>
+                </div>
               </v-col>
             </v-row>
 
@@ -263,7 +278,7 @@
             <v-row>
               <v-col cols="12">
                 <div class="d-flex mb-3 mt-3">
-                  <div class="text-h6 mr-3">Answers:</div>
+                  <div class="text-h6 mr-3">Choices type:</div>
                   <v-chip-group
                     v-model="text_answer"
                     column
@@ -310,14 +325,25 @@
                     <div>
                       <v-radio value="a" label="A"></v-radio>
                       <div v-if="text_answer" class="d-inline-block" style="width: calc(100% - 45px)">
-                        <v-text-field
-                          v-model="form.answer_a"
-                          label="a"
-                          type="text"
-                          variant="outlined"
-                          density="compact"
-                          :rules="text_answer_rules ? [v => !!v || 'Answer A is required'] : []"
-                        ></v-text-field>
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <CkEditor 
+                              v-model="form.answer_a"
+                              placeholder="Enter choice A..."
+                              height="80px"
+                              :toolbar="['bold', 'italic', 'underline']"
+                            />
+                          </div>
+                          <div class="ml-2 d-flex align-start mt-2">
+                            <v-btn
+                              icon="mdi-camera-outline"
+                              color="teal"
+                              size="small"
+                              variant="text"
+                              @click="selectFile('a_file')"
+                            ></v-btn>
+                          </div>
+                        </div>
                       </div>
                       <div v-if="photo_answer" class="ml-5">
                         <v-btn
@@ -362,14 +388,25 @@
                     <div>
                       <v-radio value="b" label="B"></v-radio>
                       <div v-if="text_answer" class="d-inline-block" style="width: calc(100% - 45px)">
-                        <v-text-field
-                          v-model="form.answer_b"
-                          label="b"
-                          type="text"
-                          variant="outlined"
-                          density="compact"
-                          :rules="text_answer_rules ? [v => !!v || 'Answer B is required'] : []"
-                        ></v-text-field>
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <CkEditor 
+                              v-model="form.answer_b"
+                              placeholder="Enter choice B..."
+                              height="80px"
+                              :toolbar="['bold', 'italic', 'underline']"
+                            />
+                          </div>
+                          <div class="ml-2 d-flex align-start mt-2">
+                            <v-btn
+                              icon="mdi-camera-outline"
+                              color="teal"
+                              size="small"
+                              variant="text"
+                              @click="selectFile('b_file')"
+                            ></v-btn>
+                          </div>
+                        </div>
                       </div>
                       <div v-if="photo_answer" class="ml-5">
                         <v-btn
@@ -414,14 +451,25 @@
                     <div>
                       <v-radio value="c" label="C"></v-radio>
                       <div v-if="text_answer" class="d-inline-block" style="width: calc(100% - 45px)">
-                        <v-text-field
-                          v-model="form.answer_c"
-                          label="c"
-                          type="text"
-                          variant="outlined"
-                          density="compact"
-                          :rules="text_answer_rules ? [v => !!v || 'Answer C is required'] : []"
-                        ></v-text-field>
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <CkEditor 
+                              v-model="form.answer_c"
+                              placeholder="Enter choice C..."
+                              height="80px"
+                              :toolbar="['bold', 'italic', 'underline']"
+                            />
+                          </div>
+                          <div class="ml-2 d-flex align-start mt-2">
+                            <v-btn
+                              icon="mdi-camera-outline"
+                              color="teal"
+                              size="small"
+                              variant="text"
+                              @click="selectFile('c_file')"
+                            ></v-btn>
+                          </div>
+                        </div>
                       </div>
                       <div v-if="photo_answer" class="ml-5">
                         <v-btn
@@ -466,14 +514,25 @@
                     <div>
                       <v-radio value="d" label="D"></v-radio>
                       <div v-if="text_answer" class="d-inline-block" style="width: calc(100% - 45px)">
-                        <v-text-field
-                          v-model="form.answer_d"
-                          label="d"
-                          type="text"
-                          variant="outlined"
-                          density="compact"
-                          :rules="text_answer_rules ? [v => !!v || 'Answer D is required'] : []"
-                        ></v-text-field>
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <CkEditor 
+                              v-model="form.answer_d"
+                              placeholder="Enter choice D..."
+                              height="80px"
+                              :toolbar="['bold', 'italic', 'underline']"
+                            />
+                          </div>
+                          <div class="ml-2 d-flex align-start mt-2">
+                            <v-btn
+                              icon="mdi-camera-outline"
+                              color="teal"
+                              size="small"
+                              variant="text"
+                              @click="selectFile('d_file')"
+                            ></v-btn>
+                          </div>
+                        </div>
                       </div>
                       <div v-if="photo_answer" class="ml-5">
                         <v-btn
@@ -961,6 +1020,8 @@ import { required } from '@vee-validate/rules';
 import { defineRule } from 'vee-validate';
 import TopicSelector from "~/components/form/topic-selector";
 import { useNuxtApp } from '#app';
+import CkEditor from './ckEditor.vue';
+import * as yup from 'yup';
 
 // Define validation rules
 defineRule('required', required);
@@ -1089,6 +1150,65 @@ const editorConfig = {
   },
 };
 
+// Define validation rules
+const validationSchema = yup.object({
+  question: yup.string().required('Question is required'),
+  true_answer: yup.string().when('type', {
+    is: (val) => ['fourchoice', 'twochoice', 'tf'].includes(val),
+    then: () => yup.string().required('Please select the correct answer')
+  }),
+  // Additional validations based on answer type
+  answer_a: yup.string().when(['type', 'testImgAnswers'], {
+    is: (type, testImgAnswers) => ['fourchoice', 'twochoice', 'tf'].includes(type) && !testImgAnswers,
+    then: () => yup.string().required('Answer A is required')
+  }),
+  answer_b: yup.string().when(['type', 'testImgAnswers'], {
+    is: (type, testImgAnswers) => ['fourchoice', 'twochoice', 'tf'].includes(type) && !testImgAnswers,
+    then: () => yup.string().required('Answer B is required')
+  }),
+  answer_c: yup.string().when(['type', 'testImgAnswers'], {
+    is: (type, testImgAnswers) => type === 'fourchoice' && !testImgAnswers,
+    then: () => yup.string().required('Answer C is required')
+  }),
+  answer_d: yup.string().when(['type', 'testImgAnswers'], {
+    is: (type, testImgAnswers) => type === 'fourchoice' && !testImgAnswers,
+    then: () => yup.string().required('Answer D is required')
+  }),
+  answer_full: yup.string().when(['type', 'testImgAnswers'], {
+    is: (type, testImgAnswers) => type === 'descriptive' && !testImgAnswers,
+    then: () => yup.string().required('Full answer is required')
+  }),
+});
+
+// Use VeeValidate form
+const { handleSubmit: veeHandleSubmit, isSubmitting, validate } = useForm({
+  validationSchema,
+  initialValues: {
+    section: '',
+    base: '',
+    level: '',
+    grade: '',
+    lesson: '',
+    topic: '',
+    type: 'fourchoice',
+    direction: 'ltr',
+    true_answer: '',
+    question: '',
+    q_file_base64: '',
+    answer_full: '',
+    answer_full_file_base64: '',
+    answer_a: '',
+    answer_b: '',
+    answer_c: '',
+    answer_d: '',
+    a_file_base64: '',
+    b_file_base64: '',
+    c_file_base64: '',
+    d_file_base64: '',
+    testImgAnswers: false,
+  }
+});
+
 // Methods
 const getTypeList = async (type, parent = "") => {
   const params = { type };
@@ -1123,14 +1243,14 @@ const getTypeList = async (type, parent = "") => {
   }
 };
 
-const submitQuestion = handleSubmit(async () => {
+const submitQuestion = veeHandleSubmit(async (values) => {
   create_loading.value = true;
   const querystring = require("querystring");
   
   try {
     const response = await $fetch("/api/v1/examTests", {
       method: 'POST',
-      body: querystring.stringify(form),
+      body: querystring.stringify(values),
     });
 
     if (response.status == 1) {
@@ -1180,60 +1300,97 @@ const submitQuestion = handleSubmit(async () => {
 });
 
 const selectFile = (file_name) => {
-  if (file_name === "q_file" && questionInput.value)
-    questionInput.value.click();
-  else if (file_name === "answer_full_file" && answerFullInput.value)
-    answerFullInput.value.click();
-  else if (file_name === "a_file" && aInput.value)
-    aInput.value.click();
-  else if (file_name === "b_file" && bInput.value)
-    bInput.value.click();
-  else if (file_name === "c_file" && cInput.value)
-    cInput.value.click();
-  else if (file_name === "d_file" && dInput.value)
-    dInput.value.click();
+  if (file_name === 'q_file') {
+    questionInput.value?.click();
+  } else if (file_name === 'answer_full_file') {
+    document.querySelector('input[ref="answerFullInput"]')?.click();
+  } else if (file_name === 'a_file') {
+    document.querySelector('input[ref="aInput"]')?.click();
+  } else if (file_name === 'b_file') {
+    document.querySelector('input[ref="bInput"]')?.click();
+  } else if (file_name === 'c_file') {
+    document.querySelector('input[ref="cInput"]')?.click();
+  } else if (file_name === 'd_file') {
+    document.querySelector('input[ref="dInput"]')?.click();
+  }
 };
 
 const uploadFile = (file_name) => {
-  let file = "";
-  if (file_name === "q_file") {
+  let file = null;
+  
+  if (file_name === 'q_file') {
     file = form_hidden_data.q_file;
-    current_crop_file.value = "q_file";
-  } else if (file_name === "answer_full_file") {
+  } else if (file_name === 'answer_full_file') {
     file = form_hidden_data.answer_full_file;
-    current_crop_file.value = "answer_full_file";
-  } else if (file_name === "a_file") {
+  } else if (file_name === 'a_file') {
     file = form_hidden_data.a_file;
-    current_crop_file.value = "a_file";
-  } else if (file_name === "b_file") {
+  } else if (file_name === 'b_file') {
     file = form_hidden_data.b_file;
-    current_crop_file.value = "b_file";
-  } else if (file_name === "c_file") {
+  } else if (file_name === 'c_file') {
     file = form_hidden_data.c_file;
-    current_crop_file.value = "c_file";
-  } else if (file_name === "d_file") {
+  } else if (file_name === 'd_file') {
     file = form_hidden_data.d_file;
-    current_crop_file.value = "d_file";
   }
-
+  
   if (file) {
-    if (file_name === "q_file")
+    if (file_name === 'q_file') {
       form.q_file_base64 = URL.createObjectURL(file);
-    else if (file_name === "answer_full_file")
+    } else if (file_name === 'answer_full_file') {
       form.answer_full_file_base64 = URL.createObjectURL(file);
-    else if (file_name === "a_file")
+    } else if (file_name === 'a_file') {
       form.a_file_base64 = URL.createObjectURL(file);
-    else if (file_name === "b_file")
+    } else if (file_name === 'b_file') {
       form.b_file_base64 = URL.createObjectURL(file);
-    else if (file_name === "c_file")
+    } else if (file_name === 'c_file') {
       form.c_file_base64 = URL.createObjectURL(file);
-    else if (file_name === "d_file")
+    } else if (file_name === 'd_file') {
       form.d_file_base64 = URL.createObjectURL(file);
-
-    crop_file_url.value = URL.createObjectURL(file);
+    }
+    
+    // If using image cropper, handle here
+    // For now, we're directly using the file
+    uploadFileToServer(file, file_name);
   }
+};
 
-  if (crop_file_url.value) cropper_dialog.value = true;
+const uploadFileToServer = async (file, file_name) => {
+  try {
+    // Create a form data object
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const { $axios } = useNuxtApp();
+    const response = await $axios.post('/api/v1/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      const fileName = response.data.data[0].file.name;
+      
+      // Store the file name in the corresponding form field
+      if (file_name === 'q_file') {
+        form.q_file = fileName;
+      } else if (file_name === 'answer_full_file') {
+        form.answer_full_file = fileName;
+      } else if (file_name === 'a_file') {
+        form.a_file = fileName;
+      } else if (file_name === 'b_file') {
+        form.b_file = fileName;
+      } else if (file_name === 'c_file') {
+        form.c_file = fileName;
+      } else if (file_name === 'd_file') {
+        form.d_file = fileName;
+      }
+    }
+  } catch (error) {
+    const toast = useNuxtApp().$toast;
+    if (toast) {
+      toast.error('Failed to upload file');
+    }
+    console.error('File upload error:', error);
+  }
 };
 
 const cropFile = ({ coordinates, canvas, image }) => {
@@ -1399,5 +1556,9 @@ onMounted(() => {
 .v-card img {
   max-width: 100%;
   height: auto;
+}
+
+.ckeditor-wrapper {
+  width: 100%;
 }
 </style>
