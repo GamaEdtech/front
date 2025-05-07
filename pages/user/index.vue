@@ -1,6 +1,15 @@
 <template>
   <div>
-    <template v-if="loader"></template>
+    <template v-if="loader">
+      <v-row>
+        <v-col cols="12" md="12">
+          <v-skeleton-loader height="200"></v-skeleton-loader>
+        </v-col>
+        <v-col cols="12" md="12">
+          <v-skeleton-loader height="200"></v-skeleton-loader>
+        </v-col>
+      </v-row>
+    </template>
     <template v-else>
       <!--Profile section-->
       <v-row>
@@ -131,6 +140,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useDisplay } from "vuetify";
+const { $toast } = useNuxtApp();
 
 definePageMeta({
   layout: "dashboard-layout",
@@ -166,7 +176,7 @@ const getUserInfo = async () => {
     if (error.response?.status === 403) {
       useAuth().logout();
     }
-    // $toast.error(error.response.data.message);
+    $toast.error(error.response.data.message);
   }
 };
 
