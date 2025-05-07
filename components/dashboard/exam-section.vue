@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="userType === '6'">
+  <v-row v-if="userType === 6">
     <v-col cols="12" class="px-0 px-sm-2">
       <v-card>
         <v-card-title class="text-h4">
