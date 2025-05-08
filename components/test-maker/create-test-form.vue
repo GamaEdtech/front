@@ -108,7 +108,11 @@
             <v-col cols="12" md="6" id="test-maker-question">
               <p>Question:</p>
               <ClientOnly fallback-tag="span" fallback="Loading...">
-                <Field name="question" rules="required" v-slot="{ errorMessage }">
+                <Field
+                  name="question"
+                  rules="required"
+                  v-slot="{ errorMessage }"
+                >
                   <RickEditor
                     v-model:modelValue="form.question"
                     min-height="200px"
@@ -116,27 +120,25 @@
                   >
                     <template #content>
                       <v-btn
-                        variant="flat"
-                        size="small"
+                        variant="text"
                         color="teal"
-                        icon
+                        icon="mdi-camera"
+                        size="small"
                         @click="selectFile('q_file')"
-                      >
-                        <v-icon>mdi-camera</v-icon>
-                      </v-btn>
+                      ></v-btn>
                       <v-btn
                         v-if="form.q_file_base64"
-                        variant="flat"
+                        variant="text"
                         size="small"
-                        color="red"
-                        icon
+                        color="error"
+                        icon="mdi-delete"
                         @click="deleteFile('q_file')"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
+                      ></v-btn>
                     </template>
                   </RickEditor>
-                  <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                  <p v-if="errorMessage" class="text-error text-caption mt-1">
+                    {{ errorMessage }}
+                  </p>
                 </Field>
               </ClientOnly>
               <img
@@ -155,31 +157,35 @@
               md="6"
               v-if="['tf', 'fourchoice', 'twochoice'].includes(form.type)"
             >
-              <!--Answer type-->
+              <!--Answer type toggle-->
               <v-row v-if="['fourchoice', 'twochoice'].includes(form.type)">
                 <v-col cols="12" class="d-flex align-center justify-center">
-                  <p class="mr-3 mt-5">Choices type:</p>
-                  <v-checkbox
-                    v-model="text_answer"
-                    label="Text"
-                    color="teal"
-                    class="mr-10"
-                    @click="answerTypeChanged('txt')"
-                    hide-details
-                  />
-                  <v-checkbox
-                    v-model="photo_answer"
-                    label="Photo"
-                    color="teal"
-                    @click="answerTypeChanged('photo')"
-                    hide-details
-                  />
+                  <p class="mr-3 mt-3">Choices type:</p>
+                  <v-btn-toggle 
+                    v-model="answerType" 
+                    color="teal" 
+                    density="comfortable" 
+                    mandatory
+                  >
+                    <v-btn value="text" @click="answerTypeChanged('txt')">
+                      <v-icon start>mdi-format-text</v-icon>
+                      Text
+                    </v-btn>
+                    <v-btn value="photo" @click="answerTypeChanged('photo')">
+                      <v-icon start>mdi-camera</v-icon>
+                      Photo
+                    </v-btn>
+                  </v-btn-toggle>
                 </v-col>
               </v-row>
               <!--End answer type-->
 
               <!--Test answer options-->
-              <Field name="true_answer" rules="required" v-slot="{ field, errorMessage }">
+              <Field
+                name="true_answer"
+                rules="required"
+                v-slot="{ field, errorMessage }"
+              >
                 <v-radio-group
                   v-model="form.true_answer"
                   id="test-image-options"
@@ -198,19 +204,29 @@
                       cols="11"
                       v-show="form.testImgAnswers === false"
                     >
-                      <Field 
-                        :name="'answer_a'" 
-                        :rules="text_answer_rules ? 'required' : ''" 
+                      <Field
+                        :name="'answer_a'"
+                        :rules="text_answer_rules ? 'required' : ''"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
                           <RickEditor
                             v-model:modelValue="form.answer_a"
-                             min-height="90px"
-                            :features="['bold', 'italic', 'underline', 'alignment']"
+                            min-height="90px"
+                            :features="[
+                              'bold',
+                              'italic',
+                              'underline',
+                              'alignment',
+                            ]"
                           >
                           </RickEditor>
-                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                          <p
+                            v-if="errorMessage"
+                            class="text-error text-caption mt-1"
+                          >
+                            {{ errorMessage }}
+                          </p>
                         </ClientOnly>
                       </Field>
                     </v-col>
@@ -231,27 +247,27 @@
                         <v-btn
                           v-else
                           variant="flat"
+                          color="teal-lighten-5"
                           class="image-input d-flex align-center justify-center"
-                          style="width: 90px; height: 90px;"
+                          style="width: 90px; height: 90px"
                           @click="selectFile('a_file')"
                         >
-                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
                           v-show="form.a_file_base64"
                           @click="deleteFile('a_file')"
-                          variant="flat"
-                          color="red"
-                          icon
+                          variant="text"
+                          color="error"
+                          icon="mdi-delete"
+                          size="small"
                           class="img-clear-btn"
-                        >
-                          <v-icon small>mdi-delete</v-icon>
-                        </v-btn>
+                        ></v-btn>
                       </div>
                     </v-col>
                   </v-row>
-                  
+
                   <v-row
                     v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
                   >
@@ -264,19 +280,29 @@
                       cols="11"
                       v-show="form.testImgAnswers === false"
                     >
-                      <Field 
-                        :name="'answer_b'" 
-                        :rules="text_answer_rules ? 'required' : ''" 
+                      <Field
+                        :name="'answer_b'"
+                        :rules="text_answer_rules ? 'required' : ''"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
                           <RickEditor
                             v-model:modelValue="form.answer_b"
                             min-height="90px"
-                            :features="['bold', 'italic', 'underline', 'alignment']"
+                            :features="[
+                              'bold',
+                              'italic',
+                              'underline',
+                              'alignment',
+                            ]"
                           >
                           </RickEditor>
-                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                          <p
+                            v-if="errorMessage"
+                            class="text-error text-caption mt-1"
+                          >
+                            {{ errorMessage }}
+                          </p>
                         </ClientOnly>
                       </Field>
                     </v-col>
@@ -297,27 +323,27 @@
                         <v-btn
                           v-else
                           variant="flat"
+                          color="teal-lighten-5"
                           class="image-input d-flex align-center justify-center"
-                          style="width: 90px; height: 90px;"
+                          style="width: 90px; height: 90px"
                           @click="selectFile('b_file')"
                         >
-                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
                           v-show="form.b_file_base64"
                           @click="deleteFile('b_file')"
-                          variant="flat"
-                          color="red"
-                          icon
+                          variant="text"
+                          color="error"
+                          icon="mdi-delete"
+                          size="small"
                           class="img-clear-btn"
-                        >
-                          <v-icon small>mdi-delete</v-icon>
-                        </v-btn>
+                        ></v-btn>
                       </div>
                     </v-col>
                   </v-row>
-                  
+
                   <v-row v-if="form.type == 'fourchoice'">
                     <v-col class="pb-0" cols="1">
                       <v-radio value="3"></v-radio>
@@ -328,19 +354,29 @@
                       cols="11"
                       v-show="form.testImgAnswers === false"
                     >
-                      <Field 
-                        :name="'answer_c'" 
-                        :rules="text_answer_rules ? 'required' : ''" 
+                      <Field
+                        :name="'answer_c'"
+                        :rules="text_answer_rules ? 'required' : ''"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
                           <RickEditor
                             v-model:modelValue="form.answer_c"
                             min-height="90px"
-                            :features="['bold', 'italic', 'underline', 'alignment']"
+                            :features="[
+                              'bold',
+                              'italic',
+                              'underline',
+                              'alignment',
+                            ]"
                           >
                           </RickEditor>
-                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                          <p
+                            v-if="errorMessage"
+                            class="text-error text-caption mt-1"
+                          >
+                            {{ errorMessage }}
+                          </p>
                         </ClientOnly>
                       </Field>
                     </v-col>
@@ -361,27 +397,27 @@
                         <v-btn
                           v-else
                           variant="flat"
+                          color="teal-lighten-5"
                           class="image-input d-flex align-center justify-center"
-                          style="width: 90px; height: 90px;"
+                          style="width: 90px; height: 90px"
                           @click="selectFile('c_file')"
                         >
-                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
                           v-show="form.c_file_base64"
                           @click="deleteFile('c_file')"
-                          variant="flat"
-                          color="red"
-                          icon
+                          variant="text"
+                          color="error"
+                          icon="mdi-delete"
+                          size="small"
                           class="img-clear-btn"
-                        >
-                          <v-icon small>mdi-delete</v-icon>
-                        </v-btn>
+                        ></v-btn>
                       </div>
                     </v-col>
                   </v-row>
-                  
+
                   <v-row v-if="form.type == 'fourchoice'">
                     <v-col class="pb-0" cols="1">
                       <v-radio value="4"></v-radio>
@@ -392,19 +428,29 @@
                       cols="11"
                       v-show="form.testImgAnswers === false"
                     >
-                      <Field 
-                        :name="'answer_d'" 
-                        :rules="text_answer_rules ? 'required' : ''" 
+                      <Field
+                        :name="'answer_d'"
+                        :rules="text_answer_rules ? 'required' : ''"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
                           <RickEditor
                             v-model:modelValue="form.answer_d"
                             min-height="90px"
-                            :features="['bold', 'italic', 'underline', 'alignment']"
+                            :features="[
+                              'bold',
+                              'italic',
+                              'underline',
+                              'alignment',
+                            ]"
                           >
                           </RickEditor>
-                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                          <p
+                            v-if="errorMessage"
+                            class="text-error text-caption mt-1"
+                          >
+                            {{ errorMessage }}
+                          </p>
                         </ClientOnly>
                       </Field>
                     </v-col>
@@ -416,7 +462,7 @@
                       <div class="image-holder">
                         <img
                           width="200"
-                          height="200" 
+                          height="200"
                           class="pointer image-input rounded"
                           v-if="form.d_file_base64"
                           @click="selectFile('d_file')"
@@ -425,23 +471,23 @@
                         <v-btn
                           v-else
                           variant="flat"
+                          color="teal-lighten-5"
                           class="image-input d-flex align-center justify-center"
-                          style="width: 90px; height: 90px;"
+                          style="width: 90px; height: 90px"
                           @click="selectFile('d_file')"
                         >
-                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
                           v-show="form.d_file_base64"
                           @click="deleteFile('d_file')"
-                          variant="flat"
-                          color="red"
-                          icon
+                          variant="text"
+                          color="error"
+                          icon="mdi-delete"
+                          size="small"
                           class="img-clear-btn"
-                        >
-                          <v-icon small>mdi-delete</v-icon>
-                        </v-btn>
+                        ></v-btn>
                       </div>
                     </v-col>
                   </v-row>
@@ -449,7 +495,204 @@
               </Field>
               <!--End test answer options-->
             </v-col>
+
+            <!--Solution section-->
+            <v-col
+              cols="12"
+              :md="
+                ['tf', 'fourchoice', 'twochoice'].includes(form.type) ? 12 : 6
+              "
+              :id="
+                ['tf', 'fourchoice', 'twochoice'].includes(form.type)
+                  ? 'test-maker-answer'
+                  : 'test-maker-answer-alternative'
+              "
+            >
+              <p>Solution:</p>
+              <ClientOnly fallback-tag="span" fallback="Loading...">
+                <RickEditor
+                  v-model:modelValue="form.answer_full"
+                  min-height="90px"
+                  :features="['bold', 'italic', 'underline', 'alignment']"
+                >
+                </RickEditor>
+              </ClientOnly>
+              <img
+                width="90"
+                height="90"
+                class="pointer image-input rounded"
+                v-if="form.answer_full_file_base64"
+                @click="selectFile('answer_full_file')"
+                :src="form.answer_full_file_base64"
+              />
+              <v-btn
+                v-else
+                variant="flat"
+                color="teal-lighten-5"
+                class="image-input d-flex align-center justify-center"
+                style="width: 90px; height: 90px"
+                @click="selectFile('answer_full_file')"
+              >
+                <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+              </v-btn>
+
+              <v-btn
+                v-show="form.answer_full_file_base64"
+                @click="deleteFile('answer_full_file')"
+                variant="text"
+                color="error"
+                icon="mdi-delete"
+                size="small"
+                class="img-clear-btn"
+              >
+                <v-icon small> mdi-delete </v-icon>
+              </v-btn>
+            </v-col>
+            <!--End solution section-->
           </v-row>
+
+          <v-row>
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="12" md="6" class="pb-0">
+                  <v-btn
+                    type="submit"
+                    :disabled="invalid"
+                    :loading="create_loading"
+                    lg
+                    color="teal"
+                    class="white--text"
+                    block
+                  >
+                    Create
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    @click="goToPreviewStep"
+                    :disabled="examTestListLength < 5"
+                    lg
+                    color="teal"
+                    class="white--text"
+                    block
+                  >
+                    <span v-show="examTestListLength < 5"
+                      >Add at least {{ 5 - examTestListLength }} more
+                      tests</span
+                    >
+                    <span v-show="examTestListLength >= 5">Next step</span>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+
+          <!--Hidden input section-->
+          <div>
+            <Field name="q_file" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('q_file')"
+                v-model="form_hidden_data.q_file"
+                ref="questionInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+
+            <Field name="answer_full_file" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('answer_full_file')"
+                v-model="form_hidden_data.answer_full_file"
+                ref="answerFullInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+            
+            <Field name="a_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('a_file')"
+                v-model="form_hidden_data.a_file"
+                ref="aInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+            
+            <Field name="b_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('b_file')"
+                v-model="form_hidden_data.b_file"
+                ref="bInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+
+            <Field name="c_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('c_file')"
+                v-model="form_hidden_data.c_file"
+                ref="cInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+            
+            <Field name="d_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,image/jpeg,image/jpg"
+                @change="uploadFile('d_file')"
+                v-model="form_hidden_data.d_file"
+                ref="dInput"
+                :error-messages="errorMessage"
+              />
+            </Field>
+          </div>
+          
+
+          <!-- <v-row>
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="12" md="6" class="pb-0">
+                  <v-btn
+                    type="submit"
+                    :disabled="invalid"
+                    :loading="create_loading"
+                    lg
+                    color="teal"
+                    class="white--text"
+                    block
+                  >
+                    Create
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    @click="goToPreviewStep"
+                    :disabled="examTestListLength < 5"
+                    lg
+                    color="teal"
+                    class="white--text"
+                    block
+                  >
+                    <span v-show="examTestListLength < 5"
+                      >Add at least {{ 5 - examTestListLength }} more
+                      tests</span
+                    >
+                    <span v-show="examTestListLength >= 5">Next step</span>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row> -->
+
           <!-- 
           <v-row>
             <v-col cols="12">
@@ -542,7 +785,20 @@ const test_step = ref(1);
 const text_answer = ref(true);
 const text_answer_rules = ref("required");
 const photo_answer = ref(false);
-const photo_answer_rules = ref("");
+const photo_answer_rules = ref((value) => {
+  if (!value) return true;
+  
+  if (form.testImgAnswers && form.true_answer) {
+    const option = form.true_answer.toLowerCase();
+    if (option === 'a' || option === 'b' || option === 'c' || option === 'd') {
+      const optionFile = form_hidden_data[`${option}_file`];
+      if (!optionFile) {
+        return 'Please upload an image for the correct answer';
+      }
+    }
+  }
+  return true;
+});
 const examTestListLength = ref(0);
 const file_original_path = ref("");
 const crop_file_url = ref("");
@@ -692,6 +948,9 @@ const {
   },
 });
 
+// Add this with the other refs
+const answerType = ref("text"); // Default to text answers
+
 // Methods
 const getTypeList = async (type, parent = "") => {
   const params = { type };
@@ -785,15 +1044,15 @@ const selectFile = (file_name) => {
   if (file_name === "q_file") {
     questionInput.value?.click();
   } else if (file_name === "answer_full_file") {
-    document.querySelector('input[ref="answerFullInput"]')?.click();
+    answerFullInput.value?.click();
   } else if (file_name === "a_file") {
-    document.querySelector('input[ref="aInput"]')?.click();
+    aInput.value?.click();
   } else if (file_name === "b_file") {
-    document.querySelector('input[ref="bInput"]')?.click();
+    bInput.value?.click();
   } else if (file_name === "c_file") {
-    document.querySelector('input[ref="cInput"]')?.click();
+    cInput.value?.click();
   } else if (file_name === "d_file") {
-    document.querySelector('input[ref="dInput"]')?.click();
+    dInput.value?.click();
   }
 };
 
@@ -920,27 +1179,17 @@ const deleteFile = (file_name) => {
 
 const answerTypeChanged = (type) => {
   if (type === "txt") {
-    if (text_answer.value === true) {
-      photo_answer.value = false;
-      form.testImgAnswers = false;
-      text_answer_rules.value = "required";
-      photo_answer_rules.value = "";
-    } else {
-      photo_answer.value = true;
-      form.testImgAnswers = true;
-      text_answer_rules.value = "";
-    }
+    text_answer.value = true;
+    photo_answer.value = false;
+    form.testImgAnswers = false;
+    text_answer_rules.value = "required";
+    answerType.value = "text";
   } else {
-    if (photo_answer.value === true) {
-      text_answer.value = false;
-      form.testImgAnswers = true;
-      text_answer_rules.value = "";
-    } else {
-      text_answer.value = true;
-      form.testImgAnswers = false;
-      text_answer_rules.value = "required";
-      photo_answer_rules.value = "";
-    }
+    text_answer.value = false;
+    photo_answer.value = true;
+    form.testImgAnswers = true;
+    text_answer_rules.value = "";
+    answerType.value = "photo";
   }
 };
 
