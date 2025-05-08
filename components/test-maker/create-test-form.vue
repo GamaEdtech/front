@@ -71,24 +71,12 @@
               class="mt-2"
               v-show="path_panel_expand"
             >
-              <v-autocomplete
-                v-model="form.topic"
-                :items="topic_list"
-                label="Topic"
-                item-title="title"
-                item-value="id"
-                variant="outlined"
-                density="compact"
-              >
-                <template v-slot:item="data">
-                  <p
-                    :class="data.item.season ? 'topic_season' : ''"
-                    class="topic_list_item py-2"
-                  >
-                    {{ data.item.title }}
-                  </p>
-                </template>
-              </v-autocomplete>
+            <FormTopicSelector
+                  ref="topicSelector"
+                  :selectedTopics="selected_topics"
+                  :topic-list="topic_list"
+                  @selectTopic="selectTopic"
+                />
             </v-col>
 
             <v-col cols="12" md="2" class="mt-2">
@@ -557,7 +545,7 @@
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     type="submit"
-                    :disabled="invalid"
+                    :disabled="!meta.valid"
                     :loading="create_loading"
                     lg
                     color="teal"
@@ -751,7 +739,7 @@ import * as yup from "yup";
 defineRule("required", required);
 
 // Get services
-const { $toast, $fetch } = useNuxtApp();
+const { $toast } = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 
@@ -920,6 +908,7 @@ const {
   handleSubmit: veeHandleSubmit,
   isSubmitting,
   validate,
+  meta
 } = useForm({
   validationSchema,
   initialValues: {
@@ -1100,8 +1089,9 @@ const uploadFileToServer = async (file, file_name) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const { $axios } = useNuxtApp();
-    const response = await $axios.post("/api/v1/upload", formData, {
+    const response = await $fetch("/api/v1/upload", {
+      method: "POST",
+      body: formData,
       headers: {
         "Content-Type": "multipart/form-data",
       },
