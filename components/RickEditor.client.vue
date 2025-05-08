@@ -2,373 +2,246 @@
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 import {
   ClassicEditor,
-  AccessibilityHelp,
   Alignment,
-  Autoformat,
-  AutoImage,
-  AutoLink,
-  Autosave,
-  BlockQuote,
   Bold,
-  CloudServices,
-  Code,
-  CodeBlock,
   Essentials,
-  FindAndReplace,
-  FontBackgroundColor,
-  FontColor,
-  FontFamily,
-  FontSize,
-  GeneralHtmlSupport,
-  Heading,
-  Highlight,
-  HorizontalLine,
-  HtmlEmbed,
-  ImageBlock,
-  ImageCaption,
-  ImageInline,
-  ImageInsertViaUrl,
-  ImageResize,
-  ImageStyle,
-  ImageTextAlternative,
-  ImageToolbar,
-  ImageUpload,
-  Indent,
-  IndentBlock,
   Italic,
-  Link,
-  LinkImage,
-  List,
-  ListProperties,
-  Markdown,
-  Mention,
-  PageBreak,
   Paragraph,
-  PasteFromMarkdownExperimental,
-  PasteFromOffice,
-  RemoveFormat,
-  SelectAll,
-  ShowBlocks,
-  SourceEditing,
-  SpecialCharacters,
-  SpecialCharactersArrows,
-  SpecialCharactersCurrency,
-  SpecialCharactersEssentials,
-  SpecialCharactersLatin,
-  SpecialCharactersMathematical,
-  SpecialCharactersText,
-  Strikethrough,
-  Style,
-  Subscript,
-  Superscript,
-  Table,
-  TableCaption,
-  TableCellProperties,
-  TableColumnResize,
-  TableProperties,
-  TableToolbar,
-  TextTransformation,
-  TodoList,
   Underline,
   Undo,
 } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 
+// Define props to customize the editor features
+const props = defineProps({
+  /**
+   * Features to enable in the toolbar
+   * @type {Array}
+   * @default ['bold', 'underline', 'alignment']
+   */
+  features: {
+    type: Array,
+    default: () => ['bold', 'underline', 'alignment'],
+    validator: (value) => {
+      const allowedFeatures = ['bold', 'italic', 'underline', 'alignment'];
+      return value.every(feature => allowedFeatures.includes(feature));
+    }
+  },
+  
+  /**
+   * Placeholder text for the editor
+   * @type {String}
+   */
+  placeholder: {
+    type: String,
+    default: ""
+  },
+  
+  /**
+   * Initial content for the editor
+   * @type {String}
+   */
+  initialData: {
+    type: String,
+    default: ""
+  },
+  
+  /**
+   * Editor height
+   * @type {String}
+   */
+  height: {
+    type: String,
+    default: "auto"
+  },
+  
+  /**
+   * Editor width
+   * @type {String}
+   */
+  width: {
+    type: String,
+    default: "100%"
+  },
+  
+  /**
+   * Editor min-height
+   * @type {String}
+   */
+  minHeight: {
+    type: String,
+    default: "250px"
+  },
+  
+  /**
+   * Editor max-height
+   * @type {String}
+   */
+  maxHeight: {
+    type: String,
+    default: "500px"
+  },
+  
+  /**
+   * Border radius
+   * @type {String}
+   */
+  borderRadius: {
+    type: String,
+    default: "4px"
+  },
+  
+  /**
+   * Border color
+   * @type {String}
+   */
+  borderColor: {
+    type: String,
+    default: "#ccc"
+  },
+  
+  /**
+   * Background color
+   * @type {String}
+   */
+  backgroundColor: {
+    type: String,
+    default: "#ffffff"
+  },
+  
+  /**
+   * Custom class names
+   * @type {String}
+   */
+  customClass: {
+    type: String,
+    default: ""
+  },
+  
+  /**
+   * Additional styles as an object
+   * @type {Object}
+   */
+  additionalStyles: {
+    type: Object,
+    default: () => ({})
+  }
+});
+
 const modelValue = defineModel("modelValue");
+
+// Define the mapping between feature names and toolbar items
+const featureToToolbarItem = {
+  bold: "bold",
+  italic: "italic",
+  underline: "underline",
+  alignment: "alignment"
+};
+
+// Define the mapping between feature names and required plugins
+const featureToPlugin = {
+  bold: Bold,
+  italic: Italic,
+  underline: Underline,
+  alignment: Alignment
+};
+
+// Generate toolbar items based on enabled features
+const generateToolbarItems = () => {
+  const items = [];
+  
+  // Always include undo/redo for better UX
+  items.push("undo", "redo", "|");
+  
+  // Add enabled features to toolbar
+  props.features.forEach(feature => {
+    if (featureToToolbarItem[feature]) {
+      items.push(featureToToolbarItem[feature]);
+    }
+  });
+  
+  return items;
+};
+
+// Generate plugins list based on enabled features
+const generatePlugins = () => {
+  // Always include essential plugins
+  const plugins = [Essentials, Paragraph, Undo];
+  
+  // Add plugins for enabled features
+  props.features.forEach(feature => {
+    if (featureToPlugin[feature]) {
+      plugins.push(featureToPlugin[feature]);
+    }
+  });
+  
+  return plugins;
+};
+
+// Computed property to generate styles
+const editorStyles = {
+  width: props.width,
+  height: props.height,
+  minHeight: props.minHeight,
+  maxHeight: props.maxHeight,
+  ...props.additionalStyles
+};
+
+// Create editor configuration
 const editorConfig = {
   toolbar: {
-    items: [
-      "undo",
-      "redo",
-      "|",
-      "sourceEditing",
-      "showBlocks",
-      "findAndReplace",
-      "|",
-      "heading",
-      "style",
-      "|",
-      "fontSize",
-      "fontFamily",
-      "fontColor",
-      "fontBackgroundColor",
-      "|",
-      "bold",
-      "italic",
-      "underline",
-      "strikethrough",
-      "subscript",
-      "superscript",
-      "code",
-      "removeFormat",
-      "|",
-      "specialCharacters",
-      "horizontalLine",
-      "pageBreak",
-      "link",
-      "insertImageViaUrl",
-      "insertTable",
-      "highlight",
-      "blockQuote",
-      "codeBlock",
-      "htmlEmbed",
-      "|",
-      "alignment",
-      "|",
-      "bulletedList",
-      "numberedList",
-      "todoList",
-      "outdent",
-      "indent",
-    ],
+    items: generateToolbarItems(),
     shouldNotGroupWhenFull: false,
   },
-  plugins: [
-    AccessibilityHelp,
-    Alignment,
-    Autoformat,
-    AutoImage,
-    AutoLink,
-    Autosave,
-    BlockQuote,
-    Bold,
-    CloudServices,
-    Code,
-    CodeBlock,
-    Essentials,
-    FindAndReplace,
-    FontBackgroundColor,
-    FontColor,
-    FontFamily,
-    FontSize,
-    GeneralHtmlSupport,
-    Heading,
-    Highlight,
-    HorizontalLine,
-    HtmlEmbed,
-    ImageBlock,
-    ImageCaption,
-    ImageInline,
-    ImageInsertViaUrl,
-    ImageResize,
-    ImageStyle,
-    ImageTextAlternative,
-    ImageToolbar,
-    ImageUpload,
-    Indent,
-    IndentBlock,
-    Italic,
-    Link,
-    LinkImage,
-    List,
-    ListProperties,
-    Markdown,
-    Mention,
-    PageBreak,
-    Paragraph,
-    PasteFromMarkdownExperimental,
-    PasteFromOffice,
-    RemoveFormat,
-    SelectAll,
-    ShowBlocks,
-    SourceEditing,
-    SpecialCharacters,
-    SpecialCharactersArrows,
-    SpecialCharactersCurrency,
-    SpecialCharactersEssentials,
-    SpecialCharactersLatin,
-    SpecialCharactersMathematical,
-    SpecialCharactersText,
-    Strikethrough,
-    Style,
-    Subscript,
-    Superscript,
-    Table,
-    TableCaption,
-    TableCellProperties,
-    TableColumnResize,
-    TableProperties,
-    TableToolbar,
-    TextTransformation,
-    TodoList,
-    Underline,
-    Undo,
-  ],
-  fontFamily: {
-    supportAllValues: true,
-  },
-  fontSize: {
-    options: [10, 12, 14, "default", 18, 20, 22],
-    supportAllValues: true,
-  },
-  heading: {
-    options: [
-      {
-        model: "paragraph",
-        title: "Paragraph",
-        class: "ck-heading_paragraph",
-      },
-      {
-        model: "heading1",
-        view: "h1",
-        title: "Heading 1",
-        class: "ck-heading_heading1",
-      },
-      {
-        model: "heading2",
-        view: "h2",
-        title: "Heading 2",
-        class: "ck-heading_heading2",
-      },
-      {
-        model: "heading3",
-        view: "h3",
-        title: "Heading 3",
-        class: "ck-heading_heading3",
-      },
-      {
-        model: "heading4",
-        view: "h4",
-        title: "Heading 4",
-        class: "ck-heading_heading4",
-      },
-      {
-        model: "heading5",
-        view: "h5",
-        title: "Heading 5",
-        class: "ck-heading_heading5",
-      },
-      {
-        model: "heading6",
-        view: "h6",
-        title: "Heading 6",
-        class: "ck-heading_heading6",
-      },
-    ],
-  },
-  htmlSupport: {
-    allow: [
-      {
-        name: /^.*$/,
-        styles: true,
-        attributes: true,
-        classes: true,
-      },
-    ],
-  },
-  image: {
-    toolbar: [
-      "toggleImageCaption",
-      "imageTextAlternative",
-      "|",
-      "imageStyle:inline",
-      "imageStyle:wrapText",
-      "imageStyle:breakText",
-      "|",
-      "resizeImage",
-    ],
-  },
-  initialData:
-    '<h2>Congratulations on setting up CKEditor 5! 🎉</h2>\n<p>\n    You\'ve successfully created a CKEditor 5 project. This powerful text editor will enhance your application, enabling rich text editing\n    capabilities that are customizable and easy to use.\n</p>\n<h3>What\'s next?</h3>\n<ol>\n    <li>\n        <strong>Integrate into your app</strong>: time to bring the editing into your application. Take the code you created and add to your\n        application.\n    </li>\n    <li>\n        <strong>Explore features:</strong> Experiment with different plugins and toolbar options to discover what works best for your needs.\n    </li>\n    <li>\n        <strong>Customize your editor:</strong> Tailor the editor\'s configuration to match your application\'s style and requirements. Or even\n        write your plugin!\n    </li>\n</ol>\n<p>\n    Keep experimenting, and don\'t hesitate to push the boundaries of what you can achieve with CKEditor 5. Your feedback is invaluable to us\n    as we strive to improve and evolve. Happy editing!\n</p>\n<h3>Helpful resources</h3>\n<ul>\n    <li>📝 <a href="https://orders.ckeditor.com/trial/premium-features">Trial sign up</a>,</li>\n    <li>📕 <a href="https://ckeditor.com/docs/ckeditor5/latest/installation/index.html">Documentation</a>,</li>\n    <li>⭐️ <a href="https://github.com/ckeditor/ckeditor5">GitHub</a> (star us if you can!),</li>\n    <li>🏠 <a href="https://ckeditor.com">CKEditor Homepage</a>,</li>\n    <li>🧑‍💻 <a href="https://ckeditor.com/ckeditor-5/demo/">CKEditor 5 Demos</a>,</li>\n</ul>\n<h3>Need help?</h3>\n<p>\n    See this text, but the editor is not starting up? Check the browser\'s console for clues and guidance. It may be related to an incorrect\n    license key if you use premium features or another feature-related requirement. If you cannot make it work, file a GitHub issue, and we\n    will help as soon as possible!\n</p>\n',
-  link: {
-    addTargetToExternalLinks: true,
-    defaultProtocol: "https://",
-    decorators: {
-      toggleDownloadable: {
-        mode: "manual",
-        label: "Downloadable",
-        attributes: {
-          download: "file",
-        },
-      },
-    },
-  },
-  list: {
-    properties: {
-      styles: true,
-      startIndex: true,
-      reversed: true,
-    },
-  },
-  mention: {
-    feeds: [
-      {
-        marker: "@",
-        feed: [
-          /* See: https://ckeditor.com/docs/ckeditor5/latest/features/mentions.html */
-        ],
-      },
-    ],
-  },
-  menuBar: {
-    isVisible: true,
-  },
-  placeholder: "Type or paste your content here!",
-  style: {
-    definitions: [
-      {
-        name: "Article category",
-        element: "h3",
-        classes: ["category"],
-      },
-      {
-        name: "Title",
-        element: "h2",
-        classes: ["document-title"],
-      },
-      {
-        name: "Subtitle",
-        element: "h3",
-        classes: ["document-subtitle"],
-      },
-      {
-        name: "Info box",
-        element: "p",
-        classes: ["info-box"],
-      },
-      {
-        name: "Side quote",
-        element: "blockquote",
-        classes: ["side-quote"],
-      },
-      {
-        name: "Marker",
-        element: "span",
-        classes: ["marker"],
-      },
-      {
-        name: "Spoiler",
-        element: "span",
-        classes: ["spoiler"],
-      },
-      {
-        name: "Code (dark)",
-        element: "pre",
-        classes: ["fancy-code", "fancy-code-dark"],
-      },
-      {
-        name: "Code (bright)",
-        element: "pre",
-        classes: ["fancy-code", "fancy-code-bright"],
-      },
-    ],
-  },
-  table: {
-    contentToolbar: [
-      "tableColumn",
-      "tableRow",
-      "mergeTableCells",
-      "tableProperties",
-      "tableCellProperties",
-    ],
-  },
+  plugins: generatePlugins(),
+  placeholder: props.placeholder,
+  initialData: props.initialData,
 };
 </script>
 
 <template>
-  <Ckeditor
-    :editor="ClassicEditor"
-    :config="editorConfig"
-    v-model="modelValue"
-  />
+  <div 
+    class="rich-editor-container" 
+    :class="customClass"
+    :style="{
+      borderRadius: borderRadius,
+      borderColor: borderColor,
+      backgroundColor: backgroundColor
+    }"
+  >
+    <Ckeditor
+      :editor="ClassicEditor"
+      :config="editorConfig"
+      :style="editorStyles"
+      v-model="modelValue"
+    />
+  </div>
 </template>
+
+<style>
+.rich-editor-container {
+  border: 1px solid;
+  overflow: hidden;
+}
+
+/* Customize the editor's toolbar */
+.rich-editor-container .ck-toolbar {
+  border-bottom-color: inherit;
+}
+
+/* Customize the editor's content area */
+.rich-editor-container .ck-editor__editable {
+  padding: 0 10px;
+}
+
+/* Ensure editor takes full height of container */
+.rich-editor-container .ck-editor__main {
+  height: 100%;
+
+}
+
+.rich-editor-container .ck-editor__main > * {
+  min-height: 500px;
+}
+</style>
+
