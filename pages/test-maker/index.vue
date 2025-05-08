@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-8" id="test-album">
+  <v-container class="mt-14" id="test-album">
     <!--Mobile filter-->
     <v-row justify="center" class="d-block d-md-none">
       <v-dialog
@@ -58,6 +58,7 @@
                   item-value="id"
                   label="Curriculum"
                   variant="outlined"
+                  color="orange"
                 />
               </v-col>
               <v-col cols="12" md="3">
@@ -70,6 +71,7 @@
                   item-title="title"
                   label="Grade"
                   variant="outlined"
+                  color="orange"
                 />
               </v-col>
               <v-col cols="12" md="3">
@@ -82,6 +84,7 @@
                   clearable
                   label="Subject"
                   variant="outlined"
+                  color="orange"
                 />
               </v-col>
             </v-row>
@@ -123,8 +126,9 @@
               :items="level_list"
               item-title="title"
               item-value="id"
-              label="Curriculum"
+              label="Board"
               variant="outlined"
+              color="orange"
             />
           </v-col>
           <v-col cols="12" md="3">
@@ -137,6 +141,7 @@
               item-title="title"
               label="Grade"
               variant="outlined"
+              color="orange"
             />
           </v-col>
           <v-col cols="12" md="3">
@@ -149,6 +154,7 @@
               clearable
               label="Subject"
               variant="outlined"
+              color="orange"
             />
           </v-col>
         </v-row>
@@ -230,7 +236,9 @@
               <v-card-actions>
                 <v-chip label class="test-count-label">
                   <span class="label-text">Test count:&nbsp; </span>
-                  <span class="label-val">{{ formatNumber(album.tests_num) }}</span>
+                  <span class="label-val">{{
+                    formatNumber(album.tests_num)
+                  }}</span>
                 </v-chip>
               </v-card-actions>
             </v-card>
@@ -298,7 +306,7 @@ const album_list = ref([]);
 // Utility Functions
 const formatNumber = (value) => {
   if (!value) return "0";
-  
+
   const val = parseInt(value, 10);
   return val.toLocaleString();
 };
@@ -306,7 +314,7 @@ const formatNumber = (value) => {
 // Methods
 const getTypeList = async (type, parent = "") => {
   const params = { type };
-  
+
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
 
@@ -315,7 +323,7 @@ const getTypeList = async (type, parent = "") => {
       method: "GET",
       params,
     });
-    
+
     if (type === "section") {
       level_list.value = res.data;
     } else if (type === "base") {
@@ -331,7 +339,7 @@ const getTypeList = async (type, parent = "") => {
 const getAlbumList = async () => {
   if (all_files_loaded.value === false) {
     page_loading.value = true;
-    
+
     try {
       const response = await $fetch("/api/v1/albums", {
         method: "GET",
@@ -343,10 +351,10 @@ const getAlbumList = async () => {
           lesson: filter.lesson,
         },
       });
-      
+
       let result = response.data.list;
       for (const item of result) {
-        if (album_list.value.findIndex(x => x.id === item.id) === -1) {
+        if (album_list.value.findIndex((x) => x.id === item.id) === -1) {
           album_list.value.push(item);
         }
       }
@@ -366,13 +374,17 @@ const getAlbumList = async () => {
 const setupInfiniteScroll = () => {
   window.onscroll = () => {
     // Scroll position
-    const scrollPosition = Math.max(
-      window.pageYOffset,
-      document.documentElement.scrollTop,
-      document.body.scrollTop
-    ) + window.innerHeight + 50;
-    
-    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight;
+    const scrollPosition =
+      Math.max(
+        window.pageYOffset,
+        document.documentElement.scrollTop,
+        document.body.scrollTop
+      ) +
+      window.innerHeight +
+      50;
+
+    const bottomOfWindow =
+      scrollPosition >= document.documentElement.offsetHeight;
 
     // Avoid the number of requests
     if (timer.value) {
@@ -399,40 +411,49 @@ const imgErrorHandler = (item, key) => {
 };
 
 // Watchers
-watch(() => filter.level, (val) => {
-  filter.grade = "";
-  filter.lesson = "";
-  
-  if (val) {
-    getTypeList("base", val);
-  }
-  
-  page.value = 1;
-  all_files_loaded.value = false;
-  album_list.value = [];
-  getAlbumList();
-});
+watch(
+  () => filter.level,
+  (val) => {
+    filter.grade = "";
+    filter.lesson = "";
 
-watch(() => filter.grade, (val) => {
-  filter.lesson = "";
-  
-  if (val) {
-    album_list.value = [];
-    page.value = 1;
-    all_files_loaded.value = false;
-    getAlbumList();
-    getTypeList("lesson", val);
-  }
-});
+    if (val) {
+      getTypeList("base", val);
+    }
 
-watch(() => filter.lesson, (val) => {
-  if (val) {
     page.value = 1;
     all_files_loaded.value = false;
     album_list.value = [];
     getAlbumList();
   }
-});
+);
+
+watch(
+  () => filter.grade,
+  (val) => {
+    filter.lesson = "";
+
+    if (val) {
+      album_list.value = [];
+      page.value = 1;
+      all_files_loaded.value = false;
+      getAlbumList();
+      getTypeList("lesson", val);
+    }
+  }
+);
+
+watch(
+  () => filter.lesson,
+  (val) => {
+    if (val) {
+      page.value = 1;
+      all_files_loaded.value = false;
+      album_list.value = [];
+      getAlbumList();
+    }
+  }
+);
 
 // Lifecycle hooks
 onMounted(() => {
