@@ -198,7 +198,6 @@ const editorConfig = {
   initialData: props.initialData,
 };
 </script>
-
 <template>
   <div 
     class="rich-editor-container" 
@@ -216,6 +215,9 @@ const editorConfig = {
       :style="editorStyles"
       v-model="modelValue"
     />
+    <div class="editor-custom-tools">
+      <slot name="content"></slot>
+    </div>
   </div>
 </template>
 
@@ -223,6 +225,7 @@ const editorConfig = {
 .rich-editor-container {
   border: 1px solid;
   overflow: hidden;
+  position: relative;
 }
 
 /* Customize the editor's toolbar */
@@ -243,5 +246,15 @@ const editorConfig = {
 .rich-editor-container .ck-editor__main > * {
   min-height: var(--editor-min-height);
 }
-</style>
 
+/* Custom tools area for camera button and image preview */
+.editor-custom-tools {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+</style>

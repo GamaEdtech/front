@@ -11,7 +11,7 @@
       <v-card-text id="test-question">
         <VeeForm @submit="submitQuestion">
           <v-row>
-            <v-col cols="12" md="2" class="mt-2"  v-show="path_panel_expand">
+            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
               <v-autocomplete
                 v-model="form.section"
                 :items="level_list"
@@ -65,8 +65,12 @@
                 <span> Change path </span>
               </v-tooltip>
             </v-col>
-
-            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+            <v-col
+              :cols="path_panel_expand ? 12 : 10"
+              :md="path_panel_expand ? 2 : 9"
+              class="mt-2"
+              v-show="path_panel_expand"
+            >
               <v-autocomplete
                 v-model="form.topic"
                 :items="topic_list"
@@ -75,10 +79,19 @@
                 item-value="id"
                 variant="outlined"
                 density="compact"
-              ></v-autocomplete>
+              >
+                <template v-slot:item="data">
+                  <p
+                    :class="data.item.season ? 'topic_season' : ''"
+                    class="topic_list_item py-2"
+                  >
+                    {{ data.item.title }}
+                  </p>
+                </template>
+              </v-autocomplete>
             </v-col>
 
-            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+            <v-col cols="12" md="2" class="mt-2">
               <v-autocomplete
                 v-model="form.type"
                 :items="typeList"
@@ -90,915 +103,351 @@
                 :rules="[(v) => !!v || 'Question type is required']"
               ></v-autocomplete>
             </v-col>
-            <v-col cols="12" md="6">
-              <div class="mb-3 h-full">
-                <label class="text-h6 mb-2 d-block">Question:</label>
-                <div class="d-flex">
-                  <div class="flex-grow-1">
-                    <RickEditor
-                      v-model:modelValue="form.question"
-                      min-height="500px"
-                      :features="['bold', 'italic', 'underline', 'alignment']"
-                    />
-                  </div>
-                </div>
-              </div>
-              <input
-                ref="questionInput"
-                type="file"
-                accept="image/*"
-                style="display: none"
-                @change="
-                  form_hidden_data.q_file = $event.target.files[0];
-                  uploadFile('q_file');
-                "
-              />
-              <v-card v-if="form.q_file_base64" class="mt-2 mb-3 pa-1">
-                <div class="d-flex justify-end pr-1 pt-1">
-                  <v-btn
-                    icon="mdi-trash-can-outline"
-                    color="red"
-                    size="small"
-                    variant="plain"
-                    @click="deleteFile('q_file')"
-                  ></v-btn>
-                </div>
-                <v-img
-                  :src="form.q_file_base64"
-                  max-height="100px"
-                  contain
-                ></v-img>
-              </v-card>
-            </v-col>
 
-            <v-col cols="12" md="6">
-              <div class="mb-3">
-                <!--Answers-->
-                <div v-if="form.type === 'descriptive'">
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Solution:</div>
-                        <v-chip-group
-                          v-model="text_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('txt')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-text"></v-icon>
-                            Text
-                          </v-chip>
-                        </v-chip-group>
-
-                        <v-chip-group
-                          v-model="photo_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('photo')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-camera"></v-icon>
-                            Photo
-                          </v-chip>
-                        </v-chip-group>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row v-if="text_answer">
-                    <v-col cols="12">
-                      <div class="d-flex">
-                        <div class="flex-grow-1">
-                          <RickEditor
-                            v-model:modelValue="form.answer_full"
-                            min-height="500px"
-                            :features="[
-                              'bold',
-                              'italic',
-                              'underline',
-                              'alignment',
-                            ]"
-                          />
-                        </div>
-                        <div class="ml-2 d-flex align-start mt-2">
-                          <v-btn
-                            icon="mdi-camera-outline"
-                            color="teal"
-                            size="small"
-                            variant="text"
-                            @click="selectFile('answer_full_file')"
-                          ></v-btn>
-                        </div>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row v-if="photo_answer">
-                    <v-col cols="12">
+            <!--Question section-->
+            <v-col cols="12" md="6" id="test-maker-question">
+              <p>Question:</p>
+              <ClientOnly fallback-tag="span" fallback="Loading...">
+                <Field name="question" rules="required" v-slot="{ errorMessage }">
+                  <RickEditor
+                    v-model:modelValue="form.question"
+                    min-height="200px"
+                    :features="['bold', 'italic', 'underline', 'alignment']"
+                  >
+                    <template #content>
                       <v-btn
-                        variant="outlined"
+                        variant="flat"
+                        size="small"
                         color="teal"
-                        prepend-icon="mdi-camera"
-                        @click="selectFile('answer_full_file')"
+                        icon
+                        @click="selectFile('q_file')"
                       >
-                        Select Photo
+                        <v-icon>mdi-camera</v-icon>
                       </v-btn>
-                      <input
-                        ref="answerFullInput"
-                        type="file"
-                        accept="image/*"
-                        style="display: none"
-                        @change="
-                          form_hidden_data.answer_full_file =
-                            $event.target.files[0];
-                          uploadFile('answer_full_file');
-                        "
-                      />
-                      <v-card
-                        v-if="form.answer_full_file_base64"
-                        class="mt-2 mb-3 pa-1"
+                      <v-btn
+                        v-if="form.q_file_base64"
+                        variant="flat"
+                        size="small"
+                        color="red"
+                        icon
+                        @click="deleteFile('q_file')"
                       >
-                        <div class="d-flex justify-end pr-1 pt-1">
-                          <v-btn
-                            icon="mdi-trash-can-outline"
-                            color="red"
-                            size="small"
-                            variant="plain"
-                            @click="deleteFile('answer_full_file')"
-                          ></v-btn>
-                        </div>
-                        <v-img
-                          :src="form.answer_full_file_base64"
-                          max-height="100px"
-                          contain
-                        ></v-img>
-                      </v-card>
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                  </RickEditor>
+                  <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                </Field>
+              </ClientOnly>
+              <img
+                v-if="form.q_file_base64"
+                width="200"
+                height="200"
+                class="pointer image-preview rounded mt-2"
+                @click="selectFile('q_file')"
+                :src="form.q_file_base64"
+              />
+            </v-col>
+            <!--End question section-->
+
+            <v-col
+              cols="12"
+              md="6"
+              v-if="['tf', 'fourchoice', 'twochoice'].includes(form.type)"
+            >
+              <!--Answer type-->
+              <v-row v-if="['fourchoice', 'twochoice'].includes(form.type)">
+                <v-col cols="12" class="d-flex align-center justify-center">
+                  <p class="mr-3 mt-5">Choices type:</p>
+                  <v-checkbox
+                    v-model="text_answer"
+                    label="Text"
+                    color="teal"
+                    class="mr-10"
+                    @click="answerTypeChanged('txt')"
+                    hide-details
+                  />
+                  <v-checkbox
+                    v-model="photo_answer"
+                    label="Photo"
+                    color="teal"
+                    @click="answerTypeChanged('photo')"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <!--End answer type-->
+
+              <!--Test answer options-->
+              <Field name="true_answer" rules="required" v-slot="{ field, errorMessage }">
+                <v-radio-group
+                  v-model="form.true_answer"
+                  id="test-image-options"
+                  v-bind="field"
+                  :error-messages="errorMessage"
+                >
+                  <v-row
+                    v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
+                  >
+                    <v-col class="pb-0" cols="1">
+                      <v-radio value="1"></v-radio>
+                      <span class="answer_label">A</span>
                     </v-col>
-                  </v-row>
-                </div>
-
-                <!--Four options-->
-                <div v-if="form.type === 'fourchoice'">
-                  <v-row align-content="center" justify="space-between">
-                    <v-col cols="12">
-                      <!-- Choices type -->
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Choices type:</div>
-                        <v-chip-group
-                          v-model="text_answer"
-                          @update:model-value="answerTypeChanged('txt')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-text"></v-icon>
-                            Text
-                          </v-chip>
-                        </v-chip-group>
-
-                        <v-chip-group
-                          v-model="photo_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('photo')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-camera"></v-icon>
-                            Photo
-                          </v-chip>
-                        </v-chip-group>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-col cols="12" class="pb-0">
-                    <v-radio-group
-                      v-model="form.true_answer"
-                      direction="horizontal"
-                      inline
-                      required
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === false"
                     >
-                      <Field name="true_answer" rules="required" v-slot="{}">
-                        <div>
-                          <v-radio value="a" label="A"></v-radio>
-                          <div
-                            v-if="text_answer"
-                            class="d-inline-block"
-                            style="width: calc(100% - 45px)"
+                      <Field 
+                        :name="'answer_a'" 
+                        :rules="text_answer_rules ? 'required' : ''" 
+                        v-slot="{ errorMessage }"
+                      >
+                        <ClientOnly fallback-tag="span" fallback="Loading...">
+                          <RickEditor
+                            v-model:modelValue="form.answer_a"
+                             min-height="90px"
+                            :features="['bold', 'italic', 'underline', 'alignment']"
                           >
-                            <div class="d-flex">
-                              <div class="flex-grow-1"></div>
-                              <div class="ml-2 d-flex align-start mt-2">
-                                <v-btn
-                                  icon="mdi-camera-outline"
-                                  color="teal"
-                                  size="small"
-                                  variant="text"
-                                  @click="selectFile('a_file')"
-                                ></v-btn>
-                              </div>
-                            </div>
-                          </div>
-                          <div v-if="photo_answer" class="ml-5">
-                            <v-btn
-                              variant="outlined"
-                              color="teal"
-                              prepend-icon="mdi-camera"
-                              @click="selectFile('a_file')"
-                            >
-                              Select Photo
-                            </v-btn>
-                            <input
-                              ref="aInput"
-                              type="file"
-                              accept="image/*"
-                              style="display: none"
-                              @change="
-                                form_hidden_data.a_file =
-                                  $event.target.files[0];
-                                uploadFile('a_file');
-                              "
-                            />
-                            <v-card
-                              v-if="form.a_file_base64"
-                              class="mt-2 mb-3 pa-1"
-                            >
-                              <div class="d-flex justify-end pr-1 pt-1">
-                                <v-btn
-                                  icon="mdi-trash-can-outline"
-                                  color="red"
-                                  size="small"
-                                  variant="plain"
-                                  @click="deleteFile('a_file')"
-                                ></v-btn>
-                              </div>
-                              <v-img
-                                :src="form.a_file_base64"
-                                max-height="100px"
-                                contain
-                              ></v-img>
-                            </v-card>
-                          </div>
-                        </div>
+                          </RickEditor>
+                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                        </ClientOnly>
                       </Field>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === true"
+                    >
+                      <div class="image-holder">
+                        <img
+                          width="90"
+                          height="90"
+                          class="pointer image-input rounded"
+                          v-if="form.a_file_base64"
+                          @click="selectFile('a_file')"
+                          :src="form.a_file_base64"
+                        />
+                        <v-btn
+                          v-else
+                          variant="flat"
+                          class="image-input d-flex align-center justify-center"
+                          style="width: 90px; height: 90px;"
+                          @click="selectFile('a_file')"
+                        >
+                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                        </v-btn>
 
-                      <Field name="true_answer" rules="required" v-slot="{}">
-                        <div>
-                          <v-radio value="b" label="B"></v-radio>
-                          <div
-                            v-if="text_answer"
-                            class="d-inline-block"
-                            style="width: calc(100% - 45px)"
+                        <v-btn
+                          v-show="form.a_file_base64"
+                          @click="deleteFile('a_file')"
+                          variant="flat"
+                          color="red"
+                          icon
+                          class="img-clear-btn"
+                        >
+                          <v-icon small>mdi-delete</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-col>
+                  </v-row>
+                  
+                  <v-row
+                    v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
+                  >
+                    <v-col class="pb-0" cols="1">
+                      <v-radio value="2"></v-radio>
+                      <span class="answer_label">B</span>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === false"
+                    >
+                      <Field 
+                        :name="'answer_b'" 
+                        :rules="text_answer_rules ? 'required' : ''" 
+                        v-slot="{ errorMessage }"
+                      >
+                        <ClientOnly fallback-tag="span" fallback="Loading...">
+                          <RickEditor
+                            v-model:modelValue="form.answer_b"
+                            min-height="90px"
+                            :features="['bold', 'italic', 'underline', 'alignment']"
                           >
-                            <div class="d-flex">
-                              <div class="flex-grow-1">
-                                <RickEditor
-                                  v-model:modelValue="form.answer_b"
-                                />
-                              </div>
-                              <div class="ml-2 d-flex align-start mt-2">
-                                <v-btn
-                                  icon="mdi-camera-outline"
-                                  color="teal"
-                                  size="small"
-                                  variant="text"
-                                  @click="selectFile('b_file')"
-                                ></v-btn>
-                              </div>
-                            </div>
-                          </div>
-                          <div v-if="photo_answer" class="ml-5">
-                            <v-btn
-                              variant="outlined"
-                              color="teal"
-                              prepend-icon="mdi-camera"
-                              @click="selectFile('b_file')"
-                            >
-                              Select Photo
-                            </v-btn>
-                            <input
-                              ref="bInput"
-                              type="file"
-                              accept="image/*"
-                              style="display: none"
-                              @change="
-                                form_hidden_data.b_file =
-                                  $event.target.files[0];
-                                uploadFile('b_file');
-                              "
-                            />
-                            <v-card
-                              v-if="form.b_file_base64"
-                              class="mt-2 mb-3 pa-1"
-                            >
-                              <div class="d-flex justify-end pr-1 pt-1">
-                                <v-btn
-                                  icon="mdi-trash-can-outline"
-                                  color="red"
-                                  size="small"
-                                  variant="plain"
-                                  @click="deleteFile('b_file')"
-                                ></v-btn>
-                              </div>
-                              <v-img
-                                :src="form.b_file_base64"
-                                max-height="100px"
-                                contain
-                              ></v-img>
-                            </v-card>
-                          </div>
-                        </div>
+                          </RickEditor>
+                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                        </ClientOnly>
                       </Field>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === true"
+                    >
+                      <div class="image-holder">
+                        <img
+                          width="90"
+                          height="90"
+                          class="pointer image-input rounded"
+                          v-if="form.b_file_base64"
+                          @click="selectFile('b_file')"
+                          :src="form.b_file_base64"
+                        />
+                        <v-btn
+                          v-else
+                          variant="flat"
+                          class="image-input d-flex align-center justify-center"
+                          style="width: 90px; height: 90px;"
+                          @click="selectFile('b_file')"
+                        >
+                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                        </v-btn>
 
-                      <Field name="true_answer" rules="required" v-slot="{}">
-                        <div>
-                          <v-radio value="c" label="C"></v-radio>
-                          <div
-                            v-if="text_answer"
-                            class="d-inline-block"
-                            style="width: calc(100% - 45px)"
+                        <v-btn
+                          v-show="form.b_file_base64"
+                          @click="deleteFile('b_file')"
+                          variant="flat"
+                          color="red"
+                          icon
+                          class="img-clear-btn"
+                        >
+                          <v-icon small>mdi-delete</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-col>
+                  </v-row>
+                  
+                  <v-row v-if="form.type == 'fourchoice'">
+                    <v-col class="pb-0" cols="1">
+                      <v-radio value="3"></v-radio>
+                      <span class="answer_label">C</span>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === false"
+                    >
+                      <Field 
+                        :name="'answer_c'" 
+                        :rules="text_answer_rules ? 'required' : ''" 
+                        v-slot="{ errorMessage }"
+                      >
+                        <ClientOnly fallback-tag="span" fallback="Loading...">
+                          <RickEditor
+                            v-model:modelValue="form.answer_c"
+                            min-height="90px"
+                            :features="['bold', 'italic', 'underline', 'alignment']"
                           >
-                            <div class="d-flex">
-                              <div class="flex-grow-1">
-                                <RickEditor
-                                  v-model:modelValue="form.answer_c"
-                                />
-                              </div>
-                              <div class="ml-2 d-flex align-start mt-2">
-                                <v-btn
-                                  icon="mdi-camera-outline"
-                                  color="teal"
-                                  size="small"
-                                  variant="text"
-                                  @click="selectFile('c_file')"
-                                ></v-btn>
-                              </div>
-                            </div>
-                          </div>
-                          <div v-if="photo_answer" class="ml-5">
-                            <v-btn
-                              variant="outlined"
-                              color="teal"
-                              prepend-icon="mdi-camera"
-                              @click="selectFile('c_file')"
-                            >
-                              Select Photo
-                            </v-btn>
-                            <input
-                              ref="cInput"
-                              type="file"
-                              accept="image/*"
-                              style="display: none"
-                              @change="
-                                form_hidden_data.c_file =
-                                  $event.target.files[0];
-                                uploadFile('c_file');
-                              "
-                            />
-                            <v-card
-                              v-if="form.c_file_base64"
-                              class="mt-2 mb-3 pa-1"
-                            >
-                              <div class="d-flex justify-end pr-1 pt-1">
-                                <v-btn
-                                  icon="mdi-trash-can-outline"
-                                  color="red"
-                                  size="small"
-                                  variant="plain"
-                                  @click="deleteFile('c_file')"
-                                ></v-btn>
-                              </div>
-                              <v-img
-                                :src="form.c_file_base64"
-                                max-height="100px"
-                                contain
-                              ></v-img>
-                            </v-card>
-                          </div>
-                        </div>
+                          </RickEditor>
+                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                        </ClientOnly>
                       </Field>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === true"
+                    >
+                      <div class="image-holder">
+                        <img
+                          width="90"
+                          height="90"
+                          class="pointer image-input rounded"
+                          v-if="form.c_file_base64"
+                          @click="selectFile('c_file')"
+                          :src="form.c_file_base64"
+                        />
+                        <v-btn
+                          v-else
+                          variant="flat"
+                          class="image-input d-flex align-center justify-center"
+                          style="width: 90px; height: 90px;"
+                          @click="selectFile('c_file')"
+                        >
+                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                        </v-btn>
 
-                      <Field name="true_answer" rules="required" v-slot="{}">
-                        <div>
-                          <v-radio value="d" label="D"></v-radio>
-                          <div
-                            v-if="text_answer"
-                            class="d-inline-block"
-                            style="width: calc(100% - 45px)"
+                        <v-btn
+                          v-show="form.c_file_base64"
+                          @click="deleteFile('c_file')"
+                          variant="flat"
+                          color="red"
+                          icon
+                          class="img-clear-btn"
+                        >
+                          <v-icon small>mdi-delete</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-col>
+                  </v-row>
+                  
+                  <v-row v-if="form.type == 'fourchoice'">
+                    <v-col class="pb-0" cols="1">
+                      <v-radio value="4"></v-radio>
+                      <span class="answer_label">D</span>
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === false"
+                    >
+                      <Field 
+                        :name="'answer_d'" 
+                        :rules="text_answer_rules ? 'required' : ''" 
+                        v-slot="{ errorMessage }"
+                      >
+                        <ClientOnly fallback-tag="span" fallback="Loading...">
+                          <RickEditor
+                            v-model:modelValue="form.answer_d"
+                            min-height="90px"
+                            :features="['bold', 'italic', 'underline', 'alignment']"
                           >
-                            <div class="d-flex">
-                              <div class="flex-grow-1">
-                                <RickEditor
-                                  v-model:modelValue="form.answer_d"
-                                />
-                              </div>
-                              <div class="ml-2 d-flex align-start mt-2">
-                                <v-btn
-                                  icon="mdi-camera-outline"
-                                  color="teal"
-                                  size="small"
-                                  variant="text"
-                                  @click="selectFile('d_file')"
-                                ></v-btn>
-                              </div>
-                            </div>
-                          </div>
-                          <div v-if="photo_answer" class="ml-5">
-                            <v-btn
-                              variant="outlined"
-                              color="teal"
-                              prepend-icon="mdi-camera"
-                              @click="selectFile('d_file')"
-                            >
-                              Select Photo
-                            </v-btn>
-                            <input
-                              ref="dInput"
-                              type="file"
-                              accept="image/*"
-                              style="display: none"
-                              @change="
-                                form_hidden_data.d_file =
-                                  $event.target.files[0];
-                                uploadFile('d_file');
-                              "
-                            />
-                            <v-card
-                              v-if="form.d_file_base64"
-                              class="mt-2 mb-3 pa-1"
-                            >
-                              <div class="d-flex justify-end pr-1 pt-1">
-                                <v-btn
-                                  icon="mdi-trash-can-outline"
-                                  color="red"
-                                  size="small"
-                                  variant="plain"
-                                  @click="deleteFile('d_file')"
-                                ></v-btn>
-                              </div>
-                              <v-img
-                                :src="form.d_file_base64"
-                                max-height="100px"
-                                contain
-                              ></v-img>
-                            </v-card>
-                          </div>
-                        </div>
+                          </RickEditor>
+                          <p v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</p>
+                        </ClientOnly>
                       </Field>
-                    </v-radio-group>
-                  </v-col>
-                </div>
-
-                <!--Two options-->
-                <div v-if="form.type === 'twochoice'">
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Answers:</div>
-                        <v-chip-group
-                          v-model="text_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('txt')"
+                    </v-col>
+                    <v-col
+                      class="pb-0"
+                      cols="11"
+                      v-show="form.testImgAnswers === true"
+                    >
+                      <div class="image-holder">
+                        <img
+                          width="200"
+                          height="200" 
+                          class="pointer image-input rounded"
+                          v-if="form.d_file_base64"
+                          @click="selectFile('d_file')"
+                          :src="form.d_file_base64"
+                        />
+                        <v-btn
+                          v-else
+                          variant="flat"
+                          class="image-input d-flex align-center justify-center"
+                          style="width: 90px; height: 90px;"
+                          @click="selectFile('d_file')"
                         >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-text"></v-icon>
-                            Text
-                          </v-chip>
-                        </v-chip-group>
+                          <v-icon size="77" color="teal">mdi-camera</v-icon>
+                        </v-btn>
 
-                        <v-chip-group
-                          v-model="photo_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('photo')"
+                        <v-btn
+                          v-show="form.d_file_base64"
+                          @click="deleteFile('d_file')"
+                          variant="flat"
+                          color="red"
+                          icon
+                          class="img-clear-btn"
                         >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-camera"></v-icon>
-                            Photo
-                          </v-chip>
-                        </v-chip-group>
+                          <v-icon small>mdi-delete</v-icon>
+                        </v-btn>
                       </div>
                     </v-col>
                   </v-row>
-
-                  <v-row>
-                    <v-col cols="12" class="pb-0">
-                      <v-radio-group v-model="form.true_answer" inline required>
-                        <Field name="true_answer" rules="required" v-slot="{}">
-                          <div>
-                            <v-radio value="a" label="A"></v-radio>
-                            <div
-                              v-if="text_answer"
-                              class="d-inline-block"
-                              style="width: calc(100% - 45px)"
-                            >
-                              <v-text-field
-                                v-model="form.answer_a"
-                                label="a"
-                                type="text"
-                                variant="outlined"
-                                density="compact"
-                                :rules="
-                                  text_answer_rules
-                                    ? [(v) => !!v || 'Answer A is required']
-                                    : []
-                                "
-                              ></v-text-field>
-                            </div>
-                            <div v-if="photo_answer" class="ml-5">
-                              <v-btn
-                                variant="outlined"
-                                color="teal"
-                                prepend-icon="mdi-camera"
-                                @click="selectFile('a_file')"
-                              >
-                                Select Photo
-                              </v-btn>
-                              <input
-                                ref="aInput"
-                                type="file"
-                                accept="image/*"
-                                style="display: none"
-                                @change="
-                                  form_hidden_data.a_file =
-                                    $event.target.files[0];
-                                  uploadFile('a_file');
-                                "
-                              />
-                              <v-card
-                                v-if="form.a_file_base64"
-                                class="mt-2 mb-3 pa-1"
-                              >
-                                <div class="d-flex justify-end pr-1 pt-1">
-                                  <v-btn
-                                    icon="mdi-trash-can-outline"
-                                    color="red"
-                                    size="small"
-                                    variant="plain"
-                                    @click="deleteFile('a_file')"
-                                  ></v-btn>
-                                </div>
-                                <v-img
-                                  :src="form.a_file_base64"
-                                  max-height="100px"
-                                  contain
-                                ></v-img>
-                              </v-card>
-                            </div>
-                          </div>
-                        </Field>
-
-                        <Field name="true_answer" rules="required" v-slot="{}">
-                          <div>
-                            <v-radio value="b" label="B"></v-radio>
-                            <div
-                              v-if="text_answer"
-                              class="d-inline-block"
-                              style="width: calc(100% - 45px)"
-                            >
-                              <v-text-field
-                                v-model="form.answer_b"
-                                label="b"
-                                type="text"
-                                variant="outlined"
-                                density="compact"
-                                :rules="
-                                  text_answer_rules
-                                    ? [(v) => !!v || 'Answer B is required']
-                                    : []
-                                "
-                              ></v-text-field>
-                            </div>
-                            <div v-if="photo_answer" class="ml-5">
-                              <v-btn
-                                variant="outlined"
-                                color="teal"
-                                prepend-icon="mdi-camera"
-                                @click="selectFile('b_file')"
-                              >
-                                Select Photo
-                              </v-btn>
-                              <input
-                                ref="bInput"
-                                type="file"
-                                accept="image/*"
-                                style="display: none"
-                                @change="
-                                  form_hidden_data.b_file =
-                                    $event.target.files[0];
-                                  uploadFile('b_file');
-                                "
-                              />
-                              <v-card
-                                v-if="form.b_file_base64"
-                                class="mt-2 mb-3 pa-1"
-                              >
-                                <div class="d-flex justify-end pr-1 pt-1">
-                                  <v-btn
-                                    icon="mdi-trash-can-outline"
-                                    color="red"
-                                    size="small"
-                                    variant="plain"
-                                    @click="deleteFile('b_file')"
-                                  ></v-btn>
-                                </div>
-                                <v-img
-                                  :src="form.b_file_base64"
-                                  max-height="100px"
-                                  contain
-                                ></v-img>
-                              </v-card>
-                            </div>
-                          </div>
-                        </Field>
-                      </v-radio-group>
-                    </v-col>
-                  </v-row>
-                </div>
-
-                <!--True/False-->
-                <div v-if="form.type === 'tf'">
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Answers:</div>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row>
-                    <v-col cols="12" class="pb-0">
-                      <v-radio-group v-model="form.true_answer" inline required>
-                        <Field name="true_answer" rules="required" v-slot="{}">
-                          <div>
-                            <v-radio value="a" label="True"></v-radio>
-                          </div>
-                        </Field>
-
-                        <Field name="true_answer" rules="required" v-slot="{}">
-                          <div>
-                            <v-radio value="b" label="False"></v-radio>
-                          </div>
-                        </Field>
-                      </v-radio-group>
-                    </v-col>
-                  </v-row>
-                </div>
-
-                <!--Blank-->
-                <div v-if="form.type === 'blank'">
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Answer:</div>
-
-                        <v-chip-group
-                          v-model="text_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('txt')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-text"></v-icon>
-                            Text
-                          </v-chip>
-                        </v-chip-group>
-
-                        <v-chip-group
-                          v-model="photo_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('photo')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-camera"></v-icon>
-                            Photo
-                          </v-chip>
-                        </v-chip-group>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row>
-                    <v-col cols="12" class="pb-0">
-                      <div>
-                        <div v-if="text_answer">
-                          <v-text-field
-                            v-model="form.answer_full"
-                            label="Answer"
-                            type="text"
-                            variant="outlined"
-                            density="compact"
-                            :rules="
-                              text_answer_rules
-                                ? [(v) => !!v || 'Answer is required']
-                                : []
-                            "
-                          ></v-text-field>
-                        </div>
-
-                        <div v-if="photo_answer">
-                          <v-btn
-                            variant="outlined"
-                            color="teal"
-                            prepend-icon="mdi-camera"
-                            @click="selectFile('answer_full_file')"
-                          >
-                            Select Photo
-                          </v-btn>
-                          <input
-                            ref="answerFullInput"
-                            type="file"
-                            accept="image/*"
-                            style="display: none"
-                            @change="
-                              form_hidden_data.answer_full_file =
-                                $event.target.files[0];
-                              uploadFile('answer_full_file');
-                            "
-                          />
-                          <v-card
-                            v-if="form.answer_full_file_base64"
-                            class="mt-2 mb-3 pa-1"
-                          >
-                            <div class="d-flex justify-end pr-1 pt-1">
-                              <v-btn
-                                icon="mdi-trash-can-outline"
-                                color="red"
-                                size="small"
-                                variant="plain"
-                                @click="deleteFile('answer_full_file')"
-                              ></v-btn>
-                            </div>
-                            <v-img
-                              :src="form.answer_full_file_base64"
-                              max-height="100px"
-                              contain
-                            ></v-img>
-                          </v-card>
-                        </div>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </div>
-
-                <!--Shortanswer-->
-                <div v-if="form.type === 'shortanswer'">
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="d-flex mb-3 mt-3">
-                        <div class="text-h6 mr-3">Answer:</div>
-
-                        <v-chip-group
-                          v-model="text_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('txt')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-text"></v-icon>
-                            Text
-                          </v-chip>
-                        </v-chip-group>
-
-                        <v-chip-group
-                          v-model="photo_answer"
-                          column
-                          multiple
-                          @update:model-value="answerTypeChanged('photo')"
-                        >
-                          <v-chip
-                            :value="true"
-                            color="teal"
-                            filter
-                            label
-                            variant="outlined"
-                          >
-                            <v-icon start icon="mdi-camera"></v-icon>
-                            Photo
-                          </v-chip>
-                        </v-chip-group>
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row>
-                    <v-col cols="12" class="pb-0">
-                      <div>
-                        <div v-if="text_answer">
-                          <v-text-field
-                            v-model="form.answer_full"
-                            label="Answer"
-                            type="text"
-                            variant="outlined"
-                            density="compact"
-                            :rules="
-                              text_answer_rules
-                                ? [(v) => !!v || 'Answer is required']
-                                : []
-                            "
-                          ></v-text-field>
-                        </div>
-
-                        <div v-if="photo_answer">
-                          <v-btn
-                            variant="outlined"
-                            color="teal"
-                            prepend-icon="mdi-camera"
-                            @click="selectFile('answer_full_file')"
-                          >
-                            Select Photo
-                          </v-btn>
-                          <input
-                            ref="answerFullInput"
-                            type="file"
-                            accept="image/*"
-                            style="display: none"
-                            @change="
-                              form_hidden_data.answer_full_file =
-                                $event.target.files[0];
-                              uploadFile('answer_full_file');
-                            "
-                          />
-                          <v-card
-                            v-if="form.answer_full_file_base64"
-                            class="mt-2 mb-3 pa-1"
-                          >
-                            <div class="d-flex justify-end pr-1 pt-1">
-                              <v-btn
-                                icon="mdi-trash-can-outline"
-                                color="red"
-                                size="small"
-                                variant="plain"
-                                @click="deleteFile('answer_full_file')"
-                              ></v-btn>
-                            </div>
-                            <v-img
-                              :src="form.answer_full_file_base64"
-                              max-height="100px"
-                              contain
-                            ></v-img>
-                          </v-card>
-                        </div>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </div>
-              </div>
+                </v-radio-group>
+              </Field>
+              <!--End test answer options-->
             </v-col>
           </v-row>
           <!-- 
@@ -1570,31 +1019,62 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
-.topic_season {
-  background-color: rgba(144, 202, 249, 0.2);
-}
-
+<style>
 .pointer {
   cursor: pointer;
+}
+
+.image-input {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  border: 1px dashed #9e9e9e;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image-preview {
+  display: block;
+  object-fit: contain;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+.img-clear-btn {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -4px;
+  background-color: white !important;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
+}
+
+.topic_season {
+  background-color: rgba(144, 202, 249, 0.2);
 }
 
 #test-question {
   margin-bottom: 20px;
 }
 
-.test-maker {
-  .test-list {
-    margin-bottom: 20px;
-  }
+.test-maker .test-list {
+  margin-bottom: 20px;
+}
 
-  .answer {
-    margin-left: 10px;
-  }
+.test-maker .answer {
+  margin-left: 10px;
+}
 
-  .true_answer {
-    color: #4caf50;
-  }
+.test-maker .true_answer {
+  color: #4caf50;
+}
+
+.answer_label {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 600;
+  color: #26a69a;
+  bottom: 0;
+  left: 8px;
 }
 
 /* For image previews */
@@ -1605,5 +1085,23 @@ onMounted(() => {
 
 .ckeditor-wrapper {
   width: 100%;
+}
+
+.image-holder {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.image-holder .img-clear-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+}
+
+/* Ensure proper handling of radio buttons */
+#test-image-options .v-radio {
+  margin-bottom: 0;
 }
 </style>
