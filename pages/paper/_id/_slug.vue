@@ -726,6 +726,14 @@ export default {
 
     return {
       title: this.contentData.title,
+      // link: [
+      //   {
+      //     rel: "canonical",
+      //     href: this.contentData.title_url
+      //       ? `https://gamatrain.com/paper/${this.contentData.id}/${this.contentData.title_url}`
+      //       : `https://gamatrain.com/paper/${this.contentData.id}`,
+      //   },
+      // ],
       script: [
         {
           hid: "json-ld-schema", // Helps avoid duplicate script tags
