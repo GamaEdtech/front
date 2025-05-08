@@ -71,8 +71,8 @@
                     max-height="130"
                     height="130"
                     class="rounded"
-                    v-show="item.coverImage"
-                    :src="item.coverImage"
+                    v-show="item.defaultImageUri"
+                    :src="item.defaultImageUri"
                   />
                 </div>
               </div>
