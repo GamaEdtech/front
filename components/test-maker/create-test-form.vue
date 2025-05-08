@@ -7,88 +7,89 @@
       height="200px;"
     />
     <v-card flat class="mt-3">
-      <!--Create test form-->
-      <v-expansion-panels
-        v-model="path_panel_expand"
-        :flat="true"
-        multiple
-        density="compact"
-      >
-        <v-expansion-panel>
-          <v-form ref="observer" v-model="isFormValid">
-            <v-row>
-              <v-col cols="12" md="2" class="mt-2">
-                <v-autocomplete
-                  v-model="form.section"
-                  :items="level_list"
-                  label="Board"
-                  item-title="title"
-                  item-value="id"
-                  variant="outlined"
-                  density="compact"
-                  :rules="[(v) => !!v || 'Level is required']"
-                ></v-autocomplete>
-              </v-col>
-
-              <v-col cols="12" md="2" class="mt-2">
-                <v-autocomplete
-                  v-model="form.base"
-                  :items="grade_list"
-                  label="Grade"
-                  item-title="title"
-                  item-value="id"
-                  variant="outlined"
-                  density="compact"
-                  :rules="[(v) => !!v || 'Grade is required']"
-                ></v-autocomplete>
-              </v-col>
-
-              <v-col cols="12" md="2" class="mt-2">
-                <v-autocomplete
-                  v-model="form.lesson"
-                  :items="lesson_list"
-                  label="Subject"
-                  item-title="title"
-                  item-value="id"
-                  variant="outlined"
-                  density="compact"
-                  :rules="[(v) => !!v || 'Lesson is required']"
-                ></v-autocomplete>
-              </v-col>
-
-              <v-col cols="12" md="2" class="mt-2">
-                <v-autocomplete
-                  v-model="form.topic"
-                  :items="topic_list"
-                  label="Topic"
-                  item-title="title"
-                  item-value="id"
-                  variant="outlined"
-                  density="compact"
-                ></v-autocomplete>
-              </v-col>
-
-              <v-col cols="12" md="2" class="mt-2">
-                <v-autocomplete
-                  v-model="form.type"
-                  :items="typeList"
-                  label="Type"
-                  item-title="title"
-                  item-value="value"
-                  variant="outlined"
-                  density="compact"
-                  :rules="[(v) => !!v || 'Question type is required']"
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-expansion-panel>
-      </v-expansion-panels>
-
       <!--Question section-->
       <v-card-text id="test-question">
         <VeeForm @submit="submitQuestion">
-          <v-row style="flex-wrap: nowrap !important">
+          <v-row>
+            <v-col cols="12" md="2" class="mt-2"  v-show="path_panel_expand">
+              <v-autocomplete
+                v-model="form.section"
+                :items="level_list"
+                label="Board"
+                item-title="title"
+                item-value="id"
+                variant="outlined"
+                density="compact"
+                :rules="[(v) => !!v || 'Level is required']"
+              ></v-autocomplete>
+            </v-col>
+
+            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+              <v-autocomplete
+                v-model="form.base"
+                :items="grade_list"
+                label="Grade"
+                item-title="title"
+                item-value="id"
+                variant="outlined"
+                density="compact"
+                :rules="[(v) => !!v || 'Grade is required']"
+              ></v-autocomplete>
+            </v-col>
+
+            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+              <v-autocomplete
+                v-model="form.lesson"
+                :items="lesson_list"
+                label="Subject"
+                item-title="title"
+                item-value="id"
+                variant="outlined"
+                density="compact"
+                :rules="[(v) => !!v || 'Lesson is required']"
+              ></v-autocomplete>
+            </v-col>
+            <v-col cols="2" md="1" class="pr-0" v-show="!path_panel_expand">
+              <v-tooltip location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    color="teal"
+                    class="white--text py-5"
+                    v-bind="props"
+                    block
+                    @click="path_panel_expand = !path_panel_expand"
+                  >
+                    <i class="fas fa-route mx-3 fa-xl"></i>
+                  </v-btn>
+                </template>
+                <span> Change path </span>
+              </v-tooltip>
+            </v-col>
+
+            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+              <v-autocomplete
+                v-model="form.topic"
+                :items="topic_list"
+                label="Topic"
+                item-title="title"
+                item-value="id"
+                variant="outlined"
+                density="compact"
+              ></v-autocomplete>
+            </v-col>
+
+            <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
+              <v-autocomplete
+                v-model="form.type"
+                :items="typeList"
+                label="Type"
+                item-title="title"
+                item-value="value"
+                variant="outlined"
+                density="compact"
+                :rules="[(v) => !!v || 'Question type is required']"
+              ></v-autocomplete>
+            </v-col>
             <v-col cols="12" md="6">
               <div class="mb-3 h-full">
                 <label class="text-h6 mb-2 d-block">Question:</label>
@@ -96,6 +97,7 @@
                   <div class="flex-grow-1">
                     <RickEditor
                       v-model:modelValue="form.question"
+                      min-height="500px"
                       :features="['bold', 'italic', 'underline', 'alignment']"
                     />
                   </div>
@@ -129,7 +131,7 @@
               </v-card>
             </v-col>
 
-            <v-col cols="12">
+            <v-col cols="12" md="6">
               <div class="mb-3">
                 <!--Answers-->
                 <div v-if="form.type === 'descriptive'">
@@ -180,7 +182,16 @@
                     <v-col cols="12">
                       <div class="d-flex">
                         <div class="flex-grow-1">
-                          <RickEditor v-model:modelValue="form.answer_full" />
+                          <RickEditor
+                            v-model:modelValue="form.answer_full"
+                            min-height="500px"
+                            :features="[
+                              'bold',
+                              'italic',
+                              'underline',
+                              'alignment',
+                            ]"
+                          />
                         </div>
                         <div class="ml-2 d-flex align-start mt-2">
                           <v-btn
@@ -241,14 +252,13 @@
 
                 <!--Four options-->
                 <div v-if="form.type === 'fourchoice'">
-                  <v-row>
+                  <v-row align-content="center" justify="space-between">
                     <v-col cols="12">
+                      <!-- Choices type -->
                       <div class="d-flex mb-3 mt-3">
                         <div class="text-h6 mr-3">Choices type:</div>
                         <v-chip-group
                           v-model="text_answer"
-                          column
-                          multiple
                           @update:model-value="answerTypeChanged('txt')"
                         >
                           <v-chip
@@ -991,7 +1001,7 @@
               </div>
             </v-col>
           </v-row>
-
+          <!-- 
           <v-row>
             <v-col cols="12">
               <v-btn
@@ -1004,7 +1014,7 @@
                 Create Test
               </v-btn>
             </v-col>
-          </v-row>
+          </v-row> -->
         </VeeForm>
       </v-card-text>
     </v-card>

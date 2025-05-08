@@ -206,7 +206,8 @@ const editorConfig = {
     :style="{
       borderRadius: borderRadius,
       borderColor: borderColor,
-      backgroundColor: backgroundColor
+      backgroundColor: backgroundColor,
+      '--editor-min-height': minHeight
     }"
   >
     <Ckeditor
@@ -237,11 +238,10 @@ const editorConfig = {
 /* Ensure editor takes full height of container */
 .rich-editor-container .ck-editor__main {
   height: 100%;
-
 }
 
 .rich-editor-container .ck-editor__main > * {
-  min-height: 500px;
+  min-height: var(--editor-min-height);
 }
 </style>
 
