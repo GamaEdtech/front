@@ -1,135 +1,162 @@
 <template>
   <v-container>
-    <div class="d-flex flex-column flex-md-row justify-center align-center">
-      <div
-        class="pt-4  mb-6 mb-md-0 mr-0 mr-md-12"
-        :style="$vuetify.breakpoint.smAndDown ? 'width: 347px' : 'width: 380px; height: 601px;'"
+    <v-row
+      class="mb-12 mt-15 mt-lg-4"
+      align="center"
+      justify="center"
       >
-      <v-form v-model="valid">
-        <!--Name Input-->
-        <v-text-field
-            label="Name*"
-            placeholder="ui.lib.drive@gmail.com"
-            outlined
-            class="rounded-pill mb-5"
-            height="48"
-            :rules="[rules.required]"
-            v-model="form.name"
-          ></v-text-field>
+      <!-- Form -->
+      <v-col cols="12" md="5" class="pt-4 mb-6 mb-md-0" align="center">
+        <div
+          class="pt-4 mb-6 mb-md-0 mr-0 mr-md-12 d-flex flex-column"
+          >
+          <v-form v-model="valid">
+            <!--Name Input-->
+            <v-text-field
+                label="Name*"
+                placeholder="Enter your full name"
+                outlined
+                class="rounded-pill mb-5"
+                height="48"
+                :rules="[rules.required]"
+                v-model="form.name"
+              ></v-text-field>
 
-        <!--Email Input-->
-        <v-text-field
-            label="Email*"
-            placeholder="ui.lib.drive@gmail.com"
-            outlined
-            class="rounded-pill mb-5"
-            height="48"
-            :rules="[rules.required, rules.email]"
-            v-model="form.email"
-        ></v-text-field>
+            <!--Email Input-->
+            <v-text-field
+                label="Email*"
+                placeholder="Enter your email address"
+                outlined
+                class="rounded-pill mb-5"
+                height="48"
+                :rules="[rules.required, rules.email]"
+                v-model="form.email"
+            ></v-text-field>
 
 
-        <!--Message textarea-->
-        <v-textarea
-          outlined
-          name="input-7-4"
-          label="Message*"
-          hint="Enter at least 25 characters."
-          placeholder="Enter here.............."
-          no-resize
-          class="rounded-xl mb-5"
-          height="155"
-          :rules="[rules.required, rules.min25]"
-          v-model="form.message"
-        ></v-textarea>
-
-        <!--File Input & Preview(delete) File-->
-        <div class="d-flex flex-column-reverse mb-10" style="gap: 12px;">
-          <!--File Input-->
-          <div class="d-flex" style="gap: 10px;">
-            <!-- Hidden file input (no multiple) -->
-            <input
-              type="file"
-              ref="fileInput"
-              @change="handleFile"
-              class="d-none"
-            />
-
-            <!-- Custom trigger -->
-            <v-btn
-              color="#2E90FA"
+            <!--Message textarea-->
+            <v-textarea
               outlined
+              name="input-7-4"
+              label="Message*"
+              hint="Enter at least 25 characters."
+              placeholder="Write something..."
+              no-resize
+              class="rounded-xl mb-10"
+              height="155"
+              :rules="[rules.required, rules.min25]"
+              v-model="form.message"
+            ></v-textarea>
+
+            <!--File Input & Preview(delete) File-->
+            <v-row class="mb-14" dense>
+
+              <v-col cols="12" v-show="form.file">
+                <v-row align="center" justify="space-between">
+                  <v-col cols="auto">
+                    <span>{{ form.file?.name }}</span>
+                  </v-col>
+                  <v-col cols="auto">
+                    <v-btn icon small @click="removeFile">
+                      <v-icon color="error">mdi-minus-circle</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+
+              <v-col cols="12" v-show="!form.file">
+                <v-row align="center" dense>
+                  <!-- Hidden file input -->
+                  <input
+                    type="file"
+                    ref="fileInput"
+                    @change="handleFile"
+                    class="d-none"
+                  />
+
+                  <!-- Attach file button -->
+                  <v-col cols="auto">
+                    <v-btn
+                      color="#2E90FA"
+                      outlined
+                      rounded
+                      @click="triggerFileSelect"
+                      class="d-flex align-center gtext-t5 font-weight-medium"
+                    >
+                      <v-icon class="gtext-t4 font-weight-medium">mdi-paperclip</v-icon>
+                      Attach File
+                    </v-btn>
+                  </v-col>
+
+                  <!-- Hint -->
+                  <v-col>
+                    <p class="gtext-t6 d-flex align-center gray--text">
+                      Max size: 2MB (jpeg, png, webp)
+                    </p>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+
+            <v-btn
+              color="primary"
+              type="submit"
               rounded
-              @click="triggerFileSelect"
-              class="d-flex align-center gtext-t5 font-weight-medium"
+              class="primary-gray-800"
+              height="42"
+              block
+              :disabled="!valid"
+              @click="submitForm"
             >
-              <v-icon class="gtext-t4 font-weight-medium">mdi-paperclip</v-icon>
-              Attach File
-
+              Send
             </v-btn>
-
-            <!-- Hint -->
-            <p class="gtext-t6 d-flex align-center" style="color: #98A2B3;">
-              Max size: 2MB (jpeg, png, webp)
-            </p>
-
-          </div>
-          
-          <!-- File display with remove option -->
-          <div>
-            <div v-if="file" class="d-flex align-center justify-space-between">
-              <span>{{ file.name }}</span>
-              <v-btn icon small @click="removeFile">
-                <v-icon color="error">mdi-minus-circle</v-icon>
-              </v-btn>
-            </div>
-          </div>
+          </v-form>
         </div>
-
-        <v-btn
-          color="primary"
-          type="submit"
-          style="border-radius: 30px;color: black;"
-          height="42"
-          block
-          :disabled="!valid"
-          @click="submitForm"
-        >
-          Send
-        </v-btn>
-      </v-form>
-    </div>
-      
+      </v-col>
 
       <!-- Map -->
-      <div class="d-flex flex-column">
-        <client-only>
-          <div class="rounded-t-xl" :style="mapStyles" id="map" ref="mapContainer"></div>
-        </client-only>
-        <div class="d-flex flex-row rounded-b-xl align-center py-2 pl-4" :style="infoBoxStyles" style="background-color: #F2F4F7;gap: 8px;">
-          <v-icon class="gtext-t4" style="color: #98A2B3;">mdi-map-marker</v-icon>
-          <p :class="[textSizeClass, 'font-weight-medium']" style="color: #344054;">2419 West 53rd Street, Apt 5B, New York, NY 10019</p>
-        </div>
-      </div>
+       <v-col cols="12" md="6" align="center">
+        <v-row no-gutters class="rounded-xl overflow-hidden">
+          <v-col cols="12">
+            <client-only>
+              <div id="map" ref="mapContainer" class="rounded-t-xl mapStyle"></div>
+            </client-only>
+          </v-col>
 
-    </div>
+          <!-- Address Box -->
+          <v-col cols="12" class="bg-primary-gray-100 py-2 pl-4">
+            <v-row no-gutters align="center">
+              <v-col cols="auto mr-1">
+                <v-icon class="gtext-t5 gray--text">mdi-map-marker</v-icon>
+              </v-col>
+              <v-col>
+                <p class="font-weight-medium primary-gray-700 text-left">
+                  2419 West 53rd Street, Apt 5B, New York, NY 10019
+                </p>
+              </v-col>
+            </v-row>
+          </v-col>
+          
+        </v-row>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
   
 <script>
 
 export default {
+  auth: false,
   data() {
     return {
       form: {
         name: '',
         email: '',
         message: '',
-        files: []
+        file: null
       },
       map: null,
       officeCoords: [40.764064, -73.988577],
-      file: null,
       rules: {
         required: v => !!v || 'This field is required.',
         email: v => /.+@.+\..+/.test(v) || 'E-mail must be valid.',
@@ -139,11 +166,26 @@ export default {
     }
   },
   methods: {
-    submitForm() {
-    const isValid = this.$refs.form.validate()
-    if (isValid) {
-      console.log('Submit form', this.name, this.email, this.message)
-    }
+    async submitForm(event) {
+      event.preventDefault();
+      const querystring = require("querystring");
+      if (this.valid) {
+        await this.$axios.$post(
+            "/api/v1/users/login",
+            querystring.stringify({
+              identity: this.identity,
+              pass: this.password,
+              type: "request",
+            }),
+          )
+          .then(() => {
+            this.$toast.success('well played')
+          })
+          .catch((err) => {
+            if (err.response.status == 400)
+              this.$toast.error(err.response.data.message);
+          })
+      }
   },
     triggerFileSelect() {
       this.$refs.fileInput.click();
@@ -156,15 +198,16 @@ export default {
         ['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type) &&
         selectedFile.size <= 2 * 1024 * 1024
       ) {
-        this.file = selectedFile;
+        this.form.file = selectedFile;
       } else {
         alert('Invalid file. Only jpeg, png, or webp under 2MB allowed.');
         this.$refs.fileInput.value = null; // Reset input
       }
     },
     removeFile() {
-      this.file = null;
+      this.form.file = null;
       this.$refs.fileInput.value = null;
+      this.$toast.success('Your message has been sent successfully.')
     }
   },
   async mounted() {
@@ -209,56 +252,6 @@ export default {
       L.marker(this.officeCoords, { icon: customMarker }).addTo(this.map);
     }
   },
-  computed: {
-    textSizeClass() {
-    if (this.$vuetify.breakpoint.smAndDown) {
-      return 'gtext-t7'; // Mobile
-    } else if (this.$vuetify.breakpoint.mdOnly) {
-      return 'gtext-t6'; // Tablet
-    } else {
-      return 'gtext-t5'; // Desktop
-    }
-  },
-    mapStyles() {
-      const { md, xs , sm } = this.$vuetify.breakpoint;
-
-      if (xs) {
-        return {
-          width: '379px',
-          height: '118px',
-        };
-      } else if (sm) {
-        return {
-          width: '348px',
-          height: '377px',
-        };
-      }else if (md) {
-        return {
-          width: '348px',
-          height: '577px',
-        };
-      } else {
-        return {
-          width: '683px',
-          height: '601px',
-        };
-      }
-    },
-    infoBoxStyles() {
-      const { sm,md, xs } = this.$vuetify.breakpoint;
-
-      let width = '683px';
-      if (xs) width = '379px';
-      else if (sm||md) width = '348px';
-
-      return {
-        width,
-        height: '36px',
-        backgroundColor: '#F2F4F7',
-        gap: '8px',
-      };
-    },
-  },
 }
 </script>
 <style scoped>
@@ -266,5 +259,32 @@ export default {
   background-color: #FFE3B5 !important; /* Keep your yellow color */
   color: #98A2B3 !important; /* Custom text color */
   pointer-events: none; /* still disables clicks */
+}
+
+.display-flex{
+  display: flex;
+}
+
+.mapStyle {
+  width: 100%;
+  height: 601px; /* Default (lg and up) */
+}
+
+@media (max-width: 1264px) {
+  .mapStyle {
+    height: 577px; /* md */
+  }
+}
+
+@media (max-width: 960px) {
+  .mapStyle {
+    height: 377px; /* sm */
+  }
+}
+
+@media (max-width: 600px) {
+  .mapStyle {
+    height: 118px; /* xs */
+  }
 }
 </style>
