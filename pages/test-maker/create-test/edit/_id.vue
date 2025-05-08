@@ -61,13 +61,12 @@
             </v-col>
 
             <v-col cols="2" md="1" class="pr-0" v-show="!path_panel_expand">
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
+              <v-tooltip location="bottom">
+                <template v-slot:activator="{ props }">
                   <v-btn
                     color="teal"
                     class="white--text py-5"
-                    v-bind="attrs"
-                    v-on="on"
+                    v-bind="props"
                     block
                     @click="path_panel_expand = !path_panel_expand"
                   >

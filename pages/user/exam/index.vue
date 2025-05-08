@@ -84,28 +84,26 @@
                           </p>
                           <div>
                             {{ showStatus(item.status) }}
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   color="error"
                                   @click="openDeleteConfirmDialog(item.id)"
                                   small
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                 >
                                   <v-icon small> mdi-delete </v-icon>
                                 </v-btn>
                               </template>
                               <span>Delete</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   small
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                   :to="`/test-maker/edit/${item.id}`"
                                 >
                                   <v-icon small> mdi-note-edit-outline </v-icon>
@@ -113,14 +111,13 @@
                               </template>
                               <span>Edit</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   small
                                   color="primary"
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                 >
                                   <v-icon small>
                                     mdi-share-variant-outline

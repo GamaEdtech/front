@@ -25,7 +25,7 @@
               readonly
               dense
             >
-              <template slot="append">
+              <template v-slot:append>
                 <v-btn icon class="pointer" color="teal" @click="copyUrl">
                   <v-icon class="search-icon pb-2">mdi-content-copy</v-icon>
                 </v-btn>
@@ -109,15 +109,14 @@
                 >
                   {{ message.status_message }}
                 </v-chip>
-                <v-tooltip bottom v-if="message.deleteable">
-                  <template v-slot:activator="{ on, attrs }">
+                <v-tooltip location="bottom" v-if="message.deleteable">
+                  <template v-slot:activator="{ props }">
                     <v-btn
                       icon
                       color="error"
                       @click="openDeleteConfirmDialog(message.id)"
                       small
-                      v-bind="attrs"
-                      v-on="on"
+                      v-bind="props"
                     >
                       <v-icon small> mdi-delete </v-icon>
                     </v-btn>
