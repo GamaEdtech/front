@@ -4,8 +4,9 @@
         <div ref="container" class="container" />
 
         <!-- Game UI Components -->
-        <InteractionPrompt :opration="promptOperation" v-if="!isMathModalOpen" :is-near="isNear"
-            @door-interaction="handleDoorInteraction" @gate-interaction="handleGateInteraction"
+        <InteractionPrompt :opration="promptOperation"
+            v-if="(!isMathModalOpen && promptOperation === 'door') || (!isChestOpen && promptOperation === 'chest') || promptOperation === 'gate'"
+            :is-near="isNear" @door-interaction="handleDoorInteraction" @gate-interaction="handleGateInteraction"
             @chest-interaction="handleChestInteraction" />
 
         <MathModal v-if="isMathModalOpen" :problem="currentProblem" :answer="currentAnswer" :levels="levels"
@@ -23,11 +24,14 @@
 
         <!-- Game instructions modal -->
         <HelpModal />
+
+        <!-- Coins -->
+        <Coins :coins="coins" :reward="currentStepData!.reward" :is-chest-open="isChestOpen" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed, reactive, Ref } from 'vue'
 import { useThreeJS } from '../../composables/game/useThreejs'
 import { useCharacterController } from '../../composables/game/castle/useCharacterController'
 import MathModal from '@/components/game/castle/MathModal.vue'
@@ -43,7 +47,7 @@ import useGate from '~/composables/game/castle/useGate'
 import { DoorModels } from '~/interfaces/DoorModels.interface'
 import { Level } from '~/interfaces/DoorStatus'
 import { Levels, Step } from '~/interfaces/levels.interface'
-
+import Coins from '~/components/game/castle/coins.vue'
 // ==========================================
 // Game Configuration
 // ==========================================
@@ -51,7 +55,6 @@ import { Levels, Step } from '~/interfaces/levels.interface'
 const levels = ref<Levels>({
     level1: {
         step1: {
-            reward: "500",
             door001: { problem: "2 + 3", answer: "5" },
             door002: { problem: "5 + 7", answer: "12" },
             door003: { problem: "10 + 8", answer: "18" },
@@ -64,6 +67,7 @@ const levels = ref<Levels>({
             door004: { problem: "20 - 7", answer: "13" }
         },
         step3: {
+            reward: "500",
             door001: { problem: "10 / 2", answer: "5" },
             door002: { problem: "18 / 3", answer: "6" },
             door003: { problem: "20 / 4", answer: "5" },
@@ -91,6 +95,8 @@ const isMathModalOpen = ref(false)
 const levelUpModal = ref<boolean>(false)
 const promptOperation = ref<string>("")  // Note: Named 'promptOperation' but passed as 'opration' prop due to component definition
 const nearDoor = ref<"door001" | "door002" | "door003" | "door004" | null>(null)
+const isChestOpen = ref<boolean>(false)
+const coins = ref<number>(0)
 
 // Device detection
 const isMobile = ref(false)
@@ -106,11 +112,21 @@ const container = ref<HTMLDivElement | null>(null)
 const characterContainer = ref<THREE.Object3D<THREE.Object3DEventMap>>()
 let characterController: ReturnType<typeof useCharacterController> | null = null
 // controller for castle & chest models
-let modelsController: { visibleChest: (status: boolean) => void; chestInteractions: (character: THREE.Object3D) => boolean; chestAnimation: (() => { play: () => void; stop: () => void }) | null; chestUpdate: (delta: number) => void } | null = null
+let modelsController: {
+    visibleChest: (status: boolean) => void;
+    chestInteractions: (character: THREE.Object3D) => boolean; chestAnimation: (() => { play: () => void; stop: () => void }) | null;
+    chestUpdate: (delta: number) => void;
+} | null = null
 
 // Gate visibility
 const visibleGate = ref<() => void>()
 const unVisibleGate = ref<() => void>()
+
+// select coins ref
+const coinsRef = ref<InstanceType<typeof Coins> | null>(null)
+
+// select camera ref
+const cameraRef = ref<THREE.PerspectiveCamera | null>(null)
 
 // ==========================================
 // Computed Properties
@@ -293,7 +309,19 @@ const handleGateInteraction = () => {
 
 const handleChestInteraction = () => {
     modelsController?.chestAnimation?.()?.play()
-    
+
+    isChestOpen.value = true
+
+    console.log("coinsRef.value");
+    console.log(coinsRef.value);
+
+    coins.value += Number(currentStepData.value?.reward)
+
+    setTimeout(() => {
+        isChestOpen.value = false
+        handleGateInteraction()
+    }, 2000)
+
     console.log("Chest interaction triggered")
 }
 
@@ -396,6 +424,9 @@ const initializeCharacterAndInteractions = (scene: THREE.Scene, camera: THREE.Pe
                 } else {
                     isNearChest.value = false
                     isNearGate.value = gateInteractions(characterContainer.value as THREE.Object3D) || false
+                    console.log("isNearGate.value");
+                    console.log(isNearGate.value);
+
                 }
             })
         }
@@ -456,6 +487,8 @@ onMounted(async () => {
         startAnimationLoop,
         cleanup: cleanupThree
     } = useThreeJS()
+
+    cameraRef.value = camera.value
 
     // Set up the 3D scene in the container
     setupScene(container.value, modelsLoaded)

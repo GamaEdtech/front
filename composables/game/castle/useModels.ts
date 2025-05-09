@@ -9,7 +9,6 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
     let visibleChest: (status: boolean) => void = () => { };
     let chestInteractions: (character: THREE.Object3D) => boolean = () => false;
     let chestAnimation: (() => { play: () => void, stop: () => void }) | null = null;
-    // per-frame update callback for the chest animation mixer
     let chestUpdate: (delta: number) => void = () => { };
 
     await Promise.all(
@@ -25,7 +24,6 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
         }
         chestInteractions = chest.chestInteractions
         chestAnimation = chest.animation
-        // grab the chest-model's per-frame update callback
         chestUpdate = chest.update
 
         scene.value.add(castle)
@@ -37,7 +35,7 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
         visibleChest,
         chestInteractions,
         chestAnimation,
-        chestUpdate
+        chestUpdate,
     }
 }
 

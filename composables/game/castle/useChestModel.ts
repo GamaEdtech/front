@@ -45,11 +45,18 @@ const useChestModel = async (): Promise<{
             }
 
             const action = mixer.clipAction(chestGlb.animations[0], chest)
+            const clip = chestGlb.animations[0]
 
             const play = () => {
+                const duration = clip.duration
+                const halfDuration = duration / 2
+
                 console.log("play");
-                action.loop = 2200
-                action.play()
+                action.reset().play()
+
+                setTimeout(() => {
+                    action.paused = true
+                }, halfDuration * 1000)
             }
 
             const stop = () => {
