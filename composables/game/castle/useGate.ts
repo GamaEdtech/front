@@ -11,7 +11,9 @@ function createGate(
     size: number = 12,
     color: number = 0x3498db
 ): {
-        gateInteractions: (character: THREE.Object3D) => boolean
+        gateInteractions: (character: THREE.Object3D) => boolean,
+        visible: () => void,
+        unVisible: () => void
 } {
     
     const INTERACTION_DISTANCE = 50 
@@ -66,10 +68,19 @@ function createGate(
 
     // Position the entire beacon group
     beaconGroup.position.set(position.x, position.y, position.z);
-    scene.add(beaconGroup);
+
+    const visible = () => {
+        scene.add(beaconGroup)
+    }
+
+    const unVisible = () => {
+        scene.remove(beaconGroup)
+    }
 
     return {
-        gateInteractions
+        gateInteractions,
+        visible,
+        unVisible
     }
 }
 
