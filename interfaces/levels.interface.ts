@@ -1,4 +1,5 @@
 export interface Step {
+    reward?: string,
     door001: {
         problem: string;
         answer: string;

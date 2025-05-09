@@ -43,7 +43,8 @@ interface Opration {
 
 interface Oprations {
     gate: Opration,
-    door: Opration
+    door: Opration,
+    chest: Opration
 }
 
 const isMobile = useDisplay().mobile.value;
@@ -77,12 +78,24 @@ const oprations: Oprations = {
             },
             pc: "go to next step"
         }
+    },
+    chest: {
+        icon: "mdi-treasure-chest",
+        name: "Chest",
+        key: "F",
+        target: {
+            phone: {
+                text: "Press below button to open the chest",
+                button: "Open chest"
+            },
+            pc: "to open the chest"
+        }
     }
 }
 
 const currentPrompt = computed(() => oprations[props.opration as "door"])
 
-const emit = defineEmits(['doorInteraction', 'gateInteraction']);
+const emit = defineEmits(['doorInteraction', 'gateInteraction', 'chestInteraction']);
 
 // Handle keyboard interaction
 const handleKeyPress = (event: KeyboardEvent) => {
@@ -91,6 +104,8 @@ const handleKeyPress = (event: KeyboardEvent) => {
             emit('doorInteraction');
         } else if (props.opration === 'gate' ){
             emit('gateInteraction');
+        } else if (props.opration === 'chest') {
+            emit('chestInteraction');
         }
     } else{
         if (event.code === 'KeyE' && props.isNear && props.opration === 'door') {
@@ -99,6 +114,9 @@ const handleKeyPress = (event: KeyboardEvent) => {
         }else if (event.code === 'KeyN' && props.isNear) {
             console.log('Gate interaction triggered via N key');
             emit('gateInteraction');
+        } else if (event.code === 'KeyF' && props.isNear && props.opration === 'chest') {
+            console.log('Chest interaction triggered via F key');
+            emit('chestInteraction');
         }
     }
 };

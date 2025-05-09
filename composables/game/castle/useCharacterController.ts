@@ -68,7 +68,7 @@ export function useCharacterController(
     const characterBox = shallowRef<THREE.Box3 | null>(null)
 
     // Interaction state
-    const isNearGate = ref(false)
+    // const isNearGate = ref(false)
     const isNearDoor = ref(false)
     const doorPositions: Record<string, THREE.Vector3> = {
         door001: new THREE.Vector3(43, 55, 248), // Estimated position for Door.001
@@ -233,11 +233,12 @@ export function useCharacterController(
     /**
      * Updates interaction state based on proximity to doors
      */
-    const { gateInteractions } = useGate(scene)
-    const updateInteractions = () => {
+    // const { gateInteractions } = useGate(scene)
+    const updateInteractions = (callback: () => void) => {
         if (!character.value) return
 
-        isNearGate.value = gateInteractions(character.value)
+        // isNearGate.value = gateInteractions(character.value)
+        callback()
 
         let nearAnyDoor = false;
 
@@ -494,8 +495,10 @@ export function useCharacterController(
     /**
      * Updates character position with collision detection and wall sliding
      */
-    const updateCharacter = () => {
-        if (!character.value || !characterBox.value) return
+    const updateCharacter = (): {
+        updateInteractions: (callback: () => void) => void 
+    } | null => {
+        if (!character.value || !characterBox.value) return null
 
         // Calculate movement direction
         const direction = calculateMovementDirection()
@@ -543,7 +546,11 @@ export function useCharacterController(
         characterBox.value.setFromObject(character.value)
 
         // Update interaction states
-        updateInteractions()
+        // updateInteractions()
+
+        return {
+            updateInteractions
+        }
     }
 
     /**
@@ -568,7 +575,6 @@ export function useCharacterController(
         cleanup,
         character,
         isNearDoor,
-        isNearGate,
         characterContainer,
         isMobile,
         moveState,
