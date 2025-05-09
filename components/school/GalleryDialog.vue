@@ -228,7 +228,7 @@ export default {
         formData.append("FileType", "SimpleImage");
 
         return this.$axios.$post(
-          `/api/v2/schools/${this.$route.params.id}/images/SimpleImage`,
+          `/api/v2/schools/${this.$route.params.id}/images`,
           formData,
           {
             headers: {
