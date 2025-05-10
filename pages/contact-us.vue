@@ -33,6 +33,17 @@
                 v-model="form.email"
             ></v-text-field>
 
+            <!--Subject Input-->
+            <v-text-field
+                label="Subject*"
+                placeholder="Enter your Subject"
+                outlined
+                class="rounded-pill mb-5"
+                height="48"
+                :rules="[rules.required]"
+                v-model="form.subject"
+            ></v-text-field>
+
 
             <!--Message textarea-->
             <v-textarea
@@ -49,7 +60,7 @@
             ></v-textarea>
 
             <!--File Input & Preview(delete) File-->
-            <v-row class="mb-14" dense>
+            <!--<v-row class="mb-14" dense>
 
               <v-col cols="12" v-show="form.file">
                 <v-row align="center" justify="space-between">
@@ -66,7 +77,7 @@
 
               <v-col cols="12" v-show="!form.file">
                 <v-row align="center" dense>
-                  <!-- Hidden file input -->
+                   Hidden file input 
                   <input
                     type="file"
                     ref="fileInput"
@@ -74,7 +85,7 @@
                     class="d-none"
                   />
 
-                  <!-- Attach file button -->
+                   Attach file button 
                   <v-col cols="auto">
                     <v-btn
                       color="#2E90FA"
@@ -88,7 +99,7 @@
                     </v-btn>
                   </v-col>
 
-                  <!-- Hint -->
+                   Hint 
                   <v-col>
                     <p class="gtext-t6 d-flex align-center gray--text">
                       Max size: 2MB (jpeg, png, webp)
@@ -96,7 +107,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-            </v-row>
+            </v-row>-->
 
             <v-btn
               color="primary"
@@ -153,7 +164,8 @@ export default {
         name: '',
         email: '',
         message: '',
-        file: null
+        subject:''
+        //file: null
       },
       map: null,
       officeCoords: [40.764064, -73.988577],
@@ -163,20 +175,22 @@ export default {
         min25: v => (v && v.length >= 25) || 'Minimum 25 characters required.',
       },
       valid: false, // track form validity
+      captchaKey: ''
     }
   },
   methods: {
     async submitForm(event) {
       event.preventDefault();
-      const querystring = require("querystring");
       if (this.valid) {
         await this.$axios.$post(
-            "/api/v1/users/login",
-            querystring.stringify({
-              identity: this.identity,
-              pass: this.password,
-              type: "request",
-            }),
+            "/api/v1/contacts",
+            {
+              captcha: this.captchaKey,
+              fullName: this.form.name,
+              email: this.form.email,
+              subject: this.form.subject,
+              body: this.form.message
+            },
           )
           .then(() => {
             this.$toast.success('well played')
@@ -200,14 +214,20 @@ export default {
       ) {
         this.form.file = selectedFile;
       } else {
-        alert('Invalid file. Only jpeg, png, or webp under 2MB allowed.');
+        this.$toast.show('<span class="mdi mdi-close-circle gtext-t3 toast-contactus-message-error"></span> <span>Your file size exceeds the allowed limit.</span>', {
+        type: 'error',
+        className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-error'
+      })
         this.$refs.fileInput.value = null; // Reset input
       }
     },
     removeFile() {
       this.form.file = null;
       this.$refs.fileInput.value = null;
-      this.$toast.success('Your message has been sent successfully.')
+      this.$toast.show('<span class="mdi mdi-check-circle gtext-t3 toast-contactus-message-success"></span> <span>Your message has been sent successfully.</span>', {
+        type: 'success',
+        className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-success'
+      })
     }
   },
   async mounted() {

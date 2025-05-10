@@ -4634,3 +4634,19 @@ body {
 .h-full {
   height: 100% !important;
 }
+
+.toast-contactus-error{
+  border-left: 4px solid #F04438;
+  height: 72px !important;
+}
+.toast-contactus-message-error{
+  color: #F04438 !important;
+}
+
+.toast-contactus-success{
+  border-left: 4px solid #12B76A;
+  height: 72px !important;
+}
+.toast-contactus-message-success{
+  color: #12B76A !important;
+}
