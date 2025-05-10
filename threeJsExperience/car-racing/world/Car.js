@@ -292,6 +292,7 @@ export default class Car {
         if (sameLane && xDiff <= this.checkThreshold && !gem.collected) {
             if (this.experience.world.gems) {
                 this.experience.world.gems.onGemColocted(this.gemCheckIndex)
+                this.experience.callBacks.onGemColocted()
             }
             gem.collected = true;
             this.gemCheckIndex++;

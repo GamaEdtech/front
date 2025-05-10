@@ -28,6 +28,15 @@
             </div>
 
             <div :class="`container-timer-score ${stepGuidMenu == `timerScore` || !isShowGuidMenu ? `` : `fade`}`">
+
+                <div class="gems-show">
+                    <div class="gem-image-div">
+                        <v-icon color="white">mdi-diamond-stone</v-icon>
+                    </div>
+
+                    <span class="count-gem">{{ countGemCollected }}</span>
+                </div>
+
                 <div class="score-div">
                     <span class="score-text">{{ score }}</span>
                     <v-icon class="icon-score highligth" color="#ed8a19">
@@ -55,6 +64,10 @@
                 </div>
             </div>
 
+        </div>
+
+        <div class="gem-collect-animation" v-if="showGemAnimation" :style="gemAnimationStyle">
+            +1
         </div>
 
         <div :class="`overlay-pause ${isShowGuidMenu ? `zindex-less` : ``}`"
@@ -130,6 +143,7 @@ export default {
         return {
             experience: null,
             questionStatus: 'normal',
+
             questions: [
                 {
                     text: "10 - 2 =",
@@ -151,26 +165,7 @@ export default {
                     choices: ["72", "35", "12", "64"],
                     indexAnswer: 0
                 },
-                // {
-                //     text: "6 * 5 =",
-                //     choices: ["20", "30", "44", "81"],
-                //     indexAnswer: 1
-                // },
-                // {
-                //     text: "10 / 2 =",
-                //     choices: ["5", "11", "1", "0"],
-                //     indexAnswer: 0
-                // },
-                // {
-                //     text: "1 + 11 =",
-                //     choices: ["28", "17", "22", "64"],
-                //     indexAnswer: 2
-                // },
-                // {
-                //     text: "9 * 8 =",
-                //     choices: ["21", "35", "72", "64"],
-                //     indexAnswer: 2
-                // },
+
             ],
             currentQuestionIndex: 0,
             timer: 40,
@@ -186,6 +181,10 @@ export default {
             isShowGuidMenu: false,
             stepGuidMenu: "Finish",
             isUpdateTimer: true,
+            countGemCollected: 0,
+            showGemAnimation: false,
+            gemAnimationStyle: {},
+            animationGemCollectDuration: 1500,
         };
     },
     mounted() {
@@ -205,6 +204,7 @@ export default {
                 onResultGameChange: (result) => this.onResultGameChange(result),
                 onChangeSceneReady: this.onChangeSceneReady,
                 onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                onGemColocted: this.onGemColocted
             });
         });
     },
@@ -322,6 +322,43 @@ export default {
                 this.experience.changeCameraMode("default")
                 this.cameraMode = "default"
             }
+        },
+        async startAnimationGemCollect() {
+            const startX = window.innerWidth / 2;
+            const startY = window.innerHeight / 2;
+            const gemElement = document.querySelector('.gems-show');
+            if (gemElement) {
+                const gemRect = gemElement.getBoundingClientRect();
+                const endX = gemRect.left + gemRect.width / 2;
+                const endY = gemRect.top + gemRect.height / 2;
+
+                this.gemAnimationStyle = {
+                    left: `${startX}px`,
+                    top: `${startY}px`,
+                    opacity: '1',
+                    transform: 'scale(1)',
+                };
+                this.showGemAnimation = true;
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        this.gemAnimationStyle = {
+                            left: `${endX}px`,
+                            top: `${endY}px`,
+                            opacity: '0',
+                            transform: 'scale(0.8)',
+                            transition: `all ${this.animationGemCollectDuration}ms ease-out`,
+                        };
+                        resolve();
+                    }, 50);
+                });
+
+                await new Promise(resolve => setTimeout(resolve, this.animationGemCollectDuration));
+                this.showGemAnimation = false;
+            }
+        },
+        onGemColocted() {
+            this.countGemCollected += 1
+            this.startAnimationGemCollect()
         }
 
     }
@@ -799,6 +836,67 @@ export default {
     transform: translateY(-100px);
 }
 
+/* gems Show */
+.gems-show {
+    width: 100px;
+    height: 40px;
+    border-radius: 40px;
+    background: linear-gradient(135deg, #ffeaa7, #ff8400);
+    border: 4px solid #ffc400;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gem-image-div {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: absolute;
+    background-color: #ef993f;
+    left: -10px;
+    top: -10px;
+    border: 4px solid #ffc400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.count-gem {
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    right: 20px;
+}
+
+.gem-collect-animation {
+    position: fixed;
+    z-index: 1000;
+    font-size: 80px;
+    font-weight: bold;
+    color: #ef993f;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    user-select: none;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease-out;
+}
+
+/* responsive tablet */
+@media screen and (max-width: 768px) {
+    .top-items {
+        align-items: flex-start;
+    }
+
+    .container-timer-score {
+        column-gap: 6px;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+}
+
 /* responsive mobile */
 @media screen and (max-width: 480px) {
     .change-lane-btn {
@@ -849,6 +947,20 @@ export default {
 
     .buttons-div {
         bottom: 60px;
+    }
+
+    .gems-show {
+        width: 80px;
+        height: 30px;
+    }
+
+    .gem-image-div {
+        width: 40px;
+        height: 40px;
+    }
+
+    .count-gem {
+        font-size: 20px;
     }
 }
 </style>
