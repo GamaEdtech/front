@@ -7,6 +7,7 @@ import Clouds from "./Clouds.js"
 import Trees from "./Trees.js"
 import Car from "./Car.js"
 import Levels from "./Levels.js"
+import Gems from './Gems.js'
 
 
 export default class World {
@@ -24,11 +25,13 @@ export default class World {
         this.trees = new Trees()
         this.car = new Car()
         this.levels = new Levels()
+        this.gems = new Gems()
     }
 
 
     update() {
         this.car.update()
+        this.gems.update()
         // this.levels.update()
         // this.clouds.update()
     }

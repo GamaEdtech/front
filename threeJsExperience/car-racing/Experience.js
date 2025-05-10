@@ -106,8 +106,29 @@ export default class Experience {
             questions: questions,
             distanceFromEndRoadQuestion: 40,
 
+            // gems
+            gemCount: 3,
+            gemsInformation: [],
+
             isDevelopeMent: false
         }
+
+        this.options.questionsPositionX = this.options.questions.map((q, index) => {
+            return ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.options.questions.length + 1)) * (index + 1)
+        })
+        this.options.spacingFromEechItem = (this.options.questionsPositionX[1] - this.options.questionsPositionX[0]) / 3
+        this.options.stepXSearchAvailablePlace = 2
+        for (let i = 0; i < this.options.gemCount; i++) {
+            const availableXs = this.generateAvailableGemXs()
+            if (availableXs.length === 0) {
+                console.warn("No valid X positions found for placing a gem.")
+            }
+            const randomIndex = Math.floor(Math.random() * availableXs.length)
+            const x = Math.round(availableXs[randomIndex])
+            const lane = Math.floor(Math.random() * this.options.countLine) + 1
+            this.options.gemsInformation.push({ x, lane, collected: false })
+        }
+        this.options.gemsInformation.sort((a, b) => a.x - b.x)
 
 
         // Setup
@@ -156,6 +177,26 @@ export default class Experience {
         })
     }
 
+    generateAvailableGemXs() {
+        const availableXs = []
+
+        const firstQuestionX = Math.min(...this.options.questionsPositionX)
+        const lastQuestionX = Math.max(...this.options.questionsPositionX)
+
+        const roadStart = firstQuestionX + this.options.spacingFromEechItem
+        const roadEnd = lastQuestionX - this.options.spacingFromEechItem
+
+        for (let x = roadStart; x <= roadEnd; x += this.options.stepXSearchAvailablePlace) {
+            const isFarFromQuestions = this.options.questionsPositionX.every(qx => Math.abs(qx - x) > this.options.spacingFromEechItem)
+            const isFarFromPrevious = this.options.gemsInformation.every(gem => Math.abs(gem.x - x) > this.options.spacingFromEechItem)
+            if (isFarFromQuestions && isFarFromPrevious) {
+                availableXs.push(x)
+            }
+        }
+
+        return availableXs
+    }
+
     changeLane(direction) {
         if (this.world && this.world.car) {
             this.world.car.changeLane(direction)
@@ -171,8 +212,21 @@ export default class Experience {
     }
 
     resetGame() {
-        if (this.world && this.world.car) {
+        if (this.world && this.world.car && this.world.gems) {
+            this.options.gemsInformation = []
+            for (let i = 0; i < this.options.gemCount; i++) {
+                const availableXs = this.generateAvailableGemXs()
+                if (availableXs.length === 0) {
+                    console.warn("No valid X positions found for placing a gem.")
+                }
+                const randomIndex = Math.floor(Math.random() * availableXs.length)
+                const x = Math.round(availableXs[randomIndex])
+                const lane = Math.floor(Math.random() * this.options.countLine) + 1
+                this.options.gemsInformation.push({ x, lane, collected: false })
+            }
+            this.options.gemsInformation.sort((a, b) => a.x - b.x)
             this.world.car.reset()
+            this.world.gems.reset()
         }
     }
 

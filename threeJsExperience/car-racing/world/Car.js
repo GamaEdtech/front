@@ -4,7 +4,6 @@ import Experience from '../Experience.js'
 
 export default class Car {
     constructor() {
-
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.time = this.experience.time
@@ -24,9 +23,7 @@ export default class Car {
 
         this.currentQuestionIndex = 0
         this.checkThreshold = 2
-        this.questionPositions = this.options.questions.map((q, index) => {
-            return ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.options.questions.length + 1)) * (index + 1)
-        })
+        this.questionPositions = this.options.questionsPositionX
 
 
         this.isReversing = false
@@ -55,11 +52,16 @@ export default class Car {
         this.isDecreasingPhase = false
         this.directionLastSuccessRotation = 1
 
+        this.gemsInformation = this.options.gemsInformation
+        this.gemCheckIndex = 0;
+
+
+
 
         window.addEventListener("keydown", (event) => {
             // if (event.code === "ArrowUp") {
             //     this.moveForward()
-            // } 
+            // }
             if (event.code === "ArrowLeft") {
                 this.changeLane(-1)
             }
@@ -150,6 +152,8 @@ export default class Car {
         this.positionX = this.options.offsetXStart
         this.mesh.position.set(this.positionX, 0.5, this.getFinalZ(this.positionX, this.currentLane))
         this.currentQuestionIndex = 0
+        this.gemsInformation = this.options.gemsInformation
+        this.gemCheckIndex = 0;
     }
 
     setMesh() {
@@ -270,6 +274,30 @@ export default class Car {
         }
     }
 
+    checkGemCollision() {
+        if (this.gemCheckIndex >= this.gemsInformation.length) return;
+        const gem = this.gemsInformation[this.gemCheckIndex];
+
+        if (gem.x < this.positionX - this.checkThreshold) {
+            if (this.experience.world.gems) {
+                this.experience.world.gems.passGem(this.gemCheckIndex)
+            }
+            this.gemCheckIndex++;
+            return;
+        }
+
+        const xDiff = Math.abs(this.positionX - gem.x);
+        const sameLane = this.targetLane === gem.lane;
+
+        if (sameLane && xDiff <= this.checkThreshold && !gem.collected) {
+            if (this.experience.world.gems) {
+                this.experience.world.gems.onGemColocted(this.gemCheckIndex)
+            }
+            gem.collected = true;
+            this.gemCheckIndex++;
+        }
+    }
+
     update() {
         const distancePerFrame = this.speed * (this.time.delta / 1000)
         this.positionX += distancePerFrame
@@ -287,6 +315,7 @@ export default class Car {
         }
 
         this.checkQuestionCollision()
+        this.checkGemCollision()
 
         if (this.isReversing) {
             this.reverseStep()
