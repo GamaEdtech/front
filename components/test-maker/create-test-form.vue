@@ -9,7 +9,7 @@
     <v-card flat class="mt-3">
       <!--Question section-->
       <v-card-text id="test-question">
-        <VeeForm @submit="submitQuestion">
+        <VeeForm ref="veeForm" @submit="submitQuestion">
           <v-row>
             <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
               <v-autocomplete
@@ -101,17 +101,17 @@
                   rules="required"
                   v-slot="{ errorMessage }"
                 >
-                  <RickEditor
-                    v-model:modelValue="form.question"
+                    <RickEditor
+                      v-model:modelValue="form.question"
                     min-height="200px"
-                    :features="['bold', 'italic', 'underline', 'alignment']"
+                      :features="['bold', 'italic', 'underline', 'alignment']"
                   >
                     <template #content>
-                      <v-btn
+                  <v-btn
                         variant="text"
                         color="teal"
                         icon="mdi-camera"
-                        size="small"
+                    size="small"
                         @click="selectFile('q_file')"
                       ></v-btn>
                       <v-btn
@@ -120,8 +120,8 @@
                         size="small"
                         color="error"
                         icon="mdi-delete"
-                        @click="deleteFile('q_file')"
-                      ></v-btn>
+                    @click="deleteFile('q_file')"
+                  ></v-btn>
                     </template>
                   </RickEditor>
                   <p v-if="errorMessage" class="text-error text-caption mt-1">
@@ -135,7 +135,7 @@
                 height="200"
                 class="pointer image-preview rounded mt-2"
                 @click="selectFile('q_file')"
-                :src="form.q_file_base64"
+                  :src="form.q_file_base64"
               />
             </v-col>
             <!--End question section-->
@@ -151,7 +151,7 @@
                   <p class="mr-3 mt-3">Choices type:</p>
                   <v-btn-toggle
                     v-model="answerType"
-                    color="teal"
+                            color="teal"
                     density="comfortable"
                     mandatory
                   >
@@ -161,11 +161,11 @@
                     </v-btn>
                     <v-btn value="photo" @click="answerTypeChanged('photo')">
                       <v-icon start>mdi-camera</v-icon>
-                      Photo
+                            Photo
                     </v-btn>
                   </v-btn-toggle>
-                </v-col>
-              </v-row>
+                    </v-col>
+                  </v-row>
               <!--End answer type-->
 
               <!--Test answer options-->
@@ -245,16 +245,16 @@
                           >
                         </v-btn>
 
-                        <v-btn
+                          <v-btn
                           v-show="form.a_file_base64"
                           @click="deleteFile('a_file')"
                           variant="text"
                           color="error"
                           icon="mdi-delete"
-                          size="small"
+                            size="small"
                           class="img-clear-btn"
-                        ></v-btn>
-                      </div>
+                          ></v-btn>
+                        </div>
                     </v-col>
                   </v-row>
 
@@ -310,29 +310,29 @@
                           @click="selectFile('b_file')"
                           :src="form.b_file_base64"
                         />
-                        <v-btn
+                                <v-btn
                           v-else
                           variant="flat"
                           color="teal-lighten-5"
                           class="image-input d-flex align-center justify-center"
                           style="width: 90px; height: 90px"
-                          @click="selectFile('b_file')"
-                        >
+                              @click="selectFile('b_file')"
+                            >
                           <v-icon size="x-large" color="teal"
                             >mdi-camera</v-icon
                           >
                         </v-btn>
 
-                        <v-btn
+                                <v-btn
                           v-show="form.b_file_base64"
-                          @click="deleteFile('b_file')"
+                                  @click="deleteFile('b_file')"
                           variant="text"
                           color="error"
                           icon="mdi-delete"
                           size="small"
                           class="img-clear-btn"
-                        ></v-btn>
-                      </div>
+                                ></v-btn>
+                              </div>
                     </v-col>
                   </v-row>
 
@@ -352,8 +352,8 @@
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
-                          <RickEditor
-                            v-model:modelValue="form.answer_c"
+                                <RickEditor
+                                  v-model:modelValue="form.answer_c"
                             min-height="90px"
                             :features="[
                               'bold',
@@ -386,7 +386,7 @@
                           @click="selectFile('c_file')"
                           :src="form.c_file_base64"
                         />
-                        <v-btn
+                                <v-btn
                           v-else
                           variant="flat"
                           color="teal-lighten-5"
@@ -399,17 +399,17 @@
                           >
                         </v-btn>
 
-                        <v-btn
+                                <v-btn
                           v-show="form.c_file_base64"
                           @click="deleteFile('c_file')"
                           variant="text"
                           color="error"
                           icon="mdi-delete"
-                          size="small"
+                                  size="small"
                           class="img-clear-btn"
-                        ></v-btn>
-                      </div>
-                    </v-col>
+                                ></v-btn>
+                              </div>
+                  </v-col>
                   </v-row>
 
                   <v-row v-if="form.type == 'fourchoice'">
@@ -462,7 +462,7 @@
                           @click="selectFile('d_file')"
                           :src="form.d_file_base64"
                         />
-                        <v-btn
+                              <v-btn
                           v-else
                           variant="flat"
                           color="teal-lighten-5"
@@ -475,20 +475,20 @@
                           >
                         </v-btn>
 
-                        <v-btn
+                                  <v-btn
                           v-show="form.d_file_base64"
                           @click="deleteFile('d_file')"
                           variant="text"
                           color="error"
                           icon="mdi-delete"
-                          size="small"
+                                    size="small"
                           class="img-clear-btn"
-                        ></v-btn>
-                      </div>
+                                  ></v-btn>
+                                </div>
                     </v-col>
                   </v-row>
                 </v-radio-group>
-              </Field>
+                        </Field>
               <!--End test answer options-->
             </v-col>
 
@@ -532,31 +532,32 @@
                 <v-icon size="x-large" color="teal">mdi-camera</v-icon>
               </v-btn>
 
-              <v-btn
+                                  <v-btn
                 v-show="form.answer_full_file_base64"
                 @click="deleteFile('answer_full_file')"
                 variant="text"
                 color="error"
                 icon="mdi-delete"
-                size="small"
+                                    size="small"
                 class="img-clear-btn"
               >
                 <v-icon small> mdi-delete </v-icon>
               </v-btn>
-            </v-col>
+                    </v-col>
             <!--End solution section-->
-          </v-row>
+                  </v-row>
 
-          <v-row>
-            <v-col cols="12">
-              <v-row>
+                  <v-row>
+                    <v-col cols="12">
+                  <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     type="submit"
-                    :disabled="!meta.valid"
+                    :disabled="buttonDisabled"
                     :loading="create_loading"
-                    lg
-                    color="teal"
+                    size="large"
+                     color="teal"
+                    variant="flat"
                     class="white--text"
                     block
                   >
@@ -567,8 +568,9 @@
                   <v-btn
                     @click="goToPreviewStep"
                     :disabled="examTestListLength < 5"
-                    lg
-                    color="teal"
+                    size="large"
+                            color="teal"
+                    variant="flat"
                     class="white--text"
                     block
                   >
@@ -580,16 +582,16 @@
                   </v-btn>
                 </v-col>
               </v-row>
-            </v-col>
-          </v-row>
+                    </v-col>
+                  </v-row>
 
           <!--Hidden input section-->
-          <div>
+                      <div>
             <Field name="q_file" v-slot="{ errorMessage }">
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('q_file')"
+                @update:model-value="uploadFile('q_file', $event)"
                 v-model="form_hidden_data.q_file"
                 ref="questionInput"
                 :error-messages="errorMessage"
@@ -600,9 +602,9 @@
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('answer_full_file')"
+                @update:model-value="uploadFile('answer_full_file', $event)"
                 v-model="form_hidden_data.answer_full_file"
-                ref="answerFullInput"
+                            ref="answerFullInput"
                 :error-messages="errorMessage"
               />
             </Field>
@@ -615,7 +617,7 @@
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('a_file')"
+                @update:model-value="uploadFile('a_file', $event)"
                 v-model="form_hidden_data.a_file"
                 ref="aInput"
                 :error-messages="errorMessage"
@@ -630,7 +632,7 @@
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('b_file')"
+                @update:model-value="uploadFile('b_file', $event)"
                 v-model="form_hidden_data.b_file"
                 ref="bInput"
                 :error-messages="errorMessage"
@@ -645,7 +647,7 @@
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('c_file')"
+                @update:model-value="uploadFile('c_file', $event)"
                 v-model="form_hidden_data.c_file"
                 ref="cInput"
                 :error-messages="errorMessage"
@@ -660,64 +662,13 @@
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
-                @change="uploadFile('d_file')"
+                @update:model-value="uploadFile('d_file', $event)"
                 v-model="form_hidden_data.d_file"
                 ref="dInput"
                 :error-messages="errorMessage"
               />
             </Field>
-          </div>
-
-          <!-- <v-row>
-            <v-col cols="12">
-              <v-row>
-                <v-col cols="12" md="6" class="pb-0">
-                  <v-btn
-                    type="submit"
-                    :disabled="invalid"
-                    :loading="create_loading"
-                    lg
-                    color="teal"
-                    class="white--text"
-                    block
-                  >
-                    Create
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    @click="goToPreviewStep"
-                    :disabled="examTestListLength < 5"
-                    lg
-                    color="teal"
-                    class="white--text"
-                    block
-                  >
-                    <span v-show="examTestListLength < 5"
-                      >Add at least {{ 5 - examTestListLength }} more
-                      tests</span
-                    >
-                    <span v-show="examTestListLength >= 5">Next step</span>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row> -->
-
-          <!-- 
-          <v-row>
-            <v-col cols="12">
-              <v-btn
-                color="teal"
-                variant="flat"
-                block
-                type="submit"
-                :loading="create_loading"
-              >
-                Create Test
-              </v-btn>
-            </v-col>
-          </v-row> -->
+                            </div>
         </VeeForm>
       </v-card-text>
     </v-card>
@@ -725,21 +676,48 @@
     <!--Cropper Dialog-->
     <v-dialog v-model="cropper_dialog" max-width="500">
       <v-card>
-        <v-card-title>Crop image</v-card-title>
-        <v-card-text>
-          <!-- Replace with vue-advanced-cropper v3 component when updating -->
-          <div v-if="cropper_dialog">
-            <!-- Placeholder for cropper component -->
-            <img :src="crop_file_url" style="max-width: 100%" />
+        <v-card-title class="text-h5 bg-teal text-white">
+          <v-icon start class="mr-2">mdi-crop</v-icon>
+          Crop Image
+        </v-card-title>
+        <v-card-text class="pt-4">
+          <v-progress-circular
+            v-if="crop_file_loading"
+            indeterminate
+            color="teal"
+            size="64"
+            class="my-8 mx-auto d-block"
+          ></v-progress-circular>
+          
+          <div v-else class="cropper-container">
+            <!-- In production, you'd use a proper cropper component -->
+            <img 
+              :src="crop_file_url" 
+              style="max-width: 100%; height: auto;" 
+              class="rounded elevation-1"
+            />
+            
+            <div class="text-caption text-center text-grey mt-2">
+              Drag to adjust the crop area
+            </div>
           </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="red" variant="text" @click="cropper_dialog = false">
+          <v-btn 
+            color="grey-darken-1" 
+            variant="text" 
+            @click="cropper_dialog = false"
+          >
             Cancel
           </v-btn>
-          <v-btn color="teal" variant="text" @click="cropper_dialog = false">
-            Crop
+          <v-btn 
+            color="teal" 
+            variant="flat" 
+            @click="submitCrop"
+            :loading="crop_confirm_loading"
+          >
+            Crop & Upload
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -783,6 +761,7 @@ const route = useRoute();
 /**
  * Define refs for HTML elements (file inputs)
  */
+const veeForm = ref(null);
 const questionInput = ref(null);
 const answerFullInput = ref(null);
 const aInput = ref(null);
@@ -827,6 +806,7 @@ const file_original_path = ref("");
  */
 const crop_file_url = ref("");
 const crop_file_loading = ref(false);
+const crop_confirm_loading = ref(false);
 const cropper_dialog = ref(false);
 const current_crop_file = ref("");
 
@@ -923,33 +903,61 @@ const typeList = [
  * Validation schema using Yup
  */
 const validationSchema = yup.object({
-  question: yup.string().required("Question is required"),
+  question: yup.string().test(
+    'has-content',
+    'Question is required',
+    (value) => !!value && value.trim() !== ''
+  ),
   true_answer: yup.string().when("type", {
     is: (val) => ["fourchoice", "twochoice", "tf"].includes(val),
-    then: () => yup.string().required("Please select the correct answer"),
+    then: () => yup.string().test(
+      'has-answer',
+      'Please select the correct answer',
+      (value) => !!value
+    ),
   }),
   // Additional validations based on answer type
   answer_a: yup.string().when(["type", "testImgAnswers"], {
     is: (type, testImgAnswers) =>
       ["fourchoice", "twochoice", "tf"].includes(type) && !testImgAnswers,
-    then: () => yup.string().required("Answer A is required"),
+    then: () => yup.string().test(
+      'has-content',
+      'Answer A is required',
+      (value) => !!value && value.trim() !== ''
+    ),
   }),
   answer_b: yup.string().when(["type", "testImgAnswers"], {
     is: (type, testImgAnswers) =>
       ["fourchoice", "twochoice", "tf"].includes(type) && !testImgAnswers,
-    then: () => yup.string().required("Answer B is required"),
+    then: () => yup.string().test(
+      'has-content',
+      'Answer B is required',
+      (value) => !!value && value.trim() !== ''
+    ),
   }),
   answer_c: yup.string().when(["type", "testImgAnswers"], {
     is: (type, testImgAnswers) => type === "fourchoice" && !testImgAnswers,
-    then: () => yup.string().required("Answer C is required"),
+    then: () => yup.string().test(
+      'has-content',
+      'Answer C is required',
+      (value) => !!value && value.trim() !== ''
+    ),
   }),
   answer_d: yup.string().when(["type", "testImgAnswers"], {
     is: (type, testImgAnswers) => type === "fourchoice" && !testImgAnswers,
-    then: () => yup.string().required("Answer D is required"),
+    then: () => yup.string().test(
+      'has-content',
+      'Answer D is required',
+      (value) => !!value && value.trim() !== ''
+    ),
   }),
   answer_full: yup.string().when(["type", "testImgAnswers"], {
     is: (type, testImgAnswers) => type === "descriptive" && !testImgAnswers,
-    then: () => yup.string().required("Full answer is required"),
+    then: () => yup.string().test(
+      'has-content',
+      'Full answer is required',
+      (value) => !!value && value.trim() !== ''
+    ),
   }),
 });
 
@@ -1032,23 +1040,82 @@ const getTypeList = async (type, parent = "") => {
  * Handle form submission
  */
 const submitQuestion = veeHandleSubmit(async (values) => {
+  console.log("Submit handler triggered with values:", values);
   create_loading.value = true;
-  const querystring = require("querystring");
-
+  
   try {
+    // Extract the required fields from the form
+    const formData = {
+      section: form.section,
+      base: form.base,
+      lesson: form.lesson,
+      topic: form.topic,
+      type: form.type,
+      question: form.question,
+      true_answer: form.true_answer,
+      testImgAnswers: form.testImgAnswers,
+      // Include other fields based on the question type
+      ...(form.type === 'fourchoice' && {
+        answer_a: form.answer_a,
+        answer_b: form.answer_b,
+        answer_c: form.answer_c,
+        answer_d: form.answer_d,
+      }),
+      ...(form.type === 'twochoice' && {
+        answer_a: form.answer_a,
+        answer_b: form.answer_b,
+      }),
+      ...(form.testImgAnswers && {
+        q_file: form.q_file,
+        a_file: form.a_file,
+        b_file: form.b_file,
+        c_file: form.c_file,
+        d_file: form.d_file,
+      }),
+      answer_full: form.answer_full,
+      answer_full_file: form.answer_full_file,
+    };
+    
+    console.log("Prepared form data to send:", formData);
+    
+    // Use proper querystring
+    const querystring = require("querystring");
+    const formDataString = querystring.stringify(formData);
+    console.log("Stringified form data:", formDataString);
+    
+    console.log("Sending request to /api/v1/examTests");
+    
+    // Add a simulated delay for easier debugging in console
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
-      body: querystring.stringify(values),
+      body: formDataString,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }).catch(error => {
+      console.error("Network error details:", {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+      });
+      throw error;
     });
 
+    console.log("API response received:", response);
+
     if (response.status == 1) {
+      console.log("Test created successfully with ID:", response.data?.id);
       $toast.success("Created successfully");
       path_panel_expand.value = false;
 
       // Edit mode or create exam progress
-      if (props.examEditMode === true)
+      if (props.examEditMode === true) {
+        console.log("Emitting update event with ID:", response.data.id);
         emit("update:updateTestList", response.data.id);
-      // End edit mode or create exam progress
+      }
 
       // Reset form fields
       form.question = "";
@@ -1070,15 +1137,21 @@ const submitQuestion = veeHandleSubmit(async (values) => {
 
       resetForm();
     } else {
-      $toast.error("An error occurred, try again");
+      console.error("API returned error status:", response);
+      $toast.error(response.message || "An error occurred, try again");
     }
   } catch (err) {
-    if (err.response?.status == 400) $toast.error(err.response.data.message);
-    else if (err.response?.status == 403) {
+    console.error("Error submitting form:", err);
+    if (err.response?.status == 400) {
+      console.error("Bad request error:", err.response.data);
+      $toast.error(err.response.data.message || "Bad request");
+    } else if (err.response?.status == 403) {
       // Handle authentication error
+      console.error("Authentication error:", err.response?.data);
       $toast.error("Authentication error");
       router.push("/login");
     } else {
+      console.error("Unhandled error:", err);
       $toast.error(err.message || "An error occurred");
     }
   } finally {
@@ -1091,50 +1164,36 @@ const submitQuestion = veeHandleSubmit(async (values) => {
  * @param {string} file_name - Name of the file field
  */
 const selectFile = (file_name) => {
-  if (file_name === "q_file") {
-    questionInput.value?.click();
-  } else if (file_name === "answer_full_file") {
-    answerFullInput.value?.click();
-  } else if (file_name === "a_file") {
-    aInput.value?.click();
-  } else if (file_name === "b_file") {
-    bInput.value?.click();
-  } else if (file_name === "c_file") {
-    cInput.value?.click();
-  } else if (file_name === "d_file") {
-    dInput.value?.click();
+  if (file_name === "q_file" && questionInput.value) {
+    questionInput.value.$el.querySelector('input[type="file"]').click();
+  } else if (file_name === "answer_full_file" && answerFullInput.value) {
+    answerFullInput.value.$el.querySelector('input[type="file"]').click();
+  } else if (file_name === "a_file" && aInput.value) {
+    aInput.value.$el.querySelector('input[type="file"]').click();
+  } else if (file_name === "b_file" && bInput.value) {
+    bInput.value.$el.querySelector('input[type="file"]').click();
+  } else if (file_name === "c_file" && cInput.value) {
+    cInput.value.$el.querySelector('input[type="file"]').click();
+  } else if (file_name === "d_file" && dInput.value) {
+    dInput.value.$el.querySelector('input[type="file"]').click();
   }
 };
 
 /**
  * Handle file upload
  * @param {string} file_name - Name of the file field
+ * @param {File|File[]} fileEvent - The file(s) from the input event
  */
-const uploadFile = (file_name) => {
-  let file = null;
+const uploadFile = (file_name, fileEvent) => {
+  // v-file-input can return array or single file, handle both cases
+  const file = Array.isArray(fileEvent) ? fileEvent[0] : fileEvent;
+  
+  if (!file) return;
+  
+  // Set current crop file name
+  current_crop_file.value = file_name;
 
-  if (file_name === "q_file") {
-    file = form_hidden_data.q_file;
-    current_crop_file.value = "q_file";
-  } else if (file_name === "answer_full_file") {
-    file = form_hidden_data.answer_full_file;
-    current_crop_file.value = "answer_full_file";
-  } else if (file_name === "a_file") {
-    file = form_hidden_data.a_file;
-    current_crop_file.value = "a_file";
-  } else if (file_name === "b_file") {
-    file = form_hidden_data.b_file;
-    current_crop_file.value = "b_file";
-  } else if (file_name === "c_file") {
-    file = form_hidden_data.c_file;
-    current_crop_file.value = "c_file";
-  } else if (file_name === "d_file") {
-    file = form_hidden_data.d_file;
-    current_crop_file.value = "d_file";
-  }
-
-  if (file) {
-    // Update the preview image
+  // Update the preview image
     if (file_name === "q_file") {
       form.q_file_base64 = URL.createObjectURL(file);
     } else if (file_name === "answer_full_file") {
@@ -1149,15 +1208,14 @@ const uploadFile = (file_name) => {
       form.d_file_base64 = URL.createObjectURL(file);
     }
 
-    // Set crop file URL for cropper dialog
-    crop_file_url.value = URL.createObjectURL(file);
+  // Set crop file URL for cropper dialog
+  crop_file_url.value = URL.createObjectURL(file);
 
-    // If need to show cropper, uncomment this
-    // cropper_dialog.value = true;
+  // If need to show cropper, uncomment this
+  // cropper_dialog.value = true;
 
-    // Upload directly without cropper for now
+  // Upload directly without cropper for now
     uploadFileToServer(file, file_name);
-  }
 };
 
 /**
@@ -1166,28 +1224,29 @@ const uploadFile = (file_name) => {
  * @param {string} file_name - The name of the file field
  */
 const uploadFileToServer = async (file, file_name) => {
+  const { $toast } = useNuxtApp();
+  
+  if (!file) {
+    $toast.error("No file selected");
+    return;
+  }
+  
   try {
-    // Create a form data object
+    // Create a FormData object
     const formData = new FormData();
     formData.append("file", file);
 
-    // Get toast service
-    const { $toast } = useNuxtApp();
-
-    // Send request with proper Authorization header
+    // Send API request
     const response = await $fetch("/api/v1/upload", {
       method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
+      body: formData
     });
 
-    // Check if response contains file data
-    if (response && response.data && response.data.length > 0) {
+    if (response?.data?.[0]?.file?.name) {
+      // Get the file name from the response
       const fileName = response.data[0].file.name;
-
-      // Store the file name in the corresponding form field
+      
+      // Update the corresponding form field
       if (file_name === "q_file") {
         form.q_file = fileName;
       } else if (file_name === "answer_full_file") {
@@ -1201,11 +1260,12 @@ const uploadFileToServer = async (file, file_name) => {
       } else if (file_name === "d_file") {
         form.d_file = fileName;
       }
-
+      
       $toast.success("File uploaded successfully");
+    } else {
+      $toast.error("Invalid response from server");
     }
   } catch (error) {
-    const { $toast } = useNuxtApp();
     $toast.error("Failed to upload file");
     console.error("File upload error:", error);
   }
@@ -1269,15 +1329,15 @@ const deleteFile = (file_name) => {
 const answerTypeChanged = (type) => {
   if (type === "txt") {
     text_answer.value = true;
-    photo_answer.value = false;
-    form.testImgAnswers = false;
-    text_answer_rules.value = "required";
+      photo_answer.value = false;
+      form.testImgAnswers = false;
+      text_answer_rules.value = "required";
     answerType.value = "text";
-  } else {
+    } else {
     text_answer.value = false;
-    photo_answer.value = true;
-    form.testImgAnswers = true;
-    text_answer_rules.value = "";
+      photo_answer.value = true;
+      form.testImgAnswers = true;
+      text_answer_rules.value = "";
     answerType.value = "photo";
   }
 };
@@ -1286,7 +1346,33 @@ const answerTypeChanged = (type) => {
  * Fetch current exam information
  */
 const getCurrentExamInfo = async () => {
-  // Implementation for fetching exam info if needed
+  // Get current exam ID from router or state
+  const currentExamId = useState("user").value?.currentExamId;
+  
+  if (currentExamId) {
+    try {
+      const response = await $fetch(`/api/v1/exams/info/${currentExamId}`);
+      
+      // Set form data from response
+      form.section = response.data.section;
+      form.base = response.data.base;
+      form.lesson = response.data.lesson;
+      
+      // Set file path if available
+      if (response.data.file_original) {
+        file_original_path.value = response.data.file_original;
+      }
+      
+      // Set exam test list length
+      if (response.data.tests && Array.isArray(response.data.tests)) {
+        examTestListLength.value = response.data.tests.length;
+      }
+    } catch (err) {
+      console.error("Error fetching exam info:", err);
+      const { $toast } = useNuxtApp();
+      $toast.error("Failed to load exam information");
+    }
+  }
 };
 
 /**
@@ -1385,6 +1471,110 @@ onMounted(() => {
   getTypeList("section");
   getCurrentExamInfo();
 });
+
+/**
+ * Submit cropped image for upload
+ */
+const submitCrop = async () => {
+  crop_confirm_loading.value = true;
+  
+  try {
+    // In a real implementation with a proper cropper component,
+    // you would get the cropped canvas data here
+    
+    // For now, we'll just use the original file since we don't have
+    // the actual cropping functionality implemented
+    let file = null;
+    
+    if (current_crop_file.value === "q_file") {
+      file = form_hidden_data.q_file;
+    } else if (current_crop_file.value === "answer_full_file") {
+      file = form_hidden_data.answer_full_file;
+    } else if (current_crop_file.value === "a_file") {
+      file = form_hidden_data.a_file;
+    } else if (current_crop_file.value === "b_file") {
+      file = form_hidden_data.b_file;
+    } else if (current_crop_file.value === "c_file") {
+      file = form_hidden_data.c_file;
+    } else if (current_crop_file.value === "d_file") {
+      file = form_hidden_data.d_file;
+    }
+    
+    if (file) {
+      // Upload the file directly
+      await uploadFileToServer(file, current_crop_file.value);
+      
+      // Close the dialog after successful upload
+      cropper_dialog.value = false;
+    } else {
+      const { $toast } = useNuxtApp();
+      $toast.error("No file to upload");
+    }
+  } catch (error) {
+    console.error("Error submitting cropped image:", error);
+    const { $toast } = useNuxtApp();
+    $toast.error("Failed to upload cropped image");
+  } finally {
+    crop_confirm_loading.value = false;
+  }
+};
+
+/**
+ * Create test handler (for backward compatibility)
+ * This is a wrapper for submitQuestion
+ */
+const createTest = () => {
+  console.log("Create button clicked! Triggering manual form submission...");
+  
+  // If the button is using @click.prevent instead of type="submit",
+  // we can trigger submission via the VeeForm ref
+  if (veeForm.value) {
+    console.log("Submitting form via veeForm ref");
+    veeForm.value.submitForm();
+  } else {
+    console.log("VeeForm ref not found, calling submitQuestion directly");
+    submitQuestion();
+  }
+};
+
+/**
+ * Trigger form validation manually after user interacts with RichEditor
+ * This ensures validation state is updated properly
+ */
+const validateForm = () => {
+  // Only validate after a small delay to avoid performance issues
+  setTimeout(() => {
+    validate();
+  }, 100);
+};
+
+/**
+ * Watch for changes in rich editor content and validate the form
+ */
+watch(
+  () => form.question,
+  () => validateForm()
+);
+
+watch(
+  () => [form.answer_a, form.answer_b, form.answer_c, form.answer_d, form.answer_full],
+  () => validateForm()
+);
+
+/**
+ * Determine if the create button should be disabled
+ */
+const buttonDisabled = computed(() => {
+  // Check only basic mandatory fields
+  const required = form.section && form.base && form.lesson && form.topic && form.question;
+  
+  // For multiple choice forms, also check true_answer
+  if (['fourchoice', 'twochoice', 'tf'].includes(form.type)) {
+    return !required || !form.true_answer;
+  }
+  
+  return !required;
+});
 </script>
 
 <style>
@@ -1398,6 +1588,12 @@ onMounted(() => {
   border: 1px dashed #9e9e9e;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.image-input:hover {
+  background-color: rgba(0, 150, 136, 0.05);
+  border-color: #009688;
 }
 
 .image-preview {
@@ -1406,6 +1602,8 @@ onMounted(() => {
   border: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-top: 8px;
+  max-width: 100%;
+  height: auto;
 }
 
 .img-clear-btn {
@@ -1414,10 +1612,19 @@ onMounted(() => {
   margin-top: -4px;
   background-color: white !important;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease;
+}
+
+.img-clear-btn:hover {
+  transform: scale(1.05);
 }
 
 .topic_season {
   background-color: rgba(144, 202, 249, 0.2);
+  font-weight: 600;
+  color: #1565c0;
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 
 #test-question {
@@ -1425,16 +1632,16 @@ onMounted(() => {
 }
 
 .test-maker .test-list {
-  margin-bottom: 20px;
-}
+    margin-bottom: 20px;
+  }
 
 .test-maker .answer {
-  margin-left: 10px;
-}
+    margin-left: 10px;
+  }
 
 .test-maker .true_answer {
-  color: #4caf50;
-}
+    color: #4caf50;
+  }
 
 .answer_label {
   position: absolute;
@@ -1471,5 +1678,23 @@ onMounted(() => {
 /* Ensure proper handling of radio buttons */
 #test-image-options .v-radio {
   margin-bottom: 0;
+}
+
+/* Cropper container styles */
+.cropper-container {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.white--text {
+  color: white !important;
+}
+
+/* For better form spacing */
+.v-card-text {
+  padding-bottom: 24px;
 }
 </style>
