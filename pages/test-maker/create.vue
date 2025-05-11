@@ -50,6 +50,7 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -62,6 +63,7 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -74,6 +76,7 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
 
@@ -95,6 +98,7 @@
                   label="Exam type"
                   variant="outlined"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
 
@@ -105,6 +109,7 @@
                   label="Test duration"
                   variant="outlined"
                   color="orange"
+                  density="compact"
                 ></v-text-field>
               </v-col>
 
@@ -115,6 +120,7 @@
                   label="Year"
                   variant="outlined"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
 
@@ -127,6 +133,7 @@
                   label="Month"
                   variant="outlined"
                   color="orange"
+                  density="compact"
                 ></v-autocomplete>
               </v-col>
 
@@ -136,8 +143,9 @@
                   label="Source file"
                   variant="outlined"
                   prepend-icon="mdi-paperclip"
-                  @change="uploadFile"
+                  @update:model-value="uploadFile"
                   accept="application/pdf,image/*"
+                  density="compact"
                 ></v-file-input>
               </v-col>
 
@@ -147,6 +155,7 @@
                   label="Title"
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
+                  density="compact"
                 ></v-text-field>
                 <div class="text-caption text-grey">
                   Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A
@@ -159,6 +168,7 @@
                   v-model="form.paperID"
                   label="Past Paper Id"
                   variant="outlined"
+                  density="compact"
                 ></v-text-field>
               </v-col>
 
@@ -172,7 +182,12 @@
                       size="large"
                       type="submit"
                       :loading="submit_loading"
-                      style="text-transform: none; font-size: 13px; font-weight: 500;"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
                     >
                       Next step
                     </v-btn>
@@ -184,7 +199,12 @@
                       color="red"
                       size="large"
                       to="/user/exam"
-                      style="text-transform: none; font-size: 13px; font-weight: 500;"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
                     >
                       Discard
                     </v-btn>
@@ -204,7 +224,7 @@
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
-                style=" font-weight: 500; color: #009688;"
+                style="font-weight: 500; color: #009688"
               ></v-switch>
             </v-col>
           </v-row>
@@ -531,7 +551,7 @@ const lastCreatedTest = ref("");
 
 // Delete exam test section
 const deleteTestConfirmDialog = ref(false);
-const delete_exam_test_id = ref("");
+const delete_exam_test_id = ref(null);
 const delete_exam_test_loading = ref(false);
 
 // Data lists
@@ -787,35 +807,44 @@ const copyUrl = () => {
   if ($toast) $toast.success("Copied");
 };
 
-const uploadFile = (file) => {
-  if (!file) return;
+const uploadFile = async (files) => {
+  // For v-file-input in Vue 3, files can be an array or single file object
+  // Get the actual file from either an array or direct file object
+  const fileToUpload = Array.isArray(files) ? files[0] : files;
 
-  file_original.value = file;
+  if (!fileToUpload) {
+    console.error("No file found to upload");
+    return;
+  }
 
-  let formData = new FormData();
-  formData.append("file", file_original.value);
+  const { $toast } = useNuxtApp();
+
+  // Create a FormData object for the file upload
+  const formData = new FormData();
+  formData.append("file", fileToUpload);
 
   try {
-    $fetch("/api/v1/upload", {
+    // Using async/await with proper error handling
+    const response = await $fetch("/api/v1/upload", {
       method: "POST",
       body: formData,
       headers: {
-        accept: "*/*",
-        "Content-Type": "multipart/form-data",
+        // Don't set Content-Type manually for FormData - let the browser set it with boundary
         Authorization: `Bearer ${userToken.value}`,
       },
-    }).then((response) => {
-      if (
-        response &&
-        response.data &&
-        response.data[0] &&
-        response.data[0].file
-      ) {
-        form.file_original = response.data[0].file.name;
-      }
     });
+
+    // Check if we have a valid response with file data
+    if (response?.data?.[0]?.file?.name) {
+      form.file_original = response.data[0].file.name;
+      if ($toast) $toast.success("File uploaded successfully");
+    } else {
+      if ($toast) $toast.error("Invalid response from server");
+      console.error("Invalid upload response:", response);
+    }
   } catch (err) {
-    console.error(err);
+    if ($toast) $toast.error("Failed to upload file");
+    console.error("File upload error:", err);
   }
 };
 
@@ -862,8 +891,13 @@ const publishTest = async () => {
       form.file_original = "";
 
       test_step.value = 4;
+
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.success("Exam published successfully");
     }
   } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error publishing exam");
     console.error(err);
   } finally {
     publish_loading.value = false;
@@ -883,7 +917,101 @@ const checkActiveParam = () => {
   }
 };
 
+// Submit tests to the exam
+const submitTest = async () => {
+  if (tests.value.length === 0) return;
+
+  let formData = new FormData();
+  for (let i = 0; i < tests.value.length; i++) {
+    formData.append("tests[]", tests.value[i]);
+  }
+
+  try {
+    await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+      method: "PUT",
+      body: urlencodeFormData(formData),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    // Get current exam tests after submission
+    getExamCurrentTests();
+  } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error updating exam tests");
+    console.error(err);
+  }
+};
+
+// Get current tests for the exam
+const getExamCurrentTests = async () => {
+  try {
+    const response = await $fetch("/api/v1/examTests", {
+      method: "GET",
+      params: {
+        exam_id: exam_id.value,
+      },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    previewTestList.value = response.data.list;
+
+    if (createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+  } catch (err) {
+    console.error("Error getting exam tests:", err);
+  }
+};
+
+// Get current exam information
+const getCurrentExamInfo = async () => {
+  const currentExamId = useState("user").value?.currentExamId;
+
+  if (currentExamId) {
+    exam_id.value = currentExamId;
+    exam_code.value = useState("user").value?.currentExamCode || "";
+    test_step.value = 2;
+
+    try {
+      const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
+        headers: {
+          Authorization: `Bearer ${userToken.value}`,
+        },
+      });
+
+      tests.value = response.data.tests.length ? response.data.tests : [];
+
+      form.section = response.data.section;
+      form.base = response.data.base;
+      form.lesson = response.data.lesson;
+      file_original_path.value = response.data.file_original;
+
+      // If we have test data, get the tests
+      if (tests.value.length) {
+        getExamCurrentTests();
+      }
+    } catch (err) {
+      console.error("Error getting exam info:", err);
+    }
+  }
+};
+
 // Watchers
+watch(
+  () => lastCreatedTest.value,
+  (val) => {
+    if (val && !tests.value.find((x) => x == val)) {
+      tests.value.push(val);
+      submitTest();
+    }
+  }
+);
+
 watch(
   () => form.section,
   async (val) => {
@@ -950,6 +1078,7 @@ watch(
 onMounted(async () => {
   userToken.value = auth.getUserToken();
 
+  await getCurrentExamInfo();
   await getTypeList("section");
 
   if (form.base) {
@@ -967,12 +1096,153 @@ onMounted(async () => {
   // Handle active query parameter for test list / add test
   checkActiveParam();
 });
+
+// Open delete confirmation dialog
+const openTestDeleteConfirmDialog = (item_id) => {
+  delete_exam_test_id.value = item_id;
+  deleteTestConfirmDialog.value = true;
+};
+
+// Delete exam test
+const deleteExamTest = async () => {
+  delete_exam_test_loading.value = true;
+
+  try {
+    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Deleted successfully");
+
+    // Remove from tests array
+    const index = tests.value.findIndex(
+      (id) => id === delete_exam_test_id.value
+    );
+    if (index !== -1) {
+      tests.value.splice(index, 1);
+    }
+
+    // Refresh test lists
+    filter.page = 1;
+    test_list.value = [];
+    getExamTests();
+  } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error deleting test");
+    console.error("Error deleting exam test:", err);
+  } finally {
+    delete_exam_test_loading.value = false;
+    delete_exam_test_id.value = null;
+    deleteTestConfirmDialog.value = false;
+  }
+};
+
+// Get exam tests
+const getExamTests = async () => {
+  if (all_tests_loaded.value) return;
+
+  test_loading.value = true;
+
+  try {
+    const response = await $fetch("/api/v1/examTests", {
+      method: "GET",
+      params: {
+        lesson: filter.lesson,
+        topic: filter.topic,
+        myTests: filter.myTests,
+        testsHasVideo: filter.testsHasVideo,
+        page: filter.page,
+        perpage: filter.perpage,
+      },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    test_list.value.push(...response.data.list);
+
+    if (createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+
+    // If no more tests, mark as loaded
+    if (response.data.list.length === 0) {
+      all_tests_loaded.value = true;
+    } else {
+      all_tests_loaded.value = false;
+    }
+  } catch (err) {
+    console.error("Error getting exam tests:", err);
+  } finally {
+    test_loading.value = false;
+  }
+};
+
+// Delete entire exam handling
+const openDeleteConfirmDialog = () => {
+  confirmDeleteDialog.value = true;
+};
+
+const deleteOnlineExam = async () => {
+  deleteLoading.value = true;
+
+  try {
+    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    // Reset all values
+    exam_id.value = "";
+    exam_code.value = "";
+
+    // Update store
+    useState("user").value = {
+      ...useState("user").value,
+      currentExamId: "",
+      currentExamCode: "",
+    };
+
+    // Reset form and data
+    previewTestList.value = [];
+    tests.value = [];
+
+    form.section = "";
+    grade_list.value = [];
+    lesson_list.value = [];
+    topic_list.value = [];
+
+    form.exam_type = "";
+    form.duration = 3;
+    form.title = "";
+    form.file_original = "";
+
+    // Reset to first step
+    test_step.value = 1;
+
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Deleted successfully");
+  } catch (err) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(err.message || "Error deleting exam");
+    console.error("Error deleting exam:", err);
+  } finally {
+    deleteLoading.value = false;
+    confirmDeleteDialog.value = false;
+  }
+};
 </script>
 
 <style lang="scss">
 .create-test-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 5rem auto;
   padding-bottom: 80px; // Space for fixed bottom bar
 }
 
@@ -996,5 +1266,9 @@ onMounted(async () => {
       color: teal !important;
     }
   }
+}
+.v-stepper-vertical-item__title {
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 </style>
