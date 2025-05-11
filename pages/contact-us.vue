@@ -175,31 +175,31 @@ export default {
         min25: v => (v && v.length >= 25) || 'Minimum 25 characters required.',
       },
       valid: false, // track form validity
-      captchaKey: ''
     }
   },
   methods: {
     async submitForm(event) {
       event.preventDefault();
-      if (this.valid) {
-        await this.$axios.$post(
-            "/api/v1/contacts",
-            {
-              captcha: this.captchaKey,
-              fullName: this.form.name,
-              email: this.form.email,
-              subject: this.form.subject,
-              body: this.form.message
-            },
-          )
-          .then(() => {
-            this.$toast.success('well played')
-          })
-          .catch((err) => {
-            if (err.response.status == 400)
+      if (this.valid){
+        const token = await this.$recaptcha.execute('contact_form');
+        console.log(token)
+        try{
+          await this.$axios.$post('/api/v1/contacts', {
+            captcha: token, 
+            fullName: this.form.name,
+            email: this.form.email,
+            subject: this.form.subject,
+            body: this.form.message,
+          });
+
+            this.$toast.show('<span class="mdi mdi-check-circle gtext-t3 toast-contactus-message-success"></span> <span>Your message has been sent successfully.</span>', {
+              type: 'success',
+              className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-success'
+            })
+        }catch (err){
+          if (err.response.status == 400)
               this.$toast.error(err.response.data.message);
-          })
-      }
+      }}
   },
     triggerFileSelect() {
       this.$refs.fileInput.click();
@@ -214,32 +214,28 @@ export default {
       ) {
         this.form.file = selectedFile;
       } else {
+        this.$refs.fileInput.value = null;
         this.$toast.show('<span class="mdi mdi-close-circle gtext-t3 toast-contactus-message-error"></span> <span>Your file size exceeds the allowed limit.</span>', {
         type: 'error',
         className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-error'
       })
-        this.$refs.fileInput.value = null; // Reset input
       }
     },
     removeFile() {
       this.form.file = null;
       this.$refs.fileInput.value = null;
-      this.$toast.show('<span class="mdi mdi-check-circle gtext-t3 toast-contactus-message-success"></span> <span>Your message has been sent successfully.</span>', {
-        type: 'success',
-        className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-success'
-      })
     }
   },
   async mounted() {
     if (process.client) {
-      const L = await import('leaflet') // ✅ dynamic import
+      const L = await import('leaflet') // dynamic import
 
       // Remove default icon paths
       delete L.Icon.Default.prototype._getIconUrl;
 
       // Define a custom MDI icon marker
       const customMarker = L.divIcon({
-        className: "", // don't use default styles
+        className: "",
         html: `
           <div style="
             color: #FFB600;
@@ -276,9 +272,9 @@ export default {
 </script>
 <style scoped>
 .theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
-  background-color: #FFE3B5 !important; /* Keep your yellow color */
-  color: #98A2B3 !important; /* Custom text color */
-  pointer-events: none; /* still disables clicks */
+  background-color: #FFE3B5 !important;
+  color: #98A2B3 !important;
+  pointer-events: none;
 }
 
 .display-flex{
@@ -287,24 +283,24 @@ export default {
 
 .mapStyle {
   width: 100%;
-  height: 601px; /* Default (lg and up) */
+  height: 601px; 
 }
 
 @media (max-width: 1264px) {
   .mapStyle {
-    height: 577px; /* md */
+    height: 577px; 
   }
 }
 
 @media (max-width: 960px) {
   .mapStyle {
-    height: 377px; /* sm */
+    height: 377px;
   }
 }
 
 @media (max-width: 600px) {
   .mapStyle {
-    height: 118px; /* xs */
+    height: 118px;
   }
 }
 </style>
