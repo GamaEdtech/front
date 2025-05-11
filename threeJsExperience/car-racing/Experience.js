@@ -40,13 +40,13 @@ export default class Experience {
             far: 60,
 
             //ground
-            groundSize: 200,
+            // groundSize: 200,
             groundWidth: 30,
             groundColor: "#85d534",
             // groundColor: "#548722",
 
             //road
-            roadSize: 200,
+            // roadSize: 200,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
             roadFrequencyX: 0.14,
@@ -58,7 +58,7 @@ export default class Experience {
             colorLineSeperator: "#fff480",
             colorLineArround: "#bababa",
             // mountain
-            mountainSize: 200,
+            // mountainSize: 200,
             mountainWidth: 30,
             // positionFrequency: 0.041,
             // strength: 36,
@@ -82,10 +82,10 @@ export default class Experience {
 
 
             // tree
-            treeCount: 30,
+            // treeCount: 30,
 
             // cloud
-            cloudCount: 50,
+            // cloudCount: 50,
 
 
             // car
@@ -107,11 +107,22 @@ export default class Experience {
             distanceFromEndRoadQuestion: 40,
 
             // gems
-            gemCount: 3,
+            // gemCount: 3,
             gemsInformation: [],
 
             isDevelopeMent: false
         }
+
+        const DistanceForEachQuestion = 50
+        const totlaLength = this.options.questions.length * DistanceForEachQuestion
+
+        this.options.groundSize = totlaLength
+        this.options.roadSize = totlaLength
+        this.options.mountainSize = totlaLength
+        this.options.treeCount = 30 * (totlaLength / 200)
+        this.options.cloudCount = 50 * (totlaLength / 200)
+        this.options.gemCount = this.options.questions.length - 1
+
 
         this.options.questionsPositionX = this.options.questions.map((q, index) => {
             return ((this.options.roadSize - this.options.distanceFromEndRoadQuestion) / (this.options.questions.length + 1)) * (index + 1)
@@ -137,11 +148,11 @@ export default class Experience {
                 this.debug = new Debug()
             })
         }
+
         this.sizes = new Sizes()
         this.time = new Time()
         this.resources = new Resources(sources)
         this.scene = new Scene()
-
 
         // axes helper
         // const axesHelper = new THREE.AxesHelper(5)
@@ -213,18 +224,11 @@ export default class Experience {
 
     resetGame() {
         if (this.world && this.world.car && this.world.gems) {
-            this.options.gemsInformation = []
-            for (let i = 0; i < this.options.gemCount; i++) {
-                const availableXs = this.generateAvailableGemXs()
-                if (availableXs.length === 0) {
-                    console.warn("No valid X positions found for placing a gem.")
-                }
-                const randomIndex = Math.floor(Math.random() * availableXs.length)
-                const x = Math.round(availableXs[randomIndex])
+            this.options.gemsInformation.forEach((gemInfo) => {
                 const lane = Math.floor(Math.random() * this.options.countLine) + 1
-                this.options.gemsInformation.push({ x, lane, collected: false })
-            }
-            this.options.gemsInformation.sort((a, b) => a.x - b.x)
+                gemInfo.lane = lane
+                gemInfo.collected = false
+            })
             this.world.car.reset()
             this.world.gems.reset()
         }

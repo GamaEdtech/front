@@ -47,7 +47,8 @@ export default class Mountain {
             color: "#85d534",
 
             uniforms: {
-                uPositionFrequency: new Uniform(this.options.positionFrequency),
+                uPositionFrequency: new Uniform((this.options.mountainSize / 100000) + 0.015),
+                // uPositionFrequency: new Uniform(this.options.positionFrequency),
                 uStrength: new Uniform(this.options.strength),
                 uWarpFrequency: new Uniform(this.options.warpFrequency),
                 uWarpStrength: new Uniform(this.options.warpStrength),
@@ -87,7 +88,6 @@ export default class Mountain {
 
         this.scene.add(this.mesh)
 
-
         this.meshLeftMesh = new Mesh(this.geometry, this.material)
         this.meshLeftMesh.position.set(
             this.options.mountainSize / 2,
@@ -103,7 +103,6 @@ export default class Mountain {
 
 
         this.scene.add(this.meshLeftMesh)
-
     }
 
 

@@ -206,6 +206,9 @@ export default class Car {
                     this.jumpProgress = 0
                 }
                 this.currentQuestionIndex += 1
+                if (this.experience.world.levels) {
+                    this.experience.world.levels.updateQuestions(this.currentQuestionIndex)
+                }
                 this.experience.callBacks.onQuestionChange()
                 this.experience.callBacks.onQuestionStatusChange("success")
                 this.experience.callBacks.onScoreChange(1)
@@ -287,6 +290,7 @@ export default class Car {
         }
 
         const xDiff = Math.abs(this.positionX - gem.x);
+
         const sameLane = this.targetLane === gem.lane;
 
         if (sameLane && xDiff <= this.checkThreshold && !gem.collected) {

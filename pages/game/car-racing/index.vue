@@ -143,7 +143,258 @@ export default {
         return {
             experience: null,
             questionStatus: 'normal',
-
+            // questions: [
+            //     {
+            //         text: "10 - 2 =",
+            //         choices: ["4", "22", "45", "8"],
+            //         indexAnswer: 3
+            //     },
+            //     {
+            //         text: "22 * 2 =",
+            //         choices: ["4", "44", "81", "95"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "1 + 1 =",
+            //         choices: ["2", "15", "56", "64"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "9 * 8 =",
+            //         choices: ["72", "35", "12", "64"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "6 * 5 =",
+            //         choices: ["20", "30", "44", "81"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "10 / 2 =",
+            //         choices: ["5", "11", "1", "0"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "1 + 11 =",
+            //         choices: ["28", "17", "12", "64"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 - 7 =",
+            //         choices: ["21", "8", "72", "64"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "3 * 7 =",
+            //         choices: ["10", "21", "14", "28"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "24 / 6 =",
+            //         choices: ["3", "4", "6", "8"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "5 + 8 =",
+            //         choices: ["11", "13", "15", "17"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "18 - 9 =",
+            //         choices: ["7", "9", "11", "27"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "4 * 9 =",
+            //         choices: ["32", "36", "40", "45"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "28 / 4 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "7 + 6 =",
+            //         choices: ["11", "12", "13", "14"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "16 - 8 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "5 * 6 =",
+            //         choices: ["25", "30", "35", "40"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "36 / 9 =",
+            //         choices: ["3", "4", "5", "6"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "9 + 7 =",
+            //         choices: ["14", "15", "16", "17"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "14 - 5 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "7 * 8 =",
+            //         choices: ["48", "56", "64", "72"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "42 / 7 =",
+            //         choices: ["5", "6", "7", "8"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "12 + 9 =",
+            //         choices: ["19", "20", "21", "22"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "25 - 16 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "6 * 7 =",
+            //         choices: ["35", "42", "49", "56"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "63 / 9 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "8 + 9 =",
+            //         choices: ["15", "16", "17", "18"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "20 - 12 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "9 * 9 =",
+            //         choices: ["72", "81", "90", "99"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "54 / 6 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 + 8 =",
+            //         choices: ["21", "22", "23", "24"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "30 - 14 =",
+            //         choices: ["14", "15", "16", "17"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "8 * 7 =",
+            //         choices: ["48", "56", "64", "72"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "72 / 8 =",
+            //         choices: ["8", "9", "10", "11"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "17 + 6 =",
+            //         choices: ["21", "22", "23", "24"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "40 - 23 =",
+            //         choices: ["15", "16", "17", "18"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "11 * 5 =",
+            //         choices: ["45", "50", "55", "60"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "100 / 10 =",
+            //         choices: ["5", "10", "15", "20"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "25 + 25 =",
+            //         choices: ["40", "50", "60", "70"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "50 - 25 =",
+            //         choices: ["15", "20", "25", "30"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "12 * 4 =",
+            //         choices: ["36", "44", "48", "52"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "96 / 12 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "35 + 15 =",
+            //         choices: ["40", "45", "50", "55"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "60 - 35 =",
+            //         choices: ["20", "25", "30", "35"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "13 * 3 =",
+            //         choices: ["36", "39", "42", "45"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "144 / 12 =",
+            //         choices: ["10", "11", "12", "13"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "75 + 25 =",
+            //         choices: ["90", "95", "100", "105"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "100 - 45 =",
+            //         choices: ["45", "50", "55", "60"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 * 6 =",
+            //         choices: ["75", "80", "90", "95"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "121 / 11 =",
+            //         choices: ["9", "10", "11", "12"],
+            //         indexAnswer: 2
+            //     }
+            // ],
             questions: [
                 {
                     text: "10 - 2 =",
