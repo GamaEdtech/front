@@ -883,6 +883,21 @@ const lesson_list = ref([]);
 const topic_list = ref([]);
 
 /**
+ * Selected topics state
+ */
+const selected_topics = ref([]);
+
+/**
+ * Handle topic selection from topic selector
+ * @param {Array} topics - Array of selected topic IDs
+ */
+const selectTopic = (topics) => {
+  selected_topics.value = topics;
+  const topicIds = topics.map(id => parseInt(id));
+  form.topic = topicIds.length > 0 ? topicIds[0] : null;
+};
+
+/**
  * Static data lists
  */
 const txt_direction_list = [
