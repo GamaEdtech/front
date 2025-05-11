@@ -168,7 +168,7 @@ export default {
         //file: null
       },
       map: null,
-      officeCoords: [40.764064, -73.988577],
+      officeCoords: [41.050652, 28.894283],
       rules: {
         required: v => !!v || 'This field is required.',
         email: v => /.+@.+\..+/.test(v) || 'E-mail must be valid.',
@@ -184,7 +184,7 @@ export default {
         const token = await this.$recaptcha.execute('contact_form');
         console.log(token)
         try{
-          await this.$axios.$post('/api/v1/contacts', {
+          await this.$axios.$post('/api/v2/contacts', {
             captcha: token, 
             fullName: this.form.name,
             email: this.form.email,
