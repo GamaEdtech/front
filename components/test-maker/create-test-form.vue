@@ -71,12 +71,12 @@
               class="mt-2"
               v-show="path_panel_expand"
             >
-            <FormTopicSelector
-                  ref="topicSelector"
-                  :selectedTopics="selected_topics"
-                  :topic-list="topic_list"
-                  @selectTopic="selectTopic"
-                />
+              <FormTopicSelector
+                ref="topicSelector"
+                :selectedTopics="selected_topics"
+                :topic-list="topic_list"
+                @selectTopic="selectTopic"
+              />
             </v-col>
 
             <v-col cols="12" md="2" class="mt-2">
@@ -149,10 +149,10 @@
               <v-row v-if="['fourchoice', 'twochoice'].includes(form.type)">
                 <v-col cols="12" class="d-flex align-center justify-center">
                   <p class="mr-3 mt-3">Choices type:</p>
-                  <v-btn-toggle 
-                    v-model="answerType" 
-                    color="teal" 
-                    density="comfortable" 
+                  <v-btn-toggle
+                    v-model="answerType"
+                    color="teal"
+                    density="comfortable"
                     mandatory
                   >
                     <v-btn value="text" @click="answerTypeChanged('txt')">
@@ -240,7 +240,9 @@
                           style="width: 90px; height: 90px"
                           @click="selectFile('a_file')"
                         >
-                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal"
+                            >mdi-camera</v-icon
+                          >
                         </v-btn>
 
                         <v-btn
@@ -316,7 +318,9 @@
                           style="width: 90px; height: 90px"
                           @click="selectFile('b_file')"
                         >
-                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal"
+                            >mdi-camera</v-icon
+                          >
                         </v-btn>
 
                         <v-btn
@@ -390,7 +394,9 @@
                           style="width: 90px; height: 90px"
                           @click="selectFile('c_file')"
                         >
-                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal"
+                            >mdi-camera</v-icon
+                          >
                         </v-btn>
 
                         <v-btn
@@ -464,7 +470,9 @@
                           style="width: 90px; height: 90px"
                           @click="selectFile('d_file')"
                         >
-                          <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+                          <v-icon size="x-large" color="teal"
+                            >mdi-camera</v-icon
+                          >
                         </v-btn>
 
                         <v-btn
@@ -598,8 +606,12 @@
                 :error-messages="errorMessage"
               />
             </Field>
-            
-            <Field name="a_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+
+            <Field
+              name="a_file"
+              :rules="photo_answer_rules"
+              v-slot="{ errorMessage }"
+            >
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
@@ -609,8 +621,12 @@
                 :error-messages="errorMessage"
               />
             </Field>
-            
-            <Field name="b_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+
+            <Field
+              name="b_file"
+              :rules="photo_answer_rules"
+              v-slot="{ errorMessage }"
+            >
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
@@ -621,7 +637,11 @@
               />
             </Field>
 
-            <Field name="c_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+            <Field
+              name="c_file"
+              :rules="photo_answer_rules"
+              v-slot="{ errorMessage }"
+            >
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
@@ -631,8 +651,12 @@
                 :error-messages="errorMessage"
               />
             </Field>
-            
-            <Field name="d_file" :rules="photo_answer_rules" v-slot="{ errorMessage }">
+
+            <Field
+              name="d_file"
+              :rules="photo_answer_rules"
+              v-slot="{ errorMessage }"
+            >
               <v-file-input
                 class="d-none"
                 accept="image/png,image/webp,image/jpeg,image/jpg"
@@ -643,7 +667,6 @@
               />
             </Field>
           </div>
-          
 
           <!-- <v-row>
             <v-col cols="12">
@@ -725,38 +748,19 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { Form as VeeForm, Field, useForm } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import { defineRule } from "vee-validate";
-import TopicSelector from "~/components/form/topic-selector";
-import { useNuxtApp } from "#app";
-// import CkEditor from "./ckEditor.vue";";
+import FormTopicSelector from "~/components/form/topic-selector.vue";
 import * as yup from "yup";
+import { useAuth } from "~/composables/useAuth";
 
-// Define validation rules
-defineRule("required", required);
+const auth = useAuth();
 
-// Get services
-const { $toast } = useNuxtApp();
-const router = useRouter();
-const route = useRoute();
-
-// Form validation
-const { handleSubmit, resetForm } = useForm();
-const observer = ref(null);
-const isFormValid = ref(false);
-
-// Refs for file inputs
-const questionInput = ref(null);
-const answerFullInput = ref(null);
-const aInput = ref(null);
-const bInput = ref(null);
-const cInput = ref(null);
-const dInput = ref(null);
-
-// Component state
+/**
+ * Component props
+ */
 const props = defineProps({
   examEditMode: {
     type: Boolean,
@@ -764,9 +768,36 @@ const props = defineProps({
   },
 });
 
+/**
+ * Component emits
+ */
 const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep"]);
 
-// State variables
+/**
+ * Get Nuxt app services and utilities
+ */
+const { $toast } = useNuxtApp();
+const router = useRouter();
+const route = useRoute();
+
+/**
+ * Define refs for HTML elements (file inputs)
+ */
+const questionInput = ref(null);
+const answerFullInput = ref(null);
+const aInput = ref(null);
+const bInput = ref(null);
+const cInput = ref(null);
+const dInput = ref(null);
+
+/**
+ * User token
+ */
+const userToken = ref("");
+
+/**
+ * UI state management
+ */
 const path_panel_expand = ref(true);
 const create_loading = ref(false);
 const test_step = ref(1);
@@ -775,26 +806,33 @@ const text_answer_rules = ref("required");
 const photo_answer = ref(false);
 const photo_answer_rules = ref((value) => {
   if (!value) return true;
-  
+
   if (form.testImgAnswers && form.true_answer) {
     const option = form.true_answer.toLowerCase();
-    if (option === 'a' || option === 'b' || option === 'c' || option === 'd') {
+    if (option === "a" || option === "b" || option === "c" || option === "d") {
       const optionFile = form_hidden_data[`${option}_file`];
       if (!optionFile) {
-        return 'Please upload an image for the correct answer';
+        return "Please upload an image for the correct answer";
       }
     }
   }
   return true;
 });
+const answerType = ref("text"); // Default to text answers
 const examTestListLength = ref(0);
 const file_original_path = ref("");
+
+/**
+ * Cropper related state
+ */
 const crop_file_url = ref("");
 const crop_file_loading = ref(false);
 const cropper_dialog = ref(false);
 const current_crop_file = ref("");
 
-// Form data
+/**
+ * Form data and hidden fields
+ */
 const form = reactive({
   section: "",
   base: "",
@@ -806,9 +844,19 @@ const form = reactive({
   direction: "ltr",
   true_answer: "",
   question: "",
+  q_file: null,
   q_file_base64: "",
   answer_full: "",
+  answer_full_file: null,
   answer_full_file_base64: "",
+  answer_a: "",
+  answer_b: "",
+  answer_c: "",
+  answer_d: "",
+  a_file: null,
+  b_file: null,
+  c_file: null,
+  d_file: null,
   a_file_base64: "",
   b_file_base64: "",
   c_file_base64: "",
@@ -825,14 +873,18 @@ const form_hidden_data = reactive({
   d_file: null,
 });
 
-// Data lists
+/**
+ * Data lists for selectors
+ */
 const level_list = ref([]);
 const grade_list = ref([]);
 const field_list = ref([]);
 const lesson_list = ref([]);
 const topic_list = ref([]);
 
-// Static data
+/**
+ * Static data lists
+ */
 const txt_direction_list = [
   { value: "ltr", title: "LTR" },
   { value: "rtl", title: "RTL" },
@@ -852,26 +904,9 @@ const typeList = [
   { value: "shortanswer", title: "Short answer" },
 ];
 
-// Editor configuration
-const editorConfig = {
-  toolbar: ["bold", "underline", "alignment"],
-  plugins: [
-    "Autoformat",
-    "Essentials",
-    "MathType",
-    "Alignment",
-    "Bold",
-    "Underline",
-    "PasteFromOffice",
-    "Paragraph",
-    "WordCount",
-  ],
-  mathType: {
-    wiriseditorparselatex: false,
-  },
-};
-
-// Define validation rules
+/**
+ * Validation schema using Yup
+ */
 const validationSchema = yup.object({
   question: yup.string().required("Question is required"),
   true_answer: yup.string().when("type", {
@@ -903,12 +938,15 @@ const validationSchema = yup.object({
   }),
 });
 
-// Use VeeValidate form
+/**
+ * Initialize VeeValidate form
+ */
 const {
   handleSubmit: veeHandleSubmit,
   isSubmitting,
   validate,
-  meta
+  meta,
+  resetForm,
 } = useForm({
   validationSchema,
   initialValues: {
@@ -937,10 +975,11 @@ const {
   },
 });
 
-// Add this with the other refs
-const answerType = ref("text"); // Default to text answers
-
-// Methods
+/**
+ * Fetch type list data from API
+ * @param {string} type - The type of data to fetch (section, base, lesson, etc.)
+ * @param {string} parent - The parent ID (optional)
+ */
 const getTypeList = async (type, parent = "") => {
   const params = { type };
 
@@ -974,6 +1013,9 @@ const getTypeList = async (type, parent = "") => {
   }
 };
 
+/**
+ * Handle form submission
+ */
 const submitQuestion = veeHandleSubmit(async (values) => {
   create_loading.value = true;
   const querystring = require("querystring");
@@ -1029,6 +1071,10 @@ const submitQuestion = veeHandleSubmit(async (values) => {
   }
 });
 
+/**
+ * Select file for upload
+ * @param {string} file_name - Name of the file field
+ */
 const selectFile = (file_name) => {
   if (file_name === "q_file") {
     questionInput.value?.click();
@@ -1045,24 +1091,35 @@ const selectFile = (file_name) => {
   }
 };
 
+/**
+ * Handle file upload
+ * @param {string} file_name - Name of the file field
+ */
 const uploadFile = (file_name) => {
   let file = null;
 
   if (file_name === "q_file") {
     file = form_hidden_data.q_file;
+    current_crop_file.value = "q_file";
   } else if (file_name === "answer_full_file") {
     file = form_hidden_data.answer_full_file;
+    current_crop_file.value = "answer_full_file";
   } else if (file_name === "a_file") {
     file = form_hidden_data.a_file;
+    current_crop_file.value = "a_file";
   } else if (file_name === "b_file") {
     file = form_hidden_data.b_file;
+    current_crop_file.value = "b_file";
   } else if (file_name === "c_file") {
     file = form_hidden_data.c_file;
+    current_crop_file.value = "c_file";
   } else if (file_name === "d_file") {
     file = form_hidden_data.d_file;
+    current_crop_file.value = "d_file";
   }
 
   if (file) {
+    // Update the preview image
     if (file_name === "q_file") {
       form.q_file_base64 = URL.createObjectURL(file);
     } else if (file_name === "answer_full_file") {
@@ -1077,28 +1134,43 @@ const uploadFile = (file_name) => {
       form.d_file_base64 = URL.createObjectURL(file);
     }
 
-    // If using image cropper, handle here
-    // For now, we're directly using the file
+    // Set crop file URL for cropper dialog
+    crop_file_url.value = URL.createObjectURL(file);
+
+    // If need to show cropper, uncomment this
+    // cropper_dialog.value = true;
+
+    // Upload directly without cropper for now
     uploadFileToServer(file, file_name);
   }
 };
 
+/**
+ * Upload file to server
+ * @param {File} file - The file to upload
+ * @param {string} file_name - The name of the file field
+ */
 const uploadFileToServer = async (file, file_name) => {
   try {
     // Create a form data object
     const formData = new FormData();
     formData.append("file", file);
 
+    // Get toast service
+    const { $toast } = useNuxtApp();
+
+    // Send request with proper Authorization header
     const response = await $fetch("/api/v1/upload", {
       method: "POST",
       body: formData,
       headers: {
-        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
-    if (response.data && response.data.data && response.data.data.length > 0) {
-      const fileName = response.data.data[0].file.name;
+    // Check if response contains file data
+    if (response && response.data && response.data.length > 0) {
+      const fileName = response.data[0].file.name;
 
       // Store the file name in the corresponding form field
       if (file_name === "q_file") {
@@ -1114,16 +1186,20 @@ const uploadFileToServer = async (file, file_name) => {
       } else if (file_name === "d_file") {
         form.d_file = fileName;
       }
+
+      $toast.success("File uploaded successfully");
     }
   } catch (error) {
-    const toast = useNuxtApp().$toast;
-    if (toast) {
-      toast.error("Failed to upload file");
-    }
+    const { $toast } = useNuxtApp();
+    $toast.error("Failed to upload file");
     console.error("File upload error:", error);
   }
 };
 
+/**
+ * Handle image cropping
+ * @param {Object} param0 - Cropper data
+ */
 const cropFile = ({ coordinates, canvas, image }) => {
   if (current_crop_file.value === "q_file")
     form.q_file_base64 = canvas.toDataURL();
@@ -1139,6 +1215,10 @@ const cropFile = ({ coordinates, canvas, image }) => {
     form.d_file_base64 = canvas.toDataURL();
 };
 
+/**
+ * Delete file
+ * @param {string} file_name - Name of the file field
+ */
 const deleteFile = (file_name) => {
   if (file_name === "q_file") {
     form.q_file_base64 = "";
@@ -1167,6 +1247,10 @@ const deleteFile = (file_name) => {
   }
 };
 
+/**
+ * Handle answer type change
+ * @param {string} type - The answer type (txt or photo)
+ */
 const answerTypeChanged = (type) => {
   if (type === "txt") {
     text_answer.value = true;
@@ -1183,10 +1267,17 @@ const answerTypeChanged = (type) => {
   }
 };
 
+/**
+ * Fetch current exam information
+ */
 const getCurrentExamInfo = async () => {
   // Implementation for fetching exam info if needed
 };
 
+/**
+ * Get base64 from URL
+ * @param {string} url - The URL to fetch
+ */
 const getBase64FromUrl = async (url) => {
   try {
     const response = await $fetch(url.replace(process.env.FILE_BASE_URL, ""), {
@@ -1198,6 +1289,11 @@ const getBase64FromUrl = async (url) => {
   }
 };
 
+/**
+ * URL encode form data
+ * @param {FormData} fd - Form data object
+ * @returns {string} URL encoded string
+ */
 const urlencodeFormData = (fd) => {
   let s = "";
   for (const pair of fd.entries()) {
@@ -1208,15 +1304,26 @@ const urlencodeFormData = (fd) => {
   return s;
 };
 
+/**
+ * URL encode string
+ * @param {string} s - String to encode
+ * @returns {string} Encoded string
+ */
 const encode = (s) => {
   return encodeURIComponent(s).replace(/%20/g, "+");
 };
 
+/**
+ * Go to preview step
+ */
 const goToPreviewStep = () => {
   emit("update:goToPreviewStep", 3);
 };
 
-// Watch form fields
+/**
+ * Set up watchers
+ */
+// Watch section change to update base list
 watch(
   () => form.section,
   (val) => {
@@ -1224,6 +1331,7 @@ watch(
   }
 );
 
+// Watch base change to update lesson list
 watch(
   () => form.base,
   (val) => {
@@ -1231,6 +1339,7 @@ watch(
   }
 );
 
+// Watch lesson change to update topic list
 watch(
   () => form.lesson,
   (val) => {
@@ -1238,6 +1347,7 @@ watch(
   }
 );
 
+// Watch type change to update answers for true/false
 watch(
   () => form.type,
   (val) => {
@@ -1251,8 +1361,12 @@ watch(
   }
 );
 
-// Initialize on mount
+/**
+ * Initialize on mount
+ */
 onMounted(() => {
+  // Initialize data
+  userToken.value = auth.getUserToken();
   getTypeList("section");
   getCurrentExamInfo();
 });
