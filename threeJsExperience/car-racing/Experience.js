@@ -11,7 +11,7 @@ import sources from "./sources"
 
 let instance = null
 export default class Experience {
-    constructor(canvas, questions, callBacks) {
+    constructor(canvas, questions, level, callBacks) {
         if (instance) {
             return instance
         }
@@ -28,37 +28,94 @@ export default class Experience {
         this.callBacks = callBacks
         this.isPlayingGame = false
 
-        this.options = {
-            // rendered
+        const configDayTime = {
             clearColor: "#8ec3fb",
-            // clearColor: "#112131",
+            fogColor: "#8ec3fb",
+            groundColor: "#85d534",
+            colorRoad: "#8a8a8a",
+            colorLineSeperator: "#fff480",
+            colorLineArround: "#bababa",
+            colorWaterDeep: "#02587e",
+            colorWaterSurface: "#83b7fb",
+            colorSand: "#f8d559",
+            colorGrass: "#85d534",
+            colorSnow: "#ffffff",
+            colorRock: "#613400",
+            yLight: 400,
+        }
+
+        const configNight = {
+            clearColor: "#112131",
+            fogColor: "#112131",
+            groundColor: "#548722",
+            colorRoad: "#4b4949",
+            colorLineSeperator: "#fff480",
+            colorLineArround: "#bababa",
+            colorWaterDeep: "#011c28",
+            colorWaterSurface: "#4c6b94",
+            colorSand: "#f8d559",
+            colorGrass: "#548722",
+            colorSnow: "#a3c6ff",
+            colorRock: "#1f1000",
+            yLight: 50
+        }
+
+        const configWinter = {
+            clearColor: "#e0f0ff",
+            fogColor: "#f5f5f5",
+            groundColor: "#f5f5f5",
+            colorRoad: "#a6a6a6",
+            colorLineSeperator: "#ffbb00",
+            colorLineArround: "#dedede",
+            colorWaterDeep: "#a3e3ff",
+            colorWaterSurface: "#b3d4ff",
+            colorSand: "#ffffff",
+            colorGrass: "#f5f5f5",
+            colorSnow: "#ffffff",
+            colorRock: "#d1d1d1",
+            yLight: 400
+        }
+
+
+        const configDesert = {
+            clearColor: "#fffbcc",
+            fogColor: "#fffbcc",
+            groundColor: "#c2b280",
+            colorRoad: "#999999",
+            colorLineSeperator: "#ffea00",
+            colorLineArround: "#dedede",
+            colorWaterDeep: "#00abf5",
+            colorWaterSurface: "#006eff",
+            colorSand: "#c2b280",
+            colorGrass: "#c2b280",
+            colorSnow: "#392304",
+            colorRock: "#392304",
+            yLight: 150
+        }
+
+        this.modsEnvirment = [configDayTime, configNight, configWinter, configDesert]
+
+        this.mode = this.modsEnvirment[level - 1]
+
+        this.options = {
+            ... this.mode,
 
             // fog
-            fogColor: "#8ec3fb",
-            // fogColor: "#112131",
             near: 20,
             far: 60,
 
             //ground
-            // groundSize: 200,
             groundWidth: 30,
-            groundColor: "#85d534",
-            // groundColor: "#548722",
 
             //road
-            // roadSize: 200,
             roadWidth: 10,
             roadAmplitudeX: 4.6,
             roadFrequencyX: 0.14,
-            colorRoad: "#8a8a8a",
-            // colorRoad: "#4b4949",
             widthLineArround: 0.034,
             widthLineSeperator: 0.02,
             countLine: 4,
-            colorLineSeperator: "#fff480",
-            colorLineArround: "#bababa",
+
             // mountain
-            // mountainSize: 200,
             mountainWidth: 30,
             // positionFrequency: 0.041,
             // strength: 36,
@@ -66,30 +123,9 @@ export default class Experience {
             strength: 70,
             warpFrequency: 0,
             warpStrength: 0,
-            colorWaterDeep: "#02587e",
-            colorWaterSurface: "#83b7fb",
-            colorSand: "#f8d559",
-            colorGrass: "#85d534",
-            colorSnow: "#ffffff",
-            colorRock: "#613400",
-
-            // colorWaterDeep: "#011c28",
-            // colorWaterSurface: "#4c6b94",
-            // colorSand: "#f8d559",
-            // colorGrass: "#548722",
-            // colorSnow: "#a3c6ff",
-            // colorRock: "#1f1000",
-
-
-            // tree
-            // treeCount: 30,
-
-            // cloud
-            // cloudCount: 50,
-
 
             // car
-            carBaseSpeed: 3,
+            carBaseSpeed: 1 + level * 2,
             offsetXStart: 15,
             laneLerpSpeed: 3,
             distanceCameraFromCar: window.innerWidth < 480 ? 12 : 7,
@@ -101,13 +137,11 @@ export default class Experience {
             jumpHeightCorrectAnswer: 1,
             jumpDurationCorrectAnswer: 80, // frame per second
 
-
             // levels questions
             questions: questions,
             distanceFromEndRoadQuestion: 40,
 
             // gems
-            // gemCount: 3,
             gemsInformation: [],
 
             isDevelopeMent: false
@@ -153,11 +187,6 @@ export default class Experience {
         this.time = new Time()
         this.resources = new Resources(sources)
         this.scene = new Scene()
-
-        // axes helper
-        // const axesHelper = new THREE.AxesHelper(5)
-        // this.scene.add(axesHelper)
-
 
         // Resize event
         this.sizes.on('resize', () => {

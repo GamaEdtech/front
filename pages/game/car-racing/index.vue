@@ -89,13 +89,30 @@
 
         <div class="overlay-result-game" v-if="resultGame != `pending`">
             <div :class="`modal-status ${resultGame}-modal`">
-                <span :class="`status-text ${resultGame}-text`">
+                <span v-if="level != maxLevel" :class="`status-text ${resultGame}-text`">
                     {{ resultGame == "failed" ? "Game Over!" : "Great!" }}
                 </span>
 
-                <button class="reset-btn btn" @click="resetGame">
+                <span v-if="level == maxLevel" class="status-text success-text">
+                    Congratulations,Complete All Level
+                </span>
+
+                <button v-if="resultGame == `failed` && level != maxLevel" class="reset-btn btn" @click="resetGame">
                     <v-icon class="highligth" large color="white">
                         mdi-refresh
+                    </v-icon>
+                </button>
+
+                <button v-if="level == maxLevel" class="reset-btn btn" @click="resetWholeGame">
+                    <v-icon class="highligth" large color="white">
+                        mdi-refresh
+                    </v-icon>
+                </button>
+
+                <button v-if="resultGame == `success` && level != maxLevel" class="reset-btn btn"
+                    @click="loadNextLevel">
+                    <v-icon class="highligth" large color="white">
+                        mdi-play
                     </v-icon>
                 </button>
             </div>
@@ -142,6 +159,7 @@ export default {
     data() {
         return {
             experience: null,
+            ExperienceModule: null,
             questionStatus: 'normal',
             // questions: [
             //     {
@@ -416,7 +434,6 @@ export default {
                     choices: ["72", "35", "12", "64"],
                     indexAnswer: 0
                 },
-
             ],
             currentQuestionIndex: 0,
             timer: 40,
@@ -436,6 +453,8 @@ export default {
             showGemAnimation: false,
             gemAnimationStyle: {},
             animationGemCollectDuration: 1500,
+            level: 1,
+            maxLevel: 4,
         };
     },
     mounted() {
@@ -446,8 +465,8 @@ export default {
             localStorage.setItem('hasSeenGuideMenu', 'true')
         }
         import('@/threeJsExperience/car-racing/Experience.js').then((module) => {
-            const Experience = module.default;
-            this.experience = new Experience(document.getElementById("canvas"), this.questions, {
+            this.ExperienceModule = module.default;
+            this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
@@ -551,6 +570,70 @@ export default {
                 this.isLoading = false
                 this.isFirstTimePlayingGame = true
             }, 1000);
+        },
+        resetWholeGame() {
+            this.level = 1
+            this.isUpdateTimer = true
+            this.isLoading = true
+            this.score = 0
+            this.countGemCollected = 0
+            this.currentQuestionIndex = 0
+            this.timer = 40
+            this.questionStatus = "normal"
+            this.timerDanger = false
+            this.resultGame = 'pending'
+            this.setPlayingStatus(true)
+            this.currentCountFirstPlay = 3
+            this.experience.destroy()
+            this.experience = null
+            this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
+                onQuestionChange: this.onQuestionChange,
+                onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
+                onTimerUpdate: (delta) => this.onTimerUpdate(delta),
+                onScoreChange: (bonus) => this.onScoreChange(bonus),
+                onResultGameChange: (result) => this.onResultGameChange(result),
+                onChangeSceneReady: this.onChangeSceneReady,
+                onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                onGemColocted: this.onGemColocted
+            });
+
+            setTimeout(() => {
+                this.setPlayingStatus(false)
+                this.isLoading = false
+                this.isFirstTimePlayingGame = true
+            }, 1000);
+        },
+        loadNextLevel() {
+            if (this.level < this.maxLevel) {
+                this.level += 1
+                this.isUpdateTimer = true
+                this.isLoading = true
+                this.currentQuestionIndex = 0
+                this.timer = 40
+                this.questionStatus = "normal"
+                this.timerDanger = false
+                this.resultGame = 'pending'
+                this.setPlayingStatus(true)
+                this.currentCountFirstPlay = 3
+                this.experience.destroy()
+                this.experience = null
+                this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
+                    onQuestionChange: this.onQuestionChange,
+                    onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
+                    onTimerUpdate: (delta) => this.onTimerUpdate(delta),
+                    onScoreChange: (bonus) => this.onScoreChange(bonus),
+                    onResultGameChange: (result) => this.onResultGameChange(result),
+                    onChangeSceneReady: this.onChangeSceneReady,
+                    onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                    onGemColocted: this.onGemColocted
+                });
+
+                setTimeout(() => {
+                    this.setPlayingStatus(false)
+                    this.isLoading = false
+                    this.isFirstTimePlayingGame = true
+                }, 1000);
+            }
         },
 
         nextCount() {
