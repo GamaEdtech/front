@@ -74,19 +74,26 @@ const items = [
   {
     title: 'TEST LIST',
     icon: 'mdi-list-box-outline',
-    link: '/test-maker/create?active=test_list',
+    link: '/test-maker/create',
+    query: { active: 'test_list' }
   },
   {
     title: 'ADD NEW TEST',
     icon: 'mdi-plus-circle-outline',
-    link: '/test-maker/create?active=add_test',
-    // status: (auth && auth.user.group_id === '6' ? true : false)
+    link: '/test-maker/create',
+    query: { active: 'add_test' }
   },
 ];
 
 const openLink = (item) => {
   if (!item.subMenuList) {
-    router.push({path: item.link});
+    // Only navigate if the link is not empty
+    if (item.link) {
+      router.push({
+        path: item.link,
+        query: item.query || {}
+      });
+    }
   } else {
     subList.value = item.subMenuList;
     sheet.value = true;

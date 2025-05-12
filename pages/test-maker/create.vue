@@ -1612,6 +1612,16 @@ watch(
   }
 );
 
+// Watch for changes in route query parameter
+watch(
+  () => route.query.active,
+  (newActive) => {
+    if (newActive) {
+      checkActiveParam();
+    }
+  }
+);
+
 // Initialize on mount
 onMounted(async () => {
   userToken.value = auth.getUserToken();
@@ -1630,8 +1640,8 @@ onMounted(async () => {
 
   await getTypeList("exam_type");
   await getTypeList("state");
-
-  // Handle active query parameter for test list / add test
+  
+  // Check active query parameter
   checkActiveParam();
 });
 
