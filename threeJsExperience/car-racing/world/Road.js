@@ -39,7 +39,8 @@ export default class Road {
                 uWidthLineSeperator: new Uniform(this.options.widthLineSeperator),
                 uCountLine: new Uniform(this.options.countLine),
                 uColorLineSeperator: new Uniform(new Color(this.options.colorLineSeperator)),
-                uColorLineArround: new Uniform(new Color(this.options.colorLineArround))
+                uColorLineArround: new Uniform(new Color(this.options.colorLineArround)),
+                uLengthRoad: new Uniform(this.options.roadSize)
             }
         })
     }
