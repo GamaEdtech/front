@@ -120,7 +120,17 @@
 
     <v-container id="service-extensive-database">
       <v-row>
-        <v-col cols="12" md="6"> </v-col>
+        <v-col cols="12" md="6" class="text-center">
+          <iframe
+            class="rounded youtube-container"
+            src="https://www.youtube.com/embed/qJcZwPcXyXU?si=Y4PcVrImzRAanotw"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          />
+        </v-col>
         <v-col cols="12" md="6">
           <h2 class="gama-text-h4">Profit Distribution & Buyback Mechanism</h2>
 
@@ -229,6 +239,13 @@ export default {
 </script>
 
 <style scoped>
+.youtube-container {
+  min-width: 200px;
+  max-width: 560px;
+  width: 100%;
+  min-height: 315px;
+  height: 100%;
+}
 #service-page-header {
   height: 60rem;
   background: url("/images/get-token-page-header.webp");
