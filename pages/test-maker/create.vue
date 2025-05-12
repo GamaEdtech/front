@@ -1629,6 +1629,7 @@ onMounted(async () => {
   userToken.value = auth.getUserToken();
 
   await getCurrentExamInfo();
+  await getExamTests();
   await getTypeList("section");
 
   if (form.base) {

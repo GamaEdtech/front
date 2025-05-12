@@ -71,12 +71,18 @@
               class="mt-2"
               v-show="path_panel_expand"
             >
-              <FormTopicSelector
-                ref="topicSelector"
-                :selectedTopics="selected_topics"
-                :topic-list="topic_list"
-                @selectTopic="selectTopic"
-              />
+            <v-autocomplete
+                density="compact"
+                :items="topic_list"
+                item-value="id"
+                item-title="title"
+                v-model="form.topic"
+                label="Topics"
+                variant="outlined"
+                color="orange"
+                :rules="[(v) => !!v || 'This field is required']"
+                @update:model-value="changeOption('topic', $event)"
+                />
             </v-col>
 
             <v-col cols="12" md="2" class="mt-2">
@@ -88,6 +94,7 @@
                 item-value="value"
                 variant="outlined"
                 density="compact"
+                color="orange"
                 :rules="[(v) => !!v || 'Question type is required']"
               ></v-autocomplete>
             </v-col>
@@ -1696,5 +1703,15 @@ const buttonDisabled = computed(() => {
 /* For better form spacing */
 .v-card-text {
   padding-bottom: 24px;
+}
+
+.topic_list_item {
+  font-size: 1.4rem;
+  line-height: 2rem;
+}
+
+.topic_season {
+  font-weight: bolder !important;
+  color: blue !important;
 }
 </style>
