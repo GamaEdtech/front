@@ -2213,6 +2213,7 @@ export default {
         })
         .catch((err) => {
           if (err.response.status == 401 || err.response.status == 403) {
+            this.openAuthDialog("login");
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
