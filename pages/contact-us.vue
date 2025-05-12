@@ -10,7 +10,7 @@
         <div
           class="pt-4 mb-6 mb-md-0 mr-0 mr-md-12 d-flex flex-column"
           >
-          <v-form v-model="valid">
+          <v-form v-model="valid" ref="myForm">
             <!--Name Input-->
             <v-text-field
                 label="Name*"
@@ -118,6 +118,7 @@
               block
               :disabled="!valid"
               @click="submitForm"
+              :loading="submitLogin"
             >
               Send
             </v-btn>
@@ -175,10 +176,12 @@ export default {
         min25: v => (v && v.length >= 25) || 'Minimum 25 characters required.',
       },
       valid: false, // track form validity
+      submitLogin:false
     }
   },
   methods: {
     async submitForm(event) {
+      this.submitLogin = true
       event.preventDefault();
       if (this.valid){
         const token = await this.$recaptcha.execute('contact_form');
@@ -196,9 +199,13 @@ export default {
               type: 'success',
               className: 'gtext-t5 white--text bg-primary-gray-800 text-left font-weight-medium toast-contactus-success'
             })
+            // Reset form inputs and validation state
+          this.resetForm();
         }catch (err){
           if (err.response.status == 400)
               this.$toast.error(err.response.data.message);
+      }finally{
+        this.submitLogin = false
       }}
   },
     triggerFileSelect() {
@@ -224,7 +231,11 @@ export default {
     removeFile() {
       this.form.file = null;
       this.$refs.fileInput.value = null;
-    }
+    },
+    resetForm() {
+    this.$refs.myForm.reset();             // Clears the v-models
+    this.$refs.myForm.resetValidation();   // Clears validation state
+  }
   },
   async mounted() {
     if (process.client) {
