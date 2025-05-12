@@ -46,5 +46,22 @@ export default [
         name: 'fontLevel',
         type: 'font',
         path: "/images/car-racing/helvetiker_regular.typeface.json"
-    }
+    },
+
+    // gem
+    {
+        name: 'starParticleTexture',
+        type: 'texture',
+        path: "/images/car-racing/starParticleTexture.png"
+    },
+    {
+        name: 'gemGLTFModel',
+        type: 'gltfModel',
+        path: "/images/car-racing/gem.glb"
+    },
+    {
+        name: 'gemTexture',
+        type: 'texture',
+        path: "/images/car-racing/gemBakedTexture.jpg"
+    },
 ]

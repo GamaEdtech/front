@@ -28,6 +28,15 @@
             </div>
 
             <div :class="`container-timer-score ${stepGuidMenu == `timerScore` || !isShowGuidMenu ? `` : `fade`}`">
+
+                <div class="gems-show">
+                    <div class="gem-image-div">
+                        <v-icon color="white">mdi-diamond-stone</v-icon>
+                    </div>
+
+                    <span class="count-gem">{{ countGemCollected }}</span>
+                </div>
+
                 <div class="score-div">
                     <span class="score-text">{{ score }}</span>
                     <v-icon class="icon-score highligth" color="#ed8a19">
@@ -57,6 +66,10 @@
 
         </div>
 
+        <div class="gem-collect-animation" v-if="showGemAnimation" :style="gemAnimationStyle">
+            +1
+        </div>
+
         <div :class="`overlay-pause ${isShowGuidMenu ? `zindex-less` : ``}`"
             v-if="!isPlayingGame && resultGame == `pending`">
             <button :disabled="isShowGuidMenu"
@@ -76,13 +89,30 @@
 
         <div class="overlay-result-game" v-if="resultGame != `pending`">
             <div :class="`modal-status ${resultGame}-modal`">
-                <span :class="`status-text ${resultGame}-text`">
+                <span v-if="level != maxLevel" :class="`status-text ${resultGame}-text`">
                     {{ resultGame == "failed" ? "Game Over!" : "Great!" }}
                 </span>
 
-                <button class="reset-btn btn" @click="resetGame">
+                <span v-if="level == maxLevel" class="status-text success-text">
+                    Congratulations,Complete All Level
+                </span>
+
+                <button v-if="resultGame == `failed` && level != maxLevel" class="reset-btn btn" @click="resetGame">
                     <v-icon class="highligth" large color="white">
                         mdi-refresh
+                    </v-icon>
+                </button>
+
+                <button v-if="level == maxLevel" class="reset-btn btn" @click="resetWholeGame">
+                    <v-icon class="highligth" large color="white">
+                        mdi-refresh
+                    </v-icon>
+                </button>
+
+                <button v-if="resultGame == `success` && level != maxLevel" class="reset-btn btn"
+                    @click="loadNextLevel">
+                    <v-icon class="highligth" large color="white">
+                        mdi-play
                     </v-icon>
                 </button>
             </div>
@@ -129,7 +159,260 @@ export default {
     data() {
         return {
             experience: null,
+            ExperienceModule: null,
             questionStatus: 'normal',
+            // questions: [
+            //     {
+            //         text: "10 - 2 =",
+            //         choices: ["4", "22", "45", "8"],
+            //         indexAnswer: 3
+            //     },
+            //     {
+            //         text: "22 * 2 =",
+            //         choices: ["4", "44", "81", "95"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "1 + 1 =",
+            //         choices: ["2", "15", "56", "64"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "9 * 8 =",
+            //         choices: ["72", "35", "12", "64"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "6 * 5 =",
+            //         choices: ["20", "30", "44", "81"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "10 / 2 =",
+            //         choices: ["5", "11", "1", "0"],
+            //         indexAnswer: 0
+            //     },
+            //     {
+            //         text: "1 + 11 =",
+            //         choices: ["28", "17", "12", "64"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 - 7 =",
+            //         choices: ["21", "8", "72", "64"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "3 * 7 =",
+            //         choices: ["10", "21", "14", "28"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "24 / 6 =",
+            //         choices: ["3", "4", "6", "8"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "5 + 8 =",
+            //         choices: ["11", "13", "15", "17"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "18 - 9 =",
+            //         choices: ["7", "9", "11", "27"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "4 * 9 =",
+            //         choices: ["32", "36", "40", "45"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "28 / 4 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "7 + 6 =",
+            //         choices: ["11", "12", "13", "14"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "16 - 8 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "5 * 6 =",
+            //         choices: ["25", "30", "35", "40"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "36 / 9 =",
+            //         choices: ["3", "4", "5", "6"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "9 + 7 =",
+            //         choices: ["14", "15", "16", "17"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "14 - 5 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "7 * 8 =",
+            //         choices: ["48", "56", "64", "72"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "42 / 7 =",
+            //         choices: ["5", "6", "7", "8"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "12 + 9 =",
+            //         choices: ["19", "20", "21", "22"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "25 - 16 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "6 * 7 =",
+            //         choices: ["35", "42", "49", "56"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "63 / 9 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "8 + 9 =",
+            //         choices: ["15", "16", "17", "18"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "20 - 12 =",
+            //         choices: ["6", "7", "8", "9"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "9 * 9 =",
+            //         choices: ["72", "81", "90", "99"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "54 / 6 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 + 8 =",
+            //         choices: ["21", "22", "23", "24"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "30 - 14 =",
+            //         choices: ["14", "15", "16", "17"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "8 * 7 =",
+            //         choices: ["48", "56", "64", "72"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "72 / 8 =",
+            //         choices: ["8", "9", "10", "11"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "17 + 6 =",
+            //         choices: ["21", "22", "23", "24"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "40 - 23 =",
+            //         choices: ["15", "16", "17", "18"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "11 * 5 =",
+            //         choices: ["45", "50", "55", "60"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "100 / 10 =",
+            //         choices: ["5", "10", "15", "20"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "25 + 25 =",
+            //         choices: ["40", "50", "60", "70"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "50 - 25 =",
+            //         choices: ["15", "20", "25", "30"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "12 * 4 =",
+            //         choices: ["36", "44", "48", "52"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "96 / 12 =",
+            //         choices: ["7", "8", "9", "10"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "35 + 15 =",
+            //         choices: ["40", "45", "50", "55"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "60 - 35 =",
+            //         choices: ["20", "25", "30", "35"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "13 * 3 =",
+            //         choices: ["36", "39", "42", "45"],
+            //         indexAnswer: 1
+            //     },
+            //     {
+            //         text: "144 / 12 =",
+            //         choices: ["10", "11", "12", "13"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "75 + 25 =",
+            //         choices: ["90", "95", "100", "105"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "100 - 45 =",
+            //         choices: ["45", "50", "55", "60"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "15 * 6 =",
+            //         choices: ["75", "80", "90", "95"],
+            //         indexAnswer: 2
+            //     },
+            //     {
+            //         text: "121 / 11 =",
+            //         choices: ["9", "10", "11", "12"],
+            //         indexAnswer: 2
+            //     }
+            // ],
             questions: [
                 {
                     text: "10 - 2 =",
@@ -151,26 +434,6 @@ export default {
                     choices: ["72", "35", "12", "64"],
                     indexAnswer: 0
                 },
-                // {
-                //     text: "6 * 5 =",
-                //     choices: ["20", "30", "44", "81"],
-                //     indexAnswer: 1
-                // },
-                // {
-                //     text: "10 / 2 =",
-                //     choices: ["5", "11", "1", "0"],
-                //     indexAnswer: 0
-                // },
-                // {
-                //     text: "1 + 11 =",
-                //     choices: ["28", "17", "22", "64"],
-                //     indexAnswer: 2
-                // },
-                // {
-                //     text: "9 * 8 =",
-                //     choices: ["21", "35", "72", "64"],
-                //     indexAnswer: 2
-                // },
             ],
             currentQuestionIndex: 0,
             timer: 40,
@@ -186,6 +449,12 @@ export default {
             isShowGuidMenu: false,
             stepGuidMenu: "Finish",
             isUpdateTimer: true,
+            countGemCollected: 0,
+            showGemAnimation: false,
+            gemAnimationStyle: {},
+            animationGemCollectDuration: 1500,
+            level: 1,
+            maxLevel: 4,
         };
     },
     mounted() {
@@ -196,8 +465,8 @@ export default {
             localStorage.setItem('hasSeenGuideMenu', 'true')
         }
         import('@/threeJsExperience/car-racing/Experience.js').then((module) => {
-            const Experience = module.default;
-            this.experience = new Experience(document.getElementById("canvas"), this.questions, {
+            this.ExperienceModule = module.default;
+            this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
                 onQuestionChange: this.onQuestionChange,
                 onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
                 onTimerUpdate: (delta) => this.onTimerUpdate(delta),
@@ -205,6 +474,7 @@ export default {
                 onResultGameChange: (result) => this.onResultGameChange(result),
                 onChangeSceneReady: this.onChangeSceneReady,
                 onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                onGemColocted: this.onGemColocted
             });
         });
     },
@@ -301,6 +571,70 @@ export default {
                 this.isFirstTimePlayingGame = true
             }, 1000);
         },
+        resetWholeGame() {
+            this.level = 1
+            this.isUpdateTimer = true
+            this.isLoading = true
+            this.score = 0
+            this.countGemCollected = 0
+            this.currentQuestionIndex = 0
+            this.timer = 40
+            this.questionStatus = "normal"
+            this.timerDanger = false
+            this.resultGame = 'pending'
+            this.setPlayingStatus(true)
+            this.currentCountFirstPlay = 3
+            this.experience.destroy()
+            this.experience = null
+            this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
+                onQuestionChange: this.onQuestionChange,
+                onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
+                onTimerUpdate: (delta) => this.onTimerUpdate(delta),
+                onScoreChange: (bonus) => this.onScoreChange(bonus),
+                onResultGameChange: (result) => this.onResultGameChange(result),
+                onChangeSceneReady: this.onChangeSceneReady,
+                onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                onGemColocted: this.onGemColocted
+            });
+
+            setTimeout(() => {
+                this.setPlayingStatus(false)
+                this.isLoading = false
+                this.isFirstTimePlayingGame = true
+            }, 1000);
+        },
+        loadNextLevel() {
+            if (this.level < this.maxLevel) {
+                this.level += 1
+                this.isUpdateTimer = true
+                this.isLoading = true
+                this.currentQuestionIndex = 0
+                this.timer = 40
+                this.questionStatus = "normal"
+                this.timerDanger = false
+                this.resultGame = 'pending'
+                this.setPlayingStatus(true)
+                this.currentCountFirstPlay = 3
+                this.experience.destroy()
+                this.experience = null
+                this.experience = new this.ExperienceModule(document.getElementById("canvas"), this.questions, this.level, {
+                    onQuestionChange: this.onQuestionChange,
+                    onQuestionStatusChange: (status) => this.onQuestionStatusChange(status),
+                    onTimerUpdate: (delta) => this.onTimerUpdate(delta),
+                    onScoreChange: (bonus) => this.onScoreChange(bonus),
+                    onResultGameChange: (result) => this.onResultGameChange(result),
+                    onChangeSceneReady: this.onChangeSceneReady,
+                    onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
+                    onGemColocted: this.onGemColocted
+                });
+
+                setTimeout(() => {
+                    this.setPlayingStatus(false)
+                    this.isLoading = false
+                    this.isFirstTimePlayingGame = true
+                }, 1000);
+            }
+        },
 
         nextCount() {
             if (this.currentCountFirstPlay > 1) {
@@ -322,6 +656,43 @@ export default {
                 this.experience.changeCameraMode("default")
                 this.cameraMode = "default"
             }
+        },
+        async startAnimationGemCollect() {
+            const startX = window.innerWidth / 2;
+            const startY = window.innerHeight / 2;
+            const gemElement = document.querySelector('.gems-show');
+            if (gemElement) {
+                const gemRect = gemElement.getBoundingClientRect();
+                const endX = gemRect.left + gemRect.width / 2;
+                const endY = gemRect.top + gemRect.height / 2;
+
+                this.gemAnimationStyle = {
+                    left: `${startX}px`,
+                    top: `${startY}px`,
+                    opacity: '1',
+                    transform: 'scale(1)',
+                };
+                this.showGemAnimation = true;
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        this.gemAnimationStyle = {
+                            left: `${endX}px`,
+                            top: `${endY}px`,
+                            opacity: '0',
+                            transform: 'scale(0.8)',
+                            transition: `all ${this.animationGemCollectDuration}ms ease-out`,
+                        };
+                        resolve();
+                    }, 50);
+                });
+
+                await new Promise(resolve => setTimeout(resolve, this.animationGemCollectDuration));
+                this.showGemAnimation = false;
+            }
+        },
+        onGemColocted() {
+            this.countGemCollected += 1
+            this.startAnimationGemCollect()
         }
 
     }
@@ -799,6 +1170,67 @@ export default {
     transform: translateY(-100px);
 }
 
+/* gems Show */
+.gems-show {
+    width: 100px;
+    height: 40px;
+    border-radius: 40px;
+    background: linear-gradient(135deg, #ffeaa7, #ff8400);
+    border: 4px solid #ffc400;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gem-image-div {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: absolute;
+    background-color: #ef993f;
+    left: -10px;
+    top: -10px;
+    border: 4px solid #ffc400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.count-gem {
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    right: 20px;
+}
+
+.gem-collect-animation {
+    position: fixed;
+    z-index: 1000;
+    font-size: 80px;
+    font-weight: bold;
+    color: #ef993f;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    user-select: none;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease-out;
+}
+
+/* responsive tablet */
+@media screen and (max-width: 768px) {
+    .top-items {
+        align-items: flex-start;
+    }
+
+    .container-timer-score {
+        column-gap: 6px;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+}
+
 /* responsive mobile */
 @media screen and (max-width: 480px) {
     .change-lane-btn {
@@ -849,6 +1281,20 @@ export default {
 
     .buttons-div {
         bottom: 60px;
+    }
+
+    .gems-show {
+        width: 80px;
+        height: 30px;
+    }
+
+    .gem-image-div {
+        width: 40px;
+        height: 40px;
+    }
+
+    .count-gem {
+        font-size: 20px;
     }
 }
 </style>
