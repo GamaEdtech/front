@@ -185,7 +185,6 @@ export default {
       event.preventDefault();
       if (this.valid){
         const token = await this.$recaptcha.execute('contact_form');
-        console.log(token)
         try{
           await this.$axios.$post('/api/v2/contacts', {
             captcha: token, 
