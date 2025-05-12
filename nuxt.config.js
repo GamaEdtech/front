@@ -80,7 +80,7 @@ export default {
     { src: "plugins/vuedraggable", ssr: false },
     { src: "plugins/gtag.js", mode: "client" },
     { src: "plugins/mathjax.js", mode: "client" },
-    { src: "plugins/hotjar.client.js", mode: "client" },
+    // { src: "plugins/hotjar.client.js", mode: "client" },
     { src: "plugins/board-selection.js", mode: "client" },
   ],
 
@@ -243,17 +243,15 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", 'chart.js'],
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "chart.js"],
     extend(config, ctx) {
-      config.module.rules.push(
-        {
-          test: /\.(glsl|vs|fs|vert|frag)$/,
-          loader: 'raw-loader',
-          exclude: /node_modules/
-        })
-    }
+      config.module.rules.push({
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+        loader: "raw-loader",
+        exclude: /node_modules/,
+      });
+    },
   },
-
 
   pwa: {
     manifest: {
