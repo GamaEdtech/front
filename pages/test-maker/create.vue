@@ -1311,6 +1311,9 @@ const checkActiveParam = () => {
       testListSwitch.value = false;
       test_step.value = 2;
     }
+  } else {
+    // Reset to first step when no query parameters
+    test_step.value = 1;
   }
 };
 
@@ -1614,12 +1617,11 @@ watch(
 
 // Watch for changes in route query parameter
 watch(
-  () => route.query.active,
-  (newActive) => {
-    if (newActive) {
+  () => route.query,
+  () => {
       checkActiveParam();
-    }
-  }
+  },
+  { deep: true }
 );
 
 // Initialize on mount
