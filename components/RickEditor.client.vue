@@ -257,4 +257,7 @@ const editorConfig = {
   align-items: center;
   gap: 8px;
 }
+.ck-toolbar_grouping {
+  background-color: #FAFAFA !important;
+}
 </style>

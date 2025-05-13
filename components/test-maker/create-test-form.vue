@@ -254,15 +254,13 @@
                         />
                         <v-btn
                           v-else
-                          variant="flat"
+                          variant="text"
                           color="teal-lighten-5"
-                          class="image-input d-flex align-center justify-center"
+                          class="d-flex align-center justify-center"
                           style="width: 90px; height: 90px"
                           @click="selectFile('a_file')"
                         >
-                          <v-icon size="x-large" color="teal"
-                            >mdi-camera</v-icon
-                          >
+                          <v-icon size="80" color="#A11333">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
@@ -272,7 +270,7 @@
                           color="error"
                           icon="mdi-delete"
                           size="small"
-                          class="img-clear-btn"
+                          block
                         ></v-btn>
                       </div>
                     </v-col>
@@ -332,15 +330,13 @@
                         />
                         <v-btn
                           v-else
-                          variant="flat"
+                          variant="text"
                           color="teal-lighten-5"
-                          class="image-input d-flex align-center justify-center"
+                          class="d-flex align-center justify-center"
                           style="width: 90px; height: 90px"
                           @click="selectFile('b_file')"
                         >
-                          <v-icon size="x-large" color="teal"
-                            >mdi-camera</v-icon
-                          >
+                          <v-icon size="80" color="#A11333">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
@@ -408,15 +404,13 @@
                         />
                         <v-btn
                           v-else
-                          variant="flat"
+                          variant="text"
                           color="teal-lighten-5"
-                          class="image-input d-flex align-center justify-center"
+                          class="d-flex align-center justify-center"
                           style="width: 90px; height: 90px"
                           @click="selectFile('c_file')"
                         >
-                          <v-icon size="x-large" color="teal"
-                            >mdi-camera</v-icon
-                          >
+                          <v-icon size="80" color="#A11333">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
@@ -484,15 +478,13 @@
                         />
                         <v-btn
                           v-else
-                          variant="flat"
+                          variant="text"
                           color="teal-lighten-5"
-                          class="image-input d-flex align-center justify-center"
+                          class="d-flex align-center justify-center"
                           style="width: 90px; height: 90px"
                           @click="selectFile('d_file')"
                         >
-                          <v-icon size="x-large" color="teal"
-                            >mdi-camera</v-icon
-                          >
+                          <v-icon size="80" color="#A11333">mdi-camera</v-icon>
                         </v-btn>
 
                         <v-btn
