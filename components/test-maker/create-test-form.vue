@@ -730,7 +730,6 @@
             color="teal"
             variant="flat"
             size="x-large"
-            class="white--text"
             :loading="crop_confirm_loading"
             block
             @click="submitCrop"
@@ -905,10 +904,14 @@ const txt_direction_list = [
   { value: "rtl", title: "RTL" },
 ];
 
-const stencil_props = {
+/**
+ * Cropper stencil properties
+ */
+const stencil_props = reactive({
   width: 180,
   height: 180,
-};
+  aspectRatio: 1
+});
 
 const typeList = [
   { value: "fourchoice", title: "Multiple choice(4)" },
@@ -1204,6 +1207,7 @@ const submitQuestion = veeHandleSubmit(async (values) => {
  * @param {string} file_name - Name of the file field
  */
 const selectFile = (file_name) => {
+  // Trigger the appropriate file input click based on the file name
   if (file_name === "q_file" && questionInput.value) {
     questionInput.value.$el.querySelector('input[type="file"]').click();
   } else if (file_name === "answer_full_file" && answerFullInput.value) {
@@ -1230,7 +1234,7 @@ const uploadFile = (file_name, fileEvent) => {
 
   if (!file) return;
 
-  // Set current crop file name
+  // Set current crop file name for tracking which file we're working with
   current_crop_file.value = file_name;
 
   // Set crop file URL for cropper dialog
@@ -1271,28 +1275,34 @@ const cropFile = ({ coordinates, canvas }) => {
 const deleteFile = (file_name) => {
   if (file_name === "q_file") {
     form.q_file_base64 = "";
+    form.q_file = null;
     if (questionInput.value) questionInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.q_file = null;
   } else if (file_name === "answer_full_file") {
     form.answer_full_file_base64 = "";
+    form.answer_full_file = null;
     if (answerFullInput.value) answerFullInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.answer_full_file = null;
   } else if (file_name === "a_file") {
     form.a_file_base64 = "";
+    form.a_file = null;
     if (aInput.value) aInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.a_file = null;
   } else if (file_name === "b_file") {
     form.b_file_base64 = "";
+    form.b_file = null;
     if (bInput.value) bInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.b_file = null;
   } else if (file_name === "c_file") {
     form.c_file_base64 = "";
+    form.c_file = null;
     if (cInput.value) cInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.c_file = null;
   } else if (file_name === "d_file") {
     form.d_file_base64 = "";
+    form.d_file = null;
     if (dInput.value) dInput.value.value = null;
-    current_crop_file.value = "";
+    form_hidden_data.d_file = null;
   }
 };
 
@@ -1500,19 +1510,19 @@ const submitCrop = async () => {
           form.d_file = fileName;
         }
 
-        $toast.success("File uploaded successfully");
+        if ($toast) $toast.success("File uploaded successfully");
         
         // Close the dialog after successful upload
         cropper_dialog.value = false;
       } else {
-        $toast.error("Invalid response from server");
+        if ($toast) $toast.error("Invalid response from server");
       }
     } else {
-      $toast.error("No file to upload");
+      if ($toast) $toast.error("No file to upload");
     }
   } catch (error) {
     console.error("Error submitting cropped image:", error);
-    $toast.error("Failed to upload cropped image");
+    if ($toast) $toast.error("Failed to upload cropped image");
   } finally {
     crop_confirm_loading.value = false;
   }
