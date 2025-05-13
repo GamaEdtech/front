@@ -177,12 +177,13 @@
                 <v-row>
                   <v-col cols="12" md="6">
                     <v-btn
+                      type="submit"
                       block
                       color="teal"
                       class="text-white"
                       size="large"
-                      type="submit"
                       :loading="submit_loading"
+                      :disabled="!isFormValid"
                       style="
                         text-transform: none;
                         font-size: 13px;
@@ -540,20 +541,21 @@
               </v-card>
             </v-col>
 
+            <!-- Publish button -->
             <v-col cols="12">
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    @click="test_step = 3"
+                    @click="tests.length >= 5 ? test_step = 3 : null"
                     :disabled="tests.length < 5"
+                    :loading="test_loading"
                     block
                     color="teal"
                     class="text-white"
                     size="large"
+                    style="text-transform: none; font-size: 13px; font-weight: 500;"
                   >
-                    <span v-if="tests.length < 5"
-                      >Add at least {{ 5 - tests.length }} more tests</span
-                    >
+                    <span v-if="tests.length < 5">Add at least {{ 5 - tests.length }} more tests</span>
                     <span v-else>Next step</span>
                   </v-btn>
                 </v-col>
@@ -564,6 +566,7 @@
                     color="red"
                     size="large"
                     to="/user/exam"
+                    style="text-transform: none; font-size: 13px; font-weight: 500;"
                   >
                     Discard
                   </v-btn>
@@ -618,14 +621,15 @@
 
             <v-col cols="12">
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    block
+                    @click="publishTest"
+                    :disabled="tests.length < 5"
+                    :loading="publish_loading"
+                    size="large"
                     color="teal"
                     class="text-white"
-                    size="large"
-                    :loading="publish_loading"
-                    @click="publishTest"
+                    block 
                     style="
                       text-transform: none;
                       font-size: 13px;
@@ -633,16 +637,18 @@
                     "
                     density="compact"
                   >
-                    Publish
+                    <span v-show="tests.length < 5">Add at least {{ 5 - tests.length }} more tests</span>
+                    <span v-show="tests.length >= 5">Publish</span>
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     block
                     variant="outlined"
                     color="red"
                     size="large"
                     to="/user/exam"
+                    density="compact"
                     style="
                       text-transform: none;
                       font-size: 13px;
@@ -861,6 +867,7 @@
             <v-col v-else cols="12" class="text-center">
               <p>Oops! no data found</p>
             </v-col>
+            
           </v-row>
         </v-card-text>
       </v-card>
@@ -1159,6 +1166,12 @@ const getTopicTitleList = () => {
 const submitQuestion = async () => {
   submit_loading.value = true;
 
+  // Validate form fields
+  if (!validateHeaderForm()) {
+    submit_loading.value = false;
+    return;
+  }
+
   // Arrange to form data
   let formData = new FormData();
   for (let key in form) {
@@ -1182,21 +1195,25 @@ const submitQuestion = async () => {
     });
 
     const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Created successfully");
+    if ($toast) $toast.success("Exam created successfully");
 
     exam_id.value = response.data.id;
     exam_code.value = response.data.code;
 
     // Set in store
-    useState("user").value = {
-      ...useState("user").value,
+    const userState = useState("user");
+    userState.value = {
+      ...userState.value,
       currentExamId: exam_id.value,
       currentExamCode: exam_code.value,
     };
 
+    // Update create form component with new exam info
     if (createForm.value) {
       createForm.value.getCurrentExamInfo();
     }
+    
+    // Advance to step 2 for adding tests
     test_step.value = 2;
   } catch (error) {
     const { $toast } = useNuxtApp();
@@ -1272,6 +1289,9 @@ const publishTest = async () => {
   try {
     const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
+      }
     });
 
     if (response.data.message === "done") {
@@ -1284,13 +1304,15 @@ const publishTest = async () => {
       exam_id.value = "";
       exam_code.value = "";
 
-      // Set in store
-      useState("user").value = {
-        ...useState("user").value,
+      // Reset state in user state
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
         currentExamId: "",
         currentExamCode: "",
       };
 
+      // Reset component data
       previewTestList.value = [];
       tests.value = [];
 
@@ -1305,6 +1327,7 @@ const publishTest = async () => {
       form.title = "";
       form.file_original = "";
 
+      // Advance to the publish completed step
       test_step.value = 4;
 
       const { $toast } = useNuxtApp();
@@ -1313,7 +1336,7 @@ const publishTest = async () => {
   } catch (err) {
     const { $toast } = useNuxtApp();
     if ($toast) $toast.error(err.message || "Error publishing exam");
-    console.error(err);
+    console.error("Error publishing exam:", err);
   } finally {
     publish_loading.value = false;
   }
@@ -1339,7 +1362,8 @@ const checkActiveParam = () => {
 const submitTest = async () => {
   if (tests.value.length === 0) return;
 
-  let formData = new FormData();
+  // Create FormData to send the list of test IDs
+  const formData = new FormData();
   for (let i = 0; i < tests.value.length; i++) {
     formData.append("tests[]", tests.value[i]);
   }
@@ -1349,16 +1373,25 @@ const submitTest = async () => {
       method: "PUT",
       body: urlencodeFormData(formData),
       headers: {
+        Authorization: `Bearer ${userToken.value}`,
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       },
     });
 
-    // Get current exam tests after submission
-    getExamCurrentTests();
+    // Get current exam tests after submission to update the preview
+    await getExamCurrentTests();
+    
+    // Update the test count in create-test-form component if it exists
+    if (createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Tests added to exam successfully");
   } catch (err) {
+    console.error("Error submitting tests:", err);
     const { $toast } = useNuxtApp();
     if ($toast) $toast.error(err.message || "Error updating exam tests");
-    console.error(err);
   }
 };
 
@@ -1370,29 +1403,43 @@ const getExamCurrentTests = async () => {
       params: {
         exam_id: exam_id.value,
       },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`
+      }
     });
 
-    previewTestList.value = response.data.list;
+    if (response && response.data && response.data.list) {
+      previewTestList.value = response.data.list;
+    }
 
+    // Update the test count in create-test-form component if it exists
     if (createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
   } catch (err) {
     console.error("Error getting exam tests:", err);
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error("Failed to load exam tests");
   }
 };
 
 // Get current exam information
 const getCurrentExamInfo = async () => {
-  const currentExamId = useState("user").value?.currentExamId;
+  // Get current exam ID from useState
+  const userState = useState("user");
+  const currentExamId = userState.value?.currentExamId;
 
   if (currentExamId) {
     exam_id.value = currentExamId;
-    exam_code.value = useState("user").value?.currentExamCode || "";
+    exam_code.value = userState.value?.currentExamCode || "";
     test_step.value = 2;
 
     try {
-      const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`);
+      const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
+        headers: {
+          Authorization: `Bearer ${userToken.value}`
+        }
+      });
 
       tests.value = response.data.tests.length ? response.data.tests : [];
 
@@ -1407,6 +1454,8 @@ const getCurrentExamInfo = async () => {
       }
     } catch (err) {
       console.error("Error getting exam info:", err);
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.error("Failed to load exam information");
     }
   }
 };
@@ -1439,26 +1488,50 @@ const onScroll = () => {
   }
 };
 
-// Apply test to the exam
-const applyTest = (item, type) => {
-  if (tests.value.find((x) => x == item.id) && type === "remove") {
+// Apply test to the exam (add or remove)
+const applyTest = async (item, type) => {
+  if (type === 'remove' && tests.value.find((x) => x == item.id)) {
+    // Remove the test
     tests.value.splice(tests.value.indexOf(item.id), 1);
-    submitTest();
-  }
-
-  if (!tests.value.find((x) => x == item.id) && type === "add") {
+    
+    // Notify user of removal
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.info("Test removed from exam");
+    
+    // Update in the backend
+    await submitTest();
+  } else if (type === 'add' && !tests.value.find((x) => x == item.id)) {
+    // Add the test
     tests.value.push(item.id);
-    submitTest();
+    
+    // Notify user of addition
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Test added to exam");
+    
+    // Update in the backend
+    await submitTest();
   }
 };
 
 // Watchers
 watch(
   () => lastCreatedTest.value,
-  (val) => {
+  async (val) => {
     if (val && !tests.value.find((x) => x == val)) {
+      // Add the newly created test to the tests array
       tests.value.push(val);
-      submitTest();
+      
+      // Reset the lastCreatedTest value
+      setTimeout(() => {
+        lastCreatedTest.value = "";
+      }, 100);
+      
+      // Update in the backend
+      await submitTest();
+      
+      // Notify user
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.success("New test added to exam");
     }
   }
 );
@@ -1805,6 +1878,35 @@ const deleteOnlineExam = async () => {
     deleteLoading.value = false;
     confirmDeleteDialog.value = false;
   }
+};
+
+// Form validation helper
+const validateHeaderForm = () => {
+  // Check required fields
+  const requiredFields = {
+    section: "Board",
+    base: "Grade",
+    lesson: "Subject",
+    title: "Title"
+  };
+  
+  // Check each required field
+  for (const [field, label] of Object.entries(requiredFields)) {
+    if (!form[field]) {
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.error(`${label} is required`);
+      return false;
+    }
+  }
+  
+  // Check topics
+  if (!form.topics.length) {
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error("Please select at least one topic");
+    return false;
+  }
+  
+  return true;
 };
 </script>
 
