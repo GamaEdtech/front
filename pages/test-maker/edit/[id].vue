@@ -32,357 +32,204 @@
       </v-col>
     </v-row>
 
-    <v-stepper flat v-model="test_step" vertical class="mb-16">
-      <v-stepper-step
-        :complete="test_step > 1"
-        step="1"
-        class="pointer"
-        @click="test_step = 1"
-        color="teal"
-      >
-        <p>Header</p>
-      </v-stepper-step>
-      <v-stepper-content step="1">
-        <v-card flat class="mt-3 pb-10">
-          <validation-observer ref="observer" v-slot="{ invalid }">
-            <form @submit.prevent="updateQuestion">
-              <v-row>
-                <v-col cols="12" md="4">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="level"
-                    rules="required"
-                  >
-                    <v-autocomplete
-                      dense
-                      v-model="form.section"
-                      :items="level_list"
-                      :error-messages="errors"
-                      item-text="title"
-                      item-value="id"
-                      label="Curriculum"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="grade"
-                    rules="required"
-                  >
-                    <v-autocomplete
-                      dense
-                      v-model="form.base"
-                      :items="grade_list"
-                      item-value="id"
-                      item-text="title"
-                      :error-messages="errors"
-                      label="Grade"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
-                <!--                    <v-col cols="12" md="4">-->
-                <!--                      <validation-provider v-slot="{errors}" name="field" rules="required">-->
-                <!--                        <v-autocomplete-->
-                <!--                          dense-->
-                <!--                          v-model="form.field"-->
-                <!--                          :error-messages="errors"-->
-                <!--                          label="Field"-->
-                <!--                          outlined-->
-                <!--                        />-->
-                <!--                      </validation-provider>-->
-                <!--                    </v-col>-->
-                <v-col cols="12" md="4">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="lesson"
-                    rules="required"
-                  >
-                    <v-autocomplete
-                      dense
-                      :items="lesson_list"
-                      item-value="id"
-                      item-text="title"
-                      v-model="form.lesson"
-                      :error-messages="errors"
-                      label="Subject"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
+    <v-stepper-vertical
+      :items="[
+        { title: 'Header', value: 1 },
+        { title: 'Tests', value: 2 },
+        { title: 'Review', value: 3 },
+        { title: 'Publish', value: 4 },
+      ]"
+      v-model="test_step"
+      editable
+      color="teal"
+      hide-actions
+    >
+      <template #[`item.1`]>
+        <v-card flat class="mt-4 pb-10">
+          <v-form
+            ref="observer"
+            @submit.prevent="submitQuestion"
+            v-model="isFormValid"
+            class="pa-2"
+          >
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.section"
+                  :items="level_list"
+                  item-title="title"
+                  item-value="id"
+                  label="Board"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.base"
+                  :items="grade_list"
+                  item-title="title"
+                  item-value="id"
+                  label="Grade"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.lesson"
+                  :items="lesson_list"
+                  item-title="title"
+                  item-value="id"
+                  label="Subject"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'This field is required']"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
 
-                <v-col cols="12" md="12">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="topic"
-                    rules="required"
-                  >
-                    <topic-selector
-                      ref="topic-selector"
-                      :selectedTopics="selected_topics"
-                      :topic-list="topic_list"
-                      @selectTopic="selectTopic"
-                    />
-                  </validation-provider>
-                </v-col>
+              <v-col cols="12">
+                <FormTopicSelector
+                  ref="topicSelector"
+                  :selectedTopics="selected_topics"
+                  :topic-list="topic_list"
+                  @selectTopic="selectTopic"
+                />
+              </v-col>
 
-                <v-col cols="12" md="4">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="test_type"
-                    rules="required"
-                  >
-                    <v-autocomplete
-                      dense
-                      :items="test_type_list"
-                      item-value="id"
-                      item-text="title"
-                      v-model="form.exam_type"
-                      :error-messages="errors"
-                      label="Test type"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
+              <v-col cols="12" md="2">
+                <v-autocomplete
+                  v-model="form.exam_type"
+                  :items="test_type_list"
+                  item-title="title"
+                  item-value="id"
+                  label="Exam type"
+                  variant="outlined"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
 
-                <!--                <v-col cols="12" md="4">-->
-                <!--                  <validation-provider v-slot="{errors}" name="test_level" rules="required">-->
-                <!--                    <v-autocomplete-->
-                <!--                      dense-->
-                <!--                      :items="test_level_list"-->
-                <!--                      item-value="id"-->
-                <!--                      item-text="title"-->
-                <!--                      v-model="form.level"-->
-                <!--                      :error-messages="errors"-->
-                <!--                      label="Level"-->
-                <!--                      outlined-->
-                <!--                    />-->
-                <!--                  </validation-provider>-->
-                <!--                </v-col>-->
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model="form.duration"
+                  type="number"
+                  label="Test duration"
+                  variant="outlined"
+                  color="orange"
+                  density="compact"
+                ></v-text-field>
+              </v-col>
 
-                <!--                <v-col cols="12" md="4"-->
-                <!--                >-->
-                <!--                  <validation-provider v-slot="{errors}" name="holding_level" rules="required">-->
-                <!--                    <v-autocomplete-->
-                <!--                      dense-->
-                <!--                      :items="holding_level_list"-->
-                <!--                      v-model="form.holding_level"-->
-                <!--                      item-text="title"-->
-                <!--                      item-value="id"-->
-                <!--                      :error-messages="errors"-->
-                <!--                      label="Holding level"-->
-                <!--                      outlined-->
-                <!--                    />-->
-                <!--                  </validation-provider>-->
-                <!--                </v-col>-->
+              <v-col cols="12" md="2">
+                <v-autocomplete
+                  v-model="form.edu_year"
+                  :items="year_list"
+                  label="Year"
+                  variant="outlined"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
 
-                <v-col cols="12" md="4">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="test_duration"
-                    rules="required"
-                  >
-                    <v-text-field
-                      dense
-                      v-model="form.duration"
-                      item-text="title"
-                      type="number"
-                      min="1"
-                      item-value="id"
-                      :error-messages="errors"
-                      label="Test duration"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
+              <v-col cols="12" md="2">
+                <v-autocomplete
+                  v-model="form.edu_month"
+                  :items="month_list"
+                  item-title="title"
+                  item-value="id"
+                  label="Month"
+                  variant="outlined"
+                  color="orange"
+                  density="compact"
+                ></v-autocomplete>
+              </v-col>
 
-                <!--                <v-col cols="12" md="4">-->
-                <!--                  <v-file-input-->
-                <!--                    dense-->
-                <!--                    v-model="file_original"-->
-                <!--                    @change="uploadFile('file_original')"-->
-                <!--                    accept="application/pdf"-->
-                <!--                    label="Source file"-->
-                <!--                    outlined-->
-                <!--                  />-->
-                <!--                </v-col>-->
+              <v-col cols="12" md="4">
+                <v-file-input
+                  v-model="file_original"
+                  label="Source file"
+                  variant="outlined"
+                  prepend-icon="mdi-paperclip"
+                  @update:model-value="uploadFile"
+                  accept="application/pdf,image/*"
+                  density="compact"
+                ></v-file-input>
+              </v-col>
 
-                <v-col
-                  cols="12"
-                  md="4"
-                  v-if="
-                    form.holding_level === 1 ||
-                    form.holding_level === 2 ||
-                    form.holding_level === 3
-                  "
-                >
-                  <v-autocomplete
-                    dense
-                    :items="state_list"
-                    v-model="form.state"
-                    item-text="title"
-                    item-value="id"
-                    label="State"
-                    outlined
-                  />
-                </v-col>
+              <v-col cols="12" md="8">
+                <v-text-field
+                  v-model="form.title"
+                  label="Title"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'This field is required']"
+                  density="compact"
+                ></v-text-field>
+                <div class="text-caption text-grey">
+                  Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A
+                  Level MSCO
+                </div>
+              </v-col>
 
-                <v-col
-                  cols="12"
-                  md="4"
-                  v-if="form.holding_level === 1 || form.holding_level === 2"
-                >
-                  <v-autocomplete
-                    dense
-                    :items="area_list"
-                    v-model="form.area"
-                    item-text="title"
-                    item-value="id"
-                    label="Area"
-                    outlined
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="4"
-                  v-if="form.section && form.area && form.holding_level === 1"
-                >
-                  <v-autocomplete
-                    dense
-                    :items="school_list"
-                    v-model="form.school"
-                    item-text="title"
-                    item-value="id"
-                    label="School"
-                    outlined
-                  />
-                </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="form.paperID"
+                  label="Past Paper Id"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
+              </v-col>
 
-                <v-col cols="12" md="8">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="title"
-                    rules="required"
-                  >
-                    <v-text-field
-                      dense
-                      v-model="form.title"
-                      :error-messages="errors"
-                      label="Title"
-                      outlined
-                    />
-                  </validation-provider>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-text-field
-                    dense
-                    label="Past Paper Id"
-                    v-model="form.paperID"
-                    outlined
-                  />
-                </v-col>
-
-                <!--                <v-col cols="12" md="4">-->
-                <!--                  <v-checkbox-->
-                <!--                    dense-->
-                <!--                    v-model="form.negative_point"-->
-                <!--                    label="Negative point"-->
-                <!--                  />-->
-                <!--                </v-col>-->
-
-                <!--                <v-col cols="12" md="4">-->
-                <!--                  <v-checkbox-->
-                <!--                    dense-->
-                <!--                    v-model="form.holding_time"-->
-                <!--                    label="Time of holding"-->
-                <!--                  />-->
-
-                <!--                </v-col>-->
-
-                <!--                <v-col cols="12" md="12" v-show="form.holding_time">-->
-                <!--                  <v-date-picker-->
-                <!--                    color="teal"-->
-                <!--                    v-model="teaching_date"-->
-                <!--                    full-width-->
-                <!--                  ></v-date-picker>-->
-                <!--                </v-col>-->
-
-                <!--                <v-col-->
-                <!--                  cols="12"-->
-                <!--                  md="4"-->
-                <!--                  v-show="form.holding_time"-->
-                <!--                >-->
-                <!--                  <v-menu-->
-                <!--                    ref="menu"-->
-                <!--                    v-model="timepicker_menu"-->
-                <!--                    :close-on-content-click="false"-->
-                <!--                    :nudge-right="40"-->
-                <!--                    :return-value.sync="teaching_time"-->
-                <!--                    transition="scale-transition"-->
-                <!--                    offset-y-->
-                <!--                  >-->
-                <!--                    <template v-slot:activator="{ on, attrs }">-->
-                <!--                      <v-text-field-->
-                <!--                        v-model="teaching_time"-->
-                <!--                        label="Start time"-->
-                <!--                        prepend-icon="mdi-clock-time-four-outline"-->
-                <!--                        readonly-->
-                <!--                        outlined-->
-                <!--                        dense-->
-                <!--                        v-bind="attrs"-->
-                <!--                        v-on="on"-->
-                <!--                      ></v-text-field>-->
-                <!--                    </template>-->
-                <!--                    <v-time-picker-->
-                <!--                      v-if="timepicker_menu"-->
-                <!--                      v-model="teaching_time"-->
-                <!--                      full-width-->
-                <!--                      format="24hr"-->
-                <!--                      @click:minute="$refs.menu.save(teaching_time)"-->
-                <!--                    ></v-time-picker>-->
-                <!--                  </v-menu>-->
-                <!--                </v-col>-->
-
-                <v-col cols="12">
-                  <v-row>
-                    <v-col cols="12" md="6" class="pb-0">
-                      <v-btn
-                        type="submit"
-                        :loading="submit_loading"
-                        :disabled="invalid"
-                        lg
-                        color="teal"
-                        class="white--text"
-                        block
-                      >
-                        Update & Next step
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-btn lg outlined color="error" to="/user/exam" block>
-                        Discard
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </form>
-          </validation-observer>
+              <v-col cols="12">
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-btn
+                      block
+                      color="teal"
+                      class="text-white"
+                      size="large"
+                      type="submit"
+                      :loading="submit_loading"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
+                    >
+                      Next step
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-btn
+                      block
+                      variant="outlined"
+                      color="red"
+                      size="large"
+                      to="/user/exam"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
+                    >
+                      Discard
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-form>
         </v-card>
-      </v-stepper-content>
+      </template>
 
-      <v-stepper-step
-        :complete="test_step > 2"
-        @click="test_step = 2"
-        step="2"
-        class="pointer"
-        color="teal"
-      >
-        Tests
-      </v-stepper-step>
-      <v-stepper-content step="2">
+      <template #[`item.2`]>
         <v-card flat class="mt-3 pb-10">
           <v-row>
             <v-col cols="12">
@@ -390,111 +237,103 @@
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
+                style="font-weight: 500; color: #009688"
               ></v-switch>
             </v-col>
           </v-row>
+
           <v-row v-show="!testListSwitch">
             <v-col cols="12">
-              <create-test-form
-                ref="create-form"
-                :goToPreviewStep.sync="test_step"
-                :updateTestList.sync="lastCreatedTest"
+              <CreateTestForm
+                ref="createForm"
+                v-model:goToPreviewStep="test_step"
+                v-model:updateTestList="lastCreatedTest"
               />
             </v-col>
           </v-row>
+
           <v-row v-show="testListSwitch">
             <v-col cols="12" md="4">
               <v-autocomplete
-                dense
                 v-model="filter.section"
                 :items="filter_level_list"
-                item-text="title"
-                clearable
+                item-title="title"
                 item-value="id"
-                label="Curriculum"
-                outlined
-              />
+                clearable
+                label="Board"
+                variant="outlined"
+                density="compact"
+              ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
               <v-autocomplete
-                dense
                 v-model="filter.base"
                 :items="filter_grade_list"
+                item-title="title"
                 item-value="id"
                 clearable
-                item-text="title"
                 label="Grade"
-                outlined
-              />
+                variant="outlined"
+                density="compact"
+              ></v-autocomplete>
             </v-col>
-            <!--                    <v-col cols="12" md="4">-->
-            <!--                      <validation-provider v-slot="{errors}" name="field" rules="required">-->
-            <!--                        <v-autocomplete-->
-            <!--                          dense-->
-            <!--                          v-model="form.field"-->
-            <!--                          :error-messages="errors"-->
-            <!--                          label="Field"-->
-            <!--                          outlined-->
-            <!--                        />-->
-            <!--                      </validation-provider>-->
-            <!--                    </v-col>-->
             <v-col cols="12" md="4">
               <v-autocomplete
-                dense
-                :items="filter_lesson_list"
-                item-value="id"
-                item-text="title"
-                clearable
                 v-model="filter.lesson"
+                :items="filter_lesson_list"
+                item-title="title"
+                item-value="id"
+                clearable
                 label="Subject"
-                outlined
-              />
+                variant="outlined"
+                density="compact"
+              ></v-autocomplete>
             </v-col>
 
             <v-col cols="12" md="4">
               <v-autocomplete
-                dense
-                :items="topic_list"
-                item-value="id"
-                item-text="title"
                 v-model="filter.topic"
+                :items="topic_list"
+                item-title="title"
+                item-value="id"
+                clearable
                 label="Topic"
-                outlined
+                variant="outlined"
+                density="compact"
               >
-                <template v-slot:item="data">
-                  <p
-                    :class="data.item.season ? 'topic_season' : ''"
-                    class="py-2"
-                  >
-                    {{ data.item.title }}
-                  </p>
+                <template #item="{ item, props }">
+                  <v-list-item
+                    v-bind="props"
+                    :title="item.raw.title"
+                    :class="{ topic_season: item.raw.season }"
+                  ></v-list-item>
                 </template>
               </v-autocomplete>
             </v-col>
 
             <v-col cols="12" md="4">
               <v-autocomplete
-                dense
-                :items="video_analysis_options"
-                item-value="value"
-                item-text="title"
                 v-model="filter.testsHasVideo"
+                :items="video_analysis_options"
+                item-title="title"
+                item-value="value"
+                clearable
                 label="Video analysis"
-                outlined
-              />
+                variant="outlined"
+                density="compact"
+              ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
               <v-checkbox
-                class="mt-1"
                 v-model="filter.myTests"
                 label="My own tests"
-                outlined
-              />
+                density="compact"
+              ></v-checkbox>
             </v-col>
 
             <v-col cols="12">
               <v-card
-                class="test-list overflow-y-auto"
+                class="test-list"
                 flat
                 max-height="600"
                 ref="testList"
@@ -503,37 +342,47 @@
                 <v-card-text>
                   <v-row ref="testListContent">
                     <v-col
-                      v-show="test_list.length > 0"
                       v-for="item in test_list"
                       :key="item.id"
                       cols="12"
+                      v-show="test_list.length > 0"
                     >
                       <v-row class="mb-2">
                         <v-col cols="12">
-                          <v-chip v-show="item.lesson_title">
+                          <v-chip v-if="item.lesson_title" size="small">
                             {{ item.lesson_title }}
                           </v-chip>
-                          <v-chip v-show="item.topics_title">
+                          <v-chip
+                            v-if="item.topics_title"
+                            size="small"
+                            class="ml-2"
+                          >
                             {{ item.topics_title }}
                           </v-chip>
                           <v-chip
-                            outlined
+                            v-if="item.level === '1'"
+                            variant="outlined"
                             color="success"
-                            v-show="item.level === '1'"
+                            size="small"
+                            class="ml-2"
                           >
                             Simple
                           </v-chip>
                           <v-chip
-                            outlined
+                            v-if="item.level === '2'"
+                            variant="outlined"
                             color="primary"
-                            v-show="item.level === '2'"
+                            size="small"
+                            class="ml-2"
                           >
                             Middle
                           </v-chip>
                           <v-chip
-                            outlined
+                            v-if="item.level === '3'"
+                            variant="outlined"
                             color="error"
-                            v-show="item.level === '3'"
+                            size="small"
+                            class="ml-2"
                           >
                             Hard
                           </v-chip>
@@ -543,120 +392,135 @@
                         id="test-question"
                         ref="mathJaxEl"
                         v-html="item.question"
-                      />
-                      <img :src="item.q_file" />
+                      ></div>
+                      <img :src="item.q_file" v-if="item.q_file" />
 
-                      <div class="answer">
-                        <v-icon
-                          v-show="item.true_answer == '1'"
-                          class="true_answer"
-                          large
-                        >
-                          mdi-check
-                        </v-icon>
-                        <span>1)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_a"
-                          v-html="item.answer_a"
-                        ></span>
-                        <img v-show="item.a_file" :src="item.a_file" />
-                      </div>
-                      <div class="answer">
-                        <v-icon
-                          v-show="item.true_answer == '2'"
-                          large
-                          class="true_answer"
-                        >
-                          mdi-check
-                        </v-icon>
-
-                        <span>2)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_b"
-                          v-html="item.answer_b"
-                        ></span>
-                        <img v-show="item.b_file" :src="item.b_file" />
-                      </div>
-                      <div class="answer">
-                        <v-icon
-                          v-show="item.true_answer == '3'"
-                          large
-                          class="true_answer"
-                        >
-                          mdi-check
-                        </v-icon>
-
-                        <span>3)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_c"
-                          v-html="item.answer_c"
-                        ></span>
-                        <img v-show="item.c_file" :src="item.c_file" />
-                      </div>
-                      <div class="answer">
-                        <v-icon
-                          class="true_answer"
-                          v-show="item.true_answer == '4'"
-                          large
-                        >
-                          mdi-check
-                        </v-icon>
-                        <span>4)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_d"
-                          v-html="item.answer_d"
+                      <div
+                        v-if="
+                          item.type == 'blank' ||
+                          item.type == 'shortanswer' ||
+                          item.type == 'descriptive'
+                        "
+                      >
+                        <div ref="mathJaxEl" v-html="item.answer_full"></div>
+                        <img
+                          v-if="item.answer_full_file"
+                          :src="item.answer_full_file"
                         />
-                        <img v-show="item.d_file" :src="item.d_file" />
+                      </div>
+                      <div v-else>
+                        <div class="answer">
+                          <v-icon
+                            v-if="item.true_answer == '1'"
+                            class="true_answer"
+                            size="large"
+                          >
+                            mdi-check
+                          </v-icon>
+                          <span>1)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_a"
+                            v-html="item.answer_a"
+                          ></span>
+                          <img v-if="item.a_file" :src="item.a_file" />
+                        </div>
+                        <div class="answer">
+                          <v-icon
+                            v-if="item.true_answer == '2'"
+                            class="true_answer"
+                            size="large"
+                          >
+                            mdi-check
+                          </v-icon>
+                          <span>2)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_b"
+                            v-html="item.answer_b"
+                          ></span>
+                          <img v-if="item.b_file" :src="item.b_file" />
+                        </div>
+                        <div class="answer">
+                          <v-icon
+                            v-if="item.true_answer == '3'"
+                            class="true_answer"
+                            size="large"
+                          >
+                            mdi-check
+                          </v-icon>
+                          <span>3)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_c"
+                            v-html="item.answer_c"
+                          ></span>
+                          <img v-if="item.c_file" :src="item.c_file" />
+                        </div>
+                        <div class="answer">
+                          <v-icon
+                            v-if="item.true_answer == '4'"
+                            class="true_answer"
+                            size="large"
+                          >
+                            mdi-check
+                          </v-icon>
+                          <span>4)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_d"
+                            v-html="item.answer_d"
+                          ></span>
+                          <img v-if="item.d_file" :src="item.d_file" />
+                        </div>
                       </div>
                       <v-row>
                         <v-col cols="6">
                           <v-btn
                             icon
+                            variant="text"
                             :to="`/test-maker/create-test/edit/${item.id}`"
-                            v-show="item.owner == true"
+                            v-if="item.owner == true"
                           >
-                            <v-icon> mdi-pencil </v-icon>
+                            <v-icon>mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
-                            v-show="item.owner == true"
+                            variant="text"
+                            v-if="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
                           >
-                            <v-icon color="error"> mdi-delete </v-icon>
+                            <v-icon color="error">mdi-delete</v-icon>
                           </v-btn>
-                          <v-btn icon>
-                            <v-icon color="blue"> mdi-bullhorn-outline </v-icon>
+                          <v-btn icon variant="text">
+                            <v-icon color="blue">mdi-bullhorn-outline</v-icon>
                           </v-btn>
-                          <v-btn icon>
-                            <v-icon color="green"> mdi-eye </v-icon>
+                          <v-btn icon variant="text">
+                            <v-icon color="green">mdi-eye</v-icon>
                           </v-btn>
-                          <v-btn icon>
-                            <v-icon color="red"> mdi-video </v-icon>
+                          <v-btn icon variant="text">
+                            <v-icon color="red">mdi-video</v-icon>
                           </v-btn>
                         </v-col>
                         <v-col cols="6" class="text-right">
                           <v-btn
                             color="blue"
-                            dark
-                            small
-                            v-show="!tests.find((x) => x == item.id)"
+                            variant="flat"
+                            size="small"
+                            v-if="!tests.find((x) => x == item.id)"
                             @click="applyTest(item, 'add')"
                           >
-                            <v-icon small dark> mdi-plus </v-icon>
+                            <v-icon size="small">mdi-plus</v-icon>
                             Add
                           </v-btn>
                           <v-btn
                             color="red"
-                            dark
-                            small
-                            v-show="tests.find((x) => x == item.id)"
+                            variant="flat"
+                            size="small"
+                            v-if="tests.find((x) => x == item.id)"
                             @click="applyTest(item, 'remove')"
                           >
-                            <v-icon small dark> mdi-minus </v-icon>
+                            <v-icon size="small">mdi-minus</v-icon>
                             Delete
                           </v-btn>
                         </v-col>
@@ -665,7 +529,7 @@
                     </v-col>
 
                     <v-col
-                      v-show="!all_tests_loaded"
+                      v-if="!all_tests_loaded"
                       cols="12"
                       class="text-center"
                     >
@@ -688,20 +552,25 @@
                   <v-btn
                     @click="test_step = 3"
                     :disabled="tests.length < 5"
-                    :loading="publish_loading"
-                    lg
-                    color="teal"
-                    class="white--text"
                     block
+                    color="teal"
+                    class="text-white"
+                    size="large"
                   >
-                    <span v-show="tests.length < 5"
+                    <span v-if="tests.length < 5"
                       >Add at least {{ 5 - tests.length }} more tests</span
                     >
-                    <span v-show="tests.length >= 5">Next step</span>
+                    <span v-else>Next step</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-btn lg outlined color="error" to="/user/exam" block>
+                  <v-btn
+                    block
+                    variant="outlined"
+                    color="red"
+                    size="large"
+                    to="/user/exam"
+                  >
                     Discard
                   </v-btn>
                 </v-col>
@@ -709,228 +578,134 @@
             </v-col>
           </v-row>
         </v-card>
-      </v-stepper-content>
+      </template>
 
-      <v-stepper-step
-        :complete="test_step > 3"
-        @click="test_step = 3"
-        color="teal"
-        class="pointer"
-        step="3"
-      >
-        Review
-      </v-stepper-step>
-      <v-stepper-content step="3">
-        <v-card flat class="pb-10 test-list">
-          <v-card-text id="preview-dialog">
-            <v-row>
-              <v-col cols="12">
-                <p class="text-h4 font-weight-bold">{{ form.title }}</p>
-              </v-col>
-              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
-              <v-col cols="4">Duration: {{ form.duration }}</v-col>
-              <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
-              <v-col cols="12">
-                <v-chip label color="error"> Topics: </v-chip>
-              </v-col>
-              <v-col
-                cols="4"
-                v-for="(item, index) in topicTitleArr"
-                :key="index"
+      <template #[`item.3`]>
+        <v-card flat class="mt-3 pb-10">
+          <v-row>
+            <v-col cols="12" class="ma-2">
+              <h3 class="text-h5 font-weight-bold mb-2 text-grey-darken-2">
+                {{ form.title }}
+              </h3>
+              <v-row
+                class="gama-text-caption font-noraml text-grey-darken-2 mt-4"
+                style="font-size: 16px"
               >
-                {{ item }}
-              </v-col>
-              <v-col cols="12">
-                <v-divider />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" v-if="previewTestList.length">
-                <draggable v-model="previewTestList" @end="previewDragEnd">
-                  <v-row v-for="(item, index) in previewTestList" :key="index">
-                    <v-col cols="12">
-                      <div
-                        id="test-question"
-                        ref="mathJaxEl"
-                        v-html="item.question"
-                      />
-                      <img :src="item.q_file" />
+                <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+                <v-col cols="4">Duration: {{ form.duration }}</v-col>
+                <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <v-chip
+                    rounded="sm"
+                    size="large"
+                    density="compact"
+                    variant="text"
+                    style="
+                      font-size: 13px;
+                      font-weight: 500;
+                      background-color: #b30a29;
+                      color: white;
+                      opacity: 1;
+                    "
+                    >Topics:</v-chip
+                  >
+                </v-col>
+                <v-col
+                  v-for="(item, index) in topicTitleArr"
+                  :key="index"
+                  cols="4"
+                >
+                  {{ item }}
+                </v-col>
+              </v-row>
+            </v-col>
 
-                      <div class="answer">
-                        <span>1)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_a"
-                          v-html="item.answer_a"
-                        ></span>
-                        <img v-show="item.a_file" :src="item.a_file" />
-                      </div>
-                      <div class="answer">
-                        <span>2)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_b"
-                          v-html="item.answer_b"
-                        ></span>
-                        <img v-show="item.b_file" :src="item.b_file" />
-                      </div>
-                      <div class="answer">
-                        <span>3)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_c"
-                          v-html="item.answer_c"
-                        ></span>
-                        <img v-show="item.c_file" :src="item.c_file" />
-                      </div>
-                      <div class="answer">
-                        <span>4)</span>
-                        <span
-                          ref="mathJaxEl"
-                          v-show="item.answer_d"
-                          v-html="item.answer_d"
-                        />
-                        <img v-show="item.d_file" :src="item.d_file" />
-                      </div>
-                      <v-row>
-                        <v-col cols="6">
-                          <v-btn icon fab color="blue">
-                            <v-icon> mdi-cursor-move </v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="6" class="text-right">
-                          <v-btn
-                            small
-                            v-show="item.owner == true"
-                            :to="`/test-maker/create-test/edit/${item.id}`"
-                          >
-                            <v-icon small dark> mdi-pencil </v-icon>
-                            Edit
-                          </v-btn>
-                          <v-btn
-                            color="blue"
-                            dark
-                            small
-                            v-show="!tests.find((x) => x == item.id)"
-                            @click="applyTest(item, 'add')"
-                          >
-                            <v-icon small dark> mdi-plus </v-icon>
-                            Add
-                          </v-btn>
-                          <v-btn
-                            color="red"
-                            dark
-                            small
-                            v-show="tests.find((x) => x == item.id)"
-                            @click="applyTest(item, 'remove')"
-                          >
-                            <v-icon small dark> mdi-minus </v-icon>
-                            Delete
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                      <v-divider class="mt-3" />
-                    </v-col>
-                  </v-row>
-                </draggable>
-              </v-col>
-              <v-col v-else cols="12" class="text-center">
-                <p>Oops! no data found</p>
-              </v-col>
-            </v-row>
-
-            <!--Publish button-->
-            <v-row>
-              <v-col cols="12">
-                <v-row>
-                  <v-col cols="12" md="6" class="pb-0">
-                    <v-btn
-                      @click="publishTest"
-                      :disabled="tests.length < 5"
-                      :loading="publish_loading"
-                      lg
-                      color="teal"
-                      class="white--text"
-                      block
-                    >
-                      <span v-show="tests.length < 5"
-                        >Add at least {{ 5 - tests.length }} more tests</span
-                      >
-                      <span v-show="tests.length >= 5">Publish</span>
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-btn lg outlined color="error" to="/user/exam" block>
-                      Discard
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-            <!--End publish button-->
-          </v-card-text>
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    block
+                    color="teal"
+                    class="text-white"
+                    size="large"
+                    :loading="publish_loading"
+                    @click="publishTest"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
+                    density="compact"
+                  >
+                    Publish
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    block
+                    variant="outlined"
+                    color="red"
+                    size="large"
+                    to="/user/exam"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
+                  >
+                    Discard
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
         </v-card>
-      </v-stepper-content>
+      </template>
 
-      <v-stepper-step
-        :complete="test_step > 4"
-        color="teal"
-        class="pointer"
-        step="4"
-      >
-        Publish
-      </v-stepper-step>
-      <v-stepper-content step="4">
-        <v-card class="mb-16">
+      <template #[`item.4`]>
+        <v-card flat class="mt-3 pb-10">
           <v-card-text class="text-center">
-            <v-row>
-              <v-col cols="12">
-                <p class="font-weight-bold teal--text mb-3">
-                  Your test is ready to use!
-                </p>
-                <p>Send below link to your students or friends.</p>
+            <p class="text-h5 mb-4">Your test is ready to use!</p>
+            <p>Send below link to your students or friends.</p>
 
-                <div class="d-flex mt-4 align-center justify-center">
-                  <v-text-field
-                    outlined
-                    id="share_link"
-                    shaped
-                    @click="copyUrl"
-                    style="max-width: 320px"
-                    dense
-                    v-model="test_share_link"
-                  >
-                    <template slot="append">
-                      <v-btn icon @click="copyUrl" class="mb-1">
-                        <v-icon> mdi-content-copy </v-icon>
-                      </v-btn>
-                    </template>
-                  </v-text-field>
-                </div>
+            <div class="d-flex justify-center my-4">
+              <v-text-field
+                v-model="test_share_link"
+                variant="outlined"
+                density="compact"
+                readonly
+                style="max-width: 400px"
+                class="mx-auto"
+              >
+                <template #append>
+                  <v-btn icon variant="text" @click="copyUrl">
+                    <v-icon>mdi-content-copy</v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </div>
 
-                <p class="mt-3">
-                  To view the results of the participants, go to the following
-                  path:
-                </p>
+            <p class="mt-3">
+              To view the results of the participants, go to the following path:
+            </p>
 
-                <div class="d-flex mt-4 align-center justify-center">
-                  <v-breadcrumbs
-                    :items="[
-                      { text: 'Dashboard', href: '/user' },
-                      { text: 'My online exam', href: '/exam/results' },
-                    ]"
-                  >
-                    <template v-slot:divider>
-                      <v-icon>mdi-forward</v-icon>
-                    </template>
-                  </v-breadcrumbs>
-                </div>
-              </v-col>
-            </v-row>
+            <v-breadcrumbs
+              :items="[
+                { title: 'Dashboard', href: '/user' },
+                { title: 'My online exam', href: '/exam/results' },
+              ]"
+              class="justify-center"
+            >
+              <template #divider>
+                <v-icon>mdi-chevron-right</v-icon>
+              </template>
+            </v-breadcrumbs>
           </v-card-text>
         </v-card>
-      </v-stepper-content>
-    </v-stepper>
+      </template>
+    </v-stepper-vertical>
 
     <v-row justify="center">
       <v-dialog
@@ -1129,6 +904,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 import draggable from 'vuedraggable';
 import TopicSelector from "~/components/form/topic-selector.vue";
+import CreateTestForm from "~/components/test-maker/create-test-form.vue";
 
 // Define layout and page metadata
 definePageMeta({
@@ -1389,6 +1165,58 @@ const getTopicTitleList = () => {
     topicTitleArr.value.push(title);
   }
 };
+
+const submitQuestion = async () => {
+  submit_loading.value = true;
+
+  // Arrange to form data
+  let formData = new FormData();
+  for (let key in form) {
+    if (key !== "topics") formData.append(key, form[key]);
+  }
+
+  if (form.topics.length) {
+    for (let key in form.topics) {
+      formData.append("topics[]", form.topics[key]);
+    }
+  }
+
+  try {
+    const response = await $fetch("/api/v1/exams", {
+      method: "POST",
+      body: urlencodeFormData(formData),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Created successfully");
+
+    exam_id.value = response.data.id;
+    exam_code.value = response.data.code;
+
+    // Set in store
+    useState("user").value = {
+      ...useState("user").value,
+      currentExamId: exam_id.value,
+      currentExamCode: exam_code.value,
+    };
+
+    if (createForm.value) {
+      createForm.value.getCurrentExamInfo();
+    }
+    test_step.value = 2;
+  } catch (error) {
+    const { $toast } = useNuxtApp();
+    if ($toast)
+      $toast.error(error.response?.data?.message || "Error creating exam");
+  } finally {
+    submit_loading.value = false;
+  }
+};
+
 
 // Update online exam info
 const updateQuestion = async () => {
