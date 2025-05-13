@@ -37,10 +37,7 @@
               :loading="isLoading"
             ></v-text-field>
             <v-btn
-              style="
-                background-color: #ffb600 !important;
-                font-weight: 600;
-              "
+              style="background-color: #ffb600 !important; font-weight: 600"
               class="ml-2"
               rounded
               @click="handleSearch"
@@ -70,7 +67,7 @@
             >
               <v-list-item-avatar>
                 <!-- <v-img :src="board.logo || getBoardLogo(board.id)" :alt="board.name + ' logo'" /> -->
-                <v-icon> mdi-image </v-icon>
+                <v-img :src="board.img" />
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title v-if="!searchTerm">{{
@@ -103,6 +100,14 @@ export default {
       boards: [],
       isLoading: false,
       error: null,
+      boardImgs: [
+        "CIE.svg",
+        "Edexcel.svg",
+        "AQA.svg",
+        "OCR.svg",
+        "Gama.svg",
+        "Scientific Competition.svg",
+      ],
     };
   },
 
@@ -156,7 +161,11 @@ export default {
         );
 
         if (response.data && Array.isArray(response.data.data)) {
-          this.boards = response.data.data;
+          this.boards = response.data.data.map((item, index) => ({
+            ...item,
+            img: require(`@/assets/boards/${this.boardImgs[index]}`),
+          }));
+          console.log(this.boards);
         }
       } catch (error) {
         console.error("Error fetching boards:", error);
@@ -164,14 +173,14 @@ export default {
 
         // Fallback to static boards if API fails
         this.boards = [
-          { id: "6659", title: "CIE", name: "CIE" },
-          { id: "edexcel", title: "Edexcel" },
-          { id: "aqa", title: "AQA" },
-          { id: "ocr", title: "OCR" },
-          { id: "academic_events", title: "Academic Events" },
-          { id: "turkiye", title: "Türkiye" },
-          { id: "iran", title: "Iran" },
-          { id: "france", title: "France" },
+          // { id: "6659", title: "CIE", name: "CIE" },
+          // { id: "edexcel", title: "Edexcel" },
+          // { id: "aqa", title: "AQA" },
+          // { id: "ocr", title: "OCR" },
+          // { id: "academic_events", title: "Academic Events" },
+          // { id: "turkiye", title: "Türkiye" },
+          // { id: "iran", title: "Iran" },
+          // { id: "france", title: "France" },
         ];
       } finally {
         this.isLoading = false;
@@ -245,15 +254,12 @@ export default {
      * Set the default board (CIE)
      */
     setDefaultBoard() {
-      
       // First look for CIE board in our board list
       const cieBoard = this.boards.find(
-        board => 
-          board.title === "CIE" || 
-          board.name === "CIE" || 
-          (board.id === "6659") // CIE ID
+        (board) =>
+          board.title === "CIE" || board.name === "CIE" || board.id === "6659" // CIE ID
       );
-      
+
       if (cieBoard) {
         this.selectBoard(cieBoard);
       } else {
@@ -265,7 +271,7 @@ export default {
           const defaultBoard = {
             id: "6659",
             title: "CIE",
-            name: "CIE"
+            name: "CIE",
           };
           this.selectBoard(defaultBoard);
         }
@@ -284,10 +290,9 @@ export default {
      * @param {Object} board - The selected board
      */
     selectBoard(board) {
-
       // Extract relevant properties, ensuring we have strings for IDs
       const boardId = board.id !== undefined ? String(board.id) : "";
-      
+
       // Get the proper title and name, preferring original values when available
       const boardTitle = board.title || board.name || `Board ${boardId}`;
       const boardName = board.name || board.title || `Board ${boardId}`;
@@ -297,7 +302,7 @@ export default {
         id: boardId,
         title: boardTitle, // Use the actual title
         name: boardName, // Use the actual name
-        logo: board.logo || this.getBoardLogo(boardId),
+        logo: board.img,
         // Keep any original properties that might be needed by the API
         ...(typeof board === "object" ? board : {}),
       };
@@ -306,11 +311,10 @@ export default {
       if (this.selectedBoard.title === boardId) {
         this.selectedBoard.title = `Board ${boardId}`;
       }
-      
+
       if (this.selectedBoard.name === boardId) {
         this.selectedBoard.name = `Board ${boardId}`;
       }
-
 
       // Save to local storage for persistence
       localStorage.setItem("selectedBoard", JSON.stringify(this.selectedBoard));
@@ -335,7 +339,6 @@ export default {
      * Handle search button click or enter key press
      */
     handleSearch() {
-
       // If search term is empty, fetch all boards again
       if (!this.searchTerm.trim()) {
         this.fetchBoards();
@@ -432,4 +435,4 @@ export default {
   border-radius: 2px;
   padding: 0 2px;
 }
-</style> 
+</style>

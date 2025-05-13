@@ -8,7 +8,7 @@
             v-for="(facility, index) in displayFacilities"
             :key="index"
             :class="[
-              'mr-2',
+              'mr-2 mb-1',
               facility.selected
                 ? 'bg-primary-gray-800 white--text'
                 : 'bg-primary-gray-300 gray--text',
@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     displayFacilities() {
-      return this.tags.filter((tag) => tag.selected).slice(0, 3);
+      return this.tags.filter((tag) => tag.selected);
     },
   },
   methods: {
