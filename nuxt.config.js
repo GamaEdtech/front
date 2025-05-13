@@ -97,9 +97,22 @@ export default {
     "@nuxtjs/dotenv",
     "@nuxtjs/moment",
     "@nuxtjs/pwa",
+    '@nuxtjs/recaptcha'
 
     // '@nuxtjs/onesignal',
   ],
+
+  //recaptcha google-v3
+  recaptcha: {
+    siteKey: process.env.RECAPTCHA_SITE_KEY, // 🔑 pulled from .env
+    version: 3,
+    size: 'invisible',
+    hideBadge: true, // optional: true if you want to hide the reCAPTCHA badge
+  },
+
+  env: {
+    RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
+  },
 
   // oneSignal: {
   //   init: {
