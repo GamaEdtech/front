@@ -33,7 +33,7 @@ export default {
     this.setFavicon();
 
     // Load board from route params if available
-    this.loadSelectionsFromRoute();
+    // this.loadSelectionsFromRoute();
 
     // Listen for show-board-selector events from any component
     this.$root.$on("show-board-selector", this.showBoardSelector);

@@ -93,21 +93,33 @@
                   "
                   v-if="activeBoard"
                 >
-                  <v-icon slot="icon" color="warning" size="20">
-                    mdi-information-outline
-                  </v-icon>
-                  <div class="d-flex align-center">
-                    <div
-                      class="gama-text-h6"
-                      style="color: #2e90fa; font-weight: 600"
+                  <div class="d-flex">
+                    <v-img
+                      max-width="30"
+                      v-show="activeBoard.img"
+                      :src="activeBoard.img"
+                    />
+                    <v-icon
+                      v-show="!activeBoard.img"
+                      slot="icon"
+                      color="warning"
+                      size="20"
                     >
-                      {{ activeBoardName }}
-                    </div>
-                    <div
-                      class="gama-text-caption mx-2"
-                      style="color: #84caff; font-weight: 400"
-                    >
-                      Board
+                      mdi-information-outline
+                    </v-icon>
+                    <div class="d-flex align-center">
+                      <div
+                        class="gama-text-h6"
+                        style="color: #2e90fa; font-weight: 600"
+                      >
+                        {{ activeBoardName.title }}
+                      </div>
+                      <div
+                        class="gama-text-caption mx-2"
+                        style="color: #84caff; font-weight: 400"
+                      >
+                        Board
+                      </div>
                     </div>
                   </div>
                   <template v-slot:actions>
@@ -1482,7 +1494,7 @@ export default {
 
       // First try to use the title property
       if (board.title && board.title !== board.id) {
-        return board.title;
+        return board;
       }
 
       // Then try to use the name property
