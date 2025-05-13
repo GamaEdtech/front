@@ -769,10 +769,9 @@
           <v-btn icon @click="printPreviewDialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Preview</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn text @click="printPreviewDialog = false"> Close </v-btn>
+            <v-btn style="text-transform: none; font-size: 13px; font-weight: 500;" variant="text" @click="printPreviewDialog = false"> Ok </v-btn>
           </v-toolbar-items>
         </v-toolbar>
 
@@ -786,7 +785,7 @@
             <v-col cols="4">Duration: {{ form.duration }}</v-col>
             <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
             <v-col cols="12">
-              <v-chip color="error" size="small">Topics:</v-chip>
+              <v-chip label  variant="text" style="font-size: 13px; font-weight: 500; background-color: #b30a29; color: white; opacity: 1;">Topics:</v-chip>
             </v-col>
             <v-col cols="4" v-for="(item, index) in topicTitleArr" :key="index">
               {{ item }}
@@ -1294,7 +1293,7 @@ const publishTest = async () => {
       }
     });
 
-    if (response.data.message === "done") {
+    if ( response.data.message === "done") {
       // Only use window.location on client side
       test_share_link.value = `${
         process.client ? window.location.origin : ""
