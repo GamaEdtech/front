@@ -1,34 +1,23 @@
 <template>
-  <v-container class="test-maker">
+  <v-container class="create-test-container">
     <v-row class="mt-4">
       <v-col cols="6">
-        <span class="icon icong-azmoon text-h3 teal--text"></span>
-        <span class="text-h4 teal--text"> Update online exam </span>
+        <span class="icon icong-azmoon text-h3 text-teal"></span>
+        <span class="text-h4 text-teal"> Update online exam </span>
       </v-col>
-      <v-col cols="6" id="tool-box" class="text-right">
+      <v-col cols="6" class="text-right">
         <v-btn
-          outlined
+          variant="outlined"
           color="error"
-          fab
-          small
+          :disabled="!exam_id"
+          icon="mdi-delete"
           @click="confirmDeleteDialog = true"
-        >
-          <v-icon> mdi-delete </v-icon>
-        </v-btn>
+        />
         <v-btn
-          outlined
-          fab
-          small
+          variant="outlined"
+          icon="mdi-printer-eye"
           @click="printPreviewDialog = !printPreviewDialog"
-        >
-          <v-icon> mdi-printer-eye </v-icon>
-        </v-btn>
-
-        <!--        <v-btn fab small color="error">-->
-        <!--          <v-icon>-->
-        <!--            mdi-delete-->
-        <!--          </v-icon>-->
-        <!--        </v-btn>-->
+        />
       </v-col>
     </v-row>
 
@@ -48,7 +37,7 @@
         <v-card flat class="mt-4 pb-10">
           <v-form
             ref="observer"
-            @submit.prevent="submitQuestion"
+            @submit.prevent="updateQuestion"
             v-model="isFormValid"
             class="pa-2"
           >
@@ -102,20 +91,20 @@
                 />
               </v-col>
 
-              <v-col cols="12" md="2">
+              <v-col cols="12" md="4">
                 <v-autocomplete
                   v-model="form.exam_type"
                   :items="test_type_list"
                   item-title="title"
                   item-value="id"
-                  label="Exam type"
+                  label="Test type"
                   variant="outlined"
                   color="orange"
                   density="compact"
                 ></v-autocomplete>
               </v-col>
 
-              <v-col cols="12" md="2">
+              <v-col cols="12" md="4">
                 <v-text-field
                   v-model="form.duration"
                   type="number"
@@ -150,7 +139,7 @@
                 ></v-autocomplete>
               </v-col>
 
-              <v-col cols="12" md="4">
+              <!-- <v-col cols="12" md="4">
                 <v-file-input
                   v-model="file_original"
                   label="Source file"
@@ -160,7 +149,7 @@
                   accept="application/pdf,image/*"
                   density="compact"
                 ></v-file-input>
-              </v-col>
+              </v-col> -->
 
               <v-col cols="12" md="8">
                 <v-text-field
@@ -170,10 +159,10 @@
                   :rules="[(v) => !!v || 'This field is required']"
                   density="compact"
                 ></v-text-field>
-                <div class="text-caption text-grey">
+                <!-- <div class="text-caption text-grey">
                   Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A
                   Level MSCO
-                </div>
+                </div> -->
               </v-col>
 
               <v-col cols="12" md="4">
@@ -202,7 +191,7 @@
                       "
                       density="compact"
                     >
-                      Next step
+                      Update & Next step
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -899,10 +888,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useAuth } from '~/composables/useAuth';
-import draggable from 'vuedraggable';
+import { ref, reactive, watch, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuth } from "~/composables/useAuth";
+import draggable from "vuedraggable";
 import TopicSelector from "~/components/form/topic-selector.vue";
 import CreateTestForm from "~/components/test-maker/create-test-form.vue";
 
@@ -980,6 +969,7 @@ const deleteLoading = ref(false);
 const previewTestList = ref([]);
 const topicTitleArr = ref([]);
 const testListSwitch = ref(false);
+const isFormValid = ref(false);
 
 // Delete exam test section
 const deleteTestConfirmDialog = ref(false);
@@ -1217,11 +1207,10 @@ const submitQuestion = async () => {
   }
 };
 
-
 // Update online exam info
 const updateQuestion = async () => {
   update_loading.value = true;
-  
+
   // Arrange to form data
   let formData = new FormData();
   for (let key in form) {
@@ -1233,7 +1222,7 @@ const updateQuestion = async () => {
       formData.append("topics[]", form.topics[key]);
     }
   }
-  
+
   try {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "PUT",
@@ -1243,14 +1232,15 @@ const updateQuestion = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     const { $toast } = useNuxtApp();
     if ($toast) $toast.success("Updated successfully");
-    
+
     test_step.value = 2;
   } catch (error) {
     const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(error.response?.data?.message || "Error updating exam");
+    if ($toast)
+      $toast.error(error.response?.data?.message || "Error updating exam");
   } finally {
     update_loading.value = false;
   }
@@ -1333,7 +1323,7 @@ const publishTest = async () => {
 
 const deleteOnlineExam = async () => {
   deleteLoading.value = true;
-  
+
   try {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "DELETE",
@@ -1341,8 +1331,8 @@ const deleteOnlineExam = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
-    router.push('/test-maker');
+
+    router.push("/test-maker");
   } catch (err) {
     console.error(err);
   } finally {
@@ -1353,7 +1343,7 @@ const deleteOnlineExam = async () => {
 
 const deleteExamTest = async () => {
   delete_exam_test_loading.value = true;
-  
+
   try {
     await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
       method: "DELETE",
@@ -1361,10 +1351,12 @@ const deleteExamTest = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
-    tests.value = tests.value.filter(item => item !== delete_exam_test_id.value);
+
+    tests.value = tests.value.filter(
+      (item) => item !== delete_exam_test_id.value
+    );
     getCurrentExamTestsInfo();
-    
+
     const { $toast } = useNuxtApp();
     if ($toast) $toast.success("Test removed successfully");
   } catch (err) {
@@ -1383,24 +1375,24 @@ const getCurrentExamInfo = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     if (response && response.data) {
       form.section = response.data.section;
       form.base = response.data.base;
       form.lesson = response.data.lesson;
-      form.exam_type = response.data.exam_type;
+      form.exam_type = response.data.azmoon_type_title;
       form.level = response.data.level;
       form.holding_level = response.data.holding_level;
       form.holding_time = response.data.holding_time;
       form.state = response.data.state;
       form.area = response.data.area;
       form.school = response.data.school;
-      form.duration = response.data.duration;
+      form.duration = response.data.azmoon_time;
       form.title = response.data.title;
       form.negative_point = response.data.negative_point;
       form.file_original = response.data.file_original;
-      form.edu_year = response.data.edu_year;
-      form.edu_month = response.data.edu_month;
+      form.edu_year = parseInt(response.data.edu_year);
+      form.edu_month = parseInt(response.data.edu_month);
       file_original_path.value = response.data.file_original;
       exam_code.value = response.data.code;
       tests.value = response.data.tests;
@@ -1413,7 +1405,7 @@ const getCurrentExamInfo = async () => {
 const getCurrentExamTestsInfo = async () => {
   try {
     await getCurrentExamInfo();
-    
+
     if (form.topics && form.topics.length > 0) {
       selected_topics.value = form.topics;
       getTopicTitleList();
@@ -1426,7 +1418,7 @@ const getCurrentExamTestsInfo = async () => {
 const getTestPreview = async () => {
   test_loading.value = true;
   previewTestList.value = [];
-  
+
   try {
     const response = await $fetch("/api/v1/tests", {
       method: "GET",
@@ -1444,15 +1436,15 @@ const getTestPreview = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     if (response && response.data) {
       let result = response.data.list;
       for (const item of result) {
-        if (previewTestList.value.findIndex(x => x.id === item.id) === -1) {
+        if (previewTestList.value.findIndex((x) => x.id === item.id) === -1) {
           previewTestList.value.push(item);
         }
       }
-      
+
       if (result.length === 0) {
         all_tests_loaded.value = true;
       }
@@ -1469,7 +1461,7 @@ const previewDragEnd = (event) => {
 };
 
 const applyTest = (item, type) => {
-  if (type === 'add') {
+  if (type === "add") {
     // Add the test to the exam
     $fetch(`/api/v1/exams/${exam_id.value}/tests/${item.id}`, {
       method: "POST",
@@ -1481,7 +1473,7 @@ const applyTest = (item, type) => {
       const { $toast } = useNuxtApp();
       if ($toast) $toast.success("Test added successfully");
     });
-  } else if (type === 'remove') {
+  } else if (type === "remove") {
     // Remove the test from the exam
     $fetch(`/api/v1/exams/${exam_id.value}/tests/${item.id}`, {
       method: "DELETE",
@@ -1489,7 +1481,7 @@ const applyTest = (item, type) => {
         Authorization: `Bearer ${userToken.value}`,
       },
     }).then(() => {
-      tests.value = tests.value.filter(id => id !== item.id);
+      tests.value = tests.value.filter((id) => id !== item.id);
       const { $toast } = useNuxtApp();
       if ($toast) $toast.success("Test removed successfully");
     });
@@ -1503,7 +1495,7 @@ watch(
     if (val) {
       await getTypeList("base", val);
       filter.section = val;
-      
+
       if (form.area) {
         await getTypeList("school");
       }
@@ -1527,19 +1519,19 @@ watch(
   async (val) => {
     if (val) {
       await getTypeList("topic", val);
-      
+
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = true;
       }
     } else {
       form.topic = "";
       topic_list.value = [];
-      
+
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = false;
       }
     }
-    
+
     filter.lesson = val;
     generateTitle();
   }
@@ -1553,10 +1545,10 @@ watch(
       filter.base = "";
       filter.lesson = "";
       filter.topic = "";
-      
+
       filter.page = 1;
       all_tests_loaded.value = false;
-      
+
       getTestPreview();
     }
   }
@@ -1569,10 +1561,10 @@ watch(
       await getTypeList("lesson", val, "filter");
       filter.lesson = "";
       filter.topic = "";
-      
+
       filter.page = 1;
       all_tests_loaded.value = false;
-      
+
       getTestPreview();
     }
   }
@@ -1584,10 +1576,10 @@ watch(
     if (val) {
       await getTypeList("topic", val, "filter");
       filter.topic = "";
-      
+
       filter.page = 1;
       all_tests_loaded.value = false;
-      
+
       getTestPreview();
     }
   }
@@ -1599,7 +1591,7 @@ watch(
     if (val !== undefined) {
       filter.page = 1;
       all_tests_loaded.value = false;
-      
+
       getTestPreview();
     }
   }
@@ -1610,7 +1602,7 @@ watch(
   (val) => {
     filter.page = 1;
     all_tests_loaded.value = false;
-    
+
     getTestPreview();
   }
 );
@@ -1618,13 +1610,44 @@ watch(
 // Initialize on mount
 onMounted(async () => {
   userToken.value = auth.getUserToken();
-  
+
   await getTypeList("section");
   await getTypeList("exam_type");
   await getTypeList("state");
-  
+
   await getCurrentExamTestsInfo();
 });
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.create-test-container {
+  max-width: 1200px;
+  margin: 5rem auto;
+  padding-bottom: 80px;
+}
+.topics-container {
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.v-stepper {
+  box-shadow: none !important;
+  background-color: #f9f9f9;
+  display: contents;
+
+  &__step {
+    &--active {
+      color: teal !important;
+    }
+
+    &--complete {
+      color: teal !important;
+    }
+  }
+}
+
+.v-stepper-vertical-item__title {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+</style>
