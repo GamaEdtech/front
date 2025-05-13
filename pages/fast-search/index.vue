@@ -22,7 +22,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true,
+      isLoading: false,
       bookImage: require("@/assets/images/BiologyBook.png"),
       breads: [
         {
@@ -344,9 +344,9 @@ export default {
     },
   },
   mounted() {
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 1500);
+    // setTimeout(() => {
+    //   this.isLoading = false;
+    // }, 1500);
   },
 };
 </script>
