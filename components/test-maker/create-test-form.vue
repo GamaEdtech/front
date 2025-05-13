@@ -704,54 +704,43 @@
     </v-card>
 
     <!--Cropper Dialog-->
-    <v-dialog v-model="cropper_dialog" max-width="500">
-      <v-card>
-        <v-card-title class="text-h5 bg-teal text-white">
-          <v-icon start class="mr-2">mdi-crop</v-icon>
-          Crop Image
-        </v-card-title>
-        <v-card-text class="pt-4">
-          <v-progress-circular
-            v-if="crop_file_loading"
-            indeterminate
-            color="teal"
-            size="64"
-            class="my-8 mx-auto d-block"
-          ></v-progress-circular>
-
-          <div v-else class="cropper-container">
-            <!-- In production, you'd use a proper cropper component -->
-            <img
-              :src="crop_file_url"
-              style="max-width: 100%; height: auto"
-              class="rounded elevation-1"
+    <v-dialog v-model="cropper_dialog" max-width="600" transition="dialog-bottom-transition">
+      <v-card id="img-cropper-dialog">
+        <v-card-text class="pa-0">
+          <v-col v-if="crop_file_loading" cols="12" class="text-center">
+            <v-progress-circular
+              :size="40"
+              :width="4"
+              class="mt-12 mb-12"
+              color="orange"
+              indeterminate
             />
-
-            <div class="text-caption text-center text-grey mt-2">
-              Drag to adjust the crop area
-            </div>
+          </v-col>
+          <div v-else>
+            <Cropper
+              :src="crop_file_url"
+              :stencil-props="stencil_props"
+              image-restriction="stencil"
+              @change="cropFile"
+            />
           </div>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="grey-darken-1"
-            variant="text"
-            @click="cropper_dialog = false"
-          >
-            Cancel
-          </v-btn>
+        <v-card-actions style="position: sticky; bottom: 0; left: 0; right: 0" class="pa-0">
           <v-btn
             color="teal"
             variant="flat"
-            @click="submitCrop"
+            size="x-large"
+            class="white--text"
             :loading="crop_confirm_loading"
+            block
+            @click="submitCrop"
           >
-            Crop & Upload
+            Confirm
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!--End cropper Dialog-->
   </div>
 </template>
 
@@ -763,6 +752,7 @@ import { defineRule } from "vee-validate";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import * as yup from "yup";
 import { useAuth } from "~/composables/useAuth";
+import 'vue-advanced-cropper/dist/style.css'; // Import cropper styles
 
 const auth = useAuth();
 
@@ -1243,101 +1233,35 @@ const uploadFile = (file_name, fileEvent) => {
   // Set current crop file name
   current_crop_file.value = file_name;
 
-  // Update the preview image
-  if (file_name === "q_file") {
-    form.q_file_base64 = URL.createObjectURL(file);
-  } else if (file_name === "answer_full_file") {
-    form.answer_full_file_base64 = URL.createObjectURL(file);
-  } else if (file_name === "a_file") {
-    form.a_file_base64 = URL.createObjectURL(file);
-  } else if (file_name === "b_file") {
-    form.b_file_base64 = URL.createObjectURL(file);
-  } else if (file_name === "c_file") {
-    form.c_file_base64 = URL.createObjectURL(file);
-  } else if (file_name === "d_file") {
-    form.d_file_base64 = URL.createObjectURL(file);
-  }
-
   // Set crop file URL for cropper dialog
   crop_file_url.value = URL.createObjectURL(file);
 
-  // If need to show cropper, uncomment this
-  // cropper_dialog.value = true;
-
-  // Upload directly without cropper for now
-  uploadFileToServer(file, file_name);
-};
-
-/**
- * Upload file to server
- * @param {File} file - The file to upload
- * @param {string} file_name - The name of the file field
- */
-const uploadFileToServer = async (file, file_name) => {
-  const { $toast } = useNuxtApp();
-
-  if (!file) {
-    $toast.error("No file selected");
-    return;
-  }
-
-  try {
-    // Create a FormData object
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // Send API request
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (response?.data?.[0]?.file?.name) {
-      // Get the file name from the response
-      const fileName = response.data[0].file.name;
-
-      // Update the corresponding form field
-      if (file_name === "q_file") {
-        form.q_file = fileName;
-      } else if (file_name === "answer_full_file") {
-        form.answer_full_file = fileName;
-      } else if (file_name === "a_file") {
-        form.a_file = fileName;
-      } else if (file_name === "b_file") {
-        form.b_file = fileName;
-      } else if (file_name === "c_file") {
-        form.c_file = fileName;
-      } else if (file_name === "d_file") {
-        form.d_file = fileName;
-      }
-
-      $toast.success("File uploaded successfully");
-    } else {
-      $toast.error("Invalid response from server");
-    }
-  } catch (error) {
-    $toast.error("Failed to upload file");
-    console.error("File upload error:", error);
-  }
+  // Show the cropper dialog
+  cropper_dialog.value = true;
 };
 
 /**
  * Handle image cropping
  * @param {Object} param0 - Cropper data
  */
-const cropFile = ({ coordinates, canvas, image }) => {
-  if (current_crop_file.value === "q_file")
-    form.q_file_base64 = canvas.toDataURL();
-  else if (current_crop_file.value === "answer_full_file")
-    form.answer_full_file_base64 = canvas.toDataURL();
-  else if (current_crop_file.value === "a_file")
-    form.a_file_base64 = canvas.toDataURL();
-  else if (current_crop_file.value === "b_file")
-    form.b_file_base64 = canvas.toDataURL();
-  else if (current_crop_file.value === "c_file")
-    form.c_file_base64 = canvas.toDataURL();
-  else if (current_crop_file.value === "d_file")
-    form.d_file_base64 = canvas.toDataURL();
+const cropFile = ({ coordinates, canvas }) => {
+  // Store the cropped image data
+  const croppedBase64 = canvas.toDataURL();
+  
+  // Update the corresponding form field
+  if (current_crop_file.value === "q_file") {
+    form.q_file_base64 = croppedBase64;
+  } else if (current_crop_file.value === "answer_full_file") {
+    form.answer_full_file_base64 = croppedBase64;
+  } else if (current_crop_file.value === "a_file") {
+    form.a_file_base64 = croppedBase64;
+  } else if (current_crop_file.value === "b_file") {
+    form.b_file_base64 = croppedBase64;
+  } else if (current_crop_file.value === "c_file") {
+    form.c_file_base64 = croppedBase64;
+  } else if (current_crop_file.value === "d_file") {
+    form.d_file_base64 = croppedBase64;
+  }
 };
 
 /**
@@ -1529,13 +1453,9 @@ const submitCrop = async () => {
   crop_confirm_loading.value = true;
 
   try {
-    // In a real implementation with a proper cropper component,
-    // you would get the cropped canvas data here
-
-    // For now, we'll just use the original file since we don't have
-    // the actual cropping functionality implemented
+    // Get the current file based on the file name
     let file = null;
-
+    
     if (current_crop_file.value === "q_file") {
       file = form_hidden_data.q_file;
     } else if (current_crop_file.value === "answer_full_file") {
@@ -1551,18 +1471,47 @@ const submitCrop = async () => {
     }
 
     if (file) {
-      // Upload the file directly
-      await uploadFileToServer(file, current_crop_file.value);
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append("file", file);
 
-      // Close the dialog after successful upload
-      cropper_dialog.value = false;
+      // Send API request
+      const response = await $fetch("/api/v1/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response?.data?.[0]?.file?.name) {
+        // Get the file name from the response
+        const fileName = response.data[0].file.name;
+
+        // Update the corresponding form field
+        if (current_crop_file.value === "q_file") {
+          form.q_file = fileName;
+        } else if (current_crop_file.value === "answer_full_file") {
+          form.answer_full_file = fileName;
+        } else if (current_crop_file.value === "a_file") {
+          form.a_file = fileName;
+        } else if (current_crop_file.value === "b_file") {
+          form.b_file = fileName;
+        } else if (current_crop_file.value === "c_file") {
+          form.c_file = fileName;
+        } else if (current_crop_file.value === "d_file") {
+          form.d_file = fileName;
+        }
+
+        $toast.success("File uploaded successfully");
+        
+        // Close the dialog after successful upload
+        cropper_dialog.value = false;
+      } else {
+        $toast.error("Invalid response from server");
+      }
     } else {
-      const { $toast } = useNuxtApp();
       $toast.error("No file to upload");
     }
   } catch (error) {
     console.error("Error submitting cropped image:", error);
-    const { $toast } = useNuxtApp();
     $toast.error("Failed to upload cropped image");
   } finally {
     crop_confirm_loading.value = false;
@@ -1766,5 +1715,32 @@ const buttonDisabled = computed(() => {
 }
 .v-selection-control .v-label {
   height: auto !important;
+}
+
+/* Cropper-specific styles */
+#img-cropper-dialog {
+  overflow: hidden;
+}
+
+#img-cropper-dialog .v-card-text {
+  padding: 0;
+}
+
+.cropper-container {
+  width: 100%;
+  min-height: 300px;
+  position: relative;
+}
+
+/* Custom stencil style for the cropper */
+.vue-advanced-cropper__stencil-wrapper {
+  border: 2px solid #009688;
+}
+
+/* Make sure the cropper actions are always visible */
+#img-cropper-dialog .v-card-actions {
+  background-color: white;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 5;
 }
 </style>
