@@ -19,7 +19,6 @@
               <a href="https://x.com/GamaEdtech" target="_blank" class="v-btn">
                 <v-icon>mdi-twitter</v-icon>
               </a>
-
               <a
                 href="https://youtube.com/@GamaEdtech"
                 target="_blank"
