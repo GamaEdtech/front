@@ -6,16 +6,16 @@
       </v-col>
       <v-col cols="6" class="text-right">
         <v-btn
-          variant="text"
-          icon="mdi-file-pdf-box"
-          size="small"
-          @click="printPreviewDialog = true"
+          variant="outlined"
+          color="error"
+          :disabled="!exam_id"
+          icon="mdi-delete"
+          @click="confirmDeleteDialog = true"
         />
         <v-btn
-          variant="text"
-          icon="mdi-printer"
-          size="small"
-          @click="printPreviewDialog = true"
+          variant="outlined"
+          icon="mdi-printer-eye"
+          @click="printPreviewDialog = !printPreviewDialog"
         />
       </v-col>
     </v-row>
@@ -293,7 +293,7 @@
                   <v-list-item
                     v-bind="props"
                     :title="item.raw.title"
-                    :class="{ 'topic_season': item.raw.season }"
+                    :class="{ topic_season: item.raw.season }"
                   ></v-list-item>
                 </template>
               </v-autocomplete>
@@ -340,7 +340,11 @@
                           <v-chip v-if="item.lesson_title" size="small">
                             {{ item.lesson_title }}
                           </v-chip>
-                          <v-chip v-if="item.topics_title" size="small" class="ml-2">
+                          <v-chip
+                            v-if="item.topics_title"
+                            size="small"
+                            class="ml-2"
+                          >
                             {{ item.topics_title }}
                           </v-chip>
                           <v-chip
@@ -541,7 +545,9 @@
                     class="text-white"
                     size="large"
                   >
-                    <span v-if="tests.length < 5">Add at least {{ 5 - tests.length }} more tests</span>
+                    <span v-if="tests.length < 5"
+                      >Add at least {{ 5 - tests.length }} more tests</span
+                    >
                     <span v-else>Next step</span>
                   </v-btn>
                 </v-col>
@@ -584,7 +590,13 @@
                     size="large"
                     density="compact"
                     variant="text"
-                    style="font-size: 13px; font-weight: 500; background-color: #b30a29; color: white; opacity: 1;"
+                    style="
+                      font-size: 13px;
+                      font-weight: 500;
+                      background-color: #b30a29;
+                      color: white;
+                      opacity: 1;
+                    "
                     >Topics:</v-chip
                   >
                 </v-col>
@@ -608,7 +620,11 @@
                     size="large"
                     :loading="publish_loading"
                     @click="publishTest"
-                    style="text-transform: none; font-size: 13px; font-weight: 500;"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
                     density="compact"
                   >
                     Publish
@@ -621,7 +637,11 @@
                     color="red"
                     size="large"
                     to="/user/exam"
-                    style="text-transform: none; font-size: 13px; font-weight: 500;"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
                   >
                     Discard
                   </v-btn>
@@ -756,18 +776,14 @@
             <v-col cols="12">
               <v-chip color="error" size="small">Topics:</v-chip>
             </v-col>
-            <v-col
-              cols="4"
-              v-for="(item, index) in topicTitleArr"
-              :key="index"
-            >
+            <v-col cols="4" v-for="(item, index) in topicTitleArr" :key="index">
               {{ item }}
             </v-col>
             <v-col cols="12">
               <v-divider />
             </v-col>
           </v-row>
-          
+
           <v-row>
             <v-col cols="12" v-if="previewTestList.length">
               <div v-for="(item, index) in previewTestList" :key="index">
@@ -836,11 +852,7 @@
                 </v-row>
               </div>
             </v-col>
-            <v-col
-              v-else
-              cols="12"
-              class="text-center"
-            >
+            <v-col v-else cols="12" class="text-center">
               <p>Oops! no data found</p>
             </v-col>
           </v-row>
@@ -1396,16 +1408,16 @@ const getCurrentExamInfo = async () => {
 // Handle scrolling for test list
 const onScroll = () => {
   if (!testList.value || test_loading.value || all_tests_loaded.value) return;
-  
+
   const scrollElement = testList.value.$el;
   const scrollPosition = scrollElement.scrollTop;
   const scrollHeight = scrollElement.scrollHeight;
   const clientHeight = scrollElement.clientHeight;
-  
+
   // Check if we're near the bottom of the scroll container
   // Only trigger when we're within 200px of the bottom
   const isNearBottom = scrollPosition + clientHeight >= scrollHeight - 200;
-  
+
   // Avoid multiple requests with debounce
   if (timer.value) {
     clearTimeout(timer.value);
@@ -1515,7 +1527,7 @@ watch(
       await getTypeList("base", val, "filter");
       test_loading.value = false;
     }
-    
+
     all_tests_loaded.value = true;
     filter_grade_list.value = [];
     filter_lesson_list.value = [];
@@ -1534,7 +1546,7 @@ watch(
       await getTypeList("lesson", val, "filter");
       test_loading.value = false;
     }
-    
+
     all_tests_loaded.value = true;
     filter_lesson_list.value = [];
     filter.lesson = "";
@@ -1551,12 +1563,12 @@ watch(
       await getTypeList("topic", val, "filter");
       test_loading.value = false;
     }
-    
+
     // Reset pagination and test list before loading new data
     filter.page = 1;
     test_list.value = [];
     all_tests_loaded.value = false;
-    
+
     if (val) {
       // Only fetch if we have a lesson selected
       getExamTests();
@@ -1619,7 +1631,7 @@ watch(
 watch(
   () => route.query,
   () => {
-      checkActiveParam();
+    checkActiveParam();
   },
   { deep: true }
 );
@@ -1643,7 +1655,7 @@ onMounted(async () => {
 
   await getTypeList("exam_type");
   await getTypeList("state");
-  
+
   // Check active query parameter
   checkActiveParam();
 });
@@ -1709,7 +1721,7 @@ const getExamTests = async () => {
     });
 
     const newTests = response?.data?.list || [];
-    
+
     // Check if we received any tests
     if (newTests.length === 0) {
       // No more tests, mark as loaded
@@ -1717,8 +1729,8 @@ const getExamTests = async () => {
     } else {
       // Add new tests to the list
       test_list.value.push(...newTests);
-      
-      // If we received fewer tests than requested per page, 
+
+      // If we received fewer tests than requested per page,
       // we've likely reached the end
       if (newTests.length < filter.perpage) {
         all_tests_loaded.value = true;
@@ -1835,16 +1847,16 @@ const deleteOnlineExam = async () => {
   display: flex;
   align-items: flex-start;
   margin-bottom: 8px;
-  
+
   .true_answer {
     color: green;
     margin-right: 8px;
   }
-  
+
   span {
     margin-right: 8px;
   }
-  
+
   img {
     max-width: 100%;
     margin-top: 4px;
@@ -1855,7 +1867,7 @@ const deleteOnlineExam = async () => {
 .test-list {
   max-height: 600px;
   overflow-y: auto;
-  
+
   #test-question {
     margin-bottom: 16px;
   }
