@@ -16,15 +16,17 @@
               anywhere.
             </div>
             <div class="mt-4">
-              <nuxt-link to="/" class="v-btn">
+              <a href="https://x.com/GamaEdtech" target="_blank" class="v-btn">
                 <v-icon>mdi-twitter</v-icon>
-              </nuxt-link>
-              <nuxt-link to="/" class="v-btn">
-                <v-icon> mdi-facebook </v-icon>
-              </nuxt-link>
-              <nuxt-link to="/" class="v-btn">
-                <v-icon> mdi-instagram </v-icon>
-              </nuxt-link>
+              </a>
+
+              <a
+                href="https://youtube.com/@GamaEdtech"
+                target="_blank"
+                class="v-btn"
+              >
+                <v-icon> mdi-youtube </v-icon>
+              </a>
             </div>
           </v-col>
           <v-col
