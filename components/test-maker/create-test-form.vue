@@ -204,8 +204,12 @@
                     v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
                   >
                     <v-col class="pb-0" cols="1">
-                      <v-radio value="1"></v-radio>
-                      <span class="answer_label">A</span>
+                      <v-radio
+                        color="orange"
+                        value="1"
+                        label="A"
+                        style="display: contents; max-width: fit-content"
+                      ></v-radio>
                     </v-col>
                     <v-col
                       class="pb-0"
@@ -280,8 +284,12 @@
                     v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
                   >
                     <v-col class="pb-0" cols="1">
-                      <v-radio value="2"></v-radio>
-                      <span class="answer_label">B</span>
+                      <v-radio
+                        color="orange"
+                        value="2"
+                        label="B"
+                        style="display: contents; max-width: fit-content"
+                      ></v-radio>
                     </v-col>
                     <v-col
                       class="pb-0"
@@ -354,8 +362,12 @@
 
                   <v-row v-if="form.type == 'fourchoice'">
                     <v-col class="pb-0" cols="1">
-                      <v-radio value="3"></v-radio>
-                      <span class="answer_label">C</span>
+                      <v-radio
+                        color="orange"
+                        value="3"
+                        label="C"
+                        style="display: contents; max-width: fit-content"
+                      ></v-radio>
                     </v-col>
                     <v-col
                       class="pb-0"
@@ -428,8 +440,12 @@
 
                   <v-row v-if="form.type == 'fourchoice'">
                     <v-col class="pb-0" cols="1">
-                      <v-radio value="4"></v-radio>
-                      <span class="answer_label">D</span>
+                      <v-radio
+                        color="orange"
+                        value="4"
+                        label="D"
+                        style="display: contents; max-width: fit-content"
+                      ></v-radio>
                     </v-col>
                     <v-col
                       class="pb-0"
@@ -1745,5 +1761,8 @@ const buttonDisabled = computed(() => {
 .topic_season {
   font-weight: bolder !important;
   color: blue !important;
+}
+.v-selection-control .v-label {
+  height: auto !important;
 }
 </style>
