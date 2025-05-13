@@ -829,19 +829,25 @@
 
     <v-row>
       <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
-        <v-card>
-          <v-card-title class="text-h5">
+        <v-card class="pa-2">
+          <v-card-title
+            class="text-h5"
+            style="text-overflow: clip; text-wrap: wrap"
+          >
             Are you sure of deleting the online exam?
           </v-card-title>
-          <v-card-text>
+          <v-card-text
+            style="font-size: 10px; color: rgba(0, 0, 0, 0.5)"
+            class="px-2"
+          >
             If you are sure about the deletion, click Agree button.
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
             <v-btn
               color="green darken-1"
               text
               @click="confirmDeleteDialog = false"
+              style="text-transform: none; font-size: 14px"
             >
               Disagree
             </v-btn>
@@ -850,6 +856,7 @@
               text
               :loading="deleteLoading"
               @click="deleteOnlineExam"
+              style="text-transform: none; font-size: 14px"
             >
               Agree
             </v-btn>
@@ -1649,5 +1656,13 @@ onMounted(async () => {
 .v-stepper-vertical-item__title {
   font-size: 1.5rem;
   font-weight: 500;
+}
+.v-card-actions {
+  align-items: center;
+  display: flex;
+  flex: none;
+  min-height: unset;
+  padding: unset;
+  gap: unset;
 }
 </style>

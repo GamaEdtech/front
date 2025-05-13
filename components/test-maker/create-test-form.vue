@@ -119,11 +119,12 @@
                     <template #content>
                       <v-btn
                         variant="text"
-                        color="teal"
                         icon="mdi-camera"
-                        size="small"
+                        size="x-large"
                         @click="selectFile('q_file')"
-                      ></v-btn>
+                      >
+                      <v-icon size="80" color="#A11333">mdi-camera</v-icon>
+                    </v-btn>
                       <v-btn
                         v-if="form.q_file_base64"
                         variant="text"
@@ -551,13 +552,14 @@
               />
               <v-btn
                 v-else
-                variant="flat"
+                variant="text"
                 color="teal-lighten-5"
-                class="image-input d-flex align-center justify-center"
-                style="width: 90px; height: 90px"
+                class=" d-flex align-center justify-center"
+                style="width: 90px; height: 90px; position: absolute; bottom: 5px; right: 10px;"
+                size="x-large"
                 @click="selectFile('answer_full_file')"
               >
-                <v-icon size="x-large" color="teal">mdi-camera</v-icon>
+                <v-icon size="80" color="#A11333">mdi-camera</v-icon>
               </v-btn>
 
               <v-btn
@@ -584,9 +586,9 @@
                     :disabled="buttonDisabled"
                     :loading="create_loading"
                     size="large"
-                    color="teal"
                     variant="flat"
-                    class="white--text"
+                    class="primary-gray-400"
+                    density="compact"
                     block
                   >
                     Create
@@ -597,9 +599,9 @@
                     @click="goToPreviewStep"
                     :disabled="examTestListLength < 5"
                     size="large"
-                    color="teal"
                     variant="flat"
-                    class="white--text"
+                    class="primary-gray-400"
+                    density="compact"
                     block
                   >
                     <span v-show="examTestListLength < 5"

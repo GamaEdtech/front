@@ -251,6 +251,7 @@
                 label="Board"
                 variant="outlined"
                 density="compact"
+                color="orange"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -263,6 +264,7 @@
                 label="Grade"
                 variant="outlined"
                 density="compact"
+                color="orange"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -275,6 +277,7 @@
                 label="Subject"
                 variant="outlined"
                 density="compact"
+                color="orange"
               ></v-autocomplete>
             </v-col>
 
@@ -288,6 +291,7 @@
                 label="Topic"
                 variant="outlined"
                 density="compact"
+                color="orange"
               >
                 <template #item="{ item, props }">
                   <v-list-item
@@ -309,6 +313,7 @@
                 label="Video analysis"
                 variant="outlined"
                 density="compact"
+                color="orange"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -316,6 +321,7 @@
                 v-model="filter.myTests"
                 label="My own tests"
                 density="compact"
+                color="orange"
               ></v-checkbox>
             </v-col>
 
