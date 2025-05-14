@@ -3,7 +3,6 @@
   <div class="test-maker-menu-wrapper">
     <!-- Fixed bottom navigation bar -->
     <v-bottom-navigation
-      grow
       color="teal"
       bg-color="teal"
       class="test-maker-menu"

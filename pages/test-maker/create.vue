@@ -10,12 +10,17 @@
           color="error"
           :disabled="!exam_id"
           icon="mdi-delete"
+          size="small"
           @click="confirmDeleteDialog = true"
+          class="mr-1"
+           style="font-size: 15px; font-weight: 500;"
         />
         <v-btn
           variant="outlined"
           icon="mdi-printer-eye"
+          size="small"
           @click="printPreviewDialog = !printPreviewDialog"
+          style="font-size: 15px; font-weight: 500;"
         />
       </v-col>
     </v-row>
@@ -96,6 +101,7 @@
                   :items="test_type_list"
                   item-title="title"
                   item-value="id"
+                  :rules="[(v) => !!v || 'This field is required']" 
                   label="Exam type"
                   variant="outlined"
                   color="orange"
@@ -122,6 +128,7 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
+                  :rules="[(v) => !!v || 'This field is required']" 
                 ></v-autocomplete>
               </v-col>
 
@@ -135,6 +142,7 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
+                  :rules="[(v) => !!v || 'This field is required']" 
                 ></v-autocomplete>
               </v-col>
 
@@ -145,7 +153,7 @@
                   variant="outlined"
                   prepend-icon="mdi-paperclip"
                   @update:model-value="uploadFile"
-                  accept="application/pdf,image/*"
+                  accept="application/pdf"
                   density="compact"
                 ></v-file-input>
               </v-col>
@@ -157,8 +165,9 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'This field is required']"
                   density="compact"
+                  hide-details
                 ></v-text-field>
-                <div class="text-caption text-grey">
+                <div style="font-size: 11px; color:rgba(0,0,0,0.6); margin-left: 15px">
                   Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A
                   Level MSCO
                 </div>
