@@ -27,7 +27,7 @@
         <div v-else class="mb-4 d-inline-flex align-center flex-wrap">
           <div>
             <div
-              class="d-inline-flex flex-row align-center"
+              class="d-inline-flex flex-row align-center cursor-pointer"
               @click="toggleBoardDialog(true)"
             >
               <span class="w-100 gama-text-h3 font-weight-semibold">
@@ -47,7 +47,7 @@
             </template>
             <template v-else>
               <div
-                class="d-inline-flex flex-row align-center"
+                class="d-inline-flex flex-row align-center cursor-pointer"
                 @click="toggleGradeDialog(true)"
               >
                 <span
@@ -80,7 +80,7 @@
             </template>
             <template v-else>
               <div
-                class="d-inline-flex flex-row align-center mb-4 mb-md-0"
+                class="d-inline-flex flex-row align-center mb-4 mb-md-0 cursor-pointer"
                 @click="toggleSubjectDialog(true)"
               >
                 <span
