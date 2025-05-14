@@ -155,9 +155,9 @@
 
 <script>
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
-import BoardDialog from "@/components/search/fast-search/BoardDialog.vue";
-import GradeDialog from "@/components/search/fast-search/GradeDialog.vue";
-import SubjectDialog from "@/components/search/fast-search/SubjectDialog.vue";
+import BoardDialog from "@/components/search/typeSelector/BoardDialog.vue";
+import GradeDialog from "@/components/search/typeSelector/GradeDialog.vue";
+import SubjectDialog from "@/components/search/typeSelector/SubjectDialog.vue";
 import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
