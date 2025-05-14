@@ -1414,8 +1414,7 @@
     <v-dialog
       transition="dialog-bottom-transition"
       v-model="selectLocationDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
+      fullscreen
       style="z-index: 20001"
     >
       <v-card>
@@ -2500,7 +2499,7 @@ export default {
 
   #mapSection {
     width: 100%;
-    height: 44rem;
+    height: 80vh;
   }
 
   #searchSection {
