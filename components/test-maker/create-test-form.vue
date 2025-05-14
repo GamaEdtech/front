@@ -9,7 +9,7 @@
     <v-card flat class="mt-3">
       <!--Question section-->
       <v-card-text id="test-question">
-        <VeeForm ref="veeForm" @submit="submitQuestion">
+        <VeeForm ref="veeForm" @submit.prevent>
           <v-row>
             <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
               <v-autocomplete
@@ -84,7 +84,6 @@
                 variant="outlined"
                 color="orange"
                 :rules="[(v) => !!v || 'This field is required']"
-                @update:model-value="changeOption('topic', $event)"
               />
             </v-col>
 
@@ -108,7 +107,7 @@
               <ClientOnly fallback-tag="span" fallback="Loading...">
                 <Field
                   name="question"
-                  rules="required"
+                  :validate="validateQuestionField"
                   v-slot="{ errorMessage }"
                 >
                   <RickEditor
@@ -192,7 +191,7 @@
               <!--Test answer options-->
               <Field
                 name="true_answer"
-                rules="required"
+                :validate="validateTrueAnswer"
                 v-slot="{ field, errorMessage }"
               >
                 <v-radio-group
@@ -219,7 +218,7 @@
                     >
                       <Field
                         :name="'answer_a'"
-                        :rules="text_answer_rules ? 'required' : ''"
+                        :validate="validateAnswerField"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
@@ -275,7 +274,7 @@
                           color="error"
                           icon="mdi-delete"
                           size="small"
-                          block
+                          class="img-clear-btn"
                         ></v-btn>
                       </div>
                     </v-col>
@@ -299,7 +298,7 @@
                     >
                       <Field
                         :name="'answer_b'"
-                        :rules="text_answer_rules ? 'required' : ''"
+                        :validate="validateAnswerField"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
@@ -377,7 +376,7 @@
                     >
                       <Field
                         :name="'answer_c'"
-                        :rules="text_answer_rules ? 'required' : ''"
+                        :validate="validateAnswerField"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
@@ -455,7 +454,7 @@
                     >
                       <Field
                         :name="'answer_d'"
-                        :rules="text_answer_rules ? 'required' : ''"
+                        :validate="validateAnswerField"
                         v-slot="{ errorMessage }"
                       >
                         <ClientOnly fallback-tag="span" fallback="Loading...">
@@ -582,7 +581,7 @@
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    type="submit"
+                    type="button"
                     :disabled="buttonDisabled"
                     :loading="create_loading"
                     size="large"
@@ -590,6 +589,7 @@
                     class="primary-gray-400"
                     density="compact"
                     block
+                    @click.prevent="manualSubmit"
                   >
                     Create
                   </v-btn>
@@ -1080,52 +1080,217 @@ const getTypeList = async (type, parent = "") => {
 };
 
 /**
+ * Reset the form to initial state
+ */
+const resetFormFields = () => {
+  // First, clear all validation errors
+  clearFieldValidationErrors();
+  
+  // Reset form fields
+  form.question = "";
+  form.q_file_base64 = "";
+  form.answer_full = "";
+  form.answer_full_file_base64 = "";
+  form.true_answer = "";
+  form.testImgAnswers = false;
+  text_answer.value = true;
+  photo_answer.value = false;
+  form.answer_a = "";
+  form.answer_b = "";
+  form.answer_c = "";
+  form.answer_d = "";
+  form.a_file_base64 = "";
+  form.b_file_base64 = "";
+  form.c_file_base64 = "";
+  form.d_file_base64 = "";
+  
+  // Reset file inputs
+  if (questionInput.value) questionInput.value.value = null;
+  if (answerFullInput.value) answerFullInput.value.value = null;
+  if (aInput.value) aInput.value.value = null;
+  if (bInput.value) bInput.value.value = null;
+  if (cInput.value) cInput.value.value = null;
+  if (dInput.value) dInput.value.value = null;
+  
+  form_hidden_data.q_file = null;
+  form_hidden_data.answer_full_file = null;
+  form_hidden_data.a_file = null;
+  form_hidden_data.b_file = null;
+  form_hidden_data.c_file = null;
+  form_hidden_data.d_file = null;
+  
+  // Reset VeeValidate form state
+  if (veeForm.value) {
+    resetForm();
+    setTimeout(() => {
+      // Validate after reset to make sure validation state is fresh
+      validate();
+      // Then clear any validation messages that might have been triggered
+      clearFieldValidationErrors();
+    }, 100);
+  }
+}
+
+/**
+ * Validate all required fields and show appropriate error messages
+ * @returns {boolean} True if validation passes, false otherwise
+ */
+const validateForm = () => {
+  const { $toast } = useNuxtApp();
+  
+  // Check basic required fields
+  if (!form.section) {
+    if ($toast) $toast.error("Please select a Board");
+    return false;
+  }
+  
+  if (!form.base) {
+    if ($toast) $toast.error("Please select a Grade");
+    return false;
+  }
+  
+  if (!form.lesson) {
+    if ($toast) $toast.error("Please select a Subject");
+    return false;
+  }
+  
+  if (!form.topic) {
+    if ($toast) $toast.error("Please select a Topic");
+    return false;
+  }
+  
+  if (!form.question || form.question.trim() === "") {
+    if ($toast) $toast.error("Please enter a question");
+    return false;
+  }
+  
+  // For multiple choice questions, check answers
+  if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
+    if (!form.true_answer) {
+      if ($toast) $toast.error("Please select the correct answer");
+      return false;
+    }
+    
+    // Check text answers if not using image answers
+    if (!form.testImgAnswers) {
+      if (form.type === "fourchoice" || form.type === "twochoice" || form.type === "tf") {
+        if (!form.answer_a || form.answer_a.trim() === "") {
+          if ($toast) $toast.error("Please enter text for Answer A");
+          return false;
+        }
+        
+        if (!form.answer_b || form.answer_b.trim() === "") {
+          if ($toast) $toast.error("Please enter text for Answer B");
+          return false;
+        }
+        
+        if (form.type === "fourchoice") {
+          if (!form.answer_c || form.answer_c.trim() === "") {
+            if ($toast) $toast.error("Please enter text for Answer C");
+            return false;
+          }
+          
+          if (!form.answer_d || form.answer_d.trim() === "") {
+            if ($toast) $toast.error("Please enter text for Answer D");
+            return false;
+          }
+        }
+      }
+    } else {
+      // Check image answers
+      if (form.true_answer === "1" && !form.a_file_base64) {
+        if ($toast) $toast.error("Please upload an image for Answer A (marked as correct)");
+        return false;
+      }
+      
+      if (form.true_answer === "2" && !form.b_file_base64) {
+        if ($toast) $toast.error("Please upload an image for Answer B (marked as correct)");
+        return false;
+      }
+      
+      if (form.type === "fourchoice") {
+        if (form.true_answer === "3" && !form.c_file_base64) {
+          if ($toast) $toast.error("Please upload an image for Answer C (marked as correct)");
+          return false;
+        }
+        
+        if (form.true_answer === "4" && !form.d_file_base64) {
+          if ($toast) $toast.error("Please upload an image for Answer D (marked as correct)");
+          return false;
+        }
+      }
+    }
+  }
+  
+  return true;
+};
+
+/**
  * Handle form submission
  */
-const submitQuestion = veeHandleSubmit(async (values) => {
+const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
   console.log("Submit handler triggered with values:", values);
+  
+  // Additional debugging logs
+  console.log("Form data state:", {
+    section: form.section,
+    base: form.base,
+    lesson: form.lesson,
+    topic: form.topic, 
+    questionLength: form.question ? form.question.length : 0,
+    trueAnswer: form.true_answer,
+    answerA: form.answer_a ? form.answer_a.length : 0,
+    answerB: form.answer_b ? form.answer_b.length : 0
+  });
+  
   create_loading.value = true;
+  
+  // Force clear error messages again
+  clearFieldValidationErrors();
 
   try {
-    // Extract the required fields from the form
-    const formData = {
-      section: form.section,
-      base: form.base,
-      lesson: form.lesson,
-      topic: form.topic,
-      type: form.type,
-      question: form.question,
-      true_answer: form.true_answer,
-      testImgAnswers: form.testImgAnswers,
-      // Include other fields based on the question type
-      ...(form.type === "fourchoice" && {
-        answer_a: form.answer_a,
-        answer_b: form.answer_b,
-        answer_c: form.answer_c,
-        answer_d: form.answer_d,
-      }),
-      ...(form.type === "twochoice" && {
-        answer_a: form.answer_a,
-        answer_b: form.answer_b,
-      }),
-      ...(form.testImgAnswers && {
-        q_file: form.q_file,
-        a_file: form.a_file,
-        b_file: form.b_file,
-        c_file: form.c_file,
-        d_file: form.d_file,
-      }),
-      answer_full: form.answer_full,
-      answer_full_file: form.answer_full_file,
-    };
+    // Run our custom validation
+    if (!validateForm()) {
+      create_loading.value = false;
+      return;
+    }
+    
+    // Create a URLSearchParams object
+    const formData = new URLSearchParams();
+    
+    // Add all required fields
+    formData.append("section", form.section.toString());
+    formData.append("base", form.base.toString());
+    formData.append("lesson", form.lesson.toString());
+    formData.append("topic", form.topic.toString());
+    formData.append("type", form.type);
+    formData.append("direction", form.direction || "ltr");
+    formData.append("question", form.question);
+    formData.append("true_answer", form.true_answer);
+    formData.append("testImgAnswers", form.testImgAnswers ? "1" : "0");
+    formData.append("testingAnswers", "0");
+    formData.append("answer_full", form.answer_full || "");
+    
+    // Add answers based on question type
+    if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
+      formData.append("answer_a", form.answer_a || "");
+      formData.append("answer_b", form.answer_b || "");
+      
+      if (form.type === "fourchoice") {
+        formData.append("answer_c", form.answer_c || "");
+        formData.append("answer_d", form.answer_d || "");
+      }
+    }
+    
+    // Add file fields if they exist
+    if (form.q_file) formData.append("q_file", form.q_file);
+    if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
+    if (form.a_file) formData.append("a_file", form.a_file);
+    if (form.b_file) formData.append("b_file", form.b_file);
+    if (form.c_file) formData.append("c_file", form.c_file);
+    if (form.d_file) formData.append("d_file", form.d_file);
 
-    console.log("Prepared form data to send:", formData);
-
-    // Use proper querystring
-    const querystring = require("querystring");
-    const formDataString = querystring.stringify(formData);
-    console.log("Stringified form data:", formDataString);
-
+    console.log("Form data prepared:", formData.toString());
     console.log("Sending request to /api/v1/examTests");
 
     // Add a simulated delay for easier debugging in console
@@ -1133,9 +1298,10 @@ const submitQuestion = veeHandleSubmit(async (values) => {
 
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
-      body: formDataString,
+      body: formData,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Bearer ${userToken.value}`
       },
     }).catch((error) => {
       console.error("Network error details:", {
@@ -1160,25 +1326,8 @@ const submitQuestion = veeHandleSubmit(async (values) => {
         emit("update:updateTestList", response.data.id);
       }
 
-      // Reset form fields
-      form.question = "";
-      form.q_file_base64 = "";
-      form.answer_full = "";
-      form.answer_full_file_base64 = "";
-      form.true_answer = "";
-      form.testImgAnswers = false;
-      text_answer.value = true;
-      photo_answer.value = false;
-      form.answer_a = "";
-      form.answer_b = "";
-      form.answer_c = "";
-      form.answer_d = "";
-      form.a_file_base64 = "";
-      form.b_file_base64 = "";
-      form.c_file_base64 = "";
-      form.d_file_base64 = "";
-
-      resetForm();
+      // Reset form fields using our new function
+      resetFormFields();
     } else {
       console.error("API returned error status:", response);
       $toast.error(response.message || "An error occurred, try again");
@@ -1190,7 +1339,7 @@ const submitQuestion = veeHandleSubmit(async (values) => {
       $toast.error(err.response.data.message || "Bad request");
     } else if (err.response?.status == 403) {
       // Handle authentication error
-      console.error("Authentication error:", err.response?.data);
+      console.error("Authentication error");
       $toast.error("Authentication error");
       router.push("/login");
     } else {
@@ -1439,9 +1588,46 @@ watch(
     if (val == "tf") {
       form.answer_a = "True";
       form.answer_b = "False";
-    } else {
+    } else if (val !== "tf" && (form.answer_a === "True" && form.answer_b === "False")) {
+      // Only reset if we're coming from a true/false type
       form.answer_a = "";
       form.answer_b = "";
+    }
+    
+    // Reset true_answer when changing question type
+    form.true_answer = "";
+    
+    // Re-validate with a delay
+    debouncedValidate();
+  }
+);
+
+// Add these utility variables for debounced validation
+let validationTimer = null;
+
+/**
+ * Debounced validation to prevent flickering error messages
+ */
+const debouncedValidate = () => {
+  if (validationTimer) {
+    clearTimeout(validationTimer);
+  }
+  validationTimer = setTimeout(() => {
+    // Clear any existing error messages first
+    clearFieldValidationErrors();
+    // Then run validation
+    validate();
+    validationTimer = null;
+  }, 300);
+};
+
+// Update the watch handler for form.topic
+watch(
+  () => form.topic,
+  (newVal) => {
+    // Only run validation if we have a valid topic selected
+    if (newVal) {
+      debouncedValidate();
     }
   }
 );
@@ -1454,6 +1640,14 @@ onMounted(() => {
   userToken.value = auth.getUserToken();
   getTypeList("section");
   getCurrentExamInfo();
+  
+  // Set up form validation event handling
+  if (veeForm.value) {
+    // Clear all validation errors on initial load
+    setTimeout(() => {
+      clearFieldValidationErrors();
+    }, 500);
+  }
 });
 
 /**
@@ -1533,28 +1727,19 @@ const submitCrop = async () => {
  * This is a wrapper for submitQuestion
  */
 const createTest = () => {
-  console.log("Create button clicked! Triggering manual form submission...");
-
-  // If the button is using @click.prevent instead of type="submit",
-  // we can trigger submission via the VeeForm ref
-  if (veeForm.value) {
-    console.log("Submitting form via veeForm ref");
-    veeForm.value.submitForm();
-  } else {
-    console.log("VeeForm ref not found, calling submitQuestion directly");
-    submitQuestion();
-  }
+  console.log("Create button clicked! Trying manual submission...");
+  manualSubmit();
 };
 
 /**
  * Trigger form validation manually after user interacts with RichEditor
  * This ensures validation state is updated properly
  */
-const validateForm = () => {
-  // Only validate after a small delay to avoid performance issues
-  setTimeout(() => {
-    validate();
-  }, 100);
+const refreshValidation = () => {
+  // Clear errors first
+  clearFieldValidationErrors();
+  // Then validate after a delay
+  debouncedValidate();
 };
 
 /**
@@ -1562,7 +1747,7 @@ const validateForm = () => {
  */
 watch(
   () => form.question,
-  () => validateForm()
+  () => refreshValidation()
 );
 
 watch(
@@ -1573,24 +1758,218 @@ watch(
     form.answer_d,
     form.answer_full,
   ],
-  () => validateForm()
+  () => refreshValidation()
 );
 
 /**
- * Determine if the create button should be disabled
+ * Update the buttonDisabled computed property to accurately reflect required fields
  */
 const buttonDisabled = computed(() => {
-  // Check only basic mandatory fields
-  const required =
-    form.section && form.base && form.lesson && form.topic && form.question;
+  // Check basic mandatory fields
+  const requiredFields = 
+    form.section && 
+    form.base && 
+    form.lesson && 
+    form.topic && 
+    form.question;
 
   // For multiple choice forms, also check true_answer
   if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
-    return !required || !form.true_answer;
+    return !requiredFields || !form.true_answer;
   }
 
-  return !required;
+  return !requiredFields;
 });
+
+/**
+ * Custom validation function for answer fields
+ */
+const validateAnswerField = (value) => {
+  // If we are using image answers, then don't validate text fields
+  if (form.testImgAnswers === true) {
+    return true;
+  }
+  
+  // Otherwise, check that we have content
+  if (!value || value.trim() === '') {
+    return 'This field is required';
+  }
+  
+  return true;
+};
+
+/**
+ * Custom validation for the true answer radio group
+ */
+const validateTrueAnswer = (value) => {
+  // Only validate if this is a multiple choice question type
+  if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
+    if (!value) {
+      return "Please select the correct answer";
+    }
+  }
+  return true;
+};
+
+// Add this to our validateForm function to ensure all "validation is not valid" messages are cleared
+const clearFieldValidationErrors = () => {
+  // First method: Hide error messages with inline style
+  const errorMessages = document.querySelectorAll('.text-error');
+  errorMessages.forEach(element => {
+    element.style.display = 'none';
+  });
+  
+  // Second method: Remove the "not valid" text directly
+  const validationTexts = document.querySelectorAll('[class*="not valid"]');
+  validationTexts.forEach(element => {
+    element.style.display = 'none';
+  });
+  
+  // Third method: Clear all form error messages
+  setTimeout(() => {
+    document.querySelectorAll('.error--text').forEach(el => {
+      el.classList.remove('error--text');
+    });
+  }, 10);
+};
+
+/**
+ * Validate question field
+ */
+const validateQuestionField = (value) => {
+  if (!value || value.trim() === '') {
+    return 'Please enter a question';
+  }
+  return true;
+};
+
+// Add a more direct click handler that bypasses VeeValidate
+const manualSubmit = async () => {
+  console.log("Manual submit triggered");
+  
+  // First clear any validation errors
+  clearFieldValidationErrors();
+  
+  // Ensure the topic value is set correctly - this is critical
+  console.log("Current topic value:", form.topic);
+  
+  if (!form.topic && selected_topics.value && selected_topics.value.length > 0) {
+    form.topic = parseInt(selected_topics.value[0]);
+    console.log("Updated topic from selected_topics:", form.topic);
+  }
+  
+  // Run our direct validation
+  if (!validateForm()) {
+    console.log("Form validation failed");
+    return;
+  }
+  
+  console.log("Form validation passed, preparing to submit");
+  create_loading.value = true;
+  
+  // Ensure required fields are present
+  form.direction = form.direction || "ltr";
+  form.testingAnswers = 0;
+  
+  // Log the actual form object we'll be submitting
+  console.log("Submitting form object directly:", form);
+  
+  // Temporary hardcoded data structure to match exactly what the API expects
+  const hardcodedSubmission = {
+    section: form.section.toString(),
+    base: form.base.toString(),
+    lesson: form.lesson.toString(),
+    topic: form.topic.toString(),
+    type: form.type,
+    question: form.question,
+    true_answer: form.true_answer,
+    testImgAnswers: form.testImgAnswers ? "1" : "0",
+    answer_full: form.answer_full || "",
+    testingAnswers: "0",
+    direction: "ltr",
+    answer_a: form.answer_a || "",
+    answer_b: form.answer_b || "",
+    answer_c: form.answer_c || "",
+    answer_d: form.answer_d || ""
+  };
+  
+  // Create URLSearchParams object instead of using require('querystring')
+  const formData = new URLSearchParams();
+  
+  // Add all form fields to the URLSearchParams
+  Object.keys(hardcodedSubmission).forEach(key => {
+    formData.append(key, hardcodedSubmission[key]);
+  });
+  
+  console.log("Stringified form data:", formData.toString());
+  
+  try {
+    const response = await $fetch("/api/v1/examTests", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Bearer ${userToken.value}`
+      }
+    });
+    
+    console.log("API response received:", response);
+    
+    if (response.status == 1) {
+      console.log("Test created successfully with ID:", response.data?.id);
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.success("Created successfully");
+      
+      path_panel_expand.value = false;
+      
+      // Edit mode or create exam progress
+      if (props.examEditMode === true) {
+        console.log("Emitting update event with ID:", response.data.id);
+        emit("update:updateTestList", response.data.id);
+      }
+      
+      // Reset form fields
+      resetFormFields();
+    } else {
+      console.error("API returned error status:", response);
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.error(response.message || "An error occurred, try again");
+    }
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    
+    // Log detailed error information
+    if (err.response) {
+      console.error("Error response status:", err.response.status);
+      console.error("Error response data:", err.response.data);
+      
+      // If the API returned which fields are missing, log them specifically
+      if (err.response.data?.data?.fields) {
+        console.error("Missing fields:", err.response.data.data.fields);
+        const missingFields = err.response.data.data.fields.join(", ");
+        const { $toast } = useNuxtApp();
+        if ($toast) $toast.error(`Required fields missing: ${missingFields}`);
+        return;
+      }
+    }
+    
+    let errorMessage = "An error occurred";
+    
+    if (err.response?.status == 400) {
+      errorMessage = err.response?.data?.message || "Bad request";
+    } else if (err.response?.status == 403) {
+      errorMessage = "Authentication error";
+      router.push("/login");
+    } else {
+      errorMessage = err.message || "An error occurred";
+    }
+    
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error(errorMessage);
+  } finally {
+    create_loading.value = false;
+  }
+};
 </script>
 
 <style>
