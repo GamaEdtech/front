@@ -58,7 +58,19 @@
 
           <div class="subjects-list-container">
             <v-list v-if="filteredSubjects.length > 0">
-              <!-- Subject options with avatars -->
+              <v-list-item
+                @click="selectSubject({ id: null, title: 'ALL' })"
+                class="subject-item"
+              >
+                <v-list-item-avatar color="#F2F4F7">
+                  <v-avatar color="#F2F4F7" size="40">
+                    <span class="subject-circle-text">A</span>
+                  </v-avatar>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title>ALL</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
               <v-list-item
                 v-for="subject in filteredSubjects"
                 :key="subject.id"
@@ -158,7 +170,9 @@ export default {
           }
         });
 
-        this.checkSubjectSelection();
+        if (this.gradeId) {
+          this.checkSubjectSelection(false);
+        }
       }
     },
 
@@ -167,8 +181,10 @@ export default {
       handler(newGradeId) {
         if (newGradeId) {
           this.fetchSubjectsData().then(() => {
-            this.checkSubjectSelection();
+            this.checkSubjectSelection(true);
           });
+        } else {
+          this.$emit("subject-selected", null);
         }
       },
     },
@@ -176,7 +192,9 @@ export default {
 
   async mounted() {
     if (this.gradeId) {
-      this.checkSubjectSelection();
+      // this.checkSubjectSelection(true);
+    } else {
+      // this.$emit("subject-selected", null);
     }
   },
 
@@ -194,35 +212,41 @@ export default {
     async fetchSubjectsData() {
       if (this.gradeId) {
         await this.fetchSubjects(this.gradeId);
+        return true;
+      } else {
+        this.selectedSubject = null;
+        return false;
       }
     },
 
-    checkSubjectSelection() {
-      this.setDefaultSubject();
+    checkSubjectSelection(shouldEmit = true) {
+      if (!this.gradeId) {
+        if (shouldEmit) this.$emit("subject-selected", null);
+        return;
+      }
+
+      if (!this.subjects || this.subjects.length === 0) {
+        if (shouldEmit) this.$emit("subject-selected", null);
+        return;
+      }
+
+      this.setDefaultSubject(shouldEmit);
     },
 
-    setDefaultSubject() {
-      if (this.subjects && this.subjects.length > 0) {
-        const defaultSubject = {
-          id: this.subjects[0].id,
-          title: this.subjects[0].title,
-          name: this.subjects[0].title,
-          lesson_id: this.subjects[0].id,
-          base_id: this.gradeId,
-          parent: this.subjects[0].parent || "",
-          parent2: this.subjects[0].parent2 || "0",
-          master_: this.subjects[0].master_ || "",
-          list_order: this.subjects[0].list_order || "",
-          test_link: this.subjects[0].test_link,
-          book_link: this.subjects[0].book_link,
-          metadata: this.subjects[0].metadata || "{}",
-          bit_delete: this.subjects[0].bit_delete || "0",
-        };
-        this.selectedSubject = defaultSubject;
+    setDefaultSubject(shouldEmit = true) {
+      const defaultSubject = {
+        id: null,
+        title: "ALL",
+        name: "ALL",
+        lesson_id: null,
+        base_id: this.gradeId,
+        parent: "",
+        parent2: "0",
+      };
+
+      this.selectedSubject = defaultSubject;
+      if (shouldEmit) {
         this.$emit("subject-selected", this.selectedSubject);
-      } else {
-        this.selectedSubject = null;
-        this.$emit("subject-selected", null);
       }
     },
 

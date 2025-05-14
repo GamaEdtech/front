@@ -13,7 +13,6 @@
       </div>
     </v-col>
 
-    <!-- Title -->
     <v-row class="justify-space-between flex-nowrap">
       <v-col cols="8" sm="5" md="8">
         <!-- Parent skeleton loader for the entire selection area -->
@@ -114,9 +113,17 @@
         <slot name="content"></slot>
       </v-col>
       <v-col cols="4" style="height: fit-content">
-        <v-img :src="bookImage" max-height="300px" eager contain class="" />
+        <template v-if="searchLoader">
+          <v-skeleton-loader type="image"></v-skeleton-loader>
+        </template>
+        <template v-else>
+          <template v-if="bookImage">
+            <v-img :src="bookImage" max-height="300px" eager contain class="" />
+          </template>
+        </template>
       </v-col>
     </v-row>
+
     <BoardDialog
       :show-dialog="showBoardDialog"
       @update:show-dialog="showBoardDialog = $event"
@@ -157,10 +164,6 @@ export default {
       type: Array,
       required: true,
     },
-    bookImage: {
-      type: String,
-      default: require("@/assets/images/BiologyBook.png"),
-    },
     viewCount: {
       type: [String, Number],
       default: "28k",
@@ -169,6 +172,7 @@ export default {
 
   data() {
     return {
+      searchLoader: false,
       selectedBoard: null,
       selectedGrade: null,
       selectedSubject: null,
@@ -178,6 +182,8 @@ export default {
       showGradeDialog: false,
       showSubjectDialog: false,
       loader: true,
+      searchResults: null,
+      bookImage: null,
     };
   },
 
@@ -237,16 +243,62 @@ export default {
     handleGradeSelection(grade) {
       this.selectedGrade = grade;
       this.selectedSubject = null; // Clear subject when grade changes
-      this.isLoadingSubjects = true;
+      if (grade) {
+        this.isLoadingSubjects = true;
+      }
     },
 
     /**
      * Handle subject selection from SubjectDialog component
      */
-    handleSubjectSelection(subject) {
+    async handleSubjectSelection(subject) {
       this.selectedSubject = subject;
-      this.loader = false;
-      this.isLoadingSubjects = false;
+      if (this.selectedBoard) {
+        this.loader = false;
+        this.isLoadingSubjects = false;
+
+        // Call search API when subject is selected
+        if (this.selectedBoard.id && this.selectedGrade?.id) {
+          await this.fetchSearchResults();
+        }
+      }
+    },
+
+    /**
+     * Fetch search results based on selected board, grade, and subject
+     */
+    async fetchSearchResults() {
+      try {
+        this.searchLoader = true;
+        let endpoint = `api/v1/search?type=test&section=${this.selectedBoard.id}&base=${this.selectedGrade.id}`;
+
+        if (this.selectedSubject && this.selectedSubject.id) {
+          endpoint += `&lesson=${this.selectedSubject.id}`;
+        }
+
+        const response = await this.$axios.get(endpoint);
+        this.searchResults = response.data;
+
+        if (
+          this.searchResults &&
+          this.searchResults.data &&
+          this.searchResults.data.list &&
+          this.searchResults.data.list.length > 0 &&
+          this.searchResults.data.list[0].lesson_pic
+        ) {
+          this.bookImage = this.searchResults.data.list[0].lesson_pic;
+        } else {
+          // Set bookImage to null if the list is empty or doesn't have lesson_pic
+          this.bookImage = null;
+        }
+
+        this.$emit("search-results", this.searchResults);
+        this.searchLoader = false;
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        this.bookImage = null;
+        this.searchLoader = false;
+      }
     },
   },
 };
