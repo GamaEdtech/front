@@ -57,7 +57,8 @@
                 <div ref="mathJaxEl" v-html="`${item.question}`" />
               </div>
               <img
-                v-show="item.q_file & (item.q_file != 0)"
+                v-show="item.q_file && item.q_file != '0'"
+                class="answer-img"
                 :src="item.q_file"
               />
             </div>
