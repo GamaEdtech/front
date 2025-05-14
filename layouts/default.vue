@@ -19,7 +19,6 @@ export default {
     main_header,
     category,
     main_footer,
-    BoardSelector,
   },
   data() {
     return {
