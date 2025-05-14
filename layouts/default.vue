@@ -1,8 +1,6 @@
 <template>
   <v-app>
     <main_header />
-    <!-- Board Selector Only -->
-    <board-selector ref="boardSelector" @board-selected="handleBoardSelected" />
     <div>
       <Nuxt />
     </div>
@@ -14,7 +12,6 @@
 import main_header from "../components/common/header.vue";
 import category from "../components/common/category";
 import main_footer from "../components/common/footer";
-import BoardSelector from "../components/common/BoardSelector.vue";
 
 export default {
   name: "default_layout",
@@ -31,17 +28,8 @@ export default {
   },
   mounted() {
     this.setFavicon();
-
-    // Load board from route params if available
-    // this.loadSelectionsFromRoute();
-
-    // Listen for show-board-selector events from any component
-    this.$root.$on("show-board-selector", this.showBoardSelector);
   },
-  beforeDestroy() {
-    // Clean up event listeners
-    this.$root.$off("show-board-selector", this.showBoardSelector);
-  },
+  beforeDestroy() {},
   methods: {
     /**
      * Set favicon based on user's theme preference
@@ -125,33 +113,6 @@ export default {
           this.$refs.boardSelector.selectedBoard = this.selectedBoard;
         }
       }
-    },
-
-    /**
-     * Handle board selection from BoardSelector component
-     * @param {Object} board - The selected board
-     */
-    handleBoardSelected(board) {
-      // Validate the board object
-      if (!board || !board.id) {
-        console.error("Invalid board selected", board);
-        return;
-      }
-
-      // Ensure we have the required section_id property for API calls
-      if (!board.section_id) {
-        board.section_id = board.id;
-      }
-
-      this.selectedBoard = board;
-
-      // Save to localStorage to ensure persistence across pages
-      localStorage.setItem("selectedBoard", JSON.stringify(board));
-
-      // Notify other components about the board change using a custom event
-      this.$root.$emit("board-changed", board);
-      // Update route with the selected board
-      // this.updateRoute();
     },
 
     /**
