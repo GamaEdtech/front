@@ -8,6 +8,7 @@
       class="test-maker-menu"
       v-model="active_tab"
       height="64"
+      active
     >
       <v-btn
         v-for="(item, index) in items"
@@ -118,4 +119,17 @@ const openLink = (item) => {
   justify-content: space-evenly !important;
 
 }
+.v-btn--selected.v-btn--active {
+  background-color: rgba(33,186,69,.1) !important;
+  border-bottom: 4px solid #fff !important;
+  color: #fff !important;
+}
+.v-bottom-navigation__content > .v-btn {
+  min-width: 250px !important;
+  margin: 0 20px !important;
+}
+.v-bottom-navigation__content > .v-btn > .v-btn__prepend {
+  margin-top: 10px !important;
+}
 </style>
+

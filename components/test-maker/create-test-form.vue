@@ -1086,38 +1086,70 @@ const resetFormFields = () => {
   // First, clear all validation errors
   clearFieldValidationErrors();
   
-  // Reset form fields
+  // Reset form fields to default values
   form.question = "";
   form.q_file_base64 = "";
+  form.q_file = null;
   form.answer_full = "";
   form.answer_full_file_base64 = "";
+  form.answer_full_file = null;
   form.true_answer = "";
   form.testImgAnswers = false;
-  text_answer.value = true;
-  photo_answer.value = false;
+  
+  // Reset answer text fields
   form.answer_a = "";
   form.answer_b = "";
   form.answer_c = "";
   form.answer_d = "";
+  
+  // Reset answer image fields
   form.a_file_base64 = "";
   form.b_file_base64 = "";
   form.c_file_base64 = "";
   form.d_file_base64 = "";
+  form.a_file = null;
+  form.b_file = null;
+  form.c_file = null;
+  form.d_file = null;
   
-  // Reset file inputs
-  if (questionInput.value) questionInput.value.value = null;
-  if (answerFullInput.value) answerFullInput.value.value = null;
-  if (aInput.value) aInput.value.value = null;
-  if (bInput.value) bInput.value.value = null;
-  if (cInput.value) cInput.value.value = null;
-  if (dInput.value) dInput.value.value = null;
-  
+  // Reset hidden form data
   form_hidden_data.q_file = null;
   form_hidden_data.answer_full_file = null;
   form_hidden_data.a_file = null;
   form_hidden_data.b_file = null;
   form_hidden_data.c_file = null;
   form_hidden_data.d_file = null;
+  
+  // Reset file inputs if they exist
+  if (questionInput.value && questionInput.value.$el) {
+    const fileInput = questionInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
+  
+  if (answerFullInput.value && answerFullInput.value.$el) {
+    const fileInput = answerFullInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
+  
+  if (aInput.value && aInput.value.$el) {
+    const fileInput = aInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
+  
+  if (bInput.value && bInput.value.$el) {
+    const fileInput = bInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
+  
+  if (cInput.value && cInput.value.$el) {
+    const fileInput = cInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
+  
+  if (dInput.value && dInput.value.$el) {
+    const fileInput = dInput.value.$el.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = null;
+  }
   
   // Reset VeeValidate form state
   if (veeForm.value) {
@@ -1129,6 +1161,12 @@ const resetFormFields = () => {
       clearFieldValidationErrors();
     }, 100);
   }
+  
+  // Reset UI state
+  text_answer.value = true;
+  photo_answer.value = false;
+  
+  console.log("Form has been completely reset");
 }
 
 /**
@@ -1326,8 +1364,9 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
         emit("update:updateTestList", response.data.id);
       }
 
-      // Reset form fields using our new function
+      // Reset form fields using our improved function
       resetFormFields();
+      console.log("Form reset after successful submission");
     } else {
       console.error("API returned error status:", response);
       $toast.error(response.message || "An error occurred, try again");
@@ -1636,6 +1675,9 @@ watch(
  * Initialize on mount
  */
 onMounted(() => {
+  // Reset form to clear any previous data
+  resetFormFields();
+  
   // Initialize data
   userToken.value = auth.getUserToken();
   getTypeList("section");
@@ -1928,8 +1970,9 @@ const manualSubmit = async () => {
         emit("update:updateTestList", response.data.id);
       }
       
-      // Reset form fields
+      // Reset form fields using our improved function
       resetFormFields();
+      console.log("Form reset after successful submission");
     } else {
       console.error("API returned error status:", response);
       const { $toast } = useNuxtApp();
