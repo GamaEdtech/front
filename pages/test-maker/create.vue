@@ -1946,7 +1946,11 @@ const validateHeaderForm = () => {
     }
   }
 }
-
+.v-expansion-panel-title__overlay {
+  background-color: unset !important;
+  border-radius: inherit;
+  opacity: 0;
+}
 .v-stepper-vertical-item__title {
   font-size: 1.5rem;
   font-weight: 500;
@@ -1956,6 +1960,11 @@ const validateHeaderForm = () => {
 .topic_season {
   font-weight: bold !important;
   color: blue !important;
+}
+
+.v-stepper-vertical-item:not(:last-child):before {
+  border: unset !important;
+  border-left: thin solid rgba(0, 0, 0, 0.019) !important;
 }
 
 // Answer styling
