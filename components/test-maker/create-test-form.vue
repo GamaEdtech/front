@@ -771,6 +771,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  initialSection: {
+    type: [String, Number],
+    default: null
+  },
+  initialBase: {
+    type: [String, Number],
+    default: null
+  },
+  initialLesson: {
+    type: [String, Number],
+    default: null
+  },
+  initialTopics: {
+    type: Array,
+    default: () => []
+  }
 });
 
 /**
@@ -1094,6 +1110,22 @@ const resetFormFields = () => {
   // First, clear all validation errors
   clearFieldValidationErrors();
   
+  // If in edit mode and using props, we want to preserve certain fields
+  const preserveLocation = props.examEditMode && (
+    props.initialSection || 
+    props.initialBase || 
+    props.initialLesson || 
+    props.initialTopics?.length
+  );
+  
+  // Store current values of fields we may need to preserve
+  const preservedValues = {
+    section: form.section,
+    base: form.base,
+    lesson: form.lesson,
+    topic: form.topic
+  };
+  
   // Reset form fields to default values
   form.question = "";
   form.q_file_base64 = "";
@@ -1127,6 +1159,21 @@ const resetFormFields = () => {
   form_hidden_data.b_file = null;
   form_hidden_data.c_file = null;
   form_hidden_data.d_file = null;
+  
+  // If in edit mode and using props, restore the preserved values
+  if (preserveLocation) {
+    form.section = preservedValues.section;
+    form.base = preservedValues.base;
+    form.lesson = preservedValues.lesson;
+    form.topic = preservedValues.topic;
+    
+    console.log("Preserved form location fields:", {
+      section: form.section,
+      base: form.base,
+      lesson: form.lesson,
+      topic: form.topic
+    });
+  }
   
   // Reset file inputs if they exist
   if (questionInput.value && questionInput.value.$el) {
@@ -1174,7 +1221,6 @@ const resetFormFields = () => {
   text_answer.value = true;
   photo_answer.value = false;
   
-  console.log("Form has been completely reset");
 }
 
 /**
@@ -1526,17 +1572,30 @@ const answerTypeChanged = (type) => {
  * Fetch current exam information
  */
 const getCurrentExamInfo = async () => {
-  // Get current exam ID from router or state
-  const currentExamId = useState("user").value?.currentExamId;
-
+  // Get current exam ID from state or route
+  const userState = useState("user").value;
+  const currentExamId = userState?.currentExamId || route.params.id;
+  
   if (currentExamId) {
     try {
-      const response = await $fetch(`/api/v1/exams/info/${currentExamId}`);
+      const response = await $fetch(`/api/v1/exams/info/${currentExamId}`, {
+        headers: {
+          Authorization: `Bearer ${userToken.value}`,
+        },
+      });
 
+      // Set form data from response
+      form.section = response.data.section;
       // Set form data from response
       form.section = response.data.section;
       form.base = response.data.base;
       form.lesson = response.data.lesson;
+      
+      // If in edit mode, we need to populate topics as well
+      if (props.examEditMode && response.data.topics && response.data.topics.length) {
+        form.topic = response.data.topics[0];
+        await getTypeList("topic", form.lesson);
+      }
 
       // Set file path if available
       if (response.data.file_original) {
@@ -1547,10 +1606,23 @@ const getCurrentExamInfo = async () => {
       if (response.data.tests && Array.isArray(response.data.tests)) {
         examTestListLength.value = response.data.tests.length;
       }
+      
+      // Fetch additional data lists based on the retrieved information
+      if (form.section) {
+        await getTypeList("base", form.section);
+      }
+      
+      if (form.base) {
+        await getTypeList("lesson", form.base);
+      }
+      
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
+      }
     } catch (err) {
       console.error("Error fetching exam info:", err);
       const { $toast } = useNuxtApp();
-      $toast.error("Failed to load exam information");
+      if ($toast) $toast.error("Failed to load exam information");
     }
   }
 };
@@ -1680,16 +1752,96 @@ watch(
 );
 
 /**
+ * Watch for changes in initial props
+ */
+watch(
+  () => props.initialSection,
+  (newVal) => {
+    if (newVal && newVal !== form.section) {
+      form.section = newVal;
+      getTypeList("base", newVal);
+    }
+  }
+);
+
+watch(
+  () => props.initialBase,
+  (newVal) => {
+    if (newVal && newVal !== form.base) {
+      form.base = newVal;
+      getTypeList("lesson", newVal);
+    }
+  }
+);
+
+watch(
+  () => props.initialLesson,
+  (newVal) => {
+    if (newVal && newVal !== form.lesson) {
+      form.lesson = newVal;
+      getTypeList("topic", newVal);
+    }
+  }
+);
+
+watch(
+  () => props.initialTopics,
+  (newVal) => {
+    if (newVal?.length && !form.topic) {
+      form.topic = newVal[0];
+      selected_topics.value = newVal;
+    }
+  },
+  { deep: true }
+);
+
+/**
  * Initialize on mount
  */
 onMounted(() => {
-  // Reset form to clear any previous data
-  resetFormFields();
-  
-  // Initialize data
+  // Initialize user token
   userToken.value = auth.getUserToken();
+  
+  // Load initial data
   getTypeList("section");
-  getCurrentExamInfo();
+  // Load initial data
+  getTypeList("section");
+  
+  // Initialize form with prop values if available
+  if (props.initialSection) {
+    form.section = props.initialSection;
+    getTypeList("base", props.initialSection);
+  }
+  
+  if (props.initialBase) {
+    form.base = props.initialBase;
+    getTypeList("lesson", props.initialBase);
+  }
+  
+  if (props.initialLesson) {
+    form.lesson = props.initialLesson;
+    getTypeList("topic", props.initialLesson);
+  }
+  
+  if (props.initialTopics && props.initialTopics.length) {
+    form.topic = props.initialTopics[0];
+    selected_topics.value = props.initialTopics;
+  }
+  
+  // If in edit mode, we need to ensure we load the current exam's data
+  if (props.examEditMode) {
+    getCurrentExamInfo().then(() => {
+      console.log("Exam data loaded in edit mode:", {
+        section: form.section,
+        base: form.base,
+        lesson: form.lesson,
+        topic: form.topic
+      })
+    });
+  } else {
+    // Reset form to clear any previous data if not in edit mode
+    resetFormFields();
+  }
   
   // Set up form validation event handling
   if (veeForm.value) {
