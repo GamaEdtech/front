@@ -235,7 +235,7 @@
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
-                style="font-weight: 500; color: #009688"
+                style="font-weight: 500; color: #009688; font-size: 16px !important;"
               ></v-switch>
             </v-col>
           </v-row>
@@ -332,6 +332,7 @@
                 label="My own tests"
                 density="compact"
                 color="orange"
+                style="font-size: 16px !important; margin-inline-end: 10px !important;"
               ></v-checkbox>
             </v-col>
 
@@ -353,7 +354,7 @@
                     >
                       <v-row class="mb-2">
                         <v-col cols="12">
-                          <v-chip v-if="item.lesson_title" size="small">
+                          <v-chip v-if="item.lesson_title"  size="x-large" density="compact" style="font-size: 13px !important;">
                             {{ item.lesson_title }}
                           </v-chip>
                           <v-chip
@@ -437,7 +438,7 @@
                           >
                             mdi-check
                           </v-icon>
-                          <span>2)</span>
+                          <span>2</span>
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_b"
@@ -494,37 +495,40 @@
                             v-if="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
                           >
-                            <v-icon color="error">mdi-delete</v-icon>
+                            <v-icon color="error" size="small">mdi-delete</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text">
-                            <v-icon color="blue">mdi-bullhorn-outline</v-icon>
+                          <v-btn icon variant="text" density="compact">
+                            <v-icon color="blue" size="x-large">mdi-bullhorn-outline</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text">
-                            <v-icon color="green">mdi-eye</v-icon>
+                          <v-btn icon variant="text" density="compact">
+                            <v-icon color="green" size="x-large" >mdi-eye</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text">
-                            <v-icon color="red">mdi-video</v-icon>
+                          <v-btn icon variant="text" density="compact">
+                            <v-icon color="red" size="x-large">mdi-video</v-icon>
                           </v-btn>
                         </v-col>
                         <v-col cols="6" class="text-right">
                           <v-btn
                             color="blue"
                             variant="flat"
-                            size="small"
+                            density="compact"
                             v-if="!tests.find((x) => x == item.id)"
                             @click="applyTest(item, 'add')"
+                            style="font-size: 13px !important; font-weight: 500; text-transform: none;"
                           >
-                            <v-icon size="small">mdi-plus</v-icon>
+                            <v-icon>mdi-plus</v-icon>
                             Add
                           </v-btn>
                           <v-btn
                             color="red"
                             variant="flat"
-                            size="small"
+                            size="large"
+                            density="compact"
                             v-if="tests.find((x) => x == item.id)"
                             @click="applyTest(item, 'remove')"
+                            style="font-size: 13px !important; font-weight: 500; text-transform: none;"
                           >
-                            <v-icon size="small">mdi-minus</v-icon>
+                            <v-icon>mdi-minus</v-icon>
                             Delete
                           </v-btn>
                         </v-col>
@@ -551,7 +555,7 @@
             </v-col>
 
             <!-- Publish button -->
-            <v-col cols="12">
+            <v-col cols="12" class="mb-6">
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
@@ -1919,10 +1923,16 @@ const validateHeaderForm = () => {
 </script>
 
 <style lang="scss">
+
 .create-test-container {
   max-width: 1200px;
   margin: 5rem auto;
   padding-bottom: 80px; // Space for fixed bottom bar
+}
+@media (max-width: 768px) {
+  .create-test-container {
+    margin: 0;
+  }
 }
 
 .topics-container {
@@ -1996,5 +2006,15 @@ const validateHeaderForm = () => {
   #test-question {
     margin-bottom: 16px;
   }
+}
+
+.v-label--clickable {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+  margin-inline-start: 10px !important;
+}
+.v-expansion-panel-text__wrapper {
+  padding: 8px 14px 16px !important;
 }
 </style>

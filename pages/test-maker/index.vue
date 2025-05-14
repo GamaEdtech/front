@@ -1,6 +1,7 @@
 <template>
   <v-container class="mt-14" id="test-album">
     <!--Mobile filter-->
+    <!--
     <v-row justify="center" class="d-block d-md-none">
       <v-dialog
         v-model="dialog"
@@ -46,7 +47,7 @@
             </v-toolbar>
           </div>
           <v-card-text>
-            <!--Filter section-->
+       
             <v-row class="mt-4">
               <v-col cols="12" md="3">
                 <v-autocomplete
@@ -88,8 +89,10 @@
                 />
               </v-col>
             </v-row>
-            <!--End filter section-->
+     
+
           </v-card-text>
+  
           <v-card-actions
             style="position: sticky; bottom: 0; left: 0; right: 0"
           >
@@ -105,7 +108,8 @@
         </v-card>
       </v-dialog>
     </v-row>
-
+   Mobile filter
+   -->
     <v-row>
       <v-col cols="12" class="pl-5">
         <span class="text-h4 text-teal">

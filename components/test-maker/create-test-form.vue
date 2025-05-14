@@ -208,7 +208,8 @@
                         color="orange"
                         value="1"
                         label="A"
-                        style="display: contents; max-width: fit-content"
+                        density="compact"
+                        style="display: contents; font-size: 14px;"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -231,6 +232,7 @@
                               'underline',
                               'alignment',
                             ]"
+                            style="margin-inline-start: 10px;"
                           >
                           </RickEditor>
                           <p
@@ -288,7 +290,8 @@
                         color="orange"
                         value="2"
                         label="B"
-                        style="display: contents; max-width: fit-content"
+                        density="compact"
+                        style="display: contents; font-size: 14px;"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -311,6 +314,7 @@
                               'underline',
                               'alignment',
                             ]"
+                            style="margin-inline-start: 10px;"
                           >
                           </RickEditor>
                           <p
@@ -366,7 +370,8 @@
                         color="orange"
                         value="3"
                         label="C"
-                        style="display: contents; max-width: fit-content"
+                        density="compact"
+                        style="display: contents; font-size: 14px;"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -389,6 +394,7 @@
                               'underline',
                               'alignment',
                             ]"
+                            style="margin-inline-start: 10px;"
                           >
                           </RickEditor>
                           <p
@@ -444,7 +450,8 @@
                         color="orange"
                         value="4"
                         label="D"
-                        style="display: contents; max-width: fit-content"
+                        density="compact"
+                        style="display: contents; font-size: 14px;"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -467,6 +474,7 @@
                               'underline',
                               'alignment',
                             ]"
+                            style="margin-inline-start: 10px;"
                           >
                           </RickEditor>
                           <p

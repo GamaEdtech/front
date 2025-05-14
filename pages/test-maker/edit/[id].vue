@@ -1632,6 +1632,11 @@ onMounted(async () => {
   margin: 5rem auto;
   padding-bottom: 80px;
 }
+@media (max-width: 768px) {
+  .create-test-container {
+    margin: 0;
+  }
+}
 .topics-container {
   border-radius: 4px;
   padding: 16px;
