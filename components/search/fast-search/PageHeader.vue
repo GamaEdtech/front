@@ -118,7 +118,16 @@
         </template>
         <template v-else>
           <template v-if="bookImage">
-            <v-img :src="bookImage" max-height="300px" eager contain class="" />
+            <div
+              class="max-w-100 w-100 d-flex overflow-hideen relative w-70 mx-auto"
+            >
+              <img
+                :src="bookImage"
+                eager
+                contain
+                class="rounded-lg search-book-img w-100"
+              />
+            </div>
           </template>
         </template>
       </v-col>
@@ -305,5 +314,8 @@ export default {
 </script>
 
 <style scoped>
+.search-book-img {
+  max-height: 300px;
+}
 /* Using global styles from styles.scss */
 </style>
