@@ -162,14 +162,13 @@
                     <p class="mr-3" style="font-size: 14px">Choices type:</p>
                     <v-radio-group
                       inline
-                      default-value="text"
+                      v-model="form.answer_type"
                       hide-details
                       style="max-width: fit-content !important"
                     >
                       <v-radio
                         label="Text"
                         color="teal"
-                        v-model="form.testImgAnswers"
                         value="text"
                         @click="answerTypeChanged('txt')"
                         style="font-size: 14px; margin-inline-end: 10px"
@@ -177,7 +176,6 @@
                       <v-radio
                         label="Photo"
                         color="teal"
-                        v-model="form.testImgAnswers"
                         value="photo"
                         @click="answerTypeChanged('photo')"
                         style="font-size: 14px"
@@ -716,12 +714,12 @@
       <v-card id="img-cropper-dialog">
         <v-card-text class="pa-0">
           <v-col v-if="crop_file_loading" cols="12" class="text-center">
-            <v-progress-circular
+          <v-progress-circular
               :size="40"
               :width="4"
               class="mt-12 mb-12"
               color="orange"
-              indeterminate
+            indeterminate
             />
           </v-col>
           <div v-else>
@@ -885,6 +883,7 @@ const form = reactive({
   c_file_base64: "",
   d_file_base64: "",
   testImgAnswers: false,
+  answer_type: "text",
 });
 
 const form_hidden_data = reactive({
@@ -894,6 +893,7 @@ const form_hidden_data = reactive({
   b_file: null,
   c_file: null,
   d_file: null,
+  answer_type: "text",
 });
 
 /**
@@ -1062,6 +1062,7 @@ const {
     c_file_base64: "",
     d_file_base64: "",
     testImgAnswers: false,
+    answer_type: "text",
   },
 });
 
@@ -1135,6 +1136,7 @@ const resetFormFields = () => {
   form.answer_full_file = null;
   form.true_answer = "";
   form.testImgAnswers = false;
+  form.answer_type = "text";
   
   // Reset answer text fields
   form.answer_a = "";
@@ -1322,13 +1324,13 @@ const validateForm = () => {
  */
 const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
   console.log("Submit handler triggered with values:", values);
-  
+
   // Additional debugging logs
   console.log("Form data state:", {
-    section: form.section,
-    base: form.base,
-    lesson: form.lesson,
-    topic: form.topic, 
+      section: form.section,
+      base: form.base,
+      lesson: form.lesson,
+      topic: form.topic,
     questionLength: form.question ? form.question.length : 0,
     trueAnswer: form.true_answer,
     answerA: form.answer_a ? form.answer_a.length : 0,
@@ -1493,8 +1495,8 @@ const uploadFile = (file_name, fileEvent) => {
 const cropFile = ({ coordinates, canvas }) => {
   // Store the cropped image data
   const croppedBase64 = canvas.toDataURL();
-  
-  // Update the corresponding form field
+
+      // Update the corresponding form field
   if (current_crop_file.value === "q_file") {
     form.q_file_base64 = croppedBase64;
   } else if (current_crop_file.value === "answer_full_file") {
@@ -1557,12 +1559,14 @@ const answerTypeChanged = (type) => {
     text_answer.value = true;
     photo_answer.value = false;
     form.testImgAnswers = false;
+    form.answer_type = "text";
     text_answer_rules.value = "required";
     answerType.value = "text";
   } else {
     text_answer.value = false;
     photo_answer.value = true;
     form.testImgAnswers = true;
+    form.answer_type = "photo";
     text_answer_rules.value = "";
     answerType.value = "photo";
   }
@@ -1575,7 +1579,7 @@ const getCurrentExamInfo = async () => {
   // Get current exam ID from state or route
   const userState = useState("user").value;
   const currentExamId = userState?.currentExamId || route.params.id;
-  
+
   if (currentExamId) {
     try {
       const response = await $fetch(`/api/v1/exams/info/${currentExamId}`, {
@@ -1802,8 +1806,12 @@ onMounted(() => {
   // Initialize user token
   userToken.value = auth.getUserToken();
   
-  // Load initial data
-  getTypeList("section");
+  // Set default values for answer type
+  form.answer_type = "text";
+  form.testImgAnswers = false;
+  text_answer.value = true;
+  photo_answer.value = false;
+  
   // Load initial data
   getTypeList("section");
   
@@ -1861,7 +1869,7 @@ const submitCrop = async () => {
   try {
     // Get the current file based on the file name
     let file = null;
-    
+
     if (current_crop_file.value === "q_file") {
       file = form_hidden_data.q_file;
     } else if (current_crop_file.value === "answer_full_file") {
@@ -1907,10 +1915,10 @@ const submitCrop = async () => {
         }
 
         if ($toast) $toast.success("File uploaded successfully");
-        
-        // Close the dialog after successful upload
-        cropper_dialog.value = false;
-      } else {
+
+      // Close the dialog after successful upload
+      cropper_dialog.value = false;
+    } else {
         if ($toast) $toast.error("Invalid response from server");
       }
     } else {
