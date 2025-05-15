@@ -1,9 +1,9 @@
 <template>
-  <div id="test-details">
+  <div id="test-details" ref="testDetail">
     <!-- Start : Flying Coin -->
     <div class="flying-coin-div" v-show="showingCoin" ref="coinElement">
       <div class="inner-coin-div">
-        <span class="text-coin">1</span>
+        <span class="text-coin">$GET</span>
       </div>
     </div>
     <!-- End : Flying Coin -->
@@ -194,6 +194,8 @@
 </template>
 <script>
 import CrashReport from "~/components/common/crash-report.vue";
+import successSound from "@/assets/sounds/success.mp3"
+import failSound from "@/assets/sounds/fail.mp3"
 
 export default {
   name: "test-details",
@@ -287,7 +289,8 @@ export default {
     showingCoin: false,
     balance: "0.0000001",
     showBoxBalance: true,
-    isAnswerToQuestion: false
+    isAnswerToQuestion: false,
+    sizeCoin: 120,
   }),
 
   watch: {},
@@ -319,29 +322,34 @@ export default {
         this.renderMathJax();
       }, 100);
     },
-    animationMovingCoin(selectedElement, coinElement, destinationElement) {
-      const start = selectedElement.getBoundingClientRect();
-      const end = destinationElement.getBoundingClientRect();
-
-      coinElement.style.top = `${start.top}px`;
-      coinElement.style.left = `${start.left}px`;
-
-      const signDisplacementForSizeCoinElement = window.innerWidth < 1264 ? -1 : 1
-      const dx = end.left - start.left - 5 * signDisplacementForSizeCoinElement;
-      const dy = end.top - start.top - 5 * signDisplacementForSizeCoinElement;
+    // incresing balanceChangeDirection  = 1, decreasing balanceChangeDirection  = -1
+    animationMovingCoin(startInformation, coinElement, endInformation, balanceChangeDirection) {
+      coinElement.style.top = `${startInformation.top + (startInformation.height / 2) - (this.sizeCoin / 2)}px`;
+      coinElement.style.left = `${startInformation.left + (startInformation.width / 2) - (this.sizeCoin / 2)}px`;
+      let dx
+      let dy
+      if (balanceChangeDirection == 1) {
+        dx = endInformation.left - (startInformation.width / 2) + (endInformation.width / 2)
+        dy = endInformation.top - (startInformation.height / 2) + (endInformation.height / 2) - startInformation.top
+      } else {
+        dx = (endInformation.width / 2) - (startInformation.left) - (startInformation.width / 2)
+        dy = (endInformation.height / 2) - (startInformation.height / 2) + (endInformation.top / 2) - startInformation.top
+      }
 
       coinElement.style.setProperty('--dx', `${dx}px`);
       coinElement.style.setProperty('--dy', `${dy}px`);
 
-      coinElement.classList.remove('animate', 'fade-out');
-      coinElement.classList.add('animate');
+      coinElement.classList.remove('animate', 'fade-out', 'error-animate');
+      if (balanceChangeDirection == 1) {
+        coinElement.classList.add('animate');
+      } else {
+        coinElement.classList.add('error-animate');
+      }
     },
-    animationFadeOutCoin(coinElement, destinationElement) {
-      const end = destinationElement.getBoundingClientRect();
-      const signDisplacementForSizeCoinElement = window.innerWidth < 1264 ? -1 : 1
+    animationFadeOutCoin(coinElement, endInformation) {
       setTimeout(() => {
-        coinElement.style.top = `${end.top - 5 * signDisplacementForSizeCoinElement}px`;
-        coinElement.style.left = `${end.left - 5 * signDisplacementForSizeCoinElement}px`;
+        coinElement.style.top = `${endInformation.top + endInformation.height / 2 - (this.sizeCoin / 2)}px`;
+        coinElement.style.left = `${endInformation.left + endInformation.width / 2 - (this.sizeCoin / 2)}px`;
         coinElement.classList.remove('animate');
         coinElement.classList.add('fade-out');
       }, 3000);
@@ -396,31 +404,71 @@ export default {
       }, 7500);
     },
 
+    playSound(sound) {
+      const audio = new Audio(sound);
+      audio.play().catch((e) => {
+        console.warn('Failed to play audio:', e);
+      });
+    },
 
+    createExplosionParticles(x, y, count = 30) {
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = Math.random() * 150;
+
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
+        particle.style.setProperty('--x', `${dx}px`);
+        particle.style.setProperty('--y', `${dy}px`);
+
+        document.body.appendChild(particle);
+        particle.addEventListener('animationend', () => {
+          particle.remove();
+        });
+      }
+    },
+
+    animationExplodeCoin(coinElement, centerInformation) {
+      setTimeout(() => {
+        coinElement.classList.remove('error-animate');
+        coinElement.style.opacity = 0;
+        const centerX = centerInformation.width / 2;
+        const centerY = centerInformation.height / 2 + (this.sizeCoin / 2) - 20;
+        this.createExplosionParticles(centerX, centerY, 60);
+      }, 3000);
+    },
     fireSelectedOption() {
-
-      const selectedElement = this.$refs[`choise${this.selectedOption}`];
       const coinElement = this.$refs.coinElement;
-      const destinationElement = document.querySelector(window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div");
+      const walletElement = document.querySelector(window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div");
+      const walletElementBoundingRect = walletElement.getBoundingClientRect()
       const boxShowingBalanceElement = this.$refs.boxShowingBalance
       const amountBalanceElement = this.$refs.amountBalance
+      const testDetailElement = this.$refs.testDetail
+      const testDetailElementBoundingRect = testDetailElement.getBoundingClientRect()
+
       if (this.selectedOption === this.contentData.true_answer && !this.isAnswerToQuestion) {
         this.showingCoin = true
-        this.animationMovingCoin(selectedElement, coinElement, destinationElement)
-        this.animationFadeOutCoin(coinElement, destinationElement)
+        this.playSound(successSound)
+        this.animationMovingCoin(testDetailElementBoundingRect, coinElement, walletElementBoundingRect, 1)
+        this.animationFadeOutCoin(coinElement, walletElementBoundingRect)
         this.animationFadeInBoxBalance(boxShowingBalanceElement, "animate-in")
         this.animationCountingBalance(amountBalanceElement, 1)
         this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
       }
       if (this.selectedOption !== this.contentData.true_answer && !this.isAnswerToQuestion) {
         this.showingCoin = true
-        this.animationMovingCoin(destinationElement, coinElement, selectedElement)
-        this.animationFadeOutCoin(coinElement, selectedElement)
+        this.playSound(failSound)
+        this.animationMovingCoin(walletElementBoundingRect, coinElement, testDetailElementBoundingRect, -1)
+        this.animationExplodeCoin(coinElement, testDetailElementBoundingRect)
         this.animationFadeInBoxBalance(boxShowingBalanceElement, "animate-in-error")
         this.animationCountingBalance(amountBalanceElement, -1)
         this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
       }
-
 
       this.isAnswerToQuestion = true
       this.fullAnswer = 0;
@@ -536,8 +584,8 @@ p {
 
 /* flying coin */
 .flying-coin-div {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   border: 4px solid #c99001;
   background-color: #fede2f;
@@ -549,10 +597,10 @@ p {
 }
 
 .inner-coin-div {
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 2px solid #c48e00;
+  border: 4px solid #c48e00;
   background-color: #e2a900;
   display: flex;
   align-items: center;
@@ -560,7 +608,7 @@ p {
 }
 
 .text-coin {
-  font-size: 36px;
+  font-size: 24px;
   font-weight: bold;
   color: #fede2f;
   text-shadow: 3px 2px 0px #c99001;
@@ -572,7 +620,17 @@ p {
   }
 
   100% {
-    transform: translate(var(--dx), var(--dy)) scale(0.5) rotate(1440deg);
+    transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(720deg);
+  }
+}
+
+@keyframes fly-to-wallet-reverse {
+  0% {
+    transform: translate(0, 0) scale(0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(1) rotate(720deg);
   }
 }
 
@@ -588,9 +646,21 @@ p {
   }
 }
 
+@keyframes coin-pulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 @keyframes scale-and-fade-out {
   0% {
-    transform: scale(0.5);
+    transform: scale(0.3);
     opacity: 1;
   }
 
@@ -605,7 +675,31 @@ p {
 }
 
 .flying-coin-div.animate {
-  animation: fly-to-wallet 3s ease-in-out forwards, coin-glow 0.5s ease-in-out infinite;
+  animation: fly-to-wallet 3s ease-in-out forwards, coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+}
+
+.flying-coin-div.error-animate {
+  animation: fly-to-wallet-reverse 3s ease-in-out forwards, coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+}
+
+/* particle explode */
+.particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #fede2f;
+  border-radius: 50%;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1006;
+  animation: particle-fly 1.5s forwards ease-out;
+}
+
+@keyframes particle-fly {
+  to {
+    transform: translate(var(--x), var(--y)) scale(0.5);
+    opacity: 0;
+  }
 }
 
 
@@ -713,7 +807,7 @@ p {
 }
 
 @media (max-width: 1264px) {
-  .flying-coin-div {
+  /* .flying-coin-div {
     width: 40px;
     height: 40px;
   }
@@ -725,7 +819,7 @@ p {
 
   .text-coin {
     font-size: 18px;
-  }
+  } */
 
   .box-showing-balance {
     right: 20px;

@@ -250,7 +250,17 @@ export default {
           test: /\.(glsl|vs|fs|vert|frag)$/,
           loader: 'raw-loader',
           exclude: /node_modules/
-        })
+        }
+      )
+      config.module.rules.push(
+        {
+          test: /\.(mp3|wav|ogg)$/i,
+          loader: 'file-loader',
+          options: {
+            name: '[path][name].[ext]',
+          }
+        }
+      )
     }
   },
 
