@@ -119,7 +119,7 @@
         <template v-else>
           <template v-if="bookImage">
             <div
-              class="max-w-100 w-100 d-flex overflow-hideen relative w-70 mx-auto"
+              class="max-w-100 w-100 d-flex overflow-hideen relative w-60 mx-auto"
             >
               <img
                 :src="bookImage"
