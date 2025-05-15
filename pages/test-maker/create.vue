@@ -30,12 +30,13 @@
         { title: 'Header', value: 1 },
         { title: 'Tests', value: 2 },
         { title: 'Review', value: 3 },
-        { title: 'Publish', value: 4 },
+        { title: 'Publish', value: 4, disabled: tests.length < 5 },
       ]"
       v-model="test_step"
       editable
       color="teal"
       hide-actions
+      @update:model-value="handleStepChange"
     >
       <template #[`item.1`]>
         <v-card flat class="mt-4 pb-10">
@@ -241,6 +242,28 @@
           </v-row>
 
           <v-row v-show="!testListSwitch">
+            <v-col cols="12" v-if="tests.length > 0">
+              <v-alert
+                type="info"
+                variant="tonal"
+                color="teal"
+                border="start"
+                density="compact"
+              >
+                <div class="d-flex align-center justify-space-between flex-wrap">
+                  <span>{{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }} added to this exam</span>
+                  <span v-if="tests.length < 5" class="ml-2">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }} to publish</span>
+                  <span v-else class="ml-2 text-success">Ready to publish!</span>
+                </div>
+              </v-alert>
+              <v-progress-linear
+                v-model="testProgress"
+                height="8"
+                color="teal"
+                rounded
+                class="mt-2 mb-3"
+              ></v-progress-linear>
+            </v-col>
             <v-col cols="12">
               <CreateTestForm
                 ref="createForm"
@@ -334,6 +357,29 @@
                 color="orange"
                 style="font-size: 16px !important; margin-inline-end: 10px !important;"
               ></v-checkbox>
+            </v-col>
+
+            <v-col cols="12" v-if="tests.length > 0">
+              <v-alert
+                type="info"
+                variant="tonal"
+                color="teal"
+                border="start"
+                density="compact"
+              >
+                <div class="d-flex align-center justify-space-between flex-wrap">
+                  <span>{{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }} added to this exam</span>
+                  <span v-if="tests.length < 5" class="ml-2">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }} to publish</span>
+                  <span v-else class="ml-2 text-success">Ready to publish!</span>
+                </div>
+              </v-alert>
+              <v-progress-linear
+                v-model="testProgress"
+                height="8"
+                color="teal"
+                rounded
+                class="mt-2 mb-3"
+              ></v-progress-linear>
             </v-col>
 
             <v-col cols="12">
@@ -559,17 +605,17 @@
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    @click="tests.length >= 5 ? test_step = 3 : null"
+                    @click="handlePublish"
                     :disabled="tests.length < 5"
-                    :loading="test_loading"
+                    :loading="publish_loading"
                     block
                     color="teal"
                     class="text-white"
                     size="large"
                     style="text-transform: none; font-size: 13px; font-weight: 500;"
                   >
-                    <span v-if="tests.length < 5">Add at least {{ 5 - tests.length }} more tests</span>
-                    <span v-else>Next step</span>
+                    <span v-if="tests.length < 5">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }}</span>
+                    <span v-else>Publish</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -632,6 +678,22 @@
               </v-row>
             </v-col>
 
+            <v-col cols="12" v-if="tests.length < 5">
+              <v-alert
+                type="warning"
+                variant="tonal"
+                color="amber-darken-2"
+                border="start"
+                density="compact"
+                class="mb-4"
+              >
+                <div class="d-flex align-center">
+                  <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
+                  <span>You need at least 5 tests to publish this exam. Currently have {{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }}.</span>
+                </div>
+              </v-alert>
+            </v-col>
+
             <v-col cols="12">
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
@@ -650,11 +712,11 @@
                     "
                     density="compact"
                   >
-                    <span v-show="tests.length < 5">Add at least {{ 5 - tests.length }} more tests</span>
-                    <span v-show="tests.length >= 5">Publish</span>
+                    <span v-if="tests.length < 5">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }}</span>
+                    <span v-else>Publish</span>
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="6" class="pb-0">
+                <v-col cols="12" md="6">
                   <v-btn
                     block
                     variant="outlined"
@@ -897,6 +959,9 @@ import draggable from "vuedraggable";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import CreateTestForm from "~/components/test-maker/create-test-form.vue";
 
+// Get Nuxt app instance for accessing plugins like toast
+const nuxtApp = useNuxtApp();
+
 // Define validation rules
 defineRule("required", required);
 
@@ -1051,14 +1116,27 @@ const holding_level_list = [
   { id: 4, title: "Country" },
 ];
 
-// Compute the test share link based on the route params
-const test_share_link = computed(() => {
-  if (process.server) {
-    // Return a consistent value during SSR to avoid hydration mismatch
-    return `/exam/${exam_id.value || ""}`;
+// Create a ref for the share link instead of a computed property
+const test_share_link = ref("");
+
+// Update the share link when exam_id changes
+watch(() => exam_id.value, (newExamId) => {
+  if (newExamId) {
+    test_share_link.value = `${window.location.origin}/exam/${newExamId}`;
+  } else {
+    test_share_link.value = "";
   }
-  // Only use window.location on client side
-  return `${window.location.origin}/exam/${exam_id.value || ""}`;
+});
+
+// Compute the progress percentage for tests added (0-100%)
+const testProgress = computed(() => {
+  const minRequired = 5;
+  const currentCount = tests.value.length;
+  
+  // Calculate percentage, capped at 100%
+  const percentage = Math.min((currentCount / minRequired) * 100, 100);
+  
+  return percentage;
 });
 
 // Generate title function
@@ -1149,8 +1227,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       generateTitle();
     }
   } catch (err) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error loading data");
+    nuxtApp.$toast.error(err.message || "Error loading data");
     console.error(err);
   }
 };
@@ -1206,8 +1283,7 @@ const submitQuestion = async () => {
       },
     });
 
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Exam created successfully");
+    nuxtApp.$toast.success("Exam created successfully");
 
     exam_id.value = response.data.id;
     exam_code.value = response.data.code;
@@ -1220,17 +1296,15 @@ const submitQuestion = async () => {
       currentExamCode: exam_code.value,
     };
 
-    // Update create form component with new exam info
-    if (createForm.value) {
+    // Update create form component with new exam info if it exists
+    if (createForm.value && typeof createForm.value.getCurrentExamInfo === 'function') {
       createForm.value.getCurrentExamInfo();
     }
     
-    // Advance to step 2 for adding tests
+    // Move to the next step
     test_step.value = 2;
   } catch (error) {
-    const { $toast } = useNuxtApp();
-    if ($toast)
-      $toast.error(error.response?.data?.message || "Error creating exam");
+    nuxtApp.$toast.error(error.response?.data?.message || "Error creating exam");
   } finally {
     submit_loading.value = false;
   }
@@ -1254,44 +1328,30 @@ const encode = (s) => {
 
 const copyUrl = () => {
   navigator.clipboard.writeText(test_share_link.value);
-  const { $toast } = useNuxtApp();
-  if ($toast) $toast.success("Copied");
+  nuxtApp.$toast.success("Copied to clipboard");
 };
 
-const uploadFile = async (files) => {
-  // For v-file-input in Vue 3, files can be an array or single file object
-  // Get the actual file from either an array or direct file object
-  const fileToUpload = Array.isArray(files) ? files[0] : files;
+const uploadFile = async (file_name) => {
+  if (!file_original.value) return;
 
-  if (!fileToUpload) {
-    console.error("No file found to upload");
-    return;
-  }
-
-  const { $toast } = useNuxtApp();
-
-  // Create a FormData object for the file upload
-  const formData = new FormData();
-  formData.append("file", fileToUpload);
-
+  let formData = new FormData();
+  formData.append("file", file_original.value);
+  
   try {
-    // Using async/await with proper error handling
     const response = await $fetch("/api/v1/upload", {
       method: "POST",
       body: formData,
     });
 
-    // Check if we have a valid response with file data
-    if (response?.data?.[0]?.file?.name) {
+    if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
-      if ($toast) $toast.success("File uploaded successfully");
+      nuxtApp.$toast.success("File uploaded successfully");
     } else {
-      if ($toast) $toast.error("Invalid response from server");
-      console.error("Invalid upload response:", response);
+      nuxtApp.$toast.error("Invalid response from server");
     }
   } catch (err) {
-    if ($toast) $toast.error("Failed to upload file");
-    console.error("File upload error:", err);
+    nuxtApp.$toast.error("Failed to upload file");
+    console.error(err);
   }
 };
 
@@ -1302,21 +1362,18 @@ const publishTest = async () => {
     const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${userToken.value}`
-      }
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
 
-    if ( response.data.message === "done") {
-      // Only use window.location on client side
-      test_share_link.value = `${
-        process.client ? window.location.origin : ""
-      }/exam/${exam_id.value}`;
-
-      // Reset values
+    if (response.data?.message === "done") {
+      nuxtApp.$toast.success("Exam published successfully");
+      
+      // Reset state
       exam_id.value = "";
       exam_code.value = "";
 
-      // Reset state in user state
+      // Update store
       const userState = useState("user");
       userState.value = {
         ...userState.value,
@@ -1324,31 +1381,18 @@ const publishTest = async () => {
         currentExamCode: "",
       };
 
-      // Reset component data
+      // Reset data
       previewTestList.value = [];
       tests.value = [];
 
-      // Reset form
-      form.section = "";
-      grade_list.value = [];
-      lesson_list.value = [];
-      topic_list.value = [];
-
-      form.exam_type = "";
-      form.duration = 3;
-      form.title = "";
-      form.file_original = "";
-
-      // Advance to the publish completed step
+      // Clear form data
+      resetForm();
+      
+      // Navigate to publish step
       test_step.value = 4;
-
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Exam published successfully");
     }
   } catch (err) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error publishing exam");
-    console.error("Error publishing exam:", err);
+    nuxtApp.$toast.error(err.message || "Error publishing exam");
   } finally {
     publish_loading.value = false;
   }
@@ -1372,10 +1416,9 @@ const checkActiveParam = () => {
 
 // Submit tests to the exam
 const submitTest = async () => {
-  if (tests.value.length === 0) return;
+  if (!tests.value.length) return;
 
-  // Create FormData to send the list of test IDs
-  const formData = new FormData();
+  let formData = new FormData();
   for (let i = 0; i < tests.value.length; i++) {
     formData.append("tests[]", tests.value[i]);
   }
@@ -1385,89 +1428,101 @@ const submitTest = async () => {
       method: "PUT",
       body: urlencodeFormData(formData),
       headers: {
-        Authorization: `Bearer ${userToken.value}`,
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
-    // Get current exam tests after submission to update the preview
-    await getExamCurrentTests();
-    
-    // Update the test count in create-test-form component if it exists
-    if (createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Tests added to exam successfully");
+    // Reload the exam tests
+    getExamCurrentTests();
+    nuxtApp.$toast.success("Tests added to exam successfully");
   } catch (err) {
-    console.error("Error submitting tests:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error updating exam tests");
+    nuxtApp.$toast.error(err.message || "Error updating exam tests");
   }
 };
 
 // Get current tests for the exam
 const getExamCurrentTests = async () => {
+  test_loading.value = true;
+  
   try {
     const response = await $fetch("/api/v1/examTests", {
       method: "GET",
       params: {
         exam_id: exam_id.value,
       },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`
-      }
     });
 
-    if (response && response.data && response.data.list) {
       previewTestList.value = response.data.list;
-    }
 
-    // Update the test count in create-test-form component if it exists
-    if (createForm.value) {
+    // If we have a create form reference, update its exam test list length
+    if (createForm.value && 'examTestListLength' in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
+    
+    // If we have test items, render MathJax on them
+    if (previewTestList.value.length) {
+      nextTick(() => {
+        renderMathJax();
+      });
+    }
   } catch (err) {
-    console.error("Error getting exam tests:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to load exam tests");
+    nuxtApp.$toast.error("Failed to load exam tests");
+  } finally {
+    test_loading.value = false;
   }
 };
 
 // Get current exam information
 const getCurrentExamInfo = async () => {
-  // Get current exam ID from useState
+  // Check if we have an exam ID in the user state
   const userState = useState("user");
-  const currentExamId = userState.value?.currentExamId;
-
-  if (currentExamId) {
-    exam_id.value = currentExamId;
-    exam_code.value = userState.value?.currentExamCode || "";
+  
+  if (userState.value?.currentExamId) {
+    exam_id.value = userState.value.currentExamId;
+    exam_code.value = userState.value.currentExamCode;
+    
+    // Move to step 2 for tests
     test_step.value = 2;
-
+    
     try {
       const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
         headers: {
-          Authorization: `Bearer ${userToken.value}`
-        }
+          Authorization: `Bearer ${userToken.value}`,
+        },
       });
-
-      tests.value = response.data.tests.length ? response.data.tests : [];
-
+      
+      // Set tests array from response
+      if (response.data?.tests?.length) {
+        tests.value = response.data.tests;
+      } else {
+        tests.value = [];
+      }
+      
+      // Update form from response data
       form.section = response.data.section;
       form.base = response.data.base;
       form.lesson = response.data.lesson;
-      file_original_path.value = response.data.file_original;
-
-      // If we have test data, get the tests
-      if (tests.value.length) {
-        getExamCurrentTests();
+      
+      // Set file path if available
+      if (response.data.file_original) {
+        file_original_path.value = response.data.file_original;
+      }
+      
+      // Load dependent data
+      if (form.section) {
+        await getTypeList("base", form.section);
+      }
+      
+      if (form.base) {
+        await getTypeList("lesson", form.base);
+      }
+      
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
       }
     } catch (err) {
-      console.error("Error getting exam info:", err);
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("Failed to load exam information");
+      nuxtApp.$toast.error("Failed to load exam information");
     }
   }
 };
@@ -1507,8 +1562,7 @@ const applyTest = async (item, type) => {
     tests.value.splice(tests.value.indexOf(item.id), 1);
     
     // Notify user of removal
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.info("Test removed from exam");
+    nuxtApp.$toast.info("Test removed from exam");
     
     // Update in the backend
     await submitTest();
@@ -1517,8 +1571,7 @@ const applyTest = async (item, type) => {
     tests.value.push(item.id);
     
     // Notify user of addition
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Test added to exam");
+    nuxtApp.$toast.success("Test added to exam");
     
     // Update in the backend
     await submitTest();
@@ -1542,8 +1595,7 @@ watch(
       await submitTest();
       
       // Notify user
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("New test added to exam");
+      nuxtApp.$toast.success("New test added to exam");
     }
   }
 );
@@ -1555,7 +1607,8 @@ watch(
       await getTypeList("base", val);
       filter.section = val; // Init second level filter
 
-      if (createForm.value) {
+      // Ensure createForm.value and createForm.value.form exist before updating
+      if (createForm.value && createForm.value.form) {
         createForm.value.form.section = val;
       }
 
@@ -1573,7 +1626,8 @@ watch(
       await getTypeList("lesson", val);
       filter.base = val; // Init second level filter
 
-      if (createForm.value) {
+      // Ensure createForm.value and createForm.value.form exist before updating
+      if (createForm.value && createForm.value.form) {
         createForm.value.form.base = val;
       }
 
@@ -1602,7 +1656,8 @@ watch(
 
     filter.lesson = val; // Init second level filter
 
-    if (createForm.value) {
+    // Ensure createForm.value and createForm.value.form exist before updating
+    if (createForm.value && createForm.value.form) {
       createForm.value.form.lesson = val;
     }
 
@@ -1659,11 +1714,7 @@ watch(
     filter.page = 1;
     test_list.value = [];
     all_tests_loaded.value = false;
-
-    if (val) {
-      // Only fetch if we have a lesson selected
       getExamTests();
-    }
   }
 );
 
@@ -1727,28 +1778,62 @@ watch(
   { deep: true }
 );
 
-// Initialize on mount
+// Initialize component on mount
 onMounted(async () => {
+  // Get user token
+  const auth = useAuth();
   userToken.value = auth.getUserToken();
-
+  
+  // Initialize data
   await getCurrentExamInfo();
-  await getExamTests();
   await getTypeList("section");
-
-  if (form.base) {
+  
+  // Conditionally load data based on URL parameters
+  if (form.section) {
     await getTypeList("base", form.section);
   }
-
-  if (form.lesson) {
+  
+  if (form.base) {
     await getTypeList("lesson", form.base);
+  }
+  
+  if (form.lesson) {
+    await getTypeList("lesson", form.lesson);
     await getTypeList("topic", form.lesson);
   }
-
+  
+  // Get type lists
   await getTypeList("exam_type");
   await getTypeList("state");
-
-  // Check active query parameter
-  checkActiveParam();
+  
+  // Load tests if needed
+  await getExamTests();
+  
+  // If we have an exam ID, get its tests and initialize share link
+  if (exam_id.value) {
+    await getExamCurrentTests();
+    test_share_link.value = `${window.location.origin}/exam/${exam_id.value}`;
+  }
+  
+  // MathJax rendering
+  renderMathJax();
+  
+  // Check active tab from route and enable it
+  if (route.query?.active === "test_list") {
+    test_step.value = 2;
+    testListSwitch.value = true;
+  } else if (route.query?.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
+  }
+  
+  // Show welcome toast
+  setTimeout(() => {
+    nuxtApp.$toast.info("Welcome to the exam creator");
+  }, 500);
 });
 
 // Open delete confirmation dialog
@@ -1766,8 +1851,7 @@ const deleteExamTest = async () => {
       method: "DELETE",
     });
 
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Deleted successfully");
+    nuxtApp.$toast.success("Deleted successfully");
 
     // Remove from tests array
     const index = tests.value.findIndex(
@@ -1782,8 +1866,7 @@ const deleteExamTest = async () => {
     test_list.value = [];
     getExamTests();
   } catch (err) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error deleting test");
+    nuxtApp.$toast.error(err.message || "Error deleting test");
     console.error("Error deleting exam test:", err);
   } finally {
     delete_exam_test_loading.value = false;
@@ -1828,7 +1911,8 @@ const getExamTests = async () => {
       }
     }
 
-    if (createForm.value) {
+    // Update createForm if it exists and has examTestListLength property
+    if (createForm.value && 'examTestListLength' in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
   } catch (err) {
@@ -1851,6 +1935,8 @@ const deleteOnlineExam = async () => {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "DELETE",
     });
+
+    nuxtApp.$toast.success("Deleted successfully");
 
     // Reset all values
     exam_id.value = "";
@@ -1879,12 +1965,8 @@ const deleteOnlineExam = async () => {
 
     // Reset to first step
     test_step.value = 1;
-
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Deleted successfully");
   } catch (err) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error deleting exam");
+    nuxtApp.$toast.error(err.message || "Error deleting exam");
     console.error("Error deleting exam:", err);
   } finally {
     deleteLoading.value = false;
@@ -1895,30 +1977,207 @@ const deleteOnlineExam = async () => {
 // Form validation helper
 const validateHeaderForm = () => {
   // Check required fields
-  const requiredFields = {
-    section: "Board",
-    base: "Grade",
-    lesson: "Subject",
-    title: "Title"
-  };
-  
-  // Check each required field
-  for (const [field, label] of Object.entries(requiredFields)) {
-    if (!form[field]) {
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error(`${label} is required`);
-      return false;
-    }
+  if (!form.section) {
+    nuxtApp.$toast.error("Board is required");
+    return false;
   }
   
-  // Check topics
-  if (!form.topics.length) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Please select at least one topic");
+  if (!form.base) {
+    nuxtApp.$toast.error("Grade is required");
+      return false;
+    }
+  
+  if (!form.lesson) {
+    nuxtApp.$toast.error("Subject is required");
+    return false;
+  }
+  
+  if (!form.topics || form.topics.length === 0) {
+    nuxtApp.$toast.error("Please select at least one topic");
+    return false;
+  }
+  
+  if (!form.title) {
+    nuxtApp.$toast.error("Title is required");
+    return false;
+  }
+  
+  if (!form.duration) {
+    nuxtApp.$toast.error("Test duration is required");
     return false;
   }
   
   return true;
+};
+
+// Handle stepper navigation to validate steps
+const handleStepChange = (newStep) => {
+  // Don't allow changing to step 4 (Publish) if we don't have enough tests
+  if (newStep === 4 && tests.value.length < 5) {
+    nuxtApp.$toast.error(`You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`);
+    
+    // Revert to step 3 (Review)
+    test_step.value = 3;
+    return;
+  }
+  
+  // Prevent skipping to step 3 or 4 if exam hasn't been created yet
+  if ((newStep === 3 || newStep === 4) && !exam_id.value) {
+    nuxtApp.$toast.error("Please complete the Header step first");
+    
+    // Revert to step 1 (Header)
+    test_step.value = 1;
+    return;
+  }
+  
+  // Prevent access to step 4 directly from step 1 or 2
+  if (newStep === 4 && test_step.value < 3) {
+    nuxtApp.$toast.error("Please review your exam before publishing");
+    
+    // Go to step 3 (Review) instead
+    test_step.value = 3;
+    return;
+  }
+  
+  // If all validations pass, update the step
+  test_step.value = newStep;
+  
+  // Show step change notification
+  if (newStep !== test_step.value) {
+    const stepNames = {
+      1: "Header",
+      2: "Tests",
+      3: "Review",
+      4: "Publish"
+    };
+    nuxtApp.$toast.info(`Navigated to ${stepNames[newStep]} step`);
+  }
+};
+
+/**
+ * Reset form fields to initial state
+ */
+const resetForm = () => {
+  // Reset all form fields
+  form.section = "";
+  form.base = "";
+  form.lesson = "";
+  form.topics = [];
+  form.exam_type = "";
+  form.level = "2";
+  form.holding_time = false;
+  form.state = "";
+  form.area = "";
+  form.school = "";
+  form.duration = 3;
+  form.title = "";
+  form.negative_point = false;
+  form.file_original = "";
+  form.paperID = "";
+  form.edu_year = "";
+  form.edu_month = "";
+  
+  // Reset data lists that are dependent on form fields
+  grade_list.value = [];
+  lesson_list.value = [];
+  topic_list.value = [];
+  
+  // Reset file inputs
+  file_original.value = null;
+  file_original_path.value = "";
+};
+
+/**
+ * Reset all data (used after deletion)
+ */
+const resetAllData = () => {
+  // Reset form
+  resetForm();
+  
+  // Reset exam data
+  exam_id.value = "";
+  exam_code.value = "";
+  
+  // Reset tests
+  tests.value = [];
+  previewTestList.value = [];
+  
+  // Reset state in user store
+  const userState = useState("user");
+  userState.value = {
+    ...userState.value,
+    currentExamId: "",
+    currentExamCode: "",
+  };
+  
+  // Reset UI state - make sure both createForm.value and its properties exist
+  if (createForm.value) {
+    // Set file_original_path if it exists as a property
+    if ('file_original_path' in createForm.value) {
+    createForm.value.file_original_path = "";
+    }
+    
+    // Set examTestListLength if it exists as a property
+    if ('examTestListLength' in createForm.value) {
+    createForm.value.examTestListLength = 0;
+    }
+  }
+};
+
+// Add a new function to help users understand how many tests are needed
+const goToNextStep = () => {
+  if (tests.value.length < 5) {
+    nuxtApp.$toast.warning(`You need at least 5 tests to proceed. Currently have ${tests.value.length}. Add ${5 - tests.value.length} more.`);
+    return;
+  }
+  
+  test_step.value = 3;
+  nuxtApp.$toast.success("Moving to Review step");
+};
+
+/**
+ * Check if exam is ready to be published
+ */
+const checkPublishReadiness = () => {
+  if (tests.value.length < 5) {
+    nuxtApp.$toast.error(`You need at least 5 tests to publish. Currently have ${tests.value.length}`);
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Wrapper for publish function with validation
+ */
+const handlePublish = () => {
+  if (checkPublishReadiness()) {
+    publishTest();
+  }
+};
+
+/**
+ * Render MathJax on the page
+ * This function processes math notation in elements with the mathJaxEl ref
+ */
+const renderMathJax = () => {
+  // Check if MathJax is available globally
+  if (typeof window !== 'undefined' && window.MathJax) {
+    nextTick(() => {
+      if (mathJaxEl.value) {
+        // If mathJaxEl is an array (multiple elements with same ref)
+        if (Array.isArray(mathJaxEl.value)) {
+          mathJaxEl.value.forEach(el => {
+            if (el) window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
+          });
+        } else {
+          // Single element
+          window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+        }
+      }
+    });
+  } else {
+    console.warn('MathJax not available');
+  }
 };
 </script>
 
