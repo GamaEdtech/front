@@ -1,8 +1,28 @@
 <template>
-  <div id="test-details">
+  <div id="test-details" ref="testDetail">
+    <!-- Start : Flying Coin -->
+    <div class="flying-coin-div" v-show="showingCoin" ref="coinElement">
+      <div class="inner-coin-div">
+        <span class="text-coin">$GET</span>
+      </div>
+    </div>
+    <!-- End : Flying Coin -->
+
     <!--  Start: detail  -->
     <section>
-      <v-container class="py-0">
+      <v-container class="py-0 relation-position">
+        <!-- Start : Box Showing Balance -->
+        <div
+          class="box-showing-balance"
+          v-show="showBoxBalance"
+          ref="boxShowingBalance"
+        >
+          <span class="title-balance">$GET: </span>
+          <span class="amount-balance" ref="amountBalance">{{
+            Number(balance).toFixed(8)
+          }}</span>
+        </div>
+        <!-- End : Box Showing Balance -->
         <div class="detail mt-md-4">
           <v-row>
             <v-col cols="12" md="12" class="pt-lg-0">
@@ -85,7 +105,7 @@
                           }"
                         >
                           <template slot="label">
-                            <div class="answer">
+                            <div ref="choise1" class="answer">
                               <p>
                                 <v-icon
                                   v-show="isCorrectAnswer(1)"
@@ -122,7 +142,7 @@
                           }"
                         >
                           <template slot="label">
-                            <div class="answer">
+                            <div ref="choise2" class="answer">
                               <v-icon
                                 v-show="isCorrectAnswer(2)"
                                 color="success"
@@ -158,7 +178,7 @@
                           }"
                         >
                           <template slot="label">
-                            <div class="answer">
+                            <div ref="choise3" class="answer">
                               <v-icon
                                 v-show="isCorrectAnswer(3)"
                                 color="success"
@@ -194,7 +214,7 @@
                           }"
                         >
                           <template slot="label">
-                            <div class="answer">
+                            <div ref="choise4" class="answer">
                               <v-icon
                                 v-show="isCorrectAnswer(4)"
                                 color="success"
@@ -298,6 +318,8 @@
 </template>
 <script>
 import CrashReport from "~/components/common/crash-report.vue";
+import successSound from "@/assets/sounds/success.mp3";
+import failSound from "@/assets/sounds/fail.mp3";
 
 export default {
   name: "test-details",
@@ -391,6 +413,11 @@ export default {
       },
     ],
     nextTestLoading: false,
+    showingCoin: false,
+    balance: "0.0000001",
+    showBoxBalance: true,
+    isAnswerToQuestion: false,
+    sizeCoin: 120,
   }),
 
   watch: {},
@@ -422,7 +449,245 @@ export default {
         this.renderMathJax();
       }, 100);
     },
+    // incresing balanceChangeDirection  = 1, decreasing balanceChangeDirection  = -1
+    animationMovingCoin(
+      startInformation,
+      coinElement,
+      endInformation,
+      balanceChangeDirection
+    ) {
+      coinElement.style.top = `${
+        startInformation.top + startInformation.height / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.style.left = `${
+        startInformation.left + startInformation.width / 2 - this.sizeCoin / 2
+      }px`;
+      let dx;
+      let dy;
+      if (balanceChangeDirection == 1) {
+        dx =
+          endInformation.left -
+          startInformation.width / 2 +
+          endInformation.width / 2;
+        dy =
+          endInformation.top -
+          startInformation.height / 2 +
+          endInformation.height / 2 -
+          startInformation.top;
+      } else {
+        dx =
+          endInformation.width / 2 -
+          startInformation.left -
+          startInformation.width / 2;
+        dy =
+          endInformation.height / 2 -
+          startInformation.height / 2 +
+          endInformation.top / 2 -
+          startInformation.top;
+      }
+
+      coinElement.style.setProperty("--dx", `${dx}px`);
+      coinElement.style.setProperty("--dy", `${dy}px`);
+
+      coinElement.classList.remove("animate", "fade-out", "error-animate");
+      if (balanceChangeDirection == 1) {
+        coinElement.classList.add("animate");
+      } else {
+        coinElement.classList.add("error-animate");
+      }
+    },
+    animationFadeOutCoin(coinElement, endInformation) {
+      setTimeout(() => {
+        coinElement.style.top = `${
+          endInformation.top + endInformation.height / 2 - this.sizeCoin / 2
+        }px`;
+        coinElement.style.left = `${
+          endInformation.left + endInformation.width / 2 - this.sizeCoin / 2
+        }px`;
+        coinElement.classList.remove("animate");
+        coinElement.classList.add("fade-out");
+      }, 3000);
+    },
+    animationFadeInBoxBalance(
+      coinElement,
+      boxShowingBalanceElement,
+      nameAnimation
+    ) {
+      setTimeout(() => {
+        this.showingCoin = false;
+        coinElement.classList.remove("fade-out");
+        this.showBoxBalance = true;
+        boxShowingBalanceElement.classList.add(nameAnimation);
+      }, 4000);
+    },
+    // incresing balanceChangeDirection  = 1, decreasing balanceChangeDirection  = -1
+    animationCountingBalance(amountBalanceElement, balanceChangeDirection) {
+      setTimeout(() => {
+        const startValue = Number(this.balance);
+        const displacementAmount = 0.0000004;
+        const endValue = parseFloat(
+          (startValue + displacementAmount * balanceChangeDirection).toFixed(8)
+        );
+        const duration = 1000;
+        const stepTime = 30;
+        let current = startValue;
+        const steps = Math.ceil(duration / stepTime);
+        const amountStep = Math.abs(endValue - startValue) / steps;
+        amountBalanceElement.classList.add(
+          "pulsing",
+          balanceChangeDirection == 1 ? "increasing" : "decreasing"
+        );
+
+        const counter = setInterval(() => {
+          current = current + balanceChangeDirection * amountStep;
+          if (current >= endValue && balanceChangeDirection == 1) {
+            current = endValue;
+            clearInterval(counter);
+          }
+
+          if (current <= endValue && balanceChangeDirection == -1) {
+            current = endValue;
+            clearInterval(counter);
+          }
+
+          this.balance = parseFloat(current.toFixed(8));
+        }, stepTime);
+      }, 4600);
+    },
+    animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement) {
+      setTimeout(() => {
+        amountBalanceElement.classList.remove(
+          "pulsing",
+          "decreasing",
+          "increasing"
+        );
+        boxShowingBalanceElement.classList.remove(
+          "animate-in",
+          "animate-in-error"
+        );
+        boxShowingBalanceElement.classList.add("animate-out");
+      }, 7000);
+
+      setTimeout(() => {
+        boxShowingBalanceElement.classList.remove("animate-out");
+        this.showBoxBalance = false;
+      }, 7500);
+    },
+
+    playSound(sound) {
+      const audio = new Audio(sound);
+      audio.play().catch((e) => {
+        console.warn("Failed to play audio:", e);
+      });
+    },
+
+    createExplosionParticles(x, y, count = 30) {
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement("div");
+        particle.classList.add("particle");
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = Math.random() * 150;
+
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
+        particle.style.setProperty("--x", `${dx}px`);
+        particle.style.setProperty("--y", `${dy}px`);
+
+        document.body.appendChild(particle);
+        particle.addEventListener("animationend", () => {
+          particle.remove();
+        });
+      }
+    },
+
+    animationExplodeCoin(coinElement, centerInformation) {
+      setTimeout(() => {
+        coinElement.classList.remove("error-animate");
+        coinElement.style.opacity = 0;
+        const centerX = centerInformation.width / 2;
+        const centerY = centerInformation.height / 2 + this.sizeCoin / 2 - 20;
+        this.createExplosionParticles(centerX, centerY, 60);
+      }, 3000);
+    },
+    animationPulseHeart(startInformation, coinElement) {
+      coinElement.style.top = `${
+        startInformation.top + startInformation.height / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.style.left = `${
+        startInformation.left + startInformation.width / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.classList.remove("animate", "fade-out", "pulse");
+      coinElement.classList.add("pulse");
+    },
     fireSelectedOption() {
+      const coinElement = this.$refs.coinElement;
+      const walletElement = document.querySelector(
+        window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div"
+      );
+      const walletElementBoundingRect = walletElement.getBoundingClientRect();
+      const boxShowingBalanceElement = this.$refs.boxShowingBalance;
+      const amountBalanceElement = this.$refs.amountBalance;
+      const testDetailElement = this.$refs.testDetail;
+      const testDetailElementBoundingRect =
+        testDetailElement.getBoundingClientRect();
+
+      if (
+        this.selectedOption === this.contentData.true_answer &&
+        !this.isAnswerToQuestion
+      ) {
+        this.showingCoin = true;
+        this.playSound(successSound);
+        this.animationPulseHeart(testDetailElementBoundingRect, coinElement);
+        setTimeout(() => {
+          coinElement.classList.remove("pulse");
+          this.animationMovingCoin(
+            testDetailElementBoundingRect,
+            coinElement,
+            walletElementBoundingRect,
+            1
+          );
+          this.animationFadeOutCoin(coinElement, walletElementBoundingRect);
+          this.animationFadeInBoxBalance(
+            coinElement,
+            boxShowingBalanceElement,
+            "animate-in"
+          );
+          this.animationCountingBalance(amountBalanceElement, 1);
+          this.animationFadeOutBoxBalance(
+            amountBalanceElement,
+            boxShowingBalanceElement
+          );
+        }, 1000);
+      }
+      if (
+        this.selectedOption !== this.contentData.true_answer &&
+        !this.isAnswerToQuestion
+      ) {
+        this.showingCoin = true;
+        this.playSound(failSound);
+        this.animationMovingCoin(
+          walletElementBoundingRect,
+          coinElement,
+          testDetailElementBoundingRect,
+          -1
+        );
+        this.animationExplodeCoin(coinElement, testDetailElementBoundingRect);
+        this.animationFadeInBoxBalance(
+          coinElement,
+          boxShowingBalanceElement,
+          "animate-in-error"
+        );
+        this.animationCountingBalance(amountBalanceElement, -1);
+        this.animationFadeOutBoxBalance(
+          amountBalanceElement,
+          boxShowingBalanceElement
+        );
+      }
+
+      this.isAnswerToQuestion = true;
       this.fullAnswer = 0;
     },
     loadNextTest() {
@@ -507,14 +772,18 @@ p {
 }
 
 .true-answer {
-  border: 1px solid #4caf50; /* Green background color */
-  color: white !important; /* White text color */
+  border: 1px solid #4caf50;
+  /* Green background color */
+  color: white !important;
+  /* White text color */
   border-radius: 10px;
 }
 
 .false-answer {
-  border: 1px solid #f44336; /* Red background color */
-  color: white !important; /* White text color */
+  border: 1px solid #f44336;
+  /* Red background color */
+  color: white !important;
+  /* White text color */
   border-radius: 10px;
 }
 
@@ -527,5 +796,262 @@ p {
 
 .answer-img {
   max-height: 15rem;
+}
+
+/* flying coin */
+.flying-coin-div {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #c99001;
+  background-color: #fede2f;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1005;
+}
+
+.inner-coin-div {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #c48e00;
+  background-color: #e2a900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-coin {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fede2f;
+  text-shadow: 3px 2px 0px #c99001;
+}
+
+@keyframes fly-to-wallet {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(720deg);
+  }
+}
+
+@keyframes fly-to-wallet-reverse {
+  0% {
+    transform: translate(0, 0) scale(0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(1) rotate(720deg);
+  }
+}
+
+@keyframes coin-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0px #fede2f;
+  }
+
+  50% {
+    box-shadow: 0 0 20px #fff94a, 0 0 30px #ffd700;
+  }
+}
+
+@keyframes coin-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-and-fade-out {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes coin-pulse-center {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.7);
+  }
+}
+
+.flying-coin-div.pulse {
+  animation: coin-pulse-center 0.5s ease-in-out 2;
+}
+
+.flying-coin-div.fade-out {
+  animation: scale-and-fade-out 1s ease-out forwards;
+}
+
+.flying-coin-div.animate {
+  animation: fly-to-wallet 3s ease-in-out forwards,
+    coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+}
+
+.flying-coin-div.error-animate {
+  animation: fly-to-wallet-reverse 3s ease-in-out forwards,
+    coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+}
+
+/* particle explode */
+.particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #fede2f;
+  border-radius: 50%;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1006;
+  animation: particle-fly 1.5s forwards ease-out;
+}
+
+@keyframes particle-fly {
+  to {
+    transform: translate(var(--x), var(--y)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Box Showing Balance */
+@keyframes show-balance-box {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes animateOut {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+.box-showing-balance {
+  padding: 10px 20px;
+  border: 2px solid #ffb600;
+  border-radius: 10px;
+  position: absolute;
+  right: 60px;
+  top: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 20px;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: border 0.5s ease;
+  z-index: 3;
+  max-width: 300px;
+}
+
+.box-showing-balance.animate-in {
+  animation: show-balance-box 0.6s ease-out forwards;
+  border: 2px solid green;
+  background-color: rgb(197 248 197 / 76%);
+}
+
+.box-showing-balance.animate-out {
+  animation: animateOut 0.5s ease forwards;
+}
+
+.box-showing-balance.animate-in-error {
+  animation: show-balance-box 0.6s ease-out forwards;
+  border: 2px solid red;
+  background-color: rgba(255, 199, 199, 0.76);
+}
+
+.title-balance {
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+}
+
+.amount-balance {
+  font-size: 20px;
+  font-weight: 700;
+  color: black;
+}
+
+.amount-balance.increasing {
+  color: green;
+}
+
+.amount-balance.decreasing {
+  color: red;
+}
+
+@keyframes pulse-scale {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.amount-balance.pulsing {
+  animation: pulse-scale 0.3s ease-in-out infinite;
+}
+
+.relation-position {
+  position: relative;
+}
+
+@media (max-width: 1264px) {
+  /* .flying-coin-div {
+    width: 40px;
+    height: 40px;
+  }
+
+  .inner-coin-div {
+    width: 20px;
+    height: 20px;
+  }
+
+  .text-coin {
+    font-size: 18px;
+  } */
+
+  .box-showing-balance {
+    right: 20px;
+    top: 20px;
+  }
 }
 </style>
