@@ -354,9 +354,10 @@ export default {
         coinElement.classList.add('fade-out');
       }, 3000);
     },
-    animationFadeInBoxBalance(boxShowingBalanceElement, nameAnimation) {
+    animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, nameAnimation) {
       setTimeout(() => {
         this.showingCoin = false;
+        coinElement.classList.remove('fade-out');
         this.showBoxBalance = true;
         boxShowingBalanceElement.classList.add(nameAnimation);
       }, 4000);
@@ -442,6 +443,12 @@ export default {
         this.createExplosionParticles(centerX, centerY, 60);
       }, 3000);
     },
+    animationPulseHeart(startInformation, coinElement) {
+      coinElement.style.top = `${startInformation.top + (startInformation.height / 2) - (this.sizeCoin / 2)}px`;
+      coinElement.style.left = `${startInformation.left + (startInformation.width / 2) - (this.sizeCoin / 2)}px`;
+      coinElement.classList.remove('animate', 'fade-out', 'pulse');
+      coinElement.classList.add('pulse');
+    },
     fireSelectedOption() {
       const coinElement = this.$refs.coinElement;
       const walletElement = document.querySelector(window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div");
@@ -454,18 +461,22 @@ export default {
       if (this.selectedOption === this.contentData.true_answer && !this.isAnswerToQuestion) {
         this.showingCoin = true
         this.playSound(successSound)
-        this.animationMovingCoin(testDetailElementBoundingRect, coinElement, walletElementBoundingRect, 1)
-        this.animationFadeOutCoin(coinElement, walletElementBoundingRect)
-        this.animationFadeInBoxBalance(boxShowingBalanceElement, "animate-in")
-        this.animationCountingBalance(amountBalanceElement, 1)
-        this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
+        this.animationPulseHeart(testDetailElementBoundingRect, coinElement)
+        setTimeout(() => {
+          coinElement.classList.remove('pulse');
+          this.animationMovingCoin(testDetailElementBoundingRect, coinElement, walletElementBoundingRect, 1)
+          this.animationFadeOutCoin(coinElement, walletElementBoundingRect)
+          this.animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, "animate-in")
+          this.animationCountingBalance(amountBalanceElement, 1)
+          this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
+        }, 1000);
       }
       if (this.selectedOption !== this.contentData.true_answer && !this.isAnswerToQuestion) {
         this.showingCoin = true
         this.playSound(failSound)
         this.animationMovingCoin(walletElementBoundingRect, coinElement, testDetailElementBoundingRect, -1)
         this.animationExplodeCoin(coinElement, testDetailElementBoundingRect)
-        this.animationFadeInBoxBalance(boxShowingBalanceElement, "animate-in-error")
+        this.animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, "animate-in-error")
         this.animationCountingBalance(amountBalanceElement, -1)
         this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
       }
@@ -668,6 +679,22 @@ p {
     transform: scale(0);
     opacity: 0;
   }
+}
+
+@keyframes coin-pulse-center {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.7);
+  }
+}
+
+.flying-coin-div.pulse {
+  animation: coin-pulse-center 0.5s ease-in-out 2;
 }
 
 .flying-coin-div.fade-out {

@@ -64,7 +64,7 @@
                 </v-menu>
 
                 <div class="wallet-div">
-                  <v-icon class="wallet-icon" color="#424A53">mdi-wallet</v-icon>
+                  <v-icon class="wallet-icon" :color="menuSetting.linkColor">mdi-wallet-outline</v-icon>
                 </div>
 
                 <!--Desktop version-->
@@ -346,7 +346,7 @@
           class="d-block d-lg-none" />
 
         <div class="wallet-div wallet-mobile">
-          <v-icon class="wallet-icon" color="#424A53">mdi-wallet</v-icon>
+          <v-icon class="wallet-icon" :color="menuSetting.linkColor">mdi-wallet-outline</v-icon>
         </div>
         <v-menu v-if="$auth.loggedIn" transition="slide-x-transition" offset-y min-width="150">
           <template v-slot:activator="{ on, attrs }">
@@ -1280,9 +1280,6 @@ export default {
   justify-content: center;
 }
 
-.wallet-icon {
-  font-size: 30px !important;
-}
 
 
 @media (min-width: 600px) {
@@ -1339,10 +1336,6 @@ export default {
         color: #000 !important;
       }
     }
-  }
-
-  .wallet-icon {
-    font-size: 40px !important;
   }
 }
 
@@ -1463,10 +1456,6 @@ export default {
       font-weight: 500;
     }
   }
-
-  .wallet-icon {
-    font-size: 40px !important;
-  }
 }
 
 @media (min-width: 1264px) {
@@ -1476,10 +1465,6 @@ export default {
     margin-top: 0.6rem;
     margin-right: 6.4rem;
     margin-left: 0 !important;
-  }
-
-  .wallet-icon {
-    font-size: 50px !important;
   }
 
   .wallet-div {
