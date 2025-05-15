@@ -117,6 +117,7 @@
                   >
                     <template #content>
                       <v-btn
+                        v-if="!form.q_file_base64"
                         variant="text"
                         icon="mdi-camera"
                         size="x-large"
@@ -127,11 +128,18 @@
                       <v-btn
                         v-if="form.q_file_base64"
                         variant="text"
-                        size="small"
                         color="error"
                         icon="mdi-delete"
                         @click="deleteFile('q_file')"
                       ></v-btn>
+                      <img
+                        v-if="form.q_file_base64"
+                        width="200"
+                        height="200"
+                        class="pointer image-preview rounded mt-2"
+                        @click="selectFile('q_file')"
+                        :src="form.q_file_base64"
+                      />
                     </template>
                   </RickEditor>
                   <p v-if="errorMessage" class="text-error text-caption mt-1">
@@ -139,14 +147,7 @@
                   </p>
                 </Field>
               </ClientOnly>
-              <img
-                v-if="form.q_file_base64"
-                width="200"
-                height="200"
-                class="pointer image-preview rounded mt-2"
-                @click="selectFile('q_file')"
-                :src="form.q_file_base64"
-              />
+            
             </v-col>
             <!--End question section-->
 
@@ -2204,13 +2205,9 @@ const manualSubmit = async () => {
 }
 
 .image-preview {
-  display: block;
+  display: inline-block;
   object-fit: contain;
-  border: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 8px;
-  max-width: 100%;
-  height: auto;
 }
 
 .img-clear-btn {
