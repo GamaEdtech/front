@@ -117,7 +117,7 @@ const openLink = (item) => {
 
 .v-bottom-navigation__content {
   justify-content: space-evenly !important;
-
+  max-width: 25% !important;
 }
 .v-btn--selected.v-btn--active {
   background-color: rgba(33,186,69,.1) !important;
@@ -125,11 +125,22 @@ const openLink = (item) => {
   color: #fff !important;
 }
 .v-bottom-navigation__content > .v-btn {
-  min-width: 250px !important;
-  margin: 0 20px !important;
+  min-width: 100% !important;
+  margin-block: 0px !important;
+  color: red!important;
 }
 .v-bottom-navigation__content > .v-btn > .v-btn__prepend {
   margin-top: 10px !important;
+}
+
+.text-caption {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: hsl(0, 0%, 100%) !important;
+}
+
+.v-btn:not(.v-btn--active) .text-caption{
+  color: hsla(0, 0%, 100%, .6) !important;
 }
 </style>
 
