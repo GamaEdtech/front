@@ -20,20 +20,11 @@
             <p class="gama-text-subtitle1">
               Discover Your Full Potential with AI-based Education
             </p>
-            <v-btn
-              :large="$vuetify.breakpoint.mdAndUp"
-              :small="$vuetify.breakpoint.xs"
-              to="/smart-learning"
-              rounded
-              class="primary gama-btn"
-            >
+            <v-btn :large="$vuetify.breakpoint.mdAndUp" :small="$vuetify.breakpoint.xs" to="/smart-learning" rounded
+              class="primary gama-btn">
               Read about it
             </v-btn>
-            <img
-              id="img-bottom"
-              alt="AI Learn"
-              src="/images/ai-learn-bg2.webp"
-            />
+            <img id="img-bottom" alt="AI Learn" src="/images/ai-learn-bg2.webp" />
           </v-card>
         </v-col>
       </v-row>
@@ -79,12 +70,7 @@
     <v-container id="school-service-container">
       <v-row>
         <v-col cols="12" sm="4">
-          <v-img
-            width="246"
-            height="184"
-            class="mx-auto"
-            src="/images/school-service.png"
-          />
+          <v-img width="246" height="184" class="mx-auto" src="/images/school-service.png" />
         </v-col>
         <v-col cols="12" sm="8">
           <h2 class="gama-text-h4">
@@ -99,18 +85,17 @@
                      :large="$vuetify.breakpoint.mdAndUp"
                      :small="$vuetify.breakpoint.xs"
                      rounded class="primary gama-btn" to="/school-service">Learn more</v-btn> -->
-          <v-btn
-            :large="$vuetify.breakpoint.mdAndUp"
-            :small="$vuetify.breakpoint.xs"
-            rounded
-            class="primary gama-btn"
-            to="/school"
-            >School finder</v-btn
-          >
+          <v-btn :large="$vuetify.breakpoint.mdAndUp" :small="$vuetify.breakpoint.xs" rounded class="primary gama-btn"
+            to="/school">School finder</v-btn>
         </v-col>
       </v-row>
     </v-container>
     <!--End school service banner-->
+
+    <!--Car Racing Banner-->
+    <car-racing-banner />
+    <!-- End Car Racing Banner -->
+
 
     <!-- Stats container -->
     <stats-banner />
@@ -130,14 +115,8 @@
             </h2>
           </v-col>
           <v-col cols="12" sm="12" md="12" class="text-center">
-            <v-btn
-              rounded
-              :large="$vuetify.breakpoint.mdAndUp"
-              :small="$vuetify.breakpoint.xs"
-              to="/earn-money"
-              class="primary gama-btn"
-              >Earn money</v-btn
-            >
+            <v-btn rounded :large="$vuetify.breakpoint.mdAndUp" :small="$vuetify.breakpoint.xs" to="/earn-money"
+              class="primary gama-btn">Earn money</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -152,6 +131,7 @@ import GradeExplorer from "~/components/home/grade-explorer.vue";
 import LevelGuidBanner from "~/components/home/level-guid-banner.vue";
 import BlogContainer from "~/components/home/blog-container.vue";
 import StatsBanner from "~/components/home/stats-banner.vue";
+import CarRacingBanner from "~/components/home/car-racing-banner.vue";
 
 export default {
   auth: false,
@@ -190,6 +170,7 @@ export default {
     LevelGuidBanner,
     BlogContainer,
     StatsBanner,
+    CarRacingBanner
   },
 
   data() {
@@ -499,6 +480,7 @@ export default {
 
       .v-card__title {
         padding-bottom: 1.6rem;
+
         .icon {
           font-size: 4.8rem;
         }
