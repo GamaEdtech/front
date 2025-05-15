@@ -41,7 +41,10 @@
               </div>
             </v-col>
             <v-col cols="4" md="3" lg="3" xl="3" class="text-right mt-md-1">
-              <div class="d-flex text-right" v-if="$auth.loggedIn">
+              <div
+                class="d-flex text-right align-md-center"
+                v-if="$auth.loggedIn"
+              >
                 <v-spacer />
                 <v-menu
                   transition="slide-x-transition"
@@ -91,6 +94,16 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
+
+                <div class="wallet-div">
+                  <v-btn
+                    to="/user/wallet"
+                    icon
+                    class="wallet-icon"
+                    :color="menuSetting.linkColor"
+                    ><v-icon>mdi-wallet-outline</v-icon></v-btn
+                  >
+                </div>
 
                 <!--Desktop version-->
                 <common-notification-component
@@ -529,6 +542,12 @@
           ref="notificationComponent"
           class="d-block d-lg-none"
         />
+
+        <div class="wallet-div wallet-mobile">
+          <v-icon class="wallet-icon" :color="menuSetting.linkColor"
+            >mdi-wallet-outline</v-icon
+          >
+        </div>
         <v-menu
           v-if="$auth.loggedIn"
           transition="slide-x-transition"
@@ -1155,6 +1174,7 @@ export default {
     right: 0;
     background: transparent;
     margin: auto;
+
     #search-sheet-handler {
       position: absolute;
       width: 3.2rem;
@@ -1483,6 +1503,14 @@ export default {
   }
 }
 
+.wallet-div {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (min-width: 600px) {
   #main-header {
     .v-icon {
@@ -1666,6 +1694,10 @@ export default {
     margin-top: 0.6rem;
     margin-right: 6.4rem;
     margin-left: 0 !important;
+  }
+
+  .wallet-div {
+    margin: 0 0 0 20px;
   }
 }
 </style>
