@@ -60,19 +60,6 @@
           <div class="grades-list-container">
             <v-list v-if="filteredGrades.length > 0">
               <v-list-item
-                @click="selectGrade({ id: null, title: 'ALL' })"
-                class="grade-item"
-              >
-                <v-list-item-avatar color="#F2F4F7">
-                  <v-avatar color="#F2F4F7" size="40">
-                    <span class="grade-circle-text">A</span>
-                  </v-avatar>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title>ALL</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item
                 v-for="grade in filteredGrades"
                 :key="grade.id"
                 @click="selectGrade(grade)"
@@ -209,15 +196,21 @@ export default {
     },
 
     setDefaultGrade() {
-      const defaultGrade = {
-        id: null,
-        title: "ALL",
-        name: "ALL",
-        parent: this.boardId,
+      if (this.grades.length === 0) return;
+
+      // Select the first grade as default
+      const firstGrade = this.grades[0];
+      this.selectedGrade = {
+        id: firstGrade.id,
+        title: firstGrade.title,
+        name: firstGrade.title,
+        parent: firstGrade.parent || this.boardId,
+        master_: firstGrade.master_ || "",
+        list_order: firstGrade.list_order || "",
         section_id: this.boardId,
+        ...firstGrade,
       };
 
-      this.selectedGrade = defaultGrade;
       this.$emit("grade-selected", this.selectedGrade);
     },
 

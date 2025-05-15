@@ -59,19 +59,6 @@
           <div class="subjects-list-container">
             <v-list v-if="filteredSubjects.length > 0">
               <v-list-item
-                @click="selectSubject({ id: null, title: 'ALL' })"
-                class="subject-item"
-              >
-                <v-list-item-avatar color="#F2F4F7">
-                  <v-avatar color="#F2F4F7" size="40">
-                    <span class="subject-circle-text">A</span>
-                  </v-avatar>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title>ALL</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item
                 v-for="subject in filteredSubjects"
                 :key="subject.id"
                 @click="selectSubject(subject)"
@@ -234,17 +221,28 @@ export default {
     },
 
     setDefaultSubject(shouldEmit = true) {
-      const defaultSubject = {
-        id: null,
-        title: "ALL",
-        name: "ALL",
-        lesson_id: null,
+      if (this.subjects.length === 0) return;
+
+      // Select the first subject as default
+      const firstSubject = this.subjects[0];
+
+      this.selectedSubject = {
+        id: firstSubject.id,
+        title: firstSubject.title,
+        name: firstSubject.title,
+        lesson_id: firstSubject.id,
         base_id: this.gradeId,
-        parent: "",
-        parent2: "0",
+        parent: firstSubject.parent || "",
+        parent2: firstSubject.parent2 || "0",
+        master_: firstSubject.master_ || "",
+        list_order: firstSubject.list_order || "",
+        test_link: firstSubject.test_link,
+        book_link: firstSubject.book_link,
+        metadata: firstSubject.metadata || "{}",
+        bit_delete: firstSubject.bit_delete || "0",
+        ...firstSubject,
       };
 
-      this.selectedSubject = defaultSubject;
       if (shouldEmit) {
         this.$emit("subject-selected", this.selectedSubject);
       }

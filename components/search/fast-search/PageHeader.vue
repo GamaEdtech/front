@@ -267,7 +267,7 @@ export default {
         this.isLoadingSubjects = false;
 
         // Call search API when subject is selected
-        if (this.selectedBoard.id && this.selectedGrade?.id) {
+        if (this.selectedBoard.id && subject?.id) {
           await this.fetchSearchResults();
         }
       }
