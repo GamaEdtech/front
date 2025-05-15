@@ -1,6 +1,10 @@
 <template>
-  <v-container class="pb-10 mb-16">
-    <create-test-form />
+  <v-container class="create-test-container mb-16 pb-10">
+    <v-card flat >
+      <v-card-text class="px-0">
+        <create-test-form />
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
@@ -13,6 +17,24 @@ definePageMeta({
 });
 
 useHead({
-  title: "New Exam",
+  title: "Create New Test",
+  meta: [
+    { name: 'description', content: 'Create a standalone test for your educational content' }
+  ]
 });
 </script>
+
+<style lang="scss">
+.create-test-container {
+  max-width: 1200px;
+  margin: 5rem auto;
+  padding-bottom: 80px; // Space for fixed bottom bar
+}
+
+@media (max-width: 768px) {
+  .create-test-container {
+    margin: 0;
+    padding: 0;
+  }
+}
+</style>
