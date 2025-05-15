@@ -1108,6 +1108,7 @@ const video_analysis_options = [
 const state_list = ref([]);
 const area_list = ref([]);
 const school_list = ref([]);
+const test_share_link = ref("");
 
 const holding_level_list = [
   { id: 1, title: "School" },
@@ -1116,17 +1117,7 @@ const holding_level_list = [
   { id: 4, title: "Country" },
 ];
 
-// Create a ref for the share link instead of a computed property
-const test_share_link = ref("");
 
-// Update the share link when exam_id changes
-watch(() => exam_id.value, (newExamId) => {
-  if (newExamId) {
-    test_share_link.value = `${window.location.origin}/exam/${newExamId}`;
-  } else {
-    test_share_link.value = "";
-  }
-});
 
 // Compute the progress percentage for tests added (0-100%)
 const testProgress = computed(() => {
@@ -1328,7 +1319,8 @@ const encode = (s) => {
 
 const copyUrl = () => {
   navigator.clipboard.writeText(test_share_link.value);
-  nuxtApp.$toast.success("Copied to clipboard");
+  const { $toast } = useNuxtApp();
+  if ($toast) $toast.success("Copied");
 };
 
 const uploadFile = async (file_name) => {
@@ -1384,9 +1376,13 @@ const publishTest = async () => {
       // Reset data
       previewTestList.value = [];
       tests.value = [];
+      test_share_link.value = "";
 
       // Clear form data
       resetForm();
+      
+      // Set new share link for published exam
+      test_share_link.value = `https://gamatrain.com/exam/${response.data.id || ""}`;
       
       // Navigate to publish step
       test_step.value = 4;
@@ -1460,10 +1456,10 @@ const getExamCurrentTests = async () => {
       createForm.value.examTestListLength = tests.value.length;
     }
     
-    // If we have test items, render MathJax on them
+    // If we have test items with mathematical notation, load/render MathJax
     if (previewTestList.value.length) {
       nextTick(() => {
-        renderMathJax();
+        loadMathJaxIfNeeded();
       });
     }
   } catch (err) {
@@ -1812,11 +1808,11 @@ onMounted(async () => {
   // If we have an exam ID, get its tests and initialize share link
   if (exam_id.value) {
     await getExamCurrentTests();
-    test_share_link.value = `${window.location.origin}/exam/${exam_id.value}`;
+    test_share_link.value = `https://gamatrain.com/exam/${exam_id.value}`;
   }
   
-  // MathJax rendering
-  renderMathJax();
+  // Try to load MathJax if it's not already available
+  loadMathJaxIfNeeded();
   
   // Check active tab from route and enable it
   if (route.query?.active === "test_list") {
@@ -1941,27 +1937,22 @@ const deleteOnlineExam = async () => {
     // Reset all values
     exam_id.value = "";
     exam_code.value = "";
-
-    // Update store
-    useState("user").value = {
-      ...useState("user").value,
+    test_share_link.value = "";
+    
+    // Reset tests
+    tests.value = [];
+    previewTestList.value = [];
+    
+    // Reset state in user store
+    const userState = useState("user");
+    userState.value = {
+      ...userState.value,
       currentExamId: "",
       currentExamCode: "",
     };
 
     // Reset form and data
-    previewTestList.value = [];
-    tests.value = [];
-
-    form.section = "";
-    grade_list.value = [];
-    lesson_list.value = [];
-    topic_list.value = [];
-
-    form.exam_type = "";
-    form.duration = 3;
-    form.title = "";
-    form.file_original = "";
+    resetForm();
 
     // Reset to first step
     test_step.value = 1;
@@ -2097,6 +2088,7 @@ const resetAllData = () => {
   // Reset exam data
   exam_id.value = "";
   exam_code.value = "";
+  test_share_link.value = "";
   
   // Reset tests
   tests.value = [];
@@ -2109,19 +2101,6 @@ const resetAllData = () => {
     currentExamId: "",
     currentExamCode: "",
   };
-  
-  // Reset UI state - make sure both createForm.value and its properties exist
-  if (createForm.value) {
-    // Set file_original_path if it exists as a property
-    if ('file_original_path' in createForm.value) {
-    createForm.value.file_original_path = "";
-    }
-    
-    // Set examTestListLength if it exists as a property
-    if ('examTestListLength' in createForm.value) {
-    createForm.value.examTestListLength = 0;
-    }
-  }
 };
 
 // Add a new function to help users understand how many tests are needed
@@ -2160,23 +2139,73 @@ const handlePublish = () => {
  * This function processes math notation in elements with the mathJaxEl ref
  */
 const renderMathJax = () => {
-  // Check if MathJax is available globally
-  if (typeof window !== 'undefined' && window.MathJax) {
-    nextTick(() => {
-      if (mathJaxEl.value) {
+  // Skip if we're in server-side rendering
+  if (typeof window === 'undefined') return;
+  
+  try {
+    // Check if MathJax is available globally
+    if (window.MathJax) {
+      nextTick(() => {
+        if (!mathJaxEl.value) return;
+        
         // If mathJaxEl is an array (multiple elements with same ref)
         if (Array.isArray(mathJaxEl.value)) {
           mathJaxEl.value.forEach(el => {
-            if (el) window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
+            if (!el) return;
+            
+            // Handle different MathJax API versions
+            if (window.MathJax.Hub) {
+              // MathJax v2.x
+              window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
+            } else if (window.MathJax.typeset) {
+              // MathJax v3.x
+              window.MathJax.typeset([el]);
+            }
           });
         } else {
           // Single element
-          window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+          // Handle different MathJax API versions
+          if (window.MathJax.Hub) {
+            // MathJax v2.x
+            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+          } else if (window.MathJax.typeset) {
+            // MathJax v3.x
+            window.MathJax.typeset([mathJaxEl.value]);
+          }
         }
-      }
-    });
+      });
+    } else {
+      // MathJax not available, but don't flood console with warnings
+      console.warn('MathJax not available - mathematical formulas will not be rendered properly');
+    }
+  } catch (error) {
+    console.error('Error rendering MathJax:', error);
+  }
+};
+
+// Add a new function to load MathJax if it's not already available
+const loadMathJaxIfNeeded = () => {
+  if (typeof window === 'undefined') return;
+  
+  if (!window.MathJax) {
+    // MathJax not available, so load it
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+    script.async = true;
+    
+    // Call renderMathJax after MathJax is loaded
+    script.onload = () => {
+      console.log('MathJax loaded successfully');
+      // Wait a bit to make sure MathJax is fully initialized
+      setTimeout(() => {
+        renderMathJax();
+      }, 500);
+    };
+    
+    document.head.appendChild(script);
   } else {
-    console.warn('MathJax not available');
+    // MathJax is already available, render math
+    renderMathJax();
   }
 };
 </script>
