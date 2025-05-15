@@ -757,6 +757,7 @@ import { defineRule } from "vee-validate";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import * as yup from "yup";
 import { useAuth } from "~/composables/useAuth";
+import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css'; // Import cropper styles
 
 const auth = useAuth();

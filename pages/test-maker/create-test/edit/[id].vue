@@ -804,9 +804,9 @@
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
-import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import { Form as VeeForm, useForm } from "vee-validate";
 import TopicSelector from "~/components/form/topic-selector.vue"
-import Cropper from 'vue-advanced-cropper'
+import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
 import { Field } from 'vee-validate'
 
