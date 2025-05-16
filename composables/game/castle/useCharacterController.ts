@@ -6,6 +6,7 @@ import createGate from './useGate'
 import useGate from './useGate'
 import { DoorModels } from '~/interfaces/DoorModels.interface'
 import { Doors, Level, Step } from '~/interfaces/DoorStatus'
+import { useSound } from '~/composables/game/useSound'
 
 // Define types for better code organization
 interface MoveState {
@@ -79,7 +80,7 @@ export function useCharacterController(
     const INTERACTION_DISTANCE = 50 // Distance to show interaction prompt
 
     // Movement constants
-    const MOVE_SPEED = 1.5
+    const MOVE_SPEED = 1
     const ROTATION_SPEED = 0.02
     const TOUCH_SENSITIVITY = 0.5 // Control sensitivity for touch
 
@@ -98,6 +99,11 @@ export function useCharacterController(
 
     // Device detection
     const isMobile = ref(false)
+
+    // Sound for footsteps
+    const { playSound } = useSound()
+    const footstepSound = ref<HTMLAudioElement | null>(null)
+    const isMoving = ref(false)
 
     // Castle boundaries for collision detection
     const boundaries: CastleBoundaries = {
@@ -188,7 +194,7 @@ export function useCharacterController(
             if (doorModels.door001.model) {
                 animate(doorModels.door001.model.rotation, {
                     z: -3.2,
-                    duration: 1000,
+                    duration: 1400,
                     easing: 'easeInOutSine'
                 })
             }
@@ -197,7 +203,7 @@ export function useCharacterController(
             if (doorModels.door002.model) {
                 animate(doorModels.door002.model.rotation, {
                     z: -3.2,
-                    duration: 1000,
+                    duration: 1400,
                     easing: 'easeInOutSine'
                 })
             }
@@ -206,7 +212,7 @@ export function useCharacterController(
             if (doorModels.door003.model) {
                 animate(doorModels.door003.model.rotation, {
                     z: -3.2,
-                    duration: 1000,
+                    duration: 1400,
                     easing: 'easeInOutSine'
                 })
             }
@@ -215,7 +221,7 @@ export function useCharacterController(
             if (doorModels.door004.model) {
                 animate(doorModels.door004.model.rotation, {
                     z: -3.130,
-                    duration: 1000,
+                    duration: 1400,
                     easing: 'easeInOutSine'
                 })
             }
@@ -496,7 +502,7 @@ export function useCharacterController(
      * Updates character position with collision detection and wall sliding
      */
     const updateCharacter = (): {
-        updateInteractions: (callback: () => void) => void 
+        updateInteractions: (callback: () => void) => void
     } | null => {
         if (!character.value || !characterBox.value) return null
 
@@ -511,11 +517,39 @@ export function useCharacterController(
         // Current position
         const currentPosition = character.value.position.clone()
 
+        // console.log("X" , currentPosition.x);
+        // console.log("Z" , currentPosition.z);
+
         // Test movement for collision (full movement)
         const potentialPosition = currentPosition.clone().add(direction)
 
         // Check for collisions
         const collision = checkCollision(potentialPosition)
+
+        // Handle footstep sounds
+        const isCurrentlyMoving = direction.length() > 0
+
+        if (isCurrentlyMoving && !isMoving.value) {
+            // Character started moving
+            isMoving.value = true
+
+            if (!footstepSound.value) {
+                footstepSound.value = playSound('/assets/sounds/STREAMING-footsteps-walk-slowly-jeff-kaale-1-00-16.mp3', 1)
+
+                if (footstepSound.value) {
+                    footstepSound.value.loop = true
+                }
+            } else if (footstepSound.value.paused) {
+                footstepSound.value.play()
+            }
+        } else if (!isCurrentlyMoving && isMoving.value) {
+            // Character stopped moving
+            isMoving.value = false
+
+            if (footstepSound.value && !footstepSound.value.paused) {
+                footstepSound.value.pause()
+            }
+        }
 
         if (!collision) {
             // No collision, move normally
@@ -564,6 +598,12 @@ export function useCharacterController(
         container.removeEventListener('touchmove', onTouchMove)
         container.removeEventListener('touchend', onTouchEnd)
         document.removeEventListener('click', () => { })
+
+        // Stop and clean up sound
+        if (footstepSound.value) {
+            footstepSound.value.pause()
+            footstepSound.value = null
+        }
     }
 
     createGate(scene)

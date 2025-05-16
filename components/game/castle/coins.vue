@@ -5,7 +5,7 @@
             <h2>{{coins}}</h2>
         </div>
         <Transition name="slide-fade">
-            <div v-if="isChestOpen" class="counter">
+            <div v-if="notificationShow" class="counter">
                 <h2>+{{reward}}</h2>
             </div>
         </Transition>
@@ -13,11 +13,23 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed, ref, watch } from 'vue';
+
+const props = defineProps<{
     coins: number,
-    reward: string | undefined,
+    reward: number | undefined,
     isChestOpen: boolean
 }>()
+
+const isChestOpen = computed<boolean>(() => props.isChestOpen)
+const notificationShow = ref<boolean>(false)
+watch(isChestOpen, () => {
+    notificationShow.value = true
+
+    setTimeout(() => {
+        notificationShow.value = false
+    }, 3000)
+})
 </script>
 
 <style scoped>

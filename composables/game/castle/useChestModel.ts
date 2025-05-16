@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import { useThreeJS } from "../useThreejs";
 import * as THREE from "three"
 
@@ -7,6 +8,7 @@ const useChestModel = async (): Promise<{
     chestInteractions: (character: THREE.Object3D) => boolean,
     animation: () => { play: () => void, stop: () => void },
     update: (delta: number) => void,
+    setChestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void
     mixer: THREE.AnimationMixer | null
 } | null> => {
     try {
@@ -15,17 +17,23 @@ const useChestModel = async (): Promise<{
 
         const chest = chestGlb.scene
 
-        chest.position.set(-15.230, -0.130, -553.280)
-        chest.rotation.set(0, 0, .002)
+        // Remove all objects named 'Sand' from the model by traversing all children
+        chest.traverse((object) => {
+            if (object.name.includes('Sand')) {
+                console.log("Found sand object:", object.name);
+                object.parent?.remove(object);
+            }
+        });
+        
         chest.scale.set(25, 25, 25)
 
         const INTERACTION_DISTANCE = 80
-        const chestPosition = new THREE.Vector3(-15.230, -0.130, -553.280);
+        const chestPosition = ref<THREE.Vector3 | null>(null)
 
 
         const chestInteractions = (character: THREE.Object3D): boolean => {
-
-            const distanceToChest = character.position.distanceTo(chestPosition);
+            if (!chestPosition.value) return false
+            const distanceToChest = character.position.distanceTo(chestPosition.value);
 
             if (distanceToChest < INTERACTION_DISTANCE) {
                 return true
@@ -37,6 +45,13 @@ const useChestModel = async (): Promise<{
 
         const update = (delta: number) => {
             if (mixer) mixer.update(delta)
+        }
+
+        const setChestPosition = (position: THREE.Vector3, rotation: THREE.Euler) => {
+            chest.position.set(position.x, position.y, position.z)
+            chest.rotation.set(rotation.x, rotation.y, rotation.z)
+
+            chestPosition.value = position
         }
 
         const animation = (): { play: () => void, stop: () => void } => {
@@ -71,6 +86,7 @@ const useChestModel = async (): Promise<{
             chestInteractions,
             animation,
             update,
+            setChestPosition,
             mixer
         }
     }

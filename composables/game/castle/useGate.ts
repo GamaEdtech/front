@@ -77,6 +77,8 @@ function createGate(
         scene.remove(beaconGroup)
     }
 
+    visible()
+    
     return {
         gateInteractions,
         visible,

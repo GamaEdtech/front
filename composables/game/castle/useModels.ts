@@ -10,6 +10,7 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
     let chestInteractions: (character: THREE.Object3D) => boolean = () => false;
     let chestAnimation: (() => { play: () => void, stop: () => void }) | null = null;
     let chestUpdate: (delta: number) => void = () => { };
+    let chestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void = () => { };
 
     await Promise.all(
         [useCastleModel(doorModels), useChestModel()]
@@ -22,9 +23,11 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
         visibleChest = (status) => {
             status ? castle.add(chest.model) : castle.remove(chest.model)
         }
+
         chestInteractions = chest.chestInteractions
         chestAnimation = chest.animation
         chestUpdate = chest.update
+        chestPosition = chest.setChestPosition
 
         scene.value.add(castle)
 
@@ -36,6 +39,7 @@ const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modele
         chestInteractions,
         chestAnimation,
         chestUpdate,
+        chestPosition
     }
 }
 

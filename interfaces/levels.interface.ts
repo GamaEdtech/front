@@ -1,5 +1,9 @@
 export interface Step {
-    reward?: string,
+    reward?: {
+        room: 'room1' | 'room2' | 'room3' | 'room4'
+        position: 'position1' | 'position2' | 'position3' | 'position4',
+        amount: number
+    },
     door001: {
         problem: string;
         answer: string;
