@@ -27,13 +27,8 @@
               <v-col cols="12" md="9" class="pt-0 px-sm-3 pt-sm-3">
                 <!-- Ask question button -->
                 <div class="text-left d-block d-md-none">
-                  <v-btn
-                    rounded
-                    outlined
-                    small
-                    @click="openQuestionForm()"
-                    class="primary gama-text-body2 mb-2 mx-auto text-transform-none mb-6"
-                  >
+                  <v-btn rounded outlined small @click="openQuestionForm()"
+                    class="primary gama-text-body2 mb-2 mx-auto text-transform-none mb-6">
                     Ask Question
                   </v-btn>
                 </div>
@@ -44,56 +39,39 @@
                     <v-row class="fill-height">
                       <!--Score action-->
                       <v-col cols="1" class="pr-0 d-none d-md-block">
-                        <v-card
-                          flat
-                          color="#EEEEEE"
-                          class="d-flex fill-height text-center"
-                          min-height="200"
-                        >
+                        <v-card flat color="#EEEEEE" class="d-flex fill-height text-center" min-height="200">
                           <v-row>
                             <v-col cols="12">
-                              <v-btn
-                                icon
-                                x-large
-                                @click="
-                                  submitScore(
-                                    'question',
-                                    contentData.id,
-                                    'plus'
-                                  )
-                                "
-                              >
+                              <v-btn icon x-large @click="
+                                submitScore(
+                                  'question',
+                                  contentData.id,
+                                  'plus'
+                                )
+                                ">
                                 <v-icon size="88"> mdi-menu-up </v-icon>
                               </v-btn>
                               <p class="text-h4">
                                 {{ contentData?.score }}
                               </p>
-                              <v-btn
-                                icon
-                                x-large
-                                @click="
-                                  submitScore(
-                                    'question',
-                                    contentData.id,
-                                    'minus'
-                                  )
-                                "
-                              >
+                              <v-btn icon x-large @click="
+                                submitScore(
+                                  'question',
+                                  contentData.id,
+                                  'minus'
+                                )
+                                ">
                                 <v-icon size="88"> mdi-menu-down </v-icon>
                               </v-btn>
                               <v-btn icon width="100%">
                                 <v-icon> mdi-bookmark </v-icon>
                               </v-btn>
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="
-                                  openCrashReportDialog(
-                                    contentData.id,
-                                    'question'
-                                  )
-                                "
-                              >
+                              <v-btn icon width="100%" @click="
+                                openCrashReportDialog(
+                                  contentData.id,
+                                  'question'
+                                )
+                                ">
                                 <v-icon> mdi-alert-octagon-outline </v-icon>
                               </v-btn>
                               <v-btn class="mb-4" icon width="100%">
@@ -110,30 +88,14 @@
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3">
-                                <h1
-                                  class="gama-text-h6 mb-2"
-                                  v-html="contentData?.title"
-                                  ref="mathJaxTitle"
-                                />
+                                <h1 class="gama-text-h6 mb-2" v-html="contentData?.title" ref="mathJaxTitle" />
                                 <v-row>
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pb-sm-0 pb-md-3">
                                       <nuxt-link to="/user/edit-profile">
-                                        <img
-                                          width="40"
-                                          height="40"
-                                          v-if="contentData.avatar"
-                                          :src="contentData?.avatar"
-                                        />
-                                        <v-btn
-                                          v-else
-                                          width="40"
-                                          height="40"
-                                          class="d-flex"
-                                          outlined
-                                          fab
-                                          x-large
-                                        >
+                                        <img width="40" height="40" v-if="contentData.avatar"
+                                          :src="contentData?.avatar" />
+                                        <v-btn v-else width="40" height="40" class="d-flex" outlined fab x-large>
                                           <v-icon> mdi-account-outline </v-icon>
                                         </v-btn>
                                       </nuxt-link>
@@ -145,9 +107,7 @@
                                           <span v-else> No name </span>
                                         </p>
                                         <p class="text-h6">
-                                          <span
-                                            v-show="contentData.stats?.qNum > 0"
-                                          >
+                                          <span v-show="contentData.stats?.qNum > 0">
                                             <span class="orange--text">
                                               {{ contentData.stats?.qNum }}
                                               Qn
@@ -155,26 +115,17 @@
                                             |
                                           </span>
 
-                                          <span
-                                            class="green--text"
-                                            v-show="contentData.stats?.aNum > 0"
-                                          >
+                                          <span class="green--text" v-show="contentData.stats?.aNum > 0">
                                             {{ contentData.stats?.aNum }}
                                             Ans
                                           </span>
-                                          <span
-                                            v-show="
-                                              contentData.stats?.aNum > 0 ||
-                                              contentData.stats?.score > 0
-                                            "
-                                          >
+                                          <span v-show="contentData.stats?.aNum > 0 ||
+                                            contentData.stats?.score > 0
+                                            ">
                                             |
                                           </span>
-                                          <span
-                                            v-show="
-                                              contentData.stats?.score > 0
-                                            "
-                                          >
+                                          <span v-show="contentData.stats?.score > 0
+                                            ">
                                             <span class="blue--text">
                                               {{ contentData.stats?.score }}
                                               Score
@@ -186,101 +137,65 @@
                                   </v-col>
 
                                   <v-col cols="2" class="text-right">
-                                    <v-btn
-                                      :outlined="$vuetify.breakpoint.mdAndUp"
-                                      :icon="$vuetify.breakpoint.xs"
-                                      color="success"
-                                      :to="`/direct/${contentData.ownerIdentity}`"
-                                    >
+                                    <v-btn :outlined="$vuetify.breakpoint.mdAndUp" :icon="$vuetify.breakpoint.xs"
+                                      color="success" :to="`/direct/${contentData.ownerIdentity}`">
                                       <v-icon class="mr-1">
                                         mdi-message-reply-text
                                       </v-icon>
-                                      <span class="d-none d-md-inline"
-                                        >Chat</span
-                                      >
+                                      <span class="d-none d-md-inline">Chat</span>
                                     </v-btn>
                                   </v-col>
                                 </v-row>
 
-                                <p
-                                  class="mt-2 gama-text-body1"
-                                  ref="mathJaxEl"
-                                  v-html="
-                                    contentData.question
-                                      ? contentData.question.replace(
-                                          /\n/g,
-                                          '<br />'
-                                        )
-                                      : ''
-                                  "
-                                />
+                                <p class="mt-2 gama-text-body1" ref="mathJaxEl" v-html="contentData.question
+                                  ? contentData.question.replace(
+                                    /\n/g,
+                                    '<br />'
+                                  )
+                                  : ''
+                                  " />
                               </v-col>
 
-                              <v-col
-                                cols="12"
-                                class="px-sm-3 pb-sm-3"
-                                align-self="end"
-                              >
+                              <v-col cols="12" class="px-sm-3 pb-sm-3" align-self="end">
                                 <v-row>
-                                  <v-col
-                                    cols="7"
-                                    md="8"
-                                    class="pb-sm-0 px-sm-3 pb-sm-3"
-                                  >
+                                  <v-col cols="7" md="8" class="pb-sm-0 px-sm-3 pb-sm-3">
                                     <div class="d-none d-md-block">
-                                      <v-chip
-                                        small
-                                        :to="`/search?type=question&section=${contentData.section}`"
-                                        link
-                                        class="mr-1 blue-grey darken-1 white--text"
-                                      >
+                                      <v-chip small :to="`/search?type=question&section=${contentData.section}`" link
+                                        class="mr-1 blue-grey darken-1 white--text">
                                         {{ contentData.section_title }}
                                       </v-chip>
-                                      <v-chip
-                                        small
-                                        link
+                                      <v-chip small link
                                         :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}`"
-                                        class="mr-1 blue-grey darken-1 white--text"
-                                      >
+                                        class="mr-1 blue-grey darken-1 white--text">
                                         {{ contentData.base_title }}
                                       </v-chip>
-                                      <v-chip
-                                        small
-                                        link
-                                        class="ma-1 blue-grey darken-1 white--text"
-                                        :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
-                                      >
+                                      <v-chip small link class="ma-1 blue-grey darken-1 white--text"
+                                        :to="`/search?type=question&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`">
                                         {{ contentData.lesson_title }}
                                       </v-chip>
                                     </div>
 
                                     <div class="d-flex d-md-none">
                                       <!--Score action sm and xs-->
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          submitScore(
-                                            'question',
-                                            contentData.id,
-                                            'plus'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        submitScore(
+                                          'question',
+                                          contentData.id,
+                                          'plus'
+                                        )
+                                        ">
                                         <v-icon size="40"> mdi-menu-up </v-icon>
                                       </v-btn>
                                       <p class="pt-3">
                                         {{ contentData?.score }}
                                       </p>
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          submitScore(
-                                            'question',
-                                            contentData.id,
-                                            'minus'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        submitScore(
+                                          'question',
+                                          contentData.id,
+                                          'minus'
+                                        )
+                                        ">
                                         <v-icon size="40">
                                           mdi-menu-down
                                         </v-icon>
@@ -299,11 +214,7 @@
                                       <v-spacer />
                                     </div>
                                   </v-col>
-                                  <v-col
-                                    cols="5"
-                                    md="4"
-                                    class="px-sm-0 pb-sm-0 text-right"
-                                  >
+                                  <v-col cols="5" md="4" class="px-sm-0 pb-sm-0 text-right">
                                     <div class="d-none d-md-block">
                                       <v-spacer />
                                       <v-btn text class="simple-btn">
@@ -332,15 +243,12 @@
                                           mdi-bookmark
                                         </v-icon>
                                       </v-btn>
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          openCrashReportDialog(
-                                            contentData.id,
-                                            'question'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        openCrashReportDialog(
+                                          contentData.id,
+                                          'question'
+                                        )
+                                        ">
                                         <v-icon size="20">
                                           mdi-alert-octagon-outline
                                         </v-icon>
@@ -383,31 +291,18 @@
                     <v-row v-for="answer in answer_list" :key="answer.id">
                       <!--Score action-->
                       <v-col cols="1" class="pr-0 d-none d-md-block">
-                        <v-card
-                          flat
-                          color="#FAFAFA"
-                          class="mb-4 d-flex fill-height text-center"
-                          min-height="200"
-                        >
+                        <v-card flat color="#FAFAFA" class="mb-4 d-flex fill-height text-center" min-height="200">
                           <v-row>
                             <v-col cols="12">
-                              <v-btn
-                                icon
-                                x-large
-                                @click="submitScore('reply', answer.id, 'plus')"
-                              >
+                              <v-btn icon x-large @click="submitScore('reply', answer.id, 'plus')">
                                 <v-icon size="88"> mdi-menu-up </v-icon>
                               </v-btn>
                               <p class="text-h4">
                                 {{ answer?.score }}
                               </p>
-                              <v-btn
-                                icon
-                                x-large
-                                @click="
-                                  submitScore('reply', answer.id, 'minus')
-                                "
-                              >
+                              <v-btn icon x-large @click="
+                                submitScore('reply', answer.id, 'minus')
+                                ">
                                 <v-icon size="88"> mdi-menu-down </v-icon>
                               </v-btn>
                               <v-btn icon width="100%">
@@ -417,18 +312,11 @@
                               <!--Select correct answer-->
                               <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    icon
-                                    width="100%"
-                                    x-large
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    @click="selectCorrectAnswer(answer.id)"
-                                    v-if="
+                                  <v-btn icon width="100%" x-large v-bind="attrs" v-on="on"
+                                    @click="selectCorrectAnswer(answer.id)" v-if="
                                       contentData.owner == true &&
                                       answer.selected == 0
-                                    "
-                                  >
+                                    ">
                                     <v-icon size="38" color="green">
                                       mdi-check
                                     </v-icon>
@@ -438,37 +326,24 @@
                               </v-tooltip>
 
                               <!--Edit button-->
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="
-                                  openEditReplyDialog(answer.id, answer.answer)
-                                "
-                                v-if="answer.owner == true"
-                              >
+                              <v-btn icon width="100%" @click="
+                                openEditReplyDialog(answer.id, answer.answer)
+                                " v-if="answer.owner == true">
                                 <v-icon> mdi-pencil </v-icon>
                               </v-btn>
 
                               <!--Delete button -->
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="openDeleteReplyConfirmDialog(answer.id)"
-                                v-if="answer.owner == true"
-                              >
+                              <v-btn icon width="100%" @click="openDeleteReplyConfirmDialog(answer.id)"
+                                v-if="answer.owner == true">
                                 <v-icon> mdi-delete </v-icon>
                               </v-btn>
 
-                              <v-btn
-                                icon
-                                width="100%"
-                                @click="
-                                  openCrashReportDialog(
-                                    answer.id,
-                                    'questionReply'
-                                  )
-                                "
-                              >
+                              <v-btn icon width="100%" @click="
+                                openCrashReportDialog(
+                                  answer.id,
+                                  'questionReply'
+                                )
+                                ">
                                 <v-icon> mdi-alert-octagon-outline </v-icon>
                               </v-btn>
                               <v-btn icon width="100%">
@@ -481,13 +356,8 @@
                       <!--End score action-->
 
                       <v-col cols="12" md="11">
-                        <v-card
-                          :color="
-                            answer.selected == 1 ? '#5EFF8126' : '#FAFAFA'
-                          "
-                          flat
-                          class="fill-height"
-                        >
+                        <v-card :color="answer.selected == 1 ? '#5EFF8126' : '#FAFAFA'
+                          " flat class="fill-height">
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3 pb-0">
@@ -495,21 +365,8 @@
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pbs-sm-0">
                                       <nuxt-link to="/user/edit-profile">
-                                        <img
-                                          width="40"
-                                          height="40"
-                                          v-if="answer.avatar"
-                                          :src="answer.avatar"
-                                        />
-                                        <v-btn
-                                          v-else
-                                          width="47"
-                                          height="47"
-                                          class="d-flex"
-                                          outlined
-                                          fab
-                                          x-large
-                                        >
+                                        <img width="40" height="40" v-if="answer.avatar" :src="answer.avatar" />
+                                        <v-btn v-else width="47" height="47" class="d-flex" outlined fab x-large>
                                           <v-icon> mdi-account-outline </v-icon>
                                         </v-btn>
                                       </nuxt-link>
@@ -528,24 +385,15 @@
                                             |
                                           </span>
 
-                                          <span
-                                            class="green--text"
-                                            v-show="answer.stats?.aNum > 0"
-                                          >
+                                          <span class="green--text" v-show="answer.stats?.aNum > 0">
                                             {{ answer.stats?.aNum }} Ans
                                           </span>
-                                          <span
-                                            v-show="
-                                              answer.stats?.score > 0 ||
-                                              answer.stats?.aNum > 0
-                                            "
-                                          >
+                                          <span v-show="answer.stats?.score > 0 ||
+                                            answer.stats?.aNum > 0
+                                            ">
                                             |
                                           </span>
-                                          <span
-                                            class="blue--text"
-                                            v-show="answer.stats?.score"
-                                          >
+                                          <span class="blue--text" v-show="answer.stats?.score">
                                             {{ answer.stats?.score }} Score
                                           </span>
                                         </p>
@@ -553,51 +401,27 @@
                                     </div>
                                   </v-col>
                                   <v-col cols="2" class="text-right">
-                                    <v-btn
-                                      :outlined="$vuetify.breakpoint.mdAndUp"
-                                      :icon="$vuetify.breakpoint.xs"
-                                      :to="`/direct/${answer.ownerIdentity}`"
-                                      color="success"
-                                    >
+                                    <v-btn :outlined="$vuetify.breakpoint.mdAndUp" :icon="$vuetify.breakpoint.xs"
+                                      :to="`/direct/${answer.ownerIdentity}`" color="success">
                                       <v-icon class="mr-1">
                                         mdi-message-reply-text
                                       </v-icon>
-                                      <span class="d-none d-md-inline"
-                                        >Chat</span
-                                      >
+                                      <span class="d-none d-md-inline">Chat</span>
                                     </v-btn>
                                   </v-col>
                                 </v-row>
                               </v-col>
                               <v-col cols="12" class="pt-0">
                                 <div>
-                                  <p
-                                    class="mt-2 gama-text-body1"
-                                    ref="mathJaxEl"
-                                    v-html="
-                                      answer.answer.replace(/\n/g, '<br />')
-                                    "
-                                  />
+                                  <p class="mt-2 gama-text-body1" ref="mathJaxEl" v-html="answer.answer.replace(/\n/g, '<br />')
+                                    " />
                                 </div>
                               </v-col>
 
-                              <v-col
-                                cols="12"
-                                class="px-sm-3 pb-sm-3"
-                                align-self="end"
-                              >
+                              <v-col cols="12" class="px-sm-3 pb-sm-3" align-self="end">
                                 <v-row>
-                                  <v-col
-                                    cols="7"
-                                    md="6"
-                                    class="px-sm-3 pb-sm-3"
-                                  >
-                                    <v-btn
-                                      text
-                                      disabled
-                                      plain
-                                      class="pl-0 simple-btn d-none d-md-block"
-                                    >
+                                  <v-col cols="7" md="6" class="px-sm-3 pb-sm-3">
+                                    <v-btn text disabled plain class="pl-0 simple-btn d-none d-md-block">
                                       <v-icon class="mr-1">
                                         mdi-comment-plus
                                       </v-icon>
@@ -605,31 +429,25 @@
                                     </v-btn>
                                     <div class="d-flex d-md-none">
                                       <!--Score action sm and xs-->
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          submitScore(
-                                            'reply',
-                                            answer.id,
-                                            'plus'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        submitScore(
+                                          'reply',
+                                          answer.id,
+                                          'plus'
+                                        )
+                                        ">
                                         <v-icon size="40"> mdi-menu-up </v-icon>
                                       </v-btn>
                                       <p class="pt-3">
                                         {{ answer.score }}
                                       </p>
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          submitScore(
-                                            'reply',
-                                            answer.id,
-                                            'minus'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        submitScore(
+                                          'reply',
+                                          answer.id,
+                                          'minus'
+                                        )
+                                        ">
                                         <v-icon size="40">
                                           mdi-menu-down
                                         </v-icon>
@@ -637,15 +455,10 @@
                                       <!--End score action sm and xs-->
 
                                       <p class="pt-3">|</p>
-                                      <v-btn
-                                        icon
-                                        color="green"
-                                        @click="selectCorrectAnswer(answer.id)"
-                                        v-if="
-                                          contentData.owner == true &&
-                                          answer.selected == 0
-                                        "
-                                      >
+                                      <v-btn icon color="green" @click="selectCorrectAnswer(answer.id)" v-if="
+                                        contentData.owner == true &&
+                                        answer.selected == 0
+                                      ">
                                         <v-icon size="20"> mdi-check </v-icon>
                                       </v-btn>
                                       <v-btn icon disabled>
@@ -653,40 +466,28 @@
                                           mdi-comment-plus
                                         </v-icon>
                                       </v-btn>
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          openEditReplyDialog(
-                                            answer.id,
-                                            answer.answer
-                                          )
-                                        "
-                                        v-if="answer.owner == true"
-                                      >
+                                      <v-btn icon @click="
+                                        openEditReplyDialog(
+                                          answer.id,
+                                          answer.answer
+                                        )
+                                        " v-if="answer.owner == true">
                                         <v-icon size="20"> mdi-pencil </v-icon>
                                       </v-btn>
 
                                       <!--Delete button -->
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          openDeleteReplyConfirmDialog(
-                                            answer.id
-                                          )
-                                        "
-                                        v-if="answer.owner == true"
-                                      >
+                                      <v-btn icon @click="
+                                        openDeleteReplyConfirmDialog(
+                                          answer.id
+                                        )
+                                        " v-if="answer.owner == true">
                                         <v-icon size="20"> mdi-delete </v-icon>
                                       </v-btn>
 
                                       <v-spacer />
                                     </div>
                                   </v-col>
-                                  <v-col
-                                    cols="5"
-                                    md="6"
-                                    class="pb-sm-0 px-sm-3 pb-md-3 text-right d-flex"
-                                  >
+                                  <v-col cols="5" md="6" class="pb-sm-0 px-sm-3 pb-md-3 text-right d-flex">
                                     <v-spacer />
 
                                     <div class="d-none d-md-block">
@@ -710,15 +511,12 @@
                                     </div>
 
                                     <div class="d-inline d-md-none px-sm-0">
-                                      <v-btn
-                                        icon
-                                        @click="
-                                          openCrashReportDialog(
-                                            answer.id,
-                                            'questionReply'
-                                          )
-                                        "
-                                      >
+                                      <v-btn icon @click="
+                                        openCrashReportDialog(
+                                          answer.id,
+                                          'questionReply'
+                                        )
+                                        ">
                                         <v-icon size="20">
                                           mdi-alert-octagon-outline
                                         </v-icon>
@@ -751,29 +549,13 @@
                       <form @submit.prevent="submitReply">
                         <v-row>
                           <v-col cols="12" class="px-sm-3">
-                            <validation-provider
-                              v-slot="{ errors }"
-                              name="your_answer"
-                              rules="required|min:25"
-                            >
-                              <v-textarea
-                                v-model="answer_form.answer"
-                                outlined
-                                :height="textAreaHeight"
-                                @click="increaseTextAreaHeight"
-                                :error-messages="errors"
-                                background-color="#ffffff"
-                                label="Your answer"
-                              >
+                            <validation-provider v-slot="{ errors }" name="your_answer" rules="required|min:25">
+                              <v-textarea v-model="answer_form.answer" outlined :height="textAreaHeight"
+                                @click="increaseTextAreaHeight" :error-messages="errors" background-color="#ffffff"
+                                label="Your answer">
                                 <template slot="append-outer">
-                                  <v-btn
-                                    icon
-                                    large
-                                    type="submit"
-                                    :disabled="invalid"
-                                    :loading="loading.reply_form"
-                                    v-if="answer_form.answer"
-                                  >
+                                  <v-btn icon large type="submit" :disabled="invalid" :loading="loading.reply_form"
+                                    v-if="answer_form.answer">
                                     <v-icon> mdi-send </v-icon>
                                   </v-btn>
                                   <v-btn icon large disabled v-else>
@@ -781,11 +563,7 @@
                                   </v-btn>
                                 </template>
                                 <template slot="prepend">
-                                  <v-btn
-                                    large
-                                    icon
-                                    @click="emoji_box = !emoji_box"
-                                  >
+                                  <v-btn large icon @click="emoji_box = !emoji_box">
                                     <v-icon>
                                       mdi-emoticon-excited-outline
                                     </v-icon>
@@ -796,10 +574,7 @@
                                 </template>
                               </v-textarea>
                             </validation-provider>
-                            <v-emoji-picker
-                              v-show="emoji_box"
-                              @select="selectEmoji"
-                            ></v-emoji-picker>
+                            <v-emoji-picker v-show="emoji_box" @select="selectEmoji"></v-emoji-picker>
                           </v-col>
                         </v-row>
                       </form>
@@ -812,14 +587,8 @@
               <!--Similar questions-->
               <v-col cols="3" id="similar-question" class="d-none d-md-block">
                 <div class="text-right">
-                  <v-btn
-                    rounded
-                    outlined
-                    large
-                    :small="$vuetify.breakpoint.xs"
-                    @click="openQuestionForm()"
-                    class="primary gama-text-body2 mb-2 mx-auto text-transform-none mx-auto"
-                  >
+                  <v-btn rounded outlined large :small="$vuetify.breakpoint.xs" @click="openQuestionForm()"
+                    class="primary gama-text-body2 mb-2 mx-auto text-transform-none mx-auto">
                     Ask Question
                   </v-btn>
                 </div>
@@ -828,39 +597,24 @@
                     <h2 class="text-h4 text-center">Related questions</h2>
                     <v-divider style="width: 80%" class="my-3 mx-auto" />
                     <div v-if="loading.similar_questions">
-                      <v-skeleton-loader
-                        v-for="i in 10"
-                        :key="i"
-                        type="list-item"
-                      ></v-skeleton-loader>
+                      <v-skeleton-loader v-for="i in 10" :key="i" type="list-item"></v-skeleton-loader>
                     </div>
-                    <p
-                      v-else-if="similarQuestions.num == 0"
-                      class="text-center"
-                    >
+                    <p v-else-if="similarQuestions.num == 0" class="text-center">
                       Opps! not found
                     </p>
                     <ul v-else>
-                      <li
-                        v-for="question in similarQuestions.slice(0, 10)"
-                        :key="question.id"
-                        class="question-item blue--text gama-text-body2"
-                      >
-                        <nuxt-link
-                          :to="`/qa/${question.id}/${$slugGenerator.convert(
-                            question.title
-                          )}`"
-                        >
+                      <li v-for="question in similarQuestions.slice(0, 10)" :key="question.id"
+                        class="question-item blue--text gama-text-body2">
+                        <nuxt-link :to="`/qa/${question.id}/${$slugGenerator.convert(
+                          question.title
+                        )}`">
                           <span>
                             {{ question.title }}
                           </span>
                         </nuxt-link>
                       </li>
 
-                      <li
-                        @click="openQuestionForm()"
-                        class="question-item pointer gama-text-body2 primary--text mb-0"
-                      >
+                      <li @click="openQuestionForm()" class="question-item pointer gama-text-body2 primary--text mb-0">
                         Ask question
                       </li>
                     </ul>
@@ -885,27 +639,12 @@
             <form @submit.prevent="updateReply">
               <v-row>
                 <v-col cols="12">
-                  <validation-provider
-                    v-slot="{ errors }"
-                    name="your_answer"
-                    rules="required|min:25"
-                  >
-                    <v-text-field
-                      v-model="edit_answer_form.answer"
-                      outlined
-                      :error-messages="errors"
-                      background-color="#ffffff"
-                      label="Your answer"
-                    >
+                  <validation-provider v-slot="{ errors }" name="your_answer" rules="required|min:25">
+                    <v-text-field v-model="edit_answer_form.answer" outlined :error-messages="errors"
+                      background-color="#ffffff" label="Your answer">
                       <template slot="append-outer">
-                        <v-btn
-                          icon
-                          large
-                          type="submit"
-                          :disabled="invalid"
-                          :loading="loading.edit_answer_form"
-                          v-if="edit_answer_form.answer"
-                        >
+                        <v-btn icon large type="submit" :disabled="invalid" :loading="loading.edit_answer_form"
+                          v-if="edit_answer_form.answer">
                           <v-icon> mdi-send </v-icon>
                         </v-btn>
                         <v-btn icon large disabled v-else>
@@ -913,11 +652,7 @@
                         </v-btn>
                       </template>
                       <template slot="prepend">
-                        <v-btn
-                          large
-                          icon
-                          @click="edit_emoji_box = !edit_emoji_box"
-                        >
+                        <v-btn large icon @click="edit_emoji_box = !edit_emoji_box">
                           <v-icon> mdi-emoticon-excited-outline </v-icon>
                         </v-btn>
                         <v-btn large icon disabled>
@@ -926,10 +661,7 @@
                       </template>
                     </v-text-field>
                   </validation-provider>
-                  <v-emoji-picker
-                    v-show="edit_emoji_box"
-                    @select="selectEmoji"
-                  />
+                  <v-emoji-picker v-show="edit_emoji_box" @select="selectEmoji" />
                 </v-col>
               </v-row>
             </form>
@@ -953,12 +685,7 @@
 
           <v-btn text @click="dialog.delete_reply_form = false"> No </v-btn>
 
-          <v-btn
-            color="red darken-1"
-            text
-            :loading="loading.delete_reply_form"
-            @click="deleteReply()"
-          >
+          <v-btn color="red darken-1" text :loading="loading.delete_reply_form" @click="deleteReply()">
             Yes
           </v-btn>
         </v-card-actions>
@@ -997,11 +724,77 @@ export default {
     ValidationProvider,
     ValidationObserver,
   },
+  // head() {
+  //   return {
+  //     title: this.contentData.title,
+  //   };
+  // },
   head() {
     return {
       title: this.contentData.title,
+      script: [
+        {
+          type: 'application/ld+json',
+          json: {
+            "@context": "https://schema.org",
+            "@type": "DiscussionForumPosting",
+            "headline": this.contentData.title,
+            "articleBody": this.contentData.question,
+            "datePublished": new Date(this.contentData.subdate).toISOString(),
+            "author": {
+              "@type": "Person",
+              "name": this.contentData.name,
+              "url": this.contentData.userLink
+            },
+            "url": `https://ca72-212-30-36-69.ngrok-free.app/qa/${this.contentData.id}`,
+            "mainEntityOfPage": `https://ca72-212-30-36-69.ngrok-free.app/qa/${this.contentData.id}`,
+            interactionStatistic: [
+              {
+                "@type": "InteractionCounter",
+                "interactionType": { "@type": "ViewAction" },
+                "userInteractionCount": parseInt(this.contentData.visits) || 0
+              },
+              {
+                "@type": "InteractionCounter",
+                "interactionType": { "@type": "CommentAction" },
+                "userInteractionCount": this.answer_list?.length || 0
+              },
+              {
+                "@type": "InteractionCounter",
+                "interactionType": { "@type": "VoteAction" },
+                "userInteractionCount": parseInt(this.contentData.score) || 0
+              }
+            ],
+            "comment": this.answer_list?.sort((a, b) => b.score - a.score)
+              .slice(0, 5)
+              .map(a => ({
+                "@type": "Comment",
+                "text": a.answer,
+                "dateCreated": new Date(a.subdate).toISOString(),
+                "author": {
+                  "@type": "Person",
+                  "name": a.name,
+                  "url": a.userLink
+                }
+              }))
+            // "suggestedAnswer": this.answer_list?.sort((a, b) => b.score - a.score)
+            //   .slice(0, 5)
+            //   .map(a => ({
+            //     "@type": "Answer",
+            //     "text": a.answer,
+            //     "dateCreated": a.subdate,
+            //     "author": {
+            //       "@type": "Person",
+            //       "name": a.name,
+            //       "url": a.userLink
+            //     }
+            //   }))
+          }
+        }
+      ]
     };
   },
+
   async asyncData({ params, $axios }) {
     // Fetch the data from the API
     const content = await $axios.$get(`/api/v1/questions/${params.id}`);
@@ -1010,14 +803,21 @@ export default {
     if (content.status === 1) {
       contentData = content.data;
     }
+    const contentAnswerList = await $axios.$get(`/api/v1/questionReplies`, {
+      params: {
+        question: params.id,
+      },
+    })
+    var answer_list = [];
+    if (contentAnswerList.status === 1) {
+      answer_list = contentAnswerList.data.list;
+    }
 
-    return { contentData };
+    return { contentData, answer_list };
   },
   mounted() {
     this.initBreadCrumb();
-    this.reInit();
     this.getSimilarQuestions();
-
     this.renderMathJax();
   },
 
@@ -1173,6 +973,7 @@ export default {
         })
         .then((response) => {
           this.answer_list = response.data.list;
+
           this.$nextTick(() => {
             this.$renderMathJax(this.$refs.mathJaxEl);
           });
@@ -1303,6 +1104,7 @@ export default {
 
 #qa-details-content {
   margin-bottom: 2rem;
+
   #similar-question {
     .question-item {
       list-style-type: none;
