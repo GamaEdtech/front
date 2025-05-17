@@ -595,7 +595,9 @@
                     class="primary-gray-400"
                     density="compact"
                     block
+                    :color="buttonDisabled == false ? '#009688' : 'gray'"
                     @click.prevent="manualSubmit"
+                    style="font-weight: 600; text-transform: none; font-size: 13px;"
                   >
                     Create
                   </v-btn>
@@ -609,6 +611,7 @@
                     class="primary-gray-400"
                     density="compact"
                     block
+                    style="font-weight: 600; text-transform: none; font-size: 13px;"
                   >
                     <span v-show="examTestListLength < 5"
                       >Add at least {{ 5 - examTestListLength }} more
