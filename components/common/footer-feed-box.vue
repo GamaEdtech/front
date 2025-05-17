@@ -68,12 +68,11 @@
             <span class="footer-text">More</span>
           </v-list-item>
         </nuxt-link>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
+        <v-tooltip location="bottom">
+          <template v-slot:activator="{ props }">
             <v-btn
               rounded
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
               :color="feed.add_link_color"
               dark
               v-if="
