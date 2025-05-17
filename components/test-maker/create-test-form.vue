@@ -57,12 +57,12 @@
                 <template v-slot:activator="{ props }">
                   <v-btn
                     color="teal"
-                    class="white--text py-5"
+                    class="white--text py-5 my-2"
                     v-bind="props"
                     block
                     @click="path_panel_expand = !path_panel_expand"
                   >
-                    <i class="fas fa-route mx-3 fa-xl"></i>
+                    <i class="fas fa-route mx-3 fa-2xl"></i>
                   </v-btn>
                 </template>
                 <span> Change path </span>
@@ -72,7 +72,6 @@
               :cols="path_panel_expand ? 12 : 10"
               :md="path_panel_expand ? 2 : 9"
               class="mt-2"
-              v-show="path_panel_expand"
             >
               <v-autocomplete
                 density="compact"
