@@ -1257,8 +1257,8 @@ const validateForm = () => {
     return false;
   }
   
-  if (!form.question || form.question.trim() === "") {
-    if ($toast) $toast.error("Please enter a question");
+  if (!form.question && !form.q_file_base64) {
+    if ($toast) $toast.error("Please enter a question or upload an image");
     return false;
   }
   
@@ -1295,25 +1295,25 @@ const validateForm = () => {
         }
       }
     } else {
-      // Check image answers
-      if (form.true_answer === "1" && !form.a_file_base64) {
-        if ($toast) $toast.error("Please upload an image for Answer A (marked as correct)");
+      // Check image answers in photo mode
+      if (!form.a_file_base64) {
+        if ($toast) $toast.error("Please upload an image for Answer A");
         return false;
       }
       
-      if (form.true_answer === "2" && !form.b_file_base64) {
-        if ($toast) $toast.error("Please upload an image for Answer B (marked as correct)");
+      if (!form.b_file_base64) {
+        if ($toast) $toast.error("Please upload an image for Answer B");
         return false;
       }
       
       if (form.type === "fourchoice") {
-        if (form.true_answer === "3" && !form.c_file_base64) {
-          if ($toast) $toast.error("Please upload an image for Answer C (marked as correct)");
+        if (!form.c_file_base64) {
+          if ($toast) $toast.error("Please upload an image for Answer C");
           return false;
         }
         
-        if (form.true_answer === "4" && !form.d_file_base64) {
-          if ($toast) $toast.error("Please upload an image for Answer D (marked as correct)");
+        if (!form.d_file_base64) {
+          if ($toast) $toast.error("Please upload an image for Answer D");
           return false;
         }
       }
@@ -1485,6 +1485,9 @@ const uploadFile = (file_name, fileEvent) => {
   // Set current crop file name for tracking which file we're working with
   current_crop_file.value = file_name;
 
+  // Store the file in form_hidden_data
+  form_hidden_data[file_name] = file;
+
   // Set crop file URL for cropper dialog
   crop_file_url.value = URL.createObjectURL(file);
 
@@ -1497,10 +1500,10 @@ const uploadFile = (file_name, fileEvent) => {
  * @param {Object} param0 - Cropper data
  */
 const cropFile = ({ coordinates, canvas }) => {
-  // Store the cropped image data
+  // Store the cropped image data as base64
   const croppedBase64 = canvas.toDataURL();
 
-      // Update the corresponding form field
+  // Update the corresponding form field
   if (current_crop_file.value === "q_file") {
     form.q_file_base64 = croppedBase64;
   } else if (current_crop_file.value === "answer_full_file") {
@@ -1574,6 +1577,9 @@ const answerTypeChanged = (type) => {
     text_answer_rules.value = "";
     answerType.value = "photo";
   }
+
+  // Reset true_answer when switching between image and text modes
+  form.true_answer = "";
 };
 
 /**
@@ -1871,32 +1877,36 @@ const submitCrop = async () => {
   crop_confirm_loading.value = true;
 
   try {
-    // Get the current file based on the file name
-    let file = null;
+    // Get the cropped base64 image based on the current file name
+    let fileBase64 = null;
 
     if (current_crop_file.value === "q_file") {
-      file = form_hidden_data.q_file;
+      fileBase64 = form.q_file_base64;
     } else if (current_crop_file.value === "answer_full_file") {
-      file = form_hidden_data.answer_full_file;
+      fileBase64 = form.answer_full_file_base64;
     } else if (current_crop_file.value === "a_file") {
-      file = form_hidden_data.a_file;
+      fileBase64 = form.a_file_base64;
     } else if (current_crop_file.value === "b_file") {
-      file = form_hidden_data.b_file;
+      fileBase64 = form.b_file_base64;
     } else if (current_crop_file.value === "c_file") {
-      file = form_hidden_data.c_file;
+      fileBase64 = form.c_file_base64;
     } else if (current_crop_file.value === "d_file") {
-      file = form_hidden_data.d_file;
+      fileBase64 = form.d_file_base64;
     }
 
-    if (file) {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append("file", file);
+    if (fileBase64) {
+      // Create URLSearchParams for the request (similar to querystring in the old version)
+      const params = new URLSearchParams();
+      params.append('file_base64', fileBase64);
 
       // Send API request
       const response = await $fetch("/api/v1/upload", {
         method: "POST",
-        body: formData,
+        body: params,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": `Bearer ${userToken.value}`
+        }
       });
 
       if (response?.data?.[0]?.file?.name) {
@@ -1920,9 +1930,9 @@ const submitCrop = async () => {
 
         if ($toast) $toast.success("File uploaded successfully");
 
-      // Close the dialog after successful upload
-      cropper_dialog.value = false;
-    } else {
+        // Close the dialog after successful upload
+        cropper_dialog.value = false;
+      } else {
         if ($toast) $toast.error("Invalid response from server");
       }
     } else {
@@ -2088,32 +2098,63 @@ const manualSubmit = async () => {
   // Log the actual form object we'll be submitting
   console.log("Submitting form object directly:", form);
   
-  // Temporary hardcoded data structure to match exactly what the API expects
-  const hardcodedSubmission = {
-    section: form.section.toString(),
-    base: form.base.toString(),
-    lesson: form.lesson.toString(),
-    topic: form.topic.toString(),
-    type: form.type,
-    question: form.question,
-    true_answer: form.true_answer,
-    testImgAnswers: form.testImgAnswers ? "1" : "0",
-    answer_full: form.answer_full || "",
-    testingAnswers: "0",
-    direction: "ltr",
-    answer_a: form.answer_a || "",
-    answer_b: form.answer_b || "",
-    answer_c: form.answer_c || "",
-    answer_d: form.answer_d || ""
-  };
-  
-  // Create URLSearchParams object instead of using require('querystring')
+  // Create URLSearchParams object for the API request
   const formData = new URLSearchParams();
   
-  // Add all form fields to the URLSearchParams
-  Object.keys(hardcodedSubmission).forEach(key => {
-    formData.append(key, hardcodedSubmission[key]);
-  });
+  // Add all required fields
+  formData.append("section", form.section.toString());
+  formData.append("base", form.base.toString());
+  formData.append("lesson", form.lesson.toString());
+  formData.append("topic", form.topic.toString());
+  formData.append("type", form.type);
+  formData.append("direction", form.direction || "ltr");
+  formData.append("question", form.question || "");
+  formData.append("true_answer", form.true_answer || "");
+  formData.append("testImgAnswers", form.testImgAnswers ? "1" : "0");
+  formData.append("testingAnswers", "0");
+  formData.append("answer_full", form.answer_full || "");
+  
+  // Add answers based on question type
+  if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
+    formData.append("answer_a", form.answer_a || "");
+    formData.append("answer_b", form.answer_b || "");
+    
+    if (form.type === "fourchoice") {
+      formData.append("answer_c", form.answer_c || "");
+      formData.append("answer_d", form.answer_d || "");
+    }
+  }
+  
+  // Add file fields if they exist
+  if (form.q_file) formData.append("q_file", form.q_file);
+  if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
+  
+  // Handle photo mode file fields
+  if (form.testImgAnswers) {
+    if (form.a_file) formData.append("a_file", form.a_file);
+    if (form.b_file) formData.append("b_file", form.b_file);
+    if (form.type === "fourchoice") {
+      if (form.c_file) formData.append("c_file", form.c_file);
+      if (form.d_file) formData.append("d_file", form.d_file);
+    }
+    
+    // If we're in photo mode but the files weren't properly uploaded,
+    // add base64 data directly for the backend to process
+    if (form.a_file_base64 && !form.a_file) {
+      formData.append("a_file_base64", form.a_file_base64);
+    }
+    if (form.b_file_base64 && !form.b_file) {
+      formData.append("b_file_base64", form.b_file_base64);
+    }
+    if (form.type === "fourchoice") {
+      if (form.c_file_base64 && !form.c_file) {
+        formData.append("c_file_base64", form.c_file_base64);
+      }
+      if (form.d_file_base64 && !form.d_file) {
+        formData.append("d_file_base64", form.d_file_base64);
+      }
+    }
+  }
   
   console.log("Stringified form data:", formData.toString());
   
