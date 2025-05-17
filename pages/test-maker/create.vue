@@ -1108,7 +1108,6 @@ const video_analysis_options = [
 const state_list = ref([]);
 const area_list = ref([]);
 const school_list = ref([]);
-const test_share_link = ref("");
 
 const holding_level_list = [
   { id: 1, title: "School" },
@@ -1116,8 +1115,6 @@ const holding_level_list = [
   { id: 3, title: "State" },
   { id: 4, title: "Country" },
 ];
-
-
 
 // Compute the progress percentage for tests added (0-100%)
 const testProgress = computed(() => {
@@ -1361,6 +1358,9 @@ const publishTest = async () => {
     if (response.data?.message === "done") {
       nuxtApp.$toast.success("Exam published successfully");
       
+      // Store the exam ID before resetting state
+      const publishedExamId = response.data.id || exam_id.value;
+      
       // Reset state
       exam_id.value = "";
       exam_code.value = "";
@@ -1376,13 +1376,12 @@ const publishTest = async () => {
       // Reset data
       previewTestList.value = [];
       tests.value = [];
-      test_share_link.value = "";
-
+      
       // Clear form data
       resetForm();
       
-      // Set new share link for published exam
-      test_share_link.value = `https://gamatrain.com/exam/${response.data.id || ""}`;
+      // Set exam_id to the published ID so the computed test_share_link works
+      exam_id.value = publishedExamId;
       
       // Navigate to publish step
       test_step.value = 4;
@@ -1805,10 +1804,9 @@ onMounted(async () => {
   // Load tests if needed
   await getExamTests();
   
-  // If we have an exam ID, get its tests and initialize share link
+  // If we have an exam ID, get its tests
   if (exam_id.value) {
     await getExamCurrentTests();
-    test_share_link.value = `https://gamatrain.com/exam/${exam_id.value}`;
   }
   
   // Try to load MathJax if it's not already available
@@ -1937,7 +1935,6 @@ const deleteOnlineExam = async () => {
     // Reset all values
     exam_id.value = "";
     exam_code.value = "";
-    test_share_link.value = "";
     
     // Reset tests
     tests.value = [];
@@ -2088,7 +2085,6 @@ const resetAllData = () => {
   // Reset exam data
   exam_id.value = "";
   exam_code.value = "";
-  test_share_link.value = "";
   
   // Reset tests
   tests.value = [];
@@ -2208,6 +2204,16 @@ const loadMathJaxIfNeeded = () => {
     renderMathJax();
   }
 };
+
+// Change from ref to computed
+const test_share_link = computed(() => {
+  if (process.server) {
+    // Return a consistent value during SSR to avoid hydration mismatch
+    return `https://gamatrain.com/exam/${exam_id.value || ""}`;
+  }
+  // Only use window.location on client side
+  return `${window.location.origin}/exam/${exam_id.value || ""}`;
+});
 </script>
 
 <style lang="scss">
