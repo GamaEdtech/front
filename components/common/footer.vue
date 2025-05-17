@@ -16,15 +16,16 @@
               anywhere.
             </div>
             <div class="mt-4">
-              <nuxt-link to="/" class="v-btn">
+              <a href="https://x.com/GamaEdtech" target="_blank" class="v-btn">
                 <v-icon>mdi-twitter</v-icon>
-              </nuxt-link>
-              <nuxt-link to="/" class="v-btn">
-                <v-icon> mdi-facebook </v-icon>
-              </nuxt-link>
-              <nuxt-link to="/" class="v-btn">
-                <v-icon> mdi-instagram </v-icon>
-              </nuxt-link>
+              </a>
+              <a
+                href="https://youtube.com/@GamaEdtech"
+                target="_blank"
+                class="v-btn"
+              >
+                <v-icon> mdi-youtube </v-icon>
+              </a>
             </div>
           </v-col>
           <v-col
@@ -76,9 +77,15 @@
     <v-container fluid id="footer-copy-right" v-if="!isPageToHideFooter">
       <v-row>
         <v-col cols="12" class="pt-3 pb-1 text-center px-0">
-          <span class="describe gama-text-overline"
-            >All Right Reserved.Copyright @ 2023</span
-          >
+          <span class="describe gama-text-overline">
+            © {{ $moment().year() }} GamaEdtech. Licensed under
+            <a
+              href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GPL-2.0+</a
+            >.
+          </span>
         </v-col>
       </v-row>
     </v-container>
@@ -97,6 +104,10 @@ export default {
             {
               title: "About us",
               link: "/about-us",
+            },
+            {
+              title: "Contact us",
+              link: "/contact-us",
             },
             {
               title: "Terms",
@@ -120,7 +131,7 @@ export default {
               link: "/school",
             },
             {
-              title: "GET Token",
+              title: "$GET Token",
               link: "/get-token",
             },
           ],

@@ -114,6 +114,8 @@
             show-arrows-on-hover
             height="26.4rem"
             class="gallery-carousel"
+            cycle
+            interval="3000"
             @click="openGalleryDialog"
             v-model="activeGalleryIndex"
             @change="updateMainGalleryImage"
@@ -326,7 +328,12 @@
           </v-col>
           <v-col cols="3" class="text-right d-block d-md-none">
             <div class="rate-section gtext-t4 font-weight-semibold ml-1">
-              {{ contentData.score ? contentData.score : "New" }}
+              <!-- {{ contentData.score ? contentData.score : "New" }} -->
+              {{
+                ratingData.averageRate
+                  ? ratingData.averageRate.toFixed(1)
+                  : "New"
+              }}
               <v-icon size="20" color="primary"> mdi-star </v-icon>
             </div>
           </v-col>
@@ -399,7 +406,12 @@
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                {{ contentData.score ? contentData.score : "New" }}
+                <!-- {{ contentData.score ? contentData.score : "New" }} -->
+                {{
+                  ratingData.averageRate
+                    ? ratingData.averageRate.toFixed(1)
+                    : "New"
+                }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
             </div>
@@ -411,21 +423,21 @@
             <div class="d-flex">
               <v-sheet class="chips-container">
                 <v-chip
-                  v-if="contentData.countryTitle"
+                  v-show="contentData.countryTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.countryTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.stateTitle"
+                  v-show="contentData.stateTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.stateTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.cityTitle"
+                  v-show="contentData.cityTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
@@ -483,45 +495,11 @@
                 <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
             </div>
-            <div class="d-flex">
-              <div class="gtext-h5 primary-gray-600">
-                <div class="mb-4">Sports facilities</div>
-                <div>
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.sport_hall == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-basketball </v-icon>
-                  </v-btn>
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.dorm == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-bed </v-icon>
-                  </v-btn>
-
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.smart_class == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-tablet-cellphone </v-icon>
-                  </v-btn>
-                </div>
-              </div>
-              <v-spacer />
-              <div
-                @click="facilitiesDialog = true"
-                class="gtext-t4 primary-blue-500 align-self-center pointer"
-              >
-                Contribute
-              </div>
-            </div>
+            <Facilities
+              :facilities="contentData.tags"
+              @open-auth-dialog="openAuthDialog"
+              @facilities-updated="refreshSchoolData"
+            />
           </v-col>
           <v-col cols="12" md="4" id="main-info-section">
             <div class="d-flex info-itm ml-md-6">
@@ -1436,8 +1414,7 @@
     <v-dialog
       transition="dialog-bottom-transition"
       v-model="selectLocationDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
+      fullscreen
       style="z-index: 20001"
     >
       <v-card>
@@ -1499,77 +1476,6 @@
     </v-dialog>
     <!-- End select location dialog -->
 
-    <!-- Select facilites dialog -->
-    <v-dialog
-      transition="dialog-bottom-transition"
-      v-model="facilitiesDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
-      style="z-index: 20001"
-    >
-      <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-8">
-          <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">Facilities</div>
-            <v-spacer></v-spacer>
-            <v-btn icon
-              ><v-icon size="20" @click="facilitiesDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
-          </div>
-          <v-divider class="mb-12 mt-4" />
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.sport_hall == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-basketball </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Sport hall</span>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.dorm == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-bed </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Dorm</span>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.smart_class == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-tablet-cellphone </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Smart class</span>
-            </v-col>
-            <v-col cols="12" md="6"> </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions class="justify-center pb-13">
-          <v-btn
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            x-large
-            >Save</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End select facilites dialog -->
-
     <!-- Report School Issue Dialog -->
     <ReportDialog
       v-model="reportDialog"
@@ -1584,7 +1490,7 @@
 import locationSearch from "@/components/Form/LocationSearch";
 import GalleryDialog from "@/components/school/GalleryDialog.vue";
 import ReportDialog from "@/components/school/ReportDialog.vue";
-
+import Facilities from "@/components/school/detail/Facilities.vue";
 export default {
   name: "school-details",
   auth: false,
@@ -1625,7 +1531,6 @@ export default {
       help_loading: false,
       leaveCommentDialog: false,
       galleryDialog: false,
-      facilitiesDialog: false,
 
       commentForm: {
         comment: "",
@@ -1711,6 +1616,7 @@ export default {
     locationSearch,
     GalleryDialog,
     ReportDialog,
+    Facilities,
   },
   async asyncData({ params, $axios }) {
     const baseURL = process.server
@@ -2306,6 +2212,7 @@ export default {
         })
         .catch((err) => {
           if (err.response.status == 401 || err.response.status == 403) {
+            this.openAuthDialog("login");
           } else this.$toast.error(err.response.data.message);
         })
         .finally(() => {
@@ -2323,6 +2230,7 @@ export default {
           this.nameSubmitLoader = false;
         });
     },
+    refreshSchoolData() {},
   },
 };
 </script>
@@ -2591,7 +2499,7 @@ export default {
 
   #mapSection {
     width: 100%;
-    height: 44rem;
+    height: 80vh;
   }
 
   #searchSection {

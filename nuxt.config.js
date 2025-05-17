@@ -80,7 +80,7 @@ export default {
     { src: "plugins/vuedraggable", ssr: false },
     { src: "plugins/gtag.js", mode: "client" },
     { src: "plugins/mathjax.js", mode: "client" },
-    { src: "plugins/hotjar.client.js", mode: "client" },
+    // { src: "plugins/hotjar.client.js", mode: "client" },
     { src: "plugins/board-selection.js", mode: "client" },
   ],
 
@@ -97,9 +97,22 @@ export default {
     "@nuxtjs/dotenv",
     "@nuxtjs/moment",
     "@nuxtjs/pwa",
+    '@nuxtjs/recaptcha'
 
     // '@nuxtjs/onesignal',
   ],
+
+  //recaptcha google-v3
+  recaptcha: {
+    siteKey: process.env.RECAPTCHA_SITE_KEY, // 🔑 pulled from .env
+    version: 3,
+    size: 'invisible',
+    hideBadge: true, // optional: true if you want to hide the reCAPTCHA badge
+  },
+
+  env: {
+    RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
+  },
 
   // oneSignal: {
   //   init: {
@@ -243,7 +256,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", 'chart.js'],
+    transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "chart.js"],
     extend(config, ctx) {
       config.module.rules.push(
         {
@@ -263,7 +276,6 @@ export default {
       )
     }
   },
-
 
   pwa: {
     manifest: {

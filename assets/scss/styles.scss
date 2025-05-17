@@ -76,6 +76,10 @@ html {
   background: #e4e7ec !important;
 }
 
+.bg-primary-gray-300 {
+  background: #d0d5dd !important;
+}
+
 .bg-primary-gray-700 {
   background: var(--Primary-Grey-700, #344054) !important;
 }
@@ -4629,4 +4633,20 @@ body {
 
 .h-full {
   height: 100% !important;
+}
+
+.toast-contactus-error{
+  border-left: 4px solid #F04438;
+  height: 72px !important;
+}
+.toast-contactus-message-error{
+  color: #F04438 !important;
+}
+
+.toast-contactus-success{
+  border-left: 4px solid #12B76A;
+  height: 72px !important;
+}
+.toast-contactus-message-success{
+  color: #12B76A !important;
 }

@@ -86,7 +86,7 @@
     <v-container>
       <v-row>
         <v-col cols="12" md="6">
-          <h4 class="section-title gama-text-h5 mb-4">Releated questions</h4>
+          <h4 class="section-title gama-text-h5 mb-4">Related questions</h4>
           <div v-if="loading">
             <v-row class="latest-card" v-for="i in 3" :key="i">
               <v-col cols="12">

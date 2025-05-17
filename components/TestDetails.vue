@@ -166,7 +166,7 @@
 
                   <!--Helpful link-->
                   <div class="justify-center text-center">
-                    <v-btn @click="loadNextTest()" :loading="nextTestLoading"
+                    <v-btn :disabled="!nextTestId" :to="`/test/${nextTestId}`" :loading="nextTestLoading"
                       class="next-test mx-auto text-transform-none">
                       {{
                         this.$route.name == "test-id"
@@ -214,6 +214,8 @@ export default {
     setTimeout(() => {
       this.renderMathJax();
     }, 2000);
+
+    this.loadNextTest();
   },
 
   data: () => ({
@@ -226,6 +228,7 @@ export default {
         href: "/search?type=azmoon",
       },
     ],
+    nextTestId: null,
     detail: {
       poster: "poster1.jpg",
       linkPoster: "",
@@ -491,11 +494,12 @@ export default {
           `/api/v1/examTests/random?lesson=${this.contentData.lesson}&topic=${this.contentData.topic}`
         )
         .then((response) => {
-          if (response.data.code)
-            this.$router.push(`/test/${response.data.code}`);
+          if (response.data.code) this.nextTestId = response.data.code;
         })
         .catch((err) => {
           // console.log(err);
+        })
+        .finally(() => {
           this.nextTestLoading = false;
         });
     },
