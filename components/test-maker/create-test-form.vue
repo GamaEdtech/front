@@ -1173,12 +1173,6 @@ const resetFormFields = () => {
     form.lesson = preservedValues.lesson;
     form.topic = preservedValues.topic;
     
-    console.log("Preserved form location fields:", {
-      section: form.section,
-      base: form.base,
-      lesson: form.lesson,
-      topic: form.topic
-    });
   }
   
   // Reset file inputs if they exist
@@ -1327,20 +1321,6 @@ const validateForm = () => {
  * Handle form submission
  */
 const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
-  console.log("Submit handler triggered with values:", values);
-
-  // Additional debugging logs
-  console.log("Form data state:", {
-      section: form.section,
-      base: form.base,
-      lesson: form.lesson,
-      topic: form.topic,
-    questionLength: form.question ? form.question.length : 0,
-    trueAnswer: form.true_answer,
-    answerA: form.answer_a ? form.answer_a.length : 0,
-    answerB: form.answer_b ? form.answer_b.length : 0
-  });
-  
   create_loading.value = true;
   
   // Force clear error messages again
@@ -1388,9 +1368,6 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
     if (form.c_file) formData.append("c_file", form.c_file);
     if (form.d_file) formData.append("d_file", form.d_file);
 
-    console.log("Form data prepared:", formData.toString());
-    console.log("Sending request to /api/v1/examTests");
-
     // Add a simulated delay for easier debugging in console
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -1411,22 +1388,17 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
       throw error;
     });
 
-    console.log("API response received:", response);
-
     if (response.status == 1) {
-      console.log("Test created successfully with ID:", response.data?.id);
       $toast.success("Created successfully");
       path_panel_expand.value = false;
 
       // Edit mode or create exam progress
       if (props.examEditMode === true) {
-        console.log("Emitting update event with ID:", response.data.id);
         emit("update:updateTestList", response.data.id);
       }
 
       // Reset form fields using our improved function
       resetFormFields();
-      console.log("Form reset after successful submission");
     } else {
       console.error("API returned error status:", response);
       $toast.error(response.message || "An error occurred, try again");
@@ -1951,7 +1923,6 @@ const submitCrop = async () => {
  * This is a wrapper for submitQuestion
  */
 const createTest = () => {
-  console.log("Create button clicked! Trying manual submission...");
   manualSubmit();
 };
 
@@ -2069,34 +2040,22 @@ const validateQuestionField = (value) => {
 
 // Add a more direct click handler that bypasses VeeValidate
 const manualSubmit = async () => {
-  console.log("Manual submit triggered");
-  
-  // First clear any validation errors
   clearFieldValidationErrors();
-  
-  // Ensure the topic value is set correctly - this is critical
-  console.log("Current topic value:", form.topic);
   
   if (!form.topic && selected_topics.value && selected_topics.value.length > 0) {
     form.topic = parseInt(selected_topics.value[0]);
-    console.log("Updated topic from selected_topics:", form.topic);
   }
   
   // Run our direct validation
   if (!validateForm()) {
-    console.log("Form validation failed");
     return;
   }
   
-  console.log("Form validation passed, preparing to submit");
   create_loading.value = true;
   
   // Ensure required fields are present
   form.direction = form.direction || "ltr";
   form.testingAnswers = 0;
-  
-  // Log the actual form object we'll be submitting
-  console.log("Submitting form object directly:", form);
   
   // Create URLSearchParams object for the API request
   const formData = new URLSearchParams();
@@ -2155,9 +2114,6 @@ const manualSubmit = async () => {
       }
     }
   }
-  
-  console.log("Stringified form data:", formData.toString());
-  
   try {
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
@@ -2168,10 +2124,7 @@ const manualSubmit = async () => {
       }
     });
     
-    console.log("API response received:", response);
-    
     if (response.status == 1) {
-      console.log("Test created successfully with ID:", response.data?.id);
       const { $toast } = useNuxtApp();
       if ($toast) $toast.success("Created successfully");
       
@@ -2179,13 +2132,11 @@ const manualSubmit = async () => {
       
       // Edit mode or create exam progress
       if (props.examEditMode === true) {
-        console.log("Emitting update event with ID:", response.data.id);
         emit("update:updateTestList", response.data.id);
       }
       
       // Reset form fields using our improved function
       resetFormFields();
-      console.log("Form reset after successful submission");
     } else {
       console.error("API returned error status:", response);
       const { $toast } = useNuxtApp();
