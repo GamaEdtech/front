@@ -288,7 +288,7 @@
                 <!--Answer section-->
                 <v-row>
                   <v-col cols="12" class="pt-0 px-sm-3 pt-sm-3">
-                    <v-row v-for="answer in answer_list" :key="answer.id">
+                    <v-row v-for="answer in answer_list" :key="answer.id" :id="'answer-' + answer.id">
                       <!--Score action-->
                       <v-col cols="1" class="pr-0 d-none d-md-block">
                         <v-card flat color="#FAFAFA" class="mb-4 d-flex fill-height text-center" min-height="200">
@@ -724,11 +724,6 @@ export default {
     ValidationProvider,
     ValidationObserver,
   },
-  // head() {
-  //   return {
-  //     title: this.contentData.title,
-  //   };
-  // },
   head() {
     return {
       title: this.contentData.title,
@@ -737,58 +732,51 @@ export default {
           type: 'application/ld+json',
           json: {
             "@context": "https://schema.org",
-            "@type": "DiscussionForumPosting",
-            "headline": this.contentData.title,
-            "articleBody": this.contentData.question,
-            "datePublished": new Date(this.contentData.subdate).toISOString(),
-            "author": {
-              "@type": "Person",
-              "name": this.contentData.name,
-              "url": this.contentData.userLink
-            },
-            "url": `https://ca72-212-30-36-69.ngrok-free.app/qa/${this.contentData.id}`,
-            "mainEntityOfPage": `https://ca72-212-30-36-69.ngrok-free.app/qa/${this.contentData.id}`,
-            interactionStatistic: [
-              {
-                "@type": "InteractionCounter",
-                "interactionType": { "@type": "ViewAction" },
-                "userInteractionCount": parseInt(this.contentData.visits) || 0
+            "@type": "QAPage",
+            "mainEntity": {
+              "@type": "Question",
+              "name": this.contentData.title,
+              "text": this.contentData.question,
+              "dateCreated": new Date(this.contentData.subdate).toISOString(),
+              "author": {
+                "@type": "Person",
+                "name": this.contentData.name,
+                "url": this.contentData.userLink
               },
-              {
-                "@type": "InteractionCounter",
-                "interactionType": { "@type": "CommentAction" },
-                "userInteractionCount": this.answer_list?.length || 0
-              },
-              {
-                "@type": "InteractionCounter",
-                "interactionType": { "@type": "VoteAction" },
-                "userInteractionCount": parseInt(this.contentData.score) || 0
-              }
-            ],
-            "comment": this.answer_list?.sort((a, b) => b.score - a.score)
-              .slice(0, 5)
-              .map(a => ({
-                "@type": "Comment",
-                "text": a.answer,
-                "dateCreated": new Date(a.subdate).toISOString(),
-                "author": {
-                  "@type": "Person",
-                  "name": a.name,
-                  "url": a.userLink
-                }
-              }))
-            // "suggestedAnswer": this.answer_list?.sort((a, b) => b.score - a.score)
-            //   .slice(0, 5)
-            //   .map(a => ({
-            //     "@type": "Answer",
-            //     "text": a.answer,
-            //     "dateCreated": a.subdate,
-            //     "author": {
-            //       "@type": "Person",
-            //       "name": a.name,
-            //       "url": a.userLink
-            //     }
-            //   }))
+              "upvoteCount": parseInt(this.contentData.score) || 0,
+              "answerCount": this.answer_list?.length || 0,
+              "url": `https://gamatrain.com/qa/${this.contentData.id}`,
+              "acceptedAnswer": this.answer_list
+                ?.sort((a, b) => b.score - a.score)
+                .slice(0, 5)
+                .map(a => ({
+                  "@type": "Answer",
+                  "text": a.answer,
+                  "dateCreated": new Date(a.subdate).toISOString(),
+                  "upvoteCount": parseInt(a.score) || 0,
+                  "url": `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  "author": {
+                    "@type": "Person",
+                    "name": a.name,
+                    "url": a.userLink
+                  }
+                })),
+              "suggestedAnswer": this.answer_list
+                ?.sort((a, b) => b.score - a.score)
+                .slice(0, 5)
+                .map(a => ({
+                  "@type": "Answer",
+                  "text": a.answer,
+                  "dateCreated": new Date(a.subdate).toISOString(),
+                  "upvoteCount": parseInt(a.score) || 0,
+                  "url": `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  "author": {
+                    "@type": "Person",
+                    "name": a.name,
+                    "url": a.userLink
+                  }
+                }))
+            }
           }
         }
       ]
