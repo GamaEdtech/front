@@ -576,7 +576,7 @@
                 size="small"
                 class="img-clear-btn"
               >
-                <v-icon small> mdi-delete </v-icon>
+                <v-icon > mdi-delete </v-icon>
               </v-btn>
             </v-col>
             <!--End solution section-->
@@ -1077,7 +1077,9 @@ const {
  */
 const getTypeList = async (type, parent = "") => {
   const params = { type };
-
+  const { $toast } = useNuxtApp();
+  
+  // Set up parameters based on type
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
   if (type === "topic") params.lesson_id = parent;
@@ -1089,6 +1091,18 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
+    // Add loading state if needed
+    const loadingTarget = 
+      type === "section" ? level_list :
+      type === "base" ? grade_list :
+      type === "lesson" ? lesson_list :
+      type === "topic" ? topic_list : null;
+    
+    if (loadingTarget) {
+      // Set a temporary loading item
+      loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
+    }
+
     const res = await $fetch("/api/v1/types/list", {
       method: "GET",
       params,
@@ -1104,7 +1118,15 @@ const getTypeList = async (type, parent = "") => {
       topic_list.value = res.data;
     }
   } catch (err) {
-    $toast.error(err.message || "Error loading data");
+    console.error(`Error loading ${type} data:`, err);
+    
+    // Reset the target list to empty on error
+    if (type === "section") level_list.value = [];
+    else if (type === "base") grade_list.value = [];
+    else if (type === "lesson") lesson_list.value = [];
+    else if (type === "topic") topic_list.value = [];
+    
+    if ($toast) $toast.error(`Failed to load ${type} data: ${err.message || "Unknown error"}`);
   }
 };
 
@@ -1570,17 +1592,28 @@ const getCurrentExamInfo = async () => {
         },
       });
 
-      // Set form data from response
-      form.section = response.data.section;
-      // Set form data from response
-      form.section = response.data.section;
-      form.base = response.data.base;
-      form.lesson = response.data.lesson;
-      
-      // If in edit mode, we need to populate topics as well
-      if (props.examEditMode && response.data.topics && response.data.topics.length) {
-        form.topic = response.data.topics[0];
-        await getTypeList("topic", form.lesson);
+      // Set form data from response - important to set in sequence
+      if (response.data.section) {
+        form.section = response.data.section;
+        // Fetch grade list based on section
+        await getTypeList("base", response.data.section);
+        
+        if (response.data.base) {
+          form.base = response.data.base;
+          // Fetch lesson list based on base
+          await getTypeList("lesson", response.data.base);
+          
+          if (response.data.lesson) {
+            form.lesson = response.data.lesson;
+            // Fetch topic list based on lesson
+            await getTypeList("topic", response.data.lesson);
+            
+            // If in edit mode, we need to populate topics as well
+            if (props.examEditMode && response.data.topics && response.data.topics.length) {
+              form.topic = response.data.topics[0];
+            }
+          }
+        }
       }
 
       // Set file path if available
@@ -1591,19 +1624,6 @@ const getCurrentExamInfo = async () => {
       // Set exam test list length
       if (response.data.tests && Array.isArray(response.data.tests)) {
         examTestListLength.value = response.data.tests.length;
-      }
-      
-      // Fetch additional data lists based on the retrieved information
-      if (form.section) {
-        await getTypeList("base", form.section);
-      }
-      
-      if (form.base) {
-        await getTypeList("lesson", form.base);
-      }
-      
-      if (form.lesson) {
-        await getTypeList("topic", form.lesson);
       }
     } catch (err) {
       console.error("Error fetching exam info:", err);
@@ -1665,24 +1685,54 @@ const goToPreviewStep = () => {
 // Watch section change to update base list
 watch(
   () => form.section,
-  (val) => {
-    if (val) getTypeList("base", val);
+  (val, oldVal) => {
+    if (val) {
+      // Reset dependent fields when section changes
+      if (val !== oldVal) {
+        form.base = "";
+        form.lesson = "";
+        form.topic = "";
+        grade_list.value = [];
+        lesson_list.value = [];
+        topic_list.value = [];
+      }
+      // Fetch new grade list
+      getTypeList("base", val);
+    }
   }
 );
 
 // Watch base change to update lesson list
 watch(
   () => form.base,
-  (val) => {
-    if (val) getTypeList("lesson", val);
+  (val, oldVal) => {
+    if (val) {
+      // Reset dependent fields when base changes
+      if (val !== oldVal) {
+        form.lesson = "";
+        form.topic = "";
+        lesson_list.value = [];
+        topic_list.value = [];
+      }
+      // Fetch new lesson list
+      getTypeList("lesson", val);
+    }
   }
 );
 
 // Watch lesson change to update topic list
 watch(
   () => form.lesson,
-  (val) => {
-    if (val) getTypeList("topic", val);
+  (val, oldVal) => {
+    if (val) {
+      // Reset topic when lesson changes
+      if (val !== oldVal) {
+        form.topic = "";
+        topic_list.value = [];
+      }
+      // Fetch new topic list
+      getTypeList("topic", val);
+    }
   }
 );
 
@@ -1742,30 +1792,51 @@ watch(
  */
 watch(
   () => props.initialSection,
-  (newVal) => {
+  async (newVal) => {
     if (newVal && newVal !== form.section) {
+      // Reset dependent fields
+      form.base = "";
+      form.lesson = "";
+      form.topic = "";
+      grade_list.value = [];
+      lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Set new section and fetch grades
       form.section = newVal;
-      getTypeList("base", newVal);
+      await getTypeList("base", newVal);
     }
   }
 );
 
 watch(
   () => props.initialBase,
-  (newVal) => {
+  async (newVal) => {
     if (newVal && newVal !== form.base) {
+      // Reset dependent fields
+      form.lesson = "";
+      form.topic = "";
+      lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Set new base and fetch lessons
       form.base = newVal;
-      getTypeList("lesson", newVal);
+      await getTypeList("lesson", newVal);
     }
   }
 );
 
 watch(
   () => props.initialLesson,
-  (newVal) => {
+  async (newVal) => {
     if (newVal && newVal !== form.lesson) {
+      // Reset topic
+      form.topic = "";
+      topic_list.value = [];
+      
+      // Set new lesson and fetch topics
       form.lesson = newVal;
-      getTypeList("topic", newVal);
+      await getTypeList("topic", newVal);
     }
   }
 );
@@ -1773,7 +1844,7 @@ watch(
 watch(
   () => props.initialTopics,
   (newVal) => {
-    if (newVal?.length && !form.topic) {
+    if (newVal?.length && (!form.topic || !newVal.includes(form.topic))) {
       form.topic = newVal[0];
       selected_topics.value = newVal;
     }
@@ -1784,7 +1855,7 @@ watch(
 /**
  * Initialize on mount
  */
-onMounted(() => {
+onMounted(async () => {
   // Initialize user token
   userToken.value = auth.getUserToken();
   
@@ -1794,39 +1865,38 @@ onMounted(() => {
   text_answer.value = true;
   photo_answer.value = false;
   
-  // Load initial data
-  getTypeList("section");
+  // Load initial data - start with sections
+  await getTypeList("section");
   
-  // Initialize form with prop values if available
+  // Initialize form with prop values if available - make sure to load in proper sequence
   if (props.initialSection) {
     form.section = props.initialSection;
-    getTypeList("base", props.initialSection);
-  }
-  
-  if (props.initialBase) {
-    form.base = props.initialBase;
-    getTypeList("lesson", props.initialBase);
-  }
-  
-  if (props.initialLesson) {
-    form.lesson = props.initialLesson;
-    getTypeList("topic", props.initialLesson);
-  }
-  
-  if (props.initialTopics && props.initialTopics.length) {
-    form.topic = props.initialTopics[0];
-    selected_topics.value = props.initialTopics;
+    await getTypeList("base", props.initialSection);
+    
+    if (props.initialBase) {
+      form.base = props.initialBase;
+      await getTypeList("lesson", props.initialBase);
+      
+      if (props.initialLesson) {
+        form.lesson = props.initialLesson;
+        await getTypeList("topic", props.initialLesson);
+        
+        if (props.initialTopics && props.initialTopics.length) {
+          form.topic = props.initialTopics[0];
+          selected_topics.value = props.initialTopics;
+        }
+      }
+    }
   }
   
   // If in edit mode, we need to ensure we load the current exam's data
   if (props.examEditMode) {
-    getCurrentExamInfo().then(() => {
-      console.log("Exam data loaded in edit mode:", {
-        section: form.section,
-        base: form.base,
-        lesson: form.lesson,
-        topic: form.topic
-      })
+    await getCurrentExamInfo();
+    console.log("Exam data loaded in edit mode:", {
+      section: form.section,
+      base: form.base,
+      lesson: form.lesson,
+      topic: form.topic
     });
   } else {
     // Reset form to clear any previous data if not in edit mode
