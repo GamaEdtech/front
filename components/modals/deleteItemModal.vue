@@ -18,7 +18,7 @@
           <v-btn
             color="bg-Error"
             class="w-50 rounded-pill white--text"
-            @click="handleDelete"
+            @click="$emit('confirm')"
           >
             Delete
           </v-btn>
