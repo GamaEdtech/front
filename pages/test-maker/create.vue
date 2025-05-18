@@ -1160,6 +1160,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       type: type,
     };
 
+    // Set up parameters based on type
     if (type === "base") params.section_id = parent;
     if (type === "lesson") params.base_id = parent;
     if (type === "topic") params.lesson_id = parent;
@@ -1168,6 +1169,18 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     if (type === "school") {
       params.section_id = form.section;
       params.area_id = form.area;
+    }
+
+    // Add loading state if needed
+    const loadingTarget = 
+      type === "section" ? (trigger === "filter" ? filter_level_list : level_list) :
+      type === "base" ? (trigger === "filter" ? filter_grade_list : grade_list) :
+      type === "lesson" ? (trigger === "filter" ? filter_lesson_list : lesson_list) :
+      type === "topic" ? topic_list : null;
+    
+    if (loadingTarget) {
+      // Set a temporary loading item
+      loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
     }
 
     const res = await $fetch("/api/v1/types/list", {
@@ -1215,8 +1228,23 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       generateTitle();
     }
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error loading data");
-    console.error(err);
+    console.error(`Error loading ${type} data:`, err);
+    
+    // Reset the target list to empty on error
+    if (type === "section") {
+      if (trigger === "filter") filter_level_list.value = [];
+      else level_list.value = [];
+    } else if (type === "base") {
+      if (trigger === "filter") filter_grade_list.value = [];
+      else grade_list.value = [];
+    } else if (type === "lesson") {
+      if (trigger === "filter") filter_lesson_list.value = [];
+      else lesson_list.value = [];
+    } else if (type === "topic") {
+      topic_list.value = [];
+    }
+    
+    nuxtApp.$toast.error(`Failed to load ${type} data: ${err.message || "Unknown error"}`);
   }
 };
 
@@ -1494,30 +1522,38 @@ const getCurrentExamInfo = async () => {
         tests.value = [];
       }
       
-      // Update form from response data
-      form.section = response.data.section;
-      form.base = response.data.base;
-      form.lesson = response.data.lesson;
+      // Set form data in sequence to trigger proper cascading updates
+      if (response.data.section) {
+        form.section = response.data.section;
+        // Wait for grade list to load before setting base
+        await getTypeList("base", response.data.section);
+        
+        if (response.data.base) {
+          form.base = response.data.base;
+          // Wait for lesson list to load before setting lesson
+          await getTypeList("lesson", response.data.base);
+          
+          if (response.data.lesson) {
+            form.lesson = response.data.lesson;
+            // Load topics based on lesson
+            await getTypeList("topic", response.data.lesson);
+            
+            // Set topics if available
+            if (response.data.topics && response.data.topics.length) {
+              form.topics = response.data.topics;
+              await getTopicTitleList();
+            }
+          }
+        }
+      }
       
       // Set file path if available
       if (response.data.file_original) {
         file_original_path.value = response.data.file_original;
       }
-      
-      // Load dependent data
-      if (form.section) {
-        await getTypeList("base", form.section);
-      }
-      
-      if (form.base) {
-        await getTypeList("lesson", form.base);
-      }
-      
-      if (form.lesson) {
-        await getTypeList("topic", form.lesson);
-      }
     } catch (err) {
       nuxtApp.$toast.error("Failed to load exam information");
+      console.error("Error fetching exam info:", err);
     }
   }
 };
@@ -1595,18 +1631,32 @@ watch(
   }
 );
 
+// Watch for changes in form.section (Board)
 watch(
   () => form.section,
-  async (val) => {
+  async (val, oldVal) => {
     if (val) {
+      // Reset dependent fields when section changes
+      if (val !== oldVal) {
+        form.base = "";
+        form.lesson = "";
+        form.topics = [];
+        grade_list.value = [];
+        lesson_list.value = [];
+        topic_list.value = [];
+        selected_topics.value = [];
+      }
+      
+      // Fetch new grade list
       await getTypeList("base", val);
+      
+      // Update filter and createForm if available
       filter.section = val; // Init second level filter
-
-      // Ensure createForm.value and createForm.value.form exist before updating
       if (createForm.value && createForm.value.form) {
         createForm.value.form.section = val;
       }
-
+      
+      // Check if we need to fetch school list
       if (form.area) {
         await getTypeList("school");
       }
@@ -1614,102 +1664,147 @@ watch(
   }
 );
 
+// Watch for changes in form.base (Grade)
 watch(
   () => form.base,
-  async (val) => {
+  async (val, oldVal) => {
     if (val) {
+      // Reset dependent fields when base changes
+      if (val !== oldVal) {
+        form.lesson = "";
+        form.topics = [];
+        lesson_list.value = [];
+        topic_list.value = [];
+        selected_topics.value = [];
+      }
+      
+      // Fetch new lesson list
       await getTypeList("lesson", val);
+      
+      // Update filter and createForm if available
       filter.base = val; // Init second level filter
-
-      // Ensure createForm.value and createForm.value.form exist before updating
       if (createForm.value && createForm.value.form) {
         createForm.value.form.base = val;
       }
-
+      
+      // Generate title based on new base value
       generateTitle();
     }
   }
 );
 
+// Watch for changes in form.lesson (Subject)
 watch(
   () => form.lesson,
-  async (val) => {
+  async (val, oldVal) => {
     if (val) {
+      // Reset topic when lesson changes
+      if (val !== oldVal) {
+        form.topics = [];
+        topic_list.value = [];
+        selected_topics.value = [];
+      }
+      
+      // Fetch new topic list
       await getTypeList("topic", val);
-
+      
+      // Update topic selector if available
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = true;
       }
     } else {
-      form.topic = [];
+      // Reset topics when lesson is cleared
+      form.topics = [];
       topic_list.value = [];
-
+      
+      // Update topic selector if available
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = false;
       }
     }
-
+    
+    // Update filter and createForm if available
     filter.lesson = val; // Init second level filter
-
-    // Ensure createForm.value and createForm.value.form exist before updating
     if (createForm.value && createForm.value.form) {
       createForm.value.form.lesson = val;
     }
-
+    
+    // Generate title based on new lesson value
     generateTitle();
   }
 );
 
+// Watch for changes in filter.section
 watch(
   () => filter.section,
-  async (val) => {
+  async (val, oldVal) => {
     if (val) {
       test_loading.value = true;
+      // Reset dependent filters
+      filter.base = "";
+      filter.lesson = "";
+      filter_grade_list.value = [];
+      filter_lesson_list.value = [];
+      
+      // Fetch new grade list for filter
       await getTypeList("base", val, "filter");
       test_loading.value = false;
+    } else {
+      // Clear grade and lesson lists when section is cleared
+      filter_grade_list.value = [];
+      filter_lesson_list.value = [];
     }
-
+    
+    // Reset pagination and test list
     all_tests_loaded.value = true;
-    filter_grade_list.value = [];
-    filter_lesson_list.value = [];
     filter.page = 1;
     test_list.value = [];
-    filter.base = "";
-    filter.lesson = "";
   }
 );
 
+// Watch for changes in filter.base
 watch(
   () => filter.base,
-  async (val) => {
+  async (val, oldVal) => {
     if (val) {
       test_loading.value = true;
+      // Reset dependent filters
+      filter.lesson = "";
+      filter_lesson_list.value = [];
+      
+      // Fetch new lesson list for filter
       await getTypeList("lesson", val, "filter");
       test_loading.value = false;
+    } else {
+      // Clear lesson list when base is cleared
+      filter_lesson_list.value = [];
     }
-
+    
+    // Reset pagination and test list
     all_tests_loaded.value = true;
-    filter_lesson_list.value = [];
-    filter.lesson = "";
     filter.page = 1;
     test_list.value = [];
   }
 );
 
+// Watch for changes in filter.lesson
 watch(
   () => filter.lesson,
   async (val) => {
     if (val) {
       test_loading.value = true;
+      // Fetch topic list based on selected lesson
       await getTypeList("topic", val, "filter");
       test_loading.value = false;
     }
-
-    // Reset pagination and test list before loading new data
+    
+    // Reset pagination and test list
     filter.page = 1;
     test_list.value = [];
     all_tests_loaded.value = false;
-      getExamTests();
+    
+    // Load tests with new filter
+    getExamTests();
   }
 );
 
@@ -1779,25 +1874,26 @@ onMounted(async () => {
   const auth = useAuth();
   userToken.value = auth.getUserToken();
   
-  // Initialize data
+  // Initialize data in the correct sequence
   await getCurrentExamInfo();
+  
+  // Load initial data - start with sections
   await getTypeList("section");
   
-  // Conditionally load data based on URL parameters
+  // Conditionally load data based on URL parameters or existing form values
   if (form.section) {
     await getTypeList("base", form.section);
+    
+    if (form.base) {
+      await getTypeList("lesson", form.base);
+      
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
+      }
+    }
   }
   
-  if (form.base) {
-    await getTypeList("lesson", form.base);
-  }
-  
-  if (form.lesson) {
-    await getTypeList("lesson", form.lesson);
-    await getTypeList("topic", form.lesson);
-  }
-  
-  // Get type lists
+  // Get additional type lists
   await getTypeList("exam_type");
   await getTypeList("state");
   
