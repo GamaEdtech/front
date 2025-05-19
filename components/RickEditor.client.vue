@@ -257,6 +257,10 @@ const editorConfig = {
   align-items: center;
   gap: 8px;
 }
+.editor-custom-tools .v-card img{
+  height: 7rem !important;
+  width: 7rem !important;
+}
 .ck-toolbar_grouping {
   background-color: #FAFAFA !important;
 }

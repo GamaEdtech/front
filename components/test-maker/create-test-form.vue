@@ -119,25 +119,32 @@
                         v-if="!form.q_file_base64"
                         variant="text"
                         icon="mdi-camera"
+                        color="#A11333"
                         size="x-large"
                         @click="selectFile('q_file')"
                       >
-                      <v-icon size="80" color="#A11333">mdi-camera</v-icon>
-                    </v-btn>
+                        <v-icon size="80" color="#A11333">mdi-camera</v-icon>
+                      </v-btn>
                       <v-btn
                         v-if="form.q_file_base64"
                         variant="text"
-                        color="error"
+                        color="#F44336"
                         icon="mdi-delete"
                         @click="deleteFile('q_file')"
                       ></v-btn>
                       <img
                         v-if="form.q_file_base64"
-                        width="200"
-                        height="200"
-                        class="pointer image-preview rounded mt-2"
+                        width="72"
+                        height="72"
+                        class="pointer"
                         @click="selectFile('q_file')"
                         :src="form.q_file_base64"
+                        style="
+                          border-radius: 5px;
+                          height: 7rem;
+                          width: 7rem;
+                          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
+                        "
                       />
                     </template>
                   </RickEditor>
@@ -146,7 +153,6 @@
                   </p>
                 </Field>
               </ClientOnly>
-            
             </v-col>
             <!--End question section-->
 
@@ -207,7 +213,7 @@
                         value="1"
                         label="A"
                         density="compact"
-                        style="display: contents; font-size: 14px;"
+                        style="display: contents; font-size: 14px"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -230,7 +236,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            style="margin-inline-start: 10px"
                           >
                           </RickEditor>
                           <p
@@ -249,9 +255,9 @@
                     >
                       <div class="image-holder">
                         <img
-                          width="90"
-                          height="90"
-                          class="pointer image-input rounded"
+                          width="72"
+                          height="72"
+                          class="pointer image-input"
                           v-if="form.a_file_base64"
                           @click="selectFile('a_file')"
                           :src="form.a_file_base64"
@@ -260,8 +266,7 @@
                           v-else
                           variant="text"
                           color="teal-lighten-5"
-                          class="d-flex align-center justify-center"
-                          style="width: 90px; height: 90px"
+                          class="image-input"
                           @click="selectFile('a_file')"
                         >
                           <v-icon size="80" color="#A11333">mdi-camera</v-icon>
@@ -271,9 +276,9 @@
                           v-show="form.a_file_base64"
                           @click="deleteFile('a_file')"
                           variant="text"
-                          color="error"
+                          color="#F44336"
                           icon="mdi-delete"
-                          size="small"
+                          size="large"
                           class="img-clear-btn"
                         ></v-btn>
                       </div>
@@ -289,7 +294,7 @@
                         value="2"
                         label="B"
                         density="compact"
-                        style="display: contents; font-size: 14px;"
+                        style="display: contents; font-size: 14px"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -312,7 +317,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            style="margin-inline-start: 10px"
                           >
                           </RickEditor>
                           <p
@@ -331,9 +336,9 @@
                     >
                       <div class="image-holder">
                         <img
-                          width="90"
-                          height="90"
-                          class="pointer image-input rounded"
+                          width="72"
+                          height="72"
+                          class="pointer image-input"
                           v-if="form.b_file_base64"
                           @click="selectFile('b_file')"
                           :src="form.b_file_base64"
@@ -342,8 +347,7 @@
                           v-else
                           variant="text"
                           color="teal-lighten-5"
-                          class="d-flex align-center justify-center"
-                          style="width: 90px; height: 90px"
+                          class="image-input"
                           @click="selectFile('b_file')"
                         >
                           <v-icon size="80" color="#A11333">mdi-camera</v-icon>
@@ -353,9 +357,9 @@
                           v-show="form.b_file_base64"
                           @click="deleteFile('b_file')"
                           variant="text"
-                          color="error"
+                          color="#F44336"
                           icon="mdi-delete"
-                          size="small"
+                          size="large"
                           class="img-clear-btn"
                         ></v-btn>
                       </div>
@@ -369,7 +373,7 @@
                         value="3"
                         label="C"
                         density="compact"
-                        style="display: contents; font-size: 14px;"
+                        style="display: contents; font-size: 14px"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -392,7 +396,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            style="margin-inline-start: 10px"
                           >
                           </RickEditor>
                           <p
@@ -411,9 +415,9 @@
                     >
                       <div class="image-holder">
                         <img
-                          width="90"
-                          height="90"
-                          class="pointer image-input rounded"
+                          width="72"
+                          height="72"
+                          class="pointer image-input"
                           v-if="form.c_file_base64"
                           @click="selectFile('c_file')"
                           :src="form.c_file_base64"
@@ -422,8 +426,7 @@
                           v-else
                           variant="text"
                           color="teal-lighten-5"
-                          class="d-flex align-center justify-center"
-                          style="width: 90px; height: 90px"
+                          class="image-input"
                           @click="selectFile('c_file')"
                         >
                           <v-icon size="80" color="#A11333">mdi-camera</v-icon>
@@ -433,9 +436,9 @@
                           v-show="form.c_file_base64"
                           @click="deleteFile('c_file')"
                           variant="text"
-                          color="error"
+                          color="#F44336"
                           icon="mdi-delete"
-                          size="small"
+                          size="large"
                           class="img-clear-btn"
                         ></v-btn>
                       </div>
@@ -449,7 +452,7 @@
                         value="4"
                         label="D"
                         density="compact"
-                        style="display: contents; font-size: 14px;"
+                        style="display: contents; font-size: 14px"
                       ></v-radio>
                     </v-col>
                     <v-col
@@ -472,7 +475,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            style="margin-inline-start: 10px"
                           >
                           </RickEditor>
                           <p
@@ -491,9 +494,9 @@
                     >
                       <div class="image-holder">
                         <img
-                          width="200"
-                          height="200"
-                          class="pointer image-input rounded"
+                          width="72"
+                          height="72"
+                          class="pointer image-input"
                           v-if="form.d_file_base64"
                           @click="selectFile('d_file')"
                           :src="form.d_file_base64"
@@ -502,8 +505,7 @@
                           v-else
                           variant="text"
                           color="teal-lighten-5"
-                          class="d-flex align-center justify-center"
-                          style="width: 90px; height: 90px"
+                          class="image-input"
                           @click="selectFile('d_file')"
                         >
                           <v-icon size="80" color="#A11333">mdi-camera</v-icon>
@@ -513,9 +515,9 @@
                           v-show="form.d_file_base64"
                           @click="deleteFile('d_file')"
                           variant="text"
-                          color="error"
+                          color="#F44336"
                           icon="mdi-delete"
-                          size="small"
+                          size="large"
                           class="img-clear-btn"
                         ></v-btn>
                       </div>
@@ -548,9 +550,9 @@
                 </RickEditor>
               </ClientOnly>
               <img
-                width="90"
-                height="90"
-                class="pointer image-input rounded"
+                width="72"
+                height="72"
+                class="pointer image-input"
                 v-if="form.answer_full_file_base64"
                 @click="selectFile('answer_full_file')"
                 :src="form.answer_full_file_base64"
@@ -559,8 +561,7 @@
                 v-else
                 variant="text"
                 color="teal-lighten-5"
-                class=" d-flex align-center justify-center"
-                style="width: 90px; height: 90px; position: absolute; bottom: 5px; right: 10px;"
+                class="image-input"
                 size="x-large"
                 @click="selectFile('answer_full_file')"
               >
@@ -571,12 +572,12 @@
                 v-show="form.answer_full_file_base64"
                 @click="deleteFile('answer_full_file')"
                 variant="text"
-                color="error"
+                color="#F44336"
                 icon="mdi-delete"
-                size="small"
+                size="large"
                 class="img-clear-btn"
               >
-                <v-icon > mdi-delete </v-icon>
+                <v-icon size="20" color="#F44336"> mdi-delete </v-icon>
               </v-btn>
             </v-col>
             <!--End solution section-->
@@ -597,7 +598,11 @@
                     block
                     :color="buttonDisabled == false ? '#009688' : 'gray'"
                     @click.prevent="manualSubmit"
-                    style="font-weight: 600; text-transform: none; font-size: 13px;"
+                    style="
+                      font-weight: 600;
+                      text-transform: none;
+                      font-size: 13px;
+                    "
                   >
                     Create
                   </v-btn>
@@ -611,7 +616,11 @@
                     class="primary-gray-400"
                     density="compact"
                     block
-                    style="font-weight: 600; text-transform: none; font-size: 13px;"
+                    style="
+                      font-weight: 600;
+                      text-transform: none;
+                      font-size: 13px;
+                    "
                   >
                     <span v-show="examTestListLength < 5"
                       >Add at least {{ 5 - examTestListLength }} more
@@ -713,28 +722,34 @@
     </v-card>
 
     <!--Cropper Dialog-->
-    <v-dialog v-model="cropper_dialog" max-width="600" transition="dialog-bottom-transition">
+    <v-dialog
+      v-model="cropper_dialog"
+      max-width="600"
+      transition="dialog-bottom-transition"
+    >
       <v-card id="img-cropper-dialog">
         <v-card-text class="pa-0">
           <v-col v-if="crop_file_loading" cols="12" class="text-center">
-          <v-progress-circular
+            <v-progress-circular
               :size="40"
               :width="4"
               class="mt-12 mb-12"
               color="orange"
-            indeterminate
+              indeterminate
             />
           </v-col>
           <div v-else>
             <Cropper
               :src="crop_file_url"
-              :stencil-props="stencil_props"
-              image-restriction="stencil"
+              :aspect-ratio="1"
               @change="cropFile"
             />
           </div>
         </v-card-text>
-        <v-card-actions style="position: sticky; bottom: 0; left: 0; right: 0" class="pa-0">
+        <v-card-actions
+          style="position: sticky; bottom: 0; left: 0; right: 0"
+          class="pa-0"
+        >
           <v-btn
             color="teal"
             variant="flat"
@@ -760,8 +775,8 @@ import { defineRule } from "vee-validate";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import * as yup from "yup";
 import { useAuth } from "~/composables/useAuth";
-import { Cropper } from 'vue-advanced-cropper';
-import 'vue-advanced-cropper/dist/style.css'; // Import cropper styles
+import { Cropper } from "vue-advanced-cropper";
+import "vue-advanced-cropper/dist/style.css"; // Import cropper styles
 
 const auth = useAuth();
 
@@ -775,20 +790,20 @@ const props = defineProps({
   },
   initialSection: {
     type: [String, Number],
-    default: null
+    default: null,
   },
   initialBase: {
     type: [String, Number],
-    default: null
+    default: null,
   },
   initialLesson: {
     type: [String, Number],
-    default: null
+    default: null,
   },
   initialTopics: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 });
 
 /**
@@ -938,7 +953,7 @@ const txt_direction_list = [
 const stencil_props = reactive({
   width: 180,
   height: 180,
-  aspectRatio: 1
+  aspectRatio: 1,
 });
 
 const typeList = [
@@ -1078,7 +1093,7 @@ const {
 const getTypeList = async (type, parent = "") => {
   const params = { type };
   const { $toast } = useNuxtApp();
-  
+
   // Set up parameters based on type
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
@@ -1092,12 +1107,17 @@ const getTypeList = async (type, parent = "") => {
 
   try {
     // Add loading state if needed
-    const loadingTarget = 
-      type === "section" ? level_list :
-      type === "base" ? grade_list :
-      type === "lesson" ? lesson_list :
-      type === "topic" ? topic_list : null;
-    
+    const loadingTarget =
+      type === "section"
+        ? level_list
+        : type === "base"
+        ? grade_list
+        : type === "lesson"
+        ? lesson_list
+        : type === "topic"
+        ? topic_list
+        : null;
+
     if (loadingTarget) {
       // Set a temporary loading item
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
@@ -1119,14 +1139,17 @@ const getTypeList = async (type, parent = "") => {
     }
   } catch (err) {
     console.error(`Error loading ${type} data:`, err);
-    
+
     // Reset the target list to empty on error
     if (type === "section") level_list.value = [];
     else if (type === "base") grade_list.value = [];
     else if (type === "lesson") lesson_list.value = [];
     else if (type === "topic") topic_list.value = [];
-    
-    if ($toast) $toast.error(`Failed to load ${type} data: ${err.message || "Unknown error"}`);
+
+    if ($toast)
+      $toast.error(
+        `Failed to load ${type} data: ${err.message || "Unknown error"}`
+      );
   }
 };
 
@@ -1136,23 +1159,23 @@ const getTypeList = async (type, parent = "") => {
 const resetFormFields = () => {
   // First, clear all validation errors
   clearFieldValidationErrors();
-  
+
   // If in edit mode and using props, we want to preserve certain fields
-  const preserveLocation = props.examEditMode && (
-    props.initialSection || 
-    props.initialBase || 
-    props.initialLesson || 
-    props.initialTopics?.length
-  );
-  
+  const preserveLocation =
+    props.examEditMode &&
+    (props.initialSection ||
+      props.initialBase ||
+      props.initialLesson ||
+      props.initialTopics?.length);
+
   // Store current values of fields we may need to preserve
   const preservedValues = {
     section: form.section,
     base: form.base,
     lesson: form.lesson,
-    topic: form.topic
+    topic: form.topic,
   };
-  
+
   // Reset form fields to default values
   form.question = "";
   form.q_file_base64 = "";
@@ -1163,13 +1186,13 @@ const resetFormFields = () => {
   form.true_answer = "";
   form.testImgAnswers = false;
   form.answer_type = "text";
-  
+
   // Reset answer text fields
   form.answer_a = "";
   form.answer_b = "";
   form.answer_c = "";
   form.answer_d = "";
-  
+
   // Reset answer image fields
   form.a_file_base64 = "";
   form.b_file_base64 = "";
@@ -1179,7 +1202,7 @@ const resetFormFields = () => {
   form.b_file = null;
   form.c_file = null;
   form.d_file = null;
-  
+
   // Reset hidden form data
   form_hidden_data.q_file = null;
   form_hidden_data.answer_full_file = null;
@@ -1187,47 +1210,48 @@ const resetFormFields = () => {
   form_hidden_data.b_file = null;
   form_hidden_data.c_file = null;
   form_hidden_data.d_file = null;
-  
+
   // If in edit mode and using props, restore the preserved values
   if (preserveLocation) {
     form.section = preservedValues.section;
     form.base = preservedValues.base;
     form.lesson = preservedValues.lesson;
     form.topic = preservedValues.topic;
-    
   }
-  
+
   // Reset file inputs if they exist
   if (questionInput.value && questionInput.value.$el) {
-    const fileInput = questionInput.value.$el.querySelector('input[type="file"]');
+    const fileInput =
+      questionInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (answerFullInput.value && answerFullInput.value.$el) {
-    const fileInput = answerFullInput.value.$el.querySelector('input[type="file"]');
+    const fileInput =
+      answerFullInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (aInput.value && aInput.value.$el) {
     const fileInput = aInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (bInput.value && bInput.value.$el) {
     const fileInput = bInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (cInput.value && cInput.value.$el) {
     const fileInput = cInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (dInput.value && dInput.value.$el) {
     const fileInput = dInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   // Reset VeeValidate form state
   if (veeForm.value) {
     resetForm();
@@ -1238,12 +1262,11 @@ const resetFormFields = () => {
       clearFieldValidationErrors();
     }, 100);
   }
-  
+
   // Reset UI state
   text_answer.value = true;
   photo_answer.value = false;
-  
-}
+};
 
 /**
  * Validate all required fields and show appropriate error messages
@@ -1251,59 +1274,63 @@ const resetFormFields = () => {
  */
 const validateForm = () => {
   const { $toast } = useNuxtApp();
-  
+
   // Check basic required fields
   if (!form.section) {
     if ($toast) $toast.error("Please select a Board");
     return false;
   }
-  
+
   if (!form.base) {
     if ($toast) $toast.error("Please select a Grade");
     return false;
   }
-  
+
   if (!form.lesson) {
     if ($toast) $toast.error("Please select a Subject");
     return false;
   }
-  
+
   if (!form.topic) {
     if ($toast) $toast.error("Please select a Topic");
     return false;
   }
-  
+
   if (!form.question && !form.q_file_base64) {
     if ($toast) $toast.error("Please enter a question or upload an image");
     return false;
   }
-  
+
   // For multiple choice questions, check answers
   if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
     if (!form.true_answer) {
       if ($toast) $toast.error("Please select the correct answer");
       return false;
     }
-    
+
     // Check text answers if not using image answers
     if (!form.testImgAnswers) {
-      if (form.type === "fourchoice" || form.type === "twochoice" || form.type === "tf") {
+      if (
+        form.type === "fourchoice" ||
+        form.type === "twochoice" ||
+        form.type === "tf"
+      ) {
         if (!form.answer_a || form.answer_a.trim() === "") {
           if ($toast) $toast.error("Please enter text for Answer A");
           return false;
         }
-        
+
         if (!form.answer_b || form.answer_b.trim() === "") {
           if ($toast) $toast.error("Please enter text for Answer B");
           return false;
         }
-        
+
         if (form.type === "fourchoice") {
           if (!form.answer_c || form.answer_c.trim() === "") {
             if ($toast) $toast.error("Please enter text for Answer C");
             return false;
           }
-          
+
           if (!form.answer_d || form.answer_d.trim() === "") {
             if ($toast) $toast.error("Please enter text for Answer D");
             return false;
@@ -1316,18 +1343,18 @@ const validateForm = () => {
         if ($toast) $toast.error("Please upload an image for Answer A");
         return false;
       }
-      
+
       if (!form.b_file_base64) {
         if ($toast) $toast.error("Please upload an image for Answer B");
         return false;
       }
-      
+
       if (form.type === "fourchoice") {
         if (!form.c_file_base64) {
           if ($toast) $toast.error("Please upload an image for Answer C");
           return false;
         }
-        
+
         if (!form.d_file_base64) {
           if ($toast) $toast.error("Please upload an image for Answer D");
           return false;
@@ -1335,7 +1362,7 @@ const validateForm = () => {
       }
     }
   }
-  
+
   return true;
 };
 
@@ -1344,7 +1371,7 @@ const validateForm = () => {
  */
 const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
   create_loading.value = true;
-  
+
   // Force clear error messages again
   clearFieldValidationErrors();
 
@@ -1354,10 +1381,10 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
       create_loading.value = false;
       return;
     }
-    
+
     // Create a URLSearchParams object
     const formData = new URLSearchParams();
-    
+
     // Add all required fields
     formData.append("section", form.section.toString());
     formData.append("base", form.base.toString());
@@ -1370,21 +1397,22 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
     formData.append("testImgAnswers", form.testImgAnswers ? "1" : "0");
     formData.append("testingAnswers", "0");
     formData.append("answer_full", form.answer_full || "");
-    
+
     // Add answers based on question type
     if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
       formData.append("answer_a", form.answer_a || "");
       formData.append("answer_b", form.answer_b || "");
-      
+
       if (form.type === "fourchoice") {
         formData.append("answer_c", form.answer_c || "");
         formData.append("answer_d", form.answer_d || "");
       }
     }
-    
+
     // Add file fields if they exist
     if (form.q_file) formData.append("q_file", form.q_file);
-    if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
+    if (form.answer_full_file)
+      formData.append("answer_full_file", form.answer_full_file);
     if (form.a_file) formData.append("a_file", form.a_file);
     if (form.b_file) formData.append("b_file", form.b_file);
     if (form.c_file) formData.append("c_file", form.c_file);
@@ -1398,7 +1426,7 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
       body: formData,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${userToken.value}`
+        Authorization: `Bearer ${userToken.value}`,
       },
     }).catch((error) => {
       console.error("Network error details:", {
@@ -1597,19 +1625,23 @@ const getCurrentExamInfo = async () => {
         form.section = response.data.section;
         // Fetch grade list based on section
         await getTypeList("base", response.data.section);
-        
+
         if (response.data.base) {
           form.base = response.data.base;
           // Fetch lesson list based on base
           await getTypeList("lesson", response.data.base);
-          
+
           if (response.data.lesson) {
             form.lesson = response.data.lesson;
             // Fetch topic list based on lesson
             await getTypeList("topic", response.data.lesson);
-            
+
             // If in edit mode, we need to populate topics as well
-            if (props.examEditMode && response.data.topics && response.data.topics.length) {
+            if (
+              props.examEditMode &&
+              response.data.topics &&
+              response.data.topics.length
+            ) {
               form.topic = response.data.topics[0];
             }
           }
@@ -1743,15 +1775,19 @@ watch(
     if (val == "tf") {
       form.answer_a = "True";
       form.answer_b = "False";
-    } else if (val !== "tf" && (form.answer_a === "True" && form.answer_b === "False")) {
+    } else if (
+      val !== "tf" &&
+      form.answer_a === "True" &&
+      form.answer_b === "False"
+    ) {
       // Only reset if we're coming from a true/false type
       form.answer_a = "";
       form.answer_b = "";
     }
-    
+
     // Reset true_answer when changing question type
     form.true_answer = "";
-    
+
     // Re-validate with a delay
     debouncedValidate();
   }
@@ -1801,7 +1837,7 @@ watch(
       grade_list.value = [];
       lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Set new section and fetch grades
       form.section = newVal;
       await getTypeList("base", newVal);
@@ -1818,7 +1854,7 @@ watch(
       form.topic = "";
       lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Set new base and fetch lessons
       form.base = newVal;
       await getTypeList("lesson", newVal);
@@ -1833,7 +1869,7 @@ watch(
       // Reset topic
       form.topic = "";
       topic_list.value = [];
-      
+
       // Set new lesson and fetch topics
       form.lesson = newVal;
       await getTypeList("topic", newVal);
@@ -1858,29 +1894,29 @@ watch(
 onMounted(async () => {
   // Initialize user token
   userToken.value = auth.getUserToken();
-  
+
   // Set default values for answer type
   form.answer_type = "text";
   form.testImgAnswers = false;
   text_answer.value = true;
   photo_answer.value = false;
-  
+
   // Load initial data - start with sections
   await getTypeList("section");
-  
+
   // Initialize form with prop values if available - make sure to load in proper sequence
   if (props.initialSection) {
     form.section = props.initialSection;
     await getTypeList("base", props.initialSection);
-    
+
     if (props.initialBase) {
       form.base = props.initialBase;
       await getTypeList("lesson", props.initialBase);
-      
+
       if (props.initialLesson) {
         form.lesson = props.initialLesson;
         await getTypeList("topic", props.initialLesson);
-        
+
         if (props.initialTopics && props.initialTopics.length) {
           form.topic = props.initialTopics[0];
           selected_topics.value = props.initialTopics;
@@ -1888,7 +1924,7 @@ onMounted(async () => {
       }
     }
   }
-  
+
   // If in edit mode, we need to ensure we load the current exam's data
   if (props.examEditMode) {
     await getCurrentExamInfo();
@@ -1896,13 +1932,13 @@ onMounted(async () => {
       section: form.section,
       base: form.base,
       lesson: form.lesson,
-      topic: form.topic
+      topic: form.topic,
     });
   } else {
     // Reset form to clear any previous data if not in edit mode
     resetFormFields();
   }
-  
+
   // Set up form validation event handling
   if (veeForm.value) {
     // Clear all validation errors on initial load
@@ -1939,7 +1975,7 @@ const submitCrop = async () => {
     if (fileBase64) {
       // Create URLSearchParams for the request (similar to querystring in the old version)
       const params = new URLSearchParams();
-      params.append('file_base64', fileBase64);
+      params.append("file_base64", fileBase64);
 
       // Send API request
       const response = await $fetch("/api/v1/upload", {
@@ -1947,8 +1983,8 @@ const submitCrop = async () => {
         body: params,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "Authorization": `Bearer ${userToken.value}`
-        }
+          Authorization: `Bearer ${userToken.value}`,
+        },
       });
 
       if (response?.data?.[0]?.file?.name) {
@@ -2031,12 +2067,8 @@ watch(
  */
 const buttonDisabled = computed(() => {
   // Check basic mandatory fields
-  const requiredFields = 
-    form.section && 
-    form.base && 
-    form.lesson && 
-    form.topic && 
-    form.question;
+  const requiredFields =
+    form.section && form.base && form.lesson && form.topic && form.question;
 
   // For multiple choice forms, also check true_answer
   if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
@@ -2054,12 +2086,12 @@ const validateAnswerField = (value) => {
   if (form.testImgAnswers === true) {
     return true;
   }
-  
+
   // Otherwise, check that we have content
-  if (!value || value.trim() === '') {
-    return 'This field is required';
+  if (!value || value.trim() === "") {
+    return "This field is required";
   }
-  
+
   return true;
 };
 
@@ -2079,21 +2111,21 @@ const validateTrueAnswer = (value) => {
 // Add this to our validateForm function to ensure all "validation is not valid" messages are cleared
 const clearFieldValidationErrors = () => {
   // First method: Hide error messages with inline style
-  const errorMessages = document.querySelectorAll('.text-error');
-  errorMessages.forEach(element => {
-    element.style.display = 'none';
+  const errorMessages = document.querySelectorAll(".text-error");
+  errorMessages.forEach((element) => {
+    element.style.display = "none";
   });
-  
+
   // Second method: Remove the "not valid" text directly
   const validationTexts = document.querySelectorAll('[class*="not valid"]');
-  validationTexts.forEach(element => {
-    element.style.display = 'none';
+  validationTexts.forEach((element) => {
+    element.style.display = "none";
   });
-  
+
   // Third method: Clear all form error messages
   setTimeout(() => {
-    document.querySelectorAll('.error--text').forEach(el => {
-      el.classList.remove('error--text');
+    document.querySelectorAll(".error--text").forEach((el) => {
+      el.classList.remove("error--text");
     });
   }, 10);
 };
@@ -2102,8 +2134,8 @@ const clearFieldValidationErrors = () => {
  * Validate question field
  */
 const validateQuestionField = (value) => {
-  if (!value || value.trim() === '') {
-    return 'Please enter a question';
+  if (!value || value.trim() === "") {
+    return "Please enter a question";
   }
   return true;
 };
@@ -2111,25 +2143,29 @@ const validateQuestionField = (value) => {
 // Add a more direct click handler that bypasses VeeValidate
 const manualSubmit = async () => {
   clearFieldValidationErrors();
-  
-  if (!form.topic && selected_topics.value && selected_topics.value.length > 0) {
+
+  if (
+    !form.topic &&
+    selected_topics.value &&
+    selected_topics.value.length > 0
+  ) {
     form.topic = parseInt(selected_topics.value[0]);
   }
-  
+
   // Run our direct validation
   if (!validateForm()) {
     return;
   }
-  
+
   create_loading.value = true;
-  
+
   // Ensure required fields are present
   form.direction = form.direction || "ltr";
   form.testingAnswers = 0;
-  
+
   // Create URLSearchParams object for the API request
   const formData = new URLSearchParams();
-  
+
   // Add all required fields
   formData.append("section", form.section.toString());
   formData.append("base", form.base.toString());
@@ -2142,22 +2178,23 @@ const manualSubmit = async () => {
   formData.append("testImgAnswers", form.testImgAnswers ? "1" : "0");
   formData.append("testingAnswers", "0");
   formData.append("answer_full", form.answer_full || "");
-  
+
   // Add answers based on question type
   if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
     formData.append("answer_a", form.answer_a || "");
     formData.append("answer_b", form.answer_b || "");
-    
+
     if (form.type === "fourchoice") {
       formData.append("answer_c", form.answer_c || "");
       formData.append("answer_d", form.answer_d || "");
     }
   }
-  
+
   // Add file fields if they exist
   if (form.q_file) formData.append("q_file", form.q_file);
-  if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
-  
+  if (form.answer_full_file)
+    formData.append("answer_full_file", form.answer_full_file);
+
   // Handle photo mode file fields
   if (form.testImgAnswers) {
     if (form.a_file) formData.append("a_file", form.a_file);
@@ -2166,7 +2203,7 @@ const manualSubmit = async () => {
       if (form.c_file) formData.append("c_file", form.c_file);
       if (form.d_file) formData.append("d_file", form.d_file);
     }
-    
+
     // If we're in photo mode but the files weren't properly uploaded,
     // add base64 data directly for the backend to process
     if (form.a_file_base64 && !form.a_file) {
@@ -2190,36 +2227,37 @@ const manualSubmit = async () => {
       body: formData,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${userToken.value}`
-      }
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
-    
+
     if (response.status == 1) {
       const { $toast } = useNuxtApp();
       if ($toast) $toast.success("Created successfully");
-      
+
       path_panel_expand.value = false;
-      
+
       // Edit mode or create exam progress
       if (props.examEditMode === true) {
         emit("update:updateTestList", response.data.id);
       }
-      
+
       // Reset form fields using our improved function
       resetFormFields();
     } else {
       console.error("API returned error status:", response);
       const { $toast } = useNuxtApp();
-      if ($toast) $toast.error(response.message || "An error occurred, try again");
+      if ($toast)
+        $toast.error(response.message || "An error occurred, try again");
     }
   } catch (err) {
     console.error("Error submitting form:", err);
-    
+
     // Log detailed error information
     if (err.response) {
       console.error("Error response status:", err.response.status);
       console.error("Error response data:", err.response.data);
-      
+
       // If the API returned which fields are missing, log them specifically
       if (err.response.data?.data?.fields) {
         console.error("Missing fields:", err.response.data.data.fields);
@@ -2229,9 +2267,9 @@ const manualSubmit = async () => {
         return;
       }
     }
-    
+
     let errorMessage = "An error occurred";
-    
+
     if (err.response?.status == 400) {
       errorMessage = err.response?.data?.message || "Bad request";
     } else if (err.response?.status == 403) {
@@ -2240,7 +2278,7 @@ const manualSubmit = async () => {
     } else {
       errorMessage = err.message || "An error occurred";
     }
-    
+
     const { $toast } = useNuxtApp();
     if ($toast) $toast.error(errorMessage);
   } finally {
@@ -2252,39 +2290,6 @@ const manualSubmit = async () => {
 <style>
 .pointer {
   cursor: pointer;
-}
-
-.image-input {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  border: 1px dashed #9e9e9e;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.image-input:hover {
-  background-color: rgba(0, 150, 136, 0.05);
-  border-color: #009688;
-}
-
-.image-preview {
-  display: inline-block;
-  object-fit: contain;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.img-clear-btn {
-  position: absolute;
-  margin-left: -20px;
-  margin-top: -4px;
-  background-color: white !important;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
-  transition: all 0.2s ease;
-}
-
-.img-clear-btn:hover {
-  transform: scale(1.05);
 }
 
 .topic_season {
@@ -2332,15 +2337,8 @@ const manualSubmit = async () => {
 
 .image-holder {
   position: relative;
-  display: inline-block;
-  margin-bottom: 16px;
-}
-
-.image-holder .img-clear-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 5;
+  height: 12.5rem;
+  margin-left: 2rem;
 }
 
 /* Ensure proper handling of radio buttons */
@@ -2404,5 +2402,16 @@ const manualSubmit = async () => {
   background-color: white;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   z-index: 5;
+}
+.image-holder .image-input {
+  border-radius: 5px;
+  height: 7rem;
+  width: 7rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
+}
+
+.img-clear-btn {
+  position: relative;
+  bottom: -20px;
 }
 </style>
