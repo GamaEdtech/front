@@ -37,6 +37,7 @@
                     Ask Question
                   </v-btn>
                 </div>
+
                 <!-- End ask question button -->
                 <!--Question section-->
                 <v-row>
@@ -380,7 +381,11 @@
                 <!--Answer section-->
                 <v-row>
                   <v-col cols="12" class="pt-0 px-sm-3 pt-sm-3">
-                    <v-row v-for="answer in answer_list" :key="answer.id">
+                    <v-row
+                      v-for="answer in answer_list"
+                      :key="answer.id"
+                      :id="'answer-' + answer.id"
+                    >
                       <!--Score action-->
                       <v-col cols="1" class="pr-0 d-none d-md-block">
                         <v-card
@@ -1000,8 +1005,62 @@ export default {
   head() {
     return {
       title: this.contentData.title,
+      script: [
+        {
+          type: "application/ld+json",
+          json: {
+            "@context": "https://schema.org",
+            "@type": "QAPage",
+            mainEntity: {
+              "@type": "Question",
+              name: this.contentData.title,
+              text: this.contentData.question,
+              dateCreated: new Date(this.contentData.subdate).toISOString(),
+              author: {
+                "@type": "Person",
+                name: this.contentData.name,
+                url: this.contentData.userLink,
+              },
+              upvoteCount: parseInt(this.contentData.score) || 0,
+              answerCount: this.answer_list?.length || 0,
+              url: `https://gamatrain.com/qa/${this.contentData.id}`,
+              acceptedAnswer: this.answer_list
+                ?.sort((a, b) => b.score - a.score)
+                .slice(0, 5)
+                .map((a) => ({
+                  "@type": "Answer",
+                  text: a.answer,
+                  dateCreated: new Date(a.subdate).toISOString(),
+                  upvoteCount: parseInt(a.score) || 0,
+                  url: `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  author: {
+                    "@type": "Person",
+                    name: a.name,
+                    url: a.userLink,
+                  },
+                })),
+              suggestedAnswer: this.answer_list
+                ?.sort((a, b) => b.score - a.score)
+                .slice(0, 5)
+                .map((a) => ({
+                  "@type": "Answer",
+                  text: a.answer,
+                  dateCreated: new Date(a.subdate).toISOString(),
+                  upvoteCount: parseInt(a.score) || 0,
+                  url: `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  author: {
+                    "@type": "Person",
+                    name: a.name,
+                    url: a.userLink,
+                  },
+                })),
+            },
+          },
+        },
+      ],
     };
   },
+
   async asyncData({ params, $axios }) {
     // Fetch the data from the API
     const content = await $axios.$get(`/api/v1/questions/${params.id}`);
@@ -1010,14 +1069,21 @@ export default {
     if (content.status === 1) {
       contentData = content.data;
     }
+    const contentAnswerList = await $axios.$get(`/api/v1/questionReplies`, {
+      params: {
+        question: params.id,
+      },
+    });
+    var answer_list = [];
+    if (contentAnswerList.status === 1) {
+      answer_list = contentAnswerList.data.list;
+    }
 
-    return { contentData };
+    return { contentData, answer_list };
   },
   mounted() {
     this.initBreadCrumb();
-    this.reInit();
     this.getSimilarQuestions();
-
     this.renderMathJax();
   },
 
@@ -1173,6 +1239,7 @@ export default {
         })
         .then((response) => {
           this.answer_list = response.data.list;
+
           this.$nextTick(() => {
             this.$renderMathJax(this.$refs.mathJaxEl);
           });
@@ -1303,6 +1370,7 @@ export default {
 
 #qa-details-content {
   margin-bottom: 2rem;
+
   #similar-question {
     .question-item {
       list-style-type: none;
