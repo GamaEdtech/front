@@ -1047,7 +1047,7 @@ export default {
                   text: a.answer,
                   dateCreated: new Date(a.subdate).toISOString(),
                   upvoteCount: parseInt(a.score) || 0,
-                  url: `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  url: `https://gamatrain.com/qa/${this.contentData.id}/${this.contentData.title_url}#answer-${a.id}`,
                   author: {
                     "@type": "Person",
                     name: a.name,
