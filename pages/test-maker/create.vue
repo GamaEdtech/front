@@ -285,6 +285,7 @@
                 variant="outlined"
                 density="compact"
                 color="orange"
+                @click:clear="handleClearSection"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -298,6 +299,10 @@
                 variant="outlined"
                 density="compact"
                 color="orange"
+                :disabled="!filter.section"
+                :loading="test_loading && filter.section && !filter.base"
+                no-data-text="Select a Board first"
+                @click:clear="handleClearBase"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -311,6 +316,10 @@
                 variant="outlined"
                 density="compact"
                 color="orange"
+                :disabled="!filter.base"
+                :loading="test_loading && filter.base && !filter.lesson"
+                no-data-text="Select a Grade first"
+                @click:clear="handleClearLesson"
               ></v-autocomplete>
             </v-col>
 
@@ -325,6 +334,9 @@
                 variant="outlined"
                 density="compact"
                 color="orange"
+                :disabled="!filter.lesson"
+                :loading="test_loading && filter.lesson && !filter.topic"
+                @click:clear="handleClearTopic"
               >
                 <template #item="{ item, props }">
                   <v-list-item
@@ -1156,6 +1168,22 @@ const calcLevel = (level) => {
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
   try {
+    // If parent is empty and this is not the section type, return early
+    // This prevents API calls with empty parent IDs which could return incorrect data
+    if (!parent && type !== "section") {
+      // Clear the appropriate list based on type and trigger
+      if (type === "base") {
+        if (trigger === "filter") filter_grade_list.value = [];
+        else grade_list.value = [];
+      } else if (type === "lesson") {
+        if (trigger === "filter") filter_lesson_list.value = [];
+        else lesson_list.value = [];
+      } else if (type === "topic") {
+        topic_list.value = [];
+      }
+      return;
+    }
+
     const params = {
       type: type,
     };
@@ -1787,15 +1815,21 @@ watch(
   }
 );
 
-// Watch for changes in filter.lesson
+// Watch for changes in filter.lesson (Subject)
 watch(
   () => filter.lesson,
   async (val) => {
+    // Reset topic filter when lesson changes
+    filter.topic = "";
+    
     if (val) {
       test_loading.value = true;
       // Fetch topic list based on selected lesson
       await getTypeList("topic", val, "filter");
       test_loading.value = false;
+    } else {
+      // Clear topic list when lesson is cleared
+      topic_list.value = [];
     }
     
     // Reset pagination and test list
@@ -2310,6 +2344,103 @@ const test_share_link = computed(() => {
   // Only use window.location on client side
   return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
+
+// Add a watcher for the clear icon (X) clicks on filter.section (Board)
+watch(
+  () => filter.section,
+  (val, oldVal) => {
+    // If the value was cleared (X icon clicked)
+    if (oldVal && !val) {
+      // Clear dependent filters and their lists
+      filter.base = "";
+      filter.lesson = "";
+      filter.topic = "";
+      filter_grade_list.value = [];
+      filter_lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Reset pagination and test list
+      filter.page = 1;
+      test_list.value = [];
+      all_tests_loaded.value = true;
+    }
+  }
+);
+
+// Add a watcher for the clear icon (X) clicks on filter.base (Grade)
+watch(
+  () => filter.base,
+  (val, oldVal) => {
+    // If the value was cleared (X icon clicked)
+    if (oldVal && !val) {
+      // Clear dependent filters and their lists
+      filter.lesson = "";
+      filter.topic = "";
+      filter_lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Reset pagination and test list
+      filter.page = 1;
+      test_list.value = [];
+      all_tests_loaded.value = true;
+    }
+  }
+);
+
+// Handle clear icon click for Board filter
+const handleClearSection = () => {
+  filter.section = "";
+  filter.base = "";
+  filter.lesson = "";
+  filter.topic = "";
+  filter_grade_list.value = [];
+  filter_lesson_list.value = [];
+  topic_list.value = [];
+  
+  // Reset pagination and test list
+  filter.page = 1;
+  test_list.value = [];
+  all_tests_loaded.value = true;
+};
+
+// Handle clear icon click for Grade filter
+const handleClearBase = () => {
+  filter.base = "";
+  filter.lesson = "";
+  filter.topic = "";
+  filter_lesson_list.value = [];
+  topic_list.value = [];
+  
+  // Reset pagination and test list
+  filter.page = 1;
+  test_list.value = [];
+  all_tests_loaded.value = true;
+};
+
+// Handle clear icon click for Subject filter
+const handleClearLesson = () => {
+  filter.lesson = "";
+  filter.topic = "";
+  topic_list.value = [];
+  
+  // Reset pagination and test list
+  filter.page = 1;
+  test_list.value = [];
+  all_tests_loaded.value = true;
+};
+
+// Handle clear icon click for Topic filter
+const handleClearTopic = () => {
+  filter.topic = "";
+  
+  // Reset pagination and test list
+  filter.page = 1;
+  test_list.value = [];
+  all_tests_loaded.value = false;
+  
+  // Load tests with new filter
+  getExamTests();
+};
 </script>
 
 <style lang="scss">
