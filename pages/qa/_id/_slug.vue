@@ -1019,7 +1019,7 @@ export default {
               author: {
                 "@type": "Person",
                 name: this.contentData.name,
-                url: this.contentData.userLink,
+                // url: this.contentData.userLink,
               },
               upvoteCount: parseInt(this.contentData.score) || 0,
               answerCount: this.answer_list?.length || 0,
@@ -1036,7 +1036,7 @@ export default {
                   author: {
                     "@type": "Person",
                     name: a.name,
-                    url: a.userLink,
+                    // url: a.userLink,
                   },
                 })),
               suggestedAnswer: this.answer_list
@@ -1051,7 +1051,7 @@ export default {
                   author: {
                     "@type": "Person",
                     name: a.name,
-                    url: a.userLink,
+                    // url: a.userLink,
                   },
                 })),
             },
