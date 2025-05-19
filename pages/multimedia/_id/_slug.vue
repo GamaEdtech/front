@@ -537,7 +537,11 @@
           <!--  End:  Azmoon test album card   -->
         </v-col>
       </v-row>
-      <common-related-portrait-content pageName="multimedia" source="file" request="file"/>
+      <common-related-portrait-content
+        pageName="Multimedia"
+        source="file"
+        request="file"
+      />
     </v-container>
 
     <!-- Start : Sample Test -->
