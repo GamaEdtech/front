@@ -51,6 +51,7 @@ export default {
         { title: "Type", link: "/admin/type", icon: "mdi-basket" },
         { title: "My Stock", link: "/admin/stock", icon: "mdi-finance" },
         { title: "Analysis", link: "/admin/analysis", icon: "mdi-chart-line" },
+        { title: "Contact Us", link: "/admin/contact-us", icon: "mdi-archive-arrow-down-outline" },
       ],
       typeManagement: [{ text: "Location" }, { text: "Profile" }],
     };
