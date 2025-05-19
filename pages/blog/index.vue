@@ -11,13 +11,14 @@
         <v-card
           v-else-if="featuredItems[0]"
           flat
-          :to="`/blog/${featuredItems[slideIndex].id}/${$slugGenerator.convert(
+          :to="`/blog/${featuredItems[slideIndex].id}/${$slugGenerator(
             featuredItems[0].title
           )}`"
           class="ma-1"
         >
           <v-card>
             <v-img
+              cover
               :class="activeSlide ? 'active-img' : ''"
               :src="featuredItems[slideIndex].pic"
             />
@@ -38,7 +39,7 @@
                 <v-skeleton-loader type="image"></v-skeleton-loader>
               </div>
               <div class="text-loader-section">
-                <v-skeleton-loader type="card-heading"></v-skeleton-loader>
+                <v-skeleton-loader type="heading"></v-skeleton-loader>
               </div>
             </div>
           </v-row>
@@ -49,16 +50,12 @@
           :key="n"
           class="featured-item"
         >
-          <nuxt-link
-            :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
-          >
-            <v-img :src="item.pic" />
+          <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
+            <v-img cover :src="item.pic" />
           </nuxt-link>
 
           <div class="item-text">
-            <nuxt-link
-              :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
-            >
+            <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
               <h2 class="gama-text-caption">{{ item.title }}</h2>
             </nuxt-link>
           </div>
@@ -71,25 +68,29 @@
           <v-slide-group
             v-model="featureVal"
             class="slider py-sm-4"
-            :show-arrows="$vuetify.breakpoint.lgAndUp"
+            :show-arrows="lgAndUp"
           >
             <div class="d-flex" v-if="isLoading">
-              <v-slide-item v-for="i in 10" :key="i">
+              <v-slide-group-item v-for="i in 10" :key="i">
                 <v-skeleton-loader
                   class="mx-auto slide-loading"
                   type="image"
                 ></v-skeleton-loader>
-              </v-slide-item>
+              </v-slide-group-item>
             </div>
 
-            <v-slide-item v-else v-for="(item, n) in featuredItems" :key="n">
+            <v-slide-group-item
+              v-else
+              v-for="(item, n) in featuredItems"
+              :key="n"
+            >
               <v-card
                 flat
-                :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
+                :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
                 class="ma-1"
               >
                 <v-card>
-                  <v-img :src="item.pic" />
+                  <v-img cover :src="item.pic" />
                   <v-card-title>
                     <span class="gama-text-h6">
                       {{ item.title }}
@@ -97,7 +98,7 @@
                   </v-card-title>
                 </v-card>
               </v-card>
-            </v-slide-item>
+            </v-slide-group-item>
           </v-slide-group>
         </v-col>
       </v-row>
@@ -109,16 +110,16 @@
       <v-col cols="12" class="pb-0">
         <v-text-field
           class="rounded-ts pr-0"
-          dense
-          outlined
+          density="compact"
+          variant="outlined"
           hide-details
           v-model="searchQuery"
           label="Search"
         >
-          <template slot="append-outer">
+          <template #append>
             <v-btn
               :loading="searchLoading"
-              dense
+              density="compact"
               color="#FFB300"
               class="white--text"
             >
@@ -134,21 +135,27 @@
     <v-row justify="space-around" id="category-section">
       <v-col cols="12">
         <v-card flat class="pb-4 px-1">
-          <v-chip-group mandatory active-class="active-cate">
+          <v-chip-group
+            v-model="categoryValue"
+            mandatory
+            selected-class="active-cate"
+          >
             <v-chip
-              :x-small="$vuetify.breakpoint.xs"
-              :large="$vuetify.breakpoint.mdAndUp"
+              :x-small="xs"
+              :large="mdAndUp"
               :key="0"
-              @click="catVal = 0"
+              @click="categoryValue = 0"
+              :value="0"
             >
               All
             </v-chip>
             <v-chip
-              :x-small="$vuetify.breakpoint.xs"
-              :large="$vuetify.breakpoint.mdAndUp"
-              v-for="cat in blogCats"
+              :x-small="xs"
+              :large="mdAndUp"
+              v-for="cat in blogCategories"
               :key="cat.id"
-              @click="catVal = cat.id"
+              @click="categoryValue = cat.id"
+              :value="cat.id"
             >
               {{ cat.title }}
             </v-chip>
@@ -163,12 +170,9 @@
       <div v-if="blogList.length">
         <v-row class="blog-item" v-for="(item, index) in blogList" :key="index">
           <v-col cols="9" class="mobile-item d-block d-sm-none">
-            <v-card
-              flat
-              :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
-            >
+            <v-card flat :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
               <v-card class="ma-1">
-                <v-img :src="item.pic" />
+                <v-img cover :src="item.pic" />
                 <v-card-title>
                   <span class="gama-text-button">
                     {{ item.title }}
@@ -176,38 +180,36 @@
                 </v-card-title>
               </v-card>
               <div class="gama-text-subtitle2">
-                <span v-html="truncateBody(item.body)"></span>
-                <nuxt-link
-                  :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
+                <span v-html="truncateBody(item.body, 32)"></span>
+                <!-- <nuxt-link
+                  :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
                   >Read more</nuxt-link
-                >
+                > -->
+                <span class="read-more">Read more</span>
               </div>
             </v-card>
           </v-col>
           <v-col cols="10" sm="10" class="d-none d-sm-block">
             <div class="d-flex">
-              <nuxt-link
-                :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
-              >
-                <v-img :src="item.pic" />
+              <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
+                <v-img cover :src="item.pic" />
               </nuxt-link>
 
               <div class="item-text">
                 <nuxt-link
-                  :to="`/blog/${item.id}/${$slugGenerator.convert(item.title)}`"
+                  :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
                 >
                   <h2 class="gama-text-button">{{ item.title }}</h2>
                   <span
                     class="gama-text-subtitle2"
-                    v-html="truncateBody(item.body)"
+                    v-html="truncateBody(item.body, 142)"
                   ></span>
-                  <nuxt-link
+                  <!-- <nuxt-link
                     class="gama-text-subtitle2 read-more"
-                    :to="`/blog/${item.id}/${$slugGenerator.convert(
-                      item.title
-                    )}`"
+                    :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
                     >Read more</nuxt-link
-                  >
+                  > -->
+                  <span class="gama-text-subtitle2 read-more">Read more</span>
                 </nuxt-link>
               </div>
             </div>
@@ -243,8 +245,8 @@
           class="blog-item"
           v-if="
             allDataLoaded == false &&
-            this.paginateStatus == false &&
-            this.blogList.length > 2
+            paginateStatus == false &&
+            blogList.length > 2
           "
         >
           <v-col cols="12">
@@ -254,7 +256,7 @@
               </div>
               <div class="text-loader-section">
                 <v-skeleton-loader
-                  type="card-heading,list-item-two-line"
+                  type="heading,list-item-two-line"
                 ></v-skeleton-loader>
               </div>
             </div>
@@ -279,7 +281,7 @@
               </div>
               <div class="text-loader-section">
                 <v-skeleton-loader
-                  type="card-heading,list-item-two-line"
+                  type="heading,list-item-two-line"
                 ></v-skeleton-loader>
               </div>
             </div>
@@ -308,292 +310,327 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  auth: false,
-  name: "blog-list",
-  head() {
-    return {
-      titleTemplate: "%s",
-      title: "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
+<script setup>
+import { ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import dayjs from "dayjs";
+import { useDisplay } from "vuetify";
 
-      meta: [
-        {
-          hid: "apple-mobile-web-app-title",
-          name: "apple-mobile-web-app-title",
-          content:
-            "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
-        },
-        {
-          hid: "og:title",
-          name: "og:title",
-          content:
-            "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
-        },
-        {
-          hid: "og:site_name",
-          name: "og:site_name",
-          content: "GamaTrain",
-        },
-        {
-          hid: "description",
-          name: "description",
-          content:
-            "Stay informed and inspired with GamaTrain's insightful blog, featuring thought-provoking articles on the latest trends and best practices in K12 education.",
-        },
-        {
-          hid: "og:description",
-          name: "og:description",
-          content:
-            "Stay informed and inspired with GamaTrain's insightful blog, featuring thought-provoking articles on the latest trends and best practices in K12 education.",
-        },
-      ],
-    };
-  },
-  data() {
-    return {
-      featuredItems: [],
-      featureVal: 0,
-      isLoading: true,
+const route = useRoute();
+const router = useRouter();
 
-      searchQuery: "",
-      timer: 0,
-      searchLoading: false,
+const { lgAndUp, mdAndUp, xs, sm } = useDisplay();
+const { $slugGenerator } = useNuxtApp();
 
-      blogList: [],
-      printedYearArr: [],
-      pageNum: 1,
-      pageSize: 15,
-      pageCount: 0,
-      blogLoading: true,
-      featuredLoading: false,
-      allDataLoaded: false,
-      paginateStatus: false,
-      enablePaginateStatus: 10,
-
-      catVal: 0,
-      blogCats: [],
-
-      intervalId: null, // Store the interval ID
-      slideIndex: 0,
-      activeSlide: true,
-    };
-  },
-
-  watch: {
-    pageNum(val) {
-      this.updateQueryParams();
+// SEO
+useHead({
+  title: "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
+  meta: [
+    {
+      name: "apple-mobile-web-app-title",
+      content:
+        "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
     },
-    "$route.query.page"(val) {
-      if (this.paginateStatus) {
-        const currentScrollPosition = window.scrollY;
-        if (currentScrollPosition >= 10) {
-          window.scrollTo(0, currentScrollPosition - 10);
-        } else {
-          window.scrollTo(0, 0);
-        }
-        this.printedYearArr = [];
-        this.getBlogList();
-      }
+    {
+      name: "og:title",
+      content:
+        "Exploring the Latest Insights in K12 Education | GamaTrain Blog",
     },
-    searchQuery() {
-      this.updateQueryParams();
+    {
+      name: "og:site_name",
+      content: "GamaTrain",
     },
-
-    "$route.query.keyword"(val) {
-      this.searchLoading = true;
-
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
-      this.timer = setTimeout(() => {
-        this.allDataLoaded = false;
-        this.paginateStatus = false;
-        this.printedYearArr = [];
-        this.pageNum = 1;
-        this.blogList = [];
-        this.getBlogList();
-      }, 800);
+    {
+      name: "description",
+      content:
+        "Stay informed and inspired with GamaTrain's insightful blog, featuring thought-provoking articles on the latest trends and best practices in K12 education.",
     },
-
-    catVal() {
-      this.updateQueryParams();
+    {
+      name: "og:description",
+      content:
+        "Stay informed and inspired with GamaTrain's insightful blog, featuring thought-provoking articles on the latest trends and best practices in K12 education.",
     },
+  ],
+});
 
-    "$route.query.cat"(val) {
-      this.allDataLoaded = false;
-      this.paginateStatus = false;
-      this.printedYearArr = [];
-      this.pageNum = 1;
-      this.blogList = [];
-      this.getBlogList();
-    },
-  },
+onMounted(() => {
+  window.addEventListener("scroll", setupScrollListener);
+  updateQueryParams();
+  handleAutoCycle();
+});
 
-  mounted() {
-    this.setupScrollListener();
-    this.getFeaturedBlog(); //Get featured blog list
-    this.getCate(); //Get category list
+onBeforeUnmount(() => {
+  stopInterval();
+  window.removeEventListener("scroll", setupScrollListener);
+});
 
-    //Init value
-    this.searchQuery = this.$route.query.keyword;
-    this.catVal = this.$route.query.cat;
-    this.handleAutoCycle();
-    this.getBlogList(); //Get first blog list
-  },
-  methods: {
-    getCate() {
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params: {
-            type: "blog_cat",
-          },
-        })
-        .then((response) => {
-          this.blogCats = response.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    getFeaturedBlog() {
-      var params = {
-        featured: 1,
-      };
-      this.$fetch
-        .$get("/api/v1/blogs/search", { params })
-        .then((response) => {
-          this.featuredItems = response.data.list;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    setupScrollListener() {
-      this.$nextTick(() => {
-        const targetDiv = this.$refs.loaderSection;
+// Featued blog section Start
+const { data: featuredItemsResponse, pending: loadingFeatured } =
+  await useAsyncData("featured", () =>
+    $fetch("/api/v1/blogs/search", { params: { featured: 1 } })
+  );
+const featuredItems = ref(featuredItemsResponse.value?.data.list || []);
+const isLoading = ref(loadingFeatured.value);
+const featureVal = ref(0);
+const intervalId = ref(null);
+const slideIndex = ref(0);
+const activeSlide = ref(true);
 
-        window.addEventListener("scroll", () => {
-          const rect = targetDiv.getBoundingClientRect();
-          const isDivInView =
-            rect.top >= 0 && rect.bottom <= window.innerHeight;
-
-          if (
-            isDivInView &&
-            this.allDataLoaded == false &&
-            this.blogLoading == false &&
-            this.paginateStatus == false
-          ) {
-            {
-              this.pageNum++;
-              this.getBlogList();
-            }
-          }
-        });
-      });
-    },
-    getBlogList() {
-      var params = {};
-      this.blogLoading = true;
-
-      params.title = this.searchQuery;
-      if (this.catVal != 0) {
-        params.cat = this.catVal;
-      }
-      params.page = this.pageNum;
-      params.perpage = this.pageSize;
-      this.$fetch
-        .$get("/api/v1/blogs/search", { params })
-        .then((response) => {
-          var data = response.data.list;
-          this.pageCount = Math.ceil(response.data.num / this.pageSize);
-          if (response.data.list.length === 0 && this.paginateStatus == false) {
-            this.allDataLoaded = true; //To end loop
-            this.pageNum--;
-          }
-
-          //Arrange data for show year
-          for (var i = 0; i < data.length; i++) {
-            var year = this.$dayjs(data[i].subdate).format("YYYY");
-            if (this.printedYearArr.includes(year)) data[i].yearDisplay = false;
-            else {
-              data[i].yearDisplay = true;
-              this.printedYearArr.push(year);
-            }
-          }
-          //End arrange data for show year
-
-          if (this.paginateStatus == false) {
-            this.blogList.push(...data);
-          } else this.blogList = data;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.blogLoading = false;
-          this.searchLoading = false;
-          if (this.pageNum > this.enablePaginateStatus)
-            this.paginateStatus = true;
-        });
-    },
-    truncateBody(text) {
-      var cutLength = 200;
-      if (this.$vuetify.breakpoint.sm) cutLength = 142;
-      else if (this.$vuetify.breakpoint.xs) cutLength = 38;
-      return text.length > cutLength ? text.slice(0, cutLength) + "..." : text;
-    },
-    handleAutoCycle() {
-      this.intervalId = setInterval(() => {
-        this.activeSlide = false;
-
-        if (this.slideIndex == this.featuredItems.length - 1)
-          this.slideIndex = 0;
-        else this.slideIndex++;
-        setTimeout(() => {
-          this.activeSlide = true;
-        }, 300);
-      }, 5000);
-    },
-    stopInterval() {
-      clearInterval(this.intervalId); // Clear the interval using the interval ID
-    },
-    //Update router query params
-    updateQueryParams() {
-      const query = {};
-      if (this.pageNum !== 0) {
-        query.page = this.pageNum;
-      }
-      if (this.searchQuery != "") {
-        query.keyword = this.searchQuery;
-      }
-
-      if (this.catVal !== 0) {
-        query.cat = this.catVal;
-      }
-
-      // Handle more query parameters here ...
-      this.$router.replace({ query: query }).catch((err) => {
-        //Do noting
-      });
-    },
-  },
-  beforeDestroy() {
-    this.stopInterval();
-  },
+const handleAutoCycle = () => {
+  intervalId.value = setInterval(() => {
+    activeSlide.value = false;
+    if (slideIndex.value == featuredItems.value.length - 1)
+      slideIndex.value = 0;
+    else slideIndex.value += 1;
+    setTimeout(() => {
+      activeSlide.value = true;
+    }, 300);
+  }, 5000);
 };
+const stopInterval = () => {
+  clearInterval(intervalId.value); // Clear the interval using the interval ID
+};
+// Featued blog section End
+
+// blog serch section Start
+const searchLoading = ref(false);
+const searchQuery = ref(route.query.keyword || "");
+const timer = ref(null);
+
+watch(
+  () => route.query.keyword,
+  (value) => {
+    searchLoading.value = true;
+
+    if (timer.value) {
+      clearTimeout(timer.value);
+      timer.value = null;
+    }
+
+    timer.value = setTimeout(() => {
+      allDataLoaded.value = false;
+      paginateStatus.value = false;
+      printedYearArr.value = [];
+      pageNum.value = 1;
+      blogList.value = [];
+
+      getBlogList();
+    }, 800);
+  }
+);
+
+watch(
+  () => searchQuery.value,
+  (value) => {
+    updateQueryParams();
+  }
+);
+// blog serch section End
+
+// category section start
+const { data: blogCategoriesResponse, pending: loadingCategories } =
+  await useAsyncData("categories", () =>
+    $fetch("/api/v1/types/list", { params: { type: "blog_cat" } })
+  );
+
+const categoryValue = ref(route.query.cat || 0);
+const blogCategories = ref(blogCategoriesResponse.value?.data || []);
+
+watch(
+  () => route.query.cat,
+  (value) => {
+    allDataLoaded.value = false;
+    paginateStatus.value = false;
+    printedYearArr.value = [];
+    pageNum.value = 1;
+    blogList.value = [];
+    getBlogList();
+  }
+);
+
+watch(
+  () => categoryValue.value,
+  (value) => {
+    updateQueryParams();
+  }
+);
+
+// category section end
+
+// Blog List Section Start
+const blogList = ref([]);
+const printedYearArr = ref([]);
+const pageNum = ref(1);
+const pageSize = ref(15);
+const pageCount = ref(0);
+const allDataLoaded = ref(false);
+const paginateStatus = ref(false);
+const enablePaginateStatus = 10;
+
+const { data: initialBlogs, pending: loadingBlogsServer } = await useAsyncData(
+  "blogListSSR",
+  () => {
+    const params = {
+      title: route.query.keyword || "",
+      cat: route.query.cat || 0,
+      page: 1,
+      perpage: pageSize.value,
+    };
+
+    return $fetch("/api/v1/blogs/search", { params });
+  }
+);
+
+const blogLoading = ref(loadingBlogsServer.value);
+
+const processBlogs = (list) => {
+  for (let i = 0; i < list.length; i++) {
+    const year = dayjs(list[i].subdate).format("YYYY");
+    if (printedYearArr.value.includes(year)) {
+      list[i].yearDisplay = false;
+    } else {
+      list[i].yearDisplay = true;
+      printedYearArr.value.push(year);
+    }
+  }
+  return list;
+};
+
+if (initialBlogs.value?.data?.list) {
+  blogList.value = processBlogs(initialBlogs.value.data.list);
+  pageCount.value = Math.ceil(initialBlogs.value.data.num / pageSize.value);
+}
+
+const getBlogList = async () => {
+  let params = {};
+  blogLoading.value = true;
+  params.title = searchQuery.value;
+
+  if (categoryValue.value != 0) {
+    params.cat = categoryValue.value;
+  }
+
+  params.page = pageNum.value;
+  params.perpage = pageSize.value;
+
+  try {
+    const response = await $fetch("/api/v1/blogs/search", { params });
+    const data = response.data;
+    pageCount.value = Math.ceil(data.num / pageSize.value);
+
+    if (data.list.length === 0 && paginateStatus.value == false) {
+      allDataLoaded.value = true; //To end loop
+      pageNum.value -= 1;
+    }
+
+    //Arrange data for show year
+    for (let i = 0; i < data.list.length; i++) {
+      const year = dayjs(data.list[i].subdate).format("YYYY");
+      if (printedYearArr.value.includes(year)) {
+        data.list[i].yearDisplay = false;
+      } else {
+        data.list[i].yearDisplay = true;
+        printedYearArr.value.push(year);
+      }
+    }
+    //End arrange data for show year
+
+    if (paginateStatus.value == false) {
+      blogList.value.push(...data.list);
+    } else {
+      blogList.value = data.list;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    blogLoading.value = false;
+    searchLoading.value = false;
+    if (pageNum.value > enablePaginateStatus) paginateStatus.value = true;
+  }
+};
+
+const updateQueryParams = () => {
+  const query = {};
+  if (pageNum.value !== 0) {
+    query.page = pageNum.value;
+  }
+  if (searchQuery.value != "") {
+    query.keyword = searchQuery.value;
+  }
+  if (categoryValue.value !== 0) {
+    query.cat = categoryValue.value;
+  }
+
+  // Handle more query parameters here ...
+  router.replace({ query: query }).catch((err) => {
+    //Do noting
+  });
+};
+// Blog List Section End
+
+const truncateBody = (text, fixedLength = null) => {
+  let cutLength = fixedLength ?? 200;
+  if (!fixedLength) {
+    if (sm.value) cutLength = 142;
+    else if (xs.value) cutLength = 38;
+  }
+  return text.length > cutLength ? text.slice(0, cutLength) + "..." : text;
+};
+
+// Start Infinit Scroll Section
+const loaderSection = ref(null);
+
+const setupScrollListener = () => {
+  if (!loaderSection.value) return;
+  const rect = loaderSection.value.getBoundingClientRect();
+  const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+  if (
+    isDivInView &&
+    !allDataLoaded.value &&
+    !blogLoading.value &&
+    !paginateStatus.value
+  ) {
+    pageNum.value += 1;
+    getBlogList();
+  }
+};
+
+watch(
+  () => pageNum.value,
+  (value) => {
+    updateQueryParams();
+  }
+);
+
+watch(
+  () => route.query.page,
+  (value) => {
+    if (paginateStatus.value) {
+      const currentScrollPosition = window.scrollY;
+      if (currentScrollPosition >= 10) {
+        window.scrollTo(0, currentScrollPosition - 10);
+      } else {
+        window.scrollTo(0, 0);
+      }
+      printedYearArr.value = [];
+      getBlogList();
+    }
+  }
+);
+// End Infinit Scroll Section
 </script>
 
 <style scope>
 #blog-list-page {
+  .text-loader-section {
+    min-width: 80%;
+  }
+
   .blog-item {
     margin-bottom: 4.8rem;
-    .v-image,
+
+    .v-img,
     .v-skeleton-loader__image {
       max-width: 17.9rem;
       min-width: 17.9rem;
@@ -615,10 +652,6 @@ export default {
       .gama-text-subtitle2 {
         color: #6e7781;
       }
-    }
-
-    .text-loader-section {
-      width: 64vw;
     }
 
     .date-holder-container {
@@ -729,12 +762,16 @@ export default {
         margin: auto auto;
         position: relative;
         border-radius: 0.6rem;
+        row-gap: 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: unset;
 
         .v-card {
           width: 24rem;
           height: 18rem;
 
-          .v-card__title {
+          .v-card-title {
             border-radius: 0px 0px 6px 6px;
             background: rgba(36, 41, 47, 0.7);
             backdrop-filter: blur(7.5px);
@@ -749,6 +786,9 @@ export default {
             padding-bottom: 0.6rem;
             height: 4.9rem;
             max-height: 4.9rem;
+            white-space: wrap;
+            display: flex;
+            align-items: center;
 
             .gama-text-button {
               color: #fff;
@@ -760,7 +800,7 @@ export default {
             }
           }
 
-          .v-image {
+          .v-img {
             min-width: 24rem;
             height: 18rem;
           }
@@ -774,6 +814,9 @@ export default {
         color: #6e7781;
 
         & > a {
+          color: #ffb600;
+        }
+        .read-more {
           color: #ffb600;
         }
       }
@@ -806,7 +849,7 @@ export default {
         .v-card {
           height: 18rem;
 
-          .v-card__title {
+          .v-card-title {
             border-radius: 0px 0px 6px 6px;
             background: rgba(36, 41, 47, 0.7);
             backdrop-filter: blur(7.5px);
@@ -821,6 +864,9 @@ export default {
             padding-bottom: 0.6rem;
             height: 5rem;
             max-height: 5rem;
+            white-space: wrap;
+            display: flex;
+            align-items: center;
 
             .gama-text-h6 {
               color: #fff;
@@ -832,7 +878,7 @@ export default {
             }
           }
 
-          .v-image {
+          .v-img {
             width: 24rem;
             height: 18rem;
           }
@@ -857,22 +903,34 @@ export default {
       width: 80%;
       min-height: auto;
       height: 4rem !important;
-      border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
-
       margin: 1.6rem auto 1.6rem auto;
 
-      .v-input__control > .v-input__slot {
+      .v-input__control > .v-field {
         min-height: auto;
         height: 4rem !important;
-        border-color: rgba(36, 41, 47, 0.3);
+        border-radius: inherit;
+        border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
 
         &:before {
           border-style: none;
         }
       }
 
-      .v-input__append-outer {
+      .v-field--focused {
+        color: #ffb300;
+      }
+
+      .v-field__input {
+        color: black;
+      }
+
+      .v-label {
+        font-size: 16px;
+      }
+
+      .v-input__append {
         margin: 0 0 0 0.8rem !important;
+
         .v-btn {
           min-width: auto;
           width: 4rem !important;
@@ -882,6 +940,9 @@ export default {
           .v-icon {
             color: #fff;
             font-size: 2.2rem;
+          }
+          .v-btn__loader {
+            color: white;
           }
         }
       }
@@ -903,9 +964,16 @@ export default {
 
 @media (min-width: 600px) {
   #blog-list-page {
+    margin-top: 64px;
+
+    .text-loader-section {
+      min-width: 80%;
+    }
+
     .blog-item {
       margin-bottom: 4.8rem;
-      .v-image,
+
+      .v-img,
       .v-skeleton-loader__image {
         max-width: 17.9rem;
         min-width: 17.9rem;
@@ -927,13 +995,10 @@ export default {
         .gama-text-subtitle2 {
           color: #6e7781;
         }
+
         .read-more {
           color: #ffb600;
         }
-      }
-
-      .text-loader-section {
-        width: 64vw;
       }
 
       .date-holder-container {
@@ -1029,7 +1094,7 @@ export default {
     }
 
     #featured-blog {
-      margin: 5rem auto 2.4rem auto;
+      margin: 0 auto 2.4rem auto;
       height: 28.1rem;
 
       .slider {
@@ -1051,14 +1116,17 @@ export default {
           .v-card {
             height: 26.1rem;
 
-            .v-card__title {
+            .v-card-title {
               padding-top: 1.16rem !important;
               padding-bottom: 1.16rem;
               height: 7.25rem;
               max-height: 7.25rem;
+              white-space: wrap;
+              display: flex;
+              align-items: center;
             }
 
-            .v-image {
+            .v-img {
               width: 34.8rem;
               height: 26.1rem;
             }
@@ -1078,12 +1146,18 @@ export default {
 
 @media (min-width: 960px) {
   #blog-list-page {
+    margin-top: 6.4rem;
+
+    .text-loader-section {
+      min-width: 80%;
+    }
+
     .blog-item {
       padding-left: 1.2rem;
       padding-right: 1.2rem;
       margin-bottom: 4.8rem;
 
-      .v-image,
+      .v-img,
       .v-skeleton-loader__image {
         max-width: 17.9rem;
         min-width: 17.9rem;
@@ -1109,10 +1183,6 @@ export default {
         .read-more {
           color: #ffb600;
         }
-      }
-
-      .text-loader-section {
-        width: 64vw;
       }
 
       .date-holder-container {
@@ -1217,6 +1287,7 @@ export default {
           color: #7f8a9c;
           margin-bottom: 1.6rem;
         }
+
         .featured-item {
           margin-bottom: 0.8rem;
           display: flex;
@@ -1227,12 +1298,13 @@ export default {
             margin-left: 0.8rem;
             border-radius: 0.6rem;
           }
+
           .v-skeleton-loader__card-heading {
             width: 15.2rem;
             max-width: 15.2rem;
           }
 
-          .v-image {
+          .v-img {
             width: 11.6rem;
             height: 8.7rem;
             border-radius: 0.6rem;
@@ -1262,6 +1334,7 @@ export default {
           max-height: 50rem;
           border-radius: 1rem;
         }
+
         .v-card {
           height: 50rem;
           max-height: 50rem;
@@ -1272,7 +1345,7 @@ export default {
           .v-card {
             border-radius: 1rem;
 
-            .v-card__title {
+            .v-card-title {
               border-radius: 0px 0px 6px 6px;
               background: rgba(36, 41, 47, 0.7);
               backdrop-filter: blur(7.5px);
@@ -1288,6 +1361,9 @@ export default {
               height: 6.4rem;
               max-height: 6.4rem;
               border-radius: 0 0 1rem 1rem;
+              white-space: wrap;
+              display: flex;
+              align-items: center;
 
               .gama-text-h6 {
                 color: #fff;
@@ -1299,7 +1375,7 @@ export default {
               }
             }
 
-            .v-image {
+            .v-img {
               max-height: 50rem;
               min-height: 50rem;
               border-radius: 1rem;
@@ -1328,6 +1404,7 @@ export default {
   #blog-list-page {
     width: 72%;
     max-width: 72%;
+    margin-top: 6.4rem;
   }
 }
 </style>
