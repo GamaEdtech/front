@@ -122,6 +122,7 @@ export default defineNuxtConfig({
   modules: [
     "dayjs-nuxt",
     "nuxt-gtag",
+    "@nuxt/image",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
@@ -129,6 +130,9 @@ export default defineNuxtConfig({
       });
     },
   ],
+  image: {
+    domains: ['core.gamatrain.com']
+  },
   gtag: {
     id: "G-VLSLZJR0WK",
   },
