@@ -532,7 +532,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_a"
-                            v-html="item.answer_a"
+                            v-html="item.answer_a || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.a_file" :src="item.a_file" />
                         </div>
@@ -548,7 +549,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_b"
-                            v-html="item.answer_b"
+                            v-html="item.answer_b || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.b_file" :src="item.b_file" />
                         </div>
@@ -564,7 +566,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_c"
-                            v-html="item.answer_c"
+                            v-html="item.answer_c || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.c_file" :src="item.c_file" />
                         </div>
@@ -580,7 +583,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_d"
-                            v-html="item.answer_d"
+                            v-html="item.answer_d || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.d_file" :src="item.d_file" />
                         </div>
@@ -764,7 +768,8 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-row>
+            <v-divider class="mt-3" />
+            <v-row class="pa-0 ma-0">
               <v-col cols="12" v-if="previewTestList.length">
                 <draggable 
                   v-model="previewTestList" 
@@ -787,7 +792,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_a"
-                            v-html="item.answer_a"
+                            v-html="item.answer_a || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.a_file" :src="item.a_file" />
                         </div>
@@ -796,7 +802,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_b"
-                            v-html="item.answer_b"
+                            v-html="item.answer_b || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.b_file" :src="item.b_file" />
                         </div>
@@ -805,19 +812,21 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_c"
-                            v-html="item.answer_c"
+                            v-html="item.answer_c || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.c_file" :src="item.c_file" />
                         </div>
-                        <p class="answer">
+                        <div class="answer">
                           <span>4)</span>
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_d"
-                            v-html="item.answer_d"
-                          />
+                            v-html="item.answer_d || '&nbsp;'"
+                            class="option-text"
+                          ></span>
                           <img v-if="item.d_file" :src="item.d_file" />
-                        </p>
+                        </div>
                         <v-row>
                           <v-col cols="6">
                             <v-btn icon color="blue" class="drag-handle">
@@ -1100,7 +1109,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_a"
-                            v-html="item.answer_a"
+                            v-html="item.answer_a || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.a_file" :src="item.a_file" />
                         </div>
@@ -1109,7 +1119,8 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_b"
-                            v-html="item.answer_b"
+                            v-html="item.answer_b || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.b_file" :src="item.b_file" />
                         </div>
@@ -1118,19 +1129,21 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_c"
-                            v-html="item.answer_c"
+                            v-html="item.answer_c || '&nbsp;'"
+                            class="option-text"
                           ></span>
                           <img v-if="item.c_file" :src="item.c_file" />
                         </div>
-                        <p class="answer">
+                        <div class="answer">
                           <span>4)</span>
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_d"
-                            v-html="item.answer_d"
-                          />
+                            v-html="item.answer_d || '&nbsp;'"
+                            class="option-text"
+                          ></span>
                           <img v-if="item.d_file" :src="item.d_file" />
-                        </p>
+                        </div>
                         <v-row>
                           <v-col cols="6">
                             <v-btn icon color="blue" class="drag-handle">
@@ -1206,6 +1219,7 @@
 import { ref, reactive, watch, nextTick, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
+import { useState } from "#app";
 import { defineRule } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import draggable from "vuedraggable";
@@ -1687,9 +1701,6 @@ const publishTest = async () => {
       // Store the published exam ID for share link
       const publishedExamId = response.data.id || exam_id.value;
       
-      // Update the test share link
-      test_share_link.value = `${window.location.origin}/exam/${publishedExamId}`;
-      
       // Reset state
       exam_id.value = "";
       exam_code.value = "";
@@ -1701,6 +1712,11 @@ const publishTest = async () => {
         currentExamId: "",
         currentExamCode: "",
       };
+
+      // Update the test share link
+      exam_id.value = publishedExamId;
+      
+
 
       // Reset data
       previewTestList.value = [];
@@ -2614,29 +2630,82 @@ const renderMathJax = (elements) => {
         elements.forEach((el) => {
           if (!el) return;
 
+          // Add a class to indicate MathJax is processing
+          if (el.classList) {
+            el.classList.add('mathjax-processing');
+          }
+
+          try {
+            // Handle different MathJax API versions
+            if (window.MathJax.Hub) {
+              // MathJax v2.x
+              window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
+              // Remove the processing class after typesetting
+              window.MathJax.Hub.Queue(() => {
+                if (el.classList) {
+                  el.classList.remove('mathjax-processing');
+                  el.classList.add('mathjax-rendered');
+                }
+              });
+            } else if (window.MathJax.typeset) {
+              // MathJax v3.x
+              window.MathJax.typeset([el]);
+              // Remove the processing class after typesetting
+              if (el.classList) {
+                el.classList.remove('mathjax-processing');
+                el.classList.add('mathjax-rendered');
+              }
+            }
+          } catch (renderError) {
+            console.warn("Error during MathJax rendering:", renderError);
+            // Remove processing class if there was an error
+            if (el.classList) {
+              el.classList.remove('mathjax-processing');
+            }
+          }
+        });
+      } else if (elements) {
+        // Single element
+        // Add a class to indicate MathJax is processing
+        if (elements.classList) {
+          elements.classList.add('mathjax-processing');
+        }
+
+        try {
           // Handle different MathJax API versions
           if (window.MathJax.Hub) {
             // MathJax v2.x
-            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
+            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, elements]);
+            // Remove the processing class after typesetting
+            window.MathJax.Hub.Queue(() => {
+              if (elements.classList) {
+                elements.classList.remove('mathjax-processing');
+                elements.classList.add('mathjax-rendered');
+              }
+            });
           } else if (window.MathJax.typeset) {
             // MathJax v3.x
-            window.MathJax.typeset([el]);
+            window.MathJax.typeset([elements]);
+            // Remove the processing class after typesetting
+            if (elements.classList) {
+              elements.classList.remove('mathjax-processing');
+              elements.classList.add('mathjax-rendered');
+            }
           }
-        });
-      } else {
-        // Single element
-        // Handle different MathJax API versions
-        if (window.MathJax.Hub) {
-          // MathJax v2.x
-          window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, elements]);
-        } else if (window.MathJax.typeset) {
-          // MathJax v3.x
-          window.MathJax.typeset([elements]);
+        } catch (renderError) {
+          console.warn("Error during MathJax rendering:", renderError);
+          // Remove processing class if there was an error
+          if (elements.classList) {
+            elements.classList.remove('mathjax-processing');
+          }
         }
       }
+    } else {
+      // If MathJax is not available, just make sure content is visible
+      console.warn("MathJax not available - showing plain text content");
     }
   } catch (error) {
-    console.error("Error rendering MathJax:", error);
+    console.error("Error in renderMathJax function:", error);
   }
 };
 
@@ -2644,25 +2713,87 @@ const renderMathJax = (elements) => {
 const loadMathJaxIfNeeded = () => {
   if (typeof window === "undefined") return;
 
+  // Make all content visible immediately regardless of MathJax status
+  document.body.classList.add('show-all-content');
+  
+  // Add a class to document to indicate MathJax is loading
+  document.body.classList.add('mathjax-loading');
+
+  // Pre-process all answer options to ensure they're visible
+  const allAnswerOptions = document.querySelectorAll('.answer span[ref="mathJaxEl"]');
+  allAnswerOptions.forEach(option => {
+    if (option) {
+      option.style.visibility = 'visible';
+      option.style.display = 'inline-block';
+    }
+  });
+
+  const renderMathContent = () => {
+    nextTick(() => {
+      // Set a timeout for rendering to ensure DOM is ready
+      setTimeout(() => {
+        try {
+          renderMathJax(mathJaxEl.value);
+          document.body.classList.remove('mathjax-loading');
+          document.body.classList.add('mathjax-loaded');
+        } catch (e) {
+          console.error("Error rendering math content:", e);
+          document.body.classList.remove('mathjax-loading');
+          document.body.classList.add('mathjax-error');
+        }
+      }, 200);
+    });
+  };
+
   if (!window.MathJax) {
+    console.log("Loading MathJax from CDN...");
     // MathJax not available, so load it
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
     script.async = true;
 
+    // Configure MathJax options before loading
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      },
+      startup: {
+        ready: () => {
+          console.log("MathJax is ready!");
+        }
+      }
+    };
+
     // Call renderMathJax after MathJax is loaded
     script.onload = () => {
-      console.log("MathJax loaded successfully");
+      console.log("MathJax script loaded successfully");
       // Wait a bit to make sure MathJax is fully initialized
       setTimeout(() => {
-        renderMathJax(mathJaxEl.value);
+        renderMathContent();
       }, 500);
+    };
+
+    // Handle loading errors
+    script.onerror = () => {
+      console.error("Failed to load MathJax - showing plain text");
+      document.body.classList.remove('mathjax-loading');
+      document.body.classList.add('mathjax-failed');
+      // Still try to make content visible
+      renderMathContent();
     };
 
     document.head.appendChild(script);
   } else {
     // MathJax is already available, render math
-    renderMathJax(mathJaxEl.value);
+    renderMathContent();
   }
 };
 
@@ -2918,6 +3049,53 @@ watch(
   #test-question {
     margin-bottom: 16px;
   }
+
+  // Ensure option text is always visible
+  span[ref="mathJaxEl"] {
+    display: inline-block;
+    min-height: 1em;
+    visibility: visible !important;
+  }
+  
+  // Show content during MathJax processing
+  .mathjax-processing {
+    min-height: 1em;
+    visibility: visible !important;
+    display: inline-block !important;
+  }
+  
+  // Different answer option styles
+  .answer {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    
+    span {
+      display: inline-block;
+      visibility: visible !important;
+      margin-right: 8px;
+    }
+  }
+}
+
+// Add global styles for MathJax elements to ensure they display correctly
+[ref="mathJaxEl"] {
+  visibility: visible !important;
+  display: inline-block;
+  min-height: 1em;
+}
+
+.mathjax-processing, 
+.mathjax-error,
+.mathjax-rendered,
+.mathjax-failed {
+  visibility: visible !important;
+}
+
+.answer span[ref="mathJaxEl"] {
+  min-height: 1.5em;
+  visibility: visible !important;
+  display: inline-block !important;
 }
 
 .v-label--clickable {
@@ -2928,5 +3106,33 @@ watch(
 }
 .v-expansion-panel-text__wrapper {
   padding: 8px 14px 16px !important;
+}
+
+.show-all-content .answer span[ref="mathJaxEl"],
+.show-all-content [ref="mathJaxEl"] {
+  visibility: visible !important;
+  display: inline-block !important;
+  min-height: 1.5em;
+}
+
+.v-label--clickable {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+  margin-inline-start: 10px !important;
+}
+
+.option-text {
+  display: inline-block !important;
+  visibility: visible !important;
+  min-height: 1.5em;
+  min-width: 10px;
+}
+
+.show-all-content .answer span[ref="mathJaxEl"],
+.show-all-content [ref="mathJaxEl"] {
+  visibility: visible !important;
+  display: inline-block !important;
+  min-height: 1.5em;
 }
 </style>
