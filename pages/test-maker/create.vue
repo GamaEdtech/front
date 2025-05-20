@@ -13,14 +13,14 @@
           size="small"
           @click="confirmDeleteDialog = true"
           class="mr-1"
-           style="font-size: 15px; font-weight: 500;"
+          style="font-size: 15px; font-weight: 500"
         />
         <v-btn
           variant="outlined"
           icon="mdi-printer-eye"
           size="small"
           @click="printPreviewDialog = !printPreviewDialog"
-          style="font-size: 15px; font-weight: 500;"
+          style="font-size: 15px; font-weight: 500"
         />
       </v-col>
     </v-row>
@@ -102,7 +102,7 @@
                   :items="test_type_list"
                   item-title="title"
                   item-value="id"
-                  :rules="[(v) => !!v || 'This field is required']" 
+                  :rules="[(v) => !!v || 'This field is required']"
                   label="Exam type"
                   variant="outlined"
                   color="orange"
@@ -121,7 +121,6 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
-
                 ></v-text-field>
               </v-col>
 
@@ -133,7 +132,7 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
-                  :rules="[(v) => !!v || 'This field is required']" 
+                  :rules="[(v) => !!v || 'This field is required']"
                 ></v-autocomplete>
               </v-col>
 
@@ -147,7 +146,7 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
-                  :rules="[(v) => !!v || 'This field is required']" 
+                  :rules="[(v) => !!v || 'This field is required']"
                 ></v-autocomplete>
               </v-col>
 
@@ -172,7 +171,13 @@
                   density="compact"
                   hide-details
                 ></v-text-field>
-                <div style="font-size: 11px; color:rgba(0,0,0,0.6); margin-left: 15px">
+                <div
+                  style="
+                    font-size: 11px;
+                    color: rgba(0, 0, 0, 0.6);
+                    margin-left: 15px;
+                  "
+                >
                   Ex: 9700/11 Biology Jun 2020 Online Test | Cambridge AS & A
                   Level MSCO
                 </div>
@@ -240,7 +245,11 @@
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
-                style="font-weight: 500; color: #009688; font-size: 16px !important;"
+                style="
+                  font-weight: 500;
+                  color: #009688;
+                  font-size: 16px !important;
+                "
               ></v-switch>
             </v-col>
           </v-row>
@@ -254,10 +263,22 @@
                 border="start"
                 density="compact"
               >
-                <div class="d-flex align-center justify-space-between flex-wrap">
-                  <span>{{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }} added to this exam</span>
-                  <span v-if="tests.length < 5" class="ml-2">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }} to publish</span>
-                  <span v-else class="ml-2 text-success">Ready to publish!</span>
+                <div
+                  class="d-flex align-center justify-space-between flex-wrap"
+                >
+                  <span
+                    >{{ tests.length }}
+                    {{ tests.length === 1 ? "test" : "tests" }} added to this
+                    exam</span
+                  >
+                  <span v-if="tests.length < 5" class="ml-2"
+                    >Need {{ 5 - tests.length }} more
+                    {{ 5 - tests.length === 1 ? "test" : "tests" }} to
+                    publish</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Ready to publish!</span
+                  >
                 </div>
               </v-alert>
               <v-progress-linear
@@ -270,9 +291,12 @@
             </v-col>
             <v-col cols="12">
               <CreateTestForm
-                ref="create-form"
+                ref="createForm"
                 :goToPreviewStep="test_step"
                 :updateTestList="lastCreatedTest"
+                @update:updateTestList="val => lastCreatedTest = val"
+                @update:refreshTests="getExamCurrentTests"
+                @update:goToPreviewStep="val => test_step = val"
               />
             </v-col>
           </v-row>
@@ -371,7 +395,10 @@
                 label="My own tests"
                 density="compact"
                 color="orange"
-                style="font-size: 16px !important; margin-inline-end: 10px !important;"
+                style="
+                  font-size: 16px !important;
+                  margin-inline-end: 10px !important;
+                "
               ></v-checkbox>
             </v-col>
 
@@ -383,10 +410,22 @@
                 border="start"
                 density="compact"
               >
-                <div class="d-flex align-center justify-space-between flex-wrap">
-                  <span>{{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }} added to this exam</span>
-                  <span v-if="tests.length < 5" class="ml-2">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }} to publish</span>
-                  <span v-else class="ml-2 text-success">Ready to publish!</span>
+                <div
+                  class="d-flex align-center justify-space-between flex-wrap"
+                >
+                  <span
+                    >{{ tests.length }}
+                    {{ tests.length === 1 ? "test" : "tests" }} added to this
+                    exam</span
+                  >
+                  <span v-if="tests.length < 5" class="ml-2"
+                    >Need {{ 5 - tests.length }} more
+                    {{ 5 - tests.length === 1 ? "test" : "tests" }} to
+                    publish</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Ready to publish!</span
+                  >
                 </div>
               </v-alert>
               <v-progress-linear
@@ -416,7 +455,12 @@
                     >
                       <v-row class="mb-2">
                         <v-col cols="12">
-                          <v-chip v-if="item.lesson_title"  size="x-large" density="compact" style="font-size: 13px !important;">
+                          <v-chip
+                            v-if="item.lesson_title"
+                            size="x-large"
+                            density="compact"
+                            style="font-size: 13px !important"
+                          >
                             {{ item.lesson_title }}
                           </v-chip>
                           <v-chip
@@ -557,16 +601,24 @@
                             v-if="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
                           >
-                            <v-icon color="error" size="small">mdi-delete</v-icon>
+                            <v-icon color="error" size="small"
+                              >mdi-delete</v-icon
+                            >
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="blue" size="x-large">mdi-bullhorn-outline</v-icon>
+                            <v-icon color="blue" size="x-large"
+                              >mdi-bullhorn-outline</v-icon
+                            >
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="green" size="x-large" >mdi-eye</v-icon>
+                            <v-icon color="green" size="x-large"
+                              >mdi-eye</v-icon
+                            >
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="red" size="x-large">mdi-video</v-icon>
+                            <v-icon color="red" size="x-large"
+                              >mdi-video</v-icon
+                            >
                           </v-btn>
                         </v-col>
                         <v-col cols="6" class="text-right">
@@ -575,8 +627,12 @@
                             variant="flat"
                             density="compact"
                             v-if="!tests.find((x) => x == item.id)"
-                            @click="applyTest(item, 'add')"
-                            style="font-size: 13px !important; font-weight: 500; text-transform: none;"
+                            @click="applyTest({ ...item, isApplied: false })"
+                            style="
+                              font-size: 13px !important;
+                              font-weight: 500;
+                              text-transform: none;
+                            "
                           >
                             <v-icon>mdi-plus</v-icon>
                             Add
@@ -587,8 +643,12 @@
                             size="large"
                             density="compact"
                             v-if="tests.find((x) => x == item.id)"
-                            @click="applyTest(item, 'remove')"
-                            style="font-size: 13px !important; font-weight: 500; text-transform: none;"
+                            @click="applyTest({ ...item, isApplied: true })"
+                            style="
+                              font-size: 13px !important;
+                              font-weight: 500;
+                              text-transform: none;
+                            "
                           >
                             <v-icon>mdi-minus</v-icon>
                             Delete
@@ -628,9 +688,16 @@
                     color="teal"
                     class="text-white"
                     size="large"
-                    style="text-transform: none; font-size: 13px; font-weight: 500;"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
                   >
-                    <span v-if="tests.length < 5">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }}</span>
+                    <span v-if="tests.length < 5"
+                      >Need {{ 5 - tests.length }} more
+                      {{ 5 - tests.length === 1 ? "test" : "tests" }}</span
+                    >
                     <span v-else>Publish</span>
                   </v-btn>
                 </v-col>
@@ -641,7 +708,11 @@
                     color="red"
                     size="large"
                     to="/user/exam"
-                    style="text-transform: none; font-size: 13px; font-weight: 500;"
+                    style="
+                      text-transform: none;
+                      font-size: 13px;
+                      font-weight: 500;
+                    "
                   >
                     Discard
                   </v-btn>
@@ -693,6 +764,99 @@
                 </v-col>
               </v-row>
             </v-col>
+            <v-row>
+              <v-col cols="12" v-if="previewTestList.length">
+                <draggable
+                  v-model="previewTestList"
+                  :item-key="'id'"
+                  @end="previewDragEnd"
+                  handle=".drag-handle"
+                >
+                  <template #item="{ element: item }">
+                    <v-row :key="item.id">
+                      <v-col cols="12">
+                        <div
+                          id="test-question"
+                          ref="mathJaxEl"
+                          v-html="item.question"
+                        />
+                        <img v-if="item.q_file" :src="item.q_file" />
+
+                        <div class="answer">
+                          <span>1)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_a"
+                            v-html="item.answer_a"
+                          ></span>
+                          <img v-if="item.a_file" :src="item.a_file" />
+                        </div>
+                        <div class="answer">
+                          <span>2)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_b"
+                            v-html="item.answer_b"
+                          ></span>
+                          <img v-if="item.b_file" :src="item.b_file" />
+                        </div>
+                        <div class="answer">
+                          <span>3)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_c"
+                            v-html="item.answer_c"
+                          ></span>
+                          <img v-if="item.c_file" :src="item.c_file" />
+                        </div>
+                        <p class="answer">
+                          <span>4)</span>
+                          <span
+                            ref="mathJaxEl"
+                            v-if="item.answer_d"
+                            v-html="item.answer_d"
+                          />
+                          <img v-if="item.d_file" :src="item.d_file" />
+                        </p>
+                        <v-row>
+                          <v-col cols="6">
+                            <v-btn icon color="blue" class="drag-handle">
+                              <v-icon> mdi-cursor-move </v-icon>
+                            </v-btn>
+                          </v-col>
+                          <v-col cols="6" class="text-right">
+                            <v-btn
+                              color="blue"
+                              variant="flat"
+                              size="small"
+                              v-if="!tests.includes(item.id)"
+                              @click="applyTest(item, 'add')"
+                            >
+                              <v-icon size="small"> mdi-plus </v-icon>
+                              Add
+                            </v-btn>
+                            <v-btn
+                              color="red"
+                              variant="flat"
+                              size="small"
+                              v-if="tests.includes(item.id)"
+                              @click="applyTest(item, 'remove')"
+                            >
+                              <v-icon size="small"> mdi-minus </v-icon>
+                              Delete
+                            </v-btn>
+                          </v-col>
+                        </v-row>
+                        <v-divider class="mt-3" />
+                      </v-col>
+                    </v-row>
+                  </template>
+                </draggable>
+              </v-col>
+              <v-col v-else cols="12" class="text-center">
+                <p>Oops! no data found</p>
+              </v-col>
+            </v-row>
 
             <v-col cols="12" v-if="tests.length < 5">
               <v-alert
@@ -705,7 +869,11 @@
               >
                 <div class="d-flex align-center">
                   <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
-                  <span>You need at least 5 tests to publish this exam. Currently have {{ tests.length }} {{ tests.length === 1 ? 'test' : 'tests' }}.</span>
+                  <span
+                    >You need at least 5 tests to publish this exam. Currently
+                    have {{ tests.length }}
+                    {{ tests.length === 1 ? "test" : "tests" }}.</span
+                  >
                 </div>
               </v-alert>
             </v-col>
@@ -720,7 +888,7 @@
                     size="large"
                     color="teal"
                     class="text-white"
-                    block 
+                    block
                     style="
                       text-transform: none;
                       font-size: 13px;
@@ -728,7 +896,10 @@
                     "
                     density="compact"
                   >
-                    <span v-if="tests.length < 5">Need {{ 5 - tests.length }} more {{ (5 - tests.length) === 1 ? 'test' : 'tests' }}</span>
+                    <span v-if="tests.length < 5"
+                      >Need {{ 5 - tests.length }} more
+                      {{ 5 - tests.length === 1 ? "test" : "tests" }}</span
+                    >
                     <span v-else>Publish</span>
                   </v-btn>
                 </v-col>
@@ -862,7 +1033,13 @@
           </v-btn>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn style="text-transform: none; font-size: 13px; font-weight: 500;" variant="text" @click="printPreviewDialog = false"> Ok </v-btn>
+            <v-btn
+              style="text-transform: none; font-size: 13px; font-weight: 500"
+              variant="text"
+              @click="printPreviewDialog = false"
+            >
+              Ok
+            </v-btn>
           </v-toolbar-items>
         </v-toolbar>
 
@@ -876,7 +1053,18 @@
             <v-col cols="4">Duration: {{ form.duration }}</v-col>
             <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
             <v-col cols="12">
-              <v-chip label  variant="text" style="font-size: 13px; font-weight: 500; background-color: #b30a29; color: white; opacity: 1;">Topics:</v-chip>
+              <v-chip
+                label
+                variant="text"
+                style="
+                  font-size: 13px;
+                  font-weight: 500;
+                  background-color: #b30a29;
+                  color: white;
+                  opacity: 1;
+                "
+                >Topics:</v-chip
+              >
             </v-col>
             <v-col cols="4" v-for="(item, index) in topicTitleArr" :key="index">
               {{ item }}
@@ -885,7 +1073,103 @@
               <v-divider />
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="12" v-show="previewTestList.length">
+              <draggable
+                v-model="previewTestList"
+                :item-key="'id'"
+                @end="previewDragEnd"
+                handle=".drag-handle"
+              >
+                <template #item="{ element: item }">
+                  <v-row :key="item.id">
+                    <v-col cols="12">
+                      <div
+                        id="test-question"
+                        ref="mathJaxEl"
+                        v-html="item.question"
+                      />
+                      <img v-if="item.q_file" :src="item.q_file" />
 
+                      <div class="answer">
+                        <span>1)</span>
+                        <span
+                          ref="mathJaxEl"
+                          v-if="item.answer_a"
+                          v-html="item.answer_a"
+                        ></span>
+                        <img v-if="item.a_file" :src="item.a_file" />
+                      </div>
+                      <div class="answer">
+                        <span>2)</span>
+                        <span
+                          ref="mathJaxEl"
+                          v-if="item.answer_b"
+                          v-html="item.answer_b"
+                        ></span>
+                        <img v-if="item.b_file" :src="item.b_file" />
+                      </div>
+                      <div class="answer">
+                        <span>3)</span>
+                        <span
+                          ref="mathJaxEl"
+                          v-if="item.answer_c"
+                          v-html="item.answer_c"
+                        ></span>
+                        <img v-if="item.c_file" :src="item.c_file" />
+                      </div>
+                      <p class="answer">
+                        <span>4)</span>
+                        <span
+                          ref="mathJaxEl"
+                          v-if="item.answer_d"
+                          v-html="item.answer_d"
+                        />
+                        <img v-if="item.d_file" :src="item.d_file" />
+                      </p>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-btn icon color="blue" class="drag-handle">
+                            <v-icon> mdi-cursor-move </v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="6" class="text-right">
+                          <v-btn
+                            color="blue"
+                            variant="flat"
+                            size="small"
+                            v-if="!tests.includes(item.id)"
+                            @click="applyTest(item, 'add')"
+                          >
+                            <v-icon size="small"> mdi-plus </v-icon>
+                            Add
+                          </v-btn>
+                          <v-btn
+                            color="red"
+                            variant="flat"
+                            size="small"
+                            v-if="tests.includes(item.id)"
+                            @click="applyTest(item, 'remove')"
+                          >
+                            <v-icon size="small"> mdi-minus </v-icon>
+                            Delete
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                      <v-divider class="mt-3" />
+                    </v-col>
+                  </v-row>
+                </template>
+              </draggable>
+            </v-col>
+            <v-col
+              v-show="!previewTestList.length"
+              cols="12"
+              class="text-center"
+            >
+              <p>Oops! no data found</p>
+            </v-col>
+          </v-row>
           <v-row>
             <v-col cols="12" v-if="previewTestList.length">
               <div v-for="(item, index) in previewTestList" :key="index">
@@ -913,7 +1197,7 @@
                     </div>
                     <div v-else>
                       <div class="answer">
-                        <span>1)</span>
+                        <span>1</span>
                         <span
                           ref="mathJaxEl"
                           v-if="item.answer_a"
@@ -957,7 +1241,6 @@
             <v-col v-else cols="12" class="text-center">
               <p>Oops! no data found</p>
             </v-col>
-            
           </v-row>
         </v-card-text>
       </v-card>
@@ -1145,10 +1428,10 @@ const holding_level_list = [
 const testProgress = computed(() => {
   const minRequired = 5;
   const currentCount = tests.value.length;
-  
+
   // Calculate percentage, capped at 100%
   const percentage = Math.min((currentCount / minRequired) * 100, 100);
-  
+
   return percentage;
 });
 
@@ -1213,12 +1496,23 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     }
 
     // Add loading state if needed
-    const loadingTarget = 
-      type === "section" ? (trigger === "filter" ? filter_level_list : level_list) :
-      type === "base" ? (trigger === "filter" ? filter_grade_list : grade_list) :
-      type === "lesson" ? (trigger === "filter" ? filter_lesson_list : lesson_list) :
-      type === "topic" ? topic_list : null;
-    
+    const loadingTarget =
+      type === "section"
+        ? trigger === "filter"
+          ? filter_level_list
+          : level_list
+        : type === "base"
+        ? trigger === "filter"
+          ? filter_grade_list
+          : grade_list
+        : type === "lesson"
+        ? trigger === "filter"
+          ? filter_lesson_list
+          : lesson_list
+        : type === "topic"
+        ? topic_list
+        : null;
+
     if (loadingTarget) {
       // Set a temporary loading item
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
@@ -1272,7 +1566,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     }
   } catch (err) {
     console.error(`Error loading ${type} data:`, err);
-    
+
     // Reset the target list to empty on error
     if (type === "section") {
       if (trigger === "filter") filter_level_list.value = [];
@@ -1288,8 +1582,10 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     } else if (type === "exam_type") {
       test_type_list.value = [];
     }
-    
-    nuxtApp.$toast.error(`Failed to load ${type} data: ${err.message || "Unknown error"}`);
+
+    nuxtApp.$toast.error(
+      `Failed to load ${type} data: ${err.message || "Unknown error"}`
+    );
   }
 };
 
@@ -1358,14 +1654,19 @@ const submitQuestion = async () => {
     };
 
     // Update create form component with new exam info if it exists
-    if (createForm.value && typeof createForm.value.getCurrentExamInfo === 'function') {
+    if (
+      createForm.value &&
+      typeof createForm.value.getCurrentExamInfo === "function"
+    ) {
       createForm.value.getCurrentExamInfo();
     }
-    
+
     // Move to the next step
     test_step.value = 2;
   } catch (error) {
-    nuxtApp.$toast.error(error.response?.data?.message || "Error creating exam");
+    nuxtApp.$toast.error(
+      error.response?.data?.message || "Error creating exam"
+    );
   } finally {
     submit_loading.value = false;
   }
@@ -1398,7 +1699,7 @@ const uploadFile = async (file_name) => {
 
   let formData = new FormData();
   formData.append("file", file_original.value);
-  
+
   try {
     const response = await $fetch("/api/v1/upload", {
       method: "POST",
@@ -1430,10 +1731,10 @@ const publishTest = async () => {
 
     if (response.data?.message === "done") {
       nuxtApp.$toast.success("Exam published successfully");
-      
+
       // Store the exam ID before resetting state
       const publishedExamId = response.data.id || exam_id.value;
-      
+
       // Reset state
       exam_id.value = "";
       exam_code.value = "";
@@ -1449,13 +1750,13 @@ const publishTest = async () => {
       // Reset data
       previewTestList.value = [];
       tests.value = [];
-      
+
       // Clear form data
       resetForm();
-      
+
       // Set exam_id to the published ID so the computed test_share_link works
       exam_id.value = publishedExamId;
-      
+
       // Navigate to publish step
       test_step.value = 4;
     }
@@ -1484,43 +1785,92 @@ const checkActiveParam = () => {
 
 // Submit tests to the exam
 const submitTest = async () => {
-  if (!tests.value.length) return;
-
-  let formData = new FormData();
-  for (let i = 0; i < tests.value.length; i++) {
-    formData.append("tests[]", tests.value[i]);
-  }
-
   try {
-    await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+    if (!tests.value.length) {
+      console.log("No tests to submit");
+      return;
+    }
+    
+    // Ensure we have a valid exam ID
+    if (!exam_id.value) {
+      console.error("No exam ID available, cannot submit tests");
+      nuxtApp.$toast.error("No exam ID available");
+      return;
+    }
+    
+    console.log("Submitting tests to exam:", tests.value, "Exam ID:", exam_id.value);
+    
+    // Create FormData with all current tests
+    const formData = new URLSearchParams();
+    tests.value.forEach(testId => {
+      formData.append("tests[]", testId);
+    });
+
+    // Make API request to update the tests for this exam
+    const response = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
       method: "PUT",
-      body: urlencodeFormData(formData),
+      body: formData,
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Bearer ${userToken.value}`,
       },
     });
 
-    // Reload the exam tests
-    getExamCurrentTests();
-    nuxtApp.$toast.success("Tests added to exam successfully");
+    console.log("Submit tests API response:", response);
+    
+    if (response && response.status === 1) {
+      // Success! Update the UI to reflect changes
+      console.log("Tests submitted successfully to exam ID:", exam_id.value);
+      nuxtApp.$toast.success("Tests updated successfully");
+      
+      // Wait a moment before refreshing to ensure backend processing is complete
+      setTimeout(async () => {
+        // Fetch the current tests from API and update UI
+        await getExamCurrentTests();
+      }, 500);
+      
+      // If we have a create form reference, update its exam test list length
+      if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+      }
+    } else {
+      console.warn("API returned error for test submission:", response);
+      nuxtApp.$toast.error("Failed to update tests: " + (response?.message || "Unknown error"));
+    }
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error updating exam tests");
+    console.error("Error submitting tests to exam:", err);
+    
+    // Enhanced error handling
+    if (err.response) {
+      console.error("Error response status:", err.response.status);
+      console.error("Error response data:", err.response.data);
+      
+      // Handle specific error codes
+      if (err.response.status === 401 || err.response.status === 403) {
+        nuxtApp.$toast.error("Authentication error. Please log in again.");
+      } else if (err.response.status === 404) {
+        nuxtApp.$toast.error("Exam not found. Please refresh the page.");
+      } else {
+        nuxtApp.$toast.error(err.response.data?.message || "Error updating exam tests");
+      }
+    } else {
+      nuxtApp.$toast.error(err.message || "Error updating exam tests");
+    }
   }
 };
 
-// Get current tests for the exam
+// Load current tests for an exam
 const getExamCurrentTests = async () => {
   test_loading.value = true;
-  
+
   try {
-    // Only proceed if we have an exam ID
     if (!exam_id.value) {
-      console.warn("No exam ID available, cannot fetch exam tests");
+      console.error("No exam ID available, cannot load tests");
       return;
     }
-    
-    const response = await $fetch("/api/v1/examTests", {
+
+    console.log("Fetching current tests for exam ID:", exam_id.value);
+    const response = await $fetch(`/api/v1/examTests`, {
       method: "GET",
       params: {
         exam_id: exam_id.value,
@@ -1530,29 +1880,123 @@ const getExamCurrentTests = async () => {
       },
     });
 
-    if (response && response.data && response.data.list) {
-      previewTestList.value = response.data.list;
-      console.log("Loaded preview tests:", previewTestList.value.length);
-    } else {
-      console.warn("No test list data returned from API");
-      previewTestList.value = [];
-    }
+    console.log("API response for exam tests:", response);
 
-    // If we have a create form reference, update its exam test list length
-    if (createForm.value && 'examTestListLength' in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-    
-    // If we have test items with mathematical notation, load/render MathJax
-    if (previewTestList.value.length) {
-      nextTick(() => {
-        loadMathJaxIfNeeded();
-      });
+    if (response && response.status === 1) {
+      // Handle different response formats
+      let testData = [];
+
+      // Format 1: response.data is an array of tests
+      if (Array.isArray(response.data)) {
+        console.log("API returned array format for tests, count:", response.data.length);
+        testData = response.data;
+      }
+      // Format 2: response.data.list contains the array of tests
+      else if (response.data && Array.isArray(response.data.list)) {
+        console.log("API returned nested list format for tests, count:", response.data.list.length);
+        testData = response.data.list;
+      }
+      // No valid data found
+      else {
+        console.warn("API returned success but no recognizable test data structure:", response.data);
+        
+        // If API returns empty response but we have local tests, they might not be saved yet
+        if (tests.value.length > 0) {
+          console.log("Local tests exist but API returned empty. Attempting to submit local tests to API...");
+          
+          // Try to submit the tests to make sure they are saved to the backend
+          await submitTest();
+          
+          // Don't clear the preview list, as we'll try to resubmit the tests
+          return;
+        } else {
+          previewTestList.value = [];
+          return;
+        }
+      }
+
+      // Update the preview test list with data from API
+      previewTestList.value = testData.map((test) => ({
+        ...test,
+        isApplied: true, // Mark all tests as applied in the preview
+      }));
+
+      console.log("Updated previewTestList, count:", previewTestList.value.length);
+
+      // Extract test IDs from the API response
+      const apiTestIds = testData.map((test) => test.id);
+      console.log("Test IDs from API:", apiTestIds);
+
+      // Check if our local tests array differs from the API response
+      const localTestIds = tests.value;
+      console.log("Local test IDs:", localTestIds);
+
+      // Synchronize if needed
+      if (
+        JSON.stringify(apiTestIds.sort()) !==
+        JSON.stringify(localTestIds.sort())
+      ) {
+        console.log("Local tests and API tests are different, synchronizing...");
+
+        // If API returns empty list but we have local tests, try to submit them
+        if (apiTestIds.length === 0 && localTestIds.length > 0) {
+          console.log("API returned empty list but we have local tests, resubmitting...");
+          await submitTest();
+        } else {
+          // Otherwise, update local tests to match API
+          tests.value = [...apiTestIds];
+          console.log("Updated local tests array to match API, count:", tests.value.length);
+          
+          // If we're in edit mode and there's a discrepancy, always try to resubmit
+          // This ensures the backend is synchronized
+          if (props.examEditMode && localTestIds.length !== apiTestIds.length) {
+            console.log("Discrepancy in test count. Re-submitting to ensure backend sync...");
+            await submitTest();
+          }
+        }
+      } else {
+        console.log("Local tests and API tests are in sync, count:", tests.value.length);
+      }
+
+      // If we have a create form reference, update its exam test list length
+      if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+      }
+
+      // If we have test items with mathematical notation, load/render MathJax
+      if (previewTestList.value.length) {
+        nextTick(() => {
+          loadMathJaxIfNeeded();
+        });
+      }
+    } else {
+      console.warn("API returned error:", response);
+      nuxtApp.$toast.error(
+        "Failed to load tests: " + (response?.message || "Unknown error")
+      );
     }
   } catch (err) {
-    console.error("Failed to load exam tests:", err);
-    nuxtApp.$toast.error("Failed to load exam tests");
-    previewTestList.value = [];
+    console.error("Error fetching exam tests:", err);
+    
+    // Enhanced error handling
+    if (err.response) {
+      console.error("Error response status:", err.response.status);
+      console.error("Error response data:", err.response.data);
+      
+      // Handle specific error codes
+      if (err.response.status === 401 || err.response.status === 403) {
+        nuxtApp.$toast.error("Authentication error. Please log in again.");
+      } else {
+        nuxtApp.$toast.error(err.response?.data?.message || "Error loading tests");
+      }
+    } else {
+      nuxtApp.$toast.error(err.message || "Error loading tests");
+    }
+    
+    // Keep current previewTestList if available, don't clear it on error
+    if (!previewTestList.value.length) {
+      previewTestList.value = [];
+    }
   } finally {
     test_loading.value = false;
   }
@@ -1562,44 +2006,44 @@ const getExamCurrentTests = async () => {
 const getCurrentExamInfo = async () => {
   // Check if we have an exam ID in the user state
   const userState = useState("user");
-  
+
   if (userState.value?.currentExamId) {
     exam_id.value = userState.value.currentExamId;
     exam_code.value = userState.value.currentExamCode;
-    
+
     // Move to step 2 for tests
     test_step.value = 2;
-    
+
     try {
       const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
         headers: {
           Authorization: `Bearer ${userToken.value}`,
         },
       });
-      
+
       // Set tests array from response
       if (response.data?.tests?.length) {
         tests.value = response.data.tests;
       } else {
         tests.value = [];
       }
-      
+
       // Set form data in sequence to trigger proper cascading updates
       if (response.data.section) {
         form.section = response.data.section;
         // Wait for grade list to load before setting base
         await getTypeList("base", response.data.section);
-        
+
         if (response.data.base) {
           form.base = response.data.base;
           // Wait for lesson list to load before setting lesson
           await getTypeList("lesson", response.data.base);
-          
+
           if (response.data.lesson) {
             form.lesson = response.data.lesson;
             // Load topics based on lesson
             await getTypeList("topic", response.data.lesson);
-            
+
             // Set topics if available
             if (response.data.topics && response.data.topics.length) {
               form.topics = response.data.topics;
@@ -1608,7 +2052,7 @@ const getCurrentExamInfo = async () => {
           }
         }
       }
-      
+
       // Set file path if available
       if (response.data.file_original) {
         file_original_path.value = response.data.file_original;
@@ -1649,69 +2093,172 @@ const onScroll = () => {
 };
 
 // Apply test to the exam (add or remove)
-const applyTest = async (item, type) => {
-  if (type === 'remove' && tests.value.find((x) => x == item.id)) {
-    // Remove the test
-    tests.value.splice(tests.value.indexOf(item.id), 1);
+const applyTest = async (testData) => {
+  try {
+    // Ensure we have a valid exam ID
+    if (!exam_id.value) {
+      console.error("No exam ID available, cannot apply test");
+      nuxtApp.$toast.error("No exam ID available");
+      return;
+    }
     
-    // Notify user of removal
-    nuxtApp.$toast.info("Test removed from exam");
+    // Check if we need to add or remove the test
+    if (!tests.value.includes(testData.id)) {
+      console.log("Adding test to tests array:", testData.id);
+      
+      // Add the test to the tests array
+      tests.value.push(testData.id);
+      console.log("Test added to tests array. Current tests:", tests.value);
+      
+      // Update the previewTestList to reflect this change immediately in UI
+      const existingIndex = previewTestList.value.findIndex(t => t.id === testData.id);
+      if (existingIndex === -1) {
+        // Add test to the preview list if not already there
+        previewTestList.value.push({
+          ...testData,
+          isApplied: true // Mark as applied
+        });
+      } else {
+        // Update isApplied status if already in the list
+        previewTestList.value[existingIndex].isApplied = true;
+      }
+      
+      nuxtApp.$toast.success("Test added to exam");
+    } else {
+      console.log("Removing test from tests array:", testData.id);
+      
+      // Filter out the test ID from the array
+      tests.value = tests.value.filter(id => id !== testData.id);
+      console.log("Test removed from tests array. Current tests:", tests.value);
+      
+      // Update the previewTestList to reflect this change immediately in UI
+      const existingIndex = previewTestList.value.findIndex(t => t.id === testData.id);
+      if (existingIndex !== -1) {
+        // Update isApplied status
+        previewTestList.value[existingIndex].isApplied = false;
+      }
+      
+      nuxtApp.$toast.success("Test removed from exam");
+    }
     
-    // Update in the backend
+    // Submit changes to the API
     await submitTest();
     
-    // Update the preview list
+    // If we have a create form reference, update its exam test list length
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+    
+    // Refresh the preview list to ensure UI is in sync with backend
     await getExamCurrentTests();
-  } else if (type === 'add' && !tests.value.find((x) => x == item.id)) {
-    // Add the test
-    tests.value.push(item.id);
+  } catch (err) {
+    console.error("Error applying test:", err);
     
-    // Notify user of addition
-    nuxtApp.$toast.success("Test added to exam");
-    
-    // Update in the backend
-    await submitTest();
-    
-    // Update the preview list
-    await getExamCurrentTests();
+    // Enhanced error handling
+    if (err.response) {
+      console.error("Error response status:", err.response.status);
+      console.error("Error response data:", err.response.data);
+      nuxtApp.$toast.error(err.response?.data?.message || "Error applying test");
+    } else {
+      nuxtApp.$toast.error(err.message || "Error applying test");
+    }
   }
 };
 
-// Watchers
-watch(
-  () => lastCreatedTest.value,
-  async (val) => {
-    if (val && !tests.value.find((x) => x == val)) {
-      // Add the newly created test to the tests array
-      tests.value.push(val);
-      
-      // Reset the lastCreatedTest value
-      setTimeout(() => {
-        lastCreatedTest.value = "";
-      }, 100);
-      
-      // Update in the backend
-      await submitTest();
-      
-      // Update the preview list
-      await getExamCurrentTests();
-      
-      // Notify user
-      nuxtApp.$toast.success("New test added to exam");
+// Watch for newly created tests and add them to the current exam
+watch(() => lastCreatedTest.value, async (newTest) => {
+  if (newTest && exam_id.value) {
+    console.log("lastCreatedTest watcher triggered with new test:", newTest);
+    
+    // Check if this test is already in our list to avoid duplicates
+    if (!tests.value.includes(newTest)) {
+      try {
+        console.log("Adding newly created test to exam:", newTest, "Exam ID:", exam_id.value);
+        
+        // Add the new test to the tests array
+        tests.value.push(newTest);
+        
+        // Create a form data object specifically for this test
+        const formData = new URLSearchParams();
+        formData.append("tests[]", newTest);
+        
+        // Make a direct API call to add this specific test to the exam
+        // This is more reliable than calling submitTest with the full tests array
+        const response = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+          method: "PUT",
+          body: formData,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${userToken.value}`,
+          },
+        });
+        
+        console.log("API response for adding new test:", response);
+        
+        if (response && response.status === 1) {
+          console.log("Test successfully added to exam");
+          nuxtApp.$toast.success("New test added to exam");
+          
+          // Refresh the preview list to show the added test
+          await getExamCurrentTests();
+          
+          // If we have a create form reference, update its exam test list length
+          if (createForm.value && "examTestListLength" in createForm.value) {
+            createForm.value.examTestListLength = tests.value.length;
+          }
+        } else {
+          console.warn("API returned error when adding test:", response);
+          nuxtApp.$toast.warning("Test created but couldn't be added to exam automatically. Will try again...");
+          
+          // Fall back to submitting all tests
+          await submitTest();
+        }
+        
+        // Reset the lastCreatedTest after processing
+        setTimeout(() => {
+          lastCreatedTest.value = null;
+        }, 500);
+      } catch (err) {
+        console.error("Error adding new test to exam:", err);
+        
+        // Enhanced error handling
+        if (err.response) {
+          console.error("Error response status:", err.response.status);
+          console.error("Error response data:", err.response.data);
+          nuxtApp.$toast.error(err.response?.data?.message || "Error adding new test to exam");
+        } else {
+          nuxtApp.$toast.error(err.message || "Error adding new test to exam");
+        }
+      }
+    } else {
+      console.log("Test already exists in tests array:", newTest);
     }
   }
-);
+}, { immediate: true });
 
-// Add a watcher for test_step to load preview tests when navigating to the Review step
-watch(
-  () => test_step.value,
-  async (newStep) => {
-    // When navigating to Review step (3), load the preview tests
-    if (newStep === 3 && exam_id.value) {
+// Watch for navigation to Review step (step 3)
+watch(() => test_step.value, async (newStep) => {
+  console.log("Navigation step changed to:", newStep);
+  
+  if (newStep === 3) {
+    console.log("Navigated to Review step, loading current tests");
+    // Load the current exam tests when navigating to Review
+    if (exam_id.value) {
       await getExamCurrentTests();
+      
+      // Also refresh createForm if it exists 
+      if (createForm.value && typeof createForm.value.refreshTests === 'function') {
+        console.log("Refreshing createForm component tests");
+        createForm.value.refreshTests();
+      }
+    } else {
+      console.warn("No exam ID available, cannot load tests for Review step");
+      nuxtApp.$toast.warning("Please complete the Header step first");
+      // Revert to step 1 (Header)
+      test_step.value = 1;
     }
   }
-);
+});
 
 // Watch for changes in form.section (Board)
 watch(
@@ -1728,16 +2275,16 @@ watch(
         topic_list.value = [];
         selected_topics.value = [];
       }
-      
+
       // Fetch new grade list
       await getTypeList("base", val);
-      
+
       // Update filter and createForm if available
       filter.section = val; // Init second level filter
       if (createForm.value && createForm.value.form) {
         createForm.value.form.section = val;
       }
-      
+
       // Check if we need to fetch school list
       if (form.area) {
         await getTypeList("school");
@@ -1759,16 +2306,16 @@ watch(
         topic_list.value = [];
         selected_topics.value = [];
       }
-      
+
       // Fetch new lesson list
       await getTypeList("lesson", val);
-      
+
       // Update filter and createForm if available
       filter.base = val; // Init second level filter
       if (createForm.value && createForm.value.form) {
         createForm.value.form.base = val;
       }
-      
+
       // Generate title based on new base value
       generateTitle();
     }
@@ -1786,10 +2333,10 @@ watch(
         topic_list.value = [];
         selected_topics.value = [];
       }
-      
+
       // Fetch new topic list
       await getTypeList("topic", val);
-      
+
       // Update topic selector if available
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = true;
@@ -1798,19 +2345,19 @@ watch(
       // Reset topics when lesson is cleared
       form.topics = [];
       topic_list.value = [];
-      
+
       // Update topic selector if available
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = false;
       }
     }
-    
+
     // Update filter and createForm if available
     filter.lesson = val; // Init second level filter
     if (createForm.value && createForm.value.form) {
       createForm.value.form.lesson = val;
     }
-    
+
     // Generate title based on new lesson value
     generateTitle();
   }
@@ -1827,7 +2374,7 @@ watch(
       filter.lesson = "";
       filter_grade_list.value = [];
       filter_lesson_list.value = [];
-      
+
       // Fetch new grade list for filter
       await getTypeList("base", val, "filter");
       test_loading.value = false;
@@ -1836,7 +2383,7 @@ watch(
       filter_grade_list.value = [];
       filter_lesson_list.value = [];
     }
-    
+
     // Reset pagination and test list
     all_tests_loaded.value = true;
     filter.page = 1;
@@ -1853,7 +2400,7 @@ watch(
       // Reset dependent filters
       filter.lesson = "";
       filter_lesson_list.value = [];
-      
+
       // Fetch new lesson list for filter
       await getTypeList("lesson", val, "filter");
       test_loading.value = false;
@@ -1861,7 +2408,7 @@ watch(
       // Clear lesson list when base is cleared
       filter_lesson_list.value = [];
     }
-    
+
     // Reset pagination and test list
     all_tests_loaded.value = true;
     filter.page = 1;
@@ -1875,7 +2422,7 @@ watch(
   async (val) => {
     // Reset topic filter when lesson changes
     filter.topic = "";
-    
+
     if (val) {
       test_loading.value = true;
       // Fetch topic list based on selected lesson
@@ -1885,12 +2432,12 @@ watch(
       // Clear topic list when lesson is cleared
       topic_list.value = [];
     }
-    
+
     // Reset pagination and test list
     filter.page = 1;
     test_list.value = [];
     all_tests_loaded.value = false;
-    
+
     // Load tests with new filter
     getExamTests();
   }
@@ -1961,41 +2508,41 @@ onMounted(async () => {
   // Get user token
   const auth = useAuth();
   userToken.value = auth.getUserToken();
-  
+
   // Initialize data in the correct sequence
   await getCurrentExamInfo();
-  
+
   // Load initial data - start with sections
   await getTypeList("section");
-  
+
   // Conditionally load data based on URL parameters or existing form values
   if (form.section) {
     await getTypeList("base", form.section);
-    
+
     if (form.base) {
       await getTypeList("lesson", form.base);
-      
+
       if (form.lesson) {
         await getTypeList("topic", form.lesson);
       }
     }
   }
-  
+
   // Get additional type lists
   await loadExamTypes(); // Use our specialized function for exam types
   await getTypeList("state");
-  
+
   // Load tests if needed
   await getExamTests();
-  
+
   // If we have an exam ID, get its tests
   if (exam_id.value) {
     await getExamCurrentTests();
   }
-  
+
   // Try to load MathJax if it's not already available
   loadMathJaxIfNeeded();
-  
+
   // Check active tab from route and enable it
   if (route.query?.active === "test_list") {
     test_step.value = 2;
@@ -2007,7 +2554,7 @@ onMounted(async () => {
     test_step.value = 1;
     testListSwitch.value = false;
   }
-  
+
   // Show welcome toast
   setTimeout(() => {
     nuxtApp.$toast.info("Welcome to the exam creator");
@@ -2090,7 +2637,7 @@ const getExamTests = async () => {
     }
 
     // Update createForm if it exists and has examTestListLength property
-    if (createForm.value && 'examTestListLength' in createForm.value) {
+    if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
   } catch (err) {
@@ -2119,11 +2666,11 @@ const deleteOnlineExam = async () => {
     // Reset all values
     exam_id.value = "";
     exam_code.value = "";
-    
+
     // Reset tests
     tests.value = [];
     previewTestList.value = [];
-    
+
     // Reset state in user store
     const userState = useState("user");
     userState.value = {
@@ -2153,32 +2700,32 @@ const validateHeaderForm = () => {
     nuxtApp.$toast.error("Board is required");
     return false;
   }
-  
+
   if (!form.base) {
     nuxtApp.$toast.error("Grade is required");
-      return false;
-    }
-  
+    return false;
+  }
+
   if (!form.lesson) {
     nuxtApp.$toast.error("Subject is required");
     return false;
   }
-  
+
   if (!form.topics || form.topics.length === 0) {
     nuxtApp.$toast.error("Please select at least one topic");
     return false;
   }
-  
+
   if (!form.title) {
     nuxtApp.$toast.error("Title is required");
     return false;
   }
-  
+
   if (!form.duration) {
     nuxtApp.$toast.error("Test duration is required");
     return false;
   }
-  
+
   return true;
 };
 
@@ -2186,41 +2733,43 @@ const validateHeaderForm = () => {
 const handleStepChange = (newStep) => {
   // Don't allow changing to step 4 (Publish) if we don't have enough tests
   if (newStep === 4 && tests.value.length < 5) {
-    nuxtApp.$toast.error(`You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`);
-    
+    nuxtApp.$toast.error(
+      `You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`
+    );
+
     // Revert to step 3 (Review)
     test_step.value = 3;
     return;
   }
-  
+
   // Prevent skipping to step 3 or 4 if exam hasn't been created yet
   if ((newStep === 3 || newStep === 4) && !exam_id.value) {
     nuxtApp.$toast.error("Please complete the Header step first");
-    
+
     // Revert to step 1 (Header)
     test_step.value = 1;
     return;
   }
-  
+
   // Prevent access to step 4 directly from step 1 or 2
   if (newStep === 4 && test_step.value < 3) {
     nuxtApp.$toast.error("Please review your exam before publishing");
-    
+
     // Go to step 3 (Review) instead
     test_step.value = 3;
     return;
   }
-  
+
   // If all validations pass, update the step
   test_step.value = newStep;
-  
+
   // Show step change notification
   if (newStep !== test_step.value) {
     const stepNames = {
       1: "Header",
       2: "Tests",
       3: "Review",
-      4: "Publish"
+      4: "Publish",
     };
     nuxtApp.$toast.info(`Navigated to ${stepNames[newStep]} step`);
   }
@@ -2248,12 +2797,12 @@ const resetForm = () => {
   form.paperID = "";
   form.edu_year = "";
   form.edu_month = "";
-  
+
   // Reset data lists that are dependent on form fields
   grade_list.value = [];
   lesson_list.value = [];
   topic_list.value = [];
-  
+
   // Reset file inputs
   file_original.value = null;
   file_original_path.value = "";
@@ -2265,15 +2814,15 @@ const resetForm = () => {
 const resetAllData = () => {
   // Reset form
   resetForm();
-  
+
   // Reset exam data
   exam_id.value = "";
   exam_code.value = "";
-  
+
   // Reset tests
   tests.value = [];
   previewTestList.value = [];
-  
+
   // Reset state in user store
   const userState = useState("user");
   userState.value = {
@@ -2286,10 +2835,14 @@ const resetAllData = () => {
 // Add a new function to help users understand how many tests are needed
 const goToNextStep = () => {
   if (tests.value.length < 5) {
-    nuxtApp.$toast.warning(`You need at least 5 tests to proceed. Currently have ${tests.value.length}. Add ${5 - tests.value.length} more.`);
+    nuxtApp.$toast.warning(
+      `You need at least 5 tests to proceed. Currently have ${
+        tests.value.length
+      }. Add ${5 - tests.value.length} more.`
+    );
     return;
   }
-  
+
   test_step.value = 3;
   nuxtApp.$toast.success("Moving to Review step");
 };
@@ -2299,7 +2852,9 @@ const goToNextStep = () => {
  */
 const checkPublishReadiness = () => {
   if (tests.value.length < 5) {
-    nuxtApp.$toast.error(`You need at least 5 tests to publish. Currently have ${tests.value.length}`);
+    nuxtApp.$toast.error(
+      `You need at least 5 tests to publish. Currently have ${tests.value.length}`
+    );
     return false;
   }
   return true;
@@ -2320,19 +2875,19 @@ const handlePublish = () => {
  */
 const renderMathJax = () => {
   // Skip if we're in server-side rendering
-  if (typeof window === 'undefined') return;
-  
+  if (typeof window === "undefined") return;
+
   try {
     // Check if MathJax is available globally
     if (window.MathJax) {
       nextTick(() => {
         if (!mathJaxEl.value) return;
-        
+
         // If mathJaxEl is an array (multiple elements with same ref)
         if (Array.isArray(mathJaxEl.value)) {
-          mathJaxEl.value.forEach(el => {
+          mathJaxEl.value.forEach((el) => {
             if (!el) return;
-            
+
             // Handle different MathJax API versions
             if (window.MathJax.Hub) {
               // MathJax v2.x
@@ -2347,7 +2902,11 @@ const renderMathJax = () => {
           // Handle different MathJax API versions
           if (window.MathJax.Hub) {
             // MathJax v2.x
-            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+            window.MathJax.Hub.Queue([
+              "Typeset",
+              window.MathJax.Hub,
+              mathJaxEl.value,
+            ]);
           } else if (window.MathJax.typeset) {
             // MathJax v3.x
             window.MathJax.typeset([mathJaxEl.value]);
@@ -2356,32 +2915,34 @@ const renderMathJax = () => {
       });
     } else {
       // MathJax not available, but don't flood console with warnings
-      console.warn('MathJax not available - mathematical formulas will not be rendered properly');
+      console.warn(
+        "MathJax not available - mathematical formulas will not be rendered properly"
+      );
     }
   } catch (error) {
-    console.error('Error rendering MathJax:', error);
+    console.error("Error rendering MathJax:", error);
   }
 };
 
 // Add a new function to load MathJax if it's not already available
 const loadMathJaxIfNeeded = () => {
-  if (typeof window === 'undefined') return;
-  
+  if (typeof window === "undefined") return;
+
   if (!window.MathJax) {
     // MathJax not available, so load it
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
     script.async = true;
-    
+
     // Call renderMathJax after MathJax is loaded
     script.onload = () => {
-      console.log('MathJax loaded successfully');
+      console.log("MathJax loaded successfully");
       // Wait a bit to make sure MathJax is fully initialized
       setTimeout(() => {
         renderMathJax();
       }, 500);
     };
-    
+
     document.head.appendChild(script);
   } else {
     // MathJax is already available, render math
@@ -2412,7 +2973,7 @@ watch(
       filter_grade_list.value = [];
       filter_lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Reset pagination and test list
       filter.page = 1;
       test_list.value = [];
@@ -2432,7 +2993,7 @@ watch(
       filter.topic = "";
       filter_lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Reset pagination and test list
       filter.page = 1;
       test_list.value = [];
@@ -2450,7 +3011,7 @@ const handleClearSection = () => {
   filter_grade_list.value = [];
   filter_lesson_list.value = [];
   topic_list.value = [];
-  
+
   // Reset pagination and test list
   filter.page = 1;
   test_list.value = [];
@@ -2464,7 +3025,7 @@ const handleClearBase = () => {
   filter.topic = "";
   filter_lesson_list.value = [];
   topic_list.value = [];
-  
+
   // Reset pagination and test list
   filter.page = 1;
   test_list.value = [];
@@ -2476,7 +3037,7 @@ const handleClearLesson = () => {
   filter.lesson = "";
   filter.topic = "";
   topic_list.value = [];
-  
+
   // Reset pagination and test list
   filter.page = 1;
   test_list.value = [];
@@ -2486,12 +3047,12 @@ const handleClearLesson = () => {
 // Handle clear icon click for Topic filter
 const handleClearTopic = () => {
   filter.topic = "";
-  
+
   // Reset pagination and test list
   filter.page = 1;
   test_list.value = [];
   all_tests_loaded.value = false;
-  
+
   // Load tests with new filter
   getExamTests();
 };
@@ -2502,7 +3063,7 @@ const handleClearTopic = () => {
 const loadExamTypes = async () => {
   try {
     console.log("Loading exam types...");
-    
+
     // First try to get exam types from the API
     const res = await $fetch("/api/v1/types/list", {
       method: "GET",
@@ -2511,9 +3072,9 @@ const loadExamTypes = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
+
     console.log("API response for exam types:", res);
-    
+
     if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
       test_type_list.value = res.data;
       console.log("Loaded exam types from API:", test_type_list.value);
@@ -2530,19 +3091,77 @@ const loadExamTypes = async () => {
   }
 };
 
-// Add a watcher for print preview dialog to load tests when opened
-watch(
-  () => printPreviewDialog.value,
-  async (isOpen) => {
-    if (isOpen && exam_id.value) {
+// Watch for print preview dialog opening and load tests when it opens
+watch(() => printPreviewDialog.value, async (isOpen) => {
+  console.log("Print preview dialog state changed:", isOpen);
+  
+  if (isOpen) {
+    console.log("Print preview dialog opened, loading current tests");
+    
+    if (exam_id.value) {
+      // Load the current exam tests to ensure preview is up to date
       await getExamCurrentTests();
+      
+      // Also refresh createForm if it exists
+      if (createForm.value && typeof createForm.value.refreshTests === 'function') {
+        console.log("Refreshing createForm component tests");
+        createForm.value.refreshTests();
+      }
+    } else {
+      console.warn("No exam ID available, cannot load tests for Preview dialog");
+      nuxtApp.$toast.warning("Please complete the Header step first");
+      printPreviewDialog.value = false;
     }
   }
-);
+});
+
+/**
+ * Handle drag end event for reordering preview items
+ * This is called when the user finishes dragging/reordering tests in the preview dialog
+ */
+const previewDragEnd = async () => {
+  try {
+    // Create a URLSearchParams object for the request
+    const formData = new URLSearchParams();
+    
+    // Add all tests in their new order
+    for (let i = 0; i < previewTestList.value.length; i++) {
+      formData.append("tests[]", previewTestList.value[i].id);
+    }
+    
+    console.log("Updating test order after drag...");
+    
+    // Update the backend with the new order
+    const response = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+      method: "PUT",
+      body: formData,
+      headers: {
+        "Authorization": `Bearer ${userToken.value}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    
+    console.log("Test order update response:", response);
+    
+    // Update the tests array to match the new order
+    tests.value = previewTestList.value.map(item => item.id);
+    
+    // Show success message
+    nuxtApp.$toast.success("Test order updated successfully");
+    
+    // Refresh the test list to ensure everything is in sync
+    await getExamCurrentTests();
+  } catch (err) {
+    console.error("Error updating test order:", err);
+    nuxtApp.$toast.error("Failed to update test order");
+    
+    // Refresh the preview list to restore previous order
+    await getExamCurrentTests();
+  }
+};
 </script>
 
 <style lang="scss">
-
 .create-test-container {
   max-width: 1200px;
   margin: 5rem auto;
