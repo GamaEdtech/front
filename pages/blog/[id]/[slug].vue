@@ -1,38 +1,49 @@
 <template>
-  <v-container id="blog">
+  <v-container id="blog" v-if="error">
+    <v-row>
+      <h1 class="gama-text-h3 font-weight-bold">Pleas Try Again Later.</h1>
+    </v-row>
+  </v-container>
+  <v-container id="blog" v-else>
     <v-row>
       <v-col cols="12">
         <div id="general-data-holder">
           <div id="general-data">
-            <h1 class="gama-text-h1">
+            <h1 class="gama-text-h3 font-weight-bold">
               {{ contentData.title }}
             </h1>
             <v-chip
-              :x-small="$vuetify.breakpoint.xs"
-              :small="$vuetify.breakpoint.sm"
+              :x-small="xs"
+              :small="sm"
               :to="`/blog?cat=${contentData.cat}`"
             >
               {{ contentData.cat_title }}
             </v-chip>
 
             <figure>
-              <img
+              <NuxtImg
                 id="blog-img"
                 :src="contentData.pic"
                 :alt="contentData.title"
+                sizes="xs:300,sm:300px,md:600px, 730px"
+                placeholder
               />
               <figcaption id="general-data-footer">
                 <div id="autor-holder">
-                  <img :src="contentData.avatar" />
+                  <NuxtImg width="30px" :src="contentData.avatar" placeholder />
                   <span class="gama-text-overline"
                     >{{ contentData.first_name }}
                     {{ contentData.last_name }}</span
                   >
                 </div>
                 <div id="date-holder">
-                  <v-icon @click="share()" class="pr-6">
+                  <v-icon @click="share" class="pr-6">
                     mdi-share-variant
                   </v-icon>
+                  <v-icon> mdi-eye </v-icon>
+                  <span class="gama-text-overline pr-6">
+                    {{ contentData.views }}
+                  </span>
                   <v-icon> mdi-calendar-blank-outline </v-icon>
                   <span class="gama-text-overline">
                     {{ $dayjs(contentData.subdate).format("YYYY-MM-DD") }}
@@ -51,10 +62,12 @@
 
           <div id="blog-tags" v-if="contentData.tags">
             <v-btn
-              :to="`/blog/${contentData.id}`"
+              :to="`/blog/${contentData.id}/${$slugGenerator(
+                contentData.title
+              )}`"
               plain
-              :x-small="$vuetify.breakpoint.xs"
-              :small="$vuetify.breakpoint.sm"
+              :x-small="xs"
+              :small="sm"
               v-for="(item, index) in contentData.tags"
               :key="index"
             >
@@ -78,51 +91,78 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  auth: false,
-  name: "blog",
-  head() {
-    return {
-      title: this.contentData.title,
-    };
-  },
+<script setup>
+import { useRoute } from "vue-router";
+import { useDisplay } from "vuetify";
+import dayjs from "dayjs";
 
-  async asyncData({ params, $axios }) {
-    const content = await $axios.$get(`/api/v1/blogs/${params.id}`);
-    var contentData = [];
+const { $slugGenerator } = useNuxtApp();
+const route = useRoute();
+const blogId = route.params.id;
+const { xs, sm } = useDisplay();
 
-    if (content.status == 1) contentData = content.data;
-
-    return { contentData };
-  },
-  methods: {
-    async share() {
-      if (navigator.share) {
-        console.log("level 1");
-        try {
-          await navigator.share({
-            title: this.contentData.title,
-            text: this.contentData.body,
-            url: `https://gamatrain.com/blog/${this.contentData.id}`,
-          });
-          console.log("Shared successfully");
-        } catch (error) {
-          console.error("Error sharing:", error);
-        }
-      } else {
-        console.warn("Share API is not supported in this browser");
-      }
+const {
+  data: contentData,
+  pending,
+  error,
+} = await useAsyncData(
+  `blog-${blogId}`,
+  () => $fetch(`/api/v1/blogs/${blogId}`),
+  {
+    transform: (response) => {
+      return response.status === 1 ? response.data : [];
     },
-  },
+  }
+);
+
+// SEO
+useHead({
+  title: contentData.value?.title,
+});
+
+const share = async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: contentData.value.title,
+        text: contentData.value.body,
+        url: `https://gamatrain.com/blog/${contentData.value.id}`,
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  } else {
+    console.warn("Share API is not supported in this browser");
+  }
 };
 </script>
 
 <style>
 #blog {
+  margin-top: 64px;
   max-width: 79.4rem !important;
+
+  h2 {
+    font-size: 2rem !important;
+  }
+  h3 {
+    font-size: 1.8rem !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e1e2e3;
+  }
+  h4 {
+    font-size: 1.5rem !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.4rem !important;
+    line-height: 2.5rem !important;
+  }
   #general-data-holder {
-    /* margin-top: 5.6rem; */
     padding-bottom: 8.7rem;
 
     #general-data {
@@ -145,6 +185,9 @@ export default {
         margin-bottom: 1rem;
         background: #a7b1c2;
         padding: 0.4rem 1.2rem;
+      }
+      .v-chip.v-chip--size-default {
+        font-size: 14px;
       }
 
       #blog-img {
@@ -184,10 +227,14 @@ export default {
 
     #date-holder {
       float: right;
+      display: flex;
+      align-items: center;
 
       .v-icon {
         font-size: 1.8rem;
         color: #a7b1c2;
+        margin-right: 6px;
+        margin-top: 2px;
       }
 
       .gama-text-overline {
@@ -275,6 +322,8 @@ export default {
     text-align: center;
     margin-bottom: 4.8rem;
     .v-btn {
+      color: white;
+      box-shadow: none;
       .v-btn__content {
         color: #7f8a9c;
         font-family: Inter;
@@ -329,6 +378,26 @@ export default {
 
 @media (min-width: 600px) {
   #blog {
+    margin-top: 64px;
+
+    h2 {
+      font-size: 3rem !important;
+    }
+    h3 {
+      font-size: 2.5rem !important;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h4 {
+      font-size: 2rem !important;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.7rem !important;
+      line-height: 2.5rem !important;
+    }
     #general-data-holder {
       padding-bottom: 16rem;
 
@@ -467,6 +536,7 @@ export default {
     #blog-tags {
       margin-bottom: 6.4rem;
       .v-btn {
+        color: white;
         .v-btn__content {
           font-size: 1.6rem;
         }
@@ -516,6 +586,7 @@ export default {
 
 @media (min-width: 960px) {
   #blog {
+    margin-top: 6.4rem;
     #general-data-holder {
       padding-bottom: 18rem;
 
@@ -697,13 +768,7 @@ export default {
 
 @media (min-width: 1264px) {
   #blog {
-    margin-top: 0;
-  }
-}
-
-@media (max-width: 1263px) {
-  #blog {
-    margin-top: 5.6rem;
+    margin-top: 6.4rem;
   }
 }
 </style>
