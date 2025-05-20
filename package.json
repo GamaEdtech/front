@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@blowstack/ckeditor-nuxt": "^0.6.0",
+    "@nuxt/image": "^1.10.0",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/moment": "^1.6.1",
     "@nuxtjs/toast": "^3.3.1",
