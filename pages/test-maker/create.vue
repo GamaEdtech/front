@@ -107,6 +107,8 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
+                  :loading="!test_type_list || test_type_list.length === 0"
+                  no-data-text="Loading exam types..."
                 ></v-autocomplete>
               </v-col>
 
@@ -114,10 +116,12 @@
                 <v-text-field
                   v-model="form.duration"
                   type="number"
+                  min="1"
                   label="Test duration"
                   variant="outlined"
                   color="orange"
                   density="compact"
+
                 ></v-text-field>
               </v-col>
 
@@ -266,9 +270,9 @@
             </v-col>
             <v-col cols="12">
               <CreateTestForm
-                ref="createForm"
-                v-model:goToPreviewStep="test_step"
-                v-model:updateTestList="lastCreatedTest"
+                ref="create-form"
+                :goToPreviewStep="test_step"
+                :updateTestList="lastCreatedTest"
               />
             </v-col>
           </v-row>
@@ -1105,6 +1109,15 @@ const month_list = ref([
   { id: 12, title: "December" },
 ]);
 
+// Default exam types in case API doesn't return any
+const defaultExamTypes = [
+  { id: "1", title: "Final Exam" },
+  { id: "2", title: "Mid-term Exam" },
+  { id: "3", title: "Quiz" },
+  { id: "4", title: "Practice Test" },
+  { id: "5", title: "Mock Exam" },
+];
+
 const test_level_list = [
   { id: "1", title: "Simple" },
   { id: "2", title: "Medium" },
@@ -1170,7 +1183,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
   try {
     // If parent is empty and this is not the section type, return early
     // This prevents API calls with empty parent IDs which could return incorrect data
-    if (!parent && type !== "section") {
+    if (!parent && type !== "section" && type !== "exam_type") {
       // Clear the appropriate list based on type and trigger
       if (type === "base") {
         if (trigger === "filter") filter_grade_list.value = [];
@@ -1244,7 +1257,9 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       } else if (type === "topic") {
         topic_list.value = res.data;
       } else if (type === "exam_type") {
+        // Make sure we're properly assigning the exam_type data
         test_type_list.value = res.data;
+        console.log("Loaded exam types:", res.data);
       } else if (type === "state") {
         state_list.value = res.data;
       } else if (type === "area") {
@@ -1270,6 +1285,8 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       else lesson_list.value = [];
     } else if (type === "topic") {
       topic_list.value = [];
+    } else if (type === "exam_type") {
+      test_type_list.value = [];
     }
     
     nuxtApp.$toast.error(`Failed to load ${type} data: ${err.message || "Unknown error"}`);
@@ -1497,14 +1514,29 @@ const getExamCurrentTests = async () => {
   test_loading.value = true;
   
   try {
+    // Only proceed if we have an exam ID
+    if (!exam_id.value) {
+      console.warn("No exam ID available, cannot fetch exam tests");
+      return;
+    }
+    
     const response = await $fetch("/api/v1/examTests", {
       method: "GET",
       params: {
         exam_id: exam_id.value,
       },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
 
+    if (response && response.data && response.data.list) {
       previewTestList.value = response.data.list;
+      console.log("Loaded preview tests:", previewTestList.value.length);
+    } else {
+      console.warn("No test list data returned from API");
+      previewTestList.value = [];
+    }
 
     // If we have a create form reference, update its exam test list length
     if (createForm.value && 'examTestListLength' in createForm.value) {
@@ -1518,7 +1550,9 @@ const getExamCurrentTests = async () => {
       });
     }
   } catch (err) {
+    console.error("Failed to load exam tests:", err);
     nuxtApp.$toast.error("Failed to load exam tests");
+    previewTestList.value = [];
   } finally {
     test_loading.value = false;
   }
@@ -1625,6 +1659,9 @@ const applyTest = async (item, type) => {
     
     // Update in the backend
     await submitTest();
+    
+    // Update the preview list
+    await getExamCurrentTests();
   } else if (type === 'add' && !tests.value.find((x) => x == item.id)) {
     // Add the test
     tests.value.push(item.id);
@@ -1634,6 +1671,9 @@ const applyTest = async (item, type) => {
     
     // Update in the backend
     await submitTest();
+    
+    // Update the preview list
+    await getExamCurrentTests();
   }
 };
 
@@ -1653,8 +1693,22 @@ watch(
       // Update in the backend
       await submitTest();
       
+      // Update the preview list
+      await getExamCurrentTests();
+      
       // Notify user
       nuxtApp.$toast.success("New test added to exam");
+    }
+  }
+);
+
+// Add a watcher for test_step to load preview tests when navigating to the Review step
+watch(
+  () => test_step.value,
+  async (newStep) => {
+    // When navigating to Review step (3), load the preview tests
+    if (newStep === 3 && exam_id.value) {
+      await getExamCurrentTests();
     }
   }
 );
@@ -1928,7 +1982,7 @@ onMounted(async () => {
   }
   
   // Get additional type lists
-  await getTypeList("exam_type");
+  await loadExamTypes(); // Use our specialized function for exam types
   await getTypeList("state");
   
   // Load tests if needed
@@ -2441,6 +2495,50 @@ const handleClearTopic = () => {
   // Load tests with new filter
   getExamTests();
 };
+
+/**
+ * Specifically load exam types with better error handling
+ */
+const loadExamTypes = async () => {
+  try {
+    console.log("Loading exam types...");
+    
+    // First try to get exam types from the API
+    const res = await $fetch("/api/v1/types/list", {
+      method: "GET",
+      params: { type: "exam_type" },
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    console.log("API response for exam types:", res);
+    
+    if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+      test_type_list.value = res.data;
+      console.log("Loaded exam types from API:", test_type_list.value);
+    } else {
+      // If API returned no data, use fallback
+      console.log("API returned no exam types, using fallback");
+      test_type_list.value = defaultExamTypes;
+    }
+  } catch (err) {
+    console.error("Error loading exam types:", err);
+    // Use fallback in case of error
+    test_type_list.value = defaultExamTypes;
+    console.log("Using fallback exam types due to error:", defaultExamTypes);
+  }
+};
+
+// Add a watcher for print preview dialog to load tests when opened
+watch(
+  () => printPreviewDialog.value,
+  async (isOpen) => {
+    if (isOpen && exam_id.value) {
+      await getExamCurrentTests();
+    }
+  }
+);
 </script>
 
 <style lang="scss">

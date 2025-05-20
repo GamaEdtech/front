@@ -82,7 +82,6 @@
                 label="Topics"
                 variant="outlined"
                 color="orange"
-                :rules="[(v) => !!v || 'This field is required']"
               />
             </v-col>
 
@@ -1291,11 +1290,6 @@ const validateForm = () => {
     return false;
   }
 
-  if (!form.topic) {
-    if ($toast) $toast.error("Please select a Topic");
-    return false;
-  }
-
   if (!form.question && !form.q_file_base64) {
     if ($toast) $toast.error("Please enter a question or upload an image");
     return false;
@@ -1919,6 +1913,7 @@ watch(
   { deep: true }
 );
 
+
 /**
  * Initialize on mount
  */
@@ -1926,6 +1921,8 @@ onMounted(async () => {
   // Initialize user token
   userToken.value = auth.getUserToken();
 
+
+  getCurrentExamInfo();
   // Set default values for answer type
   form.answer_type = "text";
   form.testImgAnswers = false;
@@ -2099,7 +2096,7 @@ watch(
 const buttonDisabled = computed(() => {
   // Check basic mandatory fields
   const requiredFields =
-    form.section && form.base && form.lesson && form.topic && form.question;
+    form.section && form.base && form.lesson && form.question;
 
   // For multiple choice forms, also check true_answer
   if (["fourchoice", "twochoice", "tf"].includes(form.type)) {
