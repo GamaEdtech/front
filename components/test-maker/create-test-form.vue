@@ -1442,9 +1442,40 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
       $toast.success("Created successfully");
       path_panel_expand.value = false;
 
+      // Get the created test ID
+      const createdTestId = response.data.id;
+
       // Edit mode or create exam progress
       if (props.examEditMode === true) {
-        emit("update:updateTestList", response.data.id);
+        // Get current exam ID from state
+        const userState = useState("user").value;
+        const currentExamId = userState?.currentExamId || route.params.id;
+
+        if (currentExamId) {
+          try {
+            // Add the newly created test to the current exam
+            const examTestsFormData = new URLSearchParams();
+            examTestsFormData.append("tests[]", createdTestId);
+
+            await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+              method: "PUT",
+              body: examTestsFormData,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Bearer ${userToken.value}`,
+              },
+            });
+
+            // Notify parent component about the new test
+            emit("update:updateTestList", createdTestId);
+            
+            // Increment the exam test list length
+            examTestListLength.value++;
+          } catch (err) {
+            console.error("Error adding test to exam:", err);
+            $toast.error("Test created but couldn't be added to exam");
+          }
+        }
       }
 
       // Reset form fields using our improved function
@@ -2237,9 +2268,40 @@ const manualSubmit = async () => {
 
       path_panel_expand.value = false;
 
+      // Get the created test ID
+      const createdTestId = response.data.id;
+
       // Edit mode or create exam progress
       if (props.examEditMode === true) {
-        emit("update:updateTestList", response.data.id);
+        // Get current exam ID from state
+        const userState = useState("user").value;
+        const currentExamId = userState?.currentExamId || route.params.id;
+
+        if (currentExamId) {
+          try {
+            // Add the newly created test to the current exam
+            const examTestsFormData = new URLSearchParams();
+            examTestsFormData.append("tests[]", createdTestId);
+
+            await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+              method: "PUT",
+              body: examTestsFormData,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Bearer ${userToken.value}`,
+              },
+            });
+
+            // Notify parent component about the new test
+            emit("update:updateTestList", createdTestId);
+            
+            // Increment the exam test list length
+            examTestListLength.value++;
+          } catch (err) {
+            console.error("Error adding test to exam:", err);
+            $toast.error("Test created but couldn't be added to exam");
+          }
+        }
       }
 
       // Reset form fields using our improved function
