@@ -10,6 +10,7 @@ import AdminTable from "~/components/admin/AdminTable.vue";
 // import AnalysisReport from "@/components/AnalysisReport.vue";
 
 export default {
+  auth: false,
   layout: "admin",
   components: { AdminTable },
   data() {
