@@ -808,7 +808,7 @@ const props = defineProps({
 /**
  * Component emits
  */
-const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep"]);
+const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep", "update:refreshTests"]);
 
 /**
  * Get Nuxt app services and utilities
@@ -1447,11 +1447,14 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
 
         if (currentExamId) {
           try {
+            console.log("Associating newly created test with exam ID:", currentExamId, "Test ID:", createdTestId);
+            
             // Add the newly created test to the current exam
             const examTestsFormData = new URLSearchParams();
             examTestsFormData.append("tests[]", createdTestId);
 
-            await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+            // Make API call to associate test with exam
+            const associationResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
               method: "PUT",
               body: examTestsFormData,
               headers: {
@@ -1459,16 +1462,72 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
                 Authorization: `Bearer ${userToken.value}`,
               },
             });
-
-            // Notify parent component about the new test
-            emit("update:updateTestList", createdTestId);
             
-            // Increment the exam test list length
-            examTestListLength.value++;
+            console.log("Test association response:", associationResponse);
+
+            if (associationResponse && associationResponse.status === 1) {
+              // Notify parent component about the new test
+              console.log("Emitting updateTestList event with test ID:", createdTestId);
+              emit("update:updateTestList", createdTestId);
+              
+              // Increment the exam test list length
+              examTestListLength.value++;
+              
+              // Notify user of success
+              $toast.success("Test created and added to exam successfully");
+            } else {
+              console.warn("API returned error for test association:", associationResponse);
+              
+              // Try a second time with a different approach if the first attempt failed
+              try {
+                // Wait a moment before retrying
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                console.log("Retrying test association with different method...");
+                // Try again with a different content type
+                const retryResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+                  method: "PUT",
+                  body: JSON.stringify({ tests: [createdTestId] }),
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userToken.value}`,
+                  },
+                });
+                
+                console.log("Retry test association response:", retryResponse);
+                
+                if (retryResponse && retryResponse.status === 1) {
+                  // Notify parent component about the new test
+                  emit("update:updateTestList", createdTestId);
+                  examTestListLength.value++;
+                  $toast.success("Test created and added to exam successfully");
+                } else {
+                  // If retry also failed, still emit the event to let parent component try
+                  emit("update:updateTestList", createdTestId);
+                  $toast.warning("Test created but couldn't be added to exam automatically. Please try adding it manually.");
+                }
+              } catch (retryErr) {
+                console.error("Error in retry attempt for test association:", retryErr);
+                // Still emit the event to let parent component try
+                emit("update:updateTestList", createdTestId);
+                $toast.warning("Test created but couldn't be added to exam automatically");
+              }
+            }
           } catch (err) {
             console.error("Error adding test to exam:", err);
+            
+            // Enhanced error logging
+            if (err.response) {
+              console.error("Error response status:", err.response.status);
+              console.error("Error response data:", err.response.data);
+            }
+            
+            // Still emit the event to let parent component try
+            emit("update:updateTestList", createdTestId);
             $toast.error("Test created but couldn't be added to exam");
           }
+        } else {
+          console.warn("No current exam ID found for test association");
         }
       }
 
@@ -2250,6 +2309,7 @@ const manualSubmit = async () => {
     }
   }
   try {
+    console.log("Submitting test creation form...");
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
       body: formData,
@@ -2259,46 +2319,116 @@ const manualSubmit = async () => {
       },
     });
 
+    console.log("API response for test creation:", response);
+
     if (response.status == 1) {
       const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Created successfully");
+      if ($toast) $toast.success("Test created successfully");
 
       path_panel_expand.value = false;
 
       // Get the created test ID
       const createdTestId = response.data.id;
+      console.log("Test created with ID:", createdTestId);
 
       // Edit mode or create exam progress
-      if (props.examEditMode === true) {
-        // Get current exam ID from state
-        const userState = useState("user").value;
-        const currentExamId = userState?.currentExamId || route.params.id;
+      // Get current exam ID from state or route
+      const userState = useState("user").value;
+      const currentExamId = userState?.currentExamId || route.params.id;
 
-        if (currentExamId) {
-          try {
-            // Add the newly created test to the current exam
-            const examTestsFormData = new URLSearchParams();
-            examTestsFormData.append("tests[]", createdTestId);
+      if (currentExamId) {
+        console.log("Associating test with exam ID:", currentExamId);
+        try {
+          // Create a form data object specifically for this test
+          const examTestsFormData = new URLSearchParams();
+          examTestsFormData.append("tests[]", createdTestId);
 
-            await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
-              method: "PUT",
-              body: examTestsFormData,
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${userToken.value}`,
-              },
-            });
+          console.log("Making API call to associate test with exam...");
+          // Make direct API call to associate this specific test with the exam
+          const associationResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+            method: "PUT",
+            body: examTestsFormData,
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Bearer ${userToken.value}`,
+            },
+          });
+          
+          console.log("Test association response:", associationResponse);
 
-            // Notify parent component about the new test
+          if (associationResponse && associationResponse.status === 1) {
+            console.log("Test successfully associated with exam");
+            
+            // IMPORTANT: Directly emit the event with the created test ID 
+            // This is the key step that was missing
+            console.log("Emitting updateTestList event with test ID:", createdTestId);
             emit("update:updateTestList", createdTestId);
             
             // Increment the exam test list length
             examTestListLength.value++;
-          } catch (err) {
-            console.error("Error adding test to exam:", err);
-            $toast.error("Test created but couldn't be added to exam");
+            
+            // Notify user of success
+            $toast.success("Test created and added to exam successfully");
+            
+            // Emit a refresh event to ensure parent components update their lists
+            emit("update:refreshTests");
+          } else {
+            console.warn("API returned error for test association:", associationResponse);
+            
+            // Try a second time with a different approach (JSON body)
+            try {
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              console.log("Retrying test association with JSON format...");
+              const retryResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
+                method: "PUT",
+                body: JSON.stringify({ tests: [createdTestId] }),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${userToken.value}`,
+                },
+              });
+              
+              console.log("Retry association response:", retryResponse);
+              
+              if (retryResponse && retryResponse.status === 1) {
+                console.log("Test successfully associated with exam on retry");
+                // IMPORTANT: Emit the event with the created test ID even on retry
+                emit("update:updateTestList", createdTestId);
+                examTestListLength.value++;
+                $toast.success("Test created and added to exam successfully");
+                emit("update:refreshTests");
+              } else {
+                // If retry also failed, still emit the event to let parent component try
+                emit("update:updateTestList", createdTestId);
+                $toast.warning("Test created but couldn't be added to exam automatically. Please try adding it manually.");
+              }
+            } catch (retryErr) {
+              console.error("Error in retry attempt:", retryErr);
+              // Still emit the event to let parent component try
+              emit("update:updateTestList", createdTestId);
+              $toast.warning("Test created but couldn't be added to exam automatically");
+            }
           }
+        } catch (err) {
+          console.error("Error associating test with exam:", err);
+          
+          if (err.response) {
+            console.error("Error response status:", err.response.status);
+            console.error("Error response data:", err.response.data);
+          }
+          
+          // IMPORTANT: Even if association fails, emit the event with the created test ID
+          // so the parent component can handle it
+          emit("update:updateTestList", createdTestId);
+          $toast.warning("Test created but couldn't be added to exam automatically");
         }
+      } else {
+        console.log("No exam ID found for association");
+        
+        // Still emit the event with the created test ID,
+        // in case the parent handles it differently
+        emit("update:updateTestList", createdTestId);
       }
 
       // Reset form fields using our improved function
@@ -2344,6 +2474,46 @@ const manualSubmit = async () => {
     create_loading.value = false;
   }
 };
+
+/**
+ * Method to manually refresh tests from the parent component
+ * This can be called when tests need to be refreshed due to changes
+ */
+const refreshTests = () => {
+  console.log("Refreshing tests in create-test-form component");
+  
+  // Get current exam ID from state or route
+  const userState = useState("user").value;
+  const currentExamId = userState?.currentExamId || route.params.id;
+  
+  if (currentExamId) {
+    console.log("Current exam ID found:", currentExamId);
+    
+    // First, emit the refresh event to parent component to trigger getExamCurrentTests
+    emit("update:refreshTests");
+    
+    // Then, explicitly emit a null value to updateTestList to force a complete refresh
+    // This is important as it signals the parent to reload all tests
+    console.log("Emitting updateTestList with null to force full refresh");
+    emit("update:updateTestList", null);
+    
+    // After a small delay, emit another refresh event to ensure UI is updated
+    setTimeout(() => {
+      emit("update:refreshTests");
+    }, 300);
+  } else {
+    console.warn("No exam ID found for refreshing tests");
+    // Still emit refresh event in case parent handles it
+    emit("update:refreshTests");
+  }
+};
+
+// Expose methods to parent component
+defineExpose({
+  getCurrentExamInfo,
+  resetFormFields,
+  refreshTests
+});
 </script>
 
 <style>
