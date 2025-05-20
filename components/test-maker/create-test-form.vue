@@ -808,7 +808,7 @@ const props = defineProps({
 /**
  * Component emits
  */
-const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep", "update:refreshTests"]);
+const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep"]);
 
 /**
  * Get Nuxt app services and utilities
@@ -2369,9 +2369,6 @@ const manualSubmit = async () => {
             
             // Notify user of success
             $toast.success("Test created and added to exam successfully");
-            
-            // Emit a refresh event to ensure parent components update their lists
-            emit("update:refreshTests");
           } else {
             console.warn("API returned error for test association:", associationResponse);
             
@@ -2397,7 +2394,6 @@ const manualSubmit = async () => {
                 emit("update:updateTestList", createdTestId);
                 examTestListLength.value++;
                 $toast.success("Test created and added to exam successfully");
-                emit("update:refreshTests");
               } else {
                 // If retry also failed, still emit the event to let parent component try
                 emit("update:updateTestList", createdTestId);
@@ -2475,44 +2471,10 @@ const manualSubmit = async () => {
   }
 };
 
-/**
- * Method to manually refresh tests from the parent component
- * This can be called when tests need to be refreshed due to changes
- */
-const refreshTests = () => {
-  console.log("Refreshing tests in create-test-form component");
-  
-  // Get current exam ID from state or route
-  const userState = useState("user").value;
-  const currentExamId = userState?.currentExamId || route.params.id;
-  
-  if (currentExamId) {
-    console.log("Current exam ID found:", currentExamId);
-    
-    // First, emit the refresh event to parent component to trigger getExamCurrentTests
-    emit("update:refreshTests");
-    
-    // Then, explicitly emit a null value to updateTestList to force a complete refresh
-    // This is important as it signals the parent to reload all tests
-    console.log("Emitting updateTestList with null to force full refresh");
-    emit("update:updateTestList", null);
-    
-    // After a small delay, emit another refresh event to ensure UI is updated
-    setTimeout(() => {
-      emit("update:refreshTests");
-    }, 300);
-  } else {
-    console.warn("No exam ID found for refreshing tests");
-    // Still emit refresh event in case parent handles it
-    emit("update:refreshTests");
-  }
-};
-
 // Expose methods to parent component
 defineExpose({
   getCurrentExamInfo,
   resetFormFields,
-  refreshTests
 });
 </script>
 
