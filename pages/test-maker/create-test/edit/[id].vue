@@ -615,31 +615,39 @@
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    type="submit"
-                    :disabled="buttonDisabled"
-                    :loading="update_loading"
-                    size="large"
-                    variant="flat"
-                    color="teal"
-                    class="text-white"
-                    density="compact"
-                    block
+                      block
+                      color="teal"
+                      class="text-white"
+                      size="large"
+                      type="submit"
+                      :loading="update_loading"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
                   >
                     Update
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-btn
-                    to="/test-maker"
-                    size="large"
-                    variant="flat"
-                    color="error"
-                    density="compact"
-                    block
-                  >
-                    Discard
-                  </v-btn>
-                </v-col>
+                    <v-btn
+                      block
+                      variant="outlined"
+                      color="red"
+                      size="large"
+                      to="/test-maker"
+                      style="
+                        text-transform: none;
+                        font-size: 13px;
+                        font-weight: 500;
+                      "
+                      density="compact"
+                    >
+                      Discard
+                    </v-btn>
+                  </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -1069,14 +1077,15 @@ const fetchTestData = async () => {
 const { handleSubmit: veeHandleSubmit } = useForm();
 
 // Create a proper form submission handler that uses veeHandleSubmit
-const handleSubmit = veeHandleSubmit((values, actions) => {
-  // Prevent default form submission
-  if (actions && actions.evt && typeof actions.evt.preventDefault === 'function') {
-    actions.evt.preventDefault();
+const handleSubmit = (evt) => {
+  // Safely prevent default form submission
+  if (evt && typeof evt.preventDefault === 'function') {
+    evt.preventDefault();
   }
-  // Call the updateQuestion function
+  
+  // Call the updateQuestion function directly
   updateQuestion();
-});
+};
 
 const updateQuestion = async () => {
   try {
