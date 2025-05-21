@@ -17,10 +17,12 @@
           class="ma-1"
         >
           <v-card>
-            <v-img
-              cover
-              :class="activeSlide ? 'active-img' : ''"
+            <NuxtImg
+              width="880px"
+              height="500px"
               :src="featuredItems[slideIndex].pic"
+              placeholder
+              :class="activeSlide ? 'active-img' : ''"
             />
             <v-card-title>
               <span class="gama-text-h6">
@@ -51,7 +53,15 @@
           class="featured-item"
         >
           <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
-            <v-img cover :src="item.pic" />
+            <div class="v-responsive v-img">
+              <NuxtImg
+                width="100px"
+                height="100px"
+                :src="item.pic"
+                placeholder
+                class="mobile-image-feature nuxt-image"
+              />
+            </div>
           </nuxt-link>
 
           <div class="item-text">
@@ -90,7 +100,14 @@
                 class="ma-1"
               >
                 <v-card>
-                  <v-img cover :src="item.pic" />
+                  <NuxtImg
+                    width="350px"
+                    height="350px"
+                    :src="item.pic"
+                    placeholder
+                    class="mobile-image-feature"
+                  />
+                  <!-- <v-img cover :src="item.pic" /> -->
                   <v-card-title>
                     <span class="gama-text-h6">
                       {{ item.title }}
@@ -172,7 +189,13 @@
           <v-col cols="9" class="mobile-item d-block d-sm-none">
             <v-card flat :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
               <v-card class="ma-1">
-                <v-img cover :src="item.pic" />
+                <NuxtImg
+                  width="180px"
+                  height="135px"
+                  :src="item.pic"
+                  placeholder
+                  class="nuxt-image"
+                />
                 <v-card-title>
                   <span class="gama-text-button">
                     {{ item.title }}
@@ -181,10 +204,6 @@
               </v-card>
               <div class="gama-text-subtitle2">
                 <span v-html="truncateBody(item.body, 32)"></span>
-                <!-- <nuxt-link
-                  :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
-                  >Read more</nuxt-link
-                > -->
                 <span class="read-more">Read more</span>
               </div>
             </v-card>
@@ -192,7 +211,13 @@
           <v-col cols="10" sm="10" class="d-none d-sm-block">
             <div class="d-flex">
               <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
-                <v-img cover :src="item.pic" />
+                <NuxtImg
+                  width="180px"
+                  height="135px"
+                  :src="item.pic"
+                  placeholder
+                  class="nuxt-image"
+                />
               </nuxt-link>
 
               <div class="item-text">
@@ -204,11 +229,6 @@
                     class="gama-text-subtitle2"
                     v-html="truncateBody(item.body, 142)"
                   ></span>
-                  <!-- <nuxt-link
-                    class="gama-text-subtitle2 read-more"
-                    :to="`/blog/${item.id}/${$slugGenerator(item.title)}`"
-                    >Read more</nuxt-link
-                  > -->
                   <span class="gama-text-subtitle2 read-more">Read more</span>
                 </nuxt-link>
               </div>
@@ -626,6 +646,14 @@ watch(
   .text-loader-section {
     min-width: 80%;
   }
+  .nuxt-image {
+    object-fit: cover;
+    border-radius: 1rem;
+  }
+  .mobile-image-feature {
+    width: 100%;
+    height: 100%;
+  }
 
   .blog-item {
     margin-bottom: 4.8rem;
@@ -798,6 +826,12 @@ watch(
               -webkit-line-clamp: 2;
               -webkit-box-orient: vertical;
             }
+          }
+          .nuxt-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1rem;
           }
 
           .v-img {
@@ -1385,6 +1419,9 @@ watch(
             .active-img {
               opacity: 1 !important;
               transition: opacity 1s ease;
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
             }
           }
         }
@@ -1395,6 +1432,13 @@ watch(
       .v-text-field {
         width: 50rem;
         border-radius: 4rem 0.4rem 0.4rem 4rem;
+      }
+    }
+
+    #category-section {
+      .v-chip {
+        height: 54px;
+        font-size: 16px;
       }
     }
   }
