@@ -1,21 +1,29 @@
 <template>
-  <v-dialog v-model="isOpen" max-width="600px" style="height: 404px !important">
+  <v-dialog
+    v-model="isOpen"
+    max-width="600px"
+    style="height: 404px !important"
+    @input="onDialogInput"
+  >
     <v-card class="boxs">
-      <div class="d-flex flex-column align-center justify-center">
+      <div class="d-flex flex-column align-center justify-center pt-6">
         <div class="icon-container">
           <!-- <img src="~assets/images/Vector (1).svg" alt="Icon" /> -->
           <v-icon color="red" large>mdi-delete</v-icon>
         </div>
-        <v-card-title class="text-h5">Are you Sure?</v-card-title>
+        <v-card-title class="font-size-18 primary-gray-700 font-bold"
+          >Are you Sure?</v-card-title
+        >
       </div>
 
       <div class="text-box">
         <v-card-text class="d-flex align-center justify-center">
-          <span>Do you want to delete the province?</span>
+          <span>Do you want to delete this item?</span>
         </v-card-text>
 
         <v-card-actions class="action-buttons">
           <v-btn
+            depressed
             color="bg-Error"
             class="w-50 rounded-pill white--text"
             @click="$emit('confirm')"
@@ -24,7 +32,8 @@
           </v-btn>
 
           <v-btn
-            color="bg-Primary"
+            depressed
+            color="bg-white"
             class="w-50 rounded-pill black--text"
             @click="closeModal"
           >
@@ -58,12 +67,17 @@ export default {
   },
   methods: {
     handleDelete() {
-      if (!this.newItem.title) return;
-      this.$emit("add", { ...this.newItem });
+      // if (!this.newItem.title) return;
+      this.$emit("confirm", { ...this.newItem });
       this.closeModal();
     },
     closeModal() {
       this.$emit("update:isOpen", false);
+    },
+    onDialogInput(val) {
+      if (!val) {
+        this.$emit("close");
+      }
     },
   },
 };
@@ -72,7 +86,6 @@ export default {
 <style scoped>
 .boxs {
   max-width: 600px;
-  height: 404px !important;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -90,7 +103,6 @@ export default {
 }
 
 .text-box {
-  height: 334px;
   background-color: #f2f4f7;
   width: 100%;
   margin: 0;

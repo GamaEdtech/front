@@ -24,7 +24,7 @@
         </v-list>
         <template v-slot:append>
           <div class="d-flex align-center user pb-20">
-            <img class="profile" alt="profile" :src="$auth.user.avatar" />
+            <img class="profile" alt="profile" :src="$auth?.user?.avatar" />
             <h3 class="ml-3 white--text">{{ userName }}</h3>
           </div>
         </template>
@@ -49,6 +49,7 @@ export default {
       activeTab: "Order",
       menuItems: [
         { title: "Type", link: "/admin/type", icon: "mdi-basket" },
+        { title: "Blogs", link: "/admin/blogs", icon: "mdi-book-open-outline" },
         { title: "My Stock", link: "/admin/stock", icon: "mdi-finance" },
         { title: "Analysis", link: "/admin/analysis", icon: "mdi-chart-line" },
         { title: "Contact Us", link: "/admin/contact-us", icon: "mdi-archive-arrow-down-outline" },

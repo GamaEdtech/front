@@ -187,7 +187,7 @@ export default {
         },
         user: {
           property: "data",
-          autoFetch: true,
+          autoFetch: false,
         },
         endpoints: {
           login: { url: "/api/v1/users/login", method: "post" },
@@ -202,7 +202,7 @@ export default {
       logout: "/",
       callback: false,
       home: "/",
-    },
+    }
   },
 
   toast: {

@@ -166,8 +166,8 @@ export default {
         );
         if (result.succeeded) {
           localStorage.setItem("v2_token", result.data.token);
-          this.$auth.setUserToken(result.data.token);
-          this.$auth.setUser({});
+          // this.$auth.setUserToken(result.data.token);
+          // this.$auth.setUser({});
           this.$router.push("/admin");
         } else {
           // Handle unsuccessful authentication
