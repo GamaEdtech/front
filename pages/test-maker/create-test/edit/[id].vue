@@ -31,7 +31,7 @@
       </v-card-text>
       
       <v-card-text>
-        <VeeForm ref="veeForm" @submit.prevent="updateQuestion">
+        <VeeForm ref="veeForm" @submit="handleSubmit">
           <v-row>
             <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
               <v-autocomplete
@@ -1066,40 +1066,60 @@ const fetchTestData = async () => {
 }
 
 // Update test
+const { handleSubmit: veeHandleSubmit } = useForm();
+
+// Create a proper form submission handler that uses veeHandleSubmit
+const handleSubmit = veeHandleSubmit((values, actions) => {
+  // Prevent default form submission
+  if (actions && actions.evt && typeof actions.evt.preventDefault === 'function') {
+    actions.evt.preventDefault();
+  }
+  // Call the updateQuestion function
+  updateQuestion();
+});
+
 const updateQuestion = async () => {
   try {
-    update_loading.value = true
+    update_loading.value = true;
     
     // Validate form fields
     if (!validateForm()) {
-      update_loading.value = false
-      return
+      update_loading.value = false;
+      return;
     }
     
     // Create FormData for the request
-    const formData = new URLSearchParams()
-    formData.append('section', form.section.toString())
-    formData.append('base', form.base.toString())
-    formData.append('lesson', form.lesson.toString())
-    formData.append('topic', form.topic.toString())
-    formData.append('type', form.type)
-    formData.append('direction', form.direction || 'ltr')
-    formData.append('question', form.question)
-    formData.append('true_answer', form.true_answer)
-    formData.append('testImgAnswers', form.testImgAnswers ? '1' : '0')
-    formData.append('testingAnswers', '0')
-    formData.append('answer_full', form.answer_full || '')
+    const formData = new URLSearchParams();
+    formData.append('section', form.section.toString());
+    formData.append('base', form.base.toString());
+    formData.append('lesson', form.lesson.toString());
+    formData.append('topic', form.topic.toString());
+    formData.append('type', form.type);
+    formData.append('direction', form.direction || 'ltr');
+    formData.append('question', form.question);
+    formData.append('true_answer', form.true_answer);
+    formData.append('testImgAnswers', form.testImgAnswers ? '1' : '0');
+    formData.append('testingAnswers', '0');
+    formData.append('answer_full', form.answer_full || '');
     
     // Add answers based on question type
     if (['fourchoice', 'twochoice', 'tf'].includes(form.type)) {
-      formData.append('answer_a', form.answer_a || '')
-      formData.append('answer_b', form.answer_b || '')
+      formData.append('answer_a', form.answer_a || '');
+      formData.append('answer_b', form.answer_b || '');
       
       if (form.type === 'fourchoice') {
-        formData.append('answer_c', form.answer_c || '')
-        formData.append('answer_d', form.answer_d || '')
+        formData.append('answer_c', form.answer_c || '');
+        formData.append('answer_d', form.answer_d || '');
       }
     }
+    
+    // Add file fields if they exist
+    if (form.q_file) formData.append('q_file', form.q_file);
+    if (form.answer_full_file) formData.append('answer_full_file', form.answer_full_file);
+    if (form.a_file) formData.append('a_file', form.a_file);
+    if (form.b_file) formData.append('b_file', form.b_file);
+    if (form.c_file) formData.append('c_file', form.c_file);
+    if (form.d_file) formData.append('d_file', form.d_file);
     
     // Send update request
     const response = await $fetch(`/api/v1/examTests/${form.id}`, {
@@ -1107,23 +1127,27 @@ const updateQuestion = async () => {
       body: formData,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${userToken.value}`
+        Authorization: `Bearer ${userToken.value}`
       }
-    })
+    });
     
-    if (response.status === 1) {
-      $toast.success('Test updated successfully')
-      router.push('/test-maker')
+    if (response && response.status === 1) {
+      $toast.success('Test updated successfully');
+      
+      // Redirect back to test maker
+      setTimeout(() => {
+        router.push('/test-maker');
+      }, 1500);
     } else {
-      $toast.error(response.message || 'Error updating test')
+      $toast.error(response?.message || 'Failed to update test');
     }
   } catch (err) {
-    console.error('Error updating test:', err)
-    $toast.error(err.message || 'Error updating test')
+    console.error('Error updating test:', err);
+    $toast.error('Error updating test');
   } finally {
-    update_loading.value = false
+    update_loading.value = false;
   }
-}
+};
 
 // Delete test
 const deleteTest = async () => {
