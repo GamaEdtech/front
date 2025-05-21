@@ -1142,7 +1142,7 @@
                           <span
                             ref="mathJaxEl"
                             v-if="item.answer_c"
-                            v-html="item.answer_c || '&nbsp;'"
+                            v-html="item.answer_c"
                             class="option-text"
                           ></span>
                           <img v-if="item.c_file" :src="item.c_file" />
@@ -1230,6 +1230,7 @@
 
 <script setup>
 import { ref, reactive, watch, nextTick, onMounted, computed } from "vue";
+import { useRuntimeConfig } from 'nuxt/app';
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
 import { useState } from "#app";
@@ -1240,6 +1241,7 @@ import FormTopicSelector from "~/components/form/topic-selector.vue";
 import CreateTestForm from "~/components/test-maker/create-test-form.vue";
 
 // Get Nuxt app instance for accessing plugins like toast
+const config = useRuntimeConfig();
 const nuxtApp = useNuxtApp();
 
 // Define validation rules
@@ -1252,6 +1254,11 @@ definePageMeta({
 
 useHead({
   title: "New Exam",
+  // script: [
+  //   {
+  //     src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+  //   },
+  // ],
 });
 
 // Get services
@@ -1838,21 +1845,9 @@ const getExamCurrentTests = async () => {
       if (createForm.value && "examTestListLength" in createForm.value) {
         createForm.value.examTestListLength = tests.value.length;
       }
-    
-      // If we have test items with mathematical notation, load/render MathJax
-      if (previewTestList.value.length) {
-        nextTick(() => {
-          loadMathJaxIfNeeded();
-        });
-      }
-    } else {
-      nuxtApp.$toast.error(
-        "Failed to load tests: " + (response?.message || "Unknown error")
-      );
     }
   } catch (err) {
     nuxtApp.$toast.error("Error loading tests");
-    previewTestList.value = [];
   } finally {
     test_loading.value = false;
   }
@@ -2296,8 +2291,8 @@ onMounted(async () => {
     await getExamCurrentTests();
   }
 
-  // Try to load MathJax if it's not already available
-  loadMathJaxIfNeeded();
+  // Try to load MathJax if it's not already available(currently commented out)
+  // renderMathJax();
 
   // Check active tab from route and enable it
   if (route.query?.active === "test_list") {
@@ -2629,184 +2624,37 @@ const handlePublish = () => {
  * Render MathJax on the page
  * This function processes math notation in elements with the mathJaxEl ref
  */
-const renderMathJax = (elements) => {
-  // Skip if we're in server-side rendering
-  if (typeof window === "undefined") return;
-
-  try {
-    // Check if MathJax is available globally
-    if (window.MathJax) {
-      if (!elements) return;
-
-      // If elements is an array (multiple elements with same ref)
-      if (Array.isArray(elements)) {
-        elements.forEach((el) => {
-          if (!el) return;
-
-          // Add a class to indicate MathJax is processing
-          if (el.classList) {
-            el.classList.add('mathjax-processing');
-          }
-
-          try {
-            // Handle different MathJax API versions
-            if (window.MathJax.Hub) {
-              // MathJax v2.x
-              window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, el]);
-              // Remove the processing class after typesetting
-              window.MathJax.Hub.Queue(() => {
-                if (el.classList) {
-                  el.classList.remove('mathjax-processing');
-                  el.classList.add('mathjax-rendered');
-                }
-              });
-            } else if (window.MathJax.typeset) {
-              // MathJax v3.x
-              window.MathJax.typeset([el]);
-              // Remove the processing class after typesetting
-              if (el.classList) {
-                el.classList.remove('mathjax-processing');
-                el.classList.add('mathjax-rendered');
-              }
-            }
-          } catch (renderError) {
-            console.warn("Error during MathJax rendering:", renderError);
-            // Remove processing class if there was an error
-            if (el.classList) {
-              el.classList.remove('mathjax-processing');
-            }
-          }
-        });
-      } else if (elements) {
-        // Single element
-        // Add a class to indicate MathJax is processing
-        if (elements.classList) {
-          elements.classList.add('mathjax-processing');
-        }
-
-        try {
-          // Handle different MathJax API versions
-          if (window.MathJax.Hub) {
-            // MathJax v2.x
-            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, elements]);
-            // Remove the processing class after typesetting
-            window.MathJax.Hub.Queue(() => {
-              if (elements.classList) {
-                elements.classList.remove('mathjax-processing');
-                elements.classList.add('mathjax-rendered');
-              }
-            });
-          } else if (window.MathJax.typeset) {
-            // MathJax v3.x
-            window.MathJax.typeset([elements]);
-            // Remove the processing class after typesetting
-            if (elements.classList) {
-              elements.classList.remove('mathjax-processing');
-              elements.classList.add('mathjax-rendered');
-            }
-          }
-        } catch (renderError) {
-          console.warn("Error during MathJax rendering:", renderError);
-          // Remove processing class if there was an error
-          if (elements.classList) {
-            elements.classList.remove('mathjax-processing');
-          }
-        }
-      }
-    } else {
-      // If MathJax is not available, just make sure content is visible
-      console.warn("MathJax not available - showing plain text content");
-    }
-  } catch (error) {
-    console.error("Error in renderMathJax function:", error);
-  }
-};
-
-// Add a new function to load MathJax if it's not already available
-const loadMathJaxIfNeeded = () => {
-  if (typeof window === "undefined") return;
-
-  // Make all content visible immediately regardless of MathJax status
-  document.body.classList.add('show-all-content');
-  
-  // Add a class to document to indicate MathJax is loading
-  document.body.classList.add('mathjax-loading');
-
-  // Pre-process all answer options to ensure they're visible
-  const allAnswerOptions = document.querySelectorAll('.answer span[ref="mathJaxEl"]');
-  allAnswerOptions.forEach(option => {
-    if (option) {
-      option.style.visibility = 'visible';
-      option.style.display = 'inline-block';
-    }
-  });
-
-  const renderMathContent = () => {
-    nextTick(() => {
-      // Set a timeout for rendering to ensure DOM is ready
-      setTimeout(() => {
-        try {
-          renderMathJax(mathJaxEl.value);
-          document.body.classList.remove('mathjax-loading');
-          document.body.classList.add('mathjax-loaded');
-        } catch (e) {
-          console.error("Error rendering math content:", e);
-          document.body.classList.remove('mathjax-loading');
-          document.body.classList.add('mathjax-error');
-        }
-      }, 200);
-    });
-  };
-
-  if (!window.MathJax) {
-    console.log("Loading MathJax from CDN...");
-    // MathJax not available, so load it
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
-    script.async = true;
-
-    // Configure MathJax options before loading
-    window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+ const renderMathJax = () => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [
+          ["$", "$"],
+          ["\(", "\)"],
+        ],
+        displayMath: [
+          ["$$", "$$"],
+          ["\[", "\]"],
+        ],
         processEscapes: true,
-        processEnvironments: true
+        processEnvironments: true,
       },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process'
+      displayAlign: "center",
+      "HTML-CSS": {
+        styles: { ".MathJax_Display": { margin: 0 } },
+        linebreaks: { automatic: true },
+        availableFonts: ["Asana Math"],
+        preferredFont: "Asana Math",
+        webFont: "Asana Math-Web",
+        imageFont: null,
       },
-      startup: {
-        ready: () => {
-          console.log("MathJax is ready!");
-        }
-      }
-    };
+    });
 
-    // Call renderMathJax after MathJax is loaded
-    script.onload = () => {
-      console.log("MathJax script loaded successfully");
-      // Wait a bit to make sure MathJax is fully initialized
-      setTimeout(() => {
-        renderMathContent();
-      }, 500);
-    };
-
-    // Handle loading errors
-    script.onerror = () => {
-      console.error("Failed to load MathJax - showing plain text");
-      document.body.classList.remove('mathjax-loading');
-      document.body.classList.add('mathjax-failed');
-      // Still try to make content visible
-      renderMathContent();
-    };
-
-    document.head.appendChild(script);
-  } else {
-    // MathJax is already available, render math
-    renderMathContent();
+    window.MathJax.Hub.Queue([
+      "Typeset",
+      window.MathJax.Hub,
+      mathJaxEl.value,
+    ]);
   }
 };
 
@@ -2948,10 +2796,6 @@ const loadExamTypes = async () => {
  * This is called when the user finishes dragging/reordering tests in the preview dialog
  */
 const previewDragEnd = async () => {
-  // Ensure MathJax is rendered after dragging
-  nextTick(() => {
-    renderMathJax(mathJaxEl.value);
-  });
   
   // Extract IDs from the reordered preview list
   const new_list = [];
@@ -2966,17 +2810,6 @@ const previewDragEnd = async () => {
   await submitTest();
 };
 
-// Watch for changes in previewTestList to render MathJax
-watch(
-  () => previewTestList.value,
-  () => {
-    // Wait for the DOM to update before rendering MathJax
-    nextTick(() => {
-      loadMathJaxIfNeeded();
-    });
-  },
-  { deep: true }
-);
 </script>
 
 <style lang="scss">
@@ -3063,19 +2896,9 @@ watch(
     margin-bottom: 16px;
   }
 
-  // Ensure option text is always visible
-  span[ref="mathJaxEl"] {
-    display: inline-block;
-    min-height: 1em;
-    visibility: visible !important;
-  }
+
   
-  // Show content during MathJax processing
-  .mathjax-processing {
-    min-height: 1em;
-    visibility: visible !important;
-    display: inline-block !important;
-  }
+  
   
   // Different answer option styles
   .answer {
@@ -3091,25 +2914,10 @@ watch(
   }
 }
 
-// Add global styles for MathJax elements to ensure they display correctly
-[ref="mathJaxEl"] {
-  visibility: visible !important;
-  display: inline-block;
-  min-height: 1em;
-}
 
-.mathjax-processing, 
-.mathjax-error,
-.mathjax-rendered,
-.mathjax-failed {
-  visibility: visible !important;
-}
 
-.answer span[ref="mathJaxEl"] {
-  min-height: 1.5em;
-  visibility: visible !important;
-  display: inline-block !important;
-}
+
+
 
 .v-label--clickable {
   font-size: 16px !important;
@@ -3121,12 +2929,6 @@ watch(
   padding: 8px 14px 16px !important;
 }
 
-.show-all-content .answer span[ref="mathJaxEl"],
-.show-all-content [ref="mathJaxEl"] {
-  visibility: visible !important;
-  display: inline-block !important;
-  min-height: 1.5em;
-}
 
 .v-label--clickable {
   font-size: 16px !important;
@@ -3140,12 +2942,5 @@ watch(
   visibility: visible !important;
   min-height: 1.5em;
   min-width: 10px;
-}
-
-.show-all-content .answer span[ref="mathJaxEl"],
-.show-all-content [ref="mathJaxEl"] {
-  visibility: visible !important;
-  display: inline-block !important;
-  min-height: 1.5em;
 }
 </style>
