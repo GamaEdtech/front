@@ -955,67 +955,6 @@
         </v-card>
       </template>
     </v-stepper-vertical>
-
-    <v-row>
-      <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
-        <v-card class="pa-2">
-          <v-card-title
-            class="text-h5"
-            style="text-overflow: clip; text-wrap: wrap"
-          >
-            Are you sure of deleting the online exam?
-          </v-card-title>
-          <v-card-text
-            style="font-size: 10px; color: rgba(0, 0, 0, 0.5)"
-            class="px-2"
-          >
-            If you are sure about the deletion, click Agree button.
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="confirmDeleteDialog = false"
-              style="text-transform: none; font-size: 14px"
-            >
-              Disagree
-            </v-btn>
-            <v-btn
-              color="green darken-1"
-              text
-              :loading="deleteLoading"
-              @click="deleteOnlineExam"
-              style="text-transform: none; font-size: 14px"
-            >
-              Agree
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
-    <v-dialog v-model="deleteTestConfirmDialog" max-width="500">
-      <v-card>
-        <v-card-title class="text-h5">Are you sure?</v-card-title>
-        <v-card-text>
-          <p>If you are sure to delete, click Yes.</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="deleteTestConfirmDialog = false"
-            >No</v-btn
-          >
-          <v-btn
-            color="green-darken-1"
-            variant="text"
-            :loading="delete_exam_test_loading"
-            @click="deleteExamTest()"
-          >
-            Yes
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
     <v-dialog
       v-model="printPreviewDialog"
       fullscreen
@@ -2475,6 +2414,9 @@ const deleteExamTest = async () => {
   try {
     await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
     });
 
     nuxtApp.$toast.success("Deleted successfully");
