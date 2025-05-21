@@ -1789,33 +1789,46 @@ const checkActiveParam = () => {
  * This is used after adding/removing tests
  */
 const submitTest = async () => {
-  if (!exam_id.value) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("No exam ID found");
-    return;
-  }
-
   loading.value = true;
+  
   try {
-    // Extract just the test IDs for submission
-    const testIds = tests.value.map(test => test.id);
+    if (!tests.value.length) {
+      return;
+    }
+
+    // Ensure we have a valid exam ID
+    if (!exam_id.value) {
+      console.error('No exam ID available, cannot submit tests');
+      const { $toast } = useNuxtApp();
+      if ($toast) $toast.error("No exam ID available");
+      return;
+    }
+
+    // Create URLSearchParams directly instead of using FormData conversion
+    const formData = new URLSearchParams();
     
-    // Update the tests associated with this exam
-    const response = await $fetch(`/api/v1/exams/test/${exam_id.value}`, {
+    // Make sure all test IDs are properly converted to strings for consistency
+    tests.value.forEach(id => {
+      formData.append("tests[]", String(id));
+    });
+
+    const updateResponse = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
       method: "PUT",
-      body: { tests: testIds },
+      body: formData.toString(),
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         Authorization: `Bearer ${userToken.value}`,
       },
     });
+    
+    // Add a small delay to ensure the backend has processed the update
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    if (response.status === "success") {
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Tests updated successfully");
-      
-      // Refresh the test list to ensure we have the latest data
-      await getCurrentExamTestsInfo();
-    }
+    // Refresh the test list to ensure we have the latest data
+    await getCurrentExamTestsInfo();
+    
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.success("Tests updated successfully");
   } catch (error) {
     console.error("Error updating tests:", error);
     const { $toast } = useNuxtApp();
