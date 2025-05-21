@@ -1310,6 +1310,7 @@ const mathJaxEl = ref(null);
 const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
+const updatedExam = ref(false); // Track if exam has been updated
 
 // Form data
 const form = reactive({
@@ -3140,29 +3141,33 @@ const getCurrentExamTestsInfo = async () => {
 
   loading.value = true;
   try {
-    const res = await $fetch(`/api/v1/exams/test/${exam_id.value}`, {
+    const res = await $fetch(`/api/v1/examTests`, {
+      method: "GET",
+      params: {
+        exam_id: exam_id.value,
+      },
       headers: {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
 
-    if (res.data && Array.isArray(res.data)) {
-      // Clear existing tests first
-      tests.value = [];
+    if (res && res.status === 1) {
+      // Process the response data based on its format
+      let fetchedTests = [];
       
-      // Update the tests with the data from API
-      tests.value = res.data.map(test => ({
-        ...test,
-        id: String(test.id) // Ensure ID is a string for consistent comparison
-      }));
+      if (Array.isArray(res.data)) {
+        fetchedTests = res.data;
+      } else if (res.data && Array.isArray(res.data.list)) {
+        fetchedTests = res.data.list;
+      }
       
-      // Update preview list
-      previewTestList.value = [...tests.value];
+      // Update preview list with fetched tests
+      previewTestList.value = fetchedTests;
       
       // If we have tests, we're ready to continue
-      if (tests.value.length > 0) {
+      if (previewTestList.value.length > 0) {
         const { $toast } = useNuxtApp();
-        if ($toast) $toast.info(`Loaded ${tests.value.length} tests for this exam`);
+        if ($toast) $toast.info(`Loaded ${previewTestList.value.length} tests for this exam`);
       }
     }
   } catch (error) {
