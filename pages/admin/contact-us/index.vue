@@ -38,6 +38,7 @@
         outlined
         class="searchInput"
         rounded
+        dense
     ></v-text-field>
     </div>
     <div class="scrollable-table">
@@ -49,9 +50,7 @@
           :page.sync="page"
           class="elevation-1"
           :loading="tableLoading"
-          loading-text="Loading... Please wait"
-          :search="search"
-          @page-count="pageCount = $event"
+          v-model="selected"
           hide-default-footer
           show-select
         >
@@ -118,6 +117,10 @@
         :message="selectedMessage"
         :email="selectedEmail"
         :name="selectedName"
+        @next="goToNextMessage(selectedId)"
+        :disableNext="disableNextBtn"
+        @back="goToPreviousMessage(selectedId)"
+        :disableBack="disableBackBtn"
       />
       <DeleteMessage
         :isOpen.sync="isDeleteModalOpen"
@@ -125,13 +128,18 @@
       />
     </div>
     <v-row
-    class="mt-2"
-    align="center"
-    justify="space-between"
-    no-gutters
+      class="mt-2"
+      align="center"
+      justify="space-between"
+      no-gutters
     >
-      <v-col cols="12" class="d-flex justify-space-between flex-wrap flex-sm-nowrap">
-        <div class="d-flex align-center">
+      
+      <v-col
+        cols="12"
+        class="d-flex flex-wrap flex-sm-nowrap align-center justify-space-between"
+      >
+        
+        <div class="d-flex align-center mb-2 mb-sm-0">
           <v-select
             v-model="selectedAction"
             :items="allActions"
@@ -140,31 +148,54 @@
             solo
             dense
             class="rounded-pill footerBtns"
+            :disabled="!selected.length"
           ></v-select>
+
           <v-btn
             class="rounded-pill bg-primary-gray-700 white--text ml-4"
+            :disabled="!selected.length"
           >
             <span>Do</span>
           </v-btn>
         </div>
+        <!-- Pagination (hidden on mobile here) -->
+        <div class="d-none d-sm-flex">
+          <v-pagination
+          next-icon="mdi-arrow-right"
+          prev-icon="mdi-arrow-left"
+            v-model="page"
+            :length="pageCount"
+            :total-visible="5"
+            class="custom-pagination"
+          ></v-pagination>
+        </div>
 
-        <v-select
-          v-model="selectedPageSize"
-          :items="allPageSize"
-          item-text="label"
-          item-value="value"
-          solo
-          dense
-          class="rounded-pill footerBtns"
-          @change="fetchContactUs"
-        ></v-select>
+        
+        <div class="mb-2 mb-sm-0">
+          <v-select
+            v-model="selectedPageSize"
+            :items="allPageSize"
+            item-text="label"
+            item-value="value"
+            solo
+            dense
+            class="rounded-pill footerBtns"
+          ></v-select>
+        </div>
       </v-col>
 
-      <v-col cols="12" class="text-center mt-2 mt-sm-0">
+      <!-- Pagination (visible only on xs, second row) -->
+      <v-col
+        cols="12"
+        class="d-flex justify-center d-sm-none mt-2"
+      >
         <v-pagination
+        next-icon="mdi-arrow-right"
+          prev-icon="mdi-arrow-left"
           v-model="page"
           :length="pageCount"
           :total-visible="5"
+          class="custom-pagination"
         ></v-pagination>
       </v-col>
     </v-row>
@@ -220,6 +251,7 @@ export default {
         selectedMessage: '',
         selectedEmail: '',
         selectedName: '',
+        selectedId: null,
         selectedDeleteId: null,
         search: '',
         filter: 'all',
@@ -230,30 +262,40 @@ export default {
       ],
       selectedAction: null,
       allPageSize: [
-        { label: '5 Rows', value: 5 },
         { label: '10 Rows', value: 10 },
-        { label: '15 Rowa', value: 15 },
+        { label: '20 Rows', value: 20 },
+        { label: '50 Rowa', value: 50 },
       ],
       selectedPageSize: null,
       page: 1,
-      pageCount: 4
+      pageCount: 0,
+      totalCount: 0,
+      selected: [],
+      disableNextBtn: false,
+      disableBackBtn: false
       };
   },
   methods:{
-    async fetchContactUs(selectedPageSize){
+    async fetchContactUs(selectedPageSize,page){
+      this.tableLoading = true
       try{
         let response =  await this.$axios.$get('/api/v2/admin/contacts',
-          {headers: {
-              Authorization: `${this.$auth.strategy.token.get()}`,
-            },
+          {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+              },
             params:{
               'PagingDto.PageFilter.Size': selectedPageSize,
+              'PagingDto.PageFilter.Skip':(page-1) * selectedPageSize,
+              'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
             }
           }
         )
         this.list = response.data.list
         this.filteredList = this.list
+        this.totalCount = response.data.totalRecordsCount
         this.tableLoading = false
+        this.pageCount = Math.ceil(this.totalCount / this.selectedPageSize)
       }
       catch(err){
         if (err.response.status == 400)
@@ -264,22 +306,27 @@ export default {
       try{
         const response = await this.$axios.$get(`/api/v2/admin/contacts/${id}`,{
         headers: {
-              Authorization: `${this.$auth.strategy.token.get()}`,
-            },
+                Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+              },
       })
         this.selectedMessage = response.data.body
         this.selectedEmail = response.data.email
         this.selectedName = response.data.fullName
+        this.selectedId = response.data.id
         this.dialogVisible = true
+
+        const index = this.list.findIndex(item => item.id === id);
         setTimeout(() => {
-          const index = this.list.findIndex(item => item.id === id);
           if (index !== -1) {
             this.$set(this.list, index, {
               ...this.list[index],
               isRead: true
             });
-          }
+          }          
         },1500)
+        this.disableNextBtn = index >= this.list.length - 1;
+        this.disableBackBtn = index <= 0;
+        
         
       }
       catch(err){
@@ -287,20 +334,33 @@ export default {
           this.$toast.error(err.response.data.message);
       }
     },
+    goToNextMessage(id){
+      const index = this.list.findIndex(item => item.id === id);
+      if(this.list.length - 1 > index)
+        this.viewMessageDetails(this.list[index+1].id)
+    },
+    goToPreviousMessage(id){
+      const index = this.list.findIndex(item => item.id === id);
+      if(index != 0 )
+        this.viewMessageDetails(this.list[index-1].id)
+    },
+
     async deleteMessage(){
       try{
         await this.$axios.$delete(`/api/v2/admin/contacts/${this.selectedDeleteId}`,{
           headers: {
-              Authorization: `${this.$auth.strategy.token.get()}`,
-            },
+                Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+              },
         })
         if(this.list.length > 1){
           this.list = this.list.filter(i => i.id !== this.selectedDeleteId);
           this.filteredList = this.list
+          this.$toast.success("Message deleted successfully!");
           }
         else{
           this.list.pop()
           this.filteredList.pop()
+          this.$toast.success("Message deleted successfully!");
           }
       }
       catch(err){
@@ -309,6 +369,7 @@ export default {
       }
       finally{
         this.isDeleteModalOpen = false
+        this.fetchContactUs(this.selectedPageSize,this.page)
       }
     },
     handleDelete(id){
@@ -322,20 +383,27 @@ export default {
   mounted(){
     this.selectedAction = this.allActions[0];
     this.selectedPageSize = this.allPageSize[0].value;
-    this.fetchContactUs(this.selectedPageSize)
   },
   watch: {
-    filter: {
-      immediate: true,
-      handler(val) {
-        this.filteredList = this.list.filter(item =>
-          val === 'read' ? item.isRead : !item.isRead
-        );
-        if(val == 'all')
-          this.filteredList = this.list
-      }
+  page() {
+    this.filter = 'all'
+    this.fetchContactUs(this.selectedPageSize,this.page);
+  },
+  selectedPageSize() {
+    this.page = 1; // reset to first page
+    this.fetchContactUs(this.selectedPageSize, this.page);
+  },
+  filter: {
+    immediate: true,
+    handler(val) {
+      this.filteredList = this.list.filter(item =>
+        val === 'read' ? item.isRead : !item.isRead
+      );
+      if(val == 'all')
+        this.filteredList = this.list
     }
   }
+}
 };
 </script>
 <style scoped>
@@ -376,6 +444,19 @@ export default {
 
 .v-pagination > li > button {
   margin: 0.1rem !important;
+}
+
+.custom-pagination {
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.custom-pagination >>> li button.primary {
+  background: #ffb300 !important;
+}
+
+.v-data-table >>> td {
+  cursor: default !important;
 }
 
 </style>

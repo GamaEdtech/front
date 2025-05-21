@@ -3,6 +3,7 @@
     <v-dialog
       v-model="dialog"
       width="500"
+      @click:outside="$emit('update:dialog', false)"
     >
       <v-card class="bg-primary-gray-100">
           <v-card-title class="gtext-t4 bg-white justify-center flex-column pt-12">
@@ -49,6 +50,7 @@
           value=""
           class="rounded-lg p-12 gtext-t6"
           no-resize
+          height="181"
         ></v-textarea>
 
           <v-row class="align-center" no-gutters>
@@ -100,7 +102,7 @@
                 sm="4"
                 class="d-flex justify-start order-2 order-sm-1 max-width-fit mr-4"
               >
-                <v-btn class="bg-white rounded-pill" height="34px">
+                <v-btn class="bg-white rounded-pill" height="34px" @click="$emit('back')" :disabled="disableBack">
                   <span class="mdi mdi-chevron-left primary-gray-900">Back</span>
                 </v-btn>
               </v-col>
@@ -110,7 +112,7 @@
                 sm="4"
                 class="d-flex justify-end order-3 order-sm-3 max-width-fit ml-4"
               >
-                <v-btn class="bg-white rounded-pill" height="34px">
+                <v-btn class="bg-white rounded-pill" height="34px" @click="$emit('next')" :disabled="disableNext">
                   <span class="mdi mdi-chevron-right primary-gray-900 d-flex flex-row-reverse align-end">
                     Next
                   </span>
@@ -131,7 +133,9 @@ export default {
     dialog: Boolean,
     message: String,
     email: String,
-    name : String
+    name : String,
+    disableNext: Boolean,
+    disableBack: Boolean,
   }
 }
 </script>
