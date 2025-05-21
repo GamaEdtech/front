@@ -1069,11 +1069,24 @@
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-              <!--              <v-col cols="4">Question's num: {{ tests.length }}</v-col>-->
+              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-                <v-chip label color="error"> Topics: </v-chip>
+                <v-chip
+                    size="large"
+                    density="compact"
+                    variant="text"
+                    label
+                    style="
+                      font-size: 13px;
+                      font-weight: 500;
+                      background-color: #b30a29;
+                      color: white;
+                      opacity: 1;
+                    "
+                    >Topics:</v-chip
+                  >
               </v-col>
               <v-col
                 cols="4"
