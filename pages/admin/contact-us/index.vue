@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-9">
-      <div class="filterBtns">
+    <div class="d-flex flex-column justify-space-between align-center mb-1 flex-sm-row">
+      <div class="filterBtns mb-4 mb-sm-0">
         <v-btn
           :color="filter === 'all' ? 'primary' : ''"
           depressed
@@ -53,6 +53,7 @@
           :search="search"
           @page-count="pageCount = $event"
           hide-default-footer
+          show-select
         >
 
           <template v-slot:header.index="{ header }">
@@ -65,6 +66,15 @@
 
           <template v-slot:header.fullName="{ header }">
             <span class="gtext-t5">{{ header.text }}</span>
+          </template>
+
+          <template v-slot:item.fullName="{ item }">
+            <div class="d-flex align-center">
+              <v-avatar size="40" class="mr-2">
+                <img alt="Avatar" />
+              </v-avatar>
+              <span>{{ item.fullName }}</span>
+            </div>
           </template>
 
           <template v-slot:header.subject="{ header }">
@@ -114,40 +124,50 @@
         @confirm="deleteMessage()"
       />
     </div>
-    <div class="d-flex align-center justify-space-between mt-5">
-      <div class="d-flex align-center">
-        <v-select
-             v-model="selectedAction"
-             :items="allActions"
-             item-text="label"
-             item-value="value"
-             solo
-             dense
-             class="rounded-pill footerBtns"
-           ></v-select>
+    <v-row
+    class="mt-2"
+    align="center"
+    justify="space-between"
+    no-gutters
+    >
+      <v-col cols="12" class="d-flex justify-space-between flex-wrap flex-sm-nowrap">
+        <div class="d-flex align-center">
+          <v-select
+            v-model="selectedAction"
+            :items="allActions"
+            item-text="label"
+            item-value="value"
+            solo
+            dense
+            class="rounded-pill footerBtns"
+          ></v-select>
           <v-btn
-          class="rounded-pill bg-primary-gray-700 white--text ml-4">
+            class="rounded-pill bg-primary-gray-700 white--text ml-4"
+          >
             <span>Do</span>
           </v-btn>
-      </div>
-        <div class="text-center">
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-            :total-visible="5"
-          ></v-pagination>
         </div>
+
         <v-select
-           v-model="selectedPageSize"
-           :items="allPageSize"
-           item-text="label"
-           item-value="value"
-           solo
-           dense
-           class="rounded-pill footerBtns"
-           @change="fetchContactUs"
-         ></v-select>
-    </div>
+          v-model="selectedPageSize"
+          :items="allPageSize"
+          item-text="label"
+          item-value="value"
+          solo
+          dense
+          class="rounded-pill footerBtns"
+          @change="fetchContactUs"
+        ></v-select>
+      </v-col>
+
+      <v-col cols="12" class="text-center mt-2 mt-sm-0">
+        <v-pagination
+          v-model="page"
+          :length="pageCount"
+          :total-visible="5"
+        ></v-pagination>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -169,7 +189,7 @@ export default {
             value: 'index',
             width: '5vw', 
           },
-          { text: 'FullName',
+          { text: 'Name',
             value: 'fullName',
             sortable: false,
             width: '15vw', 

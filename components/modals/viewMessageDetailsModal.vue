@@ -21,17 +21,19 @@
             <div class="bottom-fade"></div>
           </div>
 
-          <div class="d-flex justify-space-between mt-4">
-            <div>
-              <v-btn class="rounded-pill mr-7" height="24px" style="background-color: #F8F9FC;">
-                <span class="mdi mdi-image-area" style="color: #4E5BA6;">1.png</span>
+          <v-row class="mt-4" no-gutters>
+            
+            <v-col cols="12" sm="6">
+              <v-btn class="rounded-pill mr-7 bg-F8F9FC" height="24px">
+                <span class="mdi mdi-image-area color-4E5BA6">1.png</span>
               </v-btn>
-            </div>
-            <div class="d-flex align-center">
-              <p class="gray--text gtext-t6">Send Date:&nbsp;</p>
-              <p class="primary-gray-600 gtext-t5">02/22/2025</p>
-            </div>
-          </div>
+            </v-col>
+
+            <v-col cols="12" sm="6" class="d-flex align-center justify-sm-end mt-2 mt-sm-0">
+              <p class="gray--text gtext-t6 text mb-0">Send Date:&nbsp;</p>
+              <p class="primary-gray-600 gtext-t5 mb-0">02/22/2025</p>
+            </v-col>
+          </v-row>
           
 
           <div class="dashed-divider my-4"></div>
@@ -49,14 +51,31 @@
           no-resize
         ></v-textarea>
 
-          <div class="d-flex align-center">
-            <v-btn class="rounded-pill mr-4 align-center" style="background-color: #F8F9FC;" height="32px">
-              <span class="mdi mdi-paperclip primary-blue-500 gtext-t5 font-weight-medium ">Attachment file</span>
-            </v-btn>
-            <div class="d-flex rounded-pill align-center " style="background-color: #F8F9FC; height: 24px;" >
-              <p class="gtext-t5 dont-weight-medium mdi mdi-file-pdf-box px-2 py-1" style="color: #4E5BA6;">Sample.pdf</p>
-            </div>
-          </div>
+          <v-row class="align-center" no-gutters>
+            
+            <v-col cols="12" sm="auto" class="mb-2 mb-sm-0">
+              <v-btn
+                class="rounded-pill mr-sm-4 align-center bg-F8F9FC"
+                height="32px"
+              >
+                <span class="mdi mdi-paperclip primary-blue-500 gtext-t5 font-weight-medium">
+                  Attachment file
+                </span>
+              </v-btn>
+            </v-col>
+
+            <v-col cols="12" sm="auto">
+              <div
+                class="d-flex rounded-pill align-center bg-F8F9FC max-width-fit"
+              >
+                <p
+                  class="gtext-t5 dont-weight-medium mdi mdi-file-pdf-box px-2 py-1 mb-0 color-4E5BA6"
+                >
+                  Sample.pdf
+                </p>
+              </div>
+            </v-col>
+          </v-row>
 
           <v-card-actions class="px-0">
             <v-spacer></v-spacer>
@@ -64,17 +83,40 @@
               <span class="mdi mdi-close gtext-t1"></span>
             </v-btn>
 
-            <div class="d-flex justify-space-between align-center w-100 mb-12 mt-11">
-              <v-btn class="bg-white rounded-pill" height="34px">
-                <span class="mdi mdi-chevron-left primary-gray-900">Back</span>
-              </v-btn>
-              <v-btn class="bg-primary-gray-700 rounded-pill w-50" height="46px">
-                <span class="mdi mdi-reply white--text">Reply</span>
-              </v-btn>
-              <v-btn class="bg-white rounded-pill" height="34px">
-                <span class="mdi mdi-chevron-right primary-gray-900 d-flex flex-row-reverse align-end">Next</span>
-              </v-btn>
-            </div>
+            
+            <v-row class="w-100 mb-12 mt-11 justify-center" no-gutters align="center">
+              <v-col
+                cols="12"
+                sm="4"
+                class="d-flex justify-center order-1 order-sm-2 mb-4 mb-sm-0 replyBtn"
+              >
+                <v-btn class="bg-primary-gray-700 rounded-pill w-100" height="46px">
+                  <span class="mdi mdi-reply white--text">Reply</span>
+                </v-btn>
+              </v-col>
+
+              <v-col
+                cols="6"
+                sm="4"
+                class="d-flex justify-start order-2 order-sm-1 max-width-fit mr-4"
+              >
+                <v-btn class="bg-white rounded-pill" height="34px">
+                  <span class="mdi mdi-chevron-left primary-gray-900">Back</span>
+                </v-btn>
+              </v-col>
+
+              <v-col
+                cols="6"
+                sm="4"
+                class="d-flex justify-end order-3 order-sm-3 max-width-fit ml-4"
+              >
+                <v-btn class="bg-white rounded-pill" height="34px">
+                  <span class="mdi mdi-chevron-right primary-gray-900 d-flex flex-row-reverse align-end">
+                    Next
+                  </span>
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-card-actions>
         </div>
 
@@ -176,5 +218,20 @@ export default {
 .v-dialog .v-card {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+.bg-F8F9FC{
+  background-color: #F8F9FC;
+}
+.color-4E5BA6{
+color: #4E5BA6;
+}
+
+.max-width-fit{
+max-width: fit-content;
+}
+
+.replyBtn{
+  min-width: 170px;
 }
 </style>
