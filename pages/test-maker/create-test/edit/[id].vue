@@ -254,7 +254,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            :additionalStyles="{ marginInlineStart: '10px' }"
                           >
                           </RickEditor>
                           <p
@@ -338,7 +338,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            :additionalStyles="{ marginInlineStart: '10px' }"
                           >
                           </RickEditor>
                           <p
@@ -419,7 +419,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            :additionalStyles="{ marginInlineStart: '10px' }"
                           >
                           </RickEditor>
                           <p
@@ -500,7 +500,7 @@
                               'underline',
                               'alignment',
                             ]"
-                            style="margin-inline-start: 10px;"
+                            :additionalStyles="{ marginInlineStart: '10px' }"
                           >
                           </RickEditor>
                           <p

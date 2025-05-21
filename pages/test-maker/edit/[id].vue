@@ -293,8 +293,9 @@
               <CreateTestForm
                 ref="createForm"
                 :goToPreviewStep="test_step"
-                v-model:updateTestList="lastCreatedTest"
+                :updateTestList="lastCreatedTest"
                 :examEditMode="true"
+                @update:updateTestList="(val) => (lastCreatedTest = val)"
                 @update:refreshTests="handleTestRefresh"
                 @update:goToPreviewStep="(val) => (test_step = val)"
               />
@@ -622,11 +623,7 @@
                             color="blue"
                             variant="flat"
                             size="small"
-                            v-if="
-                              !tests.some(
-                                (id) => String(id) === String(item.id)
-                              )
-                            "
+                            v-if="!tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'add')"
                           >
                             <v-icon size="small"> mdi-plus </v-icon>
@@ -636,9 +633,7 @@
                             color="red"
                             variant="flat"
                             size="small"
-                            v-if="
-                              tests.some((id) => String(id) === String(item.id))
-                            "
+                            v-if="tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'remove')"
                           >
                             <v-icon size="small"> mdi-minus </v-icon>
@@ -817,11 +812,7 @@
                               color="blue"
                               variant="flat"
                               size="small"
-                              v-if="
-                                !tests.some(
-                                  (id) => String(id) === String(item.id)
-                                )
-                              "
+                              v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
                             >
                               <v-icon size="small"> mdi-plus </v-icon>
@@ -831,11 +822,7 @@
                               color="red"
                               variant="flat"
                               size="small"
-                              v-if="
-                                tests.some(
-                                  (id) => String(id) === String(item.id)
-                                )
-                              "
+                              v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
                             >
                               <v-icon size="small"> mdi-minus </v-icon>
@@ -1029,18 +1016,18 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="printPreviewDialog"
-      fullscreen
-      transition="dialog-bottom-transition"
-    >
+      <v-dialog
+        v-model="printPreviewDialog"
+        fullscreen
+        transition="dialog-bottom-transition"
+      >
       <v-card>
         <v-toolbar color="teal" dark>
           <v-btn icon @click="printPreviewDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-toolbar-items>
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
             <v-btn
               style="text-transform: none; font-size: 13px; font-weight: 500"
               variant="text"
@@ -1048,18 +1035,18 @@
             >
               Ok
             </v-btn>
-          </v-toolbar-items>
-        </v-toolbar>
+            </v-toolbar-items>
+          </v-toolbar>
 
-        <v-card-text id="preview-dialog">
-          <v-row>
-            <v-col cols="12">
-              <p class="text-h4 font-weight-bold">{{ form.title }}</p>
-            </v-col>
+          <v-card-text id="preview-dialog">
+            <v-row>
+              <v-col cols="12">
+                <p class="text-h4 font-weight-bold">{{ form.title }}</p>
+              </v-col>
             <v-col cols="4">Question's num: {{ tests.length }}</v-col>
-            <v-col cols="4">Duration: {{ form.duration }}</v-col>
-            <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
-            <v-col cols="12">
+              <v-col cols="4">Duration: {{ form.duration }}</v-col>
+              <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
+              <v-col cols="12">
               <v-chip
                 size="large"
                 density="compact"
@@ -1076,31 +1063,31 @@
               >
             </v-col>
             <v-col cols="4" v-for="(item, index) in topicTitleArr" :key="index">
-              {{ item }}
-            </v-col>
-            <v-col cols="12">
-              <v-divider />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" v-if="previewTestList.length">
-              <draggable
-                v-model="previewTestList"
-                :item-key="'id'"
-                @end="previewDragEnd"
-                handle=".drag-handle"
-              >
+                {{ item }}
+              </v-col>
+              <v-col cols="12">
+                <v-divider />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" v-if="previewTestList.length">
+                <draggable 
+                  v-model="previewTestList" 
+                  :item-key="'id'" 
+                  @end="previewDragEnd"
+                  handle=".drag-handle"
+                >
                 <template #item="{ element: item }">
-                  <v-row :key="item.id">
-                    <v-col cols="12">
-                      <div
-                        id="test-question"
-                        ref="mathJaxEl"
-                        v-html="item.question"
-                      />
-                      <img v-if="item.q_file" :src="item.q_file" />
+                    <v-row :key="item.id">
+                      <v-col cols="12">
+                        <div
+                          id="test-question"
+                          ref="mathJaxEl"
+                          v-html="item.question"
+                        />
+                        <img v-if="item.q_file" :src="item.q_file" />
 
-                      <div class="answer">
+                        <div class="answer">
                         <v-icon
                           v-if="item.true_answer == '1'"
                           class="true_answer"
@@ -1108,15 +1095,15 @@
                         >
                           mdi-check
                         </v-icon>
-                        <span>1)</span>
-                        <span
+                          <span>1)</span>
+                          <span
                           v-html="item.answer_a || '(Option A)'"
                           class="option-text"
-                        ></span>
-                        <img v-if="item.a_file" :src="item.a_file" />
-                      </div>
+                          ></span>
+                          <img v-if="item.a_file" :src="item.a_file" />
+                        </div>
 
-                      <div class="answer">
+                        <div class="answer">
                         <v-icon
                           v-if="item.true_answer == '2'"
                           class="true_answer"
@@ -1124,15 +1111,15 @@
                         >
                           mdi-check
                         </v-icon>
-                        <span>2)</span>
-                        <span
+                          <span>2)</span>
+                          <span
                           v-html="item.answer_b || '(Option B)'"
                           class="option-text"
-                        ></span>
-                        <img v-if="item.b_file" :src="item.b_file" />
-                      </div>
+                          ></span>
+                          <img v-if="item.b_file" :src="item.b_file" />
+                        </div>
 
-                      <div class="answer">
+                        <div class="answer">
                         <v-icon
                           v-if="item.true_answer == '3'"
                           class="true_answer"
@@ -1140,13 +1127,13 @@
                         >
                           mdi-check
                         </v-icon>
-                        <span>3)</span>
-                        <span
+                          <span>3)</span>
+                          <span
                           v-html="item.answer_c || '(Option C)'"
                           class="option-text"
-                        ></span>
-                        <img v-if="item.c_file" :src="item.c_file" />
-                      </div>
+                          ></span>
+                          <img v-if="item.c_file" :src="item.c_file" />
+                        </div>
                       <div class="answer">
                         <v-icon
                           v-if="item.true_answer == '4'"
@@ -1155,16 +1142,16 @@
                         >
                           mdi-check
                         </v-icon>
-                        <span>4)</span>
-                        <span
+                          <span>4)</span>
+                          <span
                           v-html="item.answer_d || '(Option D)'"
                           class="option-text"
                         ></span>
-                        <img v-if="item.d_file" :src="item.d_file" />
+                          <img v-if="item.d_file" :src="item.d_file" />
                       </div>
 
-                      <v-row>
-                        <v-col cols="6">
+                        <v-row>
+                          <v-col cols="6">
                           <v-btn
                             icon
                             variant="text"
@@ -1184,52 +1171,46 @@
                             >
                           </v-btn>
 
-                          <v-btn icon color="blue" class="drag-handle">
-                            <v-icon> mdi-cursor-move </v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="6" class="text-right">
-                          <v-btn
-                            color="blue"
-                            variant="flat"
-                            size="small"
-                            v-if="
-                              !tests.some(
-                                (id) => String(id) === String(item.id)
-                              )
-                            "
-                            @click="applyTest(item, 'add')"
-                          >
-                            <v-icon size="small"> mdi-plus </v-icon>
-                            Add
-                          </v-btn>
-                          <v-btn
-                            color="red"
-                            variant="flat"
-                            size="small"
-                            v-if="
-                              tests.some((id) => String(id) === String(item.id))
-                            "
-                            @click="applyTest(item, 'remove')"
-                          >
-                            <v-icon size="small"> mdi-minus </v-icon>
-                            Delete
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                      <v-divider class="mt-3" />
-                    </v-col>
-                  </v-row>
-                </template>
-              </draggable>
-            </v-col>
-            <v-col v-else cols="12" class="text-center">
-              <p>Oops! no data found</p>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+                            <v-btn icon color="blue" class="drag-handle">
+                              <v-icon> mdi-cursor-move </v-icon>
+                            </v-btn>
+                          </v-col>
+                          <v-col cols="6" class="text-right">
+                            <v-btn
+                              color="blue"
+                              variant="flat"
+                              size="small"
+                            v-if="!tests.some(id => String(id) === String(item.id))"
+                              @click="applyTest(item, 'add')"
+                            >
+                              <v-icon size="small"> mdi-plus </v-icon>
+                              Add
+                            </v-btn>
+                            <v-btn
+                              color="red"
+                              variant="flat"
+                              size="small"
+                            v-if="tests.some(id => String(id) === String(item.id))"
+                              @click="applyTest(item, 'remove')"
+                            >
+                              <v-icon size="small"> mdi-minus </v-icon>
+                              Delete
+                            </v-btn>
+                          </v-col>
+                        </v-row>
+                        <v-divider class="mt-3" />
+                      </v-col>
+                    </v-row>
+                  </template>
+                </draggable>
+              </v-col>
+              <v-col v-else cols="12" class="text-center">
+                <p>Oops! no data found</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     <!--Delete exam test confirm dialog-->
     <v-dialog v-model="deleteTestConfirmDialog" max-width="290">
       <v-card>
@@ -1285,6 +1266,11 @@ definePageMeta({
 
 useHead({
   title: "Update Exam",
+  // script: [
+  //   {
+  //     src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+  //   },
+  // ],
 });
 
 // Get services
@@ -1294,7 +1280,7 @@ const router = useRouter();
 const userToken = ref("");
 
 // Core data
-const test_step = ref(1); // Start at first step
+const test_step = ref(2); // Start at the Tests step
 const exam_id = ref("");
 const exam_code = ref("");
 const submit_loading = ref(false);
@@ -1310,7 +1296,6 @@ const mathJaxEl = ref(null);
 const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
-const updatedExam = ref(false); // Track if exam has been updated
 
 // Form data
 const form = reactive({
@@ -1500,15 +1485,15 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     };
 
     // Set up parameters based on type
-    if (type === "base") params.section_id = parent;
-    if (type === "lesson") params.base_id = parent;
-    if (type === "topic") params.lesson_id = parent;
-    if (type === "area") params.state_id = parent;
+  if (type === "base") params.section_id = parent;
+  if (type === "lesson") params.base_id = parent;
+  if (type === "topic") params.lesson_id = parent;
+  if (type === "area") params.state_id = parent;
 
-    if (type === "school") {
-      params.section_id = form.section;
-      params.area_id = form.area;
-    }
+  if (type === "school") {
+    params.section_id = form.section;
+    params.area_id = form.area;
+  }
 
     // Add loading state if needed
     const loadingTarget =
@@ -1542,40 +1527,41 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     });
 
     if (res && res.data) {
-      if (type === "section") {
+    if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
         } else {
-          level_list.value = res.data;
-          filter_level_list.value = res.data;
+      level_list.value = res.data;
+      filter_level_list.value = res.data;
         }
-      } else if (type === "base") {
+    } else if (type === "base") {
         if (trigger === "filter") {
           filter_grade_list.value = res.data;
         } else {
-          grade_list.value = res.data;
-          filter_grade_list.value = res.data;
+      grade_list.value = res.data;
+      filter_grade_list.value = res.data;
         }
-      } else if (type === "lesson") {
+    } else if (type === "lesson") {
         if (trigger === "filter") {
           filter_lesson_list.value = res.data;
         } else {
-          lesson_list.value = res.data;
-          filter_lesson_list.value = res.data;
+      lesson_list.value = res.data;
+      filter_lesson_list.value = res.data;
         }
-      } else if (type === "topic") {
-        topic_list.value = res.data;
-      } else if (type === "exam_type") {
+    } else if (type === "topic") {
+      topic_list.value = res.data;
+    } else if (type === "exam_type") {
         // Make sure we're properly assigning the exam_type data
-        test_type_list.value = res.data;
-      } else if (type === "state") {
-        state_list.value = res.data;
-      } else if (type === "area") {
-        area_list.value = res.data;
-      } else if (type === "school") {
-        school_list.value = res.data;
-      }
+      test_type_list.value = res.data;
 
+    } else if (type === "state") {
+      state_list.value = res.data;
+    } else if (type === "area") {
+      area_list.value = res.data;
+    } else if (type === "school") {
+      school_list.value = res.data;
+    }
+    
       generateTitle();
     }
   } catch (err) {
@@ -1631,17 +1617,17 @@ const submitQuestion = async () => {
     submit_loading.value = false;
     return;
   }
-
+  
   // Arrange to form data
   let formData = new FormData();
   for (let key in form) {
     if (key !== "topics") formData.append(key, form[key]);
   }
-
+  
   if (form.topics.length) {
     for (let key in form.topics) {
       formData.append("topics[]", form.topics[key]);
-    }
+  }
   }
 
   try {
@@ -1657,8 +1643,8 @@ const submitQuestion = async () => {
     nuxtApp.$toast.success("Exam created successfully");
 
     exam_id.value = response.data.id;
-    exam_code.value = response.data.code;
-
+      exam_code.value = response.data.code;
+      
     // Set in store
     const userState = useState("user");
     userState.value = {
@@ -1732,9 +1718,6 @@ const uploadFile = async (file_name) => {
   }
 };
 
-/**
- * Publish the exam
- */
 const publishTest = async () => {
   publish_loading.value = true;
 
@@ -1747,22 +1730,38 @@ const publishTest = async () => {
     });
 
     if (response.data?.message === "done") {
-      // Update the test share link
+      // Store the published exam ID for share link
       const publishedExamId = response.data.id || exam_id.value;
-      
+
+      // Reset state
+      exam_id.value = "";
+      exam_code.value = "";
+
+      // Update store
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: "",
+        currentExamCode: "",
+      };
+
+      // Update the test share link
+      exam_id.value = publishedExamId;
+
+      // Reset data
+      previewTestList.value = [];
+      tests.value = [];
+
+      // Clear form data
+      resetForm();
+
       // Navigate to publish step
       test_step.value = 4;
-      
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Exam published successfully");
-    } else {
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("Failed to publish exam");
+
+      nuxtApp.$toast.success("Exam published successfully");
     }
   } catch (err) {
-    console.error("Error publishing exam:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to publish exam");
+    nuxtApp.$toast.error(err.message || "Error publishing exam");
   } finally {
     publish_loading.value = false;
   }
@@ -1784,25 +1783,23 @@ const checkActiveParam = () => {
   }
 };
 
-/**
- * Submit test data to update the exam's tests
- * This is used after adding/removing tests
- */
+// Submit tests to the exam
 const submitTest = async () => {
-  loading.value = true;
-  
   try {
     if (!tests.value.length) {
+      console.log('No tests to submit');
       return;
     }
 
     // Ensure we have a valid exam ID
     if (!exam_id.value) {
-      console.error('No exam ID available, cannot submit tests');
+      console.error('No exam ID available, cannot update tests');
       const { $toast } = useNuxtApp();
       if ($toast) $toast.error("No exam ID available");
       return;
     }
+
+    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
 
     // Create URLSearchParams directly instead of using FormData conversion
     const formData = new URLSearchParams();
@@ -1811,6 +1808,8 @@ const submitTest = async () => {
     tests.value.forEach(id => {
       formData.append("tests[]", String(id));
     });
+
+    console.log('Tests being submitted:', tests.value.map(id => String(id)));
 
     const updateResponse = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
       method: "PUT",
@@ -1821,36 +1820,37 @@ const submitTest = async () => {
       },
     });
     
+    console.log('Tests submission response:', updateResponse);
+    
     // Add a small delay to ensure the backend has processed the update
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    // Refresh the test list to ensure we have the latest data
+    // Refresh the tests list
     await getCurrentExamTestsInfo();
     
     const { $toast } = useNuxtApp();
     if ($toast) $toast.success("Tests updated successfully");
-  } catch (error) {
-    console.error("Error updating tests:", error);
+  } catch (err) {
+    console.error('Failed to update tests:', err);
     const { $toast } = useNuxtApp();
     if ($toast) $toast.error("Failed to update tests");
-  } finally {
-    loading.value = false;
   }
 };
 
-// Load current tests for an exam
-const getExamCurrentTests = async () => {
-  if (!exam_id.value) {
-    return;
-  }
-
+/**
+ * Get a list of tests for the current exam with improved handling
+ */
+const getCurrentExamTestsInfo = async () => {
   test_loading.value = true;
-
+  
   try {
+    console.log(`Fetching tests for exam ID: ${exam_id.value}`);
+    
     // Clear the preview list before fetching to avoid display issues
     previewTestList.value = [];
-
-    const response = await $fetch(`/api/v1/examTests`, {
+    
+    // STEP 1: GET request to /api/v1/examTests
+    const response = await $fetch("/api/v1/examTests", {
       method: "GET",
       params: {
         exam_id: exam_id.value,
@@ -1860,42 +1860,42 @@ const getExamCurrentTests = async () => {
       },
     });
 
+    console.log(`API response status: ${response?.status}, found tests: ${response?.data?.list?.length || 0}`);
+
     if (response && response.status === 1) {
       // Process the response data based on its format
       let fetchedTests = [];
-
+      
       if (Array.isArray(response.data)) {
         fetchedTests = response.data;
       } else if (response.data && Array.isArray(response.data.list)) {
         fetchedTests = response.data.list;
-      }
-
+      } 
+      
+      console.log(`API returned ${fetchedTests.length} tests`);
+      console.log(`Our tests array has ${tests.value.length} tests`);
+      
       // If we have tests, double check that all tests in our tests array are included
       if (fetchedTests.length > 0) {
         // Update previewTestList with the fetched data
         previewTestList.value = fetchedTests;
-
+        
         // Validate that all tests we expect are in the preview list
-        const previewIds = previewTestList.value.map((item) => String(item.id));
-        const missingIds = tests.value.filter(
-          (id) => !previewIds.includes(String(id))
-        );
-
+        const previewIds = previewTestList.value.map(item => String(item.id));
+        const missingIds = tests.value.filter(id => !previewIds.includes(String(id)));
+        
         if (missingIds.length > 0) {
-          // This is a fallback in case the API doesn't return all tests
-
-          // Approach 1: If the preview list is empty or has fewer items than the tests array,
-          // we'll construct a manual preview list from the tests array
-          if (previewTestList.value.length < tests.value.length) {
+          console.warn(`Warning: ${missingIds.length} tests are in tests array but not in preview list:`, missingIds);
+          
             // Create a map of existing items for easy lookup
             const existingItemsMap = new Map();
-            previewTestList.value.forEach((item) => {
+            previewTestList.value.forEach(item => {
               existingItemsMap.set(String(item.id), item);
             });
-
+            
             // Create a new preview list with placeholders for missing items
             const completedList = [];
-
+            
             // Add each test from tests array (in order) to the completed list
             for (const testId of tests.value) {
               const idStr = String(testId);
@@ -1905,126 +1905,90 @@ const getExamCurrentTests = async () => {
               } else {
                 // Otherwise, create a placeholder that will be updated
                 // when the detailed information is fetched
+                console.log(`Adding placeholder for missing test ID: ${idStr}`);
                 completedList.push({
                   id: idStr,
                   question: "Loading test details...",
-                  isPlaceholder: true,
+                  isPlaceholder: true
                 });
-
+                
                 // Attempt to fetch this test's details
-                fetchTestDetails(idStr)
-                  .then((details) => {
-                    // Find the placeholder and replace it with actual details
-                    const index = previewTestList.value.findIndex(
-                      (item) => item.isPlaceholder && String(item.id) === idStr
-                    );
-
-                    if (index >= 0 && details) {
-                      // Vue's reactivity will update the UI when we modify the array
-                      previewTestList.value[index] = details;
-                    }
-                  })
-                  .catch((err) => {
-                    console.error(
-                      `Failed to fetch details for test ${idStr}:`,
-                      err
-                    );
-                  });
+                fetchTestDetails(idStr);
               }
             }
-
+            
             // Replace the preview list with our completed list
             previewTestList.value = completedList;
-          }
         }
       } else {
-        console.warn(
-          "No tests returned from API - this might be unexpected if tests.value is not empty"
-        );
-
+        console.warn("No tests returned from API - this might be unexpected if tests.value is not empty");
+        
         // If no tests were returned but we have tests in our array, create placeholders
         if (tests.value.length > 0) {
+          console.log("Creating placeholders for all tests in tests array");
           // Create placeholder items for each test ID
-          const placeholders = tests.value.map((id) => ({
+          const placeholders = tests.value.map(id => ({
             id: String(id),
             question: "Loading test details...",
-            isPlaceholder: true,
+            isPlaceholder: true
           }));
-
+          
           previewTestList.value = placeholders;
-
+          
           // Try to fetch details for each test
           for (const testId of tests.value) {
-            fetchTestDetails(String(testId))
-              .then((details) => {
-                if (details) {
-                  const index = previewTestList.value.findIndex(
-                    (item) => String(item.id) === String(testId)
-                  );
-
-                  if (index >= 0) {
-                    previewTestList.value[index] = details;
-                  }
-                }
-              })
-              .catch((err) => {
-                console.error(
-                  `Failed to fetch details for test ${testId}:`,
-                  err
-                );
-              });
+            fetchTestDetails(String(testId));
           }
-        } else {
-          previewTestList.value = [];
         }
       }
 
       // Debug the preview test list
       if (previewTestList.value.length > 0) {
-        const firstItem = previewTestList.value[0];
+        console.log(`Preview list populated with ${previewTestList.value.length} tests`);
+        console.log(`First item in preview list:`, previewTestList.value[0]);
       }
 
       // If we have a create form reference, update its exam test list length
       if (createForm.value && "examTestListLength" in createForm.value) {
         createForm.value.examTestListLength = tests.value.length;
       }
-
-      // Avoid chaining another API request immediately - wait a moment
-      // to ensure GET request is completed separately in network tab
-      if (testListSwitch.value) {
-        setTimeout(() => {
-          // Only refresh if not already in progress
-          if (!test_loading.value) {
-            filter.page = 1;
-            test_list.value = [];
-            all_tests_loaded.value = false;
-            getExamTests();
-          }
-        }, 100);
-      }
+    } else {
+      console.error("API returned error status:", response);
     }
   } catch (err) {
     console.error("Error loading tests:", err);
-    nuxtApp.$toast.error("Error loading tests");
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error("Error loading tests");
   } finally {
     test_loading.value = false;
   }
 };
 
-// Helper function to fetch details for a single test by its ID
+/**
+ * Helper function to fetch details for a single test by its ID
+ * @param {string} testId - The ID of the test to fetch details for
+ */
 const fetchTestDetails = async (testId) => {
   try {
     const response = await $fetch(`/api/v1/examTests/${testId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${userToken.value}`,
-      },
+      }
     });
-
+    
     if (response && response.status === 1 && response.data) {
+      // Find the placeholder and replace it with actual details
+      const index = previewTestList.value.findIndex(item => 
+        item.isPlaceholder && String(item.id) === String(testId));
+      
+      if (index >= 0) {
+        // Vue's reactivity will update the UI when we modify the array
+        previewTestList.value[index] = response.data;
+      }
       return response.data;
     }
-
+    
     console.warn(`No data returned for test ${testId}`);
     return null;
   } catch (err) {
@@ -2033,83 +1997,56 @@ const fetchTestDetails = async (testId) => {
   }
 };
 
-// Initialize flag
-getExamCurrentTests.isRunning = false;
-
-// Get current exam information
-const getCurrentExamInfo = async () => {
+/**
+ * Handle test refresh events from CreateTestForm component
+ */
+const handleTestRefresh = async () => {
   try {
-    // Get the exam ID from the route
-    exam_id.value = route.params.id;
+    console.log('Handling test refresh event in edit page');
+    console.log('Current tests array:', tests.value);
 
-    if (!exam_id.value) {
-      console.error("No exam ID found in route parameters");
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("No exam ID found");
-      return;
+    // Add a delay to ensure backend operations have completed
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Ensure all tests are represented as strings for consistent comparison
+    tests.value = tests.value.map(id => String(id));
+    
+    console.log('Getting updated tests list from API...');
+    // Get the updated tests list
+    await getCurrentExamTestsInfo();
+    
+    console.log('Current preview list after refresh:', previewTestList.value.length, 'items');
+    console.log('Current tests array after refresh:', tests.value);
+    
+    // Update create form test count if available
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+      console.log('Updated examTestListLength to', tests.value.length);
     }
-
-    console.log(`Loading exam info for ID: ${exam_id.value}`);
-
-    const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-
-    console.log("Exam info loaded:", response.data);
-
-    // Set tests array from response
-    if (response.data?.tests?.length) {
-      tests.value = response.data.tests.map((id) => String(id));
-    } else {
-      tests.value = [];
+    
+    // If test list is active, also refresh the main test list
+    if (testListSwitch.value) {
+      console.log('Test list is active, refreshing main test list');
+      filter.page = 1;
+      test_list.value = [];
+      all_tests_loaded.value = false;
+      await getExamTests();
     }
-
-    // Store exam code
-    exam_code.value = response.data.code;
-
-    // Set form data in sequence to trigger proper cascading updates
-    if (response.data.section) {
-      form.section = response.data.section;
-      // Wait for grade list to load before setting base
-      await getTypeList("base", response.data.section);
-
-      if (response.data.base) {
-        form.base = response.data.base;
-        // Wait for lesson list to load before setting lesson
-        await getTypeList("lesson", response.data.base);
-
-        if (response.data.lesson) {
-          form.lesson = response.data.lesson;
-          // Load topics based on lesson
-          await getTypeList("topic", response.data.lesson);
-
-          // Set topics if available
-          if (response.data.topics && response.data.topics.length) {
-            form.topics = response.data.topics;
-            await getTopicTitleList();
-          }
-        }
-      }
-    }
-
-    // Set other form fields from response
-    form.title = response.data.title || "";
-    form.exam_type = response.data.azmoon_type || response.data.exam_type || "";
-    form.duration = response.data.azmoon_time || response.data.duration || 3;
-    form.paperID = response.data.paperID || "";
-    form.edu_year = parseInt(response.data.edu_year) || "";
-    form.edu_month = parseInt(response.data.edu_month) || "";
-
-    // Set file path if available
-    if (response.data.file_original) {
-      file_original_path.value = response.data.file_original;
-    }
-  } catch (err) {
-    console.error("Error fetching exam info:", err);
+    
+    // Show success message
     const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to load exam information");
+    if (previewTestList.value.length > 0) {
+      if ($toast) $toast.success(`Tests updated: ${tests.value.length} tests in exam`);
+    } else {
+      console.warn('Preview list is empty after refresh - this may indicate an issue');
+      if ($toast) $toast.info('Refreshing test list...');
+      // Try one more time with a different approach
+      await submitTest();
+      }
+    } catch (err) {
+    console.error('Error in handleTestRefresh:', err);
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error('Error refreshing test list');
   }
 };
 
@@ -2141,72 +2078,40 @@ const onScroll = () => {
   }
 };
 
-/**
- * Apply or remove a test to/from the exam
- * @param {string|object} id - The test ID or test object
- * @param {string} type - 'add' or 'delete' to specify the action
- */
-const applyTest = async (id, type) => {
+// Apply test to the exam (add or remove)
+const applyTest = async (item, type = null) => {
   try {
+    // Ensure we have a valid exam ID
     if (!exam_id.value) {
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("No exam ID found");
+      nuxtApp.$toast.error("No exam ID available");
       return;
     }
 
-    // Handle if id is an object (containing id property)
-    const testId = typeof id === 'object' && id !== null ? id.id : id;
+    // Convert item.id to string for consistent comparison
+    const testId = String(item.id);
     
-    // Convert ID to string for consistent comparison
-    const idStr = String(testId);
-    
-    // Determine if we should add or remove based on type parameter or current state
-    const testIndex = tests.value.findIndex(test => 
-      (typeof test === 'object' ? String(test.id) : String(test)) === idStr
-    );
-    
-    const shouldAdd = type === "add" || (type === undefined && testIndex === -1);
-    
-    // Store original tests for rollback if needed
-    const originalTests = [...tests.value];
-    
+    // Check if the test ID exists in the array (using string comparison)
+    const testExists = tests.value.some(id => String(id) === testId);
+
+    // Check if we need to add or remove the test
+    const shouldAdd = type === "add" || (!type && !testExists);
+    const shouldRemove = type === "remove" || (!type && testExists);
+
     if (shouldAdd) {
-      // Add the test if it's not already in the array
-      if (testIndex === -1) {
-        if (typeof id === 'object') {
-          tests.value.push(id);
-        } else {
-          tests.value.push({ id: idStr });
-        }
-        const { $toast } = useNuxtApp();
-        if ($toast) $toast.success("Test added to exam");
-      }
-    } else {
-      // Remove the test
-      if (testIndex !== -1) {
-        tests.value.splice(testIndex, 1);
-        const { $toast } = useNuxtApp();
-        if ($toast) $toast.success("Test removed from exam");
-      }
+      // Add the test to the tests array
+      tests.value.push(testId);
+      nuxtApp.$toast.success("Test added to exam");
+    } else if (shouldRemove) {
+      // Remove the test from the tests array (using string comparison)
+      tests.value = tests.value.filter(id => String(id) !== testId);
+      nuxtApp.$toast.success("Test removed from exam");
     }
-    
-    // Send changes to backend
+
+    // Call submitTest to send the changes to the backend and update the preview
     await submitTest();
-    
-    // Update the test list display
-    await getCurrentExamTestsInfo();
-    
-    // If test list is active, also refresh the main test list
-    if (testListSwitch.value) {
-      filter.page = 1;
-      test_list.value = [];
-      all_tests_loaded.value = false;
-      await getExamTests();
-    }
-  } catch (error) {
-    console.error("Error applying test:", error);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to update test");
+  } catch (err) {
+    nuxtApp.$toast.error("Error applying test");
+    console.error("Error in applyTest:", err);
   }
 };
 
@@ -2217,17 +2122,17 @@ watch(
     if (newTest && exam_id.value) {
       // Convert to string for consistent comparison - IDs might be numbers or strings
       const newTestId = String(newTest);
-
+      
       // First check if this test is already in our list to avoid duplicates
       // Make sure we're comparing strings to strings for consistency
-      if (tests.value.some((id) => String(id) === newTestId)) {
+      if (tests.value.some(id => String(id) === newTestId)) {
         lastCreatedTest.value = null;
         return;
       }
 
       // Add the new test to the tests array - association already done in child component
       tests.value.push(newTestId);
-
+      
       // Reset the lastCreatedTest after processing
       lastCreatedTest.value = null;
     }
@@ -2480,57 +2385,61 @@ watch(
 
 // Initialize component on mount
 onMounted(async () => {
-  loading.value = true;
-  try {
-    await refreshPageData();
-    await getCurrentExamInfo();
-    await getCurrentExamTestsInfo();
-    
-    if (testListSwitch.value) {
-      await getExamTests();
-    }
-    
-    test_step.value = parseInt(route.query.step) || 2;
-    if (route.query.active === "test_list") {
-      testListSwitch.value = true;
-    }
-    
-    if (createForm.value) {
-      createForm.value.examEditMode = true;
-      if (tests.value.length > 0 && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
+  // Get user token
+  const auth = useAuth();
+  userToken.value = auth.getUserToken();
+
+  // Initialize data in the correct sequence
+  await getCurrentExamInfo();
+
+  // Load initial data - start with sections
+  await getTypeList("section");
+
+  // Conditionally load data based on URL parameters or existing form values
+  if (form.section) {
+    await getTypeList("base", form.section);
+
+    if (form.base) {
+      await getTypeList("lesson", form.base);
+
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
       }
     }
-    
-    updatedExam.value = false;
-    
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.info("Editing the exam");
-  } catch (error) {
-    console.error("Error initializing page:", error);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to load exam data");
-  } finally {
-    loading.value = false;
   }
-});
 
-/**
- * Refresh all page data
- */
-const refreshPageData = async () => {
-  // Clear existing data
-  tests.value = [];
-  previewTestList.value = [];
-  test_list.value = [];
-  
-  // Get user token
-  userToken.value = auth.getUserToken();
-  
-  // Reset pagination
-  filter.page = 1;
-  all_tests_loaded.value = false;
-};
+  // Get additional type lists
+  await loadExamTypes(); // Use our specialized function for exam types
+  await getTypeList("state");
+
+  // Load tests if needed
+  await getExamTests();
+
+  // If we have an exam ID, get its tests
+  if (exam_id.value) {
+    await getCurrentExamTestsInfo();
+  }
+
+  // Try to load MathJax if it's not already available(currently commented out)
+  // renderMathJax();
+
+  // Check active tab from route and enable it
+  if (route.query?.active === "test_list") {
+    test_step.value = 2;
+    testListSwitch.value = true;
+  } else if (route.query?.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
+  }
+
+  // Show welcome toast
+  setTimeout(() => {
+    nuxtApp.$toast.info("Welcome to the exam creator");
+  }, 500);
+});
 
 // Open delete confirmation dialog
 const openTestDeleteConfirmDialog = (item_id) => {
@@ -2538,49 +2447,32 @@ const openTestDeleteConfirmDialog = (item_id) => {
   deleteTestConfirmDialog.value = true;
 };
 
-/**
- * Delete an individual test from the exam
- */
+// Delete exam test
 const deleteExamTest = async () => {
   delete_exam_test_loading.value = true;
 
   try {
-    // Store the original tests array
-    const originalTests = [...tests.value];
-    
-    // Convert ID to string for consistent comparison
-    const testIdToDelete = String(delete_exam_test_id.value);
-    
-    // Remove the test from our state using string comparison
-    const index = tests.value.findIndex(id => String(id) === testIdToDelete);
+    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
+      method: "DELETE",
+    });
+
+    nuxtApp.$toast.success("Deleted successfully");
+
+    // Remove from tests array
+    const index = tests.value.findIndex(
+      (id) => id === delete_exam_test_id.value
+    );
     if (index !== -1) {
       tests.value.splice(index, 1);
-      
-      // Use the submitTest function to update the backend
-      await submitTest();
-      
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Test deleted successfully");
-      
-      // Refresh test lists
-      filter.page = 1;
-      test_list.value = [];
-      getExamTests();
-    } else {
-      console.warn(`Test ID ${testIdToDelete} not found in tests array`);
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.warning("Test was not in the exam");
     }
+
+    // Refresh test lists
+    filter.page = 1;
+    test_list.value = [];
+    getExamTests();
   } catch (err) {
-    console.error("Error deleting test:", err);
-    
-    // Restore the original tests array if the API call failed
-    if (originalTests) {
-      tests.value = [...originalTests];
-    }
-    
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(err.message || "Error deleting test");
+    nuxtApp.$toast.error(err.message || "Error deleting test");
+    console.error("Error deleting exam test:", err);
   } finally {
     delete_exam_test_loading.value = false;
     delete_exam_test_id.value = null;
@@ -2593,7 +2485,7 @@ const getExamTests = async () => {
   if (all_tests_loaded.value || test_loading.value) return;
 
   test_loading.value = true;
-
+  
   try {
     const response = await $fetch("/api/v1/examTests", {
       method: "GET",
@@ -2612,8 +2504,8 @@ const getExamTests = async () => {
     // Check if we received any tests
     if (newTests.length === 0) {
       // No more tests, mark as loaded
-      all_tests_loaded.value = true;
-    } else {
+        all_tests_loaded.value = true;
+      } else {
       // Add new tests to the list
       test_list.value.push(...newTests);
 
@@ -2641,29 +2533,40 @@ const openDeleteConfirmDialog = () => {
   confirmDeleteDialog.value = true;
 };
 
-/**
- * Delete the entire exam
- */
 const deleteOnlineExam = async () => {
   deleteLoading.value = true;
-  
+
   try {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
     });
-    
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Exam deleted successfully");
-    
-    // Redirect to the exam list
-    router.push("/user/exam");
+
+    nuxtApp.$toast.success("Deleted successfully");
+
+    // Reset all values
+    exam_id.value = "";
+    exam_code.value = "";
+
+    // Reset tests
+    tests.value = [];
+    previewTestList.value = [];
+
+    // Reset state in user store
+    const userState = useState("user");
+    userState.value = {
+      ...userState.value,
+      currentExamId: "",
+      currentExamCode: "",
+    };
+
+    // Reset form and data
+    resetForm();
+
+    // Reset to first step
+    test_step.value = 1;
   } catch (err) {
+    nuxtApp.$toast.error(err.message || "Error deleting exam");
     console.error("Error deleting exam:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to delete exam");
   } finally {
     deleteLoading.value = false;
     confirmDeleteDialog.value = false;
@@ -2706,16 +2609,11 @@ const validateHeaderForm = () => {
   return true;
 };
 
-/**
- * Handle stepper navigation with validation for different steps
- * @param {number} newStep - The step number to navigate to
- */
+// Handle stepper navigation to validate steps
 const handleStepChange = (newStep) => {
-  const { $toast } = useNuxtApp();
-  
   // Don't allow changing to step 4 (Publish) if we don't have enough tests
   if (newStep === 4 && tests.value.length < 5) {
-    if ($toast) $toast.error(
+    nuxtApp.$toast.error(
       `You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`
     );
 
@@ -2724,31 +2622,36 @@ const handleStepChange = (newStep) => {
     return;
   }
 
-  // Prevent skipping to step 3 or 4 if exam hasn't been updated
-  if ((newStep === 3 || newStep === 4) && test_step.value === 1) {
-    if ($toast) $toast.info("Please update the exam information first");
-    
-    // Stay on step 1
+  // Prevent skipping to step 3 or 4 if exam hasn't been created yet
+  if ((newStep === 3 || newStep === 4) && !exam_id.value) {
+    nuxtApp.$toast.error("Please complete the Header step first");
+
+    // Revert to step 1 (Header)
     test_step.value = 1;
+    return;
+  }
+
+  // Prevent access to step 4 directly from step 1 or 2
+  if (newStep === 4 && test_step.value < 3) {
+    nuxtApp.$toast.error("Please review your exam before publishing");
+
+    // Go to step 3 (Review) instead
+    test_step.value = 3;
     return;
   }
 
   // If all validations pass, update the step
   test_step.value = newStep;
-  
+
   // Show step change notification
-  const stepNames = {
-    1: "Header",
-    2: "Tests",
-    3: "Review",
-    4: "Publish",
-  };
-  
-  if ($toast) $toast.info(`Navigated to ${stepNames[newStep]} step`);
-  
-  // If moving to step 3 (Review), refresh the test list
-  if (newStep === 3) {
-    getCurrentExamTestsInfo();
+  if (newStep !== test_step.value) {
+    const stepNames = {
+      1: "Header",
+      2: "Tests",
+      3: "Review",
+      4: "Publish",
+    };
+    nuxtApp.$toast.info(`Navigated to ${stepNames[newStep]} step`);
   }
 };
 
@@ -2853,7 +2756,7 @@ const handlePublish = () => {
 const renderMathJax = () => {
   // Disable MathJax rendering completely for now
   return;
-
+  
   if (window.MathJax) {
     window.MathJax.Hub.Config({
       tex2jax: {
@@ -2886,8 +2789,10 @@ const renderMathJax = () => {
 // Change from ref to computed
 const test_share_link = computed(() => {
   if (process.server) {
+    // Return a consistent value during SSR to avoid hydration mismatch
     return `https://gamatrain.com/exam/${exam_id.value || ""}`;
   }
+  // Only use window.location on client side
   return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
 
@@ -2906,8 +2811,8 @@ watch(
       topic_list.value = [];
 
       // Reset pagination and test list
-      filter.page = 1;
-      test_list.value = [];
+    filter.page = 1;
+    test_list.value = [];
       all_tests_loaded.value = true;
     }
   }
@@ -2985,7 +2890,7 @@ const handleClearTopic = () => {
   all_tests_loaded.value = false;
 
   // Load tests with new filter
-  getExamTests();
+    getExamTests();
 };
 
 /**
@@ -3033,167 +2938,187 @@ const previewDragEnd = async () => {
 };
 
 /**
- * Refresh test list data
+ * Get current exam information
  */
-const handleTestRefresh = async () => {
+const getCurrentExamInfo = async () => {
+  // Get the exam ID from the route params
+  exam_id.value = route.params.id;
+  
   try {
-    // Clear all tests and show loading state
-    test_list.value = [];
-    all_tests_loaded.value = false;
-    loading.value = true;
+    console.log(`Fetching exam info for ID: ${exam_id.value}`);
+    
+    const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
+    });
+    
+    console.log('Exam info response:', response);
 
-    // Reset pagination
-    filter.page = 1;
-
-    // Small delay to ensure UI updates
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Ensure all tests are represented as strings
-    tests.value = tests.value.map((test) => 
-      typeof test === 'object' ? test : { id: String(test) }
-    );
-
-    // Update exam tests information
-    await getCurrentExamTestsInfo();
-
-    // Update create form test count
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
+    // Set tests array from response
+    if (response.data?.tests?.length) {
+      tests.value = response.data.tests.map(id => String(id));
+      console.log(`Loaded ${tests.value.length} tests for this exam`);
+    } else {
+      tests.value = [];
+      console.log('No tests found for this exam');
     }
+    
+    // Set form data in sequence to trigger proper cascading updates
+    if (response.data.section) {
+      form.section = response.data.section;
+      // Wait for grade list to load before setting base
+      await getTypeList("base", response.data.section);
 
-    // If test list is active, also refresh the main test list
-    if (testListSwitch.value) {
-      filter.page = 1;
-      test_list.value = [];
-      all_tests_loaded.value = false;
-      await getExamTests();
+      if (response.data.base) {
+        form.base = response.data.base;
+        // Wait for lesson list to load before setting lesson
+        await getTypeList("lesson", response.data.base);
+
+        if (response.data.lesson) {
+          form.lesson = response.data.lesson;
+          // Load topics based on lesson
+          await getTypeList("topic", response.data.lesson);
+
+          // Set topics if available
+          if (response.data.topics && response.data.topics.length) {
+            form.topics = response.data.topics;
+            await getTopicTitleList();
+          }
+        }
+      }
     }
-
-    // Show success message
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success(`Tests updated: ${tests.value.length} tests in exam`);
+    
+    // Set other form fields
+    form.exam_type = response.data.exam_type || response.data.azmoon_type;
+    form.paperID = response.data.paperID || '';
+    form.duration = response.data.duration || response.data.azmoon_time || 3;
+    form.title = response.data.title || '';
+    form.edu_year = response.data.edu_year ? parseInt(response.data.edu_year) : '';
+    form.edu_month = response.data.edu_month ? parseInt(response.data.edu_month) : '';
+    
+    // Set file path if available
+    if (response.data.file_original) {
+      file_original_path.value = response.data.file_original;
+    }
+    
+    // Set exam code for sharing
+    exam_code.value = response.data.code || '';
+    
+    // Update test share link
+    test_share_link.value = `${window.location.origin}/exam/${exam_id.value}`;
+    
+    // If createForm exists, update it with the exam info
+    if (createForm.value) {
+      createForm.value.examEditMode = true;
+      if (typeof createForm.value.getCurrentExamInfo === "function") {
+        createForm.value.getCurrentExamInfo();
+      }
+    }
   } catch (err) {
-    console.error("Error in handleTestRefresh:", err);
+    console.error("Error fetching exam info:", err);
     const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Error refreshing test list");
-  } finally {
-    loading.value = false;
+    if ($toast) $toast.error("Failed to load exam information");
   }
 };
 
+/**
+ * Update exam info with improved error handling and validation
+ */
 const updateQuestion = async () => {
+  submit_loading.value = true;
+
+  // Validate form fields
+  if (!validateForm()) {
+    submit_loading.value = false;
+    return;
+  }
+  
+  // Create FormData object
+  let formData = new FormData();
+  
+  // Add form fields
+  for (const key in form) {
+    if (key !== "topics") formData.append(key, form[key]);
+  }
+  
+  // Add topics array
+  if (form.topics && form.topics.length) {
+    for (const topic of form.topics) {
+      formData.append("topics[]", topic);
+    }
+  }
+
+  console.log("Form data prepared for update - topics:", form.topics);
+  
   try {
-    submit_loading.value = true;
-
-    console.log("Starting exam update for ID:", exam_id.value);
-
-    // Validate form (basic validation before submission)
-    if (!validateHeaderForm()) {
-      submit_loading.value = false;
-      return;
-    }
-
-    // Create FormData object
-    const formData = new FormData();
-
-    // Add form fields
-    for (const key in form) {
-      if (key !== "topics") formData.append(key, form[key]);
-    }
-
-    // Add topics array
-    if (form.topics && form.topics.length) {
-      for (const topic of form.topics) {
-        formData.append("topics[]", topic);
-      }
-    }
-
-    console.log("Form data prepared for update - topics:", form.topics);
-
     const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "PUT",
       body: urlencodeFormData(formData),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
+        "Authorization": `Bearer ${userToken.value}`,
       },
     });
 
     console.log("Update response:", response);
-
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Exam updated successfully");
-
+    
+    nuxtApp.$toast.success("Exam updated successfully");
+    
     // Move to the next step
     test_step.value = 2;
-
+    
     // Add a small delay before getting updated tests list
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     // Get updated tests list
     await getCurrentExamTestsInfo();
   } catch (error) {
     console.error("Error updating exam:", error);
-    const { $toast } = useNuxtApp();
-    if ($toast)
-      $toast.error(error.response?.data?.message || "Error updating exam");
+    nuxtApp.$toast.error(error.response?.data?.message || "Error updating exam");
   } finally {
     submit_loading.value = false;
   }
 };
 
 /**
- * Fetch current exam's test information from the API
+ * Basic form validation
+ * @returns {boolean} True if form is valid
  */
-const getCurrentExamTestsInfo = async () => {
-  if (!exam_id.value) {
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("No exam ID found");
-    return;
+const validateForm = () => {
+  // Check required fields
+  if (!form.section) {
+    nuxtApp.$toast.error("Please select a Board");
+    return false;
   }
 
-  loading.value = true;
-  try {
-    const res = await $fetch(`/api/v1/examTests`, {
-      method: "GET",
-      params: {
-        exam_id: exam_id.value,
-      },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-
-    if (res && res.status === 1) {
-      // Process the response data based on its format
-      let fetchedTests = [];
-      
-      if (Array.isArray(res.data)) {
-        fetchedTests = res.data;
-      } else if (res.data && Array.isArray(res.data.list)) {
-        fetchedTests = res.data.list;
-      }
-      
-      // Update preview list with fetched tests
-      previewTestList.value = fetchedTests;
-      
-      // If we have tests, we're ready to continue
-      if (previewTestList.value.length > 0) {
-        const { $toast } = useNuxtApp();
-        if ($toast) $toast.info(`Loaded ${previewTestList.value.length} tests for this exam`);
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching exam tests:", error);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to load exam tests");
-  } finally {
-    loading.value = false;
+  if (!form.base) {
+    nuxtApp.$toast.error("Please select a Grade");
+    return false;
   }
+  
+  if (!form.lesson) {
+    nuxtApp.$toast.error("Please select a Subject");
+    return false;
+  }
+  
+  if (!form.topics || form.topics.length === 0) {
+    nuxtApp.$toast.error("Please select at least one topic");
+    return false;
+  }
+  
+  if (!form.title) {
+    nuxtApp.$toast.error("Title is required");
+    return false;
+  }
+  
+  if (!form.duration) {
+    nuxtApp.$toast.error("Test duration is required");
+    return false;
+  }
+  
+  return true;
 };
-
-// Add this with your other refs
-const loading = ref(false);
 </script>
 
 <style lang="scss">
