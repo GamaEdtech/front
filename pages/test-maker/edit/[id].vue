@@ -502,20 +502,20 @@
                             color="blue"
                             variant="flat"
                             size="small"
-                            v-if="!tests.find((x) => x == item.id)"
+                            v-if="!tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'add')"
                           >
-                            <v-icon size="small">mdi-plus</v-icon>
+                            <v-icon size="small"> mdi-plus </v-icon>
                             Add
                           </v-btn>
                           <v-btn
                             color="red"
                             variant="flat"
                             size="small"
-                            v-if="tests.find((x) => x == item.id)"
+                            v-if="tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'remove')"
                           >
-                            <v-icon size="small">mdi-minus</v-icon>
+                            <v-icon size="small"> mdi-minus </v-icon>
                             Delete
                           </v-btn>
                         </v-col>
@@ -807,7 +807,7 @@
                               color="blue"
                               variant="flat"
                               size="small"
-                              v-if="!tests.includes(item.id)"
+                              v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
                             >
                               <v-icon size="small"> mdi-plus </v-icon>
@@ -817,7 +817,7 @@
                               color="red"
                               variant="flat"
                               size="small"
-                              v-if="tests.includes(item.id)"
+                              v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
                             >
                               <v-icon size="small"> mdi-minus </v-icon>
@@ -1322,12 +1322,18 @@ const updateQuestion = async () => {
  * Handle adding or removing a test from the exam
  */
 const applyTest = (item, type) => {
-  if (type === "add" && !tests.value.includes(item.id)) {
+  // Convert item.id to string for consistent comparison
+  const testId = String(item.id);
+  
+  // Check if the test ID exists in the array (using string comparison)
+  const testExists = tests.value.some(id => String(id) === testId);
+  
+  if (type === "add" && !testExists) {
     // Add the test to our state
-    tests.value.push(item.id);
+    tests.value.push(testId);
     
     // Update the backend using a POST request for individual test addition
-    $fetch(`/api/v1/exams/${exam_id.value}/tests/${item.id}`, {
+    $fetch(`/api/v1/exams/${exam_id.value}/tests/${testId}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${userToken.value}`,
@@ -1344,14 +1350,14 @@ const applyTest = (item, type) => {
       if ($toast) $toast.error("Failed to add test");
       
       // Remove the test from our state if the API call failed
-      tests.value = tests.value.filter(id => id !== item.id);
+      tests.value = tests.value.filter(id => String(id) !== testId);
     });
-  } else if (type === "remove" && tests.value.includes(item.id)) {
+  } else if (type === "remove" && testExists) {
     // Store the original tests array before removing the item
     const originalTests = [...tests.value];
     
     // Remove the test from our state
-    tests.value = tests.value.filter(id => id !== item.id);
+    tests.value = tests.value.filter(id => String(id) !== testId);
     
     // Create FormData with the updated test list
     const formData = new FormData();
@@ -1575,8 +1581,11 @@ const deleteExamTest = async () => {
     // Store the original tests array
     const originalTests = [...tests.value];
     
-    // Remove the test from our state
-    const index = tests.value.findIndex(id => id === delete_exam_test_id.value);
+    // Convert ID to string for consistent comparison
+    const testIdToDelete = String(delete_exam_test_id.value);
+    
+    // Remove the test from our state using string comparison
+    const index = tests.value.findIndex(id => String(id) === testIdToDelete);
     if (index !== -1) {
       tests.value.splice(index, 1);
     }

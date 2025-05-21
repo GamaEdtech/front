@@ -808,7 +808,7 @@ const props = defineProps({
 /**
  * Component emits
  */
-const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep"]);
+const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep", "update:refreshTests"]);
 
 /**
  * Get Nuxt app services and utilities
@@ -1153,45 +1153,28 @@ const getTypeList = async (type, parent = "") => {
 };
 
 /**
- * Reset the form to initial state
+ * Reset the form to initial state - simplified to match Vue 2 version
  */
 const resetFormFields = () => {
-  // First, clear all validation errors
-  clearFieldValidationErrors();
-
-  // If in edit mode and using props, we want to preserve certain fields
-  const preserveLocation =
-    props.examEditMode &&
-    (props.initialSection ||
-      props.initialBase ||
-      props.initialLesson ||
-      props.initialTopics?.length);
-
-  // Store current values of fields we may need to preserve
-  const preservedValues = {
-    section: form.section,
-    base: form.base,
-    lesson: form.lesson,
-    topic: form.topic,
-  };
-
-  // Reset form fields to default values
+  // Clear form fields to initial state
   form.question = "";
   form.q_file_base64 = "";
   form.q_file = null;
+  
   form.answer_full = "";
   form.answer_full_file_base64 = "";
   form.answer_full_file = null;
+  
   form.true_answer = "";
   form.testImgAnswers = false;
   form.answer_type = "text";
-
+  
   // Reset answer text fields
   form.answer_a = "";
   form.answer_b = "";
   form.answer_c = "";
   form.answer_d = "";
-
+  
   // Reset answer image fields
   form.a_file_base64 = "";
   form.b_file_base64 = "";
@@ -1201,7 +1184,7 @@ const resetFormFields = () => {
   form.b_file = null;
   form.c_file = null;
   form.d_file = null;
-
+  
   // Reset hidden form data
   form_hidden_data.q_file = null;
   form_hidden_data.answer_full_file = null;
@@ -1209,62 +1192,46 @@ const resetFormFields = () => {
   form_hidden_data.b_file = null;
   form_hidden_data.c_file = null;
   form_hidden_data.d_file = null;
-
-  // If in edit mode and using props, restore the preserved values
-  if (preserveLocation) {
-    form.section = preservedValues.section;
-    form.base = preservedValues.base;
-    form.lesson = preservedValues.lesson;
-    form.topic = preservedValues.topic;
-  }
-
-  // Reset file inputs if they exist
+  
+  // Reset UI state
+  text_answer.value = true;
+  photo_answer.value = false;
+  
+  // Reset file inputs
   if (questionInput.value && questionInput.value.$el) {
-    const fileInput =
-      questionInput.value.$el.querySelector('input[type="file"]');
+    const fileInput = questionInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-
+  
   if (answerFullInput.value && answerFullInput.value.$el) {
-    const fileInput =
-      answerFullInput.value.$el.querySelector('input[type="file"]');
+    const fileInput = answerFullInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-
+  
   if (aInput.value && aInput.value.$el) {
     const fileInput = aInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-
+  
   if (bInput.value && bInput.value.$el) {
     const fileInput = bInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-
+  
   if (cInput.value && cInput.value.$el) {
     const fileInput = cInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-
+  
   if (dInput.value && dInput.value.$el) {
     const fileInput = dInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
 
-  // Reset VeeValidate form state
+  // If VeeValidate form is available, reset it
   if (veeForm.value) {
     resetForm();
-    setTimeout(() => {
-      // Validate after reset to make sure validation state is fresh
-      validate();
-      // Then clear any validation messages that might have been triggered
-      clearFieldValidationErrors();
-    }, 100);
   }
-
-  // Reset UI state
-  text_answer.value = true;
-  photo_answer.value = false;
 };
 
 /**
@@ -1473,6 +1440,9 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
               // Increment the exam test list length
               examTestListLength.value++;
               
+              // Force parent to refresh tests list
+              emit("update:refreshTests");
+              
               // Notify user of success
               $toast.success("Test created and added to exam successfully");
             } else {
@@ -1500,6 +1470,10 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
                   // Notify parent component about the new test
                   emit("update:updateTestList", createdTestId);
                   examTestListLength.value++;
+                  
+                  // Force parent to refresh tests list
+                  emit("update:refreshTests");
+                  
                   $toast.success("Test created and added to exam successfully");
                 } else {
                   // If retry also failed, still emit the event to let parent component try
@@ -2227,15 +2201,13 @@ const validateQuestionField = (value) => {
   return true;
 };
 
-// Add a more direct click handler that bypasses VeeValidate
+/**
+ * Trigger form validation manually and submit
+ */
 const manualSubmit = async () => {
   clearFieldValidationErrors();
 
-  if (
-    !form.topic &&
-    selected_topics.value &&
-    selected_topics.value.length > 0
-  ) {
+  if (!form.topic && selected_topics.value && selected_topics.value.length > 0) {
     form.topic = parseInt(selected_topics.value[0]);
   }
 
@@ -2246,11 +2218,7 @@ const manualSubmit = async () => {
 
   create_loading.value = true;
 
-  // Ensure required fields are present
-  form.direction = form.direction || "ltr";
-  form.testingAnswers = 0;
-
-  // Create URLSearchParams object for the API request
+  // Create URLSearchParams object for the API request - similar to querystring.stringify in Vue 2
   const formData = new URLSearchParams();
 
   // Add all required fields
@@ -2279,37 +2247,17 @@ const manualSubmit = async () => {
 
   // Add file fields if they exist
   if (form.q_file) formData.append("q_file", form.q_file);
-  if (form.answer_full_file)
-    formData.append("answer_full_file", form.answer_full_file);
-
-  // Handle photo mode file fields
-  if (form.testImgAnswers) {
-    if (form.a_file) formData.append("a_file", form.a_file);
-    if (form.b_file) formData.append("b_file", form.b_file);
-    if (form.type === "fourchoice") {
-      if (form.c_file) formData.append("c_file", form.c_file);
-      if (form.d_file) formData.append("d_file", form.d_file);
-    }
-
-    // If we're in photo mode but the files weren't properly uploaded,
-    // add base64 data directly for the backend to process
-    if (form.a_file_base64 && !form.a_file) {
-      formData.append("a_file_base64", form.a_file_base64);
-    }
-    if (form.b_file_base64 && !form.b_file) {
-      formData.append("b_file_base64", form.b_file_base64);
-    }
-    if (form.type === "fourchoice") {
-      if (form.c_file_base64 && !form.c_file) {
-        formData.append("c_file_base64", form.c_file_base64);
-      }
-      if (form.d_file_base64 && !form.d_file) {
-        formData.append("d_file_base64", form.d_file_base64);
-      }
-    }
-  }
+  if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
+  if (form.a_file) formData.append("a_file", form.a_file);
+  if (form.b_file) formData.append("b_file", form.b_file);
+  if (form.c_file) formData.append("c_file", form.c_file);
+  if (form.d_file) formData.append("d_file", form.d_file);
+  
   try {
-    console.log("Submitting test creation form...");
+    const { $toast } = useNuxtApp();
+    
+    // STEP 1: Create the test - POST to /api/v1/examTests
+    console.log("Step 1: Creating test");
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
       body: formData,
@@ -2319,32 +2267,25 @@ const manualSubmit = async () => {
       },
     });
 
-    console.log("API response for test creation:", response);
-
     if (response.status == 1) {
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.success("Test created successfully");
-
+      if ($toast) $toast.success("Created successfully");
       path_panel_expand.value = false;
 
       // Get the created test ID
       const createdTestId = response.data.id;
-      console.log("Test created with ID:", createdTestId);
 
-      // Edit mode or create exam progress
-      // Get current exam ID from state or route
+      // Get current exam ID from state
       const userState = useState("user").value;
       const currentExamId = userState?.currentExamId || route.params.id;
 
-      if (currentExamId) {
-        console.log("Associating test with exam ID:", currentExamId);
+      if (currentExamId && props.examEditMode === true) {
         try {
-          // Create a form data object specifically for this test
+          console.log("Step 2: Associating test", createdTestId, "with exam", currentExamId);
+          
+          // STEP 2: Associate test with exam - PUT to /api/v1/exams/tests/{exam_id}
           const examTestsFormData = new URLSearchParams();
           examTestsFormData.append("tests[]", createdTestId);
-
-          console.log("Making API call to associate test with exam...");
-          // Make direct API call to associate this specific test with the exam
+          
           const associationResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
             method: "PUT",
             body: examTestsFormData,
@@ -2354,118 +2295,40 @@ const manualSubmit = async () => {
             },
           });
           
-          console.log("Test association response:", associationResponse);
-
-          if (associationResponse && associationResponse.status === 1) {
-            console.log("Test successfully associated with exam");
-            
-            // IMPORTANT: Directly emit the event with the created test ID 
-            // This is the key step that was missing
-            console.log("Emitting updateTestList event with test ID:", createdTestId);
-            emit("update:updateTestList", createdTestId);
-            
-            // Increment the exam test list length
-            examTestListLength.value++;
-            
-            // Notify user of success
-            $toast.success("Test created and added to exam successfully");
-          } else {
-            console.warn("API returned error for test association:", associationResponse);
-            
-            // Try a second time with a different approach (JSON body)
-            try {
-              await new Promise(resolve => setTimeout(resolve, 500));
-              
-              console.log("Retrying test association with JSON format...");
-              const retryResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
-                method: "PUT",
-                body: JSON.stringify({ tests: [createdTestId] }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${userToken.value}`,
-                },
-              });
-              
-              console.log("Retry association response:", retryResponse);
-              
-              if (retryResponse && retryResponse.status === 1) {
-                console.log("Test successfully associated with exam on retry");
-                // IMPORTANT: Emit the event with the created test ID even on retry
-                emit("update:updateTestList", createdTestId);
-                examTestListLength.value++;
-                $toast.success("Test created and added to exam successfully");
-              } else {
-                // If retry also failed, still emit the event to let parent component try
-                emit("update:updateTestList", createdTestId);
-                $toast.warning("Test created but couldn't be added to exam automatically. Please try adding it manually.");
-              }
-            } catch (retryErr) {
-              console.error("Error in retry attempt:", retryErr);
-              // Still emit the event to let parent component try
-              emit("update:updateTestList", createdTestId);
-              $toast.warning("Test created but couldn't be added to exam automatically");
-            }
-          }
+          console.log("Association response:", associationResponse);
+          
+          // STEP 3: Only after successful association, emit events to update UI
+          console.log("Step 3: Emitting events and updating UI");
+          emit("update:updateTestList", createdTestId);
+          examTestListLength.value++;
+          emit("update:refreshTests");
+          
+          if ($toast) $toast.success("Test added to exam successfully");
         } catch (err) {
           console.error("Error associating test with exam:", err);
-          
-          if (err.response) {
-            console.error("Error response status:", err.response.status);
-            console.error("Error response data:", err.response.data);
-          }
-          
-          // IMPORTANT: Even if association fails, emit the event with the created test ID
-          // so the parent component can handle it
-          emit("update:updateTestList", createdTestId);
-          $toast.warning("Test created but couldn't be added to exam automatically");
+          if ($toast) $toast.error("Test created but couldn't be added to exam");
         }
       } else {
-        console.log("No exam ID found for association");
-        
-        // Still emit the event with the created test ID,
-        // in case the parent handles it differently
+        // Not in exam edit mode, just emit the events
         emit("update:updateTestList", createdTestId);
+        examTestListLength.value++;
       }
 
-      // Reset form fields using our improved function
+      // Reset form fields
       resetFormFields();
     } else {
-      console.error("API returned error status:", response);
-      const { $toast } = useNuxtApp();
-      if ($toast)
-        $toast.error(response.message || "An error occurred, try again");
+      if ($toast) $toast.error(response.message || "An error occurred, try again");
     }
   } catch (err) {
-    console.error("Error submitting form:", err);
-
-    // Log detailed error information
-    if (err.response) {
-      console.error("Error response status:", err.response.status);
-      console.error("Error response data:", err.response.data);
-
-      // If the API returned which fields are missing, log them specifically
-      if (err.response.data?.data?.fields) {
-        console.error("Missing fields:", err.response.data.data.fields);
-        const missingFields = err.response.data.data.fields.join(", ");
-        const { $toast } = useNuxtApp();
-        if ($toast) $toast.error(`Required fields missing: ${missingFields}`);
-        return;
-      }
-    }
-
-    let errorMessage = "An error occurred";
-
+    const { $toast } = useNuxtApp();
     if (err.response?.status == 400) {
-      errorMessage = err.response?.data?.message || "Bad request";
+      if ($toast) $toast.error(err.response.data.message || "Bad request");
     } else if (err.response?.status == 403) {
-      errorMessage = "Authentication error";
+      if ($toast) $toast.error("Authentication error");
       router.push("/login");
     } else {
-      errorMessage = err.message || "An error occurred";
+      if ($toast) $toast.error(err.message || "An error occurred");
     }
-
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error(errorMessage);
   } finally {
     create_loading.value = false;
   }
