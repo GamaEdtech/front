@@ -1414,8 +1414,6 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
 
         if (currentExamId) {
           try {
-            console.log("Associating newly created test with exam ID:", currentExamId, "Test ID:", createdTestId);
-            
             // Add the newly created test to the current exam
             const examTestsFormData = new URLSearchParams();
             examTestsFormData.append("tests[]", createdTestId);
@@ -1429,12 +1427,8 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
                 Authorization: `Bearer ${userToken.value}`,
               },
             });
-            
-            console.log("Test association response:", associationResponse);
-
+          
             if (associationResponse && associationResponse.status === 1) {
-              // Notify parent component about the new test
-              console.log("Emitting updateTestList event with test ID:", createdTestId);
               emit("update:updateTestList", createdTestId);
               
               // Increment the exam test list length
@@ -1452,8 +1446,7 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
               try {
                 // Wait a moment before retrying
                 await new Promise(resolve => setTimeout(resolve, 500));
-                
-                console.log("Retrying test association with different method...");
+
                 // Try again with a different content type
                 const retryResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
                   method: "PUT",
@@ -1463,9 +1456,6 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
                     Authorization: `Bearer ${userToken.value}`,
                   },
                 });
-                
-                console.log("Retry test association response:", retryResponse);
-                
                 if (retryResponse && retryResponse.status === 1) {
                   // Notify parent component about the new test
                   emit("update:updateTestList", createdTestId);
@@ -1989,12 +1979,6 @@ onMounted(async () => {
   // If in edit mode, we need to ensure we load the current exam's data
   if (props.examEditMode) {
     await getCurrentExamInfo();
-    console.log("Exam data loaded in edit mode:", {
-      section: form.section,
-      base: form.base,
-      lesson: form.lesson,
-      topic: form.topic,
-    });
   } else {
     // Reset form to clear any previous data if not in edit mode
     resetFormFields();
@@ -2256,8 +2240,6 @@ const manualSubmit = async () => {
   try {
     const { $toast } = useNuxtApp();
     
-    // STEP 1: Create the test - POST to /api/v1/examTests
-    console.log("Step 1: Creating test");
     const response = await $fetch("/api/v1/examTests", {
       method: "POST",
       body: formData,
@@ -2280,8 +2262,6 @@ const manualSubmit = async () => {
 
       if (currentExamId && props.examEditMode === true) {
         try {
-          console.log("Step 2: Associating test", createdTestId, "with exam", currentExamId);
-          
           // STEP 2: Associate test with exam - PUT to /api/v1/exams/tests/{exam_id}
           const examTestsFormData = new URLSearchParams();
           examTestsFormData.append("tests[]", createdTestId);
@@ -2294,11 +2274,6 @@ const manualSubmit = async () => {
               Authorization: `Bearer ${userToken.value}`,
             },
           });
-          
-          console.log("Association response:", associationResponse);
-          
-          // STEP 3: Only after successful association, emit events to update UI
-          console.log("Step 3: Emitting events and updating UI");
           emit("update:updateTestList", createdTestId);
           examTestListLength.value++;
           emit("update:refreshTests");
