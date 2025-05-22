@@ -58,6 +58,7 @@
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
                   density="compact"
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -71,6 +72,7 @@
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
                   density="compact"
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12" md="4">
@@ -84,6 +86,7 @@
                   :rules="[(v) => !!v || 'This field is required']"
                   color="orange"
                   density="compact"
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
 
@@ -109,6 +112,7 @@
                   density="compact"
                   :loading="!test_type_list || test_type_list.length === 0"
                   no-data-text="Loading exam types..."
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
 
@@ -121,6 +125,7 @@
                   variant="outlined"
                   color="orange"
                   density="compact"
+                  autocomplete="off"
                 ></v-text-field>
               </v-col>
 
@@ -133,6 +138,7 @@
                   color="orange"
                   density="compact"
                   :rules="[(v) => !!v || 'This field is required']"
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
 
@@ -147,6 +153,7 @@
                   color="orange"
                   density="compact"
                   :rules="[(v) => !!v || 'This field is required']"
+                  autocomplete="off"
                 ></v-autocomplete>
               </v-col>
 
@@ -159,6 +166,7 @@
                   @update:model-value="uploadFile"
                   accept="application/pdf"
                   density="compact"
+                  autocomplete="off"
                 ></v-file-input>
               </v-col>
 
@@ -170,6 +178,7 @@
                   :rules="[(v) => !!v || 'This field is required']"
                   density="compact"
                   hide-details
+                  autocomplete="off"
                 ></v-text-field>
                 <div
                   style="
@@ -189,6 +198,7 @@
                   label="Past Paper Id"
                   variant="outlined"
                   density="compact"
+                  autocomplete="off"
                 ></v-text-field>
               </v-col>
 
@@ -315,6 +325,7 @@
                 density="compact"
                 color="orange"
                 @click:clear="handleClearSection"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -332,6 +343,7 @@
                 :loading="test_loading && filter.section && !filter.base"
                 no-data-text="Select a Board first"
                 @click:clear="handleClearBase"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -349,6 +361,7 @@
                 :loading="test_loading && filter.base && !filter.lesson"
                 no-data-text="Select a Grade first"
                 @click:clear="handleClearLesson"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
@@ -366,6 +379,7 @@
                 :disabled="!filter.lesson"
                 :loading="test_loading && filter.lesson && !filter.topic"
                 @click:clear="handleClearTopic"
+                autocomplete="off"
               >
                 <template #item="{ item, props }">
                   <v-list-item
@@ -388,6 +402,7 @@
                 variant="outlined"
                 density="compact"
                 color="orange"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
             <v-col cols="12" md="4">
@@ -927,6 +942,7 @@
                 readonly
                 style="max-width: 400px"
                 class="mx-auto"
+                autocomplete="off"
               >
                 <template #append>
                   <v-btn icon variant="text" @click="copyUrl">
