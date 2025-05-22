@@ -44,6 +44,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Level is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
@@ -58,6 +59,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Grade is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
@@ -72,6 +74,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Lesson is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
             
@@ -108,6 +111,7 @@
                 variant="outlined"
                 color="orange"
                 :rules="[(v) => !!v || 'This field is required']"
+                autocomplete="off"
               />
             </v-col>
 
@@ -122,6 +126,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Question type is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
