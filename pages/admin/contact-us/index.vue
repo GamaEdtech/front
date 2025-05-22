@@ -69,7 +69,7 @@
 
           <template v-slot:item.fullName="{ item }">
             <div class="d-flex align-center">
-              <v-avatar size="40" class="mr-2">
+              <v-avatar size="40" class="mr-2" v-show="item.avatar">
                 <img alt="Avatar" />
               </v-avatar>
               <span>{{ item.fullName }}</span>
