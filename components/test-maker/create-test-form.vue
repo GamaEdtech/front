@@ -22,6 +22,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Level is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
@@ -36,6 +37,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Grade is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
@@ -50,6 +52,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Lesson is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
             <v-col cols="2" md="1" class="pr-0" v-show="!path_panel_expand">
@@ -82,6 +85,7 @@
                 label="Topics"
                 variant="outlined"
                 color="orange"
+                autocomplete="off"
               />
             </v-col>
 
@@ -96,6 +100,7 @@
                 density="compact"
                 color="orange"
                 :rules="[(v) => !!v || 'Question type is required']"
+                autocomplete="off"
               ></v-autocomplete>
             </v-col>
 
