@@ -133,6 +133,7 @@
               label="Board"
               variant="outlined"
               color="orange"
+              autocomplete="off"
             />
           </v-col>
           <v-col cols="12" md="3">
@@ -146,6 +147,7 @@
               label="Grade"
               variant="outlined"
               color="orange"
+              autocomplete="off"
             />
           </v-col>
           <v-col cols="12" md="3">
@@ -159,6 +161,7 @@
               label="Subject"
               variant="outlined"
               color="orange"
+              autocomplete="off"
             />
           </v-col>
         </v-row>
