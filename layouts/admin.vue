@@ -52,6 +52,7 @@ export default {
         { title: "Blogs", link: "/admin/blogs", icon: "mdi-book-open-outline" },
         { title: "My Stock", link: "/admin/stock", icon: "mdi-finance" },
         { title: "Analysis", link: "/admin/analysis", icon: "mdi-chart-line" },
+        { title: "Contact Us", link: "/admin/contact-us", icon: "mdi-archive-arrow-down-outline" },
       ],
       typeManagement: [{ text: "Location" }, { text: "Profile" }],
     };

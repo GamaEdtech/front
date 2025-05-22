@@ -4,6 +4,7 @@
     max-width="600px"
     style="height: 404px !important"
     @input="onDialogInput"
+    @click:outside="closeModal"
   >
     <v-card class="boxs">
       <div class="d-flex flex-column align-center justify-center pt-6">
@@ -26,7 +27,7 @@
             depressed
             color="bg-Error"
             class="w-50 rounded-pill white--text"
-            @click="handleDelete"
+            @click="$emit('confirm')"
           >
             Delete
           </v-btn>
