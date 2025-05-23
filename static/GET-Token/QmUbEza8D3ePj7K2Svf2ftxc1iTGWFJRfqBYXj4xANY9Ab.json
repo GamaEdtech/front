@@ -4,5 +4,9 @@
   "description": "Gama EdTech Governance token",
   "image": "https://gamatrain.com/GET-Token/QmRU6u4TAG1sHW9V8GZyZCn3Qp2ztkYzhhWawzZQEwQaEU.png",
   "website": "https://gamatrain.com",
-  "email": "info@gamatrain.com"
+  "email": "info@gamatrain.com",
+  "extensions": {
+    "twitter": "https://x.com/GamaEdtech",
+    "youtube": "https://youtube.com/@GamaEdtech"
+  }
 }
