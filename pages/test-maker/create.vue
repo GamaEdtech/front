@@ -1744,7 +1744,7 @@ const checkActiveParam = () => {
 };
 
 // Submit tests to the exam
-const submitTest = async () => {
+const submitTest = async (skipListRefresh = false) => {
   try {
     if (!tests.value.length) {
       return;
@@ -1780,7 +1780,15 @@ const submitTest = async () => {
     // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    await getExamCurrentTests();
+    // Only update the preview list, skip refreshing the test list if requested
+    if (skipListRefresh) {
+      // Update createForm if it exists and has examTestListLength property
+      if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+      }
+    } else {
+      await getExamCurrentTests();
+    }
   } catch (err) {
     console.error("Failed to update tests:", err);
     nuxtApp.$toast.error("Failed to update tests");
@@ -1944,19 +1952,8 @@ const getExamCurrentTests = async () => {
         createForm.value.examTestListLength = tests.value.length;
       }
 
-      // Avoid chaining another API request immediately - wait a moment
-      // to ensure GET request is completed separately in network tab
-      if (testListSwitch.value) {
-        setTimeout(() => {
-          // Only refresh if not already in progress
-          if (!test_loading.value) {
-            filter.page = 1;
-            test_list.value = [];
-            all_tests_loaded.value = false;
-            getExamTests();
-          }
-        }, 100);
-      }
+      // Remove the automatic test list refresh
+      // This was causing the list to refresh after adding a test
     }
   } catch (err) {
     console.error("Error loading tests:", err);
@@ -2111,7 +2108,13 @@ const applyTest = async (item, type = null) => {
     }
 
     // Call submitTest to send the changes to the backend and update the preview
-    await submitTest();
+    // Skip refreshing the list when adding/removing from the list view
+    await submitTest(testListSwitch.value);
+    
+    // Update the examTestListLength in the CreateTestForm component
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
   } catch (err) {
     nuxtApp.$toast.error("Error applying test");
     console.error("Error in applyTest:", err);
@@ -2424,6 +2427,11 @@ onMounted(async () => {
   // If we have an exam ID, get its tests
   if (exam_id.value) {
     await getExamCurrentTests();
+    
+    // Make sure the examTestListLength is properly initialized
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
   }
 
   // Try to load MathJax if it's not already available(currently commented out)
@@ -2962,7 +2970,7 @@ const handleTestRefresh = async () => {
 
     await getExamCurrentTests();
 
-    // Update create form test count
+    // Update create form test count - ensure this happens after tests are updated
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
@@ -2984,6 +2992,18 @@ const handleTestRefresh = async () => {
     nuxtApp.$toast.error("Error refreshing test list");
   }
 };
+
+// Watch for changes in tests array to update the button number
+watch(
+  () => tests.value,
+  (newTests) => {
+    // Update the examTestListLength in the CreateTestForm component
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = newTests.length;
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <style lang="scss">
