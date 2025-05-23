@@ -189,7 +189,7 @@ export default {
       ],
       slideArr: [
         {
-          img: "banner-signup.png",
+          img: "banner-sign-up.png",
           caption: "Sign Up",
           describe: "Register and Create Your Content Creator Profile",
         },
