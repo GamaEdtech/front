@@ -146,22 +146,22 @@ export default {
     return {
       slideArr: [
         {
-          img: "guid-banner1.webp",
+          img: "banner-signup.png",
           caption: "Sign Up",
           describe: "Register and Create Your Content Creator Profile",
         },
         {
-          img: "guid-banner2.wepb",
+          img: "banner-upload.png",
           caption: "Upload Your Content",
           describe: "Share Your Lesson Plans, Study Guides, and More.",
         },
         {
-          img: "guid-banner3.webp",
+          img: "banner-reach.png",
           caption: "Reach Students",
           describe: "Gain Exposure through Our Platform and Network.",
         },
         {
-          img: "guid-banner4.webp",
+          img: "banner-earn.png",
           caption: "Earn Big",
           describe: "Reap the Rewards as Students Purchase Your Content.",
         },
