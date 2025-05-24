@@ -183,9 +183,12 @@ function convertDataToXML(data, contentType) {
     if (contentType === "blog") {
       title = item.title
         .trim()
-        .replace(/ (?!$)/g, "-")
-        .replace(/\//g, "-")
-        .toLowerCase();
+        .toLowerCase()
+        .replace(/\s+/g, "-") // Replace spaces (and multiple spaces) with -
+        .replace(/\//g, "-") // Replace slashes with -
+        .replace(/[^a-z0-9\-]/g, "") // Remove all non-alphanumeric and non-hyphen characters
+        .replace(/-+/g, "-") // Collapse multiple hyphens
+        .replace(/^-+|-+$/g, ""); // Trim leading/trailing hyphens
     } else if (contentType === "school") {
       title = item.slug;
       modifyDate = item.lastModifyDate;
