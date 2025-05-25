@@ -1,0 +1,121 @@
+@use "../../../assets/scss/app.scss" as style;
+
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    border: 2px solid #cbcbcb;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .dropdown-input {
+        width: 100%;
+        position: relative;
+        cursor: pointer;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        input {
+            width: 100%;
+            padding: 8px 36px 8px 36px;
+            border: none;
+            outline: none;
+            font-size: 20px;
+            transition: border-color 0.3s;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .suffix-icons {
+            position: absolute;
+            right: 10px;
+            display: flex;
+
+            .clear-icon {
+                color: rgba(0, 0, 0, 0.6);
+                cursor: pointer;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: #f44336;
+                }
+            }
+
+            .arrow-icon {
+                color: rgba(0, 0, 0, 0.6);
+                transition: all 0.5s;
+            }
+            .rotate {
+                transform: rotateZ(180deg);
+            }
+        }
+
+        label {
+            position: absolute;
+            left: 36px;
+            top: 15px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 18px;
+            transition: all 0.3s;
+            pointer-events: none;
+            background-color: transparent;
+        }
+        .active-lable-class {
+            left: 20px;
+            top: -14px;
+            font-size: 18px;
+            background-color: white;
+            padding: 0 20px;
+        }
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        margin-top: 6px;
+        z-index: 10;
+
+        .dropdown-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+            font-size: 20px;
+            font-weight: 500;
+
+            &:hover {
+                background: #cccccc;
+            }
+        }
+
+        .dropdown-empty {
+            padding: 8px 16px;
+            color: rgba(0, 0, 0, 0.5);
+            font-style: italic;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .selected-item {
+            background-color: #fff3d6;
+            color: #ffc51a;
+            &:hover {
+                background: #fff3d6;
+            }
+        }
+    }
+}
+.disable-drop-down {
+    opacity: 0.5;
+}
