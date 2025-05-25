@@ -30,7 +30,7 @@
         { title: 'Header', value: 1 },
         { title: 'Tests', value: 2 },
         { title: 'Review', value: 3 },
-        { title: 'Publish', value: 4, disabled: tests.length < 5 },
+        { title: 'Publish', value: 4, disabled: !isExamPublished || tests.length < 5 },
       ]"
       v-model="test_step"
       editable
@@ -219,6 +219,7 @@
                         font-weight: 500;
                       "
                       density="compact"
+                      autocomplete="off"
                     >
                       Update & Next step
                     </v-btn>
@@ -299,7 +300,7 @@
                 class="mt-2 mb-3"
               ></v-progress-linear>
             </v-col>
-            <v-col cols="12" v-show="!testListSwitch">
+            <v-col cols="12">
               <CreateTestForm
                 ref="createForm"
                 :goToPreviewStep="test_step"
@@ -481,8 +482,12 @@
                           </v-chip>
                           <v-chip
                             v-if="item.topics_title"
-                            size="small"
-                            class="ml-2"
+                            size="x-large"
+                            density="compact"
+                            style="
+                              font-size: 13px !important;
+                              margin-inline-start: 5px !important;
+                            "
                           >
                             {{ item.topics_title }}
                           </v-chip>
@@ -546,10 +551,11 @@
                           </v-icon>
                           <span>1)</span>
                           <span
-                            v-html="item.answer_a || '(Option A)'"
-                            class="option-text"
+                          ref="mathJaxEl"
+                          v-show="item.answer_a"
+                          v-html="item.answer_a"
                           ></span>
-                          <img v-if="item.a_file" :src="item.a_file" />
+                          <img v-show="item.a_file" :src="item.a_file" />
                         </div>
                         <div class="answer">
                           <v-icon
@@ -561,10 +567,11 @@
                           </v-icon>
                           <span>2)</span>
                           <span
-                            v-html="item.answer_b || '(Option B)'"
-                            class="option-text"
+                            ref="mathJaxEl"
+                            v-show="item.answer_b"
+                            v-html="item.answer_b"
                           ></span>
-                          <img v-if="item.b_file" :src="item.b_file" />
+                          <img v-show="item.b_file" :src="item.b_file" />
                         </div>
                         <div class="answer">
                           <v-icon
@@ -576,10 +583,11 @@
                           </v-icon>
                           <span>3)</span>
                           <span
-                            v-html="item.answer_c || '(Option C)'"
-                            class="option-text"
+                            ref="mathJaxEl"
+                            v-show="item.answer_c"
+                            v-html="item.answer_c"
                           ></span>
-                          <img v-if="item.c_file" :src="item.c_file" />
+                          <img v-show="item.c_file" :src="item.c_file" />
                         </div>
                         <div class="answer">
                           <v-icon
@@ -591,10 +599,11 @@
                           </v-icon>
                           <span>4)</span>
                           <span
-                            v-html="item.answer_d || '(Option D)'"
-                            class="option-text"
+                            ref="mathJaxEl"
+                            v-show="item.answer_d"
+                            v-html="item.answer_d"
                           ></span>
-                          <img v-if="item.d_file" :src="item.d_file" />
+                          <img v-show="item.d_file" :src="item.d_file" />
                         </div>
                       </div>
                       <v-row>
@@ -603,14 +612,14 @@
                             icon
                             variant="text"
                             :to="`/test-maker/create-test/edit/${item.id}`"
-                            v-if="item.owner == true"
+                            v-show="item.owner == true"
                           >
                             <v-icon>mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
                             variant="text"
-                            v-if="item.owner == true"
+                            v-show="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
                           >
                             <v-icon color="error" size="small"
@@ -638,7 +647,11 @@
                             color="blue"
                             variant="flat"
                             size="small"
-                            v-if="!tests.some(id => String(id) === String(item.id))"
+                            v-show="
+                              !tests.some(
+                                (id) => String(id) === String(item.id)
+                              )
+                            "
                             @click="applyTest(item, 'add')"
                           >
                             <v-icon size="small"> mdi-plus </v-icon>
@@ -648,7 +661,11 @@
                             color="red"
                             variant="flat"
                             size="small"
-                            v-if="tests.some(id => String(id) === String(item.id))"
+                            v-show="
+                              tests.some(
+                                (id) => String(id) === String(item.id)
+                              )
+                            "
                             @click="applyTest(item, 'remove')"
                           >
                             <v-icon size="small"> mdi-minus </v-icon>
@@ -660,7 +677,7 @@
                     </v-col>
 
                     <v-col
-                      v-if="!all_tests_loaded"
+                      v-show="!all_tests_loaded"
                       cols="12"
                       class="text-center"
                     >
@@ -677,12 +694,11 @@
               </v-card>
             </v-col>
 
-            <!-- Publish button -->
             <v-col cols="12" class="mb-6">
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
-                  <v-btn
-                    @click="handlePublish"
+                   <v-btn
+                    @click="test_step = 3"
                     :disabled="tests.length < 5"
                     :loading="publish_loading"
                     block
@@ -695,11 +711,10 @@
                       font-weight: 500;
                     "
                   >
-                    <span v-if="tests.length < 5"
-                      >Need {{ 5 - tests.length }} more
-                      {{ 5 - tests.length === 1 ? "test" : "tests" }}</span
+                    <span v-show="tests.length < 5"
+                      >Add at least {{ 5 - tests.length }} more tests</span
                     >
-                    <span v-else>Publish</span>
+                    <span v-show="tests.length >= 5">Next step</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -725,49 +740,31 @@
       </template>
 
       <template #[`item.3`]>
-        <v-card flat class="mt-3 pb-10">
-          <v-row>
-            <v-col cols="12" class="ma-2">
-              <h3 class="text-h5 font-weight-bold mb-2 text-grey-darken-2">
-                {{ form.title }}
-              </h3>
-              <v-row
-                class="gama-text-caption font-noraml text-grey-darken-2 mt-4"
-                style="font-size: 16px"
+        <v-card flat class="pb-10 test-list">
+          <v-card-text id="preview-dialog">
+            <v-row>
+              <v-col cols="12">
+                <p class="text-h4 font-weight-bold">{{ form.title }}</p>
+              </v-col>
+              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+              <v-col cols="4">Duration: {{ form.duration }}</v-col>
+              <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
+              <v-col cols="12">
+                <v-chip label color="error"> Topics: </v-chip>
+              </v-col>
+              <v-col
+                cols="4"
+                v-for="(item, index) in topicTitleArr"
+                :key="index"
               >
-                <v-col cols="4">Question's num: {{ tests.length }}</v-col>
-                <v-col cols="4">Duration: {{ form.duration }}</v-col>
-                <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-chip
-                    rounded="sm"
-                    size="large"
-                    density="compact"
-                    variant="text"
-                    style="
-                      font-size: 13px;
-                      font-weight: 500;
-                      background-color: #b30a29;
-                      color: white;
-                      opacity: 1;
-                    "
-                    >Topics:</v-chip
-                  >
-                </v-col>
-                <v-col
-                  v-for="(item, index) in topicTitleArr"
-                  :key="index"
-                  cols="4"
-                >
-                  {{ item }}
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-divider class="mt-3" />
-            <v-row class="pa-0 ma-0">
-              <v-col cols="12" v-if="previewTestList.length">
+                {{ item }}
+              </v-col>
+              <v-col cols="12">
+                <v-divider />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" v-show="previewTestList.length">
                 <draggable
                   v-model="previewTestList"
                   @end="previewDragEnd"
@@ -782,39 +779,58 @@
                           ref="mathJaxEl"
                           v-html="item.question"
                         />
-                        <img v-if="item.q_file" :src="item.q_file" />
+                        <img :src="item.q_file" />
 
-                        <div class="answer">
-                          <span>1)</span>
-                          <span
-                            v-html="item.answer_a || '(Option A)'"
-                            class="option-text"
-                          ></span>
-                          <img v-if="item.a_file" :src="item.a_file" />
+                        <div
+                          v-if="
+                            item.type == 'blank' ||
+                            item.type == 'shortanswer' ||
+                            item.type == 'descriptive'
+                          "
+                        >
+                          <div ref="mathJaxEl" v-html="item.answer_full" />
+                          <img
+                            v-show="item.answer_full_file"
+                            :src="item.answer_full_file"
+                          />
                         </div>
-                        <div class="answer">
-                          <span>2)</span>
-                          <span
-                            v-html="item.answer_b || '(Option B)'"
-                            class="option-text"
-                          ></span>
-                          <img v-if="item.b_file" :src="item.b_file" />
-                        </div>
-                        <div class="answer">
-                          <span>3)</span>
-                          <span
-                            v-html="item.answer_c || '(Option C)'"
-                            class="option-text"
-                          ></span>
-                          <img v-if="item.c_file" :src="item.c_file" />
-                        </div>
-                        <div class="answer">
-                          <span>4)</span>
-                          <span
-                            v-html="item.answer_d || '(Option D)'"
-                            class="option-text"
-                          ></span>
-                          <img v-if="item.d_file" :src="item.d_file" />
+                        <div v-else>
+                          <div class="answer">
+                            <span>1)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_a"
+                              v-html="item.answer_a"
+                            ></span>
+                            <img v-show="item.a_file" :src="item.a_file" />
+                          </div>
+                          <div class="answer">
+                            <span>2)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_b"
+                              v-html="item.answer_b"
+                            ></span>
+                            <img v-show="item.b_file" :src="item.b_file" />
+                          </div>
+                          <div class="answer">
+                            <span>3)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_c"
+                              v-html="item.answer_c"
+                            ></span>
+                            <img v-show="item.c_file" :src="item.c_file" />
+                          </div>
+                          <p class="answer">
+                            <span>4)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_d"
+                              v-html="item.answer_d"
+                            />
+                            <img v-show="item.d_file" :src="item.d_file" />
+                          </p>
                         </div>
                         <v-row>
                           <v-col cols="6">
@@ -824,23 +840,31 @@
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              color="blue"
-                              variant="flat"
                               size="small"
-                              v-if="!tests.some(id => String(id) === String(item.id))"
+                              v-show="item.owner == true"
+                              :to="`/test-maker/create-test/edit/${item.id}`"
+                            >
+                              <v-icon small dark> mdi-pencil </v-icon>
+                              Edit
+                            </v-btn>
+                            <v-btn
+                              color="blue"
+                              dark
+                              small
+                              v-show="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
                             >
-                              <v-icon size="small"> mdi-plus </v-icon>
+                              <v-icon small dark> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              variant="flat"
-                              size="small"
-                              v-if="tests.some(id => String(id) === String(item.id))"
+                              dark
+                              small
+                              v-show="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
                             >
-                              <v-icon size="small"> mdi-minus </v-icon>
+                              <v-icon small dark> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -860,78 +884,55 @@
               </v-col>
             </v-row>
 
-            <v-col cols="12" v-if="tests.length < 5">
-              <v-alert
-                type="warning"
-                variant="tonal"
-                color="amber-darken-2"
-                border="start"
-                density="compact"
-                class="mb-4"
-              >
-                <div class="d-flex align-center">
-                  <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
-                  <span
-                    >You need at least 5 tests to publish this exam. Currently
-                    have {{ tests.length }}
-                    {{ tests.length === 1 ? "test" : "tests" }}.</span
-                  >
-                </div>
-              </v-alert>
-            </v-col>
-
-            <v-col cols="12">
-              <v-row>
-                <v-col cols="12" md="6" class="pb-0">
-                  <v-btn
-                    @click="publishTest"
-                    :disabled="tests.length < 5"
-                    :loading="publish_loading"
-                    size="large"
-                    color="teal"
-                    class="text-white"
-                    block
-                    style="
-                      text-transform: none;
-                      font-size: 13px;
-                      font-weight: 500;
-                    "
-                    density="compact"
-                  >
-                    <span v-if="tests.length < 5"
-                      >Need {{ 5 - tests.length }} more
-                      {{ 5 - tests.length === 1 ? "test" : "tests" }}</span
+            <!--Publish button-->
+            <v-row>
+              <v-col cols="12">
+                <v-row>
+                  <v-col cols="12" md="6" class="pb-0">
+                    <v-btn
+                      @click="publishTest"
+                      :disabled="tests.length < 5"
+                      :loading="publish_loading"
+                      size="large"
+                      density="compact"
+                      color="teal"
+                      class="white--text"
+                      block
+                      style="text-transform: none; font-size: 13px !important"
                     >
-                    <span v-else>Publish</span>
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    block
-                    variant="outlined"
-                    color="red"
-                    size="large"
-                    to="/user/exam"
-                    density="compact"
-                    style="
-                      text-transform: none;
-                      font-size: 13px;
-                      font-weight: 500;
-                    "
-                  >
-                    Discard
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+                      <span v-show="tests.length < 5"
+                        >Add at least {{ 5 - tests.length }} more tests</span
+                      >
+                      <span v-show="tests.length >= 5">Publish</span>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-btn
+                      size="large"
+                      variant="outlined"
+                      density="compact"
+                      color="error"
+                      to="/user/exam"
+                      block
+                      style="font-size: 13px !important; text-transform: none"
+                    >
+                      Discard
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+            <!--End publish button-->
+          </v-card-text>
         </v-card>
       </template>
 
       <template #[`item.4`]>
         <v-card flat class="mt-3 pb-10">
           <v-card-text class="text-center">
-            <p class="text-h5 mb-4">Your test is ready to use!</p>
+            <p class="font-weight-bold teal--text mb-3">
+              Your test is ready to use!
+            </p>
             <p>Send below link to your students or friends.</p>
 
             <div class="d-flex justify-center my-4">
@@ -971,114 +972,44 @@
         </v-card>
       </template>
     </v-stepper-vertical>
-
-    <v-row>
-      <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
-        <v-card class="pa-2">
-          <v-card-title
-            class="text-h5"
-            style="text-overflow: clip; text-wrap: wrap"
-          >
-            Are you sure of deleting the online exam?
-          </v-card-title>
-          <v-card-text
-            style="font-size: 10px; color: rgba(0, 0, 0, 0.5)"
-            class="px-2"
-          >
-            If you are sure about the deletion, click Agree button.
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="confirmDeleteDialog = false"
-              style="text-transform: none; font-size: 14px"
-            >
-              Disagree
-            </v-btn>
-            <v-btn
-              color="green darken-1"
-              text
-              :loading="deleteLoading"
-              @click="deleteOnlineExam"
-              style="text-transform: none; font-size: 14px"
-            >
-              Agree
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
-    <v-dialog v-model="deleteTestConfirmDialog" max-width="500">
-      <v-card>
-        <v-card-title class="text-h5">Are you sure?</v-card-title>
-        <v-card-text>
-          <p>If you are sure to delete, click Yes.</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="deleteTestConfirmDialog = false"
-            >No</v-btn
-          >
-          <v-btn
-            color="green-darken-1"
-            variant="text"
-            :loading="delete_exam_test_loading"
-            @click="deleteExamTest()"
-          >
-            Yes
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+    <v-row justify="center">
       <v-dialog
         v-model="printPreviewDialog"
         fullscreen
         transition="dialog-bottom-transition"
       >
-      <v-card>
-        <v-toolbar color="teal" dark>
-          <v-btn icon @click="printPreviewDialog = false">
+        <v-card class="test-list">
+          <v-toolbar color="teal" dark>
+            <v-btn icon @click="printPreviewDialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-            <v-btn
-              style="text-transform: none; font-size: 13px; font-weight: 500"
-              variant="text"
-              @click="printPreviewDialog = false"
-            >
-              Ok
-            </v-btn>
+              <v-btn
+                style="text-transform: none; font-size: 13px; font-weight: 500"
+                variant="text"
+                @click="printPreviewDialog = false"
+              >
+                Ok
+              </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-
           <v-card-text id="preview-dialog">
             <v-row>
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-            <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-              <v-chip
-                size="large"
-                density="compact"
-                variant="text"
-                label
-                style="
-                  font-size: 13px;
-                  font-weight: 500;
-                  background-color: #b30a29;
-                  color: white;
-                  opacity: 1;
-                "
-                >Topics:</v-chip
+                <v-chip label color="error"> Topics: </v-chip>
+              </v-col>
+              <v-col
+                cols="4"
+                v-for="(item, index) in topicTitleArr"
+                :key="index"
               >
-            </v-col>
-            <v-col cols="4" v-for="(item, index) in topicTitleArr" :key="index">
                 {{ item }}
               </v-col>
               <v-col cols="12">
@@ -1087,13 +1018,13 @@
             </v-row>
             <v-row>
               <v-col cols="12" v-if="previewTestList.length">
-                <draggable 
-                  v-model="previewTestList" 
-                  :item-key="'id'" 
+                <draggable
+                  v-model="previewTestList"
                   @end="previewDragEnd"
+                  item-key="id"
                   handle=".drag-handle"
                 >
-                <template #item="{ element: item }">
+                  <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
                         <div
@@ -1101,115 +1032,92 @@
                           ref="mathJaxEl"
                           v-html="item.question"
                         />
-                        <img v-if="item.q_file" :src="item.q_file" />
+                        <img :src="item.q_file" />
 
-                        <div class="answer">
-                        <v-icon
-                          v-if="item.true_answer == '1'"
-                          class="true_answer"
-                          size="large"
+                        <div
+                          v-if="
+                            item.type == 'blank' ||
+                            item.type == 'shortanswer' ||
+                            item.type == 'descriptive'
+                          "
                         >
-                          mdi-check
-                        </v-icon>
-                          <span>1)</span>
-                          <span
-                          v-html="item.answer_a || '(Option A)'"
-                          class="option-text"
-                          ></span>
-                          <img v-if="item.a_file" :src="item.a_file" />
+                          <div ref="mathJaxEl" v-html="item.answer_full" />
+                          <img
+                            v-show="item.answer_full_file"
+                            :src="item.answer_full_file"
+                          />
                         </div>
-
-                        <div class="answer">
-                        <v-icon
-                          v-if="item.true_answer == '2'"
-                          class="true_answer"
-                          size="large"
-                        >
-                          mdi-check
-                        </v-icon>
-                          <span>2)</span>
-                          <span
-                          v-html="item.answer_b || '(Option B)'"
-                          class="option-text"
-                          ></span>
-                          <img v-if="item.b_file" :src="item.b_file" />
+                        <div v-else>
+                          <div class="answer">
+                            <span>1)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_a"
+                              v-html="item.answer_a"
+                            ></span>
+                            <img v-show="item.a_file" :src="item.a_file" />
+                          </div>
+                          <div class="answer">
+                            <span>2)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_b"
+                              v-html="item.answer_b"
+                            ></span>
+                            <img v-show="item.b_file" :src="item.b_file" />
+                          </div>
+                          <div class="answer">
+                            <span>3)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_c"
+                              v-html="item.answer_c"
+                            ></span>
+                            <img v-show="item.c_file" :src="item.c_file" />
+                          </div>
+                          <p class="answer">
+                            <span>4)</span>
+                            <span
+                              ref="mathJaxEl"
+                              v-show="item.answer_d"
+                              v-html="item.answer_d"
+                            />
+                            <img v-show="item.d_file" :src="item.d_file" />
+                          </p>
                         </div>
-
-                        <div class="answer">
-                        <v-icon
-                          v-if="item.true_answer == '3'"
-                          class="true_answer"
-                          size="large"
-                        >
-                          mdi-check
-                        </v-icon>
-                          <span>3)</span>
-                          <span
-                          v-html="item.answer_c || '(Option C)'"
-                          class="option-text"
-                          ></span>
-                          <img v-if="item.c_file" :src="item.c_file" />
-                        </div>
-                      <div class="answer">
-                        <v-icon
-                          v-if="item.true_answer == '4'"
-                          class="true_answer"
-                          size="large"
-                        >
-                          mdi-check
-                        </v-icon>
-                          <span>4)</span>
-                          <span
-                          v-html="item.answer_d || '(Option D)'"
-                          class="option-text"
-                        ></span>
-                          <img v-if="item.d_file" :src="item.d_file" />
-                      </div>
-
                         <v-row>
                           <v-col cols="6">
-                          <v-btn
-                            icon
-                            variant="text"
-                            :to="`/test-maker/create-test/edit/${item.id}`"
-                            v-if="item.owner == true"
-                          >
-                            <v-icon>mdi-pencil</v-icon>
-                          </v-btn>
-                          <v-btn
-                            icon
-                            variant="text"
-                            v-if="item.owner == true"
-                            @click="openTestDeleteConfirmDialog(item.id)"
-                          >
-                            <v-icon color="error" size="small"
-                              >mdi-delete</v-icon
-                            >
-                          </v-btn>
-
                             <v-btn icon color="blue" class="drag-handle">
                               <v-icon> mdi-cursor-move </v-icon>
                             </v-btn>
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              color="blue"
-                              variant="flat"
                               size="small"
-                            v-if="!tests.some(id => String(id) === String(item.id))"
+                              v-show="item.owner == true"
+                              :to="`/test-maker/create-test/edit/${item.id}`"
+                            >
+                              <v-icon small dark> mdi-pencil </v-icon>
+                              Edit
+                            </v-btn>
+                            <v-btn
+                              color="blue"
+                              dark
+                              small
+                              v-show="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
                             >
-                              <v-icon size="small"> mdi-plus </v-icon>
+                              <v-icon small dark> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              variant="flat"
-                              size="small"
-                            v-if="tests.some(id => String(id) === String(item.id))"
+                              dark
+                              small
+                              v-show="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
                             >
-                              <v-icon size="small"> mdi-minus </v-icon>
+                              <v-icon small dark> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -1220,13 +1128,67 @@
                   </template>
                 </draggable>
               </v-col>
-              <v-col v-else cols="12" class="text-center">
+              <v-col
+                v-show="!previewTestList.length"
+                cols="12"
+                class="text-center"
+              >
                 <p>Oops! no data found</p>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
       </v-dialog>
+    </v-row>
+    <v-row>
+      <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
+        <v-card>
+          <v-card-title class="text-h5">
+            Are you sure of deleting the online exam?
+          </v-card-title>
+          <v-card-text>
+            If you are sure about the deletion, click Agree button.
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="confirmDeleteDialog = false"> Disagree </v-btn>
+            <v-btn
+              color="green darken-1"
+              text
+              :loading="deleteLoading"
+              @click="deleteOnlineExam"
+            >
+              Agree
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+    <!--Delete exam test confirm dialog-->
+    <v-dialog v-model="deleteTestConfirmDialog" max-width="290">
+      <v-card>
+        <v-card-title class="text-h5"> Are you sure? </v-card-title>
+
+        <v-card-text>
+          <p>If you are sure to delete, click Yes.</p>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn text @click="deleteTestConfirmDialog = false"> No </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            :loading="delete_exam_test_loading"
+            @click="deleteExamTest()"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!--Delete exam test confirm dialog-->
     <v-dialog v-model="deleteTestConfirmDialog" max-width="290">
       <v-card>
@@ -1312,6 +1274,7 @@ const mathJaxEl = ref(null);
 const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
+const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
@@ -1803,31 +1766,21 @@ const checkActiveParam = () => {
 const submitTest = async () => {
   try {
     if (!tests.value.length) {
-      console.log('No tests to submit');
+      // console.log('No tests to submit'); // Keep for debugging if needed
       return;
     }
 
-    // Ensure we have a valid exam ID
     if (!exam_id.value) {
-      console.error('No exam ID available, cannot update tests');
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("No exam ID available");
+      nuxtApp.$toast.error("No exam ID available");
       return;
     }
 
-    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
-
-    // Create URLSearchParams directly instead of using FormData conversion
     const formData = new URLSearchParams();
-    
-    // Make sure all test IDs are properly converted to strings for consistency
     tests.value.forEach(id => {
       formData.append("tests[]", String(id));
     });
 
-    console.log('Tests being submitted:', tests.value.map(id => String(id)));
-
-    const updateResponse = await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
+    await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
       method: "PUT",
       body: formData.toString(),
       headers: {
@@ -1836,180 +1789,113 @@ const submitTest = async () => {
       },
     });
     
-    console.log('Tests submission response:', updateResponse);
-    
-    // Add a small delay to ensure the backend has processed the update
     await new Promise(resolve => setTimeout(resolve, 300));
-
-    // Refresh the tests list
-    await getCurrentExamTestsInfo();
+    await handleRefreshPreviewList(); // MODIFIED HERE
     
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.success("Tests updated successfully");
+    nuxtApp.$toast.success("Tests updated successfully");
   } catch (err) {
     console.error('Failed to update tests:', err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to update tests");
+    nuxtApp.$toast.error("Failed to update tests");
   }
 };
 
-/**
- * Get a list of tests for the current exam with improved handling
- */
-const getCurrentExamTestsInfo = async () => {
-  test_loading.value = true;
-  
-  try {
-    console.log(`Fetching tests for exam ID: ${exam_id.value}`);
-    
-    // Clear the preview list before fetching to avoid display issues
-    previewTestList.value = [];
-    
-    // STEP 1: GET request to /api/v1/examTests
-    const response = await $fetch("/api/v1/examTests", {
-      method: "GET",
-      params: {
-        exam_id: exam_id.value,
-      },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-
-    console.log(`API response status: ${response?.status}, found tests: ${response?.data?.list?.length || 0}`);
-
-    if (response && response.status === 1) {
-      // Process the response data based on its format
-      let fetchedTests = [];
-      
-      if (Array.isArray(response.data)) {
-        fetchedTests = response.data;
-      } else if (response.data && Array.isArray(response.data.list)) {
-        fetchedTests = response.data.list;
-      } 
-      
-      console.log(`API returned ${fetchedTests.length} tests`);
-      console.log(`Our tests array has ${tests.value.length} tests`);
-      
-      // If we have tests, double check that all tests in our tests array are included
-      if (fetchedTests.length > 0) {
-        // Update previewTestList with the fetched data
-        previewTestList.value = fetchedTests;
-        
-        // Validate that all tests we expect are in the preview list
-        const previewIds = previewTestList.value.map(item => String(item.id));
-        const missingIds = tests.value.filter(id => !previewIds.includes(String(id)));
-        
-        if (missingIds.length > 0) {
-          console.warn(`Warning: ${missingIds.length} tests are in tests array but not in preview list:`, missingIds);
-          
-            // Create a map of existing items for easy lookup
-            const existingItemsMap = new Map();
-            previewTestList.value.forEach(item => {
-              existingItemsMap.set(String(item.id), item);
-            });
-            
-            // Create a new preview list with placeholders for missing items
-            const completedList = [];
-            
-            // Add each test from tests array (in order) to the completed list
-            for (const testId of tests.value) {
-              const idStr = String(testId);
-              if (existingItemsMap.has(idStr)) {
-                // If we have the item details, add it to the list
-                completedList.push(existingItemsMap.get(idStr));
-              } else {
-                // Otherwise, create a placeholder that will be updated
-                // when the detailed information is fetched
-                console.log(`Adding placeholder for missing test ID: ${idStr}`);
-                completedList.push({
-                  id: idStr,
-                  question: "Loading test details...",
-                  isPlaceholder: true
-                });
-                
-                // Attempt to fetch this test's details
-                fetchTestDetails(idStr);
-              }
-            }
-            
-            // Replace the preview list with our completed list
-            previewTestList.value = completedList;
-        }
-      } else {
-        console.warn("No tests returned from API - this might be unexpected if tests.value is not empty");
-        
-        // If no tests were returned but we have tests in our array, create placeholders
-        if (tests.value.length > 0) {
-          console.log("Creating placeholders for all tests in tests array");
-          // Create placeholder items for each test ID
-          const placeholders = tests.value.map(id => ({
-            id: String(id),
-            question: "Loading test details...",
-            isPlaceholder: true
-          }));
-          
-          previewTestList.value = placeholders;
-          
-          // Try to fetch details for each test
-          for (const testId of tests.value) {
-            fetchTestDetails(String(testId));
-          }
-        }
-      }
-
-      // Debug the preview test list
-      if (previewTestList.value.length > 0) {
-        console.log(`Preview list populated with ${previewTestList.value.length} tests`);
-        console.log(`First item in preview list:`, previewTestList.value[0]);
-      }
-
-      // If we have a create form reference, update its exam test list length
-      if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
-      }
-    } else {
-      console.error("API returned error status:", response);
-    }
-  } catch (err) {
-    console.error("Error loading tests:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Error loading tests");
-  } finally {
-    test_loading.value = false;
-  }
-};
-
-/**
- * Helper function to fetch details for a single test by its ID
- * @param {string} testId - The ID of the test to fetch details for
- */
+// Helper function to fetch details for a single test by its ID
 const fetchTestDetails = async (testId) => {
   try {
     const response = await $fetch(`/api/v1/examTests/${testId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${userToken.value}`,
-      }
+      },
     });
-    
+
     if (response && response.status === 1 && response.data) {
-      // Find the placeholder and replace it with actual details
-      const index = previewTestList.value.findIndex(item => 
-        item.isPlaceholder && String(item.id) === String(testId));
-      
-      if (index >= 0) {
-        // Vue's reactivity will update the UI when we modify the array
-        previewTestList.value[index] = response.data;
-      }
       return response.data;
     }
-    
-    console.warn(`No data returned for test ${testId}`);
+    console.warn(`No data returned for test ${testId} from fetchTestDetails`);
     return null;
   } catch (err) {
     console.error(`Error fetching details for test ${testId}:`, err);
     return null;
+  }
+};
+
+// New unified function to load and refresh the preview list
+const handleRefreshPreviewList = async () => {
+  if (!exam_id.value) {
+    previewTestList.value = [];
+    if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = 0;
+    }
+    return;
+  }
+
+  test_loading.value = true;
+  try {
+    const currentTestIds = tests.value.map(id => String(id));
+
+    if (currentTestIds.length === 0) {
+      previewTestList.value = [];
+      if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = 0;
+      }
+      test_loading.value = false;
+      return;
+    }
+
+    const response = await $fetch(`/api/v1/examTests`, {
+      method: "GET",
+      params: { exam_id: exam_id.value }, // This should fetch all tests linked to the exam
+      headers: { Authorization: `Bearer ${userToken.value}` },
+    });
+
+    let fetchedApiTests = [];
+    if (response && response.status === 1) {
+      fetchedApiTests = Array.isArray(response.data) ? response.data : (response.data?.list || []);
+    }
+
+    const fetchedDetailsMap = new Map(
+      fetchedApiTests.map(test => [String(test.id), test])
+    );
+
+    const newPreviewListConstructionPromises = currentTestIds.map(async (testId) => {
+      if (fetchedDetailsMap.has(testId)) {
+        return fetchedDetailsMap.get(testId);
+      } else {
+        console.warn(`Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`);
+        const individualDetails = await fetchTestDetails(testId);
+        if (individualDetails) {
+          return individualDetails;
+        } else {
+          console.error(`Failed to fetch details for ${testId} even individually. Creating placeholder.`);
+          return { id: testId, question: `Issue loading test ${testId}`, type: 'error', isPlaceholder: true, owner: true }; // Assuming owner if it's in tests.value
+        }
+      }
+    });
+
+    const constructedList = (await Promise.all(newPreviewListConstructionPromises)).filter(Boolean);
+
+    // Ensure the order of previewTestList matches tests.value
+    previewTestList.value = currentTestIds.map(id => {
+        return constructedList.find(test => String(test.id) === id);
+    }).filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
+
+  } catch (err) {
+    console.error("Error in handleRefreshPreviewList during API call:", err);
+    nuxtApp.$toast.error("Error refreshing preview list.");
+    // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
+    if (tests.value.length > 0 && previewTestList.value.length === 0) {
+        const fallbackPromises = tests.value.map(async (id) => {
+            const details = await fetchTestDetails(String(id));
+            return details || { id: String(id), question: `Loading error for ${id}`, type: 'error', isPlaceholder: true, owner: true };
+        });
+        previewTestList.value = (await Promise.all(fallbackPromises)).filter(Boolean);
+    }
+  } finally {
+    test_loading.value = false;
+    if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+    }
   }
 };
 
@@ -2018,51 +1904,30 @@ const fetchTestDetails = async (testId) => {
  */
 const handleTestRefresh = async () => {
   try {
-    console.log('Handling test refresh event in edit page');
-    console.log('Current tests array:', tests.value);
-
-    // Add a delay to ensure backend operations have completed
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Ensure all tests are represented as strings for consistent comparison
     tests.value = tests.value.map(id => String(id));
+    await handleRefreshPreviewList(); // MODIFIED HERE
     
-    console.log('Getting updated tests list from API...');
-    // Get the updated tests list
-    await getCurrentExamTestsInfo();
-    
-    console.log('Current preview list after refresh:', previewTestList.value.length, 'items');
-    console.log('Current tests array after refresh:', tests.value);
-    
-    // Update create form test count if available
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
-      console.log('Updated examTestListLength to', tests.value.length);
     }
     
-    // If test list is active, also refresh the main test list
     if (testListSwitch.value) {
-      console.log('Test list is active, refreshing main test list');
       filter.page = 1;
       test_list.value = [];
       all_tests_loaded.value = false;
       await getExamTests();
     }
     
-    // Show success message
-    const { $toast } = useNuxtApp();
     if (previewTestList.value.length > 0) {
-      if ($toast) $toast.success(`Tests updated: ${tests.value.length} tests in exam`);
+      nuxtApp.$toast.success(`Tests updated: ${tests.value.length} tests in exam`);
     } else {
-      console.warn('Preview list is empty after refresh - this may indicate an issue');
-      if ($toast) $toast.info('Refreshing test list...');
-      // Try one more time with a different approach
-      await submitTest();
-      }
-    } catch (err) {
+      nuxtApp.$toast.info('Refreshing test list...');
+      await submitTest(); // This will call handleRefreshPreviewList again
+    }
+  } catch (err) {
     console.error('Error in handleTestRefresh:', err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error('Error refreshing test list');
+    nuxtApp.$toast.error('Error refreshing test list');
   }
 };
 
@@ -2401,45 +2266,29 @@ watch(
 
 // Initialize component on mount
 onMounted(async () => {
-  // Get user token
   const auth = useAuth();
   userToken.value = auth.getUserToken();
 
-  // Initialize data in the correct sequence
-  await getCurrentExamInfo();
+  await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
 
-  // Load initial data - start with sections
   await getTypeList("section");
-
-  // Conditionally load data based on URL parameters or existing form values
   if (form.section) {
     await getTypeList("base", form.section);
-
     if (form.base) {
       await getTypeList("lesson", form.base);
-
       if (form.lesson) {
         await getTypeList("topic", form.lesson);
       }
     }
   }
-
-  // Get additional type lists
-  await loadExamTypes(); // Use our specialized function for exam types
+  await loadExamTypes();
   await getTypeList("state");
+  await getExamTests(); // For the general list of tests to choose from
 
-  // Load tests if needed
-  await getExamTests();
-
-  // If we have an exam ID, get its tests
   if (exam_id.value) {
-    await getCurrentExamTestsInfo();
+    await handleRefreshPreviewList(); // MODIFIED HERE - Populates previewTestList based on tests.value
   }
 
-  // Try to load MathJax if it's not already available(currently commented out)
-  // renderMathJax();
-
-  // Check active tab from route and enable it
   if (route.query?.active === "test_list") {
     test_step.value = 2;
     testListSwitch.value = true;
@@ -2447,13 +2296,13 @@ onMounted(async () => {
     test_step.value = 2;
     testListSwitch.value = false;
   } else {
-    test_step.value = 1;
-    testListSwitch.value = false;
+    // Default to step 1 if no specific active query or if it's an existing exam being edited
+    // For edit, we might want to default to step 2 if exam_id is present
+    test_step.value = exam_id.value ? 2 : 1; 
   }
 
-  // Show welcome toast
   setTimeout(() => {
-    nuxtApp.$toast.info("Welcome to the exam creator");
+    nuxtApp.$toast.info("Welcome to the exam editor");
   }, 500);
 });
 
@@ -2957,84 +2806,89 @@ const previewDragEnd = async () => {
  * Get current exam information
  */
 const getCurrentExamInfo = async () => {
-  // Get the exam ID from the route params
   exam_id.value = route.params.id;
+  if (!exam_id.value) {
+    nuxtApp.$toast.error("Exam ID is missing from route.");
+    router.push('/user/exam'); // Redirect if no ID
+    return;
+  }
   
   try {
-    console.log(`Fetching exam info for ID: ${exam_id.value}`);
-    
     const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
       headers: {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-    
-    console.log('Exam info response:', response);
 
-    // Set tests array from response
-    if (response.data?.tests?.length) {
-      tests.value = response.data.tests.map(id => String(id));
-      console.log(`Loaded ${tests.value.length} tests for this exam`);
+    if (response.data) {
+      const examData = response.data;
+      tests.value = examData.tests?.map(id => String(id)) || [];
+      
+      // Set form data in sequence to trigger proper cascading updates
+      form.section = examData.section || "";
+      if (form.section) await getTypeList("base", form.section);
+      
+      form.base = examData.base || "";
+      if (form.base) await getTypeList("lesson", form.base);
+      
+      form.lesson = examData.lesson || "";
+      if (form.lesson) await getTypeList("topic", form.lesson);
+      
+      // Ensure topics are correctly mapped to string IDs for selected_topics
+      // and for the form.topics array.
+      // The API might return topics as an array of objects or just an array of IDs.
+      if (examData.topics && Array.isArray(examData.topics)) {
+        form.topics = examData.topics.map(topic => String(topic.id || topic));
+        selected_topics.value = form.topics; // Sync with topic selector
+      } else {
+        form.topics = [];
+        selected_topics.value = [];
+      }
+      if (form.topics.length) await getTopicTitleList();
+
+      form.exam_type = examData.exam_type || examData.azmoon_type || "";
+      form.paperID = examData.paperID || '';
+      form.duration = examData.duration || examData.azmoon_time || 3;
+      form.title = examData.title || '';
+      form.level = examData.level || '2'; // Default to '2' if not provided
+      form.edu_year = examData.edu_year ? parseInt(examData.edu_year) : '';
+      form.edu_month = examData.edu_month ? parseInt(examData.edu_month) : '';
+      form.state = examData.state || '';
+      form.area = examData.area || '';
+      form.school = examData.school || '';
+      form.holding_time = examData.holding_time || false;
+      form.negative_point = examData.negative_point || false;
+      form.holding_level = examData.holding_level || 4;
+
+
+      if (examData.file_original) {
+        file_original_path.value = examData.file_original;
+      }
+      exam_code.value = examData.code || '';
+
+      // If createForm component is used, ensure its state is updated
+      if (createForm.value) {
+        createForm.value.examEditMode = true; // Let child know it's in edit context
+        // Pass relevant exam data to createForm if it needs it directly
+        // e.g., createForm.value.setInitialExamData(examData);
+        // Or rely on its own getCurrentExamInfo if that's robust
+         if (typeof createForm.value.getCurrentExamInfo === "function") {
+             // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
+         }
+         if ("examTestListLength" in createForm.value) {
+            createForm.value.examTestListLength = tests.value.length;
+         }
+      }
+
     } else {
-      tests.value = [];
-      console.log('No tests found for this exam');
-    }
-    
-    // Set form data in sequence to trigger proper cascading updates
-    if (response.data.section) {
-      form.section = response.data.section;
-      // Wait for grade list to load before setting base
-      await getTypeList("base", response.data.section);
-
-      if (response.data.base) {
-        form.base = response.data.base;
-        // Wait for lesson list to load before setting lesson
-        await getTypeList("lesson", response.data.base);
-
-        if (response.data.lesson) {
-          form.lesson = response.data.lesson;
-          // Load topics based on lesson
-          await getTypeList("topic", response.data.lesson);
-
-          // Set topics if available
-          if (response.data.topics && response.data.topics.length) {
-            form.topics = response.data.topics;
-            await getTopicTitleList();
-          }
-        }
-      }
-    }
-    
-    // Set other form fields
-    form.exam_type = response.data.exam_type || response.data.azmoon_type;
-    form.paperID = response.data.paperID || '';
-    form.duration = response.data.duration || response.data.azmoon_time || 3;
-    form.title = response.data.title || '';
-    form.edu_year = response.data.edu_year ? parseInt(response.data.edu_year) : '';
-    form.edu_month = response.data.edu_month ? parseInt(response.data.edu_month) : '';
-    
-    // Set file path if available
-    if (response.data.file_original) {
-      file_original_path.value = response.data.file_original;
-    }
-    
-    // Set exam code for sharing
-    exam_code.value = response.data.code || '';
-    
-    // Update test share link
-    test_share_link.value = `${window.location.origin}/exam/${exam_id.value}`;
-    
-    // If createForm exists, update it with the exam info
-    if (createForm.value) {
-      createForm.value.examEditMode = true;
-      if (typeof createForm.value.getCurrentExamInfo === "function") {
-        createForm.value.getCurrentExamInfo();
-      }
+      nuxtApp.$toast.error("Failed to load exam data. No data in response.");
+      router.push('/user/exam');
     }
   } catch (err) {
     console.error("Error fetching exam info:", err);
-    const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to load exam information");
+    nuxtApp.$toast.error("Failed to load exam information. Please try again.");
+    // Consider redirecting or providing a retry mechanism
+    // router.push('/user/exam'); 
   }
 };
 
@@ -3044,51 +2898,37 @@ const getCurrentExamInfo = async () => {
 const updateQuestion = async () => {
   submit_loading.value = true;
 
-  // Validate form fields
-  if (!validateForm()) {
+  if (!validateForm()) { // Assuming validateForm is defined elsewhere or you mean validateHeaderForm
     submit_loading.value = false;
     return;
   }
   
-  // Create FormData object
-  let formData = new FormData();
-  
-  // Add form fields
+  let submissionForm = new FormData();
   for (const key in form) {
-    if (key !== "topics") formData.append(key, form[key]);
-  }
-  
-  // Add topics array
-  if (form.topics && form.topics.length) {
-    for (const topic of form.topics) {
-      formData.append("topics[]", topic);
+    if (key === "topics") {
+      form.topics.forEach(topicId => submissionForm.append("topics[]", String(topicId)));
+    } else if (form[key] !== null && form[key] !== undefined) { // Append only if value exists
+      submissionForm.append(key, form[key]);
     }
   }
+  // File might need special handling if it's a new file vs existing path
+  // For now, assuming form.file_original is managed correctly (e.g., path or new file object)
 
-  console.log("Form data prepared for update - topics:", form.topics);
-  
   try {
-    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
-      method: "PUT",
-      body: urlencodeFormData(formData),
+    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      method: "PUT", // Usually PUT for updates, but your server might expect POST with _method=PUT
+      body: urlencodeFormData(submissionForm), // Ensure this matches server expectation (form-data or urlencoded)
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": `Bearer ${userToken.value}`,
       },
     });
 
-    console.log("Update response:", response);
-    
     nuxtApp.$toast.success("Exam updated successfully");
-    
-    // Move to the next step
-    test_step.value = 2;
-    
-    // Add a small delay before getting updated tests list
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Get updated tests list
-    await getCurrentExamTestsInfo();
+    test_step.value = 2; // Move to tests step
+    await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay
+    await handleRefreshPreviewList(); // MODIFIED HERE
+
   } catch (error) {
     console.error("Error updating exam:", error);
     nuxtApp.$toast.error(error.response?.data?.message || "Error updating exam");
