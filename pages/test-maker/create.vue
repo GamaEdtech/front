@@ -1780,14 +1780,13 @@ const submitTest = async (skipListRefresh = false) => {
     // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    // Only update the preview list, skip refreshing the test list if requested
-    if (skipListRefresh) {
-      // Update createForm if it exists and has examTestListLength property
-      if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
-      }
-    } else {
-      await getExamCurrentTests();
+    // Always update the preview list after submitting tests
+    // This ensures the Review section is always up to date
+    await getExamCurrentTests();
+    
+    // Update createForm if it exists and has examTestListLength property
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
     }
   } catch (err) {
     console.error("Failed to update tests:", err);
@@ -2107,9 +2106,8 @@ const applyTest = async (item, type = null) => {
       nuxtApp.$toast.success("Test removed from exam");
     }
 
-    // Call submitTest to send the changes to the backend and update the preview
-    // Skip refreshing the list when adding/removing from the list view
-    await submitTest(testListSwitch.value);
+    // Always call submitTest to update the backend and refresh the preview
+    await submitTest();
     
     // Update the examTestListLength in the CreateTestForm component
     if (createForm.value && "examTestListLength" in createForm.value) {
@@ -2138,6 +2136,13 @@ watch(
 
       // Add the new test to the tests array - association already done in child component
       tests.value.push(newTestId);
+
+      // Always update the preview list when a new test is created
+      // This ensures the Review section is always up to date
+      await submitTest();
+      
+      // Show success message
+      nuxtApp.$toast.success("Test added to exam");
 
       // Reset the lastCreatedTest after processing
       lastCreatedTest.value = null;
@@ -2644,15 +2649,6 @@ const handleStepChange = (newStep) => {
     return;
   }
 
-  // Prevent skipping to step 3 or 4 if exam hasn't been created yet
-  if ((newStep === 3 || newStep === 4) && !exam_id.value) {
-    nuxtApp.$toast.error("Please complete the Header step first");
-
-    // Revert to step 1 (Header)
-    test_step.value = 1;
-    return;
-  }
-
   // Prevent access to step 4 directly from step 1 or 2
   if (newStep === 4 && test_step.value < 3) {
     nuxtApp.$toast.error("Please review your exam before publishing");
@@ -2667,15 +2663,24 @@ const handleStepChange = (newStep) => {
     // Update the step first so UI changes immediately
     test_step.value = newStep;
     
+    // Show loading indicator
+    nuxtApp.$toast.info("Loading test data...");
+    
     // Then load the test data
     getExamCurrentTests().then(() => {
-      // If no tests were loaded, show a message
+      // If no tests were loaded, but we have tests in our array, try again
       if (previewTestList.value.length === 0 && tests.value.length > 0) {
-        nuxtApp.$toast.warning("Loading test data...");
+        nuxtApp.$toast.warning("Retrying test data load...");
         // Try once more after a short delay
         setTimeout(() => {
-          getExamCurrentTests();
+          getExamCurrentTests().then(() => {
+            if (previewTestList.value.length > 0) {
+              nuxtApp.$toast.success(`Loaded ${previewTestList.value.length} tests`);
+            }
+          });
         }, 1000);
+      } else if (previewTestList.value.length > 0) {
+        nuxtApp.$toast.success(`Loaded ${previewTestList.value.length} tests`);
       }
     }).catch(err => {
       console.error("Error loading test data:", err);
@@ -2991,6 +2996,7 @@ const handleTestRefresh = async () => {
     // Ensure all tests are represented as strings
     tests.value = tests.value.map((id) => String(id));
 
+    // Always update the preview list when tests are refreshed
     await getExamCurrentTests();
 
     // Update create form test count - ensure this happens after tests are updated
@@ -3019,10 +3025,21 @@ const handleTestRefresh = async () => {
 // Watch for changes in tests array to update the button number
 watch(
   () => tests.value,
-  (newTests) => {
+  (newTests, oldTests) => {
     // Update the examTestListLength in the CreateTestForm component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
+    }
+    
+    // Only update if there's an actual change in the tests array
+    // This prevents unnecessary API calls
+    if (exam_id.value && 
+        (newTests.length !== oldTests?.length || 
+         JSON.stringify(newTests) !== JSON.stringify(oldTests))) {
+      // Update the preview list with a slight delay to ensure other operations complete first
+      setTimeout(() => {
+        getExamCurrentTests();
+      }, 300);
     }
   },
   { deep: true }
