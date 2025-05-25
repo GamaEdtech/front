@@ -1757,15 +1757,12 @@ const submitTest = async (skipListRefresh = false) => {
       return;
     }
 
-    // Create URLSearchParams directly instead of using FormData conversion
     const formData = new URLSearchParams();
-
-    // Make sure all test IDs are properly converted to strings for consistency
     tests.value.forEach((id) => {
       formData.append("tests[]", String(id));
     });
 
-    const updateResponse = await $fetch(
+    await $fetch(
       `/api/v1/exams/tests/${exam_id.value}`,
       {
         method: "PUT",
@@ -1776,189 +1773,15 @@ const submitTest = async (skipListRefresh = false) => {
         },
       }
     );
-
-    // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // Always update the preview list after submitting tests
-    // This ensures the Review section is always up to date
-    await getExamCurrentTests();
+    await handleRefreshPreviewList();
     
-    // Update createForm if it exists and has examTestListLength property
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
   } catch (err) {
     console.error("Failed to update tests:", err);
     nuxtApp.$toast.error("Failed to update tests");
-  }
-};
-
-// Load current tests for an exam
-const getExamCurrentTests = async () => {
-  if (!exam_id.value) {
-    return;
-  }
-
-  test_loading.value = true;
-
-  try {
-    // Clear the preview list before fetching to avoid display issues
-    previewTestList.value = [];
-
-    const response = await $fetch(`/api/v1/examTests`, {
-      method: "GET",
-      params: {
-        exam_id: exam_id.value,
-      },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-
-    if (response && response.status === 1) {
-      // Process the response data based on its format
-      let fetchedTests = [];
-
-      if (Array.isArray(response.data)) {
-        fetchedTests = response.data;
-      } else if (response.data && Array.isArray(response.data.list)) {
-        fetchedTests = response.data.list;
-      }
-
-      // If we have tests, double check that all tests in our tests array are included
-      if (fetchedTests.length > 0) {
-        // Update previewTestList with the fetched data
-        previewTestList.value = fetchedTests;
-
-        // Validate that all tests we expect are in the preview list
-        const previewIds = previewTestList.value.map((item) => String(item.id));
-        const missingIds = tests.value.filter(
-          (id) => !previewIds.includes(String(id))
-        );
-
-        if (missingIds.length > 0) {
-          console.warn(
-            `Warning: ${missingIds.length} tests are in tests array but not in preview list:`,
-            missingIds
-          );
-
-          // SOLUTION: Use the tests array to ensure all tests are displayed
-          // This is a fallback in case the API doesn't return all tests
-
-          // Approach 1: If the preview list is empty or has fewer items than the tests array,
-          // we'll construct a manual preview list from the tests array
-          if (previewTestList.value.length < tests.value.length) {
-            // Create a map of existing items for easy lookup
-            const existingItemsMap = new Map();
-            previewTestList.value.forEach((item) => {
-              existingItemsMap.set(String(item.id), item);
-            });
-
-            // Create a new preview list with placeholders for missing items
-            const completedList = [];
-
-            // Add each test from tests array (in order) to the completed list
-            for (const testId of tests.value) {
-              const idStr = String(testId);
-              if (existingItemsMap.has(idStr)) {
-                // If we have the item details, add it to the list
-                completedList.push(existingItemsMap.get(idStr));
-              } else {
-                // Otherwise, create a placeholder that will be updated
-                // when the detailed information is fetched
-                completedList.push({
-                  id: idStr,
-                  question: "Loading test details...",
-                  isPlaceholder: true,
-                });
-
-                // Attempt to fetch this test's details
-                fetchTestDetails(idStr)
-                  .then((details) => {
-                    // Find the placeholder and replace it with actual details
-                    const index = previewTestList.value.findIndex(
-                      (item) => item.isPlaceholder && String(item.id) === idStr
-                    );
-
-                    if (index >= 0 && details) {
-                      // Vue's reactivity will update the UI when we modify the array
-                      previewTestList.value[index] = details;
-                    }
-                  })
-                  .catch((err) => {
-                    console.error(
-                      `Failed to fetch details for test ${idStr}:`,
-                      err
-                    );
-                  });
-              }
-            }
-
-            // Replace the preview list with our completed list
-            previewTestList.value = completedList;
-          }
-        }
-      } else {
-        console.warn(
-          "No tests returned from API - this might be unexpected if tests.value is not empty"
-        );
-
-        // If no tests were returned but we have tests in our array, create placeholders
-        if (tests.value.length > 0) {
-          // Create placeholder items for each test ID
-          const placeholders = tests.value.map((id) => ({
-            id: String(id),
-            question: "Loading test details...",
-            isPlaceholder: true,
-          }));
-
-          previewTestList.value = placeholders;
-
-          // Try to fetch details for each test
-          for (const testId of tests.value) {
-            fetchTestDetails(String(testId))
-              .then((details) => {
-                if (details) {
-                  const index = previewTestList.value.findIndex(
-                    (item) => String(item.id) === String(testId)
-                  );
-
-                  if (index >= 0) {
-                    previewTestList.value[index] = details;
-                  }
-                }
-              })
-              .catch((err) => {
-                console.error(
-                  `Failed to fetch details for test ${testId}:`,
-                  err
-                );
-              });
-          }
-        } else {
-          previewTestList.value = [];
-        }
-      }
-
-      // Debug the preview test list
-      if (previewTestList.value.length > 0) {
-        const firstItem = previewTestList.value[0];
-      }
-
-      // If we have a create form reference, update its exam test list length
-      if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
-      }
-
-      // Remove the automatic test list refresh
-      // This was causing the list to refresh after adding a test
-    }
-  } catch (err) {
-    console.error("Error loading tests:", err);
-    nuxtApp.$toast.error("Error loading tests");
-  } finally {
-    test_loading.value = false;
   }
 };
 
@@ -1975,8 +1798,7 @@ const fetchTestDetails = async (testId) => {
     if (response && response.status === 1 && response.data) {
       return response.data;
     }
-
-    console.warn(`No data returned for test ${testId}`);
+    console.warn(`No data returned for test ${testId} from fetchTestDetails`);
     return null;
   } catch (err) {
     console.error(`Error fetching details for test ${testId}:`, err);
@@ -1984,8 +1806,88 @@ const fetchTestDetails = async (testId) => {
   }
 };
 
-// Initialize flag
-getExamCurrentTests.isRunning = false;
+// New unified function to load and refresh the preview list
+const handleRefreshPreviewList = async () => {
+  if (!exam_id.value) {
+    previewTestList.value = [];
+    if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = 0;
+    }
+    return;
+  }
+
+  test_loading.value = true;
+  try {
+    const currentTestIds = tests.value.map(id => String(id));
+
+    if (currentTestIds.length === 0) {
+      previewTestList.value = [];
+      if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = 0;
+      }
+      test_loading.value = false;
+      return;
+    }
+
+    const response = await $fetch(`/api/v1/examTests`, {
+      method: "GET",
+      params: { exam_id: exam_id.value }, // This should fetch all tests linked to the exam
+      headers: { Authorization: `Bearer ${userToken.value}` },
+    });
+
+    let fetchedApiTests = [];
+    if (response && response.status === 1) {
+      fetchedApiTests = Array.isArray(response.data) ? response.data : (response.data?.list || []);
+    }
+
+    const fetchedDetailsMap = new Map(
+      fetchedApiTests.map(test => [String(test.id), test])
+    );
+
+    const newPreviewListConstructionPromises = currentTestIds.map(async (testId) => {
+      if (fetchedDetailsMap.has(testId)) {
+        return fetchedDetailsMap.get(testId);
+      } else {
+        // Test is in local `tests.value` but not in the bulk API response.
+        // This could be a newly added test not yet fully reflected, or an orphaned ID.
+        // Attempt to fetch its details directly.
+        console.warn(`Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`);
+        const individualDetails = await fetchTestDetails(testId);
+        if (individualDetails) {
+          return individualDetails;
+        } else {
+          // If even individual fetch fails, create a placeholder indicating an issue.
+          console.error(`Failed to fetch details for ${testId} even individually. Creating placeholder.`);
+          return { id: testId, question: `Issue loading test ${testId}`, type: 'error', isPlaceholder: true, owner: true }; // Assuming owner if it's in tests.value
+        }
+      }
+    });
+
+    const constructedList = (await Promise.all(newPreviewListConstructionPromises)).filter(Boolean);
+
+    // Ensure the order of previewTestList matches tests.value
+    previewTestList.value = currentTestIds.map(id => {
+        return constructedList.find(test => String(test.id) === id);
+    }).filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
+
+  } catch (err) {
+    console.error("Error in handleRefreshPreviewList during API call:", err);
+    nuxtApp.$toast.error("Error refreshing preview list.");
+    // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
+    if (tests.value.length > 0 && previewTestList.value.length === 0) {
+        const fallbackPromises = tests.value.map(async (id) => {
+            const details = await fetchTestDetails(String(id));
+            return details || { id: String(id), question: `Loading error for ${id}`, type: 'error', isPlaceholder: true, owner: true };
+        });
+        previewTestList.value = (await Promise.all(fallbackPromises)).filter(Boolean);
+    }
+  } finally {
+    test_loading.value = false;
+    if (createForm.value && "examTestListLength" in createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+    }
+  }
+};
 
 // Get current exam information
 const getCurrentExamInfo = async () => {
@@ -2008,7 +1910,7 @@ const getCurrentExamInfo = async () => {
 
       // Set tests array from response
       if (response.data?.tests?.length) {
-        tests.value = response.data.tests;
+        tests.value = response.data.tests.map(id => String(id)); // Ensure string IDs
       } else {
         tests.value = [];
       }
@@ -2016,20 +1918,16 @@ const getCurrentExamInfo = async () => {
       // Set form data in sequence to trigger proper cascading updates
       if (response.data.section) {
         form.section = response.data.section;
-        // Wait for grade list to load before setting base
         await getTypeList("base", response.data.section);
 
         if (response.data.base) {
           form.base = response.data.base;
-          // Wait for lesson list to load before setting lesson
           await getTypeList("lesson", response.data.base);
 
           if (response.data.lesson) {
             form.lesson = response.data.lesson;
-            // Load topics based on lesson
             await getTypeList("topic", response.data.lesson);
 
-            // Set topics if available
             if (response.data.topics && response.data.topics.length) {
               form.topics = response.data.topics;
               await getTopicTitleList();
@@ -2038,10 +1936,20 @@ const getCurrentExamInfo = async () => {
         }
       }
 
-      // Set file path if available
       if (response.data.file_original) {
         file_original_path.value = response.data.file_original;
       }
+      
+      // Other form fields from response.data if necessary
+      form.exam_type = response.data.exam_type || "";
+      form.level = response.data.level || "2";
+      form.duration = response.data.duration || 3;
+      form.title = response.data.title || "";
+      form.paperID = response.data.paperID || "";
+      form.edu_year = response.data.edu_year || "";
+      form.edu_month = response.data.edu_month || "";
+      // ... any other fields that should be populated from exam info
+
     } catch (err) {
       nuxtApp.$toast.error("Failed to load exam information");
       console.error("Error fetching exam info:", err);
@@ -2431,7 +2339,7 @@ onMounted(async () => {
 
   // If we have an exam ID, get its tests
   if (exam_id.value) {
-    await getExamCurrentTests();
+    await handleRefreshPreviewList();
     
     // Make sure the examTestListLength is properly initialized
     if (createForm.value && "examTestListLength" in createForm.value) {
@@ -2660,20 +2568,13 @@ const handleStepChange = (newStep) => {
 
   // If moving to Review step (3), make sure we load the test data
   if (newStep === 3 && exam_id.value) {
-    // Update the step first so UI changes immediately
     test_step.value = newStep;
-    
-    // Show loading indicator
     nuxtApp.$toast.info("Loading test data...");
-    
-    // Then load the test data
-    getExamCurrentTests().then(() => {
-      // If no tests were loaded, but we have tests in our array, try again
+    handleRefreshPreviewList().then(() => {
       if (previewTestList.value.length === 0 && tests.value.length > 0) {
         nuxtApp.$toast.warning("Retrying test data load...");
-        // Try once more after a short delay
         setTimeout(() => {
-          getExamCurrentTests().then(() => {
+          handleRefreshPreviewList().then(() => {
             if (previewTestList.value.length > 0) {
               nuxtApp.$toast.success(`Loaded ${previewTestList.value.length} tests`);
             }
@@ -2686,7 +2587,6 @@ const handleStepChange = (newStep) => {
       console.error("Error loading test data:", err);
       nuxtApp.$toast.error("Error loading test data");
     });
-    
     return;
   }
 
@@ -2992,27 +2892,19 @@ const previewDragEnd = async () => {
 const handleTestRefresh = async () => {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Ensure all tests are represented as strings
     tests.value = tests.value.map((id) => String(id));
+    await handleRefreshPreviewList();
 
-    // Always update the preview list when tests are refreshed
-    await getExamCurrentTests();
-
-    // Update create form test count - ensure this happens after tests are updated
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
 
-    // If test list is active, also refresh the main test list
     if (testListSwitch.value) {
       filter.page = 1;
       test_list.value = [];
       all_tests_loaded.value = false;
       await getExamTests();
     }
-
-    // Show success message
     nuxtApp.$toast.success(
       `Tests updated: ${tests.value.length} tests in exam`
     );
@@ -3026,19 +2918,14 @@ const handleTestRefresh = async () => {
 watch(
   () => tests.value,
   (newTests, oldTests) => {
-    // Update the examTestListLength in the CreateTestForm component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
     }
-    
-    // Only update if there's an actual change in the tests array
-    // This prevents unnecessary API calls
     if (exam_id.value && 
         (newTests.length !== oldTests?.length || 
          JSON.stringify(newTests) !== JSON.stringify(oldTests))) {
-      // Update the preview list with a slight delay to ensure other operations complete first
       setTimeout(() => {
-        getExamCurrentTests();
+        handleRefreshPreviewList();
       }, 300);
     }
   },
