@@ -2662,6 +2662,29 @@ const handleStepChange = (newStep) => {
     return;
   }
 
+  // If moving to Review step (3), make sure we load the test data
+  if (newStep === 3 && exam_id.value) {
+    // Update the step first so UI changes immediately
+    test_step.value = newStep;
+    
+    // Then load the test data
+    getExamCurrentTests().then(() => {
+      // If no tests were loaded, show a message
+      if (previewTestList.value.length === 0 && tests.value.length > 0) {
+        nuxtApp.$toast.warning("Loading test data...");
+        // Try once more after a short delay
+        setTimeout(() => {
+          getExamCurrentTests();
+        }, 1000);
+      }
+    }).catch(err => {
+      console.error("Error loading test data:", err);
+      nuxtApp.$toast.error("Error loading test data");
+    });
+    
+    return;
+  }
+
   // If all validations pass, update the step
   test_step.value = newStep;
 
