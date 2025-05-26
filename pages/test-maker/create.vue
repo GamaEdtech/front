@@ -756,7 +756,20 @@
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-                <v-chip label color="error"> Topics: </v-chip>
+                <v-chip
+                  size="x-large"
+                  label
+                  variant="outlined"
+                  rounded
+                  density="compact"
+                  class="text-white"
+                  style="
+                    background-color: #b30a29;
+                    font-size: 15px;
+                  "
+                >
+                  Topics:
+                </v-chip>
               </v-col>
               <v-col
                 cols="4"
@@ -1020,7 +1033,20 @@
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-                <v-chip label color="error"> Topics: </v-chip>
+                <v-chip
+                  size="x-large"
+                  label
+                  variant="outlined"
+                  rounded
+                  density="compact"
+                  class="text-white"
+                  style="
+                    background-color: #b30a29;
+                    font-size: 15px;
+                  "
+                >
+                  Topics:
+                </v-chip>
               </v-col>
               <v-col
                 cols="4"
