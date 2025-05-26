@@ -945,7 +945,7 @@
                 density="compact"
                 readonly
                 style="max-width: 400px"
-                class="mx-auto"
+                class="mx-auto textFiledLink"
                 autocomplete="off"
               >
                 <template #append>
@@ -3062,5 +3062,14 @@ watch(
 .answer span {
   visibility: visible !important;
   display: inline-block !important;
+}
+.textFiledLink .v-field--variant-outlined .v-field__outline {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+}
+.textFiledLink .v-text-field .v-field--no-label input,
+.textFiledLink .v-text-field .v-field--active input{
+  padding-left: 20px !important;
+  padding-block-end: 0px !important;
 }
 </style>
