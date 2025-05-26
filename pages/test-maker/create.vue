@@ -1212,24 +1212,35 @@
       </v-dialog>
     </v-row>
     <!--Delete exam test confirm dialog-->
-    <v-dialog v-model="deleteTestConfirmDialog" max-width="290">
-      <v-card>
-        <v-card-title class="text-h5"> Are you sure? </v-card-title>
+    <v-dialog v-model="deleteTestConfirmDialog" max-width="290" persistent >
+      <v-card class="pa-0">
+        <v-card-title class="mt-2 text-h5" style="font-size: 13px">
+          Are you sure?
+        </v-card-title>
 
         <v-card-text>
-          <p>If you are sure to delete, click Yes.</p>
+          <p style="color: rgba(0, 0, 0, 0.6); font-size: 13px">
+            If you are sure to delete, click Yes.
+          </p>
         </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn text @click="deleteTestConfirmDialog = false"> No </v-btn>
+          <v-btn
+            text
+            @click="deleteTestConfirmDialog = false"
+            style="text-transform: none; font-size: 13px"
+          >
+            No
+          </v-btn>
 
           <v-btn
             color="green darken-1"
             text
             :loading="delete_exam_test_loading"
             @click="deleteExamTest()"
+            style="text-transform: none; font-size: 13px"
           >
             Yes
           </v-btn>
