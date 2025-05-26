@@ -614,12 +614,13 @@
                       <v-row>
                         <v-col cols="6">
                           <v-btn
-                            icon
+                            color="blue"
+                            density="compact"
                             variant="text"
                             :to="`/test-maker/create-test/edit/${item.id}`"
                             v-show="item.owner == true"
                           >
-                            <v-icon>mdi-pencil</v-icon>
+                            <v-icon size="small">mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
@@ -650,8 +651,9 @@
                         <v-col cols="6" class="text-right">
                           <v-btn
                             color="blue"
-                            variant="flat"
-                            size="small"
+                            density="compact"
+                            size="large"
+                            style="text-transform: none; font-size: 13px;"
                             v-show="
                               !tests.some(
                                 (id) => String(id) === String(item.id)
@@ -664,8 +666,9 @@
                           </v-btn>
                           <v-btn
                             color="red"
-                            variant="flat"
-                            size="small"
+                            density="compact"
+                            size="large"
+                            style="text-transform: none; font-size: 13px;"
                             v-show="
                               tests.some((id) => String(id) === String(item.id))
                             "
@@ -843,31 +846,36 @@
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              size="small"
+                              color="blue"
+                              density="compact"
+                              size="large"
                               v-show="item.owner == true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon small dark> mdi-pencil </v-icon>
+                              <v-icon size="small"> mdi-pencil </v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              dark
-                              small
+                              density="compact"
+                              size="large"
                               v-show="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon small dark> mdi-plus </v-icon>
+                              <v-icon size="large"> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              dark
-                              small
+                              density="compact"
+                              size="large"
                               v-show="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
+                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
-                              <v-icon small dark> mdi-minus </v-icon>
+                              <v-icon size="large"> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -1102,31 +1110,35 @@
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              size="small"
+                              color="blue"
+                              density="compact"
+                              size="large"
                               v-show="item.owner == true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon small dark> mdi-pencil </v-icon>
+                              <v-icon size="large"> mdi-pencil </v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              dark
-                              small
+                              density="compact"
+                              size="large"
                               v-show="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
                             >
-                              <v-icon small dark> mdi-plus </v-icon>
+                              <v-icon size="large"> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              dark
-                              small
+                              density="compact"
+                              size="large"
                               v-show="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
+                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
-                              <v-icon small dark> mdi-minus </v-icon>
+                              <v-icon size="large"> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
