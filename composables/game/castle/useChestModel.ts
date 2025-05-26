@@ -8,7 +8,7 @@ const useChestModel = async (): Promise<{
     chestInteractions: (character: THREE.Object3D) => boolean,
     animation: () => { play: () => void, stop: () => void },
     update: (delta: number) => void,
-    setChestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void
+    setChestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void,
     mixer: THREE.AnimationMixer | null
 } | null> => {
     try {
@@ -29,7 +29,6 @@ const useChestModel = async (): Promise<{
 
         const INTERACTION_DISTANCE = 80
         const chestPosition = ref<THREE.Vector3 | null>(null)
-
 
         const chestInteractions = (character: THREE.Object3D): boolean => {
             if (!chestPosition.value) return false

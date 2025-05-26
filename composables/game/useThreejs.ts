@@ -146,8 +146,9 @@ export function useThreeJS() {
     /**
      * Starts the main rendering animation loop
      */
-    const startAnimationLoop = () => {
+    const startAnimationLoop = (callback?: () => void) => {
         const animate = () => {
+            if (callback) callback()
             if (renderer.value) {
                 renderer.value.render(scene.value, camera.value)
             }

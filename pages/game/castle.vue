@@ -49,6 +49,8 @@ import { Level } from '~/interfaces/DoorStatus'
 import { Levels, Step } from '~/interfaces/levels.interface'
 import Coins from '~/components/game/castle/coins.vue'
 import { useSound } from '~/composables/game/useSound'
+import { usePhysics } from '~/composables/game/castle/usePhysics'
+import { createGround } from '~/composables/game/castle/usePhysicsEnv'
 // ==========================================
 // Game Configuration
 // ==========================================
@@ -59,7 +61,7 @@ const levels = ref<Levels>({
             reward: {
                 amount: 50,
                 position: "position4",
-                room: "room3"
+                room: "room1"
             },
             door001: { problem: "2 + 3", answer: "5" },
             door002: { problem: "5 + 7", answer: "12" },
@@ -124,7 +126,7 @@ let modelsController: {
     visibleChest: (status: boolean) => void;
     chestInteractions: (character: THREE.Object3D) => boolean; chestAnimation: (() => { play: () => void; stop: () => void }) | null;
     chestUpdate: (delta: number) => void;
-    chestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void
+    chestPosition: (position: THREE.Vector3, rotation: THREE.Euler) => void,
 } | null = null
 
 // Gate visibility
@@ -136,6 +138,13 @@ const coinsRef = ref<InstanceType<typeof Coins> | null>(null)
 
 // select camera ref
 const cameraRef = ref<THREE.PerspectiveCamera | null>(null)
+
+
+// throw coin from them chest
+let throwCoinsMethod: ((boxSize: any, side: 'left' | 'right', count?: number) => void) | null = null
+let boxSizeRef: any = null
+
+let cleanupPhysics: (() => void) | null = null
 
 // ==========================================
 // Computed Properties
@@ -325,6 +334,11 @@ const resetGameState = () => {
 
     isChestOpen.value = false
 
+    // reset chest animation
+    modelsController?.chestAnimation?.()?.stop()
+
+    // cleanup physics
+    cleanupPhysics?.()
 }
 
 // ==========================================
@@ -409,8 +423,9 @@ const handleChestInteraction = () => {
 
     if (!currentStepData.value?.reward) return
 
-    // Play coins grab sound after a short delay
+    // Play coins grab sound and lunch coins after a short delay
     setTimeout(() => {
+        launchCoins()
         playSound(COINS_GRAB_SOUND, 0.5)
     }, 1600)
 
@@ -554,6 +569,13 @@ const initializeCharacterAndInteractions = (scene: THREE.Scene, camera: THREE.Pe
     )
 }
 
+// lunch coins from the chest
+const launchCoins = () => {
+    if (throwCoinsMethod && boxSizeRef) {
+        throwCoinsMethod(boxSizeRef, ['position1', 'position3'].includes(currentStepData.value?.reward?.position || '') ? 'right' : 'left', 80)
+    }
+}
+
 // ==========================================
 // Lifecycle Hooks
 // ==========================================
@@ -598,8 +620,36 @@ onMounted(async () => {
         initializeCharacterAndInteractions(scene.value, camera.value)
     })
 
+    // initialize physics
+    const {
+        initPhysics,
+        throwCoins,
+        updatePhysics,
+        cleanup
+    } = usePhysics(scene.value)
+
+    initPhysics()
+
+    // create ground
+    createGround(scene.value)
+
+    // throw coins method
+    throwCoinsMethod = throwCoins
+
+    // cleanup physics
+    cleanupPhysics = cleanup
+
     // Start the main ThreeJS rendering loop
-    startAnimationLoop()
+    startAnimationLoop(() => {
+        if (currentStepData.value?.reward) {
+            const roomData = chestPosations[currentStepData.value.reward.room as keyof typeof chestPosations];
+            const positionKey = `posistion${currentStepData.value.reward.position.slice(-1)}` as keyof typeof roomData;
+
+            boxSizeRef = { x: roomData[positionKey].x, y: 0, z: roomData[positionKey].z }
+
+            updatePhysics(boxSizeRef)
+        }
+    })
 
     // Cleanup when component unmounts
     onUnmounted(() => {
