@@ -1,10 +1,11 @@
 <template>
   <v-container class="create-test-container">
     <v-row class="mt-4">
-      <v-col cols="6">
-        <h1 class="text-h4 text-teal">Update Exam</h1>
+      <v-col cols="6" class="d-flex align-center">
+        <span class="icon icong-azmoon text-h3 text-teal mx-1"></span>
+        <h1 class="text-h4 text-teal">Update Online Exam</h1>
       </v-col>
-      <v-col cols="6" class="text-right">
+      <v-col cols="6" id="tool-box" class="text-right">
         <v-btn
           variant="outlined"
           color="error"
@@ -13,7 +14,7 @@
           size="small"
           @click="confirmDeleteDialog = true"
           class="mr-1"
-          style="font-size: 15px; font-weight: 500"
+          style="font-size: 15px; font-weight: 500; display: inline-block !important"
         />
         <v-btn
           variant="outlined"
@@ -3014,7 +3015,7 @@ const validateForm = () => {
 .v-stepper {
   box-shadow: none !important;
   background-color: #f9f9f9;
-  display: contents;
+  display: flex;
 
   &__step {
     &--active {
@@ -3122,5 +3123,8 @@ const validateForm = () => {
 .answer span {
   visibility: visible !important;
   display: inline-block !important;
+}
+.v-btn {
+  display: inline-grid !important;
 }
 </style>
