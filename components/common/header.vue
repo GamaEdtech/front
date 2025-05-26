@@ -2,19 +2,36 @@
   <div>
     <header id="main-header">
       <!--Desktop menu-->
-      <v-app-bar flat :fixed="menuSetting.fixedStatus" id="main-menu" :class="menuSetting.class"
-        class="d-none d-lg-block" v-if="!isPageToHideHeader">
+      <v-app-bar
+        flat
+        :fixed="menuSetting.fixedStatus"
+        id="main-menu"
+        :class="menuSetting.class"
+        class="d-none d-lg-block"
+        v-if="!isPageToHideHeader"
+      >
         <v-container class="px-0">
           <v-row>
             <v-col cols="6" md="9" lg="9" xl="9">
               <div class="d-flex">
                 <nuxt-link to="/">
-                  <img alt="Gamatrain" id="main-logo" :src="`/images/${menuSetting.logo}`" />
+                  <img
+                    alt="Gamatrain"
+                    id="main-logo"
+                    :src="`/images/${menuSetting.logo}`"
+                  />
                 </nuxt-link>
 
                 <div class="pt-2">
-                  <v-btn tile v-for="(link, i) in menuLink" :to="link.link" :key="i" :color="menuSetting.linkColor" text
-                    class="mx-2 mx-md-0 mx-lg-2 text-transform-none gtext-t4">
+                  <v-btn
+                    tile
+                    v-for="(link, i) in menuLink"
+                    :to="link.link"
+                    :key="i"
+                    :color="menuSetting.linkColor"
+                    text
+                    class="mx-2 mx-md-0 mx-lg-2 text-transform-none gtext-t4"
+                  >
                     <v-icon class="mb-2 mr-1" v-if="link.icon" color="#FFB300">
                       {{ link.icon }}
                     </v-icon>
@@ -24,15 +41,26 @@
               </div>
             </v-col>
             <v-col cols="4" md="3" lg="3" xl="3" class="text-right mt-md-1">
-              <div class="d-flex text-right align-md-center" v-if="$auth.loggedIn">
+              <div
+                class="d-flex text-right align-md-center"
+                v-if="$auth.loggedIn"
+              >
                 <v-spacer />
-                <v-menu transition="slide-x-transition" offset-y min-width="150">
+                <v-menu
+                  transition="slide-x-transition"
+                  offset-y
+                  min-width="150"
+                >
                   <template v-slot:activator="{ on, attrs }">
                     <div v-bind="attrs" v-on="on" class="d-flex">
-                      <div class="gama-text-subtitle1" :id="menuSetting.bgColor == '#fff'
-                        ? 'header-username-dark'
-                        : 'header-username-light'
-                        ">
+                      <div
+                        class="gama-text-subtitle1"
+                        :id="
+                          menuSetting.bgColor == '#fff'
+                            ? 'header-username-dark'
+                            : 'header-username-light'
+                        "
+                      >
                         {{ userName }}
                       </div>
                       <v-avatar size="32" v-if="$auth.user.avatar">
@@ -44,7 +72,11 @@
                     </div>
                   </template>
                   <v-list>
-                    <v-list-item v-for="(item, i) in user_profile_items" :key="i" :to="item.link">
+                    <v-list-item
+                      v-for="(item, i) in user_profile_items"
+                      :key="i"
+                      :to="item.link"
+                    >
                       <v-list-item-icon class="mr-0 nt">
                         <v-icon small>
                           {{ item.icon }}
@@ -64,15 +96,29 @@
                 </v-menu>
 
                 <div class="wallet-div">
-                  <v-icon class="wallet-icon" :color="menuSetting.linkColor">mdi-wallet-outline</v-icon>
+                  <v-btn
+                    to="/user/wallet"
+                    icon
+                    class="wallet-icon"
+                    :color="menuSetting.linkColor"
+                    ><v-icon>mdi-wallet-outline</v-icon></v-btn
+                  >
                 </div>
 
                 <!--Desktop version-->
-                <common-notification-component :menuSetting="menuSetting" ref="notificationComponent"
-                  class="d-none d-lg-block" />
+                <common-notification-component
+                  :menuSetting="menuSetting"
+                  ref="notificationComponent"
+                  class="d-none d-lg-block"
+                />
               </div>
               <div v-else>
-                <v-btn rounded class="primary text-transform-none black--text" large @click="openLoginDialog">
+                <v-btn
+                  rounded
+                  class="primary text-transform-none black--text"
+                  large
+                  @click="openLoginDialog"
+                >
                   Sign in
                 </v-btn>
               </div>
@@ -83,22 +129,35 @@
 
       <div>
         <!--Login component-->
-        <login ref="login_modal" :switchToRegister.sync="currentOpenDialog"
-          :switchToPassRecover.sync="currentOpenDialog" />
+        <login
+          ref="login_modal"
+          :switchToRegister.sync="currentOpenDialog"
+          :switchToPassRecover.sync="currentOpenDialog"
+        />
         <!--End login component-->
 
         <!--Register component-->
-        <register ref="register_modal" :switchToLogin.sync="currentOpenDialog" />
+        <register
+          ref="register_modal"
+          :switchToLogin.sync="currentOpenDialog"
+        />
         <!--End register component-->
 
         <!--Recover password component-->
-        <pass-recover ref="pass_recover_modal" :switchToLogin.sync="currentOpenDialog"
-          :switchToRegister.sync="currentOpenDialog" />
+        <pass-recover
+          ref="pass_recover_modal"
+          :switchToLogin.sync="currentOpenDialog"
+          :switchToRegister.sync="currentOpenDialog"
+        />
         <!--End recover password component-->
       </div>
       <!--End desktop menu-->
 
-      <v-navigation-drawer v-model="sidebar" app class="hidden-lg-and-up main-sidebar">
+      <v-navigation-drawer
+        v-model="sidebar"
+        app
+        class="hidden-lg-and-up main-sidebar"
+      >
         <!-- Start:  Menu items -->
         <v-list dense shaped>
           <!--Profile info-->
@@ -118,7 +177,12 @@
               </v-list-item-title>
             </template>
 
-            <v-list-item class="pl-7" v-for="(item, i) in user_profile_items" :key="i" link>
+            <v-list-item
+              class="pl-7"
+              v-for="(item, i) in user_profile_items"
+              :key="i"
+              link
+            >
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
               </v-list-item-icon>
@@ -132,7 +196,10 @@
               <v-list-item-title v-text="'Logout'"></v-list-item-title>
             </v-list-item>
           </v-list-group>
-          <v-list-item v-if="$auth.loggedIn" @click="notificationListDialog = true">
+          <v-list-item
+            v-if="$auth.loggedIn"
+            @click="notificationListDialog = true"
+          >
             <v-list-item-icon>
               <v-badge overlap content="3">
                 <v-icon v-text="'mdi-bell-outline'"></v-icon>
@@ -157,22 +224,43 @@
 
           <!--Mobile menu items-->
           <div v-for="(item, side) in menuItems" :key="side">
-            <v-list-item class="py-2" active-class="menu_active" v-if="!item.subMenuList" :to="item.link">
+            <v-list-item
+              class="py-2"
+              active-class="menu_active"
+              v-if="!item.subMenuList"
+              :to="item.link"
+            >
               <v-list-item-icon>
                 <v-icon v-text="item.icon" :color="item.icon_color"></v-icon>
               </v-list-item-icon>
               <v-list-item-title v-text="item.title" class="menu-title" />
             </v-list-item>
 
-            <v-list-group v-else active-class="menu_group_active" :key="item.title" no-action :value="false">
+            <v-list-group
+              v-else
+              active-class="menu_group_active"
+              :key="item.title"
+              no-action
+              :value="false"
+            >
               <template v-slot:activator>
-                <v-list-item-title v-text="item.title" class="py-2"></v-list-item-title>
+                <v-list-item-title
+                  v-text="item.title"
+                  class="py-2"
+                ></v-list-item-title>
               </template>
 
-              <v-list-item class="pl-7" active-class="menu_active" v-for="(subMenuItem, side) in item.subMenuList"
-                :to="subMenuItem.link" :key="side.title">
+              <v-list-item
+                class="pl-7"
+                active-class="menu_active"
+                v-for="(subMenuItem, side) in item.subMenuList"
+                :to="subMenuItem.link"
+                :key="side.title"
+              >
                 <v-list-item-content class="py-2">
-                  <v-list-item-title v-text="subMenuItem.title"></v-list-item-title>
+                  <v-list-item-title
+                    v-text="subMenuItem.title"
+                  ></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-group>
@@ -185,8 +273,17 @@
       <!--   Start: navbar   main-container -->
 
       <!--Mobile nav-->
-      <v-app-bar class="d-block d-lg-none mobile_bar" fixed flat :class="menuSetting.class">
-        <v-icon @click="sidebar = !sidebar" class="px-2" :class="menuSetting.bgColor == '#fff' ? '' : 'white--text '">
+      <v-app-bar
+        class="d-block d-lg-none mobile_bar"
+        fixed
+        flat
+        :class="menuSetting.class"
+      >
+        <v-icon
+          @click="sidebar = !sidebar"
+          class="px-2"
+          :class="menuSetting.bgColor == '#fff' ? '' : 'white--text '"
+        >
           mdi-menu
         </v-icon>
         <!--Logo section-->
@@ -202,17 +299,39 @@
         <div class="text-center">
           <v-bottom-sheet v-model="mobileSearchSheet">
             <template v-slot:activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on" :color="menuSetting.linkColor" class="pa-23">
+              <v-icon
+                v-bind="attrs"
+                v-on="on"
+                :color="menuSetting.linkColor"
+                class="pa-23"
+              >
                 mdi-magnify
               </v-icon>
             </template>
-            <v-sheet id="mobile-search-sheet" :height="`${mobileSearchSheetConfig.sheetHeight}vh`">
-              <div id="search-sheet-handler-holder" @touchstart="startDrag" @touchend="endDrag" @touchmove="handleDrag">
+            <v-sheet
+              id="mobile-search-sheet"
+              :height="`${mobileSearchSheetConfig.sheetHeight}vh`"
+            >
+              <div
+                id="search-sheet-handler-holder"
+                @touchstart="startDrag"
+                @touchend="endDrag"
+                @touchmove="handleDrag"
+              >
                 <div id="search-sheet-handler"></div>
               </div>
-              <v-slide-group id="search-cate-slide" center-active class="pt-4" show-arrows>
-                <v-slide-item v-for="(item, n) in searchFilterItems" class="slide-item"
-                  :class="mobileSearchFilter == item.key ? 'active-item' : ''" :key="n">
+              <v-slide-group
+                id="search-cate-slide"
+                center-active
+                class="pt-4"
+                show-arrows
+              >
+                <v-slide-item
+                  v-for="(item, n) in searchFilterItems"
+                  class="slide-item"
+                  :class="mobileSearchFilter == item.key ? 'active-item' : ''"
+                  :key="n"
+                >
                   <div @click="setActiveFilter(item.key)">
                     <div :class="`active-avatar active-${item.key}-avatar`">
                       <div :class="`avatar ${item.key}-avatar`">
@@ -228,10 +347,20 @@
                   <div id="keyword-card">
                     <v-row>
                       <v-col cols="12" class="pb-0 px-6">
-                        <v-text-field ref="mobileKeywordInput" class="rounded-ts pr-0" dense outlined hide-details
-                          v-model="searchKey" label="Ex: Paper Summer Session">
+                        <v-text-field
+                          ref="mobileKeywordInput"
+                          class="rounded-ts pr-0"
+                          dense
+                          outlined
+                          hide-details
+                          v-model="searchKey"
+                          label="Ex: Paper Summer Session"
+                        >
                           <template slot="append">
-                            <v-icon v-if="searchResultsSection" @click="closeSearch()">
+                            <v-icon
+                              v-if="searchResultsSection"
+                              @click="closeSearch()"
+                            >
                               mdi-close-circle
                             </v-icon>
                           </template>
@@ -243,8 +372,15 @@
                         </v-text-field>
                       </v-col>
                       <v-col cols="12" class="pt-0">
-                        <div id="mobile-search-result-container" v-if="searchResultsSection">
-                          <div id="search-result" ref="mobileSearchResult" @scroll="checkSearchScroll">
+                        <div
+                          id="mobile-search-result-container"
+                          v-if="searchResultsSection"
+                        >
+                          <div
+                            id="search-result"
+                            ref="mobileSearchResult"
+                            @scroll="checkSearchScroll"
+                          >
                             <div id="result-stat">
                               <span class="gama-text-overline">
                                 Search result
@@ -254,68 +390,117 @@
                               </span>
                             </div>
                             <div v-if="searchCount > 0">
-                              <v-row class="list-item" v-for="(item, index) in searchResults" :key="index">
+                              <v-row
+                                class="list-item"
+                                v-for="(item, index) in searchResults"
+                                :key="index"
+                              >
                                 <v-col cols="1">
-                                  <nuxt-link :to="`/${calcPath(item.type)}/${item.id}`">
-                                    <div v-if="item.type == 'gama_tests'" class="avatar paper-avatar">
+                                  <nuxt-link
+                                    :to="`/${calcPath(item.type)}/${item.id}`"
+                                  >
+                                    <div
+                                      v-if="item.type == 'gama_tests'"
+                                      class="avatar paper-avatar"
+                                    >
                                       <span class="icon icon-paper"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_learnfiles'" class="avatar multimedia-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_learnfiles'"
+                                      class="avatar multimedia-avatar"
+                                    >
                                       <span class="icon icon-multimedia"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_azmoons'" class="avatar exam-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_azmoons'"
+                                      class="avatar exam-avatar"
+                                    >
                                       <span class="icon icon-exam"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_questions'" class="avatar qa-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_questions'"
+                                      class="avatar qa-avatar"
+                                    >
                                       <span class="icon icon-q-a"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_dars'" class="avatar tutorial-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_dars'"
+                                      class="avatar tutorial-avatar"
+                                    >
                                       <span class="icon icon-tutorial"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_teachers'" class="avatar teacher-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_teachers'"
+                                      class="avatar teacher-avatar"
+                                    >
                                       <span class="icon icon-teacher"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_schools'" class="avatar school-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_schools'"
+                                      class="avatar school-avatar"
+                                    >
                                       <span class="icon icon-school"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_live'" class="avatar live-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_live'"
+                                      class="avatar live-avatar"
+                                    >
                                       <span class="icon icon-live"></span>
                                     </div>
-                                    <div v-else-if="item.type == 'gama_students'" class="avatar student-avatar">
+                                    <div
+                                      v-else-if="item.type == 'gama_students'"
+                                      class="avatar student-avatar"
+                                    >
                                       <span class="icon icon-live"></span>
                                     </div>
                                   </nuxt-link>
                                 </v-col>
                                 <v-col cols="11">
                                   <div class="gama-text-button ml-2">
-                                    <nuxt-link :to="`/${calcPath(item.type)}/${item.id}`">{{ item.title }}</nuxt-link>
+                                    <nuxt-link
+                                      :to="`/${calcPath(item.type)}/${item.id}`"
+                                      >{{ item.title }}</nuxt-link
+                                    >
                                   </div>
                                   <div class="chip-container ml-2">
                                     <div class="chip" v-if="item.lesson_title">
                                       <nuxt-link
-                                        :to="`/search?type=test&section=${item.section}&base=${item.base}&lesson=${item.lesson}`">{{
-                                          item.lesson_title }}</nuxt-link>
+                                        :to="`/search?type=test&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
+                                        >{{ item.lesson_title }}</nuxt-link
+                                      >
                                     </div>
                                     <div class="chip" v-if="item.base_title">
-                                      <nuxt-link :to="`/search?type=test&section=${item.section}&base=${item.base}`">{{
-                                        item.base_title }}</nuxt-link>
+                                      <nuxt-link
+                                        :to="`/search?type=test&section=${item.section}&base=${item.base}`"
+                                        >{{ item.base_title }}</nuxt-link
+                                      >
                                     </div>
                                     <div class="chip" v-if="item.section_title">
-                                      <nuxt-link :to="`/search?type=test&section=${item.section}`">{{ item.section_title
-                                      }}</nuxt-link>
+                                      <nuxt-link
+                                        :to="`/search?type=test&section=${item.section}`"
+                                        >{{ item.section_title }}</nuxt-link
+                                      >
                                     </div>
                                   </div>
                                 </v-col>
                               </v-row>
-                              <v-row v-if="allDataLoaded == false" class="list-item">
+                              <v-row
+                                v-if="allDataLoaded == false"
+                                class="list-item"
+                              >
                                 <v-col cols="12">
-                                  <v-skeleton-loader type="list-item-avatar"></v-skeleton-loader>
+                                  <v-skeleton-loader
+                                    type="list-item-avatar"
+                                  ></v-skeleton-loader>
                                 </v-col>
                               </v-row>
                             </div>
-                            <div v-else-if="
-                              searchCount == 0 && searchLoading == false
-                            " class="text-center">
+                            <div
+                              v-else-if="
+                                searchCount == 0 && searchLoading == false
+                              "
+                              class="text-center"
+                            >
                               <span class="gama-text-button">
                                 Opps! no data found
                               </span>
@@ -323,7 +508,9 @@
                             <div v-else>
                               <v-row class="list-item" v-for="i in 3" :key="i">
                                 <v-col cols="12">
-                                  <v-skeleton-loader type="list-item-avatar"></v-skeleton-loader>
+                                  <v-skeleton-loader
+                                    type="list-item-avatar"
+                                  ></v-skeleton-loader>
                                 </v-col>
                               </v-row>
                             </div>
@@ -338,17 +525,35 @@
           </v-bottom-sheet>
         </div>
 
-        <v-btn v-if="!$auth.loggedIn" :small="$vuetify.breakpoint.smAndUp" :x-small="$vuetify.breakpoint.xs" rounded
-          id="mobile-signin-btn" class="primary gama-btn" @click="openLoginDialog">
+        <v-btn
+          v-if="!$auth.loggedIn"
+          :small="$vuetify.breakpoint.smAndUp"
+          :x-small="$vuetify.breakpoint.xs"
+          rounded
+          id="mobile-signin-btn"
+          class="primary gama-btn"
+          @click="openLoginDialog"
+        >
           Sign in
         </v-btn>
-        <common-notification-component v-if="$auth.loggedIn" :menuSetting="menuSetting" ref="notificationComponent"
-          class="d-block d-lg-none" />
+        <common-notification-component
+          v-if="$auth.loggedIn"
+          :menuSetting="menuSetting"
+          ref="notificationComponent"
+          class="d-block d-lg-none"
+        />
 
         <div class="wallet-div wallet-mobile">
-          <v-icon class="wallet-icon" :color="menuSetting.linkColor">mdi-wallet-outline</v-icon>
+          <v-icon class="wallet-icon" :color="menuSetting.linkColor"
+            >mdi-wallet-outline</v-icon
+          >
         </div>
-        <v-menu v-if="$auth.loggedIn" transition="slide-x-transition" offset-y min-width="150">
+        <v-menu
+          v-if="$auth.loggedIn"
+          transition="slide-x-transition"
+          offset-y
+          min-width="150"
+        >
           <template v-slot:activator="{ on, attrs }">
             <div v-bind="attrs" v-on="on">
               <v-avatar v-if="$auth.user.avatar" class="ml-2">
@@ -360,7 +565,11 @@
             </div>
           </template>
           <v-list>
-            <v-list-item v-for="(item, i) in user_profile_items" :key="i" :to="item.link">
+            <v-list-item
+              v-for="(item, i) in user_profile_items"
+              :key="i"
+              :to="item.link"
+            >
               <v-list-item-icon class="mr-0 nt">
                 <v-icon small>
                   {{ item.icon }}
@@ -384,7 +593,12 @@
       <!--   End: navbar   -->
     </header>
 
-    <v-dialog v-model="notificationListDialog" fullscreen transition="dialog-bottom-transition" scrollable>
+    <v-dialog
+      v-model="notificationListDialog"
+      fullscreen
+      transition="dialog-bottom-transition"
+      scrollable
+    >
       <v-card id="notificationListCard">
         <v-card-text>
           <v-toolbar flat>
@@ -404,8 +618,14 @@
 
                 <v-list-item-content>
                   <div class="date">{{ item.date }}</div>
-                  <v-list-item-title class="title" v-html="item.title"></v-list-item-title>
-                  <v-list-item-subtitle class="describe" v-html="item.describe"></v-list-item-subtitle>
+                  <v-list-item-title
+                    class="title"
+                    v-html="item.title"
+                  ></v-list-item-title>
+                  <v-list-item-subtitle
+                    class="describe"
+                    v-html="item.describe"
+                  ></v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
             </template>
@@ -1124,7 +1344,7 @@ export default {
 
         margin: 1.6rem auto 1.6rem auto;
 
-        .v-input__control>.v-input__slot {
+        .v-input__control > .v-input__slot {
           min-height: auto;
           height: 4rem !important;
 
@@ -1290,8 +1510,6 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
-
 
 @media (min-width: 600px) {
   #main-header {

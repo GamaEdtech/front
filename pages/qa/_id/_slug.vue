@@ -1019,11 +1019,11 @@ export default {
               author: {
                 "@type": "Person",
                 name: this.contentData.name,
-                url: this.contentData.userLink,
+                // url: this.contentData.userLink,
               },
               upvoteCount: parseInt(this.contentData.score) || 0,
               answerCount: this.answer_list?.length || 0,
-              url: `https://gamatrain.com/qa/${this.contentData.id}`,
+              url: `https://gamatrain.com/qa/${this.contentData.id}/${this.contentData.title_url}`,
               acceptedAnswer: this.answer_list
                 ?.sort((a, b) => b.score - a.score)
                 .slice(0, 5)
@@ -1032,11 +1032,11 @@ export default {
                   text: a.answer,
                   dateCreated: new Date(a.subdate).toISOString(),
                   upvoteCount: parseInt(a.score) || 0,
-                  url: `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  url: `https://gamatrain.com/qa/${this.contentData.id}/${this.contentData.title_url}#answer-${a.id}`,
                   author: {
                     "@type": "Person",
                     name: a.name,
-                    url: a.userLink,
+                    // url: a.userLink,
                   },
                 })),
               suggestedAnswer: this.answer_list
@@ -1047,11 +1047,11 @@ export default {
                   text: a.answer,
                   dateCreated: new Date(a.subdate).toISOString(),
                   upvoteCount: parseInt(a.score) || 0,
-                  url: `https://gamatrain.com/qa/${this.contentData.id}#answer-${a.id}`,
+                  url: `https://gamatrain.com/qa/${this.contentData.id}/${this.contentData.title_url}#answer-${a.id}`,
                   author: {
                     "@type": "Person",
                     name: a.name,
-                    url: a.userLink,
+                    // url: a.userLink,
                   },
                 })),
             },

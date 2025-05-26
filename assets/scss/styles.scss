@@ -30,7 +30,7 @@ html {
 }
 
 .primary-gray-500 {
-  color: var(--Primary-Grey-500, #667085);
+  color: var(--Primary-Grey-500, #667085) !important;
 }
 
 .primary-gray-600 {
@@ -4635,18 +4635,74 @@ body {
   height: 100% !important;
 }
 
-.toast-contactus-error{
-  border-left: 4px solid #F04438;
+.toast-contactus-error {
+  border-left: 4px solid #f04438;
   height: 72px !important;
 }
-.toast-contactus-message-error{
-  color: #F04438 !important;
+.toast-contactus-message-error {
+  color: #f04438 !important;
 }
 
-.toast-contactus-success{
-  border-left: 4px solid #12B76A;
+.toast-contactus-success {
+  border-left: 4px solid #12b76a;
   height: 72px !important;
 }
-.toast-contactus-message-success{
-  color: #12B76A !important;
+.toast-contactus-message-success {
+  color: #12b76a !important;
+}
+.text-white {
+  color: #ffffff;
+}
+
+.custom-pagination {
+  margin-right: 10px;
+}
+.custom-pagination ul {
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+}
+.custom-pagination li {
+  // height: 30px;
+  // width: 27px;
+}
+.custom-pagination li button {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #475467 !important;
+}
+.custom-pagination li:first-child {
+  border-right: 1px solid #d0d5dd;
+}
+.custom-pagination li:last-child {
+  border-left: 1px solid #d0d5dd;
+}
+.custom-pagination li button.primary {
+  background: #f2f4f7 !important;
+  color: #101828 !important;
+  font-weight: 500 !important;
+}
+// .custom-pagination .v-pagination__item {
+//   background: transparent !important;
+//   box-shadow: none !important;
+// }
+.v-pagination__more {
+  align-items: center !important;
+  margin-bottom: 8px;
+}
+
+.ck-rounded-corners .ck.ck-editor__top .ck-sticky-panel .ck-toolbar,
+.ck.ck-editor__top .ck-sticky-panel .ck-toolbar.ck-rounded-corners {
+  border-radius: 8px 8px 0 0 !important;
+}
+.ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+  border-color: 8px !important;
+}
+
+.ck-rounded-corners .ck.ck-editor__editable:not(.ck-editor__nested-editable),
+.ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-rounded-corners {
+  border-radius: 0 0 8px 8px !important;
+}
+
+.ck-toolbar__items {
+  flex-wrap: wrap !important;
 }

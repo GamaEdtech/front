@@ -97,7 +97,7 @@ export default {
     "@nuxtjs/dotenv",
     "@nuxtjs/moment",
     "@nuxtjs/pwa",
-    '@nuxtjs/recaptcha'
+    "@nuxtjs/recaptcha",
 
     // '@nuxtjs/onesignal',
   ],
@@ -106,7 +106,7 @@ export default {
   recaptcha: {
     siteKey: process.env.RECAPTCHA_SITE_KEY, // 🔑 pulled from .env
     version: 3,
-    size: 'invisible',
+    size: "invisible",
     hideBadge: true, // optional: true if you want to hide the reCAPTCHA badge
   },
 
@@ -187,7 +187,7 @@ export default {
         },
         user: {
           property: "data",
-          autoFetch: true,
+          autoFetch: false,
         },
         endpoints: {
           login: { url: "/api/v1/users/login", method: "post" },
@@ -202,7 +202,7 @@ export default {
       logout: "/",
       callback: false,
       home: "/",
-    },
+    }
   },
 
   toast: {
@@ -258,23 +258,19 @@ export default {
   build: {
     transpile: ["vee-validate", "vue-chartjs", "ofetch", "defu", "chart.js"],
     extend(config, ctx) {
-      config.module.rules.push(
-        {
-          test: /\.(glsl|vs|fs|vert|frag)$/,
-          loader: 'raw-loader',
-          exclude: /node_modules/
-        }
-      )
-      config.module.rules.push(
-        {
-          test: /\.(mp3|wav|ogg)$/i,
-          loader: 'file-loader',
-          options: {
-            name: '[path][name].[ext]',
-          }
-        }
-      )
-    }
+      config.module.rules.push({
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+        loader: "raw-loader",
+        exclude: /node_modules/,
+      });
+      config.module.rules.push({
+        test: /\.(mp3|wav|ogg)$/i,
+        loader: "file-loader",
+        options: {
+          name: "[path][name].[ext]",
+        },
+      });
+    },
   },
 
   pwa: {

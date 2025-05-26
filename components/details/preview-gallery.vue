@@ -123,7 +123,7 @@ export default {
         },
         {
           class: "paper",
-          text: "Related paper",
+          text: "Related Past Paper",
           icon: "paper",
           link: "/search?type=test",
         },

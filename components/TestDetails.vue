@@ -8,42 +8,64 @@
     </div>
     <!-- End : Flying Coin -->
 
-
     <!--  Start: detail  -->
     <section>
       <v-container class="py-0 relation-position">
         <!-- Start : Box Showing Balance -->
-        <div class="box-showing-balance" v-show="showBoxBalance" ref="boxShowingBalance">
-
-
-          <span class="title-balance">$GEM : </span>
-          <span class="amount-balance" ref="amountBalance">{{ Number(balance).toFixed(8) }}</span>
+        <div
+          class="box-showing-balance"
+          v-show="showBoxBalance"
+          ref="boxShowingBalance"
+        >
+          <span class="title-balance">$GET: </span>
+          <span class="amount-balance" ref="amountBalance">{{
+            Number(balance).toFixed(8)
+          }}</span>
         </div>
         <!-- End : Box Showing Balance -->
         <div class="detail mt-md-4">
           <v-row>
             <v-col cols="12" md="12" class="pt-lg-0">
               <div class="label-holder" v-show="this.$route.name == 'test-id'">
-                <v-chip v-if="contentData.topic"
+                <v-chip
+                  v-if="contentData.topic"
                   :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}&topic=${contentData.topic}`"
-                  class="ma-1 blue-grey darken-1 white--text" small>
+                  class="ma-1 blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.topic_title }}
                 </v-chip>
                 <v-chip
                   :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}&lesson=${contentData.lesson}`"
-                  class="ma-1 blue-grey darken-1 white--text" small>
+                  class="ma-1 blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.lesson_title }}
                 </v-chip>
-                <v-chip :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`" link
-                  class="mr-1 blue-grey darken-1 white--text" small>
+                <v-chip
+                  :to="`/search?type=azmoon&section=${contentData.section}&base=${contentData.base}`"
+                  link
+                  class="mr-1 blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.base_title }}
                 </v-chip>
-                <v-chip :to="`/search?type=azmoon&section=${contentData.section}`" link
-                  class="mr-1 blue-grey darken-1 white--text" small>
+                <v-chip
+                  :to="`/search?type=azmoon&section=${contentData.section}`"
+                  link
+                  class="mr-1 blue-grey darken-1 white--text"
+                  small
+                >
                   {{ contentData.section_title }}
                 </v-chip>
-                <v-chip v-if="contentData.tutorial_id" :to="`/tutorial/${contentData.tutorial_id}`" link outlined
-                  class="mr-1 blue-grey darken-1" small>
+                <v-chip
+                  v-if="contentData.tutorial_id"
+                  :to="`/tutorial/${contentData.tutorial_id}`"
+                  link
+                  outlined
+                  class="mr-1 blue-grey darken-1"
+                  small
+                >
                   Tutorial
                 </v-chip>
               </div>
@@ -52,72 +74,170 @@
                 <div class="w-100">
                   <div class="description-holder my-4">
                     <v-col class="test-list pt-0" cols="12">
-                      <div id="test-question" class="text-h4" ref="test-question" v-html="contentData.question" />
-                      <img v-show="contentData.q_file && contentData.q_file != '0'" class="answer-img"
-                        :src="contentData.q_file" />
+                      <div
+                        id="test-question"
+                        class="text-h4"
+                        ref="test-question"
+                        v-html="contentData.question"
+                      />
+                      <img
+                        v-show="contentData.q_file && contentData.q_file != '0'"
+                        class="answer-img"
+                        :src="contentData.q_file"
+                      />
 
-                      <v-radio-group v-model="selectedOption" @change="fireSelectedOption" hide-details v-if="
-                        contentData.type == 'fourchoice' ||
-                        contentData.type == 'twochoice' ||
-                        contentData.type == 'tf'
-                      ">
-                        <v-radio value="1" class="answer" :class="{
-                          'true-answer': isCorrectAnswer(1),
-                          'false-answer': isIncorrectAnswer(1),
-                        }">
+                      <v-radio-group
+                        v-model="selectedOption"
+                        @change="fireSelectedOption"
+                        hide-details
+                        v-if="
+                          contentData.type == 'fourchoice' ||
+                          contentData.type == 'twochoice' ||
+                          contentData.type == 'tf'
+                        "
+                      >
+                        <v-radio
+                          value="1"
+                          class="answer"
+                          :class="{
+                            'true-answer': isCorrectAnswer(1),
+                            'false-answer': isIncorrectAnswer(1),
+                          }"
+                        >
                           <template slot="label">
                             <div ref="choise1" class="answer">
                               <p>
-                                <v-icon v-show="isCorrectAnswer(1)" color="success"
-                                  class="mr-2">mdi-check-circle</v-icon>
-                                <v-btn icon v-show="!isCorrectAnswer(1)" class="option-icon subtitle-1 mr-2"
-                                  small>A</v-btn>
-                                <span ref="mathJaxEl" v-html="contentData.answer_a"></span>
+                                <v-icon
+                                  v-show="isCorrectAnswer(1)"
+                                  color="success"
+                                  class="mr-2"
+                                  >mdi-check-circle</v-icon
+                                >
+                                <v-btn
+                                  icon
+                                  v-show="!isCorrectAnswer(1)"
+                                  class="option-icon subtitle-1 mr-2"
+                                  small
+                                  >A</v-btn
+                                >
+                                <span
+                                  ref="mathJaxEl"
+                                  v-html="contentData.answer_a"
+                                ></span>
                               </p>
-                              <img v-show="contentData.a_file" class="answer-img" :src="contentData.a_file" />
+                              <img
+                                v-show="contentData.a_file"
+                                class="answer-img"
+                                :src="contentData.a_file"
+                              />
                             </div>
                           </template>
                         </v-radio>
-                        <v-radio value="2" class="answer" :class="{
-                          'true-answer': isCorrectAnswer(2),
-                          'false-answer': isIncorrectAnswer(2),
-                        }">
+                        <v-radio
+                          value="2"
+                          class="answer"
+                          :class="{
+                            'true-answer': isCorrectAnswer(2),
+                            'false-answer': isIncorrectAnswer(2),
+                          }"
+                        >
                           <template slot="label">
                             <div ref="choise2" class="answer">
-                              <v-icon v-show="isCorrectAnswer(2)" color="success" class="mr-2">mdi-check-circle</v-icon>
-                              <v-btn v-show="!isCorrectAnswer(2)" icon class="option-icon subtitle-1 mr-2"
-                                small>B</v-btn>
-                              <span ref="mathJaxEl" v-html="contentData.answer_b"></span>
-                              <img v-show="contentData.b_file" :src="contentData.b_file" class="answer-img" />
+                              <v-icon
+                                v-show="isCorrectAnswer(2)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                v-show="!isCorrectAnswer(2)"
+                                icon
+                                class="option-icon subtitle-1 mr-2"
+                                small
+                                >B</v-btn
+                              >
+                              <span
+                                ref="mathJaxEl"
+                                v-html="contentData.answer_b"
+                              ></span>
+                              <img
+                                v-show="contentData.b_file"
+                                :src="contentData.b_file"
+                                class="answer-img"
+                              />
                             </div>
                           </template>
                         </v-radio>
-                        <v-radio value="3" v-if="contentData.type == 'fourchoice'" class="answer" :class="{
-                          'true-answer': isCorrectAnswer(3),
-                          'false-answer': isIncorrectAnswer(3),
-                        }">
+                        <v-radio
+                          value="3"
+                          v-if="contentData.type == 'fourchoice'"
+                          class="answer"
+                          :class="{
+                            'true-answer': isCorrectAnswer(3),
+                            'false-answer': isIncorrectAnswer(3),
+                          }"
+                        >
                           <template slot="label">
                             <div ref="choise3" class="answer">
-                              <v-icon v-show="isCorrectAnswer(3)" color="success" class="mr-2">mdi-check-circle</v-icon>
-                              <v-btn icon v-show="!isCorrectAnswer(4)" class="option-icon subtitle-1 mr-2"
-                                small>C</v-btn>
-                              <span ref="mathJaxEl" v-html="contentData.answer_c"></span>
-                              <img v-show="contentData.c_file" class="answer-img" :src="contentData.c_file" />
+                              <v-icon
+                                v-show="isCorrectAnswer(3)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                icon
+                                v-show="!isCorrectAnswer(4)"
+                                class="option-icon subtitle-1 mr-2"
+                                small
+                                >C</v-btn
+                              >
+                              <span
+                                ref="mathJaxEl"
+                                v-html="contentData.answer_c"
+                              ></span>
+                              <img
+                                v-show="contentData.c_file"
+                                class="answer-img"
+                                :src="contentData.c_file"
+                              />
                             </div>
                           </template>
                         </v-radio>
-                        <v-radio value="4" v-if="contentData.type == 'fourchoice'" class="answer" :class="{
-                          'true-answer': isCorrectAnswer(4),
-                          'false-answer': isIncorrectAnswer(4),
-                        }">
+                        <v-radio
+                          value="4"
+                          v-if="contentData.type == 'fourchoice'"
+                          class="answer"
+                          :class="{
+                            'true-answer': isCorrectAnswer(4),
+                            'false-answer': isIncorrectAnswer(4),
+                          }"
+                        >
                           <template slot="label">
                             <div ref="choise4" class="answer">
-                              <v-icon v-show="isCorrectAnswer(4)" color="success" class="mr-2">mdi-check-circle</v-icon>
-                              <v-btn icon v-show="!isCorrectAnswer(4)" class="option-icon subtitle-1 mr-2"
-                                small>D</v-btn>
-                              <span ref="mathJaxEl" v-html="contentData.answer_d" />
+                              <v-icon
+                                v-show="isCorrectAnswer(4)"
+                                color="success"
+                                class="mr-2"
+                                >mdi-check-circle</v-icon
+                              >
+                              <v-btn
+                                icon
+                                v-show="!isCorrectAnswer(4)"
+                                class="option-icon subtitle-1 mr-2"
+                                small
+                                >D</v-btn
+                              >
+                              <span
+                                ref="mathJaxEl"
+                                v-html="contentData.answer_d"
+                              />
 
-                              <img v-show="contentData.d_file" class="answer-img" :src="contentData.d_file" />
+                              <img
+                                v-show="contentData.d_file"
+                                class="answer-img"
+                                :src="contentData.d_file"
+                              />
                             </div>
                           </template>
                         </v-radio>
@@ -166,8 +286,12 @@
 
                   <!--Helpful link-->
                   <div class="justify-center text-center">
-                    <v-btn :disabled="!nextTestId" :to="`/test/${nextTestId}`" :loading="nextTestLoading"
-                      class="next-test mx-auto text-transform-none">
+                    <v-btn
+                      :disabled="!nextTestId"
+                      :to="`/test/${nextTestId}`"
+                      :loading="nextTestLoading"
+                      class="next-test mx-auto text-transform-none"
+                    >
                       {{
                         this.$route.name == "test-id"
                           ? "Try the Next One"
@@ -194,8 +318,8 @@
 </template>
 <script>
 import CrashReport from "~/components/common/crash-report.vue";
-import successSound from "@/assets/sounds/success.mp3"
-import failSound from "@/assets/sounds/fail.mp3"
+import successSound from "@/assets/sounds/success.mp3";
+import failSound from "@/assets/sounds/fail.mp3";
 
 export default {
   name: "test-details",
@@ -326,41 +450,72 @@ export default {
       }, 100);
     },
     // incresing balanceChangeDirection  = 1, decreasing balanceChangeDirection  = -1
-    animationMovingCoin(startInformation, coinElement, endInformation, balanceChangeDirection) {
-      coinElement.style.top = `${startInformation.top + (startInformation.height / 2) - (this.sizeCoin / 2)}px`;
-      coinElement.style.left = `${startInformation.left + (startInformation.width / 2) - (this.sizeCoin / 2)}px`;
-      let dx
-      let dy
+    animationMovingCoin(
+      startInformation,
+      coinElement,
+      endInformation,
+      balanceChangeDirection
+    ) {
+      coinElement.style.top = `${
+        startInformation.top + startInformation.height / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.style.left = `${
+        startInformation.left + startInformation.width / 2 - this.sizeCoin / 2
+      }px`;
+      let dx;
+      let dy;
       if (balanceChangeDirection == 1) {
-        dx = endInformation.left - (startInformation.width / 2) + (endInformation.width / 2)
-        dy = endInformation.top - (startInformation.height / 2) + (endInformation.height / 2) - startInformation.top
+        dx =
+          endInformation.left -
+          startInformation.width / 2 +
+          endInformation.width / 2;
+        dy =
+          endInformation.top -
+          startInformation.height / 2 +
+          endInformation.height / 2 -
+          startInformation.top;
       } else {
-        dx = (endInformation.width / 2) - (startInformation.left) - (startInformation.width / 2)
-        dy = (endInformation.height / 2) - (startInformation.height / 2) + (endInformation.top / 2) - startInformation.top
+        dx =
+          endInformation.width / 2 -
+          startInformation.left -
+          startInformation.width / 2;
+        dy =
+          endInformation.height / 2 -
+          startInformation.height / 2 +
+          endInformation.top / 2 -
+          startInformation.top;
       }
 
-      coinElement.style.setProperty('--dx', `${dx}px`);
-      coinElement.style.setProperty('--dy', `${dy}px`);
+      coinElement.style.setProperty("--dx", `${dx}px`);
+      coinElement.style.setProperty("--dy", `${dy}px`);
 
-      coinElement.classList.remove('animate', 'fade-out', 'error-animate');
+      coinElement.classList.remove("animate", "fade-out", "error-animate");
       if (balanceChangeDirection == 1) {
-        coinElement.classList.add('animate');
+        coinElement.classList.add("animate");
       } else {
-        coinElement.classList.add('error-animate');
+        coinElement.classList.add("error-animate");
       }
     },
     animationFadeOutCoin(coinElement, endInformation) {
       setTimeout(() => {
-        coinElement.style.top = `${endInformation.top + endInformation.height / 2 - (this.sizeCoin / 2)}px`;
-        coinElement.style.left = `${endInformation.left + endInformation.width / 2 - (this.sizeCoin / 2)}px`;
-        coinElement.classList.remove('animate');
-        coinElement.classList.add('fade-out');
+        coinElement.style.top = `${
+          endInformation.top + endInformation.height / 2 - this.sizeCoin / 2
+        }px`;
+        coinElement.style.left = `${
+          endInformation.left + endInformation.width / 2 - this.sizeCoin / 2
+        }px`;
+        coinElement.classList.remove("animate");
+        coinElement.classList.add("fade-out");
       }, 3000);
     },
-    animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, nameAnimation) {
+    animationFadeInBoxBalance(
+      coinElement,
+      boxShowingBalanceElement,
+      nameAnimation
+    ) {
       setTimeout(() => {
         this.showingCoin = false;
-        coinElement.classList.remove('fade-out');
+        coinElement.classList.remove("fade-out");
         this.showBoxBalance = true;
         boxShowingBalanceElement.classList.add(nameAnimation);
       }, 4000);
@@ -370,14 +525,18 @@ export default {
       setTimeout(() => {
         const startValue = Number(this.balance);
         const displacementAmount = 0.0000004;
-        const endValue = parseFloat((startValue + displacementAmount * balanceChangeDirection).toFixed(8));
+        const endValue = parseFloat(
+          (startValue + displacementAmount * balanceChangeDirection).toFixed(8)
+        );
         const duration = 1000;
         const stepTime = 30;
         let current = startValue;
         const steps = Math.ceil(duration / stepTime);
         const amountStep = Math.abs(endValue - startValue) / steps;
-        amountBalanceElement.classList.add("pulsing", balanceChangeDirection == 1 ? "increasing" : "decreasing");
-
+        amountBalanceElement.classList.add(
+          "pulsing",
+          balanceChangeDirection == 1 ? "increasing" : "decreasing"
+        );
 
         const counter = setInterval(() => {
           current = current + balanceChangeDirection * amountStep;
@@ -397,28 +556,35 @@ export default {
     },
     animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement) {
       setTimeout(() => {
-        amountBalanceElement.classList.remove("pulsing", "decreasing", "increasing");
-        boxShowingBalanceElement.classList.remove("animate-in", "animate-in-error");
+        amountBalanceElement.classList.remove(
+          "pulsing",
+          "decreasing",
+          "increasing"
+        );
+        boxShowingBalanceElement.classList.remove(
+          "animate-in",
+          "animate-in-error"
+        );
         boxShowingBalanceElement.classList.add("animate-out");
       }, 7000);
 
       setTimeout(() => {
         boxShowingBalanceElement.classList.remove("animate-out");
-        this.showBoxBalance = false
+        this.showBoxBalance = false;
       }, 7500);
     },
 
     playSound(sound) {
       const audio = new Audio(sound);
       audio.play().catch((e) => {
-        console.warn('Failed to play audio:', e);
+        console.warn("Failed to play audio:", e);
       });
     },
 
     createExplosionParticles(x, y, count = 30) {
       for (let i = 0; i < count; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
+        const particle = document.createElement("div");
+        particle.classList.add("particle");
         particle.style.left = `${x}px`;
         particle.style.top = `${y}px`;
 
@@ -427,11 +593,11 @@ export default {
 
         const dx = Math.cos(angle) * radius;
         const dy = Math.sin(angle) * radius;
-        particle.style.setProperty('--x', `${dx}px`);
-        particle.style.setProperty('--y', `${dy}px`);
+        particle.style.setProperty("--x", `${dx}px`);
+        particle.style.setProperty("--y", `${dy}px`);
 
         document.body.appendChild(particle);
-        particle.addEventListener('animationend', () => {
+        particle.addEventListener("animationend", () => {
           particle.remove();
         });
       }
@@ -439,52 +605,89 @@ export default {
 
     animationExplodeCoin(coinElement, centerInformation) {
       setTimeout(() => {
-        coinElement.classList.remove('error-animate');
+        coinElement.classList.remove("error-animate");
         coinElement.style.opacity = 0;
         const centerX = centerInformation.width / 2;
-        const centerY = centerInformation.height / 2 + (this.sizeCoin / 2) - 20;
+        const centerY = centerInformation.height / 2 + this.sizeCoin / 2 - 20;
         this.createExplosionParticles(centerX, centerY, 60);
       }, 3000);
     },
     animationPulseHeart(startInformation, coinElement) {
-      coinElement.style.top = `${startInformation.top + (startInformation.height / 2) - (this.sizeCoin / 2)}px`;
-      coinElement.style.left = `${startInformation.left + (startInformation.width / 2) - (this.sizeCoin / 2)}px`;
-      coinElement.classList.remove('animate', 'fade-out', 'pulse');
-      coinElement.classList.add('pulse');
+      coinElement.style.top = `${
+        startInformation.top + startInformation.height / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.style.left = `${
+        startInformation.left + startInformation.width / 2 - this.sizeCoin / 2
+      }px`;
+      coinElement.classList.remove("animate", "fade-out", "pulse");
+      coinElement.classList.add("pulse");
     },
     fireSelectedOption() {
       const coinElement = this.$refs.coinElement;
-      const walletElement = document.querySelector(window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div");
-      const walletElementBoundingRect = walletElement.getBoundingClientRect()
-      const boxShowingBalanceElement = this.$refs.boxShowingBalance
-      const amountBalanceElement = this.$refs.amountBalance
-      const testDetailElement = this.$refs.testDetail
-      const testDetailElementBoundingRect = testDetailElement.getBoundingClientRect()
+      const walletElement = document.querySelector(
+        window.innerWidth < 1264 ? ".wallet-mobile" : ".wallet-div"
+      );
+      const walletElementBoundingRect = walletElement.getBoundingClientRect();
+      const boxShowingBalanceElement = this.$refs.boxShowingBalance;
+      const amountBalanceElement = this.$refs.amountBalance;
+      const testDetailElement = this.$refs.testDetail;
+      const testDetailElementBoundingRect =
+        testDetailElement.getBoundingClientRect();
 
-      if (this.selectedOption === this.contentData.true_answer && !this.isAnswerToQuestion) {
-        this.showingCoin = true
-        this.playSound(successSound)
-        this.animationPulseHeart(testDetailElementBoundingRect, coinElement)
+      if (
+        this.selectedOption === this.contentData.true_answer &&
+        !this.isAnswerToQuestion
+      ) {
+        this.showingCoin = true;
+        this.playSound(successSound);
+        this.animationPulseHeart(testDetailElementBoundingRect, coinElement);
         setTimeout(() => {
-          coinElement.classList.remove('pulse');
-          this.animationMovingCoin(testDetailElementBoundingRect, coinElement, walletElementBoundingRect, 1)
-          this.animationFadeOutCoin(coinElement, walletElementBoundingRect)
-          this.animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, "animate-in")
-          this.animationCountingBalance(amountBalanceElement, 1)
-          this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
+          coinElement.classList.remove("pulse");
+          this.animationMovingCoin(
+            testDetailElementBoundingRect,
+            coinElement,
+            walletElementBoundingRect,
+            1
+          );
+          this.animationFadeOutCoin(coinElement, walletElementBoundingRect);
+          this.animationFadeInBoxBalance(
+            coinElement,
+            boxShowingBalanceElement,
+            "animate-in"
+          );
+          this.animationCountingBalance(amountBalanceElement, 1);
+          this.animationFadeOutBoxBalance(
+            amountBalanceElement,
+            boxShowingBalanceElement
+          );
         }, 1000);
       }
-      if (this.selectedOption !== this.contentData.true_answer && !this.isAnswerToQuestion) {
-        this.showingCoin = true
-        this.playSound(failSound)
-        this.animationMovingCoin(walletElementBoundingRect, coinElement, testDetailElementBoundingRect, -1)
-        this.animationExplodeCoin(coinElement, testDetailElementBoundingRect)
-        this.animationFadeInBoxBalance(coinElement, boxShowingBalanceElement, "animate-in-error")
-        this.animationCountingBalance(amountBalanceElement, -1)
-        this.animationFadeOutBoxBalance(amountBalanceElement, boxShowingBalanceElement)
+      if (
+        this.selectedOption !== this.contentData.true_answer &&
+        !this.isAnswerToQuestion
+      ) {
+        this.showingCoin = true;
+        this.playSound(failSound);
+        this.animationMovingCoin(
+          walletElementBoundingRect,
+          coinElement,
+          testDetailElementBoundingRect,
+          -1
+        );
+        this.animationExplodeCoin(coinElement, testDetailElementBoundingRect);
+        this.animationFadeInBoxBalance(
+          coinElement,
+          boxShowingBalanceElement,
+          "animate-in-error"
+        );
+        this.animationCountingBalance(amountBalanceElement, -1);
+        this.animationFadeOutBoxBalance(
+          amountBalanceElement,
+          boxShowingBalanceElement
+        );
       }
 
-      this.isAnswerToQuestion = true
+      this.isAnswerToQuestion = true;
       this.fullAnswer = 0;
     },
     loadNextTest() {
@@ -595,8 +798,6 @@ p {
   max-height: 15rem;
 }
 
-
-
 /* flying coin */
 .flying-coin-div {
   width: 120px;
@@ -650,7 +851,6 @@ p {
 }
 
 @keyframes coin-glow {
-
   0%,
   100% {
     box-shadow: 0 0 0px #fede2f;
@@ -662,7 +862,6 @@ p {
 }
 
 @keyframes coin-pulse {
-
   0%,
   100% {
     opacity: 0.5;
@@ -686,7 +885,6 @@ p {
 }
 
 @keyframes coin-pulse-center {
-
   0%,
   100% {
     transform: scale(1);
@@ -706,11 +904,13 @@ p {
 }
 
 .flying-coin-div.animate {
-  animation: fly-to-wallet 3s ease-in-out forwards, coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+  animation: fly-to-wallet 3s ease-in-out forwards,
+    coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
 }
 
 .flying-coin-div.error-animate {
-  animation: fly-to-wallet-reverse 3s ease-in-out forwards, coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
+  animation: fly-to-wallet-reverse 3s ease-in-out forwards,
+    coin-glow 0.5s ease-in-out infinite, coin-pulse 0.5s ease-in-out infinite;
 }
 
 /* particle explode */
@@ -732,7 +932,6 @@ p {
     opacity: 0;
   }
 }
-
 
 /* Box Showing Balance */
 @keyframes show-balance-box {
@@ -758,7 +957,6 @@ p {
     opacity: 0;
   }
 }
-
 
 .box-showing-balance {
   padding: 10px 20px;
@@ -793,7 +991,6 @@ p {
   border: 2px solid red;
   background-color: rgba(255, 199, 199, 0.76);
 }
-
 
 .title-balance {
   font-size: 18px;

@@ -483,12 +483,22 @@
         </v-row>
       </v-card-text>
     </v-card>
+    <BoardDialog
+      :show-dialog="shwBoardDialog"
+      @update:show-dialog="shwBoardDialog = $event"
+      @board-selected="handleBoardChanged"
+    />
   </v-container>
 </template>
 
 <script>
+import BoardDialog from "@/components/search/typeSelector/BoardDialog.vue";
+
 export default {
   name: "grade-explorer-component",
+  components: {
+    BoardDialog,
+  },
   props: {
     stats: {
       type: Array,
@@ -497,6 +507,7 @@ export default {
   },
   data() {
     return {
+      shwBoardDialog: false,
       statsSlideVal: 6,
       gradeColors: [
         "#FF6498",
@@ -1460,8 +1471,7 @@ export default {
     },
 
     showBoardSelector() {
-      // Emit an event that can be caught by the default layout component
-      this.$root.$emit("show-board-selector");
+      this.shwBoardDialog = true;
     },
 
     /**
@@ -1839,16 +1849,9 @@ export default {
     },
   },
 
-  created() {
-    // Move the event listener registration to created hook
-    // This ensures it's set up before the component is mounted
-    this.$root.$on("board-changed", this.handleBoardChanged);
-  },
+  created() {},
 
   beforeDestroy() {
-    // Clean up event listener to prevent memory leaks and duplicate listeners
-    this.$root.$off("board-changed", this.handleBoardChanged);
-
     // Also clean up any intervals or timers
     this.stopInterval();
     if (this.debounceTimer) {
