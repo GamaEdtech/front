@@ -395,11 +395,10 @@
 
             <v-col cols="12" md="4">
               <v-autocomplete
-                v-model="filter.testsHasVideo"
+                v-model.number="filter.testsHasVideo"
                 :items="video_analysis_options"
                 item-title="title"
                 item-value="value"
-                clearable
                 label="Video analysis"
                 variant="outlined"
                 density="compact"
@@ -614,37 +613,27 @@
                             variant="text"
                             density="compact"
                             :to="`/test-maker/create-test/edit/${item.id}`"
-                            v-show="item.owner == true"
-                            style="text-transform: none; font-size: 13px"
+                            v-if="item.owner === true"
                           >
-                            <v-icon >mdi-pencil</v-icon>
+                            <v-icon>mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
                             variant="text"
                             density="compact"
-                            v-show="item.owner == true"
+                            v-if="item.owner === true"
                             @click="openTestDeleteConfirmDialog(item.id)"
-                            style="text-transform: none; font-size: 13px"
                           >
-                            <v-icon color="error"
-                              >mdi-delete</v-icon
-                            >
+                            <v-icon color="error">mdi-delete</v-icon>
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="blue" size="x-large"
-                              >mdi-bullhorn-outline</v-icon
-                            >
+                            <v-icon color="blue" size="x-large">mdi-bullhorn-outline</v-icon>
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="green" size="x-large"
-                              >mdi-eye</v-icon
-                            >
+                            <v-icon color="green" size="x-large">mdi-eye</v-icon>
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="red" size="x-large"
-                              >mdi-video</v-icon
-                            >
+                            <v-icon color="red" size="x-large">mdi-video</v-icon>
                           </v-btn>
                         </v-col>
                         <v-col cols="6" class="text-right">
@@ -652,28 +641,20 @@
                             color="blue"
                             variant="flat"
                             size="small"
-                            v-show="
-                              !tests.some(
-                                (id) => String(id) === String(item.id)
-                              )
-                            "
+                            v-if="!tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'add')"
                           >
-                            <v-icon size="small"> mdi-plus </v-icon>
+                            <v-icon size="small">mdi-plus</v-icon>
                             Add
                           </v-btn>
                           <v-btn
                             color="red"
                             variant="flat"
                             size="small"
-                            v-show="
-                              tests.some(
-                                (id) => String(id) === String(item.id)
-                              )
-                            "
+                            v-if="tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'remove')"
                           >
-                            <v-icon size="small"> mdi-minus </v-icon>
+                            <v-icon size="small">mdi-minus</v-icon>
                             Delete
                           </v-btn>
                         </v-col>
@@ -702,7 +683,7 @@
             <v-col cols="12" class="mb-6">
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
-                   <v-btn
+                  <v-btn
                     @click="test_step = 3"
                     :disabled="tests.length < 5"
                     :loading="publish_loading"
@@ -747,39 +728,39 @@
       <template #[`item.3`]>
         <v-card flat class="pb-10 test-list">
           <v-card-text id="preview-dialog">
-            <v-row>
+          <v-row>
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
-              <v-col cols="4">Duration: {{ form.duration }}</v-col>
-              <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
-              <v-col cols="12">
-                <v-chip
+                <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+                <v-col cols="4">Duration: {{ form.duration }}</v-col>
+                <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
+                <v-col cols="12">
+                  <v-chip
                   size="x-large"
                   label
                   variant="outlined"
                   rounded
-                  density="compact"
+                    density="compact"
                   class="text-white"
-                  style="
-                    background-color: #b30a29;
+                    style="
+                      background-color: #b30a29;
                     font-size: 15px;
-                  "
-                >
+                    "
+                  >
                   Topics:
                 </v-chip>
-              </v-col>
-              <v-col
+                </v-col>
+                <v-col
                 cols="4"
-                v-for="(item, index) in topicTitleArr"
-                :key="index"
-              >
-                {{ item }}
-              </v-col>
+                  v-for="(item, index) in topicTitleArr"
+                  :key="index"
+                >
+                  {{ item }}
+                </v-col>
               <v-col cols="12">
                 <v-divider />
-              </v-col>
+            </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" v-show="previewTestList.length">
@@ -792,97 +773,129 @@
                   <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
-                        <div
-                          id="test-question"
-                          ref="mathJaxEl"
-                          v-html="item.question"
-                        />
-                        <img :src="item.q_file" />
-
-                        <div
-                          v-if="
-                            item.type == 'blank' ||
-                            item.type == 'shortanswer' ||
-                            item.type == 'descriptive'
-                          "
+                        <!-- Add a special display for placeholder/error items -->
+                        <v-alert
+                          v-if="item.isPlaceholder || item.error"
+                          type="warning"
+                          variant="tonal"
+                          color="amber-darken-2"
+                          border="start"
+                          density="compact"
+                          class="mb-4"
                         >
-                          <div ref="mathJaxEl" v-html="item.answer_full" />
-                          <img
-                            v-show="item.answer_full_file"
-                            :src="item.answer_full_file"
+                          <div class="d-flex align-center">
+                            <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
+                            <span>{{ item.question }}</span>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="red"
+                              variant="flat"
+                              size="small"
+                              @click="removeErrorTest(item.id)"
+                              class="ml-2"
+                            >
+                              <v-icon size="small">mdi-close</v-icon>
+                              Remove
+                            </v-btn>
+                          </div>
+                        </v-alert>
+                        
+                        <!-- Regular test display for non-error items -->
+                        <template v-else>
+                          <div
+                            id="test-question"
+                            ref="mathJaxEl"
+                            v-html="item.question"
                           />
-                        </div>
-                        <div v-else>
-                          <div class="answer">
-                            <span>1)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_a"
-                              v-html="item.answer_a"
-                            ></span>
-                            <img v-show="item.a_file" :src="item.a_file" />
-                          </div>
-                          <div class="answer">
-                            <span>2)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_b"
-                              v-html="item.answer_b"
-                            ></span>
-                            <img v-show="item.b_file" :src="item.b_file" />
-                          </div>
-                          <div class="answer">
-                            <span>3)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_c"
-                              v-html="item.answer_c"
-                            ></span>
-                            <img v-show="item.c_file" :src="item.c_file" />
-                          </div>
-                          <p class="answer">
-                            <span>4)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_d"
-                              v-html="item.answer_d"
+                          <img v-if="item.q_file" :src="item.q_file" />
+
+                          <div
+                            v-if="
+                              item.type == 'blank' ||
+                              item.type == 'shortanswer' ||
+                              item.type == 'descriptive'
+                            "
+                          >
+                            <div ref="mathJaxEl" v-html="item.answer_full" />
+                            <img
+                              v-show="item.answer_full_file"
+                              :src="item.answer_full_file"
                             />
-                            <img v-show="item.d_file" :src="item.d_file" />
-                          </p>
-                        </div>
-                        <v-row>
+                          </div>
+                          <div v-else>
+                            <div class="answer">
+                              <span>1)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_a"
+                                  v-html="item.answer_a"
+                              ></span>
+                              <img v-show="item.a_file" :src="item.a_file" />
+                            </div>
+                            <div class="answer">
+                              <span>2)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_b"
+                                  v-html="item.answer_b"
+                              ></span>
+                              <img v-show="item.b_file" :src="item.b_file" />
+                            </div>
+                            <div class="answer">
+                              <span>3)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_c"
+                                  v-html="item.answer_c"
+                              ></span>
+                              <img v-show="item.c_file" :src="item.c_file" />
+                            </div>
+                            <p class="answer">
+                              <span>4)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_d"
+                                  v-html="item.answer_d"
+                              />
+                              <img v-show="item.d_file" :src="item.d_file" />
+                            </p>
+                          </div>
+                        </template>
+                        
+                        <!-- Only show action buttons for non-error items -->
+                        <v-row v-if="!item.isPlaceholder && !item.error">
                           <v-col cols="6">
                             <v-btn icon color="blue" class="drag-handle">
-                              <v-icon> mdi-cursor-move </v-icon>
+                              <v-icon>mdi-cursor-move</v-icon>
                             </v-btn>
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
                               size="small"
-                              v-show="item.owner == true"
+                              v-if="item.owner === true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
                             >
-                              <v-icon small dark> mdi-pencil </v-icon>
+                              <v-icon small dark>mdi-pencil</v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              dark
-                              small
-                              v-show="!tests.find((x) => x == item.id)"
+                              variant="flat"
+                              size="small"
+                              v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
                             >
-                              <v-icon small dark> mdi-plus </v-icon>
+                              <v-icon size="small">mdi-plus</v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              dark
-                              small
-                              v-show="tests.find((x) => x == item.id)"
+                              variant="flat"
+                              size="small"
+                              v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
                             >
-                              <v-icon small dark> mdi-minus </v-icon>
+                              <v-icon size="small">mdi-minus</v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -904,42 +917,42 @@
 
             <!--Publish button-->
             <v-row>
-              <v-col cols="12">
-                <v-row>
-                  <v-col cols="12" md="6" class="pb-0">
-                    <v-btn
-                      @click="publishTest"
-                      :disabled="tests.length < 5"
-                      :loading="publish_loading"
-                      size="large"
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="12" md="6" class="pb-0">
+                  <v-btn
+                    @click="publishTest"
+                    :disabled="tests.length < 5"
+                    :loading="publish_loading"
+                    size="large"
                       density="compact"
-                      color="teal"
+                    color="teal"
                       class="white--text"
-                      block
+                    block
                       style="text-transform: none; font-size: 13px !important"
                     >
                       <span v-show="tests.length < 5"
                         >Add at least {{ 5 - tests.length }} more tests</span
                       >
                       <span v-show="tests.length >= 5">Publish</span>
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-btn
-                      size="large"
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    size="large"
                       variant="outlined"
-                      density="compact"
+                    density="compact"
                       color="error"
                       to="/user/exam"
                       block
                       style="font-size: 13px !important; text-transform: none"
-                    >
-                      Discard
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
+                  >
+                    Discard
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
             <!--End publish button-->
           </v-card-text>
         </v-card>
@@ -997,19 +1010,19 @@
         transition="dialog-bottom-transition"
       >
         <v-card class="test-list">
-          <v-toolbar color="teal" dark>
-            <v-btn icon @click="printPreviewDialog = false">
+        <v-toolbar color="teal" dark>
+          <v-btn icon @click="printPreviewDialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn
-                style="text-transform: none; font-size: 13px; font-weight: 500"
-                variant="text"
-                @click="printPreviewDialog = false"
-              >
-                Ok
-              </v-btn>
+            <v-btn
+              style="text-transform: none; font-size: 13px; font-weight: 500"
+              variant="text"
+              @click="printPreviewDialog = false"
+            >
+              Ok
+            </v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text id="preview-dialog">
@@ -1017,25 +1030,25 @@
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+              <!-- <v-col cols="4">Question's num: {{ tests.length }}</v-col> -->
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-                <v-chip
+              <v-chip
                   size="x-large"
-                  label
+                label
                   variant="outlined"
                   rounded
                   density="compact"
                   class="text-white"
-                  style="
-                    background-color: #b30a29;
+                style="
+                  background-color: #b30a29;
                     font-size: 15px;
-                  "
-                >
+                "
+              >
                   Topics:
                 </v-chip>
-              </v-col>
+            </v-col>
               <v-col
                 cols="4"
                 v-for="(item, index) in topicTitleArr"
@@ -1049,106 +1062,138 @@
             </v-row>
             <v-row>
               <v-col cols="12" v-if="previewTestList.length">
-                <draggable
-                  v-model="previewTestList"
+                <draggable 
+                  v-model="previewTestList" 
                   @end="previewDragEnd"
                   item-key="id"
                   handle=".drag-handle"
                 >
-                  <template #item="{ element: item }">
+                <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
-                        <div
-                          id="test-question"
-                          ref="mathJaxEl"
-                          v-html="item.question"
-                        />
-                        <img :src="item.q_file" />
-
-                        <div
-                          v-if="
-                            item.type == 'blank' ||
-                            item.type == 'shortanswer' ||
-                            item.type == 'descriptive'
-                          "
+                        <!-- Add a special display for placeholder/error items -->
+                        <v-alert
+                          v-if="item.isPlaceholder || item.error"
+                          type="warning"
+                          variant="tonal"
+                          color="amber-darken-2"
+                          border="start"
+                          density="compact"
+                          class="mb-4"
                         >
-                          <div ref="mathJaxEl" v-html="item.answer_full" />
-                          <img
-                            v-show="item.answer_full_file"
-                            :src="item.answer_full_file"
+                          <div class="d-flex align-center">
+                            <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
+                            <span>{{ item.question }}</span>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="red"
+                              variant="flat"
+                              size="small"
+                              @click="removeErrorTest(item.id)"
+                              class="ml-2"
+                            >
+                              <v-icon size="small">mdi-close</v-icon>
+                              Remove
+                            </v-btn>
+                          </div>
+                        </v-alert>
+                        
+                        <!-- Regular test display for non-error items -->
+                        <template v-else>
+                          <div
+                            id="test-question"
+                            ref="mathJaxEl"
+                            v-html="item.question"
                           />
-                        </div>
-                        <div v-else>
-                          <div class="answer">
-                            <span>1)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_a"
-                              v-html="item.answer_a"
-                            ></span>
-                            <img v-show="item.a_file" :src="item.a_file" />
-                          </div>
-                          <div class="answer">
-                            <span>2)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_b"
-                              v-html="item.answer_b"
-                            ></span>
-                            <img v-show="item.b_file" :src="item.b_file" />
-                          </div>
-                          <div class="answer">
-                            <span>3)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_c"
-                              v-html="item.answer_c"
-                            ></span>
-                            <img v-show="item.c_file" :src="item.c_file" />
-                          </div>
-                          <p class="answer">
-                            <span>4)</span>
-                            <span
-                              ref="mathJaxEl"
-                              v-show="item.answer_d"
-                              v-html="item.answer_d"
+                          <img v-if="item.q_file" :src="item.q_file" />
+
+                          <div
+                            v-if="
+                              item.type == 'blank' ||
+                              item.type == 'shortanswer' ||
+                              item.type == 'descriptive'
+                            "
+                          >
+                            <div ref="mathJaxEl" v-html="item.answer_full" />
+                            <img
+                              v-show="item.answer_full_file"
+                              :src="item.answer_full_file"
                             />
-                            <img v-show="item.d_file" :src="item.d_file" />
-                          </p>
-                        </div>
-                        <v-row>
+                          </div>
+                          <div v-else>
+                            <div class="answer">
+                              <span>1)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_a"
+                                  v-html="item.answer_a"
+                              ></span>
+                              <img v-show="item.a_file" :src="item.a_file" />
+                            </div>
+                            <div class="answer">
+                              <span>2)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_b"
+                                  v-html="item.answer_b"
+                              ></span>
+                              <img v-show="item.b_file" :src="item.b_file" />
+                            </div>
+                            <div class="answer">
+                              <span>3)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_c"
+                                  v-html="item.answer_c"
+                              ></span>
+                              <img v-show="item.c_file" :src="item.c_file" />
+                            </div>
+                            <p class="answer">
+                              <span>4)</span>
+                              <span
+                                  ref="mathJaxEl"
+                                  v-show="item.answer_d"
+                                  v-html="item.answer_d"
+                              />
+                              <img v-show="item.d_file" :src="item.d_file" />
+                            </p>
+                          </div>
+                        </template>
+                        
+                        <!-- Only show action buttons for non-error items -->
+                        <v-row v-if="!item.isPlaceholder && !item.error">
                           <v-col cols="6">
                             <v-btn icon color="blue" class="drag-handle">
-                              <v-icon> mdi-cursor-move </v-icon>
+                              <v-icon>mdi-cursor-move</v-icon>
                             </v-btn>
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
                               size="small"
-                              v-show="item.owner == true"
+                              v-if="item.owner === true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
                             >
-                              <v-icon small dark> mdi-pencil </v-icon>
+                              <v-icon small dark>mdi-pencil</v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              dark
-                              small
-                              v-show="!tests.find((x) => x == item.id)"
+                              variant="flat"
+                              size="small"
+                              v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
                             >
-                              <v-icon small dark> mdi-plus </v-icon>
+                              <v-icon size="small">mdi-plus</v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              dark
-                              small
-                              v-show="tests.find((x) => x == item.id)"
+                              variant="flat"
+                              size="small"
+                              v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
                             >
-                              <v-icon small dark> mdi-minus </v-icon>
+                              <v-icon size="small">mdi-minus</v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -1173,21 +1218,21 @@
     </v-row>
     <v-row>
       <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
-        <v-card>
-          <v-card-title class="text-h5">
+        <v-card class="px-5 py-3">
+          <v-card-title class="text-h5 px-0" style="font-size: 13px; word-break: break-word; white-space: normal;">
             Are you sure of deleting the online exam?
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="px-0 py-1 " style="font-size: 11px; word-break: break-word; white-space: normal; color: rgba(0, 0, 0, 0.6);">
             If you are sure about the deletion, click Agree button.
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="confirmDeleteDialog = false"> Disagree </v-btn>
+          <v-card-actions style="min-height: 35px !important; padding: 0px !important;">
+            <v-btn text color="error" @click="confirmDeleteDialog = false" style="text-transform: none; font-size: 13px"> Disagree </v-btn>
             <v-btn
               color="green darken-1"
               text
               :loading="deleteLoading"
               @click="deleteOnlineExam"
+              style="text-transform: none; font-size: 13px"
             >
               Agree
             </v-btn>
@@ -1330,15 +1375,15 @@ const file_original = ref(null);
 const file_original_path = ref("");
 
 // Filter data
-const filter = reactive({
+const filter = ref({
   section: "",
   base: "",
   lesson: "",
   topic: "",
   page: 1,
   perpage: 40,
-  testsHasVideo: "All",
   myTests: false,
+  testsHasVideo: 0, // Use 0 instead of "All" string
 });
 
 // UI State
@@ -1837,7 +1882,7 @@ const fetchTestDetails = async (testId) => {
   }
 };
 
-// New unified function to load and refresh the preview list
+// Update the handleRefreshPreviewList function to improve error handling for test placeholders
 const handleRefreshPreviewList = async () => {
   if (!exam_id.value) {
     previewTestList.value = [];
@@ -1862,7 +1907,7 @@ const handleRefreshPreviewList = async () => {
 
     const response = await $fetch(`/api/v1/examTests`, {
       method: "GET",
-      params: { exam_id: exam_id.value }, // This should fetch all tests linked to the exam
+      params: { exam_id: exam_id.value }, 
       headers: { Authorization: `Bearer ${userToken.value}` },
     });
 
@@ -1885,7 +1930,15 @@ const handleRefreshPreviewList = async () => {
           return individualDetails;
         } else {
           console.error(`Failed to fetch details for ${testId} even individually. Creating placeholder.`);
-          return { id: testId, question: `Issue loading test ${testId}`, type: 'error', isPlaceholder: true, owner: true }; // Assuming owner if it's in tests.value
+          // Mark these placeholders clearly so we can handle them in the UI
+          return { 
+            id: testId, 
+            question: `Test ${testId} could not be loaded. It may have been deleted or you may not have permission to view it.`, 
+            type: 'error', 
+            isPlaceholder: true, 
+            owner: false,  // Don't show edit buttons for placeholders
+            error: true    // Add an error flag to clearly identify this as an error state
+          };
         }
       }
     });
@@ -1904,7 +1957,14 @@ const handleRefreshPreviewList = async () => {
     if (tests.value.length > 0 && previewTestList.value.length === 0) {
         const fallbackPromises = tests.value.map(async (id) => {
             const details = await fetchTestDetails(String(id));
-            return details || { id: String(id), question: `Loading error for ${id}`, type: 'error', isPlaceholder: true, owner: true };
+            return details || { 
+              id: String(id), 
+              question: `Test ${id} could not be loaded. It may have been deleted.`, 
+              type: 'error', 
+              isPlaceholder: true, 
+              owner: false, 
+              error: true 
+            };
         });
         previewTestList.value = (await Promise.all(fallbackPromises)).filter(Boolean);
     }
@@ -1941,8 +2001,8 @@ const handleTestRefresh = async () => {
     } else {
       nuxtApp.$toast.info('Refreshing test list...');
       await submitTest(); // This will call handleRefreshPreviewList again
-    }
-  } catch (err) {
+      }
+    } catch (err) {
     console.error('Error in handleTestRefresh:', err);
     nuxtApp.$toast.error('Error refreshing test list');
   }
@@ -2234,7 +2294,12 @@ watch(
 
 watch(
   () => filter.testsHasVideo,
-  () => {
+  (val) => {
+    // If the value is cleared (null or undefined), set it to 0
+    if (val === null || val === undefined) {
+      filter.testsHasVideo = 0;
+    }
+    
     // Reset pagination and test list before loading new data
     filter.page = 1;
     test_list.value = [];
@@ -2283,11 +2348,16 @@ watch(
 
 // Initialize component on mount
 onMounted(async () => {
-  const auth = useAuth();
+  // Get user token for API calls
   userToken.value = auth.getUserToken();
+  
+  // Ensure filter.testsHasVideo is set to 0 at initialization
+  if (filter.testsHasVideo === null || filter.testsHasVideo === undefined) {
+    filter.testsHasVideo = 0;
+  }
 
   await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
-
+  
   await getTypeList("section");
   if (form.section) {
     await getTypeList("base", form.section);
@@ -2318,9 +2388,6 @@ onMounted(async () => {
     test_step.value = exam_id.value ? 2 : 1; 
   }
 
-  setTimeout(() => {
-    nuxtApp.$toast.info("Welcome to the exam editor");
-  }, 500);
 });
 
 // Open delete confirmation dialog
@@ -2335,6 +2402,10 @@ const deleteExamTest = async () => {
 
   try {
     await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+        "Content-Type": "application/json",
+      },
       method: "DELETE",
     });
 
@@ -2362,49 +2433,101 @@ const deleteExamTest = async () => {
   }
 };
 
-// Get exam tests
+// Get exam tests with improved error handling
 const getExamTests = async () => {
-  if (all_tests_loaded.value || test_loading.value) return;
-
+  // If already loading or all tests loaded, don't make another request
+  if (test_loading.value || all_tests_loaded.value) return;
+  
   test_loading.value = true;
   
-  try {
-    const response = await $fetch("/api/v1/examTests", {
-      method: "GET",
-      params: {
-        lesson: filter.lesson,
-        topic: filter.topic,
-        myTests: filter.myTests,
-        testsHasVideo: filter.testsHasVideo,
-        page: filter.page,
-        perpage: filter.perpage,
-      },
-    });
-
-    const newTests = response?.data?.list || [];
-
-    // Check if we received any tests
-    if (newTests.length === 0) {
-      // No more tests, mark as loaded
-        all_tests_loaded.value = true;
-      } else {
-      // Add new tests to the list
-      test_list.value.push(...newTests);
-
-      // If we received fewer tests than requested per page,
-      // we've likely reached the end
-      if (newTests.length < filter.perpage) {
-        all_tests_loaded.value = true;
-      }
+  // Build query params, ensuring testsHasVideo is always a number
+  const params = {
+    lesson: filter.lesson,
+    topic: filter.topic,
+    myTests: filter.myTests,
+    // Ensure testsHasVideo is always a number (0 if null/undefined/cleared)
+    testsHasVideo: filter.testsHasVideo === null || filter.testsHasVideo === undefined ? 0 : filter.testsHasVideo,
+    page: filter.page,
+    perpage: filter.perpage
+  };
+  
+  // Remove undefined or null values (except testsHasVideo which we've already handled)
+  Object.keys(params).forEach(key => {
+    if (key !== 'testsHasVideo' && (params[key] === undefined || params[key] === null)) {
+      delete params[key];
     }
+  });
 
-    // Update createForm if it exists and has examTestListLength property
-    if (createForm.value && "examTestListLength" in createForm.value) {
+  try {
+    // First attempt with all parameters
+    const response = await $fetch('/api/v1/examTests', {
+      method: 'GET',
+      params
+    });
+    
+    test_list.value.push(...response.data.list);
+
+    if (test_list.value.length) {
+      renderMathJax();
+    }
+    
+    // Update exam test list length
+    if (createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
-  } catch (err) {
-    console.error("Error getting exam tests:", err);
-    all_tests_loaded.value = true; // Prevent further requests on error
+
+    // Check if we've loaded all tests
+    all_tests_loaded.value = response.data.list.length === 0;
+    
+    return response;
+  } catch (error) {
+    console.error('Error getting exam tests:', error);
+    
+    // Try a fallback with simpler params if the first request failed
+    try {
+      // Show a toast notification about the fallback
+      useToast().info('Some filters were ignored due to an error. Trying with simplified parameters.');
+      
+      // Simplified params - just keep the essential ones
+      const fallbackParams = {
+        lesson: filter.lesson,
+        page: filter.page,
+        perpage: filter.perpage
+      };
+      
+      console.log('Retrying with simplified params:', fallbackParams);
+      
+      const fallbackResponse = await $fetch('/api/v1/examTests', {
+        method: 'GET',
+        params: fallbackParams
+      });
+      
+      test_list.value.push(...fallbackResponse.data.list);
+
+      if (test_list.value.length) {
+        renderMathJax();
+      }
+      
+      // Update exam test list length
+      if (createForm.value) {
+        createForm.value.examTestListLength = tests.value.length;
+      }
+
+      // Check if we've loaded all tests
+      all_tests_loaded.value = fallbackResponse.data.list.length === 0;
+      
+      return fallbackResponse;
+    } catch (fallbackError) {
+      console.error('Error in fallback test fetch:', fallbackError);
+      
+      // Final fallback - try with minimal params or handle the error gracefully
+      useToast().error('Could not load tests. Please try again later or contact support.');
+      
+      // Mark as loaded to prevent further requests
+      all_tests_loaded.value = true;
+      
+      return { data: { list: [] } };
+    }
   } finally {
     test_loading.value = false;
   }
@@ -2421,6 +2544,10 @@ const deleteOnlineExam = async () => {
   try {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+        "Content-Type": "application/json",
+      },
     });
 
     nuxtApp.$toast.success("Deleted successfully");
@@ -2836,12 +2963,12 @@ const getCurrentExamInfo = async () => {
         Authorization: `Bearer ${userToken.value}`,
       },
     });
-
+    
     if (response.data) {
       const examData = response.data;
       tests.value = examData.tests?.map(id => String(id)) || [];
-      
-      // Set form data in sequence to trigger proper cascading updates
+    
+    // Set form data in sequence to trigger proper cascading updates
       form.section = examData.section || "";
       if (form.section) await getTypeList("base", form.section);
       
@@ -2884,12 +3011,12 @@ const getCurrentExamInfo = async () => {
       exam_code.value = examData.code || '';
 
       // If createForm component is used, ensure its state is updated
-      if (createForm.value) {
+    if (createForm.value) {
         createForm.value.examEditMode = true; // Let child know it's in edit context
         // Pass relevant exam data to createForm if it needs it directly
         // e.g., createForm.value.setInitialExamData(examData);
         // Or rely on its own getCurrentExamInfo if that's robust
-         if (typeof createForm.value.getCurrentExamInfo === "function") {
+      if (typeof createForm.value.getCurrentExamInfo === "function") {
              // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
          }
          if ("examTestListLength" in createForm.value) {
@@ -2940,7 +3067,7 @@ const updateQuestion = async () => {
         "Authorization": `Bearer ${userToken.value}`,
       },
     });
-
+    
     nuxtApp.$toast.success("Exam updated successfully");
     test_step.value = 2; // Move to tests step
     await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay
@@ -2992,6 +3119,38 @@ const validateForm = () => {
   
   return true;
 };
+
+// Add this function to the script section
+const removeErrorTest = (testId) => {
+  // Remove the test from the tests array
+  tests.value = tests.value.filter(id => String(id) !== String(testId));
+  
+  // Also remove it from the preview list
+  previewTestList.value = previewTestList.value.filter(test => String(test.id) !== String(testId));
+  
+  // Update the backend
+  submitTest();
+  
+  // Show a toast message
+  nuxtApp.$toast.success(`Removed test ${testId} from exam`);
+};
+
+// Watch for changes in filter.testsHasVideo
+watch(
+  () => filter.testsHasVideo,
+  (val) => {
+    // If the value is cleared (null or undefined), set it to 0
+    if (val === null || val === undefined) {
+      filter.testsHasVideo = 0;
+    }
+    
+    // Reset pagination and test list before loading new data
+    filter.page = 1;
+    test_list.value = [];
+    all_tests_loaded.value = false;
+    getExamTests();
+  }
+);
 </script>
 
 <style lang="scss">
