@@ -611,18 +611,22 @@
                           <v-btn
                             icon
                             variant="text"
+                            density="compact"
                             :to="`/test-maker/create-test/edit/${item.id}`"
                             v-show="item.owner == true"
+                            style="text-transform: none; font-size: 13px"
                           >
-                            <v-icon>mdi-pencil</v-icon>
+                            <v-icon >mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
                             variant="text"
+                            density="compact"
                             v-show="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
+                            style="text-transform: none; font-size: 13px"
                           >
-                            <v-icon color="error" size="small"
+                            <v-icon color="error"
                               >mdi-delete</v-icon
                             >
                           </v-btn>
