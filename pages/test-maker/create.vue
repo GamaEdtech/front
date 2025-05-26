@@ -3128,4 +3128,7 @@ watch(
 .textFiledLink:deep(input){
   padding-left: 20px !important;
 }
+.v-btn {
+  display: inline-grid !important;
+}
 </style>

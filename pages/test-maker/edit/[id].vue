@@ -21,7 +21,7 @@
           icon="mdi-printer-eye"
           size="small"
           @click="printPreviewDialog = !printPreviewDialog"
-          style="font-size: 15px; font-weight: 500"
+          style="font-size: 15px; font-weight: 500; display: inline-block !important"
         />
       </v-col>
     </v-row>
@@ -38,6 +38,7 @@
       color="teal"
       hide-actions
       @update:model-value="handleStepChange"
+      
     >
       <template #[`item.1`]>
         <v-card flat class="mt-4 pb-10">
@@ -614,6 +615,7 @@
                             density="compact"
                             :to="`/test-maker/create-test/edit/${item.id}`"
                             v-if="item.owner === true"
+                            style="text-transform: none; font-size: 13px"
                           >
                             <v-icon>mdi-pencil</v-icon>
                           </v-btn>
@@ -623,6 +625,7 @@
                             density="compact"
                             v-if="item.owner === true"
                             @click="openTestDeleteConfirmDialog(item.id)"
+                            style="text-transform: none; font-size: 13px"
                           >
                             <v-icon color="error">mdi-delete</v-icon>
                           </v-btn>
@@ -639,8 +642,9 @@
                         <v-col cols="6" class="text-right">
                           <v-btn
                             color="blue"
-                            variant="flat"
-                            size="small"
+                            density="compact"
+                            size="large"
+                            style="text-transform: none; font-size: 13px;"
                             v-if="!tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'add')"
                           >
@@ -649,8 +653,9 @@
                           </v-btn>
                           <v-btn
                             color="red"
-                            variant="flat"
-                            size="small"
+                            density="compact"
+                            size="large"
+                            style="text-transform: none; font-size: 13px;"
                             v-if="tests.some(id => String(id) === String(item.id))"
                             @click="applyTest(item, 'remove')"
                           >
@@ -871,31 +876,36 @@
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              size="small"
+                              color="blue"
+                              density="compact"
+                              size="large"
                               v-if="item.owner === true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon small dark>mdi-pencil</v-icon>
+                              <v-icon size="small"> mdi-pencil </v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              variant="flat"
-                              size="small"
+                              density="compact"
+                              size="large"
                               v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon size="small">mdi-plus</v-icon>
+                              <v-icon size="small"> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              variant="flat"
-                              size="small"
+                              density="compact"
+                              size="large"
                               v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
+                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
-                              <v-icon size="small">mdi-minus</v-icon>
+                              <v-icon size="small"> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -961,10 +971,12 @@
       <template #[`item.4`]>
         <v-card flat class="mt-3 pb-10">
           <v-card-text class="text-center">
-            <p class="font-weight-bold teal--text mb-3">
+            <p class="font-weight-bold text-teal mb-3">
               Your test is ready to use!
             </p>
-            <p>Send below link to your students or friends.</p>
+            <p class="font-weight-normal text-grey font-size-16">
+              Send below link to your students or friends.
+            </p>
 
             <div class="d-flex justify-center my-4">
               <v-text-field
@@ -972,19 +984,20 @@
                 variant="outlined"
                 density="compact"
                 readonly
-                style="max-width: 400px"
-                class="mx-auto"
+                style="max-width: 350px"
+                class="mx-auto textFiledLink"
+                :rounded="false"
                 autocomplete="off"
               >
-                <template #append>
-                  <v-btn icon variant="text" @click="copyUrl">
+                <template #append-inner>
+                  <v-btn icon variant="plain" @click="copyUrl">
                     <v-icon>mdi-content-copy</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
             </div>
 
-            <p class="mt-3">
+            <p class="mt-2 font-weight-normal font-size-16 text-grey">
               To view the results of the participants, go to the following path:
             </p>
 
@@ -993,12 +1006,14 @@
                 { title: 'Dashboard', href: '/user' },
                 { title: 'My online exam', href: '/exam/results' },
               ]"
-              class="justify-center"
+              class="justify-center mt-2 mb-2 font-size-16"
+              color="gray"
             >
               <template #divider>
                 <v-icon>mdi-chevron-right</v-icon>
               </template>
             </v-breadcrumbs>
+            <v-divider class="mt-2 mb-2" thickness="3" color="gray"></v-divider>
           </v-card-text>
         </v-card>
       </template>
@@ -1169,31 +1184,36 @@
                           </v-col>
                           <v-col cols="6" class="text-right">
                             <v-btn
-                              size="small"
+                              color="blue"
+                              density="compact"
+                              size="large"
                               v-if="item.owner === true"
                               :to="`/test-maker/create-test/edit/${item.id}`"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon small dark>mdi-pencil</v-icon>
+                              <v-icon size="small"> mdi-pencil </v-icon>
                               Edit
                             </v-btn>
                             <v-btn
                               color="blue"
-                              variant="flat"
-                              size="small"
+                              density="compact"
+                              size="large"
                               v-if="!tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'add')"
+                              style="text-transform: none; font-size: 13px"
                             >
-                              <v-icon size="small">mdi-plus</v-icon>
+                              <v-icon size="small"> mdi-plus </v-icon>
                               Add
                             </v-btn>
                             <v-btn
                               color="red"
-                              variant="flat"
-                              size="small"
+                              density="compact"
+                              size="large"
                               v-if="tests.some(id => String(id) === String(item.id))"
                               @click="applyTest(item, 'remove')"
+                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
-                              <v-icon size="small">mdi-minus</v-icon>
+                              <v-icon size="small"> mdi-minus </v-icon>
                               Delete
                             </v-btn>
                           </v-col>
@@ -3174,7 +3194,7 @@ watch(
 .v-stepper {
   box-shadow: none !important;
   background-color: #f9f9f9;
-  display: flex;
+  display: contents;
 
   &__step {
     &--active {
@@ -3282,6 +3302,14 @@ watch(
 .answer span {
   visibility: visible !important;
   display: inline-block !important;
+}
+.textFiledLink .v-field--variant-outlined .v-field__outline {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  
+}
+.textFiledLink:deep(input){
+  padding-left: 20px !important;
 }
 .v-btn {
   display: inline-grid !important;
