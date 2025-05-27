@@ -291,8 +291,11 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-else class="ml-2 text-success"
+                  <span v-if="tests.length > 5 && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Please First Create an Exam</span
                   >
                 </div>
               </v-alert>
@@ -445,8 +448,11 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-else class="ml-2 text-success"
+                  <span v-if="tests.length > 5 && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Please First Create an Exam</span
                   >
                 </div>
               </v-alert>
@@ -618,7 +624,7 @@
                             variant="text"
                             density="compact"
                             :to="`/test-maker/create-test/edit/${item.id}`"
-                            v-show="item.owner == true"
+                            v-if="item.owner == true"
                             style="text-transform: none; font-size: 13px"
                           >
                             <v-icon >mdi-pencil</v-icon>
@@ -627,7 +633,7 @@
                             icon
                             variant="text"
                             density="compact"
-                            v-show="item.owner == true"
+                            v-if="item.owner == true"
                             @click="openTestDeleteConfirmDialog(item.id)"
                             style="text-transform: none; font-size: 13px"
                           >
@@ -657,7 +663,7 @@
                             density="compact"
                             size="large"
                             style="text-transform: none; font-size: 13px;"
-                            v-show="
+                            v-if="
                               !tests.some(
                                 (id) => String(id) === String(item.id)
                               )
@@ -672,7 +678,7 @@
                             density="compact"
                             size="large"
                             style="text-transform: none; font-size: 13px;"
-                            v-show="
+                            v-if="
                               tests.some((id) => String(id) === String(item.id))
                             "
                             @click="applyTest(item, 'remove')"
@@ -2044,44 +2050,29 @@ const onScroll = () => {
 
 // Apply test to the exam (add or remove)
 const applyTest = async (item, type = null) => {
-  try {
-    // Ensure we have a valid exam ID
-    if (!exam_id.value) {
-      nuxtApp.$toast.error("No exam ID available");
-      return;
-    }
 
-    // Convert item.id to string for consistent comparison
-    const testId = String(item.id);
+    if (tests.value.find((x) => x == item.id) && type === "remove") {
+        tests.value.splice(tests.value.indexOf(item.id), 1);
 
-    // Check if the test ID exists in the array (using string comparison)
-    const testExists = tests.value.some((id) => String(id) === testId);
+        //Remove from preview
+        // this.$store.commit('user/removePreviewTestList', item.id);
 
-    // Check if we need to add or remove the test
-    const shouldAdd = type === "add" || (!type && !testExists);
-    const shouldRemove = type === "remove" || (!type && testExists);
+        submitTest();
+      }
+      if (!tests.value.find((x) => x == item.id) && type === "add") {
+        tests.value.push(item.id);
 
-    if (shouldAdd) {
-      // Add the test to the tests array
-      tests.value.push(testId);
-      nuxtApp.$toast.success("Test added to exam");
-    } else if (shouldRemove) {
-      // Remove the test from the tests array (using string comparison)
-      tests.value = tests.value.filter((id) => String(id) !== testId);
-      nuxtApp.$toast.success("Test removed from exam");
-    }
+        //Add to preview list
+        // this.$store.commit('user/addPreviewTestList', item)
 
-    // Always call submitTest to update the backend and refresh the preview
-    await submitTest();
-    
-    // Update the examTestListLength in the CreateTestForm component
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-  } catch (err) {
-    nuxtApp.$toast.error("Error applying test");
-    console.error("Error in applyTest:", err);
-  }
+        // if (this.$store.getters["user/getPreviewTestListLength"]) {
+        //   this.$nextTick(function () {
+        //  this.$renderMathJax(this.$refs.mathJaxEl);
+        //   });
+        // }
+
+        submitTest();
+      }
 };
 
 // Watch for newly created tests and add them to the current exam

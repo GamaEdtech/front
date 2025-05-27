@@ -277,7 +277,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.a_file_base64"
+                          v-if="form.a_file_base64"
                           @click="deleteFile('a_file')"
                           variant="text"
                           color="#F44336"
@@ -358,7 +358,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.b_file_base64"
+                          v-if="form.b_file_base64"
                           @click="deleteFile('b_file')"
                           variant="text"
                           color="#F44336"
@@ -437,7 +437,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.c_file_base64"
+                          v-if="form.c_file_base64"
                           @click="deleteFile('c_file')"
                           variant="text"
                           color="#F44336"
@@ -516,7 +516,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.d_file_base64"
+                          v-if="form.d_file_base64"
                           @click="deleteFile('d_file')"
                           variant="text"
                           color="#F44336"
@@ -573,7 +573,7 @@
               </v-btn>
 
               <v-btn
-                v-show="form.answer_full_file_base64"
+                v-if="form.answer_full_file_base64"
                 @click="deleteFile('answer_full_file')"
                 variant="text"
                 color="#F44336"
