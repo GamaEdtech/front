@@ -1,6 +1,6 @@
 <template>
-  <v-container class="create-test-container my-16" id="create-test">
-    <embed :src="file_original_path" width="100%" height="200px;" />
+  <v-container class="create-test-container my-md-16" id="create-test">
+    <embed v-if="file_original_path" :src="file_original_path" width="100%" height="200px;" />
     <v-card flat class="mt-3">
       <v-card-text>
         <VeeForm ref="veeForm" @submit="handleSubmit">
@@ -269,7 +269,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.a_file_base64"
+                          v-if="form.a_file_base64"
                           @click="deleteFile('a_file')"
                           variant="text"
                           color="error"
@@ -353,7 +353,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.b_file_base64"
+                          v-if="form.b_file_base64"
                           @click="deleteFile('b_file')"
                           variant="text"
                           color="error"
@@ -434,7 +434,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.c_file_base64"
+                          v-if="form.c_file_base64"
                           @click="deleteFile('c_file')"
                           variant="text"
                           color="error"
@@ -515,7 +515,7 @@
                         </v-btn>
 
                         <v-btn
-                          v-show="form.d_file_base64"
+                          v-if="form.d_file_base64"
                           @click="deleteFile('d_file')"
                           variant="text"
                           color="error"
@@ -573,7 +573,7 @@
               </v-btn>
 
               <v-btn
-                v-show="form.answer_full_file_base64"
+                v-if="form.answer_full_file_base64"
                 @click="deleteFile('answer_full_file')"
                 variant="text"
                 color="error"
