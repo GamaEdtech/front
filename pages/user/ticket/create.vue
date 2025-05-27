@@ -11,102 +11,102 @@
         <v-card-text class="px-0 px-sm-8 px-md-4">
           <v-card-text>
             <v-card flat class="mt-3">
-              <validation-observer ref="observer" v-slot="{ invalid }">
-                <form @submit.prevent="submitContent">
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <v-autocomplete
-                        dense
-                        v-model="form.type"
-                        :items="subject_list"
-                        :error-messages="errors"
-                        item-text="title"
-                        item-value="id"
-                        label="Subject"
-                        outlined
-                      />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <validation-provider
+              <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+              <form @submit.prevent="submitContent">
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-autocomplete
+                      dense
+                      v-model="form.type"
+                      :items="subject_list"
+                      :error-messages="errors"
+                      item-text="title"
+                      item-value="id"
+                      label="Subject"
+                      outlined
+                    />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <!-- <validation-provider
                         v-slot="{ errors }"
                         name="title"
                         rules="required|min:3"
-                      >
-                        <v-text-field
-                          dense
-                          v-model="form.title"
-                          :error-messages="errors"
-                          label="Title"
-                          outlined
-                        />
-                      </validation-provider>
-                    </v-col>
+                      > -->
+                    <v-text-field
+                      dense
+                      v-model="form.title"
+                      :error-messages="errors"
+                      label="Title"
+                      outlined
+                    />
+                    <!-- </validation-provider> -->
+                  </v-col>
 
-                    <v-col cols="12" md="12">
-                      <validation-provider
+                  <v-col cols="12" md="12">
+                    <!-- <validation-provider
                         v-slot="{ errors }"
                         name="text"
                         rules="required|min:10"
-                      >
-                        <v-textarea
-                          dense
-                          v-model="form.message"
-                          :error-messages="errors"
-                          label="Message text"
-                          outlined
-                        />
-                      </validation-provider>
-                      <nuxt-link to="/formula-help">
-                        <strong class="pointer teal--text text-h6">
-                          <span class="fa-solid fa-link" />
-                          Formula writing guide
-                        </strong>
-                      </nuxt-link>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <validation-provider
+                      > -->
+                    <v-textarea
+                      dense
+                      v-model="form.message"
+                      :error-messages="errors"
+                      label="Message text"
+                      outlined
+                    />
+                    <!-- </validation-provider> -->
+                    <nuxt-link to="/formula-help">
+                      <strong class="pointer teal--text text-h6">
+                        <span class="fa-solid fa-link" />
+                        Formula writing guide
+                      </strong>
+                    </nuxt-link>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <!-- <validation-provider
                         v-slot="{ validate, errors }"
                         rules="mimes:image/png,image/jpg,image/jpeg,image/gif,video/mp4,audio/mp3,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats,officedocument.presentationml.presentation"
                         ref="file_provider"
                         name="file"
-                      >
-                        <v-file-input
-                          dense
-                          v-model="file"
-                          :error-messages="errors"
-                          label="Attach file"
-                          accept=".jpg,.jpeg,.png,.gif,.docx,.pptx,.pdf,.mp4,.mp3"
-                          @change="uploadFile('file', $event), validate"
-                          :prepend-icon="null"
-                          color="red"
-                          prepend-inner-icon="mdi-file"
-                          append-icon="mdi-folder-open"
-                          outlined
-                        />
-                      </validation-provider>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" md="6" class="pb-0">
-                      <v-btn
-                        type="submit"
-                        lg
-                        color="success"
-                        :loading="loading.form"
-                        :disabled="invalid"
-                        block
-                      >
-                        Submit
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-btn lg outlined color="error" to="/user/ticket" block>
-                        Discard
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </form>
-              </validation-observer>
+                      > -->
+                    <v-file-input
+                      dense
+                      v-model="file"
+                      :error-messages="errors"
+                      label="Attach file"
+                      accept=".jpg,.jpeg,.png,.gif,.docx,.pptx,.pdf,.mp4,.mp3"
+                      @change="uploadFile('file', $event), validate"
+                      :prepend-icon="null"
+                      color="red"
+                      prepend-inner-icon="mdi-file"
+                      append-icon="mdi-folder-open"
+                      outlined
+                    />
+                    <!-- </validation-provider> -->
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12" md="6" class="pb-0">
+                    <v-btn
+                      type="submit"
+                      lg
+                      color="success"
+                      :loading="loading.form"
+                      :disabled="invalid"
+                      block
+                    >
+                      Submit
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-btn lg outlined color="error" to="/user/ticket" block>
+                      Discard
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </form>
+              <!-- </validation-observer> -->
             </v-card>
           </v-card-text>
         </v-card-text>
@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import TopicSelector from "@/components/form/topic-selector";
 
 export default {
@@ -148,8 +148,8 @@ export default {
   },
   components: {
     TopicSelector,
-    ValidationProvider,
-    ValidationObserver,
+    // ValidationProvider,
+    // ValidationObserver,
   },
   mounted() {
     this.getTypeList("ticket_type");

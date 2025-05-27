@@ -37,261 +37,258 @@
         <!--Choose username-->
         <v-row>
           <v-col cols="12" md="12" class="pa-0 pa-md-3">
-            <validation-observer ref="observer" v-slot="{ invalid }">
-              <form @submit.prevent="updateUsername()">
-                <v-file-input
-                  class="d-none"
-                  accept="image/png,image/webp,"
-                  @change="uploadAvatar"
-                  v-model="form.avatar"
-                  ref="avatar-input"
-                />
+            <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+            <form @submit.prevent="updateUsername()">
+              <v-file-input
+                class="d-none"
+                accept="image/png,image/webp,"
+                @change="uploadAvatar"
+                v-model="form.avatar"
+                ref="avatar-input"
+              />
 
-                <validation-provider
+              <!-- <validation-provider
                   name="username"
                   v-slot="{ errors }"
                   rules="required|min:6"
-                >
-                  <v-text-field
-                    v-model="username"
-                    filled
-                    dense
-                    :error-messages="errors"
-                    class="mt-4 mb-0"
-                    placeholder="Choose username"
-                    type="text"
+                > -->
+              <v-text-field
+                v-model="username"
+                filled
+                dense
+                :error-messages="errors"
+                class="mt-4 mb-0"
+                placeholder="Choose username"
+                type="text"
+              >
+                <template slot="prepend-inner">
+                  <span class="mt-1">@</span>
+                </template>
+                <template slot="append">
+                  <v-btn
+                    class="default"
+                    type="submit"
+                    :disabled="invalid"
+                    absolute
+                    style="right: 0; height: 80%; top: 10%; bottom: 0"
                   >
-                    <template slot="prepend-inner">
-                      <span class="mt-1">@</span>
-                    </template>
-                    <template slot="append">
-                      <v-btn
-                        class="default"
-                        type="submit"
-                        :disabled="invalid"
-                        absolute
-                        style="right: 0; height: 80%; top: 10%; bottom: 0"
-                      >
-                        choose
-                      </v-btn>
-                    </template>
-                  </v-text-field>
-                </validation-provider>
-              </form>
-            </validation-observer>
+                    choose
+                  </v-btn>
+                </template>
+              </v-text-field>
+              <!-- </validation-provider> -->
+            </form>
+            <!-- </validation-observer> -->
           </v-col>
         </v-row>
         <!--End choose username-->
       </v-col>
     </v-row>
 
-    <validation-observer ref="observer" v-slot="{ invalid }">
-      <form @submit.prevent="submitProfile">
-        <!--Personal information-->
-        <v-row>
-          <v-col cols="12" class="pl-5 text-h4 teal--text">
-            <v-icon large color="teal">mdi-account-outline</v-icon>
-            <span> Your personal information </span>
-          </v-col>
+    <!-- <validation-observer ref="observer" v-slot="{ invalid }"> -->
+    <form @submit.prevent="submitProfile">
+      <!--Personal information-->
+      <v-row>
+        <v-col cols="12" class="pl-5 text-h4 teal--text">
+          <v-icon large color="teal">mdi-account-outline</v-icon>
+          <span> Your personal information </span>
+        </v-col>
 
-          <v-col cols="12" md="3">
-            <validation-provider
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="first_name"
               rules="required"
-            >
-              <v-text-field
-                dense
-                v-model="form.first_name"
-                :error-messages="errors"
-                label="First name"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-text-field
+            dense
+            v-model="form.first_name"
+            :error-messages="errors"
+            label="First name"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="last_name"
               rules="required"
-            >
-              <v-text-field
-                dense
-                v-model="form.last_name"
-                :error-messages="errors"
-                label="Last name"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-text-field
+            dense
+            v-model="form.last_name"
+            :error-messages="errors"
+            label="Last name"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="gender"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                v-model="form.gender"
-                :error-messages="errors"
-                :items="gender_list"
-                item-value="id"
-                item-text="title"
-                label="Gender"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-        </v-row>
-        <!--End personal information-->
+            > -->
+          <v-autocomplete
+            dense
+            v-model="form.gender"
+            :error-messages="errors"
+            :items="gender_list"
+            item-value="id"
+            item-text="title"
+            label="Gender"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+      </v-row>
+      <!--End personal information-->
 
-        <!--Location details-->
-        <v-row>
-          <v-col cols="12" class="pl-5 text-h4 teal--text">
-            <v-icon large color="teal">mdi-map-marker-outline</v-icon>
-            <span> Location details </span>
-          </v-col>
+      <!--Location details-->
+      <v-row>
+        <v-col cols="12" class="pl-5 text-h4 teal--text">
+          <v-icon large color="teal">mdi-map-marker-outline</v-icon>
+          <span> Location details </span>
+        </v-col>
 
-          <v-col cols="12" md="3">
-            <validation-provider
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="state"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                :items="state_list"
-                v-model="form.state"
-                item-text="title"
-                item-value="id"
-                :error-messages="errors"
-                label="State"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-autocomplete
+            dense
+            :items="state_list"
+            v-model="form.state"
+            item-text="title"
+            item-value="id"
+            :error-messages="errors"
+            label="State"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="area"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                :items="area_list"
-                v-model="form.area"
-                item-text="title"
-                item-value="id"
-                :error-messages="errors"
-                label="Area"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="6" lg="6" xl="6">
-            <validation-provider
+            > -->
+          <v-autocomplete
+            dense
+            :items="area_list"
+            v-model="form.area"
+            item-text="title"
+            item-value="id"
+            :error-messages="errors"
+            label="Area"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="6" lg="6" xl="6">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="businessLocation"
               rules="required"
-            >
-              <LocationField
-                label="Location"
-                @locationSelected="selectLocation"
-              />
-            </validation-provider>
-          </v-col>
-        </v-row>
-        <!--End location details-->
+            > -->
+          <LocationField label="Location" @locationSelected="selectLocation" />
+          <!-- </validation-provider> -->
+        </v-col>
+      </v-row>
+      <!--End location details-->
 
-        <!--School profile-->
-        <v-row>
-          <v-col cols="12" class="pl-5 text-h4 teal--text">
-            <v-icon large color="teal">mdi-account-school-outline</v-icon>
-            <span> School Profile </span>
-          </v-col>
+      <!--School profile-->
+      <v-row>
+        <v-col cols="12" class="pl-5 text-h4 teal--text">
+          <v-icon large color="teal">mdi-account-school-outline</v-icon>
+          <span> School Profile </span>
+        </v-col>
 
-          <v-col cols="12" md="3">
-            <validation-provider
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="level"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                v-model="form.level"
-                :items="level_list"
-                :error-messages="errors"
-                item-text="title"
-                item-value="id"
-                label="Curriculum"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-autocomplete
+            dense
+            v-model="form.level"
+            :items="level_list"
+            :error-messages="errors"
+            item-text="title"
+            item-value="id"
+            label="Curriculum"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="grade"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                v-model="form.grade"
-                :items="grade_list"
-                item-value="id"
-                item-text="title"
-                :error-messages="errors"
-                label="Grade"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-          <!--                    <v-col cols="12" md="4">-->
-          <!--                      <validation-provider v-slot="{errors}" name="field" rules="required">-->
-          <!--                        <v-autocomplete-->
-          <!--                          dense-->
-          <!--                          v-model="form.field"-->
-          <!--                          :error-messages="errors"-->
-          <!--                          label="Field"-->
-          <!--                          outlined-->
-          <!--                        />-->
-          <!--                      </validation-provider>-->
-          <!--                    </v-col>-->
-          <v-col cols="12" md="3">
-            <validation-provider
+            > -->
+          <v-autocomplete
+            dense
+            v-model="form.grade"
+            :items="grade_list"
+            item-value="id"
+            item-text="title"
+            :error-messages="errors"
+            label="Grade"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+        <!--                    <v-col cols="12" md="4">-->
+        <!--                      <validation-provider v-slot="{errors}" name="field" rules="required">-->
+        <!--                        <v-autocomplete-->
+        <!--                          dense-->
+        <!--                          v-model="form.field"-->
+        <!--                          :error-messages="errors"-->
+        <!--                          label="Field"-->
+        <!--                          outlined-->
+        <!--                        />-->
+        <!--                      </validation-provider>-->
+        <!--                    </v-col>-->
+        <v-col cols="12" md="3">
+          <!-- <validation-provider
               v-slot="{ errors }"
               name="school"
               rules="required"
-            >
-              <v-autocomplete
-                dense
-                :items="school_list"
-                item-value="id"
-                item-text="title"
-                v-model="form.school"
-                :error-messages="errors"
-                label="School"
-                outlined
-              />
-            </validation-provider>
-          </v-col>
-        </v-row>
-        <!--End school profile-->
+            > -->
+          <v-autocomplete
+            dense
+            :items="school_list"
+            item-value="id"
+            item-text="title"
+            v-model="form.school"
+            :error-messages="errors"
+            label="School"
+            outlined
+          />
+          <!-- </validation-provider> -->
+        </v-col>
+      </v-row>
+      <!--End school profile-->
 
-        <v-row>
-          <v-divider class="my-3" />
+      <v-row>
+        <v-divider class="my-3" />
 
-          <v-col cols="12" md="6" class="pb-0">
-            <v-btn type="submit" lg color="success" block> Submit </v-btn>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-btn lg outlined color="error" to="/user/question" block>
-              Discard
-            </v-btn>
-          </v-col>
-        </v-row>
-      </form>
-    </validation-observer>
+        <v-col cols="12" md="6" class="pb-0">
+          <v-btn type="submit" lg color="success" block> Submit </v-btn>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-btn lg outlined color="error" to="/user/question" block>
+            Discard
+          </v-btn>
+        </v-col>
+      </v-row>
+    </form>
+    <!-- </validation-observer> -->
 
     <v-col cols="auto">
       <v-dialog
@@ -339,7 +336,7 @@
 </template>
 
 <script>
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import LocationField from "@/components/form/LocationField";
 // import "vue-advanced-cropper/dist/style.css";
 
@@ -390,8 +387,8 @@ export default {
     };
   },
   components: {
-    ValidationObserver,
-    ValidationProvider,
+    // ValidationObserver,
+    // ValidationProvider,
     LocationField,
   },
   created() {
