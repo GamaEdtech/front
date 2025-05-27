@@ -617,6 +617,7 @@
                     :disabled="examTestListLength < 5"
                     size="large"
                     variant="flat"
+                    color="teal"
                     class="primary-gray-400"
                     density="compact"
                     block

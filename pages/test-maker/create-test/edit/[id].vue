@@ -1,35 +1,7 @@
 <template>
-  <v-container class="create-test-container mt-4 mb-16 pb-10">
-    <v-row>
-      <v-col cols="6">
-        <h1 class="text-h4 text-teal">Edit Test</h1>
-      </v-col>
-      <v-col cols="6" class="text-right">
-        <v-btn
-          variant="outlined"
-          color="error"
-          icon="mdi-delete"
-          size="small"
-          @click="confirmDeleteDialog = true"
-          class="mr-1"
-          style="font-size: 15px; font-weight: 500;"
-        />
-        <v-btn
-          variant="outlined"
-          icon="mdi-eye"
-          size="small"
-          :to="'/test-maker'"
-          style="font-size: 15px; font-weight: 500;"
-        />
-      </v-col>
-    </v-row>
-    
+  <v-container class="create-test-container my-16" id="create-test">
+    <embed :src="file_original_path" width="100%" height="200px;" />
     <v-card flat class="mt-3">
-      <!-- Display file if available -->
-      <v-card-text v-if="file_original_path" class="pa-0">
-        <embed :src="file_original_path" width="100%" height="200px;" />
-      </v-card-text>
-      
       <v-card-text>
         <VeeForm ref="veeForm" @submit="handleSubmit">
           <v-row>
