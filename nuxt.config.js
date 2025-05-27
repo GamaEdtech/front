@@ -88,6 +88,7 @@ export default defineNuxtConfig({
     { src: "plugins/vue-emoji-picker", ssr: false },
     { src: "plugins/img-cropper", ssr: false },
     { src: "plugins/vuedraggable", ssr: false },
+
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -138,7 +139,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // "/search": { prerender: true }, // Ensures it's treated as a static page
+    "/test-maker/**": { ssr: false, prerender: true },
     "/api/v1/**": {
       proxy: "https://core.gamatrain.com/api/v1/**",
     },
@@ -220,6 +221,7 @@ export default defineNuxtConfig({
       // "vee-validate",
       "vue-chartjs",
       "defu",
+      "@ckeditor/ckeditor5-vue",
     ],
   },
 
