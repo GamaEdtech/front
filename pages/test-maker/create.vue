@@ -448,11 +448,8 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-if="tests.length > 5 && exam_id" class="ml-2 text-success"
+                  <span v-if="tests.length > 5" class="ml-2 text-success"
                     >Ready to publish!</span
-                  >
-                  <span v-else class="ml-2 text-success"
-                    >Please First Create an Exam</span
                   >
                 </div>
               </v-alert>
@@ -882,7 +879,7 @@
                               color="blue"
                               density="compact"
                               size="large"
-                              v-show="!tests.find((x) => x == item.id)"
+                              v-if="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
                               style="text-transform: none; font-size: 13px"
                             >
@@ -893,7 +890,7 @@
                               color="red"
                               density="compact"
                               size="large"
-                              v-show="tests.find((x) => x == item.id)"
+                              v-if="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
                               style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
@@ -1159,7 +1156,7 @@
                               color="blue"
                               density="compact"
                               size="large"
-                              v-show="!tests.find((x) => x == item.id)"
+                              v-if="!tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'add')"
                             >
                               <v-icon size="large"> mdi-plus </v-icon>
@@ -1169,7 +1166,7 @@
                               color="red"
                               density="compact"
                               size="large"
-                              v-show="tests.find((x) => x == item.id)"
+                              v-if="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
                               style="text-transform: none; font-size: 13px; margin-inline: 5px"
                             >
