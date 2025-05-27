@@ -2711,6 +2711,8 @@ const resetForm = () => {
   grade_list.value = [];
   lesson_list.value = [];
   topic_list.value = [];
+  form.topics = [];
+  selected_topics.value = [];
 
   // Reset file inputs
   file_original.value = null;

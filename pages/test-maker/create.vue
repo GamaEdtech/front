@@ -1198,21 +1198,21 @@
     </v-row>
     <v-row>
       <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
-        <v-card>
-          <v-card-title class="text-h5">
+        <v-card class="px-5 py-3">
+          <v-card-title class="text-h5 px-0" style="font-size: 13px; word-break: break-word; white-space: normal;">
             Are you sure of deleting the online exam?
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="px-0 py-1 " style="font-size: 11px; word-break: break-word; white-space: normal; color: rgba(0, 0, 0, 0.6);">
             If you are sure about the deletion, click Agree button.
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="confirmDeleteDialog = false"> Disagree </v-btn>
+          <v-card-actions style="min-height: 35px !important; padding: 0px !important;">
+            <v-btn text color="error" @click="confirmDeleteDialog = false" style="text-transform: none; font-size: 13px"> Disagree </v-btn>
             <v-btn
               color="green darken-1"
               text
               :loading="deleteLoading"
               @click="deleteOnlineExam"
+              style="text-transform: none; font-size: 13px"
             >
               Agree
             </v-btn>
@@ -2511,6 +2511,9 @@ const deleteOnlineExam = async () => {
 
   try {
     await $fetch(`/api/v1/exams/${exam_id.value}`, {
+      headers: {
+        Authorization: `Bearer ${userToken.value}`,
+      },
       method: "DELETE",
     });
 
@@ -2680,6 +2683,8 @@ const resetForm = () => {
   grade_list.value = [];
   lesson_list.value = [];
   topic_list.value = [];
+  form.topics = [];
+  selected_topics.value = [];
 
   // Reset file inputs
   file_original.value = null;
