@@ -1,9 +1,9 @@
 <template>
   <v-container class="create-test-container">
     <v-row class="mt-4">
-      <v-col cols="6" class="d-flex align-center">
+      <v-col cols="6" class="d-flex align-center mb-4" >
         <span class="icon icong-azmoon text-h3 text-teal mx-1"></span>
-        <h1 class="text-h4 text-teal">Update Online Exam</h1>
+        <h1 class="text-md-h4 text-h5 text-teal">Update Online Exam</h1>
       </v-col>
       <v-col cols="6" id="tool-box" class="text-right">
         <v-btn
@@ -2711,8 +2711,7 @@ const resetForm = () => {
   grade_list.value = [];
   lesson_list.value = [];
   topic_list.value = [];
-  form.topics = [];
-  selected_topics.value = [];
+  
 
   // Reset file inputs
   file_original.value = null;
