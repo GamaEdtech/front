@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="papers.items.length > 0" id="topicals-taps">
     <!-- Desktop Layout -->
-    <v-row class="my-0 flex-col flex-md-row d-none d-sm-flex">
+    <v-row class="my-0 flex-col flex-md-row d-flex">
       <v-col>
         <v-list
           class="d-inline-flex flex-col flex-md-row align-center flex-wrap"
@@ -20,10 +20,7 @@
               >
             </v-list-item-content>
           </v-list-item>
-          <v-list-item
-            class="pa-0"
-            style="min-height: fit-content; justify-content: space-evenly"
-          >
+          <div class="container-topical-chip">
             <v-chip-group>
               <v-chip
                 v-for="(paper, i) in papers.items"
@@ -31,39 +28,19 @@
                 class="white--text bg-primary-gray-700"
                 small
               >
-                {{ paper }}
+                <NuxtLink :to="`/paper/${paper.id}/${paper.title_url}`">
+                  {{
+                    paper.title.length > 50
+                      ? paper.title.slice(0, 50) + "..."
+                      : paper.title
+                  }}
+                </NuxtLink>
               </v-chip>
             </v-chip-group>
-          </v-list-item>
+          </div>
         </v-list>
       </v-col>
     </v-row>
-
-    <!-- Mobile Layout -->
-    <div class="d-sm-none mb-4">
-      <div class="d-flex align-center topical-header">
-        <v-icon color="#667085" size="24" class="topical-icon"
-          >mdi-book-open-variant</v-icon
-        >
-        <span class="gama-text-h6 font-weight-bold">{{ papers.label }}</span>
-      </div>
-
-      <div class="years-container">
-        <div v-for="(year, index) in years" :key="index" class="year-section">
-          <div class="year-label">{{ year.year }}</div>
-          <div class="papers-container">
-            <v-chip
-              v-for="(paper, i) in year.papers"
-              :key="i"
-              class="white--text bg-primary-gray-700 paper-chip"
-              small
-            >
-              {{ paper }}
-            </v-chip>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -77,66 +54,64 @@ export default {
     },
   },
   data() {
-    return {
-      years: [
-        {
-          year: "2024",
-          papers: ["Paper1", "Paper2", "Paper3"],
-        },
-        {
-          year: "2023",
-          papers: ["Paper1", "Paper2"],
-        },
-        {
-          year: "2022",
-          papers: ["Paper1", "Paper2"],
-        },
-      ],
-    };
+    return {};
   },
 };
 </script>
 
-<style scoped>
-.v-list-item__icon:first-child {
-  margin-right: 12px !important;
-}
+<style>
+#topicals-taps {
+  .v-list-item__icon:first-child {
+    margin-right: 12px !important;
+  }
 
-.topical-icon {
-  margin-right: 12px;
-  color: #ffb600 !important;
-}
-.v-list-item__icon > i {
-  color: #ffb600 !important;
-}
+  .topical-icon {
+    margin-right: 12px;
+    color: #ffb600 !important;
+  }
+  .v-list-item__icon > i {
+    color: #ffb600 !important;
+  }
 
-.years-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-}
+  .years-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
 
-.year-label {
-  color: #667085;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
+  .year-label {
+    color: #667085;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
 
-.papers-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
+  .papers-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 
-.paper-chip {
-  border-radius: 1rem;
-  font-weight: 500;
+  .paper-chip {
+    border-radius: 1rem;
+    font-weight: 500;
+  }
+  .container-topical-chip {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .v-chip-group .v-slide-group__content {
+    flex-wrap: wrap !important;
+  }
+  .v-item-group > .v-slide-group__wrapper > .v-slide-group__content {
+    flex-wrap: wrap !important;
+  }
 }
-@media only screen and (min-width: 960px) and (max-width: 1264px){
+@media only screen and (min-width: 960px) and (max-width: 1264px) {
   .gama-text-h6 {
     font-style: normal;
-    font-size: 1rem  !important;
+    font-size: 1rem !important;
     font-weight: 700 !important;
     line-height: normal;
   }
@@ -145,4 +120,4 @@ export default {
 .gama-text-h6 {
   color: #667085 !important;
 }
-</style> 
+</style>

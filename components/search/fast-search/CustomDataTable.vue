@@ -17,7 +17,23 @@
     <!-- Column Classification -->
     <template v-slot:[`item.name`]="{ item }">
       <span class="font-weight-normal text--primary-gray-600">{{
-        item.name
+        item.test_type_title
+      }}</span>
+    </template>
+
+    <!-- Column Year -->
+    <template v-slot:[`item.year`]="{ item }">
+      <span class="font-weight-normal text--primary-gray-600">{{
+        item.edu_year
+      }}</span>
+    </template>
+
+    <!-- Column Month -->
+    <template v-slot:[`item.term`]="{ item }">
+      <span class="font-weight-normal text--primary-gray-600">{{
+        $moment()
+          .month(Number(item.edu_month) - 1)
+          .format("MMMM")
       }}</span>
     </template>
 
@@ -25,11 +41,12 @@
     <template v-slot:[`item.downloadFilesContains`]="{ item }">
       <div class="d-flex flex-wrap justify-content-center">
         <v-chip
-          v-if="item.downloadFilesContains.qp"
+          v-if="item.q_file"
+          @click="startDownload(`q_pdf`, item)"
           small
           class="ma-1 chip-pill"
-          :color="item.theme === 'blackAndWhite' ? '#344054' : '#FEF3F2'"
-          :text-color="item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F04438'"
+          color="#FEF3F2"
+          text-color="#F04438"
           >qp</v-chip
         >
         <v-chip
@@ -42,11 +59,12 @@
         >
 
         <v-chip
-          v-if="item.downloadFilesContains.ms"
+          v-if="item.a_file"
+          @click="startDownload(`a_file`, item)"
           small
           class="ma-1 chip-pill"
-          :color="item.theme === 'blackAndWhite' ? '#344054' : '#ECFDF3'"
-          :text-color="item.theme === 'blackAndWhite' ? '#FFFFFF' : '#12B76A'"
+          color="#ECFDF3"
+          text-color="#12B76A"
           >ms</v-chip
         >
         <v-chip
@@ -59,11 +77,11 @@
         >
 
         <v-chip
-          v-if="item.downloadFilesContains.sf"
+          v-if="false"
           small
           class="ma-1 chip-pill"
-          :color="item.theme === 'blackAndWhite' ? '#344054' : '#FFFAEB'"
-          :text-color="item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F79009'"
+          color="#FFFAEB"
+          text-color="#F79009"
           >sf</v-chip
         >
         <v-chip
@@ -76,11 +94,11 @@
         >
 
         <v-chip
-          v-if="item.downloadFilesContains.in"
+          v-if="false"
           small
           class="ma-1 chip-pill"
-          :color="item.theme === 'blackAndWhite' ? '#344054' : '#FCF6F3'"
-          :text-color="item.theme === 'blackAndWhite' ? '#FFFFFF' : '#8F4949'"
+          color="#FCF6F3"
+          text-color="#8F4949"
           >in</v-chip
         >
         <v-chip
@@ -98,13 +116,11 @@
     <template v-slot:[`item.examHubIcon`]="{ item }">
       <v-chip
         class="d-flex align-center justify-center v-chip--link"
-        :color="item.theme === 'blackAndWhite' ? '#F2F4F7' : '#F9F5FF'"
+        color="#F9F5FF"
         link
-        :disabled="item.disable"
+        :disabled="!item.exam_id"
       >
-        <v-icon :color="item.theme === 'blackAndWhite' ? '#667085' : '#7F56D9'">
-          mdi-clipboard-text-outline
-        </v-icon>
+        <v-icon color="#7F56D9"> mdi-clipboard-text-outline </v-icon>
       </v-chip>
     </template>
   </v-data-table>
@@ -141,18 +157,28 @@
           <div class="mobile-card">
             <div class="paper-info">
               <!-- Display paper info directly -->
-              <span class="paper-info-part">{{ item.name }}</span>
+              <span class="paper-info-part">{{ item.test_type_title }}</span>
+            </div>
+            <div class="paper-info">
+              <span class="paper-info-part">{{ item.edu_year }}</span>
+            </div>
+            <div class="paper-info">
+              <span class="paper-info-part">{{
+                $moment()
+                  .month(Number(item.edu_month) - 1)
+                  .format("MMMM")
+              }}</span>
             </div>
             <div class="paper-chips">
               <!-- QP Chip -->
               <v-chip
-                v-if="item.downloadFilesContains.qp"
+                v-if="item.q_file"
+                @click="startDownload(`q_pdf`, item)"
                 x-small
                 class="chip-pill"
-                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FEF3F2'"
-                :text-color="
-                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F04438'
-                "
+                color="#FEF3F2"
+                text-color="
+                  #F04438"
                 >qp</v-chip
               >
               <v-chip
@@ -165,12 +191,13 @@
               >
               <!-- MS Chip -->
               <v-chip
-                v-if="item.downloadFilesContains.ms"
+                v-if="item.a_file"
+                @click="startDownload(`a_file`, item)"
                 x-small
                 class="chip-pill"
-                :color="item.theme === 'blackAndWhite' ? '#344054' : '#ECFDF3'"
-                :text-color="
-                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#12B76A'
+                color="#ECFDF3"
+                text-color="
+                 #12B76A
                 "
                 >ms</v-chip
               >
@@ -184,12 +211,12 @@
               >
               <!-- SF Chip -->
               <v-chip
-                v-if="item.downloadFilesContains.sf"
+                v-if="false"
                 x-small
                 class="chip-pill"
-                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FFFAEB'"
-                :text-color="
-                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#F79009'
+                color="#FFFAEB"
+                text-color="
+#F79009
                 "
                 >sf</v-chip
               >
@@ -203,12 +230,12 @@
               >
               <!-- IN Chip -->
               <v-chip
-                v-if="item.downloadFilesContains.in"
+                v-if="false"
                 x-small
                 class="chip-pill"
-                :color="item.theme === 'blackAndWhite' ? '#344054' : '#FCF6F3'"
-                :text-color="
-                  item.theme === 'blackAndWhite' ? '#FFFFFF' : '#8F4949'
+                color="#FCF6F3"
+                text-color="
+                  #8F4949
                 "
                 >in</v-chip
               >
@@ -223,15 +250,15 @@
               <!-- ExamHub Chip -->
               <v-chip
                 class="exam-hub-chip"
-                :color="item.theme === 'blackAndWhite' ? '#F2F4F7' : '#F9F5FF'"
+                color="#F9F5FF"
                 link
                 x-small
-                :disabled="item.disable"
+                :disabled="!item.exam_id"
               >
                 <v-icon
                   x-small
-                  :color="
-                    item.theme === 'blackAndWhite' ? '#667085' : '#7F56D9'
+                  color="
+                    #7F56D9
                   "
                 >
                   mdi-clipboard-text-outline
@@ -242,21 +269,6 @@
           </div>
         </template>
       </v-data-table>
-
-      <!-- Timeline -->
-      <div class="timeline-container">
-        <div class="timeline-line"></div>
-        <div class="year-markers">
-          <div class="year-marker" v-for="year in yearMarkers" :key="year.year">
-            <div class="year-label">
-              <div class="year">{{ year.year }}</div>
-              <div class="sub-label" v-if="year.subLabel">
-                {{ year.subLabel }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -273,6 +285,10 @@ export default {
       type: Array,
       required: true,
     },
+    timeline: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -283,15 +299,9 @@ export default {
         { text: "Year", value: "year" },
         { text: "Term", value: "term" },
       ],
-      yearMarkers: [
-        { year: "2024", subLabel: null },
-        { year: "Oct", subLabel: "Nov" },
-        { year: "May", subLabel: "JUN" },
-        { year: "Mar", subLabel: null },
-        { year: "2023", subLabel: null },
-      ],
     };
   },
+  computed: {},
   mounted() {
     this.checkScreenSize();
     window.addEventListener("resize", this.checkScreenSize);
@@ -310,6 +320,34 @@ export default {
       const width = window.innerWidth;
       this.isMobile = width < 768;
       this.isTablet = width >= 768 && width < 960;
+    },
+    startDownload(type, item) {
+      let apiUrl = "";
+      if (type === "q_word") apiUrl = `/api/v1/tests/download/${item.id}/word`;
+      if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${item.id}/pdf`;
+      if (type === "a_file")
+        apiUrl = `/api/v1/tests/download/${item.id}/answer`;
+      this.$axios
+        .$get(apiUrl, {
+          headers: {
+            Authorization: `${this.$auth.strategy.token.get()}`,
+          },
+        })
+        .then((response) => {
+          var FileSaver = require("file-saver");
+          FileSaver.saveAs(response.data.url, response.data.name);
+        })
+        .catch((err) => {
+          if (err.response.status == 400) {
+            if (
+              err.response.data.status == 0 &&
+              err.response.data.error == "creditNotEnough"
+            ) {
+              this.$toast.info("No enough credit");
+            }
+          }
+          console.log(err);
+        });
     },
   },
 };
@@ -457,7 +495,7 @@ export default {
   gap: 2rem;
   padding: 12px 12px;
   background-color: #f2f4f7;
-  width: calc(100% - 5em);
+  width: calc(100%);
   border-bottom: 1px solid #eaecf0;
 }
 
@@ -631,4 +669,4 @@ export default {
   text-align: center;
   vertical-align: middle;
 }
-</style> 
+</style>

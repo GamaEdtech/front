@@ -101,13 +101,13 @@
             </template>
           </div>
 
-          <div class="d-inline-flex d-md-none align-center gap-2">
+          <!-- <div class="d-inline-flex d-md-none align-center gap-2">
             <v-icon color="#98A2B3">mdi-eye</v-icon>
             <span style="margin-inline: 8px; color: #98a2b3">View</span>
             <span class="gama-text-h6 font-weight-bold">
               {{ viewCount }}
             </span>
-          </div>
+          </div> -->
         </div>
 
         <slot name="content"></slot>
@@ -239,6 +239,7 @@ export default {
      * Handle board selection from BoardDialog component
      */
     handleBoardSelection(board) {
+      this.$emit("board-change", board);
       this.selectedBoard = board;
       if (this.selectedBoard.id && this.selectedBoard.id !== board.id) {
         this.selectedGrade = null;
@@ -250,6 +251,7 @@ export default {
      * Handle grade selection from GradeDialog component
      */
     handleGradeSelection(grade) {
+      this.$emit("grade-change", grade);
       this.selectedGrade = grade;
       this.selectedSubject = null; // Clear subject when grade changes
       if (grade) {
@@ -261,6 +263,7 @@ export default {
      * Handle subject selection from SubjectDialog component
      */
     async handleSubjectSelection(subject) {
+      this.$emit("subject-change", subject);
       this.selectedSubject = subject;
       if (this.selectedBoard) {
         this.loader = false;
@@ -279,34 +282,43 @@ export default {
     async fetchSearchResults() {
       try {
         this.searchLoader = true;
-        let endpoint = `api/v1/search?type=test&section=${this.selectedBoard.id}&base=${this.selectedGrade.id}`;
 
-        if (this.selectedSubject && this.selectedSubject.id) {
-          endpoint += `&lesson=${this.selectedSubject.id}`;
-        }
+        let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${this.selectedSubject.id}`;
+        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}`;
 
-        const response = await this.$axios.get(endpoint);
+        this.$emit("changeLoadingTable", true);
+        this.$emit("changeLoadingTopSection", true);
+
+        const [response, responsePapers] = await Promise.all([
+          this.$axios.get(endpointTopSectionData),
+          this.$axios.get(endpointPapers),
+        ]);
+
         this.searchResults = response.data;
-
         if (
           this.searchResults &&
           this.searchResults.data &&
           this.searchResults.data.list &&
           this.searchResults.data.list.length > 0 &&
-          this.searchResults.data.list[0].lesson_pic
+          this.searchResults.data.lesson_pic
         ) {
-          this.bookImage = this.searchResults.data.list[0].lesson_pic;
+          this.bookImage = this.searchResults.data.lesson_pic;
         } else {
-          // Set bookImage to null if the list is empty or doesn't have lesson_pic
           this.bookImage = null;
         }
 
+        this.$emit("changeLoadingTable", false);
+        this.$emit("changeLoadingTopSection", false);
         this.$emit("search-results", this.searchResults);
+        this.$emit("result-papers", responsePapers.data);
+
         this.searchLoader = false;
       } catch (error) {
         console.error("Error fetching search results:", error);
         this.bookImage = null;
         this.searchLoader = false;
+        this.$emit("changeLoadingTable", false);
+        this.$emit("changeLoadingTopSection", false);
       }
     },
   },

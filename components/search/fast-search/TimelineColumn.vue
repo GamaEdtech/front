@@ -1,15 +1,15 @@
 <template>
   <v-col cols="2" class="timeline-column text-center">
-    <div 
-      v-for="(yearData, yearIndex) in timeline" 
-      :key="yearIndex" 
+    <div
+      v-for="(yearData, yearIndex) in timeline"
+      :key="yearIndex"
       class="timeline-group"
     >
       <div class="timeline-year">{{ yearData.year }}</div>
 
-      <div 
-        v-for="(monthPair, idx) in getMonthPairs(yearData.months)" 
-        :key="idx" 
+      <div
+        v-for="(monthPair, idx) in getMonthPairs(yearData.months)"
+        :key="idx"
         class="timeline-box"
       >
         <div class="timeline-month">{{ monthPair[0] }}</div>
@@ -23,12 +23,12 @@
 
 <script>
 export default {
-  name: 'TimelineColumn',
+  name: "TimelineColumn",
   props: {
     timeline: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
     getMonthPairs(months) {
@@ -37,9 +37,9 @@ export default {
         pairs.push([months[i], months[i + 1]]);
       }
       return pairs;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -114,4 +114,14 @@ export default {
   color: #667085;
   margin-top: 2px;
 }
-</style> 
+
+@media screen and (max-width: 600px) {
+  .timeline-box {
+    min-width: 62px;
+    min-height: 62px;
+  }
+  .timeline-month {
+    font-size: 12px;
+  }
+}
+</style>
