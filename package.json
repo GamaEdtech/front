@@ -21,6 +21,7 @@
     "@vee-validate/rules": "^4.15.0",
     "animejs": "^4.0.1",
     "axios": "^1.8.3",
+    "cannon-es": "^0.20.0",
     "chart.js": "4.4.7",
     "core-js": "3.40.0",
     "dayjs-nuxt": "2.1.11",
@@ -45,6 +46,5 @@
     "sass-loader": "^16.0.4",
     "vite-plugin-vuetify": "^2.0.4",
     "vuetify": "^3.7.8"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

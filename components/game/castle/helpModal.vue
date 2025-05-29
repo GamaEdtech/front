@@ -45,23 +45,23 @@
                     </h3>
                     <div class="mobile-controls">
                         <div class="mobile-control-group">
-                            <v-btn class="control-btn" @click="moveCharacter('up')" fab>
+                            <v-btn class="control-btn" fab>
                                 <v-icon>mdi-arrow-up</v-icon>
                             </v-btn>
                         </div>
                         <div class="mobile-control-group">
-                            <v-btn class="control-btn" @click="moveCharacter('left')" fab>
+                            <v-btn class="control-btn"  fab>
                                 <v-icon>mdi-arrow-left</v-icon>
                             </v-btn>
-                            <v-btn class="control-btn" @click="moveCharacter('down')" fab>
+                            <v-btn class="control-btn" fab>
                                 <v-icon>mdi-arrow-down</v-icon>
                             </v-btn>
-                            <v-btn class="control-btn" @click="moveCharacter('right')" fab>
+                            <v-btn class="control-btn" fab>
                                 <v-icon>mdi-arrow-right</v-icon>
                             </v-btn>
                         </div>
                         <div class="mobile-control-group">
-                            <v-btn class="rotate-btn" @touchstart="startTouch" @touchmove="moveTouch" fab>
+                            <v-btn class="rotate-btn" fab>
                                 <v-icon>mdi-rotate-3d-variant</v-icon>
                             </v-btn>
                             <span>Touch and drag to rotate</span>
@@ -106,48 +106,18 @@ const closeModal = () => {
     showModal.value = false;
 };
 
-const moveCharacter = (direction: string) => {
-    console.log(`Move character ${direction}`);
-    // Add your movement logic here
-};
-
-const startTouch = (event: TouchEvent) => {
-    // Add your touch start logic here
-};
-
-const moveTouch = (event: TouchEvent) => {
-    // Add your touch move logic here
-};
-
-const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.key === 'w' || event.key === 'a' || event.key === 's' || event.key === 'd') {
-        moveCharacter(event.key);
-    }
-};
-
-const handleMouseMove = (event: MouseEvent) => {
-    // Add your mouse move logic here
-};
 
 onMounted(() => {
     checkSavedPreference();
     window.addEventListener('resize', () => {
         isMobileOrTablet.value = window.innerWidth <= 1024;
     });
-    if (!isMobileOrTablet.value) {
-        window.addEventListener('keypress', handleKeyPress);
-        window.addEventListener('mousemove', handleMouseMove);
-    }
 });
 
 onUnmounted(() => {
     window.removeEventListener('resize', () => {
         isMobileOrTablet.value = window.innerWidth <= 1024;
     });
-    if (!isMobileOrTablet.value) {
-        window.removeEventListener('keypress', handleKeyPress);
-        window.removeEventListener('mousemove', handleMouseMove);
-    }
 });
 </script>
 
