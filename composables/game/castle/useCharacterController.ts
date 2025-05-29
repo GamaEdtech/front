@@ -1,11 +1,11 @@
 import * as THREE from 'three'
-import { shallowRef, ref, watch, computed, Ref } from 'vue'
+import { shallowRef, ref, watch, computed, type Ref } from 'vue'
 // import { doorModels } from '~/store/doorModels'
 import { animate } from 'animejs'
 import createGate from './useGate'
 import useGate from './useGate'
-import { DoorModels } from '~/interfaces/DoorModels.interface'
-import { Doors, Level, Step } from '~/interfaces/DoorStatus'
+import type { DoorModels } from '~/interfaces/DoorModels.interface'
+import type { Doors, Level, Step } from '~/interfaces/DoorStatus'
 import { useSound } from '~/composables/game/useSound'
 
 // Define types for better code organization

@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed, reactive, Ref } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed, reactive, type Ref } from 'vue'
 import { useThreeJS } from '../../composables/game/useThreejs'
 import { useCharacterController } from '../../composables/game/castle/useCharacterController'
 import MathModal from '@/components/game/castle/MathModal.vue'
@@ -44,9 +44,9 @@ import MobileMovementController from '~/components/game/castle/mobileMovementCon
 import MobileScreenControls from '~/components/game/castle/mobileScreenControls.vue'
 import HelpModal from '~/components/game/castle/helpModal.vue'
 import useGate from '~/composables/game/castle/useGate'
-import { DoorModels } from '~/interfaces/DoorModels.interface'
-import { Level } from '~/interfaces/DoorStatus'
-import { Levels, Step } from '~/interfaces/levels.interface'
+import type { DoorModels } from '~/interfaces/DoorModels.interface'
+import type { Level } from '~/interfaces/DoorStatus'
+import type { Levels, Step } from '~/interfaces/levels.interface'
 import Coins from '~/components/game/castle/coins.vue'
 import { useSound } from '~/composables/game/useSound'
 import { usePhysics } from '~/composables/game/castle/usePhysics'
