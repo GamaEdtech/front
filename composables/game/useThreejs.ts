@@ -1,7 +1,7 @@
 // composables/useThreejs.ts
 import * as THREE from 'three'
 import { ref, shallowRef, Ref } from 'vue'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export function useThreeJS() {
     // Scene elements
@@ -131,10 +131,10 @@ export function useThreeJS() {
     // }
 
     
-    const loadModel = async (url: string): Promise<THREE.Group<THREE.Object3DEventMap>> => {
+    const loadModel = async (url: string): Promise<GLTF> => {
         const loader = new GLTFLoader();
         const gltf = await loader.loadAsync(url)
-        const model = gltf.scene
+        const model = gltf
 
         console.log(model);
         
@@ -146,8 +146,9 @@ export function useThreeJS() {
     /**
      * Starts the main rendering animation loop
      */
-    const startAnimationLoop = () => {
+    const startAnimationLoop = (callback?: () => void) => {
         const animate = () => {
+            if (callback) callback()
             if (renderer.value) {
                 renderer.value.render(scene.value, camera.value)
             }
