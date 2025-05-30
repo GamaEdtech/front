@@ -5,17 +5,26 @@
       :key="yearIndex"
       class="timeline-group"
     >
-      <div class="timeline-year">{{ yearData.year }}</div>
-
       <div
-        v-for="(monthPair, idx) in getMonthPairs(yearData.months)"
-        :key="idx"
-        class="timeline-box"
+        class="timeline-year"
+        :style="{
+          top: `${getMarkerPosition(yearData.positions[0])}px`,
+        }"
       >
-        <div class="timeline-month">{{ monthPair[0] }}</div>
-        <div class="timeline-submonth" v-if="monthPair[1]">
-          {{ monthPair[1] }}
-        </div>
+        {{ yearData.year }}
+      </div>
+      <div
+        v-for="(month, monthIndex) in yearData.months"
+        :key="monthIndex"
+        class="timeline-box timeline-month"
+        :style="{
+          top: `${getMarkerPosition(
+            yearData.positions[monthIndex],
+            monthIndex
+          )}px`,
+        }"
+      >
+        {{ month }}
       </div>
     </div>
   </v-col>
@@ -31,12 +40,9 @@ export default {
     },
   },
   methods: {
-    getMonthPairs(months) {
-      const pairs = [];
-      for (let i = 0; i < months.length; i += 2) {
-        pairs.push([months[i], months[i + 1]]);
-      }
-      return pairs;
+    getMarkerPosition(itemIndex, monthIndex = 0) {
+      const heightSizeTableElement = window.innerWidth < 960 ? 174 : 57;
+      return itemIndex * heightSizeTableElement + monthIndex * 30;
     },
   },
 };
@@ -48,6 +54,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1 !important;
 }
 
 .timeline-column::before {
@@ -64,8 +71,9 @@ export default {
 
 .timeline-group {
   margin-bottom: 24px;
-  position: relative;
   z-index: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .timeline-year {
@@ -73,7 +81,7 @@ export default {
   color: #98a2b3;
   margin-bottom: 40px;
   background: #fff;
-  position: relative;
+  position: absolute;
 }
 .timeline-year::after {
   content: "";
@@ -106,6 +114,7 @@ export default {
   font-weight: 600;
   font-size: 14px;
   color: #101828;
+  position: absolute;
 }
 
 .timeline-submonth {

@@ -178,23 +178,36 @@ export default {
     },
 
     selectDefaultOrStoredBoard() {
-      const storedBoardJson = localStorage.getItem("selectedBoard");
-
-      if (storedBoardJson) {
-        try {
-          const storedBoard = JSON.parse(storedBoardJson);
-          const boardExists = this.boards.some((b) => b.id === storedBoard.id);
-          if (boardExists) {
-            this.selectedBoard = storedBoard;
-            this.$emit("board-selected", this.selectedBoard);
-            return;
-          }
-        } catch (error) {
-          console.error("Error parsing stored board", error);
-          localStorage.removeItem("selectedBoard");
+      if (this.$route.query.board) {
+        const boardExists = this.boards.find(
+          (b) => b.id === this.$route.query.board
+        );
+        if (boardExists) {
+          this.selectedBoard = boardExists;
+          this.$emit("board-selected", this.selectedBoard);
+          return;
         }
+      } else {
+        const storedBoardJson = localStorage.getItem("selectedBoard");
+
+        if (storedBoardJson) {
+          try {
+            const storedBoard = JSON.parse(storedBoardJson);
+            const boardExists = this.boards.some(
+              (b) => b.id === storedBoard.id
+            );
+            if (boardExists) {
+              this.selectedBoard = storedBoard;
+              this.$emit("board-selected", this.selectedBoard);
+              return;
+            }
+          } catch (error) {
+            console.error("Error parsing stored board", error);
+            localStorage.removeItem("selectedBoard");
+          }
+        }
+        this.setDefaultBoard();
       }
-      this.setDefaultBoard();
     },
 
     getBoardLogo(boardId) {

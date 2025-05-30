@@ -164,7 +164,7 @@ export default {
     },
 
     gradeId: {
-      immediate: true,
+      //immediate: true,
       handler(newGradeId) {
         if (newGradeId) {
           this.fetchSubjectsData().then(() => {
@@ -208,12 +208,16 @@ export default {
 
     checkSubjectSelection(shouldEmit = true) {
       if (!this.gradeId) {
-        if (shouldEmit) this.$emit("subject-selected", null);
+        if (shouldEmit) {
+          this.$emit("subject-selected", null);
+        }
         return;
       }
 
       if (!this.subjects || this.subjects.length === 0) {
-        if (shouldEmit) this.$emit("subject-selected", null);
+        if (shouldEmit) {
+          this.$emit("subject-selected", null);
+        }
         return;
       }
 
@@ -223,25 +227,52 @@ export default {
     setDefaultSubject(shouldEmit = true) {
       if (this.subjects.length === 0) return;
 
-      // Select the first subject as default
-      const firstSubject = this.subjects[0];
+      if (
+        this.$route.query.board &&
+        this.$route.query.grade &&
+        this.$route.query.subject
+      ) {
+        const subjectExists = this.subjects.find(
+          (b) => b.id === this.$route.query.subject
+        );
+        if (subjectExists) {
+          this.selectedSubject = {
+            id: subjectExists.id,
+            title: subjectExists.title,
+            name: subjectExists.title,
+            lesson_id: subjectExists.id,
+            base_id: subjectExists.gradeId,
+            parent: subjectExists.parent || "",
+            parent2: subjectExists.parent2 || "0",
+            master_: subjectExists.master_ || "",
+            list_order: subjectExists.list_order || "",
+            test_link: subjectExists.test_link,
+            book_link: subjectExists.book_link,
+            metadata: subjectExists.metadata || "{}",
+            bit_delete: subjectExists.bit_delete || "0",
+          };
+        }
+      } else {
+        // Select the first subject as default
+        const firstSubject = this.subjects[0];
 
-      this.selectedSubject = {
-        id: firstSubject.id,
-        title: firstSubject.title,
-        name: firstSubject.title,
-        lesson_id: firstSubject.id,
-        base_id: this.gradeId,
-        parent: firstSubject.parent || "",
-        parent2: firstSubject.parent2 || "0",
-        master_: firstSubject.master_ || "",
-        list_order: firstSubject.list_order || "",
-        test_link: firstSubject.test_link,
-        book_link: firstSubject.book_link,
-        metadata: firstSubject.metadata || "{}",
-        bit_delete: firstSubject.bit_delete || "0",
-        ...firstSubject,
-      };
+        this.selectedSubject = {
+          id: firstSubject.id,
+          title: firstSubject.title,
+          name: firstSubject.title,
+          lesson_id: firstSubject.id,
+          base_id: this.gradeId,
+          parent: firstSubject.parent || "",
+          parent2: firstSubject.parent2 || "0",
+          master_: firstSubject.master_ || "",
+          list_order: firstSubject.list_order || "",
+          test_link: firstSubject.test_link,
+          book_link: firstSubject.book_link,
+          metadata: firstSubject.metadata || "{}",
+          bit_delete: firstSubject.bit_delete || "0",
+          ...firstSubject,
+        };
+      }
 
       if (shouldEmit) {
         this.$emit("subject-selected", this.selectedSubject);

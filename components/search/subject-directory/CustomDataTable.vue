@@ -118,6 +118,7 @@
         class="d-flex align-center justify-center v-chip--link"
         color="#F9F5FF"
         link
+        :to="`/exam/${item.exam_id}`"
         :disabled="!item.exam_id"
       >
         <v-icon color="#7F56D9"> mdi-clipboard-text-outline </v-icon>
@@ -253,6 +254,7 @@
                 color="#F9F5FF"
                 link
                 x-small
+                :to="`/exam/${item.exam_id}`"
                 :disabled="!item.exam_id"
               >
                 <v-icon
@@ -435,7 +437,7 @@ export default {
   height: 30px !important;
   border-radius: 100%;
   cursor: pointer;
-  width: 100%;
+  width: 100% !important;
 }
 
 .chip-pill {
@@ -668,5 +670,11 @@ export default {
   letter-spacing: 0%;
   text-align: center;
   vertical-align: middle;
+}
+
+@media screen and (max-width: 960px) {
+  .v-chip--link {
+    width: 30px !important;
+  }
 }
 </style>

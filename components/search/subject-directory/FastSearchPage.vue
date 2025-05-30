@@ -15,6 +15,8 @@
       @subject-change="onSubjectChange"
       @changeLoadingTable="onChangeLoadingTable"
       @changeLoadingTopSection="onChangeLoadingTopSection"
+      ref="pageHeader"
+      @changeLoadingInfinitScroll="onChangeLoadingInfiniteScroll"
     >
       <!-- Desktop view -->
       <template slot="content">
@@ -53,7 +55,7 @@
 
     <!-- Table & Timeline -->
     <v-row
-      class="d-flex flex-row align-start justify-space-around justify-lg-space-between"
+      class="container-table-time-line d-flex flex-row justify-space-around justify-lg-space-between"
     >
       <v-col cols="10">
         <v-skeleton-loader
@@ -79,6 +81,20 @@
           <!-- Timeline Column -->
           <timeline-column :timeline="timeline" />
         </template>
+      </v-col>
+    </v-row>
+
+    <div class="line-infinite-loading" ref="loaderSection"></div>
+    <v-row
+      v-if="loadingInfinitScroll"
+      class="d-flex flex-row align-start justify-space-around justify-lg-space-between"
+    >
+      <v-col cols="10">
+        <v-skeleton-loader type="table-row"></v-skeleton-loader>
+        <v-skeleton-loader type="table-row"></v-skeleton-loader>
+        <v-skeleton-loader type="table-row"></v-skeleton-loader>
+        <v-skeleton-loader type="table-row"></v-skeleton-loader>
+        <v-skeleton-loader type="table-row"></v-skeleton-loader>
       </v-col>
     </v-row>
   </v-container>
@@ -145,22 +161,34 @@ export default {
     return {
       loadingDataTable: true,
       loadingTopSection: true,
+      loadingInfinitScroll: false,
+      isReachToEndListPaper: false,
     };
+  },
+
+  async mounted() {
+    this.setupScrollListener();
   },
   methods: {
     onSearchResult(data) {
       this.$emit("search-results", data);
     },
-    onSearchPaper(data) {
-      this.$emit("result-papers", data);
+    onSearchPaper(data, isContinuePreviousSubject) {
+      if (data.data.list.length == 0) {
+        this.isReachToEndListPaper = true;
+      }
+      this.$emit("result-papers", data, isContinuePreviousSubject);
     },
     onChangeBoard(board) {
+      this.isReachToEndListPaper = false;
       this.$emit("board-change", board);
     },
     onGradeChange(grade) {
+      this.isReachToEndListPaper = false;
       this.$emit("grade-change", grade);
     },
     onSubjectChange(subject) {
+      this.isReachToEndListPaper = false;
       this.$emit("subject-change", subject);
     },
     onChangeLoadingTable(loadingStatus) {
@@ -168,6 +196,28 @@ export default {
     },
     onChangeLoadingTopSection(loadingStatus) {
       this.loadingTopSection = loadingStatus;
+    },
+    onChangeLoadingInfiniteScroll(loadingStatus) {
+      this.loadingInfinitScroll = loadingStatus;
+    },
+    setupScrollListener() {
+      const targetDiv = this.$refs.loaderSection;
+
+      window.addEventListener("scroll", () => {
+        const rect = targetDiv.getBoundingClientRect();
+        const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+        if (
+          isDivInView &&
+          !this.loadingDataTable &&
+          !this.loadingInfinitScroll &&
+          !this.isReachToEndListPaper
+        ) {
+          {
+            this.$refs.pageHeader.fetchPapersWithPaginate();
+          }
+        }
+      });
     },
   },
 };
@@ -178,5 +228,14 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
+}
+
+.line-infinite-loading {
+  width: 100%;
+  height: 6px;
+}
+
+.container-table-time-line {
+  align-content: stretch;
 }
 </style>

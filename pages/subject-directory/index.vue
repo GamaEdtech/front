@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import FastSearchPage from "@/components/search/fast-search/FastSearchPage.vue";
+import FastSearchPage from "~/components/search/subject-directory/FastSearchPage.vue";
 import moment from "moment";
 
 export default {
@@ -110,8 +110,13 @@ export default {
         this.papersTopical.items = filterTopical[0].items;
       }
     },
-    onSearchPaper(data) {
-      this.papersItemsTable = data.data.list;
+    onSearchPaper(data, isContinuePreviousSubject) {
+      if (isContinuePreviousSubject) {
+        this.papersItemsTable = [...this.papersItemsTable, ...data.data.list];
+      } else {
+        this.papersItemsTable = data.data.list;
+        this.timeline = [];
+      }
 
       if (!this.papersItemsTable || this.papersItemsTable.length === 0) {
         this.timeline = [];
@@ -123,25 +128,35 @@ export default {
         .sort((a, b) => b - a);
 
       const timelineMap = {};
+      let positionCounter = 0;
+
       moments.forEach((m) => {
         const year = m.year();
         const month = m.format("MMM");
+
         if (!timelineMap[year]) {
-          timelineMap[year] = new Set();
+          timelineMap[year] = { months: new Set(), positions: [] };
         }
-        timelineMap[year].add(month);
+
+        if (!timelineMap[year].months.has(month)) {
+          timelineMap[year].positions.push(positionCounter);
+        }
+
+        timelineMap[year].months.add(month);
+        positionCounter++;
       });
 
       this.timeline = Object.keys(timelineMap)
         .sort((a, b) => b - a)
         .map((year) => ({
           year: parseInt(year),
-          months: Array.from(timelineMap[year]).reverse(),
+          months: Array.from(timelineMap[year].months),
+          positions: timelineMap[year].positions,
         }));
     },
     onChangeBoard(board) {
       const newBoard = {
-        text: board.name,
+        text: board.name ? board.name : board.title,
         disabled: true,
         href: `/search?type=test&section=${board.id}`,
         name: "board",
