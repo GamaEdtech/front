@@ -1,8 +1,8 @@
 import { useThreeJS } from "../useThreejs";
 // import { doorModels } from '~/store/doorModels'
 import * as THREE from "three"
-import { Ref } from "@vue/runtime-dom";
-import { DoorModels } from "~/interfaces/DoorModels.interface";
+import type { Ref } from "@vue/runtime-dom";
+import type { DoorModels } from "~/interfaces/DoorModels.interface";
 import useChestModel from "./useChestModel";
 
 

@@ -1,7 +1,8 @@
 // composables/useThreejs.ts
 import * as THREE from 'three'
-import { ref, shallowRef, Ref } from 'vue'
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { ref, shallowRef, type Ref } from 'vue'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export function useThreeJS() {
     // Scene elements

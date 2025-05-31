@@ -1,7 +1,7 @@
 import useCastleModel from "./useCastleModel"
 import * as THREE from "three"
-import { Ref } from "@vue/runtime-dom"
-import { DoorModels } from "~/interfaces/DoorModels.interface"
+import type { Ref } from "@vue/runtime-dom"
+import type { DoorModels } from "~/interfaces/DoorModels.interface"
 import useChestModel from "./useChestModel"
 
 const useModels = async (scene: Ref<THREE.Scene>, doorModels: DoorModels, modelesLoaded: Ref<boolean>) => {
