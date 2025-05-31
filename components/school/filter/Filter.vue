@@ -87,8 +87,19 @@
           </div>
           <div class="each-item-filter result-div">
             Results
-            <span class="count-result">102665</span>
+            <span class="count-result" v-if="totalSchoolFind != 0">{{
+              totalSchoolFind
+            }}</span>
           </div>
+        </div>
+
+        <div class="result-div-mobile gama-text-overline">
+          Results
+          <span
+            class="count-result gama-text-button"
+            v-if="totalSchoolFind != 0"
+            >{{ totalSchoolFind }}</span
+          >
         </div>
       </div>
     </div>
@@ -123,6 +134,7 @@
           placeholder="City"
           active-color="#ffb600"
           :disabled="!filterForm.state"
+          @update:modelValue="cityChange"
         />
       </div>
     </div>
@@ -170,6 +182,7 @@
               placeholder="City"
               active-color="#ffb600"
               :disabled="!filterForm.state"
+              @update:modelValue="cityChange"
             />
           </div>
         </div>
@@ -277,8 +290,12 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  totalSchoolFind: {
+    type: Number,
+    required: true,
+  },
 });
-
+const emit = defineEmits(["update-filter"]);
 const router = useRouter();
 const route = useRoute();
 
@@ -352,7 +369,6 @@ const filterForm = reactive({
     ? [route.query.religion]
     : [],
 });
-const resultCount = ref("--");
 const filter = reactive({
   countryList: [],
   stateList: [],
@@ -374,7 +390,7 @@ const getFilterList = async (params, type) => {
       endpoint = `/api/v2/locations/cities/${filterForm.state}`;
 
     const response = await $fetch(endpoint, { params });
-    console.log("gereft response", response);
+    // console.log("gereft response", response);
 
     if (type === "countries") filter.countryList = response.data.list;
     if (type === "states") filter.stateList = response.data.list;
@@ -411,7 +427,8 @@ const updateQueryParams = () => {
     query.coed_status = filterForm.coed_status;
   if (filterForm.religion.length > 0 && filterForm.religion != undefined)
     query.religion = filterForm.religion;
-  router.replace({ query });
+  // router.replace({ query });
+  emit("update-filter", query);
 };
 
 const openFilterSection = (event, filter) => {
@@ -458,7 +475,10 @@ const stateChange = () => {
   }
   updateQueryParams();
 };
-// watch(() => filterForm.city, updateQueryParams);
+
+const cityChange = () => {
+  updateQueryParams();
+};
 
 // End Section Filter Location
 

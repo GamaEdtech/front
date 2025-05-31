@@ -24,10 +24,10 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        bottom: -75%;
+        bottom: -60%;
         transition: all 0.5s;
         @include style.responsive-size(position, relative, absolute, absolute, absolute);
-        @include style.responsive-size(height, 100%, 80%, 80%, 80%);
+        @include style.responsive-size(height, 100%, 95%, 95%, 95%);
         @include style.responsive-size(border-radius, 0, 20px 20px 0 0, 20px 20px 0 0, 20px 20px 0 0);
 
         .grab-line-div {
@@ -44,6 +44,30 @@
                 border-radius: 30px;
                 background-color: #ccc;
                 cursor: pointer;
+            }
+        }
+        .container-div-button {
+            width: 100%;
+            min-height: 70px;
+            background-color: #f2f4f7;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 20px;
+            @include style.responsive-size(display, flex, none, none, none);
+            .map-view-button {
+                width: 160px;
+                height: 50px;
+                border-radius: 28px;
+                background-color: rgb(18, 183, 106);
+                border: none;
+                outline: none;
+                font-weight: 500;
+                font-size: 20px;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                column-gap: 10px;
             }
         }
     }
