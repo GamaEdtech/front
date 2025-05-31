@@ -198,18 +198,35 @@ export default {
     setDefaultGrade() {
       if (this.grades.length === 0) return;
 
-      // Select the first grade as default
-      const firstGrade = this.grades[0];
-      this.selectedGrade = {
-        id: firstGrade.id,
-        title: firstGrade.title,
-        name: firstGrade.title,
-        parent: firstGrade.parent || this.boardId,
-        master_: firstGrade.master_ || "",
-        list_order: firstGrade.list_order || "",
-        section_id: this.boardId,
-        ...firstGrade,
-      };
+      if (this.$route.query.board && this.$route.query.grade) {
+        const gradeExists = this.grades.find(
+          (b) => b.id === this.$route.query.grade
+        );
+        if (gradeExists) {
+          this.selectedGrade = {
+            id: gradeExists.id,
+            title: gradeExists.title,
+            name: gradeExists.title,
+            parent: gradeExists.parent || "",
+            master_: gradeExists.master_ || "",
+            list_order: gradeExists.list_order || "",
+            section_id: gradeExists.parent || "",
+          };
+        }
+      } else {
+        // Select the first grade as default
+        const firstGrade = this.grades[0];
+        this.selectedGrade = {
+          id: firstGrade.id,
+          title: firstGrade.title,
+          name: firstGrade.title,
+          parent: firstGrade.parent || this.boardId,
+          master_: firstGrade.master_ || "",
+          list_order: firstGrade.list_order || "",
+          section_id: this.boardId,
+          ...firstGrade,
+        };
+      }
 
       this.$emit("grade-selected", this.selectedGrade);
     },

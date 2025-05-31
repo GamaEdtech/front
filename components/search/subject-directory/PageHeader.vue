@@ -31,7 +31,11 @@
               @click="toggleBoardDialog(true)"
             >
               <span class="w-100 gama-text-h3 font-weight-semibold">
-                {{ selectedBoard?.name }}
+                {{
+                  selectedBoard?.name
+                    ? selectedBoard?.name
+                    : selectedBoard?.title
+                }}
               </span>
               <v-icon size="18" color="black" class="mx-2">
                 mdi-menu-down
@@ -193,6 +197,8 @@ export default {
       loader: true,
       searchResults: null,
       bookImage: null,
+      pageNumber: 1,
+      isFirstTime: true,
     };
   },
 
@@ -235,15 +241,34 @@ export default {
       this.showSubjectDialog = value;
     },
 
+    setQueryParam() {
+      if (this.selectedBoard) {
+        const query = {};
+        query.board = this.selectedBoard.id;
+        if (this.selectedGrade) {
+          query.grade = this.selectedGrade.id;
+          if (this.selectedSubject) {
+            query.subject = this.selectedSubject.id;
+          }
+        }
+        this.$router.replace({ query: query }).catch((err) => {
+          //Do noting
+        });
+      }
+    },
     /**
      * Handle board selection from BoardDialog component
      */
     handleBoardSelection(board) {
-      this.$emit("board-change", board);
-      this.selectedBoard = board;
-      if (this.selectedBoard.id && this.selectedBoard.id !== board.id) {
+      if (!this.selectedBoard || this.selectedBoard.id !== board.id) {
+        this.pageNumber = 1;
+        this.$emit("board-change", board);
+        this.selectedBoard = board;
         this.selectedGrade = null;
         this.selectedSubject = null;
+        if (!this.isFirstTime) {
+          this.setQueryParam();
+        }
       }
     },
 
@@ -251,11 +276,17 @@ export default {
      * Handle grade selection from GradeDialog component
      */
     handleGradeSelection(grade) {
-      this.$emit("grade-change", grade);
-      this.selectedGrade = grade;
-      this.selectedSubject = null; // Clear subject when grade changes
-      if (grade) {
-        this.isLoadingSubjects = true;
+      if (!this.selectedGrade || this.selectedGrade.id !== grade.id) {
+        this.pageNumber = 1;
+        this.$emit("grade-change", grade);
+        this.selectedGrade = grade;
+        this.selectedSubject = null; // Clear subject when grade changes
+        if (!this.isFirstTime) {
+          this.setQueryParam();
+        }
+        if (grade) {
+          this.isLoadingSubjects = true;
+        }
       }
     },
 
@@ -263,12 +294,14 @@ export default {
      * Handle subject selection from SubjectDialog component
      */
     async handleSubjectSelection(subject) {
+      this.pageNumber = 1;
       this.$emit("subject-change", subject);
       this.selectedSubject = subject;
+      this.setQueryParam();
+      this.isFirstTime = false;
       if (this.selectedBoard) {
         this.loader = false;
         this.isLoadingSubjects = false;
-
         // Call search API when subject is selected
         if (this.selectedBoard.id && subject?.id) {
           await this.fetchSearchResults();
@@ -284,7 +317,7 @@ export default {
         this.searchLoader = true;
 
         let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${this.selectedSubject.id}`;
-        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}`;
+        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20`;
 
         this.$emit("changeLoadingTable", true);
         this.$emit("changeLoadingTopSection", true);
@@ -319,6 +352,21 @@ export default {
         this.searchLoader = false;
         this.$emit("changeLoadingTable", false);
         this.$emit("changeLoadingTopSection", false);
+      }
+    },
+
+    async fetchPapersWithPaginate() {
+      try {
+        this.pageNumber += 1;
+        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20`;
+        this.$emit("changeLoadingInfinitScroll", true);
+        const responsePapers = await this.$axios.get(endpointPapers);
+
+        this.$emit("result-papers", responsePapers.data, true);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        this.$emit("changeLoadingInfinitScroll", false);
       }
     },
   },
