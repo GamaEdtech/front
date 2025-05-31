@@ -157,6 +157,14 @@
                     >
                       {{ contentData.edu_year }}
                     </v-chip>
+                    <v-chip
+                      :small="$vuetify.breakpoint.mdAndDown"
+                      link
+                      :to="`/subject-directory?board=${contentData.section}&grade=${contentData.base}&subject=${contentData.lesson}`"
+                      class="ma-1 primary"
+                    >
+                      {{ `${contentData.lesson_title} directory` }}
+                    </v-chip>
                   </div>
                 </div>
               </div>
