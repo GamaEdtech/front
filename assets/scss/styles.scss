@@ -4706,3 +4706,7 @@ body {
 .ck-toolbar__items {
   flex-wrap: wrap !important;
 }
+
+.token-market__section .v-expansion-panel::before {
+  box-shadow: unset !important;
+}
