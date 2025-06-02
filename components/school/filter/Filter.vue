@@ -9,6 +9,7 @@
             placeholder="Search anything..."
             icon="mdi-magnify"
             active-color="#ffb600"
+            :disable="isExpandMap"
           />
         </div>
         <div class="button-sort-filter-mobile">
@@ -22,7 +23,9 @@
         </div>
         <div class="filter-options-div">
           <div
-            :class="`each-item-filter ${item.active ? `` : `deactive`}`"
+            :class="`each-item-filter ${
+              item.active && !isExpandMap ? `` : `deactive`
+            }`"
             v-for="item in optionFilter"
             :key="item.name"
             @click="openFilterSection($event, item)"
@@ -186,7 +189,7 @@
             />
           </div>
         </div>
-        <div class="container-checkbox-group">
+        <div class="container-checkbox-group" v-if="false">
           <div class="container-each-group">
             <span class="title-group">Board</span>
             <checkboxInput
@@ -237,7 +240,7 @@
             />
           </div>
         </div>
-        <div class="container-tuition">
+        <div class="container-tuition" v-if="false">
           <span class="title-group">Tition fee</span>
           <div class="container-input">
             <div
@@ -294,6 +297,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  isExpandMap: {
+    type: Boolean,
+    required: true,
+  },
 });
 const emit = defineEmits(["update-filter"]);
 const router = useRouter();
@@ -302,11 +309,11 @@ const route = useRoute();
 onMounted(() => {
   // Initial data fetch
   getFilterList({ "PagingDto.PageFilter.Size": 250 }, "countries");
-  getFilterList({ type: "section" }, "board");
-  getFilterList({ type: "school_type" }, "school_type");
-  getFilterList({ type: "boarding_type" }, "boarding_type");
-  getFilterList({ type: "coed_status" }, "coed_status");
-  getFilterList({ type: "religion" }, "religion");
+  //getFilterList({ type: "section" }, "board");
+  //getFilterList({ type: "school_type" }, "school_type");
+  //getFilterList({ type: "boarding_type" }, "boarding_type");
+  //getFilterList({ type: "coed_status" }, "coed_status");
+  //getFilterList({ type: "religion" }, "religion");
 
   // Initialize from route
   if (route.query.country) {
@@ -321,12 +328,12 @@ onMounted(() => {
 const optionFilter = ref([
   {
     name: "Board",
-    active: true,
+    active: false,
     isShow: false,
   },
   {
     name: "Tuition fee",
-    active: true,
+    active: false,
     isShow: false,
   },
   {
@@ -336,7 +343,7 @@ const optionFilter = ref([
   },
   {
     name: "Sort",
-    active: true,
+    active: false,
     isShow: false,
   },
 ]);
@@ -433,18 +440,20 @@ const updateQueryParams = () => {
 
 const openFilterSection = (event, filter) => {
   event.stopPropagation();
-  console.log("open filter");
+  if (filter.active && !props.isExpandMap) {
+    console.log("open filter");
 
-  const lastShowOption = optionFilter.value.filter((item) => item.isShow);
-  if (lastShowOption.length > 0) {
-    if (lastShowOption[0].name == filter.name) {
-      filter.isShow = false;
+    const lastShowOption = optionFilter.value.filter((item) => item.isShow);
+    if (lastShowOption.length > 0) {
+      if (lastShowOption[0].name == filter.name) {
+        filter.isShow = false;
+      } else {
+        lastShowOption[0].isShow = false;
+        filter.isShow = true;
+      }
     } else {
-      lastShowOption[0].isShow = false;
       filter.isShow = true;
     }
-  } else {
-    filter.isShow = true;
   }
 };
 

@@ -1,6 +1,19 @@
 <template>
   <div :class="`main-list-school-div ${isExpanded ? `` : `closed-list`}`">
-    <div class="container-list-div" ref="scrollDivRef">
+    <div
+      class="container-button-load-previous-data"
+      v-if="pageNumberForLoadPreviousData != 1 && !isInitialLoading"
+    >
+      <button @click="loadPreviousPage" class="load-previous-button">
+        Load Previous Data
+      </button>
+    </div>
+    <div
+      :class="`container-list-div ${
+        pageNumberForLoadPreviousData != 1 ? `adjust-height` : ``
+      }`"
+      ref="scrollDivRef"
+    >
       <div class="container-scroll">
         <div
           v-if="isInitialLoading"
@@ -28,7 +41,34 @@
             <div class="rate-update skeleton-loader"></div>
           </div>
         </div>
-        <div v-else class="card-school" v-for="(school, index) in schoolList">
+
+        <div v-if="isPaginationPreviousLoading" class="skeleton-card-school">
+          <div class="name-address-image">
+            <div class="name-div">
+              <span class="name skeleton-loader"></span>
+              <div class="chips-address">
+                <span class="chip-address skeleton-loader"></span>
+                <span class="chip-address skeleton-loader"></span>
+                <span class="chip-address skeleton-loader"></span>
+              </div>
+            </div>
+            <div class="img-div skeleton-loader"></div>
+          </div>
+          <div class="line-seperator"></div>
+          <div class="links-rate">
+            <div class="link-icons">
+              <div class="link skeleton-loader"></div>
+              <div class="link skeleton-loader"></div>
+              <div class="link skeleton-loader"></div>
+            </div>
+            <div class="rate-update skeleton-loader"></div>
+          </div>
+        </div>
+        <div
+          v-if="!isInitialLoading"
+          class="card-school"
+          v-for="(school, index) in schoolList"
+        >
           <div class="name-address-image">
             <div class="name-div">
               <span class="name gtext-t4 font-weight-semibold">{{
@@ -142,6 +182,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  isPaginationPreviousLoading: {
+    type: Boolean,
+    required: true,
+  },
   isAllDataLoaded: {
     type: Boolean,
     required: true,
@@ -150,9 +194,13 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  pageNumberForLoadPreviousData: {
+    type: Boolean,
+    required: true,
+  },
 });
 
-const emit = defineEmits(["loadNextPage"]);
+const emit = defineEmits(["loadNextPage", "loadPreviousPage"]);
 
 const lineSpecifierLoadMoreRef = ref(null);
 const scrollDivRef = ref(null);
@@ -183,6 +231,10 @@ const handleScrollListener = () => {
     console.log("reach to scroll view for load more data");
     emit("loadNextPage");
   }
+};
+
+const loadPreviousPage = () => {
+  emit("loadPreviousPage");
 };
 </script>
 

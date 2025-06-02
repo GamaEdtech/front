@@ -2,7 +2,7 @@
   <div class="main-search-input-div">
     <div
       class="custom-text-field"
-      :class="{ 'has-value': hasValue }"
+      :class="{ 'has-value': hasValue, disable: disable }"
       :style="{
         borderColor: hasValue ? activeColor : `#ccc`,
       }"
@@ -14,6 +14,7 @@
         @input="onInput"
         @focus="isFocused = true"
         @blur="isFocused = false"
+        :disabled="disable"
       />
       <label :style="labelStyle">{{ placeholder }}</label>
     </div>
@@ -39,6 +40,10 @@ const props = defineProps({
   activeColor: {
     type: String,
     default: "#1976D2",
+  },
+  disable: {
+    type: Boolean,
+    default: false,
   },
 });
 

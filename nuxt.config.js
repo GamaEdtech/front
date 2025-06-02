@@ -123,6 +123,7 @@ export default defineNuxtConfig({
     "dayjs-nuxt",
     "nuxt-gtag",
     "@nuxt/image",
+    "@nuxtjs/leaflet",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
@@ -130,6 +131,9 @@ export default defineNuxtConfig({
       });
     },
   ],
+  leaflet: {
+    markerCluster: true
+  },
   image: {
     domains: ['core.gamatrain.com']
   },
