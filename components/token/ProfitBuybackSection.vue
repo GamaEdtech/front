@@ -3,14 +3,12 @@
     <v-container class="profit-buyback-container">
       <v-row justify="center">
         <v-col cols="12">
-          <div class="profit-buyback-title text-h3 font-weight-bold">
-            Profit Distribution and Buyback
-          </div>
+          <h2 class="profit-buyback-title">Profit Distribution and Buyback</h2>
         </v-col>
       </v-row>
       <v-row justify="center">
         <v-col cols="12" class="d-flex justify-center px-0">
-          <div class="video-card px-15 px-lg-0">
+          <div class="video-card px-4 px-sm-15 px-lg-0">
             <iframe
               class="rounded youtube-container"
               src="https://www.youtube.com/embed/qJcZwPcXyXU?si=Y4PcVrImzRAanotw"
@@ -24,7 +22,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <div class="profit-buyback-description px-15 px-lg-0">
+        <div class="profit-buyback-description px-7 px-sm-15 px-lg-0">
           <p>
             After covering platform costs (servers, development, maintenance,
             content team, and taxes), all remaining profits go toward buying
@@ -57,13 +55,14 @@ export default {
 .profit-buyback-title {
   text-align: center;
   color: #354053;
-  margin-bottom: 22px;
+  margin-bottom: 7px;
+  font-size: 24px;
+  font-weight: 800;
 }
 .video-card {
   position: relative;
   width: 100%;
-  height: 340px;
-  min-height: 400px;
+  height: 200px;
   max-width: 100%;
   max-height: 550px;
   border-radius: 8px;
@@ -87,36 +86,31 @@ export default {
   pointer-events: auto;
   transition: background 0.2s;
 }
-
 .profit-buyback-description {
-  color: #6e7781;
-  font-size: 18px;
-  font-weight: 400;
+  color: #242a2f;
+  font-size: 16px;
+  font-weight: 600;
   margin-top: 32px;
+}
+@media (min-width: 600px) {
+  .profit-buyback-title {
+    font-size: 30px;
+    margin-bottom: 22px;
+  }
+  .video-card {
+    height: 340px;
+  }
+  .profit-buyback-description {
+    color: #6e7781;
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 32px;
+  }
 }
 @media (min-width: 960px) {
   .video-card {
-    height: 550px;
-  }
-}
-@media (max-width: 900px) {
-  .video-card {
-    max-width: 100%;
-    min-height: 220px;
-  }
-}
-@media (max-width: 600px) {
-  .profit-buyback-title {
-    font-size: 18px;
-    margin-bottom: 18px;
-  }
-  .video-card {
-    min-height: 160px;
-  }
-
-  .profit-buyback-description {
-    font-size: 12px;
-    margin-top: 18px;
+    min-height: 400px;
+    height: 540px;
   }
 }
 </style>

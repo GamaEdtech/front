@@ -1,8 +1,8 @@
 <template>
   <div>
-    <section class="token-market__section px-15 px-lg-0">
+    <section class="token-market__section px-5 px-sm-15 px-lg-0">
       <v-container>
-        <h4 class="token-market__title mb-6">View $GET Live on Solana</h4>
+        <h2 class="token-market__title mb-6">View $GET Live on Solana</h2>
         <div>
           <iframe
             class="token-market__iframe"
@@ -13,9 +13,9 @@
           >
           </iframe>
         </div>
-        <div class="token-market__description">
-          Keep an eye on $GET’s market movement and trade anytime with Jupiter.
-        </div>
+        <p class="token-market__description">
+          Keep an eye on $GET's market movement and trade anytime with Jupiter.
+        </p>
       </v-container>
     </section>
   </div>
@@ -34,18 +34,32 @@ export default {
   font-weight: 800;
   text-align: center;
 }
+
 .token-market__section {
   padding-top: 8rem;
 }
+
 .token-market__description {
   color: #24292f;
   font-size: 16px;
   font-weight: 400;
-  margin: 20px 30px;
+  margin: 20px 10px;
   text-align: center;
 }
+
 .token-market__iframe {
   height: 380px;
+}
+@media (min-width: 600px) {
+  .token-market__title {
+    color: #000000;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+  }
+  ken-market__iframe {
+    height: 380px;
+  }
 }
 @media (min-width: 960px) {
   .token-market__description {

@@ -3,8 +3,8 @@
     <section class="token-market__section">
       <div class="token-market__head">
         <div class="d-flex align-center flex-column py-8">
-          <h1 class="token-market__title">$GET FAQ’s</h1>
-          <h6 class="token-market__description">Frequently Asked Questions</h6>
+          <h2 class="token-market__title">$GET FAQ’s</h2>
+          <p class="token-market__description">Frequently Asked Questions</p>
         </div>
       </div>
       <v-container>
@@ -16,12 +16,12 @@
                 expand-icon-collapsed="mdi-minus"
                 disable-icon-rotate
               >
-                <div class="token-market__expansion">
+                <h3 class="token-market__expansion">
                   {{ faq.question }}
-                </div>
+                </h3>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                {{ faq.answer }}
+                <p>{{ faq.answer }}</p>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
@@ -100,18 +100,30 @@ export default {
   background: #000000;
 }
 .token-market__title {
-  font-size: 50px;
+  font-size: 34px;
   color: #ffb600;
   font-weight: 800;
 }
 .token-market__description {
   color: #ffb600;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 }
 .token-market__expansion {
   color: #24292f;
   font-size: 18px;
   font-weight: 600;
+}
+@media (min-width: 600px) {
+  .token-market__title {
+    font-size: 50px;
+    font-weight: 800;
+  }
+  .token-market__description {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+@media (min-width: 960px) {
 }
 </style>

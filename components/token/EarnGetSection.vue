@@ -1,16 +1,16 @@
 <template>
   <section class="earn-get-section">
     <v-container class="earn-get-container">
-      <div class="earn-get-title">How Do You Earn $GET?</div>
+      <h2 class="earn-get-title">How Do You Earn $GET?</h2>
       <v-row class="earn-get-grid" align="center" justify="center" no-gutters>
-        <v-col v-for="(card, i) in cards" :key="i" cols="12" sm="6" md="3">
+        <v-col v-for="(card, i) in cards" :key="i" cols="6" md="6" lg="3">
           <div class="earn-get-card">
             <div class="earn-get-img-section">
               <v-img :src="card.img" class="earn-get-img" contain />
             </div>
             <div class="earn-get-card-content">
-              <div class="earn-get-card-title">{{ card.title }}</div>
-              <div class="earn-get-card-desc">{{ card.desc }}</div>
+              <h3 class="earn-get-card-title">{{ card.title }}</h3>
+              <p class="earn-get-card-desc">{{ card.desc }}</p>
             </div>
           </div>
         </v-col>
@@ -116,28 +116,16 @@ export default {
   color: #6e7781;
   font-size: 14px;
   height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
-@media (max-width: 1260px) {
-  .earn-get-card {
-  }
-  .earn-get-img-section {
-    height: 200px;
-  }
-  .earn-get-img {
-    /* width: 120px;
-    height: 120px; */
-  }
+
+@media (min-width: 600px) {
 }
-@media (max-width: 960px) {
-  .earn-get-card {
-  }
-  .earn-get-img-section {
-    /* height: 100px; */
-  }
-  .earn-get-img {
-    /* width: 60px;
-    height: 60px; */
-  }
+@media (min-width: 960px) {
 }
 @media (max-width: 600px) {
   .earn-get-container {
@@ -147,18 +135,8 @@ export default {
     font-size: 20px;
     margin-bottom: 24px;
   }
-  .earn-get-card {
-    width: 100%;
-  }
   .earn-get-img-section {
-    height: 60px;
-  }
-  .earn-get-img {
-    width: 40px;
-    height: 40px;
-  }
-  .earn-get-card-content {
-    padding: 10px 6px 0 6px;
+    height: 125px;
   }
 }
 </style>
