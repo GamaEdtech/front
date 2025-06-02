@@ -150,7 +150,7 @@ export default {
     height: 220px;
   }
   .h-token-token {
-    top: 45%;
+    top: 40%;
   }
   .h-token-preview {
     margin-top: 5rem;
