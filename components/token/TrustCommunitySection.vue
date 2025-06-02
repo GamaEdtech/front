@@ -1,10 +1,10 @@
 <template>
   <section class="trust-community-section">
     <v-container class="trust-community-container">
-      <div class="trust-community-title">
+      <div class="trust-community-title text-h3">
         Built On Trust, Driven By Community
       </div>
-      <div class="trust-community-subtitle">
+      <div class="trust-community-subtitle text-h5">
         At Gamatrain, our mission is to empower the community through a
         foundation of:
       </div>
@@ -39,14 +39,14 @@
           <v-img
             src="/images/token/built.png"
             alt="Community Illustration"
-            class="trust-community-illustration"
+            class="trust-community-illustration d-none d-lg-block"
             contain
             width="245"
             height="245"
           />
         </v-col>
       </v-row>
-      <div class="trust-community-description">
+      <div class="trust-community-description text-h5">
         Every decision, reward, and improvement is made with our contributors in
         mind – because GamaTrain is built with you, not just for you.
       </div>
@@ -88,15 +88,12 @@ export default {
 .trust-community-title {
   text-align: center;
   color: #354053;
-  font-size: 30px;
   font-weight: 800;
   margin-bottom: 32px;
 }
 .trust-community-subtitle {
   text-align: center;
   color: #24292f;
-  font-size: 20px;
-  font-weight: 400;
   margin-bottom: 32px;
 }
 .trust-community-content {
@@ -105,7 +102,6 @@ export default {
 .trust-community-list-col {
   display: flex;
   justify-content: center;
-  /* justify-content: flex-end; */
 }
 .trust-community-list {
   display: flex;
@@ -115,7 +111,7 @@ export default {
 .trust-community-list-item {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 11px;
 }
 .trust-community-icon {
   background: #23272f;
@@ -152,9 +148,6 @@ export default {
   margin-top: 40px;
   text-align: center;
   color: #4a5568;
-  font-size: 14px;
-  font-weight: 400;
-  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -167,7 +160,6 @@ export default {
   .trust-community-list {
     margin-left: 0;
     margin-right: 0;
-    align-items: center;
   }
   .trust-community-illustration {
     margin-top: 32px;

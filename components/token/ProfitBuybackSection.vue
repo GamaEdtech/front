@@ -3,14 +3,14 @@
     <v-container class="profit-buyback-container">
       <v-row justify="center">
         <v-col cols="12">
-          <div class="profit-buyback-title">
+          <div class="profit-buyback-title text-h3 font-weight-bold">
             Profit Distribution and Buyback
           </div>
         </v-col>
       </v-row>
       <v-row justify="center">
         <v-col cols="12" class="d-flex justify-center px-0">
-          <div class="video-card">
+          <div class="video-card px-15 px-lg-0">
             <iframe
               class="rounded youtube-container"
               src="https://www.youtube.com/embed/qJcZwPcXyXU?si=Y4PcVrImzRAanotw"
@@ -24,7 +24,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <div class="profit-buyback-description">
+        <div class="profit-buyback-description px-15 px-lg-0">
           <p>
             After covering platform costs (servers, development, maintenance,
             content team, and taxes), all remaining profits go toward buying
@@ -56,15 +56,13 @@ export default {
 }
 .profit-buyback-title {
   text-align: center;
-  color: #000000;
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 32px;
+  color: #354053;
+  margin-bottom: 22px;
 }
 .video-card {
   position: relative;
   width: 100%;
-  height: 550px;
+  height: 340px;
   min-height: 400px;
   max-width: 100%;
   max-height: 550px;
@@ -91,10 +89,15 @@ export default {
 }
 
 .profit-buyback-description {
-  color: #000000;
+  color: #6e7781;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 400;
   margin-top: 32px;
+}
+@media (min-width: 960px) {
+  .video-card {
+    height: 550px;
+  }
 }
 @media (max-width: 900px) {
   .video-card {

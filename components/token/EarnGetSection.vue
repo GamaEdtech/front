@@ -115,6 +115,7 @@ export default {
 .earn-get-card-desc {
   color: #6e7781;
   font-size: 14px;
+  height: 40px;
 }
 @media (max-width: 1260px) {
   .earn-get-card {
@@ -131,11 +132,11 @@ export default {
   .earn-get-card {
   }
   .earn-get-img-section {
-    height: 100px;
+    /* height: 100px; */
   }
   .earn-get-img {
-    width: 60px;
-    height: 60px;
+    /* width: 60px;
+    height: 60px; */
   }
 }
 @media (max-width: 600px) {
