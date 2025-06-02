@@ -193,24 +193,23 @@
                   >
                   <v-card-text class="pt- mt-3">
                     <div class="category-options">
-                      <v-checkbox
-                        v-model="blog.categories"
-                        label="News"
-                        value="news"
-                        hide-details
-                        class="category-checkbox"
-                        dense
-                      ></v-checkbox>
-
-                      <v-checkbox
-                        v-model="blog.categories"
-                        label="Announcement"
-                        value="announcement"
-                        hide-details
-                        class="category-checkbox"
-                        dense
-                      ></v-checkbox>
-
+                      <template v-if="categoriesLoading">
+                        <v-skeleton-loader
+                          type="list-item-two-line"
+                        ></v-skeleton-loader>
+                      </template>
+                      <template v-else>
+                        <v-checkbox
+                          v-for="cat in categories"
+                          :key="cat.id"
+                          v-model="blog.categories"
+                          :label="cat.name"
+                          :value="cat.id"
+                          hide-details
+                          class="category-checkbox"
+                          dense
+                        ></v-checkbox>
+                      </template>
                       <div class="add-category mt-4">
                         <v-icon color="#1e88e5" small class="mr-1"
                           >mdi-plus-circle</v-icon
@@ -307,7 +306,7 @@ export default {
         title: "",
         content: null,
         status: "draft",
-        visibility: "general",
+        visibility: "General",
         publishTime: "Immediately",
         categories: [],
         image: null,
@@ -347,10 +346,13 @@ export default {
           ],
         },
       },
+      categories: [],
+      categoriesLoading: true,
     };
   },
   async mounted() {
     await this.fetchBlog();
+    await this.fetchCategories();
   },
   methods: {
     async fetchBlog() {
@@ -380,6 +382,18 @@ export default {
         this.loading = false;
       }
     },
+    async fetchCategories() {
+      try {
+        const response = await this.$axios.$get("/api/v2/tags/Post");
+        if (response && response.succeeded) {
+          this.categories = response.data;
+        }
+      } catch (e) {
+        this.$toast && this.$toast.error("Failed to load categories");
+      } finally {
+        this.categoriesLoading = false;
+      }
+    },
     triggerImageUpload() {
       this.$refs.imageInput.click();
     },
@@ -397,7 +411,43 @@ export default {
       this.$refs.imageInput.value = "";
       if (typeof validate === "function") validate(null);
     },
-    async onSubmit() {},
+    async onSubmit() {
+      this.loading = true;
+      const formData = new FormData();
+      formData.append("Title", this.blog.title);
+      formData.append("Slug", this.blog.title);
+      formData.append("Body", this.blog.content);
+      formData.append(
+        "Summary",
+        this.blog.content ? this.blog.content.substring(0, 120) : ""
+      );
+      let publishDate;
+      if (this.blog.publishTime === "Immediately") {
+        publishDate = new Date().toISOString();
+      } else if (
+        this.blog.publishTime === "Schedule" &&
+        this.blog.scheduledDate
+      ) {
+        const date = new Date(this.blog.scheduledDate);
+        publishDate = date.toISOString();
+      }
+      formData.append("PublishDate", publishDate);
+      formData.append("VisibilityType", this.blog.visibility);
+      this.blog.categories.forEach((id) => formData.append("Tags[]", id));
+      if (this.blog.image) {
+        formData.append("Image", this.blog.image);
+      }
+      try {
+        // TODO: Replace with the correct update endpoint and method
+        // const response = await this.$axios.$put(`/api/v2/blogs/contributions/${this.$route.params.id}`, formData, { ... });
+        // if (response && response.succeeded) { ... }
+        this.$toast && this.$toast.success("Blog updated (mock)");
+      } catch (e) {
+        this.$toast && this.$toast.error("Failed to update blog.");
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
