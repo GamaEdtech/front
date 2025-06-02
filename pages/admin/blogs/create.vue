@@ -185,16 +185,23 @@
                   >
                   <v-card-text class="pt- mt-3">
                     <div class="category-options">
-                      <v-checkbox
-                        v-for="cat in categories"
-                        :key="cat.id"
-                        v-model="blog.categories"
-                        :label="cat.name"
-                        :value="cat.id"
-                        hide-details
-                        class="category-checkbox"
-                        dense
-                      ></v-checkbox>
+                      <template v-if="categoriesLoading">
+                        <v-skeleton-loader
+                          type="list-item-two-line"
+                        ></v-skeleton-loader>
+                      </template>
+                      <template v-else>
+                        <v-checkbox
+                          v-for="cat in categories"
+                          :key="cat.id"
+                          v-model="blog.categories"
+                          :label="cat.name"
+                          :value="cat.id"
+                          hide-details
+                          class="category-checkbox"
+                          dense
+                        ></v-checkbox>
+                      </template>
                       <div class="add-category mt-4">
                         <v-icon color="#1e88e5" small class="mr-1"
                           >mdi-plus-circle</v-icon
@@ -333,6 +340,7 @@ export default {
         },
       },
       categories: [],
+      categoriesLoading: true,
     };
   },
 
@@ -412,6 +420,8 @@ export default {
         }
       } catch (e) {
         this.$toast.error("Failed to load categories");
+      } finally {
+        this.categoriesLoading = false;
       }
     },
   },
