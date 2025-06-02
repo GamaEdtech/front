@@ -136,7 +136,7 @@ export default {
 }
 @media (min-width: 960px) {
   .hero-section-content {
-    padding-top: 11rem;
+    padding-top: 7rem;
   }
   .h-token-preview img {
     height: 550px;
