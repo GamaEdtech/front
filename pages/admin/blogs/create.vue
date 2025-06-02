@@ -117,6 +117,7 @@
                     <div class="primary-gray-700 font-size-16">Visibility</div>
                     <div class="card-select-item mobile-full">
                       <v-select
+                        v-model="blog.visibility"
                         outlined
                         dense
                         hide-details
@@ -185,23 +186,15 @@
                   <v-card-text class="pt- mt-3">
                     <div class="category-options">
                       <v-checkbox
+                        v-for="cat in categories"
+                        :key="cat.id"
                         v-model="blog.categories"
-                        label="News"
-                        value="news"
+                        :label="cat.name"
+                        :value="cat.id"
                         hide-details
                         class="category-checkbox"
                         dense
                       ></v-checkbox>
-
-                      <v-checkbox
-                        v-model="blog.categories"
-                        label="Announcement"
-                        value="announcement"
-                        hide-details
-                        class="category-checkbox"
-                        dense
-                      ></v-checkbox>
-
                       <div class="add-category mt-4">
                         <v-icon color="#1e88e5" small class="mr-1"
                           >mdi-plus-circle</v-icon
@@ -299,7 +292,7 @@ export default {
         title: "",
         content: null,
         status: "draft",
-        visibility: "general",
+        visibility: "General",
         publishTime: "Immediately",
         categories: [],
         image: null,
@@ -339,8 +332,10 @@ export default {
           ],
         },
       },
+      categories: [],
     };
   },
+
   methods: {
     triggerImageUpload() {
       this.$refs.imageInput.click();
@@ -363,11 +358,26 @@ export default {
       this.loading = true;
       const formData = new FormData();
       formData.append("Title", this.blog.title);
+      formData.append("Slug", this.blog.title);
       formData.append("Body", this.blog.content);
       formData.append(
         "Summary",
         this.blog.content ? this.blog.content.substring(0, 120) : ""
       );
+      let publishDate;
+      if (this.blog.publishTime === "Immediately") {
+        publishDate = new Date().toISOString();
+      } else if (
+        this.blog.publishTime === "Schedule" &&
+        this.blog.scheduledDate
+      ) {
+        const date = new Date(this.blog.scheduledDate);
+        publishDate = date.toISOString();
+      }
+      formData.append("PublishDate", publishDate);
+      formData.append("VisibilityType", this.blog.visibility);
+
+      this.blog.categories.forEach((id) => formData.append("Tags[]", id));
       if (this.blog.image) {
         formData.append("Image", this.blog.image);
       }
@@ -394,6 +404,20 @@ export default {
         this.loading = false;
       }
     },
+    async fetchCategories() {
+      try {
+        const response = await this.$axios.$get("/api/v2/tags/Post");
+        if (response && response.succeeded) {
+          this.categories = response.data;
+        }
+      } catch (e) {
+        this.$toast.error("Failed to load categories");
+      }
+    },
+  },
+
+  mounted() {
+    this.fetchCategories();
   },
 };
 </script>
@@ -409,9 +433,6 @@ export default {
   }
   .content-editor,
   .publishing-options {
-    /* width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important; */
   }
   .ml-4 {
     margin-left: 0 !important;
@@ -443,12 +464,9 @@ export default {
 }
 
 .content-editor {
-  /* width: 65%; */
 }
 
 .publishing-options {
-  /* width: 35%;
-  max-width: 320px; */
 }
 
 .title-input {
@@ -459,12 +477,10 @@ export default {
   margin-bottom: 20px;
 }
 
-/* Increase editor height */
 .editor-container :deep(.ck-editor__editable) {
   min-height: 250px !important;
 }
 
-/* Style the editor toolbar and content area */
 .editor-container :deep(.ck-toolbar) {
   border-radius: 8px 8px 0 0;
 }
