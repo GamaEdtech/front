@@ -31,6 +31,9 @@
             @click="openFilterSection($event, item)"
           >
             {{ item.name }}
+            <v-icon :color="item.active && !isExpandMap ? `#ffffff` : `#828385`"
+              >mdi-chevron-down</v-icon
+            >
 
             <div class="line-seperator"></div>
             <div
@@ -118,6 +121,7 @@
           placeholder="Country"
           active-color="#ffb600"
           @update:modelValue="countryChange"
+          :is-loading-data="loadingCountry"
         />
       </div>
       <div class="cotainer-dropdown">
@@ -128,6 +132,7 @@
           active-color="#ffb600"
           :disabled="!filterForm.country"
           @update:modelValue="stateChange"
+          :is-loading-data="loadingState"
         />
       </div>
       <div class="cotainer-dropdown">
@@ -138,6 +143,7 @@
           active-color="#ffb600"
           :disabled="!filterForm.state"
           @update:modelValue="cityChange"
+          :is-loading-data="loadingCity"
         />
       </div>
     </div>
@@ -166,6 +172,7 @@
               placeholder="Country"
               active-color="#ffb600"
               @update:modelValue="countryChange"
+              :is-loading-data="loadingCountry"
             />
           </div>
           <div class="cotainer-dropdown">
@@ -176,6 +183,7 @@
               active-color="#ffb600"
               :disabled="!filterForm.country"
               @update:modelValue="stateChange"
+              :is-loading-data="loadingState"
             />
           </div>
           <div class="cotainer-dropdown">
@@ -186,6 +194,7 @@
               active-color="#ffb600"
               :disabled="!filterForm.state"
               @update:modelValue="cityChange"
+              :is-loading-data="loadingCity"
             />
           </div>
         </div>
@@ -390,17 +399,33 @@ const filter = reactive({
 const getFilterList = async (params, type) => {
   try {
     let endpoint = "/api/v1/types/list";
-    if (type === "countries") endpoint = "/api/v2/locations/countries";
-    if (type === "states")
+    if (type === "countries") {
+      loadingCountry.value = true;
+      endpoint = "/api/v2/locations/countries";
+    }
+    if (type === "states") {
+      loadingState.value = true;
       endpoint = `/api/v2/locations/states/${filterForm.country}`;
-    if (type === "cities")
+    }
+    if (type === "cities") {
+      loadingCity.value = true;
       endpoint = `/api/v2/locations/cities/${filterForm.state}`;
+    }
 
     const response = await $fetch(endpoint, { params });
 
-    if (type === "countries") filter.countryList = response.data.list;
-    if (type === "states") filter.stateList = response.data.list;
-    if (type === "cities") filter.cityList = response.data.list;
+    if (type === "countries") {
+      loadingCountry.value = false;
+      filter.countryList = response.data.list;
+    }
+    if (type === "states") {
+      loadingState.value = false;
+      filter.stateList = response.data.list;
+    }
+    if (type === "cities") {
+      loadingCity.value = false;
+      filter.cityList = response.data.list;
+    }
     if (type === "board") filter.stageList = response.data;
     if (type === "school_type") filter.schoolTypeList = response.data;
     if (type === "boarding_type") filter.boarding_type = response.data;
@@ -456,6 +481,9 @@ const openFilterSection = (event, filter) => {
 
 // Start Section Filter Location
 const boxRegionRef = ref(null);
+const loadingCountry = ref(false);
+const loadingState = ref(false);
+const loadingCity = ref(false);
 
 useClickOutside(boxRegionRef, () => {
   optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;

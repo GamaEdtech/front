@@ -33,20 +33,28 @@
     </div>
 
     <div v-if="isOpen" class="dropdown-menu">
-      <div
-        v-for="(item, index) in filteredItems"
-        :key="index"
-        :class="`dropdown-item ${
-          item.title == selectedItem?.title ? `selected-item` : ``
-        }`"
-        @click="selectItem($event, item)"
-      >
-        {{ item.title }}
-      </div>
+      <template v-if="isLoadingData">
+        <div v-for="item in 6" class="skeleton-item skeleton-loader"></div>
+      </template>
+      <template v-else>
+        <div
+          v-for="(item, index) in filteredItems"
+          :key="index"
+          :class="`dropdown-item ${
+            item.title == selectedItem?.title ? `selected-item` : ``
+          }`"
+          @click="selectItem($event, item)"
+        >
+          {{ item.title }}
+        </div>
 
-      <div v-if="filteredItems.length === 0" class="dropdown-empty">
-        Not Found.
-      </div>
+        <div
+          v-if="filteredItems.length === 0 && !isLoadingData"
+          class="dropdown-empty"
+        >
+          Not Found.
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -81,6 +89,10 @@ const props = defineProps({
     default: "value",
   },
   disabled: {
+    type: Boolean,
+    default: false,
+  },
+  isLoadingData: {
     type: Boolean,
     default: false,
   },
@@ -193,6 +205,7 @@ watch(
 watch(
   () => props.items,
   () => {
+    filteredItems.value = props.items;
     if (!props.modelValue) {
       searchText.value = "";
     } else {

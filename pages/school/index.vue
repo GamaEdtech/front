@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/filter/Filter.vue";
 import schoolList from "~/components/school/list/List.vue";
@@ -201,11 +201,16 @@ const updateFilter = (query) => {
 };
 
 const changeFilterWithMapMoved = (locationParam) => {
-  filterForm.value.distance = locationParam.distance;
-  filterForm.value.lat = locationParam.center[0];
-  filterForm.value.lng = locationParam.center[1];
-  resetParameter();
-  updateQueryParams();
+  if (
+    (isExpandMapInDesktop.value && window.innerWidth > 1260) ||
+    (!openBottomNavFilterList.value && window.innerWidth < 1260)
+  ) {
+    filterForm.value.distance = locationParam.distance;
+    filterForm.value.lat = locationParam.center[0];
+    filterForm.value.lng = locationParam.center[1];
+    resetParameter();
+    updateQueryParams();
+  }
 };
 
 const updateQueryParams = () => {

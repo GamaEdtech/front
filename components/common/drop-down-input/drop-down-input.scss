@@ -114,6 +114,37 @@
                 background: #fff3d6;
             }
         }
+        .skeleton-loader {
+            position: relative;
+            overflow: hidden;
+            background-color: #d1d1d1;
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+                animation: shimmer 1.5s infinite;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    transform: translateX(-100%);
+                }
+                100% {
+                    transform: translateX(100%);
+                }
+            }
+        }
+        .skeleton-item {
+            width: 200px;
+            min-height: 20px;
+            border-radius: 20px;
+            margin: 30px 10px;
+        }
     }
 }
 .disable-drop-down {
