@@ -9,10 +9,7 @@
               <div class="content-editor flex-grow-1">
                 <!-- Title input -->
                 <div class="title-section mb-4">
-                  <label
-                    class="font-weight-medium font-size-12 mb-2 d-block primary-gray-700"
-                    >Title</label
-                  >
+                  <label class="mb-2 d-block form-label-title">Title</label>
                   <validation-provider
                     name="title"
                     rules="required"
@@ -26,8 +23,24 @@
                       :error="!!errors.length"
                       :error-messages="errors"
                       class="title-input"
-                    ></v-text-field>
+                    >
+                      <template slot="append">
+                        <div class="cursor-pointer" @click="showSlugDialog">
+                          <v-icon color="#2E90FA" v-text="'mdi-link'"></v-icon>
+                        </div>
+                      </template>
+                    </v-text-field>
                   </validation-provider>
+                </div>
+
+                <div class="mt-10">
+                  <label class="mb-2 d-block form-label-title">Abstract</label>
+                  <v-textarea
+                    v-model="blog.summary"
+                    class="textarea-input"
+                    outlined
+                    placeholder="Enter here.............."
+                  ></v-textarea>
                 </div>
 
                 <!-- Rich text editor -->
@@ -37,6 +50,7 @@
                     rules="required"
                     v-slot="{ errors }"
                   >
+                    <label class="mb-2 d-block form-label-title">Main </label>
                     <client-only>
                       <template #placeholder>
                         <v-skeleton-loader
@@ -57,7 +71,7 @@
                 </div>
 
                 <!-- Bottom publish button -->
-                <div class="d-flex justify-center mt-6">
+                <div class="d-flex justify-start mt-6">
                   <v-btn
                     type="submit"
                     color="#FFC107"
@@ -84,17 +98,18 @@
                   <div
                     class="d-flex justify-space-between align-center pa-4 mobile-stack"
                   >
-                    <v-btn icon color="error" small class="mobile-mb-2">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
                     <v-btn
                       :loading="loading"
                       :disabled="observer.invalid || !observer.validated"
                       color="#FFC107"
-                      class="px-6 mobile-full d-none d-md-block"
+                      class="px-6 mobile-full d-none d-md-block flex-grow-1 mr-6"
                       rounded
                       >Publish</v-btn
                     >
+
+                    <v-btn icon color="#344054" small class="mobile-mb-2">
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
                   </div>
                   <div
                     class="d-flex align-center justify-space-between mb-3 pa-4 mobile-stack"
@@ -176,15 +191,45 @@
                 </v-card>
 
                 <v-card
-                  class="mb-4 options-card mobile-full"
+                  class="mb-4 options-card mobile-full category-card"
                   color="#F9FAFB"
                   flat
                 >
-                  <v-card-title class="options-title pb-1 mt-3 primary-gray-700"
-                    >Category</v-card-title
+                  <v-card-title
+                    class="options-title pb-1 mt-3 primary-gray-700"
                   >
+                    Category
+                  </v-card-title>
                   <v-card-text class="pt- mt-3">
-                    <div class="category-options">
+                    <div class="category-search-row">
+                      <v-text-field
+                        v-model="categorySearch"
+                        class="category-search-input w-100"
+                        placeholder="Search or add category"
+                        hide-details
+                        outlined
+                        rounded
+                        dense
+                        @keyup.enter="createCategory"
+                      >
+                        <template slot="append">
+                          <v-btn
+                            class="input-enter-button"
+                            fab
+                            small
+                            depressed
+                            color="#FFB600"
+                            :loading="categoryLoader"
+                            @click="createCategory"
+                          >
+                            <v-icon small color="#1D2939"
+                              >mdi-subdirectory-arrow-left
+                            </v-icon>
+                          </v-btn>
+                        </template>
+                      </v-text-field>
+                    </div>
+                    <div class="category-options-list">
                       <template v-if="categoriesLoading">
                         <v-skeleton-loader
                           type="list-item-two-line"
@@ -192,7 +237,7 @@
                       </template>
                       <template v-else>
                         <v-checkbox
-                          v-for="cat in categories"
+                          v-for="cat in filteredCategories"
                           :key="cat.id"
                           v-model="blog.categories"
                           :label="cat.name"
@@ -202,11 +247,68 @@
                           dense
                         ></v-checkbox>
                       </template>
-                      <div class="add-category mt-4">
-                        <v-icon color="#1e88e5" small class="mr-1"
-                          >mdi-plus-circle</v-icon
+                    </div>
+                  </v-card-text>
+                </v-card>
+
+                <v-card
+                  class="mb-4 options-card mobile-full category-card"
+                  color="#F9FAFB"
+                  flat
+                >
+                  <v-card-title
+                    class="options-title pb-1 mt-3 primary-gray-700"
+                  >
+                    keyword
+                  </v-card-title>
+                  <v-card-text class="pt- mt-3">
+                    <div class="category-search-row">
+                      <v-text-field
+                        v-model="keywordSearch"
+                        class="category-search-input w-100"
+                        placeholder="Search or add keyword"
+                        hide-details
+                        outlined
+                        rounded
+                        dense
+                        @keyup.enter="createKeyword"
+                      >
+                        <template slot="append">
+                          <v-btn
+                            class="input-enter-button"
+                            fab
+                            small
+                            depressed
+                            color="#FFB600"
+                            :loading="categoryLoader"
+                            @click="createKeyword"
+                          >
+                            <v-icon small color="#1D2939"
+                              >mdi-subdirectory-arrow-left
+                            </v-icon>
+                          </v-btn>
+                        </template>
+                      </v-text-field>
+                    </div>
+                    <div class="search-hint-label mt-3 mb-7">
+                      You can also use commas
+                    </div>
+
+                    <div class="d-flex flex-wrap align-center">
+                      <div
+                        class="keyword-item mr-1 mb-2"
+                        v-for="(kitem, index) in keywords"
+                        :key="index"
+                      >
+                        <div class="keyword-item__title">{{ kitem }}</div>
+                        <div
+                          class="keyword-item__icon cursor-pointer"
+                          @click="deleteKeyword(kitem, index)"
                         >
-                        <span class="add-category-text">Add new category</span>
+                          <v-icon small color="#98A2B3"
+                            >mdi-close-circle
+                          </v-icon>
+                        </div>
                       </div>
                     </div>
                   </v-card-text>
@@ -232,6 +334,15 @@
                       </div>
                       <div class="d-flex justify-space-between mobile-stack">
                         <v-btn
+                          color="white"
+                          class="black--text px-6 mobile-full upload-btn"
+                          rounded
+                          depressed
+                          @click="triggerImageUpload"
+                        >
+                          {{ imagePreview ? "Change image" : "Upload image" }}
+                        </v-btn>
+                        <v-btn
                           icon
                           color="error"
                           @click="deleteImage(validate)"
@@ -239,14 +350,6 @@
                           class="mobile-mb-2"
                         >
                           <v-icon class="primary-gray-500">mdi-delete</v-icon>
-                        </v-btn>
-                        <v-btn
-                          color="white"
-                          class="black--text px-6 mobile-full"
-                          rounded
-                          @click="triggerImageUpload"
-                        >
-                          {{ imagePreview ? "Change image" : "Upload image" }}
                         </v-btn>
                         <input
                           type="file"
@@ -268,11 +371,15 @@
         </div>
       </form>
     </validation-observer>
+
+    <BlogSlugDialog v-model="slugDialog" :slug="slug" @save="onSlugSave" />
   </div>
 </template>
 
 <script>
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
+import BlogSlugDialog from "@/components/admin/blogs/BlogSlugDialog.vue";
+
 extend("required", {
   validate: (value) => {
     if (Array.isArray(value)) return value.length > 0;
@@ -284,6 +391,7 @@ export default {
   auth: false,
   layout: "admin",
   components: {
+    BlogSlugDialog,
     ValidationObserver,
     ValidationProvider,
     "ckeditor-nuxt": () => {
@@ -294,10 +402,14 @@ export default {
   },
   data() {
     return {
+      categoryLoader: false,
+      slugDialog: false,
       loading: false,
+      keywords: [],
       blog: {
         title: "",
         content: null,
+        summary: null,
         status: "draft",
         visibility: "General",
         publishTime: "Immediately",
@@ -305,6 +417,7 @@ export default {
         image: null,
         scheduledDate: null,
       },
+      slug: "",
       imagePreview: null,
       menu: false,
       editorConfig: {
@@ -341,10 +454,33 @@ export default {
       },
       categories: [],
       categoriesLoading: true,
+      categorySearch: "",
+      keywordSearch: "",
     };
   },
 
+  watch: {
+    "blog.title"(newTitle) {
+      this.slug = this.$slugGenerator.convert(newTitle || "");
+    },
+  },
+
+  computed: {
+    filteredCategories() {
+      if (!this.categorySearch) return this.categories;
+      return this.categories.filter((cat) =>
+        cat.name.toLowerCase().includes(this.categorySearch.toLowerCase())
+      );
+    },
+  },
+
   methods: {
+    showSlugDialog() {
+      this.slugDialog = true;
+    },
+    onSlugSave(newSlug) {
+      this.slug = newSlug;
+    },
     triggerImageUpload() {
       this.$refs.imageInput.click();
     },
@@ -366,12 +502,9 @@ export default {
       this.loading = true;
       const formData = new FormData();
       formData.append("Title", this.blog.title);
-      formData.append("Slug", this.blog.title);
+      formData.append("Slug", this.slug);
       formData.append("Body", this.blog.content);
-      formData.append(
-        "Summary",
-        this.blog.content ? this.blog.content.substring(0, 120) : ""
-      );
+      formData.append("Summary", this.blog.summary);
       let publishDate;
       if (this.blog.publishTime === "Immediately") {
         publishDate = new Date().toISOString();
@@ -424,6 +557,55 @@ export default {
         this.categoriesLoading = false;
       }
     },
+    async createCategory() {
+      const name = this.categorySearch && this.categorySearch.trim();
+      if (!name) {
+        this.$toast.error("Please enter a category name.");
+        return;
+      }
+      try {
+        this.categoryLoader = true;
+        const response = await this.$axios.$post(
+          "/api/v2/admin/tags",
+          {
+            name,
+            icon: "shape-outline",
+            tagType: "Post",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded) {
+          this.$toast.success("Category created successfully!");
+          this.categorySearch = "";
+          await this.fetchCategories();
+        } else {
+          this.$toast.error(
+            response?.errors?.[0]?.message || "Failed to create category."
+          );
+        }
+        this.categoryLoader = false;
+      } catch (e) {
+        this.categoryLoader = false;
+        this.$toast.error("Failed to create category.");
+      }
+    },
+    async createKeyword() {
+      if (!this.keywordSearch) return;
+      // Split by comma, trim, and filter out empty
+      const newKeywords = this.keywordSearch
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0);
+      this.keywords.push(...newKeywords);
+      this.keywordSearch = "";
+    },
+    async deleteKeyword(row, index) {
+      this.keywords.splice(index, 1);
+    },
   },
 
   mounted() {
@@ -433,6 +615,46 @@ export default {
 </script>
 
 <style scoped>
+.upload-btn {
+  border: 1px solid #e4e7ec !important;
+}
+.keyword-item {
+  background: #1d2939;
+  color: #fcfcfd;
+  font-size: 12px;
+  font-weight: 400;
+  width: 73px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 11px 9px;
+}
+.search-hint-label {
+  color: #98a2b3;
+  font-size: 14px;
+  font-weight: 400;
+}
+.input-enter-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  background: #ffb600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 9px;
+  margin-right: -15px;
+}
+.form-label-title {
+  color: #344054;
+  font-size: 20px;
+  font-weight: 600;
+}
+.textarea-input {
+  border-radius: 16px !important;
+}
 @media (max-width: 900px) {
   .blog-create-page {
     padding: 8px;
@@ -481,6 +703,7 @@ export default {
 
 .title-input {
   font-size: 18px;
+  border-radius: 16px !important;
 }
 
 .editor-container {
@@ -557,15 +780,45 @@ export default {
   color: #344054;
 }
 
-.category-options {
-  padding-top: 6px;
+.category-card {
+  /* background: #f9fafb;
+  border-radius: 20px; */
+  /* padding: 20px 24px 24px 24px; */
 }
-
+.category-search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.category-search-input {
+  min-width: 100%;
+  flex: 1;
+  border-radius: 24px !important;
+  background: #fff !important;
+  margin-right: 8px;
+}
+.category-search-btn {
+  border-radius: 50% !important;
+  min-width: 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.category-options-list {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
 .category-checkbox {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0 0 8px 0;
+  padding-left: 16px;
 }
-
 .add-category {
   display: flex;
   align-items: center;
