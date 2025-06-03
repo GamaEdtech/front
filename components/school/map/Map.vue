@@ -29,6 +29,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   items: {
@@ -45,12 +46,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits([
-  "mapMoved",
-  "zoomChanged",
-  "markerClicked",
-  "userLocationFound",
-]);
+const emit = defineEmits(["mapMoved", "userLocationFound"]);
+
+const router = useRouter();
 
 const map = ref(null);
 const zoom = ref(props.initialZoom);
@@ -67,8 +65,8 @@ onMounted(async () => {
   await import("leaflet.markercluster");
 
   isModuleImport.value = true;
-  console.log("module load");
   if (isMapReady.value) {
+    map.value.leafletObject.setView(center.value);
     setMarkers();
   }
 
@@ -81,11 +79,9 @@ onMounted(async () => {
 });
 
 const onMapReady = () => {
-  console.log("map ready");
   isMapReady.value = true;
   if (isModuleImport.value) {
-    console.log("map ready if");
-    map.value.setView(center.value);
+    map.value.leafletObject.setView(center.value);
     setMarkers();
   }
 };
@@ -93,20 +89,17 @@ const onMapReady = () => {
 watch(
   () => props.items,
   () => {
-    console.log("item recienve");
     if (isMapReady.value) {
-      console.log("item recienve if");
       setMarkers();
     }
   }
 );
 
-const markerClusterGroupRef = ref(null);
+const markerClusterGroupRef = ref([]);
 const setMarkers = async () => {
-  if (markerClusterGroupRef.value) {
-    console.log("omad remove");
-    markerClusterGroupRef.value.remove();
-  }
+  // if (markerClusterGroupRef.value) {
+  //   markerClusterGroupRef.value.remove();
+  // }
 
   const mapItems = props.items
     .filter((item) => item.lat && item.long)
@@ -117,6 +110,7 @@ const setMarkers = async () => {
       id: item.id,
       options: {
         icon: schoolIcon.value,
+        alt: item.id,
       },
     }));
 
@@ -124,16 +118,17 @@ const setMarkers = async () => {
     leafletObject: map.value.leafletObject,
     markers: mapItems,
   });
-  markerClusterGroupRef.value = markerCluster;
+  markerClusterGroupRef.value.push(markerCluster);
   markers.forEach((marker) => {
-    marker.on("click", (e) => {
-      console.log("e", e);
+    marker.on("click", (event) => {
+      if (event.target.options.alt) {
+        router.push(`/school/${event.target.options.alt}`);
+      }
     });
   });
 };
 
 const onMoveEnd = (event) => {
-  console.log("move on map");
   const bounds = event.target.getBounds();
   const newCenter = event.target.getCenter();
   const ne = bounds.getNorthEast();
@@ -174,8 +169,8 @@ const getUserLocation = () => {
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log("geo location", position);
         center.value = [position.coords.latitude, position.coords.longitude];
+        emit("userLocationFound", center.value);
       },
       (error) => {
         console.error("Error getting user location:", error);
@@ -184,20 +179,6 @@ const getUserLocation = () => {
   } else {
     console.error("Geolocation is not supported in this browser.");
   }
-};
-
-const focusOnSchool = (school) => {
-  console.log("focus on school");
-  // if (school.lat && school.long) {
-  //   center.value = [school.lat, school.long];
-  //   zoom.value = 14;
-  // }
-};
-
-const setView = (latLng, zoomLevel) => {
-  console.log("set view");
-  // center.value = latLng;
-  // zoom.value = zoomLevel;
 };
 </script>
 

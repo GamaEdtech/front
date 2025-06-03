@@ -17,7 +17,7 @@
             <v-icon x-large color="#000000">mdi-filter</v-icon>
           </button>
 
-          <button class="btn-filter" @click="openSortNav($event)">
+          <button disabled class="btn-filter" @click="openSortNav($event)">
             <v-icon x-large color="#000000">mdi-filter-variant</v-icon>
           </button>
         </div>
@@ -397,7 +397,6 @@ const getFilterList = async (params, type) => {
       endpoint = `/api/v2/locations/cities/${filterForm.state}`;
 
     const response = await $fetch(endpoint, { params });
-    // console.log("gereft response", response);
 
     if (type === "countries") filter.countryList = response.data.list;
     if (type === "states") filter.stateList = response.data.list;
@@ -441,8 +440,6 @@ const updateQueryParams = () => {
 const openFilterSection = (event, filter) => {
   event.stopPropagation();
   if (filter.active && !props.isExpandMap) {
-    console.log("open filter");
-
     const lastShowOption = optionFilter.value.filter((item) => item.isShow);
     if (lastShowOption.length > 0) {
       if (lastShowOption[0].name == filter.name) {
@@ -461,7 +458,6 @@ const openFilterSection = (event, filter) => {
 const boxRegionRef = ref(null);
 
 useClickOutside(boxRegionRef, () => {
-  console.log("Region");
   optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;
 });
 
@@ -508,12 +504,10 @@ const selectStage = (event, stage) => {
 };
 
 useClickOutside(boxStageRef, () => {
-  console.log("box stage ref");
   optionFilter.value.filter((item) => item.name == "Board")[0].isShow = false;
 });
 const stageChange = () => {
   updateQueryParams();
-  console.log("inka", filterForm.stage);
 };
 // End Section Stage
 
@@ -521,7 +515,6 @@ const stageChange = () => {
 const boxTuitionRef = ref(null);
 
 useClickOutside(boxTuitionRef, () => {
-  console.log("box Tuition fee ref");
   optionFilter.value.filter(
     (item) => item.name == "Tuition fee"
   )[0].isShow = false;
@@ -552,12 +545,10 @@ const openSortNav = (event) => {
 };
 
 useClickOutside(boxSortRef, () => {
-  console.log("box Sort ref");
   optionFilter.value.filter((item) => item.name == "Sort")[0].isShow = false;
 });
 
 useClickOutside(sortBottomNavRef, () => {
-  console.log("bottom nav Sort ref");
   showSortNavMobile.value = false;
 });
 
@@ -565,22 +556,18 @@ useClickOutside(sortBottomNavRef, () => {
 
 // Start Section School type, Boarding Type, Religion , Ceod Stats
 const schoolTypeChange = () => {
-  console.log("type School", filterForm.school_type);
   updateQueryParams();
 };
 
 const coedStatusChange = () => {
-  console.log("coedStatusChange", filterForm.coed_status);
   updateQueryParams();
 };
 
 const boardingTypeChange = () => {
-  console.log("boardingTypeChange", filterForm.boarding_type);
   updateQueryParams();
 };
 
 const religionChange = () => {
-  console.log("religionChange", filterForm.religion);
   updateQueryParams();
 };
 

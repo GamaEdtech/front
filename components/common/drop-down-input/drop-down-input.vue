@@ -118,17 +118,7 @@ const searchText = ref("");
 const input = ref(null);
 const isFirstOpen = ref(true);
 const selectedItem = ref(null);
-
-const filteredItems = computed(() => {
-  if (!searchText.value || isFirstOpen.value) return props.items;
-
-  return props.items.filter((item) => {
-    return item.title
-      .toString()
-      .toLowerCase()
-      .includes(searchText.value.toLowerCase());
-  });
-});
+const filteredItems = ref(props.items);
 
 const activeInput = computed(() => isFocused.value || isOpen.value);
 
@@ -146,6 +136,7 @@ const toggleDropdown = () => {
     isOpen.value = !isOpen.value;
     if (isOpen.value) {
       input.value.focus();
+      filteredItems.value = props.items;
     } else {
       input.value.blur();
       isFirstOpen.value = true;
@@ -176,7 +167,17 @@ const onInputFocus = () => {
   isFocused.value = true;
 };
 
-const onSearchInput = () => {
+const onSearchInput = (event) => {
+  if (isFirstOpen.value || event.target.value.length == 0) {
+    filteredItems.value = props.items;
+  } else {
+    filteredItems.value = props.items.filter((item) => {
+      return item.title
+        .toString()
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+  }
   isFirstOpen.value = false;
 };
 

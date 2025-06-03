@@ -64,10 +64,11 @@
             <div class="rate-update skeleton-loader"></div>
           </div>
         </div>
-        <div
+        <NuxtLink
           v-if="!isInitialLoading"
           class="card-school"
           v-for="(school, index) in schoolList"
+          :to="`school/${school.id}/${$slugGenerator(school.name)}`"
         >
           <div class="name-address-image">
             <div class="name-div">
@@ -131,7 +132,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </NuxtLink>
 
         <div
           class="line-specifier-load-more"
@@ -159,6 +160,13 @@
             </div>
             <div class="rate-update skeleton-loader"></div>
           </div>
+        </div>
+
+        <div
+          class="not-found-div"
+          v-if="!isInitialLoading && schoolList.length == 0"
+        >
+          Opps! no data found
         </div>
       </div>
     </div>
@@ -195,12 +203,14 @@ const props = defineProps({
     required: true,
   },
   pageNumberForLoadPreviousData: {
-    type: Boolean,
+    type: Number,
     required: true,
   },
 });
 
 const emit = defineEmits(["loadNextPage", "loadPreviousPage"]);
+
+const { $slugGenerator } = useNuxtApp();
 
 const lineSpecifierLoadMoreRef = ref(null);
 const scrollDivRef = ref(null);
@@ -228,7 +238,6 @@ const handleScrollListener = () => {
     !props.isPaginationLoading &&
     !props.isAllDataLoaded
   ) {
-    console.log("reach to scroll view for load more data");
     emit("loadNextPage");
   }
 };

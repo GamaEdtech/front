@@ -49,6 +49,10 @@
                 .btn-filter:active {
                     transform: scale(0.8);
                 }
+                .btn-filter:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
             }
 
             .filter-options-div {
@@ -258,7 +262,7 @@
     .mobile-filter-div {
         position: fixed;
         width: 100%;
-        height: 100vh;
+        height: 100dvh;
         z-index: 11;
         background-color: white;
         top: 0;

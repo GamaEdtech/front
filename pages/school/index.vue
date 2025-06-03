@@ -1,22 +1,29 @@
 <template>
   <div class="main-school-list-div">
-    <!-- <button @click="openBottomNavFilterList = !openBottomNavFilterList">
-      test
-    </button> -->
     <div class="map-div">
       <button @click="changeStatusExpandMap" class="list-view-button">
         <v-icon color="#000000" size="16">mdi-menu</v-icon>
         List view
       </button>
 
-      <Map :items="schools" @map-moved="changeFilterWithMapMoved" />
+      <Map
+        :items="newSchoolForMarkersOnMap"
+        @map-moved="changeFilterWithMapMoved"
+        @user-location-found="userLocationFound"
+      />
     </div>
     <div
       :class="`filter-list-div ${
         openBottomNavFilterList ? `open-bottom-nav` : ``
       }`"
+      :style="{ bottom: `${currentBottom}%` }"
+      @touchmove="handleDrag"
+      @mousemove="handleDrag"
+      @touchend="endDrag"
+      @mouseup="endDrag"
+      @mouseleave="endDrag"
     >
-      <div class="grab-line-div">
+      <div class="grab-line-div" @touchstart="startDrag" @mousedown="startDrag">
         <div class="grab"></div>
       </div>
       <schoolFilter
@@ -52,6 +59,44 @@ import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/filter/Filter.vue";
 import schoolList from "~/components/school/list/List.vue";
 import Map from "~/components/school/map/Map.vue";
+
+useHead({
+  titleTemplate: "%s",
+  title:
+    "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+
+  meta: [
+    {
+      hid: "apple-mobile-web-app-title",
+      name: "apple-mobile-web-app-title",
+      content:
+        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+    },
+    {
+      hid: "og:title",
+      name: "og:title",
+      content:
+        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
+    },
+    {
+      hid: "og:site_name",
+      name: "og:site_name",
+      content: "GamaTrain",
+    },
+    {
+      hid: "description",
+      name: "description",
+      content:
+        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+    },
+    {
+      hid: "og:description",
+      name: "og:description",
+      content:
+        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+    },
+  ],
+});
 
 const router = useRouter();
 const route = useRoute();
@@ -113,11 +158,23 @@ const filterForm = ref({
   lng: Number(route.query.lng) || null,
   page: Number(route.query.page) || 1,
 });
+const defaultLatLongDistance = {
+  lat: 39.90973623453719,
+  lng: -81.12304687500001,
+  distance: 5598568,
+};
+
+const userLocationFound = (data) => {
+  defaultLatLongDistance.lat = data[0];
+  defaultLatLongDistance.lng = data[1];
+};
+
 const timer = ref(null);
-const isInitialSchoolLoading = ref(true);
+const isInitialSchoolLoading = ref(false);
 const isPaginationSchoolLoading = ref(false);
 const isPaginationPreviousSchoolLoading = ref(false);
 const schools = ref([]);
+const newSchoolForMarkersOnMap = ref([]);
 const isAllSchoolLoaded = ref(false);
 const pageNumberForLoadPreviousSchool = ref(
   route.query.page ? Number(route.query.page) : 1
@@ -138,14 +195,12 @@ const resetParameter = () => {
 };
 
 const updateFilter = (query) => {
-  console.log("update query from component", query);
   filterForm.value = query;
   resetParameter();
   updateQueryParams();
 };
 
 const changeFilterWithMapMoved = (locationParam) => {
-  console.log("location param", locationParam);
   filterForm.value.distance = locationParam.distance;
   filterForm.value.lat = locationParam.center[0];
   filterForm.value.lng = locationParam.center[1];
@@ -165,14 +220,12 @@ const updateQueryParams = () => {
       query[key] = value;
     }
   });
-  console.log("query made", query);
   router.replace({ query });
 };
 
 watch(
   () => route.query,
   () => {
-    console.log("watch update query");
     applyFiltersFromQuery(route.query);
   }
 );
@@ -193,13 +246,37 @@ const debouncedGetSchoolList = () => {
   // }
 };
 
-onMounted(() => {
-  isInitialSchoolLoading.value = true;
-  getSchoolList();
-});
-const getSchoolList = async () => {
-  console.log("get school", filterForm.value);
+const { data: initialSchools, pending: loadingSchoolsServer } =
+  await useAsyncData("schoolListSSR", () => {
+    const params = {
+      "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
+      "PagingDto.PageFilter.Size": perPage,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+      Name: filterForm.value.keyword,
+      section: filterForm.value.stage,
+      tuition_fee: filterForm.value.tuition_fee,
+      CountryId: filterForm.value.country,
+      StateId: filterForm.value.state,
+      CityId: filterForm.value.city,
+      school_type: filterForm.value.school_type,
+      religion: filterForm.value.religion,
+      boarding_type: filterForm.value.boarding_type,
+      coed_status: filterForm.value.coed_status,
+      sort: filterForm.value.sort,
+    };
 
+    return $fetch("/api/v2/schools", { params });
+  });
+
+if (initialSchools.value) {
+  schools.value = initialSchools.value.data.list;
+  totalSchoolFind.value = initialSchools.value.data.totalRecordsCount || 0;
+  isInitialSchoolLoading.value = false;
+  isPaginationSchoolLoading.value = false;
+  isPaginationPreviousSchoolLoading.value = false;
+}
+
+const getSchoolList = async () => {
   if (isAllSchoolLoaded.value) return;
   try {
     const params = {
@@ -207,7 +284,7 @@ const getSchoolList = async () => {
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
     };
-    if (isExpandMapInDesktop.value) {
+    if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
       params["Location.Radius"] = filterForm.value.distance;
       params["Location.Latitude"] = filterForm.value.lat;
       params["Location.Longitude"] = filterForm.value.lng;
@@ -227,7 +304,6 @@ const getSchoolList = async () => {
     const response = await $fetch("/api/v2/schools", {
       params,
     });
-    console.log("response school list", response);
 
     if (response.data.list.length < perPage) {
       isAllSchoolLoaded.value = true;
@@ -240,6 +316,9 @@ const getSchoolList = async () => {
       schools.value = [...response.data.list, ...schools.value];
     } else {
       schools.value = [...schools.value, ...response.data.list];
+    }
+    if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
+      newSchoolForMarkersOnMap.value = response.data.list;
     }
   } catch (err) {
     console.error(err);
@@ -257,14 +336,12 @@ const loadNextPageSchool = () => {
     pageNumberForLoadNextSchool.value += 1;
     filterForm.value.page = pageNumberForLoadNextSchool.value;
   }
-  console.log("index file load next page");
   isPaginationSchoolLoading.value = true;
   updateQueryParams();
 };
 
 const loadPreviousSchool = () => {
   if (filterForm.value.page > 1) {
-    console.log("index file load prev page");
     pageNumberForLoadPreviousSchool.value -= 1;
     filterForm.value.page = pageNumberForLoadPreviousSchool.value;
     isPaginationPreviousSchoolLoading.value = true;
@@ -275,17 +352,95 @@ const loadPreviousSchool = () => {
 // End Filter Section
 
 // Start Open/Close bottom nav and Expand Map in Desktop
-const openBottomNavFilterList = ref(true);
-
 const isExpandMapInDesktop = ref(false);
 
 const changeStatusExpandMap = () => {
   isExpandMapInDesktop.value = !isExpandMapInDesktop.value;
+  if (isExpandMapInDesktop.value) {
+    filterForm.value.lat = defaultLatLongDistance.lat;
+    filterForm.value.lng = defaultLatLongDistance.lng;
+    filterForm.value.distance = defaultLatLongDistance.distance;
+  } else {
+    filterForm.value.lat = null;
+    filterForm.value.lng = null;
+    filterForm.value.distance = null;
+  }
+  resetParameter();
+  updateQueryParams();
 };
 
 // End Open/Close bottom nav and Expand Map in Desktop
+
+// Start Handle Drag To Open/Close Bottom Nav
+const openBottomNavFilterList = ref(true);
+
+const isDragging = ref(false);
+const startY = ref(0);
+const startBottom = ref(0);
+const CLOSED_BOTTOM = -85;
+const OPEN_BOTTOM = 0;
+const currentBottom = ref(
+  openBottomNavFilterList.value ? OPEN_BOTTOM : CLOSED_BOTTOM
+);
+
+const startDrag = (e) => {
+  isDragging.value = true;
+  startBottom.value = openBottomNavFilterList.value
+    ? OPEN_BOTTOM
+    : CLOSED_BOTTOM;
+  currentBottom.value = startBottom.value;
+
+  startY.value = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+  document.body.style.overflow = "hidden";
+};
+
+const handleDrag = (e) => {
+  if (!isDragging.value) return;
+
+  e.preventDefault();
+  const currentY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+  const deltaY = currentY - startY.value;
+
+  let newBottom =
+    (openBottomNavFilterList.value ? -1 : 1) *
+    (deltaY / window.innerHeight) *
+    100;
+
+  currentBottom.value = newBottom;
+};
+
+const endDrag = () => {
+  if (!isDragging.value) return;
+
+  isDragging.value = false;
+  document.body.style.overflow = "";
+
+  openBottomNavFilterList.value =
+    currentBottom.value < -20
+      ? !openBottomNavFilterList.value
+      : openBottomNavFilterList.value;
+  currentBottom.value = openBottomNavFilterList.value
+    ? OPEN_BOTTOM
+    : CLOSED_BOTTOM;
+  if (openBottomNavFilterList.value) {
+    filterForm.value.lat = null;
+    filterForm.value.lng = null;
+    filterForm.value.distance = null;
+  } else {
+    filterForm.value.lat = defaultLatLongDistance.lat;
+    filterForm.value.lng = defaultLatLongDistance.lng;
+    filterForm.value.distance = defaultLatLongDistance.distance;
+  }
+  resetParameter();
+  updateQueryParams();
+};
+// End Handle Drag To Open/Close Bottom Nav
 </script>
 
-<style scoped>
+<style>
 @import "./index.scss";
+
+#footer-container {
+  display: none !important;
+}
 </style>
