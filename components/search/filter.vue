@@ -595,8 +595,6 @@ export default {
             value: "a_file",
           },
         ],
-        state_list: [],
-        city_list: [],
       },
 
       breadcrumbs: [],
