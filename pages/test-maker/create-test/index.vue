@@ -1,37 +1,40 @@
 <template>
-  <v-container class="pb-10 mb-16">
-    <create-test-form/>
+  <v-container class="create-test-container mb-16 pb-10">
+    <v-card flat >
+      <v-card-text class="px-0">
+        <create-test-form />
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
-<script>
-import CreateTestForm from "@/components/test-maker/create-test-form";
+<script setup>
+import CreateTestForm from "~/components/test-maker/create-test-form.vue";
 
-export default {
+// Define layout and page metadata
+definePageMeta({
   layout: "test-maker-layout",
-  name: "test-maker",
-  head() {
-    return {
-      title: 'New Exam',
-      correct_answer: 1,
-      script: [
-        //MathType to Latex
-        // {
-        //   type: 'text/javascript',
-        //   src: '/MathType.js'
-        // },
-        // {
-        //   type: 'text/javascript',
-        //   src: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=MML_HTMLorMML',
-        //   async: true,
-        // }
-        //End MathType to Latex
-      ]
-    }
-  },
-  components: {
-    CreateTestForm,
-  },
+});
 
-}
+useHead({
+  title: "Create New Test",
+  meta: [
+    { name: 'description', content: 'Create a standalone test for your educational content' }
+  ]
+});
 </script>
+
+<style lang="scss">
+.create-test-container {
+  max-width: 1200px;
+  margin: 5rem auto;
+  padding-bottom: 80px; // Space for fixed bottom bar
+}
+
+@media (max-width: 768px) {
+  .create-test-container {
+    margin: 0;
+    padding: 0;
+  }
+}
+</style>

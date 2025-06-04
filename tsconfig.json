@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": [
@@ -24,7 +24,6 @@
       ]
     },
     "types": [
-      "@nuxt/types",
       "@types/node",
       "three"
     ]
@@ -33,5 +32,6 @@
     "node_modules",
     ".nuxt",
     "dist"
-  ]
+  ],
+  "extends": "./.nuxt/tsconfig.json"
 }

@@ -84,28 +84,26 @@
                           </p>
                           <div>
                             {{ showStatus(item.status) }}
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   color="error"
                                   @click="openDeleteConfirmDialog(item.id)"
                                   small
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                 >
                                   <v-icon small> mdi-delete </v-icon>
                                 </v-btn>
                               </template>
                               <span>Delete</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   small
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                   :to="`/test-maker/edit/${item.id}`"
                                 >
                                   <v-icon small> mdi-note-edit-outline </v-icon>
@@ -113,14 +111,13 @@
                               </template>
                               <span>Edit</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
+                            <v-tooltip location="bottom">
+                              <template v-slot:activator="{ props }">
                                 <v-btn
                                   icon
                                   small
                                   color="primary"
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  v-bind="props"
                                 >
                                   <v-icon small>
                                     mdi-share-variant-outline
@@ -162,23 +159,34 @@
       </v-col>
 
       <v-dialog v-model="deleteConfirmDialog" max-width="290">
-        <v-card>
-          <v-card-title class="text-h5"> Are you sure? </v-card-title>
+        <v-card class="pa-0">
+          <v-card-title class="mt-2 text-h5" style="font-size: 13px">
+            Are you sure?
+          </v-card-title>
 
           <v-card-text>
-            <p>If you are sure to delete, click Yes.</p>
+            <p style="color: rgba(0, 0, 0, 0.6); font-size: 13px">
+              If you are sure to delete, click Yes.
+            </p>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
 
-            <v-btn text @click="deleteConfirmDialog = false"> No </v-btn>
+            <v-btn
+              text
+              @click="deleteConfirmDialog = false"
+              style="text-transform: none; font-size: 13px"
+            >
+              No
+            </v-btn>
 
             <v-btn
               color="green darken-1"
               text
               :loading="delete_loading"
               @click="deleteExam()"
+              style="text-transform: none; font-size: 13px"
             >
               Yes
             </v-btn>
