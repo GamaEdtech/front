@@ -6,7 +6,7 @@
           <v-row>
             <v-col cols="12" md="7">
               <!-- Left side - Content Editor -->
-              <div class="content-editor flex-grow-1">
+              <div class="content-editor">
                 <!-- Title input -->
                 <div class="title-section mb-4">
                   <label class="mb-2 d-block form-label-title">Title</label>
@@ -51,22 +51,15 @@
                     v-slot="{ errors }"
                   >
                     <label class="mb-2 d-block form-label-title">Main </label>
-                    <client-only>
-                      <template #placeholder>
-                        <v-skeleton-loader
-                          type="table-heading, image"
-                        ></v-skeleton-loader>
-                      </template>
-                      <div class="w-100 overflow-hidden relative">
-                        <ckeditor-nuxt
-                          v-model="blog.content"
-                          :config="editorConfig"
-                        ></ckeditor-nuxt>
-                      </div>
-                      <div v-if="errors.length" class="error-message">
-                        {{ errors[0] }}
-                      </div>
-                    </client-only>
+
+                    <div class="w-100 overflow-hidden relative">
+                      <ClientOnly>
+                        <rich-editor v-model="blog.content" />
+                      </ClientOnly>
+                    </div>
+                    <div v-if="errors.length" class="error-message">
+                      {{ errors[0] }}
+                    </div>
                   </validation-provider>
                 </div>
 
@@ -99,6 +92,7 @@
                     class="d-flex justify-space-between align-center pa-4 mobile-stack"
                   >
                     <v-btn
+                      type="submit"
                       :loading="loading"
                       :disabled="observer.invalid || !observer.validated"
                       color="#FFC107"
@@ -379,6 +373,7 @@
 <script>
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
 import BlogSlugDialog from "@/components/admin/blogs/BlogSlugDialog.vue";
+import RichEditor from "@/components/RichEditor.vue";
 
 extend("required", {
   validate: (value) => {
@@ -394,11 +389,7 @@ export default {
     BlogSlugDialog,
     ValidationObserver,
     ValidationProvider,
-    "ckeditor-nuxt": () => {
-      if (process.client) {
-        return import("@blowstack/ckeditor-nuxt");
-      }
-    },
+    RichEditor,
   },
   data() {
     return {
@@ -408,7 +399,7 @@ export default {
       keywords: [],
       blog: {
         title: "",
-        content: null,
+        content: "",
         summary: null,
         status: "draft",
         visibility: "General",
@@ -420,38 +411,7 @@ export default {
       slug: "",
       imagePreview: null,
       menu: false,
-      editorConfig: {
-        width: "auto",
-        title: false,
-        removePlugins: ["Title"],
-        toolbar: [
-          "heading",
-          "|",
-          "bold",
-          "italic",
-          "link",
-          "bulletedList",
-          "numberedList",
-          "|",
-          "indent",
-          "outdent",
-          "|",
-          "imageUpload",
-          "blockQuote",
-          "insertTable",
-          "mediaEmbed",
-          "undo",
-          "redo",
-        ],
-        language: "en",
-        image: {
-          toolbar: [
-            "imageTextAlternative",
-            "imageStyle:full",
-            "imageStyle:side",
-          ],
-        },
-      },
+      editorConfig: {},
       categories: [],
       categoriesLoading: true,
       categorySearch: "",
@@ -663,9 +623,7 @@ export default {
     flex-direction: column !important;
     gap: 0;
   }
-  .content-editor,
-  .publishing-options {
-  }
+
   .ml-4 {
     margin-left: 0 !important;
   }
@@ -693,12 +651,6 @@ export default {
 }
 .blog-create-page {
   padding: 20px;
-}
-
-.content-editor {
-}
-
-.publishing-options {
 }
 
 .title-input {
@@ -780,11 +732,6 @@ export default {
   color: #344054;
 }
 
-.category-card {
-  /* background: #f9fafb;
-  border-radius: 20px; */
-  /* padding: 20px 24px 24px 24px; */
-}
 .category-search-row {
   display: flex;
   align-items: center;
@@ -818,16 +765,6 @@ export default {
 .category-checkbox {
   margin: 0 0 8px 0;
   padding-left: 16px;
-}
-.add-category {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.add-category-text {
-  color: #1e88e5;
-  font-size: 14px;
 }
 
 .preview-image {

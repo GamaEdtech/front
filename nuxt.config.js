@@ -82,6 +82,7 @@ export default {
     { src: "plugins/mathjax.js", mode: "client" },
     // { src: "plugins/hotjar.client.js", mode: "client" },
     { src: "plugins/board-selection.js", mode: "client" },
+   { src: '~/plugins/ckeditor.js', mode: 'client' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
