@@ -67,7 +67,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].tests | numberFormat }}</div>
+                    <div class="stat">+{{ $numberFormat(stats[7].tests) }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -80,7 +80,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].files | numberFormat }}</div>
+                    <div class="stat">+{{ $numberFormat(stats[7].files) }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -93,7 +93,7 @@
                         >mdi-chevron-right</v-icon
                       >
                     </nuxt-link>
-                    <div class="stat">+{{ stats[7].exams | numberFormat }}</div>
+                    <div class="stat">+{{ $numberFormat(stats[7].exams) }}</div>
                   </v-col>
                   <v-col md="6" class="pb-0 pb-sm-6">
                     <nuxt-link
@@ -107,7 +107,7 @@
                       >
                     </nuxt-link>
                     <div class="stat">
-                      +{{ stats[7].questions | numberFormat }}
+                      +{{ $numberFormat(stats[7].questions) }}
                     </div>
                   </v-col>
                 </v-row>
@@ -127,7 +127,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ stats[7].tests | numberFormat }}</span
+                          >+{{ $numberFormat(stats[7].tests) }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -150,7 +150,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ stats[7].files | numberFormat }}</span
+                          >+{{ $numberFormat(stats[7].files) }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -173,7 +173,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ stats[7].exams | numberFormat }}</span
+                          >+{{ $numberFormat(stats[7].exams) }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon
@@ -197,7 +197,7 @@
                       </v-col>
                       <v-col cols="5" class="text-right pt-0">
                         <span class="stat"
-                          >+{{ stats[7].questions | numberFormat }}</span
+                          >+{{ $numberFormat(stats[7].questions) }}</span
                         >
                         <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
                           >mdi-chevron-right</v-icon

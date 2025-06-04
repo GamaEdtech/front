@@ -724,7 +724,7 @@ const coedStatusArray = computed(() => {
                           <div id="result-stat " class="mr-4">
                             <span class="gama-text-overline"> Results </span>
                             <span class="gama-text-button">
-                              {{ resultCount | numberFormat }}
+                              {{ $numberFormat(resultCount) }}
                             </span>
                           </div>
                         </v-col>
@@ -799,7 +799,7 @@ const coedStatusArray = computed(() => {
               @click:close="closeFilter('tuition_fee')"
               class="mb-1"
             >
-              Tuition fee above: ${{ $route.query.tuition_fee | numberFormat }}
+              Tuition fee above: ${{ $numberFormat($route.query.tuition_fee) }}
             </v-chip>
             <v-chip
               small

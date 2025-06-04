@@ -272,7 +272,7 @@
               <div class="gtext-t2 font-weight-heavy primary-gray-800">
                 <span v-show="contentData.tuition_fee"
                   ><span class="gtext-t6">$</span>
-                  {{ contentData.tuition_fee | numberFormat }}</span
+                  {{ $numberFormat(contentData.tuition_fee) }}</span
                 >
                 <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
@@ -549,7 +549,7 @@
               <li class="d-flex mb-4">
                 <div class="bullet"></div>
                 <div class="gtext-t4 font-weight-medium score-title">
-                  Teachers’ expertise
+                  Teachers' expertise
                 </div>
                 <v-progress-linear
                   color="success"
@@ -713,7 +713,7 @@
                 </div>
                 <v-divider class="mb-5" />
                 <div class="gtext-t2 primary-gray-700 mb-6">
-                  “{{ comment.comment }}”
+                  "{{ comment.comment }}"
                 </div>
                 <div class="pb-8">
                   <div class="float-left">
@@ -991,7 +991,7 @@
                   <div
                     class="gtext-t4 font-weight-medium primary-gray-700 score-title"
                   >
-                    Teachers’ expertise
+                    Teachers' expertise
                   </div>
                   <v-rating
                     v-model="commentForm.educationRate"
@@ -1606,7 +1606,7 @@ export default {
           }
 
           ### **Evaluation Criteria:**
-          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school’s official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
+          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
           \n1. Quality of classrooms and educational facilities
           \n2. Teachers' proficiency and teaching effectiveness
           \n3. Access to and use of computers and technology
@@ -1619,7 +1619,7 @@ export default {
           ### **Response Format:**
           Return a structured JSON object with:
           - Category ratings as numbers (1-5) and it 8 items.
-          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school’s actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
+          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school's actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
 
           Response Format: (Don't forget end of rating object close by })
           \`\`\`json

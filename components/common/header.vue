@@ -123,8 +123,8 @@ const searchFilterItems = [
     key: "student",
   },
 ];
-const mobileSearchFilter = "exam";
-const keyword = "";
+let mobileSearchFilter = "exam";
+let keyword = "";
 
 const user_profile_items = [
   {
@@ -292,31 +292,31 @@ const isScrollAtBottom = (element) => {
   return element.scrollHeight - element.scrollTop <= element.clientHeight;
 };
 const search = () => {
-  searchLoading = true;
-  if (timer) {
+  searchLoading.value = true;
+  if (timer.value) {
     clearTimeout(timer.value);
-    timer = null;
+    timer.value = null;
   }
 
-  timer = setTimeout(() => {
-    if (this.searchKey && this.allDataLoaded == false)
+  timer.value = setTimeout(() => {
+    if (searchKey.value && allDataLoaded.value == false)
       $fetch("/api/v1/search/text", {
         params: {
-          query: this.searchKey,
-          page: this.pageNum,
+          query: searchKey.value,
+          page: pageNum.value,
         },
       })
         .then((response) => {
           searchCount.value = response.data.num;
-          searchResults.push(...response.data.list);
+          searchResults.value.push(...response.data.list);
 
-          if (response.data.list.length === 0) this.allDataLoaded = true;
+          if (response.data.list.length === 0) allDataLoaded.value = true;
         })
         .catch((err) => {
           console.log(err);
         })
         .finally(() => {
-          this.searchLoading = false;
+          searchLoading.value = false;
         });
   }, 800);
 };
