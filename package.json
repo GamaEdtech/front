@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--unhandled-rejections=warn' nuxt dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' nuxt build",
-    "start": "nuxt start",
-    "generate": "NODE_OPTIONS='--max-old-space-size=8192' nuxt generate"
+    "dev": "cross-env NODE_OPTIONS='--unhandled-rejections=warn' nuxt dev",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' nuxt build",
+    "generate": "cross-env NODE_OPTIONS='--max-old-space-size=8192' nuxt generate",
+    "start": "cross-env NODE_OPTIONS='--max-old-space-size=8192' nuxt start"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^43.3.1",
