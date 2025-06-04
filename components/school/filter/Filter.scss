@@ -8,6 +8,7 @@
     justify-content: center;
     position: relative;
     z-index: 4;
+    flex: 0 0 auto;
     .box-filter-option {
         width: 100%;
         height: 100px;
@@ -292,9 +293,9 @@
                 align-items: center;
                 justify-content: space-between;
                 flex-wrap: wrap;
-                row-gap: 20px;
+                row-gap: 40px;
                 .cotainer-dropdown {
-                    @include style.responsive-size(width, 33%, 33%, 33%, 100%);
+                    @include style.responsive-size(width, 33%, 33%, 100%, 100%);
                 }
             }
             .container-checkbox-group {
@@ -405,6 +406,61 @@
                         transform: scale(0.98);
                     }
                 }
+            }
+            .box-chips-query-mobile {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+                .container-chips {
+                    width: 90%;
+                    display: flex;
+                    justify-content: flex-start;
+                    column-gap: 10px;
+                    flex-wrap: wrap;
+                    row-gap: 10px;
+                    .chip-div {
+                        min-width: 100px;
+                        padding: 6px 10px;
+                        border: 1px solid #252626;
+                        border-radius: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        column-gap: 6px;
+                        font-size: 16px;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+    .box-chips-query-desktop {
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        padding-top: 20px;
+        @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+        @include style.responsive-size(display, flex, none, none, none);
+        .container-chips {
+            width: 90%;
+            display: flex;
+            justify-content: flex-start;
+            column-gap: 10px;
+            flex-wrap: wrap;
+            row-gap: 10px;
+            .chip-div {
+                min-width: 100px;
+                padding: 6px 10px;
+                border: 1px solid #252626;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                column-gap: 6px;
+                font-size: 16px;
+                font-weight: 500;
             }
         }
     }

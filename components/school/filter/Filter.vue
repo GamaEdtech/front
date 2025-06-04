@@ -165,6 +165,67 @@
     <div class="mobile-filter-div" v-if="showFilterMobile">
       <div class="container-scroll">
         <div class="contaier-region-country-filter">
+          <div class="box-chips-query-mobile">
+            <div class="container-chips">
+              <div class="chip-div" v-if="filterForm.keyword.length > 0">
+                {{ filterForm.keyword }}
+                <v-icon
+                  @click="clearFilter(`keyword`)"
+                  size="small"
+                  color="#252626"
+                  >mdi-close-circle</v-icon
+                >
+              </div>
+
+              <div
+                class="chip-div"
+                v-if="
+                  filterForm.country.length > 0 &&
+                  findTitle(`countryList`, filterForm.country)
+                "
+              >
+                {{ findTitle("countryList", filterForm.country) }}
+                <v-icon
+                  @click="clearFilter(`country`)"
+                  size="small"
+                  color="#252626"
+                  >mdi-close-circle</v-icon
+                >
+              </div>
+
+              <div
+                class="chip-div"
+                v-if="
+                  filterForm.state.length > 0 &&
+                  findTitle(`stateList`, filterForm.state)
+                "
+              >
+                {{ findTitle("stateList", filterForm.state) }}
+                <v-icon
+                  @click="clearFilter(`state`)"
+                  size="small"
+                  color="#252626"
+                  >mdi-close-circle</v-icon
+                >
+              </div>
+
+              <div
+                class="chip-div"
+                v-if="
+                  filterForm.city.length > 0 &&
+                  findTitle(`cityList`, filterForm.city)
+                "
+              >
+                {{ findTitle("cityList", filterForm.city) }}
+                <v-icon
+                  @click="clearFilter(`city`)"
+                  size="small"
+                  color="#252626"
+                  >mdi-close-circle</v-icon
+                >
+              </div>
+            </div>
+          </div>
           <div class="cotainer-dropdown">
             <dropDownInput
               v-model="filterForm.country"
@@ -282,6 +343,55 @@
           <button class="btn-apply" @click="applyFilterMobie">
             Apply filter
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box-chips-query-desktop" v-if="!isExpandMap">
+      <div class="container-chips">
+        <div class="chip-div" v-if="filterForm.keyword.length > 0">
+          {{ filterForm.keyword }}
+          <v-icon @click="clearFilter(`keyword`)" size="small" color="#252626"
+            >mdi-close-circle</v-icon
+          >
+        </div>
+
+        <div
+          class="chip-div"
+          v-if="
+            filterForm.country.length > 0 &&
+            findTitle(`countryList`, filterForm.country)
+          "
+        >
+          {{ findTitle("countryList", filterForm.country) }}
+          <v-icon @click="clearFilter(`country`)" size="small" color="#252626"
+            >mdi-close-circle</v-icon
+          >
+        </div>
+
+        <div
+          class="chip-div"
+          v-if="
+            filterForm.state.length > 0 &&
+            findTitle(`stateList`, filterForm.state)
+          "
+        >
+          {{ findTitle("stateList", filterForm.state) }}
+          <v-icon @click="clearFilter(`state`)" size="small" color="#252626"
+            >mdi-close-circle</v-icon
+          >
+        </div>
+
+        <div
+          class="chip-div"
+          v-if="
+            filterForm.city.length > 0 && findTitle(`cityList`, filterForm.city)
+          "
+        >
+          {{ findTitle("cityList", filterForm.city) }}
+          <v-icon @click="clearFilter(`city`)" size="small" color="#252626"
+            >mdi-close-circle</v-icon
+          >
         </div>
       </div>
     </div>
@@ -477,6 +587,32 @@ const openFilterSection = (event, filter) => {
       filter.isShow = true;
     }
   }
+};
+
+const clearFilter = (key) => {
+  filterForm[key] = "";
+  if (key == "country") {
+    filter.stateList = [];
+    filterForm.state = "";
+    filter.cityList = [];
+    filterForm.city = "";
+  }
+  if (key == "state") {
+    filter.cityList = [];
+    filterForm.city = "";
+  }
+  if (key == "city") {
+    filterForm.city = "";
+  }
+  updateQueryParams();
+};
+
+const findTitle = (list, id) => {
+  const itemFounded = filter[list].filter((item) => item.id == id);
+  if (itemFounded.length > 0) {
+    return itemFounded[0].title;
+  }
+  return null;
 };
 
 // Start Section Filter Location

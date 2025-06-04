@@ -93,7 +93,7 @@
                 >
               </div>
             </div>
-            <div class="img-div">
+            <div class="img-div" v-if="school.defaultImageUri">
               <NuxtImg
                 alt="school.name"
                 v-if="school.defaultImageUri"
