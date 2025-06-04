@@ -563,7 +563,7 @@ export default {
                         :thumb-label="true"
                       >
                         <template #thumb-label="{ value }">
-                          ${{ value | numberFormat }}
+                          ${{ $numberFormat(value) }}
                         </template>
                       </v-slider>
                     </v-card-text>
@@ -616,7 +616,7 @@ export default {
                 <v-btn class="gtext-t4 font-weight-regular text-capitalize">
                   <span class="gray--text">Results</span> &nbsp;
                   <span class="white--text">
-                    {{ resultCount | numberFormat }}
+                    {{ $numberFormat(resultCount) }}
                   </span>
                 </v-btn>
               </div>
@@ -805,12 +805,10 @@ export default {
                           close
                           outlined
                           class="mb-1"
-                          v-if="$route.query.tuition_fee"
+                          v-if="$route.query.tuition_fee && $numberFormat($route.query.tuition_fee)"
                           @click:close="closeFilter('tuition_fee')"
                         >
-                          Tuition fee above: ${{
-                            $route.query.tuition_fee | numberFormat
-                          }}
+                          Tuition fee above: ${{ $numberFormat($route.query.tuition_fee) }}
                         </v-chip>
                         <v-chip
                           small
@@ -1028,25 +1026,6 @@ export default {
                           </v-checkbox>
                         </div>
                       </v-col>
-                      <v-col cols="12" sm="4">
-                        <p class="gtext-t4 font-weight-medium primary-gray-900">
-                          Coed status
-                        </p>
-                        <div class="pl-8">
-                          <v-checkbox
-                            v-for="(item, index) in filter.coedStatusList"
-                            :key="index"
-                            v-model="filterForm.coed_status"
-                            :value="item.id"
-                          >
-                            <template #label>
-                              <span class="gtext-t4 primary-gray-900">{{
-                                item.title
-                              }}</span>
-                            </template>
-                          </v-checkbox>
-                        </div>
-                      </v-col>
                       <v-col cols="12">
                         <div class="d-flex">
                           <p class="gtext-t4 primary-gray-900">Tuition fee</p>
@@ -1060,7 +1039,7 @@ export default {
                             thumb-label="always"
                           >
                             <template #thumb-label="{ value }">
-                              ${{ value | numberFormat }}
+                              ${{ $numberFormat(value) }}
                             </template>
                           </v-slider>
                         </div>

@@ -47,14 +47,15 @@ export default defineNuxtPlugin((nuxtApp) => {
   };
 
   const numberFormat = (value) => {
+    if (process.server) return String(value);
     return Number(value).toLocaleString("en-US");
   };
 
-  // Inject functions globally
+  // Provide functions globally
+  nuxtApp.provide("numberFormat", numberFormat);
   nuxtApp.provide("loadImg", loadImg);
   nuxtApp.provide("slugGenerator", slugGenerator);
   nuxtApp.provide("loadAvatar", loadAvatar);
   nuxtApp.provide("testLevel", testLevel);
   nuxtApp.provide("timeAgo", timeAgo);
-  nuxtApp.provide("numberFormat", numberFormat);
 });
