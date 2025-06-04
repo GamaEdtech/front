@@ -464,7 +464,7 @@
                 @scroll="onScroll"
               >
                 <v-card-text>
-                  <v-row ref="testListContent">
+                  <v-row ref="mathJaxStep2ListContainerRef">
                     <v-col
                       v-for="item in test_list"
                       :key="item.id"
@@ -523,7 +523,6 @@
                       </v-row>
                       <div
                         id="test-question"
-                        ref="mathJaxEl"
                         v-html="item.question"
                       ></div>
                       <img :src="item.q_file" />
@@ -535,7 +534,7 @@
                           item.type == 'descriptive'
                         "
                       >
-                        <div ref="mathJaxEl" v-html="item.answer_full"></div>
+                        <div  v-html="item.answer_full"></div>
                         <img
                           v-show="item.answer_full_file"
                           :src="item.answer_full_file"
@@ -552,7 +551,7 @@
                           </v-icon>
                           <span>1)</span>
                           <span
-                          ref="mathJaxEl"
+                          
                           v-show="item.answer_a"
                           v-html="item.answer_a"
                           ></span>
@@ -568,7 +567,7 @@
                           </v-icon>
                           <span>2)</span>
                           <span
-                            ref="mathJaxEl"
+                            
                             v-show="item.answer_b"
                             v-html="item.answer_b"
                           ></span>
@@ -584,7 +583,7 @@
                           </v-icon>
                           <span>3)</span>
                           <span
-                            ref="mathJaxEl"
+                            
                             v-show="item.answer_c"
                             v-html="item.answer_c"
                           ></span>
@@ -600,7 +599,7 @@
                           </v-icon>
                           <span>4)</span>
                           <span
-                            ref="mathJaxEl"
+                            
                             v-show="item.answer_d"
                             v-html="item.answer_d"
                           ></span>
@@ -767,7 +766,7 @@
                 <v-divider />
             </v-col>
             </v-row>
-            <v-row>
+            <v-row ref="mathJaxStep3ReviewContainerRef">
               <v-col cols="12" v-show="previewTestList.length">
                 <draggable
                   v-model="previewTestList"
@@ -809,7 +808,7 @@
                         <template v-else>
                           <div
                             id="test-question"
-                            ref="mathJaxEl"
+                            
                             v-html="item.question"
                           />
                           <img v-if="item.q_file" :src="item.q_file" />
@@ -821,7 +820,7 @@
                               item.type == 'descriptive'
                             "
                           >
-                            <div ref="mathJaxEl" v-html="item.answer_full" />
+                            <div  v-html="item.answer_full" />
                             <img
                               v-show="item.answer_full_file"
                               :src="item.answer_full_file"
@@ -831,7 +830,7 @@
                             <div class="answer">
                               <span>1)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_a"
                                   v-html="item.answer_a"
                               ></span>
@@ -840,7 +839,7 @@
                             <div class="answer">
                               <span>2)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_b"
                                   v-html="item.answer_b"
                               ></span>
@@ -849,7 +848,7 @@
                             <div class="answer">
                               <span>3)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_c"
                                   v-html="item.answer_c"
                               ></span>
@@ -858,7 +857,7 @@
                             <p class="answer">
                               <span>4)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_d"
                                   v-html="item.answer_d"
                               />
@@ -1040,7 +1039,7 @@
             </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-          <v-card-text id="preview-dialog">
+          <v-card-text ref="mathJaxPrintDialogContainerRef" id="preview-dialog">
             <v-row>
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
@@ -1075,7 +1074,7 @@
                 <v-divider />
               </v-col>
             </v-row>
-            <v-row>
+            <v-row ref="mathJaxPrintDialogContainerRef">
               <v-col cols="12" v-if="previewTestList.length">
                 <draggable 
                   v-model="previewTestList" 
@@ -1117,7 +1116,6 @@
                         <template v-else>
                           <div
                             id="test-question"
-                            ref="mathJaxEl"
                             v-html="item.question"
                           />
                           <img v-if="item.q_file" :src="item.q_file" />
@@ -1129,7 +1127,7 @@
                               item.type == 'descriptive'
                             "
                           >
-                            <div ref="mathJaxEl" v-html="item.answer_full" />
+                            <div  v-html="item.answer_full" />
                             <img
                               v-show="item.answer_full_file"
                               :src="item.answer_full_file"
@@ -1139,7 +1137,7 @@
                             <div class="answer">
                               <span>1)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_a"
                                   v-html="item.answer_a"
                               ></span>
@@ -1148,7 +1146,7 @@
                             <div class="answer">
                               <span>2)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_b"
                                   v-html="item.answer_b"
                               ></span>
@@ -1157,7 +1155,7 @@
                             <div class="answer">
                               <span>3)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_c"
                                   v-html="item.answer_c"
                               ></span>
@@ -1166,7 +1164,7 @@
                             <p class="answer">
                               <span>4)</span>
                               <span
-                                  ref="mathJaxEl"
+                                  
                                   v-show="item.answer_d"
                                   v-html="item.answer_d"
                               />
@@ -1306,11 +1304,13 @@ import { useRuntimeConfig } from "nuxt/app";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
 import { useState } from "#app";
+import { useNuxtApp } from '#app'; 
 import { defineRule } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import draggable from "vuedraggable";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import CreateTestForm from "~/components/test-maker/create-test-form.vue";
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
 
 // Get Nuxt app instance for accessing plugins like toast
 const config = useRuntimeConfig();
@@ -1326,11 +1326,6 @@ definePageMeta({
 
 useHead({
   title: "Update Exam",
-  // script: [
-  //   {
-  //     src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-  //   },
-  // ],
 });
 
 // Get services
@@ -1432,6 +1427,12 @@ const topic_list = ref([]);
 const test_type_list = ref([]);
 const test_list = ref([]);
 const selected_topics = ref([]);
+
+
+// MathJax refs
+const mathJaxStep2ListContainerRef = ref()
+const mathJaxStep3ReviewContainerRef = ref()
+const mathJaxPrintDialogContainerRef = ref() 
 
 // Static data
 const year_list = ref([
@@ -1790,7 +1791,7 @@ const publishTest = async () => {
       },
     });
 
-    if (response.data?.message === "done") {
+    if (response.status === 1) {
       // Store the published exam ID for share link
       const publishedExamId = response.data.id || exam_id.value;
 
@@ -2407,7 +2408,25 @@ onMounted(async () => {
     // For edit, we might want to default to step 2 if exam_id is present
     test_step.value = exam_id.value ? 2 : 1; 
   }
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  }
+});
 
+
+onUpdated(async () => {
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  }
+  if (printPreviewDialog.value) {
+    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+  }
 });
 
 // Open delete confirmation dialog
@@ -2486,10 +2505,6 @@ const getExamTests = async () => {
     });
     
     test_list.value.push(...response.data.list);
-
-    if (test_list.value.length) {
-      renderMathJax();
-    }
     
     // Update exam test list length
     if (createForm.value) {
@@ -2523,11 +2538,6 @@ const getExamTests = async () => {
       });
       
       test_list.value.push(...fallbackResponse.data.list);
-
-      if (test_list.value.length) {
-        renderMathJax();
-      }
-      
       // Update exam test list length
       if (createForm.value) {
         createForm.value.examTestListLength = tests.value.length;
@@ -2562,7 +2572,7 @@ const deleteOnlineExam = async () => {
   deleteLoading.value = true;
 
   try {
-    await $fetch(`/api/v1/exams/${exam_id.value}`, {
+    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${userToken.value}`,
@@ -2570,6 +2580,7 @@ const deleteOnlineExam = async () => {
       },
     });
 
+    if(response.data.message === "done"){
     nuxtApp.$toast.success("Deleted successfully");
 
     // Reset all values
@@ -2593,6 +2604,7 @@ const deleteOnlineExam = async () => {
 
     // Reset to first step
     test_step.value = 1;
+  }
   } catch (err) {
     nuxtApp.$toast.error(err.message || "Error deleting exam");
     console.error("Error deleting exam:", err);
@@ -2779,42 +2791,6 @@ const handlePublish = () => {
   }
 };
 
-/**
- * Render MathJax on the page
- * This function processes math notation in elements with the mathJaxEl ref
- */
-const renderMathJax = () => {
-  // Disable MathJax rendering completely for now
-  return;
-  
-  if (window.MathJax) {
-    window.MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["$", "$"],
-          ["(", ")"],
-        ],
-        displayMath: [
-          ["$$", "$$"],
-          ["[", "]"],
-        ],
-        processEscapes: true,
-        processEnvironments: true,
-      },
-      displayAlign: "center",
-      "HTML-CSS": {
-        styles: { ".MathJax_Display": { margin: 0 } },
-        linebreaks: { automatic: true },
-        availableFonts: ["Asana Math"],
-        preferredFont: "Asana Math",
-        webFont: "Asana Math-Web",
-        imageFont: null,
-      },
-    });
-
-    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
-  }
-};
 
 // Change from ref to computed
 const test_share_link = computed(() => {
@@ -2868,6 +2844,45 @@ watch(
   }
 );
 
+
+watch(test_list, async () => {
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+}, { deep: true });
+
+watch(previewTestList, async () => {
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  }
+  if (printPreviewDialog.value) {
+    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+  }
+}, { deep: true });
+
+watch(printPreviewDialog, async (isDialogVisible) => {
+  if (isDialogVisible) {
+    await nextTick(); 
+    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+  }
+});
+
+
+watch(test_step, async (newStep, oldStep) => {
+  await nextTick(); 
+  if (newStep === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  } else if (newStep === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  }
+});
+
+watch(testListSwitch, async (isSwitchedOn) => {
+  if (test_step.value === 2 && isSwitchedOn) {
+    await nextTick(); 
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+});
 // Handle clear icon click for Board filter
 const handleClearSection = () => {
   filter.section = "";
@@ -3172,6 +3187,39 @@ watch(
     getExamTests();
   }
 );
+const typesetMathInSpecificContainer = async (containerRef ) => {
+  if (process.client && containerRef.value && window.MathJax) {
+    let elementToProcess = null;
+
+    if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+      elementToProcess = containerRef.value.$el;
+    } else if (containerRef.value instanceof HTMLElement) {
+      elementToProcess = containerRef.value;
+    }
+
+    if (!elementToProcess) {
+      return;
+    }
+    try {
+      await $ensureMathJaxReady(); 
+      await nextTick(); 
+      if (containerRef.value) { 
+        let currentElementForProcessing = null;
+        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+          currentElementForProcessing = containerRef.value.$el;
+        } else if (containerRef.value instanceof HTMLElement) {
+          currentElementForProcessing = containerRef.value;
+        }
+
+        if (currentElementForProcessing) {
+          $renderMathInElement(currentElementForProcessing);
+        }
+      }
+    } catch (error) {
+      console.error('MathJax Error:', error);
+    }
+  }
+};
 </script>
 
 <style lang="scss">
