@@ -46,6 +46,7 @@
                 <!-- Rich text editor -->
                 <div class="editor-container">
                   <validation-provider
+                    ref="contentProvider"
                     name="content"
                     rules="required"
                     v-slot="{ errors }"
@@ -310,50 +311,40 @@
                     >Index image</v-card-title
                   >
                   <v-card-text class="pt-0">
-                    <validation-provider
-                      name="image"
-                      rules="required"
-                      :value="blog.image"
-                      v-slot="{ errors, validate }"
-                    >
-                      <div class="image-preview mb-2" v-if="imagePreview">
-                        <img
-                          :src="imagePreview"
-                          alt="Index image"
-                          class="preview-image"
-                        />
-                      </div>
-                      <div class="d-flex justify-space-between mobile-stack">
-                        <v-btn
-                          color="white"
-                          class="black--text px-6 mobile-full upload-btn"
-                          rounded
-                          depressed
-                          @click="triggerImageUpload"
-                        >
-                          {{ imagePreview ? "Change image" : "Upload image" }}
-                        </v-btn>
-                        <v-btn
-                          icon
-                          color="error"
-                          @click="deleteImage(validate)"
-                          :disabled="!imagePreview"
-                          class="mobile-mb-2"
-                        >
-                          <v-icon class="primary-gray-500">mdi-delete</v-icon>
-                        </v-btn>
-                        <input
-                          type="file"
-                          ref="imageInput"
-                          accept="image/*"
-                          style="display: none"
-                          @change="(e) => onImageSelected(e, validate)"
-                        />
-                      </div>
-                      <div v-if="errors.length" class="error-message">
-                        {{ errors[0] }}
-                      </div>
-                    </validation-provider>
+                    <div class="image-preview mb-2" v-if="imagePreview">
+                      <img
+                        :src="imagePreview"
+                        alt="Index image"
+                        class="preview-image"
+                      />
+                    </div>
+                    <div class="d-flex justify-space-between mobile-stack">
+                      <v-btn
+                        color="white"
+                        class="black--text px-6 mobile-full upload-btn"
+                        rounded
+                        depressed
+                        @click="triggerImageUpload"
+                      >
+                        {{ imagePreview ? "Change image" : "Upload image" }}
+                      </v-btn>
+                      <v-btn
+                        icon
+                        color="error"
+                        @click="deleteImage()"
+                        :disabled="!imagePreview"
+                        class="mobile-mb-2"
+                      >
+                        <v-icon class="primary-gray-500">mdi-delete</v-icon>
+                      </v-btn>
+                      <input
+                        type="file"
+                        ref="imageInput"
+                        accept="image/*"
+                        style="display: none"
+                        @change="onImageSelected"
+                      />
+                    </div>
                   </v-card-text>
                 </v-card>
               </div>
@@ -430,12 +421,13 @@ export default {
     },
   },
   watch: {
-    "blog.title"(newTitle) {
-      this.slug = this.$slugGenerator.convert(newTitle || "");
-    },
+    "blog.title"(newTitle) {},
   },
   methods: {
-    showSlugDialog() {
+    async showSlugDialog() {
+      if (!this.slug) {
+        await this.createSlug();
+      }
       this.slugDialog = true;
     },
     onSlugSave(newSlug) {
@@ -469,30 +461,97 @@ export default {
             response.data.slug ||
             this.$slugGenerator.convert(this.blog.title || "");
           await this.$nextTick();
+          if (this.$refs.contentProvider) {
+            this.$refs.contentProvider.validate();
+          }
+          await this.$nextTick();
+          console.log("this.$refs.observer", this.$refs.observer);
+
           if (this.$refs.observer) {
-            this.$refs.observer.validate();
+            if (typeof this.$refs.observer.setValues === "function") {
+              this.$refs.observer.setValues({
+                title: this.blog.title,
+                content: this.blog.content,
+                summary: this.blog.summary,
+                status: this.blog.status,
+                visibility: this.blog.visibility,
+                publishTime: this.blog.publishTime,
+                categories: this.blog.categories,
+                image: this.blog.image,
+                scheduledDate: this.blog.scheduledDate,
+              });
+            } else if (typeof this.$refs.observer.validate === "function") {
+              this.$refs.observer.validate();
+            }
           }
         }
       } finally {
         this.loading = false;
+        this.$nextTick(() => {
+          if (this.$refs.contentProvider) {
+            this.$refs.contentProvider.validate();
+          }
+          if (this.$refs.observer) {
+            if (typeof this.$refs.observer.setValues === "function") {
+              this.$refs.observer.setValues({
+                title: this.blog.title,
+                content: this.blog.content,
+                summary: this.blog.summary,
+                status: this.blog.status,
+                visibility: this.blog.visibility,
+                publishTime: this.blog.publishTime,
+                categories: this.blog.categories,
+                image: this.blog.image,
+                scheduledDate: this.blog.scheduledDate,
+              });
+            } else if (typeof this.$refs.observer.validate === "function") {
+              this.$refs.observer.validate();
+            }
+          }
+        });
       }
     },
     triggerImageUpload() {
       this.$refs.imageInput.click();
     },
-    onImageSelected(event, validate) {
+    onImageSelected(event) {
       const file = event.target.files[0];
       if (file) {
         this.blog.image = file;
         this.imagePreview = URL.createObjectURL(file);
-        if (typeof validate === "function") validate(file);
       }
     },
-    deleteImage(validate) {
+    deleteImage() {
       this.blog.image = null;
       this.imagePreview = null;
       this.$refs.imageInput.value = "";
-      if (typeof validate === "function") validate(null);
+    },
+    async createSlug() {
+      if (!this.blog.title) {
+        this.slug = "";
+        return "";
+      }
+      try {
+        const response = await this.$axios.$get(
+          "/api/v2/blogs/slugs/generate",
+          {
+            params: { title: this.blog.title },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded && response.data) {
+          this.slug = response.data;
+          return response.data;
+        } else {
+          this.slug = this.$slugGenerator.convert(this.blog.title || "");
+          return this.slug;
+        }
+      } catch (e) {
+        this.slug = this.$slugGenerator.convert(this.blog.title || "");
+        return this.slug;
+      }
     },
     async fetchCategories() {
       try {
@@ -557,6 +616,7 @@ export default {
     },
     async onSubmit() {
       this.loading = true;
+      if (!this.slug) await this.createSlug();
       const formData = new FormData();
       formData.append("Title", this.blog.title);
       formData.append("Slug", this.slug);

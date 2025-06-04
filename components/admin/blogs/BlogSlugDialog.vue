@@ -50,7 +50,7 @@
               block
               rounded
               color="primary"
-              :disabled="!localSlug || localSlug.length < 4"
+              :disabled="!localSlug || localSlug.length < 4 || !slugValid"
               :loading="submitLoader"
               @click="saveSlug"
             >
@@ -80,6 +80,8 @@ export default {
     return {
       localSlug: this.slug,
       submitLoader: false,
+      slugValid: false,
+      _slugDebounce: null,
     };
   },
   watch: {
@@ -88,6 +90,42 @@ export default {
     },
     value(val) {
       if (val) this.localSlug = this.slug;
+    },
+    localSlug(newVal) {
+      if (this._slugDebounce) clearTimeout(this._slugDebounce);
+      if (!newVal || newVal.length < 4) {
+        this.slugValid = false;
+        return;
+      }
+      if (newVal === this.slug) {
+        this.slugValid = true;
+        return;
+      }
+      this._slugDebounce = setTimeout(async () => {
+        try {
+          const response = await this.$axios.$get(
+            "/api/v2/blogs/slugs/validate",
+            {
+              params: { slug: newVal },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+              },
+            }
+          );
+          if (response && response.succeeded) {
+            if (response.data === true) {
+              this.slugValid = true;
+            } else {
+              this.slugValid = false;
+              this.$toast.error("Slug already exists.");
+            }
+          } else {
+            this.slugValid = false;
+          }
+        } catch (e) {
+          this.slugValid = false;
+        }
+      }, 400);
     },
   },
   computed: {
@@ -104,14 +142,35 @@ export default {
     closeDialog() {
       this.dialogVisible = false;
     },
-    saveSlug() {
+    saveSlug: async function () {
+      if (this.localSlug === this.slug) {
+        this.dialogVisible = false;
+        return;
+      }
       if (!this.localSlug || this.localSlug.length < 4) {
         this.$toast.error("Enter at least 4 characters for the slug.");
         return;
       }
       this.submitLoader = true;
-      this.$emit("save", this.localSlug);
-      this.dialogVisible = false;
+      try {
+        const response = await this.$axios.$get(
+          "/api/v2/blogs/slugs/generate",
+          {
+            params: { title: this.localSlug },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded && response.data) {
+          this.$emit("save", response.data);
+          this.dialogVisible = false;
+        } else {
+          this.$toast.error("Failed to generate slug.");
+        }
+      } catch (e) {
+        this.$toast.error("Failed to generate slug.");
+      }
       this.submitLoader = false;
     },
   },

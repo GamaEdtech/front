@@ -416,12 +416,13 @@ export default {
       categoriesLoading: true,
       categorySearch: "",
       keywordSearch: "",
+      _slugDebounce: null,
     };
   },
 
   watch: {
-    "blog.title"(newTitle) {
-      this.slug = this.$slugGenerator.convert(newTitle || "");
+    "blog.title": {
+      handler(newTitle) {},
     },
   },
 
@@ -435,7 +436,10 @@ export default {
   },
 
   methods: {
-    showSlugDialog() {
+    async showSlugDialog() {
+      if (!this.slug) {
+        await this.createSlug();
+      }
       this.slugDialog = true;
     },
     onSlugSave(newSlug) {
@@ -458,8 +462,36 @@ export default {
       this.$refs.imageInput.value = "";
       if (typeof validate === "function") validate(null);
     },
+    async createSlug() {
+      if (!this.blog.title) {
+        this.slug = "";
+        return "";
+      }
+      try {
+        const response = await this.$axios.$get(
+          "/api/v2/blogs/slugs/generate",
+          {
+            params: { title: this.blog.title },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded && response.data) {
+          this.slug = response.data;
+          return response.data;
+        } else {
+          this.slug = this.$slugGenerator.convert(this.blog.title || "");
+          return this.slug;
+        }
+      } catch (e) {
+        this.slug = this.$slugGenerator.convert(this.blog.title || "");
+        return this.slug;
+      }
+    },
     async onSubmit() {
       this.loading = true;
+      if (!this.slug) await this.createSlug();
       const formData = new FormData();
       formData.append("Title", this.blog.title);
       formData.append("Slug", this.slug);
@@ -477,7 +509,6 @@ export default {
       }
       formData.append("PublishDate", publishDate);
       formData.append("VisibilityType", this.blog.visibility);
-
       this.blog.categories.forEach((id) => formData.append("Tags[]", id));
       if (this.blog.image) {
         formData.append("Image", this.blog.image);
@@ -555,7 +586,6 @@ export default {
     },
     async createKeyword() {
       if (!this.keywordSearch) return;
-      // Split by comma, trim, and filter out empty
       const newKeywords = this.keywordSearch
         .split(",")
         .map((k) => k.trim())
