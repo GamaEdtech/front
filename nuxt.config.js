@@ -93,12 +93,16 @@ export default defineNuxtConfig({
     "dayjs-nuxt",
     "nuxt-gtag",
     "@nuxt/image",
+    "@nuxtjs/leaflet",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
   ],
+  leaflet: {
+    markerCluster: true
+  },
 
   // Development modules
   devtools: { enabled: true },
