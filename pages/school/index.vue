@@ -54,7 +54,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onUnmounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/filter/Filter.vue";
 import schoolList from "~/components/school/list/List.vue";
@@ -123,6 +124,20 @@ const sortList = [
     title: "Tuition Fee (Lowest First)",
   },
 ];
+
+onMounted(() => {
+  const footer = document.getElementById("footer-container");
+  if (footer) {
+    footer.style.display = "none";
+  }
+});
+
+onUnmounted(() => {
+  const footer = document.getElementById("footer-container");
+  if (footer) {
+    footer.style.display = "unset";
+  }
+});
 
 // Start Filter Section
 const filterForm = ref({
@@ -442,10 +457,6 @@ const endDrag = () => {
 // End Handle Drag To Open/Close Bottom Nav
 </script>
 
-<style>
+<style scoped>
 @import "./index.scss";
-
-#footer-container {
-  display: none !important;
-}
 </style>

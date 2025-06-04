@@ -1,4 +1,5 @@
-import { onMounted, onUnmounted, Ref, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+import type { Ref } from 'vue'
 
 export function useClickOutside(
     elementRef: Ref<HTMLElement | HTMLElement[] | null | undefined>,
