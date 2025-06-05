@@ -414,6 +414,7 @@ export default {
       categoriesLoading: true,
       categorySearch: "",
       keywordSearch: "",
+      isInitialLoad: true,
     };
   },
   computed: {
@@ -427,6 +428,7 @@ export default {
   watch: {
     "blog.title": {
       handler(newTitle) {
+        if (this.isInitialLoad) return;
         if (this._slugDebounce) clearTimeout(this._slugDebounce);
         this._slugDebounce = setTimeout(() => {
           this.createSlug();
@@ -444,6 +446,7 @@ export default {
     async fetchBlog() {
       this.loading = true;
       try {
+        this.isInitialLoad = true;
         const postId = this.$route.params.id;
         const response = await this.$axios.$get(
           `/api/v2/blogs/posts/${postId}`,
@@ -495,6 +498,7 @@ export default {
             }
           }
         }
+        this.isInitialLoad = false;
       } finally {
         this.loading = false;
         this.$nextTick(() => {
