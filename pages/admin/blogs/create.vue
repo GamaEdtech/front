@@ -422,7 +422,12 @@ export default {
 
   watch: {
     "blog.title": {
-      handler(newTitle) {},
+      handler(newTitle) {
+        if (this._slugDebounce) clearTimeout(this._slugDebounce);
+        this._slugDebounce = setTimeout(() => {
+          this.createSlug();
+        }, 500);
+      },
     },
   },
 
@@ -437,9 +442,6 @@ export default {
 
   methods: {
     async showSlugDialog() {
-      if (!this.slug) {
-        await this.createSlug();
-      }
       this.slugDialog = true;
     },
     onSlugSave(newSlug) {
@@ -491,7 +493,6 @@ export default {
     },
     async onSubmit() {
       this.loading = true;
-      if (!this.slug) await this.createSlug();
       const formData = new FormData();
       formData.append("Title", this.blog.title);
       formData.append("Slug", this.slug);

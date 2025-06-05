@@ -421,13 +421,17 @@ export default {
     },
   },
   watch: {
-    "blog.title"(newTitle) {},
+    "blog.title": {
+      handler(newTitle) {
+        if (this._slugDebounce) clearTimeout(this._slugDebounce);
+        this._slugDebounce = setTimeout(() => {
+          this.createSlug();
+        }, 500);
+      },
+    },
   },
   methods: {
     async showSlugDialog() {
-      if (!this.slug) {
-        await this.createSlug();
-      }
       this.slugDialog = true;
     },
     onSlugSave(newSlug) {
@@ -453,7 +457,9 @@ export default {
           this.blog.status = response.data.status || "Drafted";
           this.blog.visibility = response.data.visibility || "General";
           this.blog.publishTime = response.data.publishTime || "Immediately";
-          this.blog.categories = response.data.categories || [];
+          this.blog.categories = (response.data.tags || []).map(
+            (tag) => tag.id
+          );
           this.blog.scheduledDate = response.data.scheduledDate || null;
           this.blog.image = null;
           this.imagePreview = response.data.imageUri || null;
@@ -616,7 +622,6 @@ export default {
     },
     async onSubmit() {
       this.loading = true;
-      if (!this.slug) await this.createSlug();
       const formData = new FormData();
       formData.append("Title", this.blog.title);
       formData.append("Slug", this.slug);
