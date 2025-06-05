@@ -22,7 +22,7 @@ function initializeMathJax(): Promise<void> {
     useHead({
       script: [
         {
-          src: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML', // نسخه جدیدتر 2.7.x
+          src: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML',
           defer: true,
           tagPosition: 'bodyClose',
           onload: () => {
