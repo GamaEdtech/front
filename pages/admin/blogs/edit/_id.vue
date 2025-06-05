@@ -1,6 +1,10 @@
 <template>
   <div class="blog-create-page">
-    <validation-observer ref="observer" v-slot="observer" v-if="!loading">
+    <validation-observer
+      ref="observer"
+      v-slot="observer"
+      v-if="!categoriesLoading"
+    >
       <form @submit.prevent="onSubmit">
         <div class="d-flex flex-wrap flex-mobile">
           <v-row>
@@ -640,9 +644,9 @@ export default {
       formData.append("PublishDate", publishDate);
       formData.append("VisibilityType", this.blog.visibility);
       this.blog.categories.forEach((id) => formData.append("Tags[]", id));
-      if (this.blog.image) {
-        formData.append("Image", this.blog.image);
-      }
+
+      formData.append("Image", this.blog.image ? this.blog.image : "");
+
       try {
         const response = await this.$axios.$put(
           `/api/v2/blogs/contributions/${this.$route.params.id}`,
