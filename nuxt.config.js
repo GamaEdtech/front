@@ -272,6 +272,10 @@ export default {
         },
       });
     },
+    babel: {
+      // Exclude ckeditor from babel transpilation
+      ignore: [/ckeditor/]
+    }
   },
 
   pwa: {
