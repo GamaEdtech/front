@@ -6,7 +6,7 @@
           app
           color="#1d2939"
           v-model="drawer"
-          :temporary="$vuetify.breakpoint.smAndDown"
+          :temporary="$vuetify.breakpoint.mobile"
         >
           <v-list-item class="text-h4 font-weight-bold white--text"
             >Dashboard
@@ -81,7 +81,15 @@ export default {
       );
     },
   },
+  watch: {},
   methods: {},
+  mounted() {
+    if (this.$vuetify.breakpoint.mobile) {
+      this.drawer = false;
+    } else {
+      this.drawer = true;
+    }
+  },
 };
 </script>
 
