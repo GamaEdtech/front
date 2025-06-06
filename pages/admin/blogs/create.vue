@@ -6,13 +6,10 @@
           <v-row>
             <v-col cols="12" md="7">
               <!-- Left side - Content Editor -->
-              <div class="content-editor flex-grow-1">
+              <div class="content-editor">
                 <!-- Title input -->
                 <div class="title-section mb-4">
-                  <label
-                    class="font-weight-medium font-size-12 mb-2 d-block primary-gray-700"
-                    >Title</label
-                  >
+                  <label class="mb-2 d-block form-label-title">Title</label>
                   <validation-provider
                     name="title"
                     rules="required"
@@ -26,8 +23,24 @@
                       :error="!!errors.length"
                       :error-messages="errors"
                       class="title-input"
-                    ></v-text-field>
+                    >
+                      <template slot="append">
+                        <div class="cursor-pointer" @click="showSlugDialog">
+                          <v-icon color="#2E90FA" v-text="'mdi-link'"></v-icon>
+                        </div>
+                      </template>
+                    </v-text-field>
                   </validation-provider>
+                </div>
+
+                <div class="mt-10">
+                  <label class="mb-2 d-block form-label-title">Abstract</label>
+                  <v-textarea
+                    v-model="blog.summary"
+                    class="textarea-input"
+                    outlined
+                    placeholder="Enter here.............."
+                  ></v-textarea>
                 </div>
 
                 <!-- Rich text editor -->
@@ -37,27 +50,21 @@
                     rules="required"
                     v-slot="{ errors }"
                   >
-                    <client-only>
-                      <template #placeholder>
-                        <v-skeleton-loader
-                          type="table-heading, image"
-                        ></v-skeleton-loader>
-                      </template>
-                      <div class="w-100 overflow-hidden relative">
-                        <ckeditor-nuxt
-                          v-model="blog.content"
-                          :config="editorConfig"
-                        ></ckeditor-nuxt>
-                      </div>
-                      <div v-if="errors.length" class="error-message">
-                        {{ errors[0] }}
-                      </div>
-                    </client-only>
+                    <label class="mb-2 d-block form-label-title">Main </label>
+
+                    <div class="w-100 overflow-hidden relative">
+                      <ClientOnly>
+                        <rich-editor v-model="blog.content" />
+                      </ClientOnly>
+                    </div>
+                    <div v-if="errors.length" class="error-message">
+                      {{ errors[0] }}
+                    </div>
                   </validation-provider>
                 </div>
 
                 <!-- Bottom publish button -->
-                <div class="d-flex justify-center mt-6">
+                <div class="d-flex justify-start mt-6">
                   <v-btn
                     type="submit"
                     color="#FFC107"
@@ -84,17 +91,19 @@
                   <div
                     class="d-flex justify-space-between align-center pa-4 mobile-stack"
                   >
-                    <v-btn icon color="error" small class="mobile-mb-2">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
                     <v-btn
+                      type="submit"
                       :loading="loading"
                       :disabled="observer.invalid || !observer.validated"
                       color="#FFC107"
-                      class="px-6 mobile-full d-none d-md-block"
+                      class="px-6 mobile-full d-none d-md-block flex-grow-1 mr-6"
                       rounded
                       >Publish</v-btn
                     >
+
+                    <v-btn icon color="#344054" small class="mobile-mb-2">
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
                   </div>
                   <div
                     class="d-flex align-center justify-space-between mb-3 pa-4 mobile-stack"
@@ -117,6 +126,7 @@
                     <div class="primary-gray-700 font-size-16">Visibility</div>
                     <div class="card-select-item mobile-full">
                       <v-select
+                        v-model="blog.visibility"
                         outlined
                         dense
                         hide-details
@@ -175,38 +185,124 @@
                 </v-card>
 
                 <v-card
-                  class="mb-4 options-card mobile-full"
+                  class="mb-4 options-card mobile-full category-card"
                   color="#F9FAFB"
                   flat
                 >
-                  <v-card-title class="options-title pb-1 mt-3 primary-gray-700"
-                    >Category</v-card-title
+                  <v-card-title
+                    class="options-title pb-1 mt-3 primary-gray-700"
                   >
+                    Category
+                  </v-card-title>
                   <v-card-text class="pt- mt-3">
-                    <div class="category-options">
-                      <v-checkbox
-                        v-model="blog.categories"
-                        label="News"
-                        value="news"
+                    <div class="category-search-row">
+                      <v-text-field
+                        v-model="categorySearch"
+                        class="category-search-input w-100"
+                        placeholder="Search or add category"
                         hide-details
-                        class="category-checkbox"
+                        outlined
+                        rounded
                         dense
-                      ></v-checkbox>
+                        @keyup.enter="createCategory"
+                      >
+                        <template slot="append">
+                          <v-btn
+                            class="input-enter-button"
+                            fab
+                            small
+                            depressed
+                            color="#FFB600"
+                            :loading="categoryLoader"
+                            @click="createCategory"
+                          >
+                            <v-icon small color="#1D2939"
+                              >mdi-subdirectory-arrow-left
+                            </v-icon>
+                          </v-btn>
+                        </template>
+                      </v-text-field>
+                    </div>
+                    <div class="category-options-list">
+                      <template v-if="categoriesLoading">
+                        <v-skeleton-loader
+                          type="list-item-two-line"
+                        ></v-skeleton-loader>
+                      </template>
+                      <template v-else>
+                        <v-checkbox
+                          v-for="cat in filteredCategories"
+                          :key="cat.id"
+                          v-model="blog.categories"
+                          :label="cat.name"
+                          :value="cat.id"
+                          hide-details
+                          class="category-checkbox"
+                          dense
+                        ></v-checkbox>
+                      </template>
+                    </div>
+                  </v-card-text>
+                </v-card>
 
-                      <v-checkbox
-                        v-model="blog.categories"
-                        label="Announcement"
-                        value="announcement"
+                <v-card
+                  class="mb-4 options-card mobile-full category-card"
+                  color="#F9FAFB"
+                  flat
+                >
+                  <v-card-title
+                    class="options-title pb-1 mt-3 primary-gray-700"
+                  >
+                    keyword
+                  </v-card-title>
+                  <v-card-text class="pt- mt-3">
+                    <div class="category-search-row">
+                      <v-text-field
+                        v-model="keywordSearch"
+                        class="category-search-input w-100"
+                        placeholder="Search or add keyword"
                         hide-details
-                        class="category-checkbox"
+                        outlined
+                        rounded
                         dense
-                      ></v-checkbox>
+                        @keyup.enter="createKeyword"
+                      >
+                        <template slot="append">
+                          <v-btn
+                            class="input-enter-button"
+                            fab
+                            small
+                            depressed
+                            color="#FFB600"
+                            :loading="categoryLoader"
+                            @click="createKeyword"
+                          >
+                            <v-icon small color="#1D2939"
+                              >mdi-subdirectory-arrow-left
+                            </v-icon>
+                          </v-btn>
+                        </template>
+                      </v-text-field>
+                    </div>
+                    <div class="search-hint-label mt-3 mb-7">
+                      You can also use commas
+                    </div>
 
-                      <div class="add-category mt-4">
-                        <v-icon color="#1e88e5" small class="mr-1"
-                          >mdi-plus-circle</v-icon
+                    <div class="d-flex flex-wrap align-center">
+                      <div
+                        class="keyword-item mr-1 mb-2"
+                        v-for="(kitem, index) in keywords"
+                        :key="index"
+                      >
+                        <div class="keyword-item__title">{{ kitem }}</div>
+                        <div
+                          class="keyword-item__icon cursor-pointer"
+                          @click="deleteKeyword(kitem, index)"
                         >
-                        <span class="add-category-text">Add new category</span>
+                          <v-icon small color="#98A2B3"
+                            >mdi-close-circle
+                          </v-icon>
+                        </div>
                       </div>
                     </div>
                   </v-card-text>
@@ -232,6 +328,15 @@
                       </div>
                       <div class="d-flex justify-space-between mobile-stack">
                         <v-btn
+                          color="white"
+                          class="black--text px-6 mobile-full upload-btn"
+                          rounded
+                          depressed
+                          @click="triggerImageUpload"
+                        >
+                          {{ imagePreview ? "Change image" : "Upload image" }}
+                        </v-btn>
+                        <v-btn
                           icon
                           color="error"
                           @click="deleteImage(validate)"
@@ -239,14 +344,6 @@
                           class="mobile-mb-2"
                         >
                           <v-icon class="primary-gray-500">mdi-delete</v-icon>
-                        </v-btn>
-                        <v-btn
-                          color="white"
-                          class="black--text px-6 mobile-full"
-                          rounded
-                          @click="triggerImageUpload"
-                        >
-                          {{ imagePreview ? "Change image" : "Upload image" }}
                         </v-btn>
                         <input
                           type="file"
@@ -268,11 +365,16 @@
         </div>
       </form>
     </validation-observer>
+
+    <BlogSlugDialog v-model="slugDialog" :slug="slug" @save="onSlugSave" />
   </div>
 </template>
 
 <script>
 import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
+import BlogSlugDialog from "@/components/admin/blogs/BlogSlugDialog.vue";
+import RichEditor from "@/components/RichEditor.vue";
+
 extend("required", {
   validate: (value) => {
     if (Array.isArray(value)) return value.length > 0;
@@ -284,64 +386,67 @@ export default {
   auth: false,
   layout: "admin",
   components: {
+    BlogSlugDialog,
     ValidationObserver,
     ValidationProvider,
-    "ckeditor-nuxt": () => {
-      if (process.client) {
-        return import("@blowstack/ckeditor-nuxt");
-      }
-    },
+    RichEditor,
   },
   data() {
     return {
+      categoryLoader: false,
+      slugDialog: false,
       loading: false,
+      keywords: [],
       blog: {
         title: "",
-        content: null,
+        content: "",
+        summary: null,
         status: "draft",
-        visibility: "general",
+        visibility: "General",
         publishTime: "Immediately",
         categories: [],
         image: null,
         scheduledDate: null,
       },
+      slug: "",
       imagePreview: null,
       menu: false,
-      editorConfig: {
-        width: "auto",
-        title: false,
-        removePlugins: ["Title"],
-        toolbar: [
-          "heading",
-          "|",
-          "bold",
-          "italic",
-          "link",
-          "bulletedList",
-          "numberedList",
-          "|",
-          "indent",
-          "outdent",
-          "|",
-          "imageUpload",
-          "blockQuote",
-          "insertTable",
-          "mediaEmbed",
-          "undo",
-          "redo",
-        ],
-        language: "en",
-        image: {
-          toolbar: [
-            "imageTextAlternative",
-            "imageStyle:full",
-            "imageStyle:side",
-          ],
-        },
-      },
+      editorConfig: {},
+      categories: [],
+      categoriesLoading: true,
+      categorySearch: "",
+      keywordSearch: "",
+      _slugDebounce: null,
     };
   },
+
+  watch: {
+    "blog.title": {
+      handler(newTitle) {
+        if (this._slugDebounce) clearTimeout(this._slugDebounce);
+        this._slugDebounce = setTimeout(() => {
+          this.createSlug();
+        }, 500);
+      },
+    },
+  },
+
+  computed: {
+    filteredCategories() {
+      if (!this.categorySearch) return this.categories;
+      return this.categories.filter((cat) =>
+        cat.name.toLowerCase().includes(this.categorySearch.toLowerCase())
+      );
+    },
+  },
+
   methods: {
+    async showSlugDialog() {
+      this.slugDialog = true;
+    },
+    onSlugSave(newSlug) {
+      this.slug = newSlug;
+    },
     triggerImageUpload() {
       this.$refs.imageInput.click();
     },
@@ -359,15 +464,53 @@ export default {
       this.$refs.imageInput.value = "";
       if (typeof validate === "function") validate(null);
     },
+    async createSlug() {
+      if (!this.blog.title) {
+        this.slug = "";
+        return "";
+      }
+      try {
+        const response = await this.$axios.$get(
+          "/api/v2/blogs/slugs/generate",
+          {
+            params: { title: this.blog.title },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded && response.data) {
+          this.slug = response.data;
+          return response.data;
+        } else {
+          this.slug = this.$slugGenerator.convert(this.blog.title || "");
+          return this.slug;
+        }
+      } catch (e) {
+        this.slug = this.$slugGenerator.convert(this.blog.title || "");
+        return this.slug;
+      }
+    },
     async onSubmit() {
       this.loading = true;
       const formData = new FormData();
       formData.append("Title", this.blog.title);
+      formData.append("Slug", this.slug);
       formData.append("Body", this.blog.content);
-      formData.append(
-        "Summary",
-        this.blog.content ? this.blog.content.substring(0, 120) : ""
-      );
+      formData.append("Summary", this.blog.summary);
+      let publishDate;
+      if (this.blog.publishTime === "Immediately") {
+        publishDate = new Date().toISOString();
+      } else if (
+        this.blog.publishTime === "Schedule" &&
+        this.blog.scheduledDate
+      ) {
+        const date = new Date(this.blog.scheduledDate);
+        publishDate = date.toISOString();
+      }
+      formData.append("PublishDate", publishDate);
+      formData.append("VisibilityType", this.blog.visibility);
+      this.blog.categories.forEach((id) => formData.append("Tags[]", id));
       if (this.blog.image) {
         formData.append("Image", this.blog.image);
       }
@@ -394,11 +537,115 @@ export default {
         this.loading = false;
       }
     },
+    async fetchCategories() {
+      try {
+        const response = await this.$axios.$get("/api/v2/tags/Post");
+        if (response && response.succeeded) {
+          this.categories = response.data;
+        }
+      } catch (e) {
+        this.$toast.error("Failed to load categories");
+      } finally {
+        this.categoriesLoading = false;
+      }
+    },
+    async createCategory() {
+      const name = this.categorySearch && this.categorySearch.trim();
+      if (!name) {
+        this.$toast.error("Please enter a category name.");
+        return;
+      }
+      try {
+        this.categoryLoader = true;
+        const response = await this.$axios.$post(
+          "/api/v2/admin/tags",
+          {
+            name,
+            icon: "shape-outline",
+            tagType: "Post",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+            },
+          }
+        );
+        if (response && response.succeeded) {
+          this.$toast.success("Category created successfully!");
+          this.categorySearch = "";
+          await this.fetchCategories();
+        } else {
+          this.$toast.error(
+            response?.errors?.[0]?.message || "Failed to create category."
+          );
+        }
+        this.categoryLoader = false;
+      } catch (e) {
+        this.categoryLoader = false;
+        this.$toast.error("Failed to create category.");
+      }
+    },
+    async createKeyword() {
+      if (!this.keywordSearch) return;
+      const newKeywords = this.keywordSearch
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0);
+      this.keywords.push(...newKeywords);
+      this.keywordSearch = "";
+    },
+    async deleteKeyword(row, index) {
+      this.keywords.splice(index, 1);
+    },
+  },
+
+  mounted() {
+    this.fetchCategories();
   },
 };
 </script>
 
 <style scoped>
+.upload-btn {
+  border: 1px solid #e4e7ec !important;
+}
+.keyword-item {
+  background: #1d2939;
+  color: #fcfcfd;
+  font-size: 12px;
+  font-weight: 400;
+  width: 73px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 11px 9px;
+}
+.search-hint-label {
+  color: #98a2b3;
+  font-size: 14px;
+  font-weight: 400;
+}
+.input-enter-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  background: #ffb600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 9px;
+  margin-right: -15px;
+}
+.form-label-title {
+  color: #344054;
+  font-size: 20px;
+  font-weight: 600;
+}
+.textarea-input {
+  border-radius: 16px !important;
+}
 @media (max-width: 900px) {
   .blog-create-page {
     padding: 8px;
@@ -407,12 +654,7 @@ export default {
     flex-direction: column !important;
     gap: 0;
   }
-  .content-editor,
-  .publishing-options {
-    /* width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important; */
-  }
+
   .ml-4 {
     margin-left: 0 !important;
   }
@@ -442,29 +684,19 @@ export default {
   padding: 20px;
 }
 
-.content-editor {
-  /* width: 65%; */
-}
-
-.publishing-options {
-  /* width: 35%;
-  max-width: 320px; */
-}
-
 .title-input {
   font-size: 18px;
+  border-radius: 16px !important;
 }
 
 .editor-container {
   margin-bottom: 20px;
 }
 
-/* Increase editor height */
 .editor-container :deep(.ck-editor__editable) {
   min-height: 250px !important;
 }
 
-/* Style the editor toolbar and content area */
 .editor-container :deep(.ck-toolbar) {
   border-radius: 8px 8px 0 0;
 }
@@ -531,24 +763,39 @@ export default {
   color: #344054;
 }
 
-.category-options {
-  padding-top: 6px;
-}
-
-.category-checkbox {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.add-category {
+.category-search-row {
   display: flex;
   align-items: center;
-  cursor: pointer;
+  margin-bottom: 16px;
 }
-
-.add-category-text {
-  color: #1e88e5;
-  font-size: 14px;
+.category-search-input {
+  min-width: 100%;
+  flex: 1;
+  border-radius: 24px !important;
+  background: #fff !important;
+  margin-right: 8px;
+}
+.category-search-btn {
+  border-radius: 50% !important;
+  min-width: 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.category-options-list {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+.category-checkbox {
+  margin: 0 0 8px 0;
+  padding-left: 16px;
 }
 
 .preview-image {
