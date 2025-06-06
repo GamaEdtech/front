@@ -1347,7 +1347,6 @@ const timer = ref(null);
 const observer = ref(null);
 const topicSelector = ref(null);
 const createForm = ref(null);
-const mathJaxEl = ref(null);
 const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
