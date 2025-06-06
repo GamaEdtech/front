@@ -1295,7 +1295,6 @@ const timer = ref(null);
 const observer = ref(null);
 const topicSelector = ref(null);
 const createForm = ref(null);
-const mathJaxEl = ref(null);
 const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
@@ -2051,13 +2050,6 @@ const applyTest = async (item, type = null) => {
 
         //Add to preview list
         // this.$store.commit('user/addPreviewTestList', item)
-
-        // if (this.$store.getters["user/getPreviewTestListLength"]) {
-        //   this.$nextTick(function () {
-        //  this.$renderMathJax(this.$refs.mathJaxEl);
-        //   });
-        // }
-
         submitTest();
       }
 };
