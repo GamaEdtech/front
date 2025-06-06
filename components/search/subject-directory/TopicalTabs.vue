@@ -116,8 +116,4 @@ export default {
     line-height: normal;
   }
 }
-.gama-text-h3,
-.gama-text-h6 {
-  color: #667085 !important;
-}
 </style>

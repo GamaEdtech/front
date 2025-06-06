@@ -17,6 +17,7 @@
       @changeLoadingTopSection="onChangeLoadingTopSection"
       ref="pageHeader"
       @changeLoadingInfinitScroll="onChangeLoadingInfiniteScroll"
+      @changeBookImage="onChangeBookImage"
     >
       <!-- Desktop view -->
       <template slot="content">
@@ -126,7 +127,6 @@ export default {
     },
     bookImage: {
       type: String,
-      default: require("@/assets/images/BiologyBook.png"),
     },
     breads: {
       type: Array,
@@ -156,16 +156,21 @@ export default {
       type: Array,
       required: true,
     },
+    loadingDataTable: {
+      type: Boolean,
+      required: true,
+    },
+    loadingTopSection: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
-      loadingDataTable: true,
-      loadingTopSection: true,
       loadingInfinitScroll: false,
       isReachToEndListPaper: false,
     };
   },
-
   async mounted() {
     this.setupScrollListener();
   },
@@ -192,13 +197,16 @@ export default {
       this.$emit("subject-change", subject);
     },
     onChangeLoadingTable(loadingStatus) {
-      this.loadingDataTable = loadingStatus;
+      this.$emit("loading-table-change", loadingStatus);
     },
     onChangeLoadingTopSection(loadingStatus) {
-      this.loadingTopSection = loadingStatus;
+      this.$emit("loading-top-section-change", loadingStatus);
     },
     onChangeLoadingInfiniteScroll(loadingStatus) {
       this.loadingInfinitScroll = loadingStatus;
+    },
+    onChangeBookImage(image) {
+      this.$emit("change-book-image", image);
     },
     setupScrollListener() {
       const targetDiv = this.$refs.loaderSection;

@@ -9,11 +9,16 @@
     :headers="headers"
     :papersItemsTable="papersItemsTable"
     :timeline="timeline"
+    :loadingTopSection="loadingTopSection"
+    :loadingDataTable="loadingDataTable"
     @search-results="onSearchResult"
     @result-papers="onSearchPaper"
     @board-change="onChangeBoard"
     @grade-change="onGradeChange"
     @subject-change="onSubjectChange"
+    @change-book-image="changeBookImage"
+    @loading-table-change="onChangeLoadingTable"
+    @loading-top-section-change="onChangeLoadingTopSection"
   />
 </template>
 
@@ -26,10 +31,115 @@ export default {
   components: {
     FastSearchPage,
   },
+  async asyncData({ params, query, $axios }) {
+    const result = {
+      isLoading: true,
+      bookImage: null,
+      searchResults: null,
+      papersResults: null,
+      resources: [],
+      papersTopical: {
+        label: "Topical",
+        icon: "Topical.svg",
+        items: [],
+      },
+      papersItemsTable: [],
+      loadingTopSection: true,
+      loadingDataTable: true,
+    };
+
+    const subjectId = params.subject || query.subject;
+    if (subjectId) {
+      try {
+        let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
+        let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
+        const [response, responsePapers] = await Promise.all([
+          $axios.get(endpointTopSectionData),
+          $axios.get(endpointPapers),
+        ]);
+
+        result.searchResults = response.data;
+        result.papersResults = responsePapers.data;
+        result.isLoading = false;
+
+        if (
+          result.searchResults &&
+          result.searchResults.data &&
+          result.searchResults.data.list &&
+          result.searchResults.data.list.length > 0 &&
+          result.searchResults.data.lesson_pic
+        ) {
+          result.bookImage = result.searchResults.data.lesson_pic;
+        } else {
+          result.bookImage = null;
+        }
+
+        if (result.searchResults?.data?.list) {
+          result.resources = result.searchResults.data.list;
+          const filterTopical = result.resources.filter(
+            (item) => item.title === "Topical"
+          );
+          if (filterTopical.length > 0) {
+            result.papersTopical.items = filterTopical[0].items;
+          }
+        }
+
+        if (result.papersResults?.data?.list) {
+          result.papersItemsTable = result.papersResults.data.list;
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        result.isLoading = false;
+      } finally {
+        result.loadingDataTable = false;
+        result.loadingTopSection = false;
+      }
+    }
+
+    return result;
+  },
+  // head() {
+  //   return {
+  //     titleTemplate: "%s",
+  //     title:
+  //       "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
+
+  //     meta: [
+  //       {
+  //         hid: "apple-mobile-web-app-title",
+  //         name: "apple-mobile-web-app-title",
+  //         content:
+  //           "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
+  //       },
+  //       {
+  //         hid: "og:title",
+  //         name: "og:title",
+  //         content:
+  //           "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
+  //       },
+  //       {
+  //         hid: "og:site_name",
+  //         name: "og:site_name",
+  //         content: "GamaTrain",
+  //       },
+  //       {
+  //         hid: "description",
+  //         name: "description",
+  //         content:
+  //           "Download free PDF resources for {lesson title}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.",
+  //       },
+  //       {
+  //         hid: "og:description",
+  //         name: "og:description",
+  //         content:
+  //           "Download free PDF resources for {lesson title}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.",
+  //       },
+  //     ],
+  //   };
+  // },
   data() {
     return {
       isLoading: true,
-      bookImage: require("@/assets/images/BiologyBook.png"),
       breads: [
         {
           text: "Subject Directory",
@@ -53,12 +163,6 @@ export default {
         },
       ],
       model: 1,
-      resources: [],
-      papersTopical: {
-        label: "Topical",
-        icon: "Topical.svg",
-        items: [],
-      },
       headers: [
         {
           text: "Classification",
@@ -92,14 +196,17 @@ export default {
           value: "examHubIcon",
         },
       ],
-      papersItemsTable: [],
       timeline: [],
       selectedBoard: null,
       selectedGrade: null,
       selectedSubject: null,
     };
   },
-  mounted() {},
+  beforeMount() {
+    if (this.papersItemsTable.length > 0) {
+      this.generateTimeLine(false);
+    }
+  },
   methods: {
     onSearchResult(data) {
       this.resources = data.data.list;
@@ -115,24 +222,31 @@ export default {
         this.papersItemsTable = [...this.papersItemsTable, ...data.data.list];
       } else {
         this.papersItemsTable = data.data.list;
+      }
+      this.generateTimeLine(isContinuePreviousSubject);
+    },
+    generateTimeLine(isContinuePreviousSubject) {
+      if (!isContinuePreviousSubject) {
         this.timeline = [];
       }
-
       if (!this.papersItemsTable || this.papersItemsTable.length === 0) {
         this.timeline = [];
         return;
       }
-
-      const moments = this.papersItemsTable
-        .map((item) => moment(item.subdate))
-        .sort((a, b) => b - a);
+      const sortedItems = [...this.papersItemsTable].sort((a, b) => {
+        const yearDiff = parseInt(b.edu_year) - parseInt(a.edu_year);
+        if (yearDiff !== 0) return yearDiff;
+        return parseInt(b.edu_month) - parseInt(a.edu_month);
+      });
 
       const timelineMap = {};
       let positionCounter = 0;
-
-      moments.forEach((m) => {
-        const year = m.year();
-        const month = m.format("MMM");
+      sortedItems.forEach((item) => {
+        const year = parseInt(item.edu_year);
+        const monthNumber = parseInt(item.edu_month);
+        const month = moment()
+          .month(monthNumber - 1)
+          .format("MMM");
 
         if (!timelineMap[year]) {
           timelineMap[year] = { months: new Set(), positions: [] };
@@ -200,6 +314,15 @@ export default {
         );
         this.breads.push(newSubject);
       }
+    },
+    changeBookImage(image) {
+      this.bookImage = image;
+    },
+    onChangeLoadingTable(loadingStatus) {
+      this.loadingDataTable = loadingStatus;
+    },
+    onChangeLoadingTopSection(loadingStatus) {
+      this.loadingTopSection = loadingStatus;
     },
   },
 };
