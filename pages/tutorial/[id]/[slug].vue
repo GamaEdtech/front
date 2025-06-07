@@ -183,10 +183,9 @@
                   :is-root-level="true"
                 />
               </v-navigation-drawer>
-              <div class="book-content">
+              <div class="book-content" ref="bookContentRef">
                 <div
                   class="bookText e-mathjax"
-                  ref="mathJaxEl"
                   v-html="tutorialInfo.content"
                 />
               </div>
@@ -226,12 +225,14 @@
 </template>
 <script setup>
 import { useRuntimeConfig } from 'nuxt/app';
+import { useNuxtApp } from '#app';
+import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue';
 
 const config = useRuntimeConfig();
-
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
+const bookContentRef = ref(null);
 
 const route = useRoute();
-
 
 // Fetch tutorial data
 let { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialInfo', async () => {
@@ -240,7 +241,7 @@ let { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialI
     return response.data;
   } catch (e) {
     throw e;
-  } 
+  }
 });
 
 // Fetch lesson tree
@@ -260,32 +261,60 @@ const filteredTree = computed(() =>
   ) || []
 );
 
-// Process lesson title
 const lessonInfo = tutorialInfo.value?.title?.split('|') || [];
 const lesson = {
   title: lessonInfo[0] || '',
   topic_title: lessonInfo[1] || ''
 };
 
-useHead({
-  script: [
-    {
-      src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-    },
-  ],
-  title: tutorialInfo.value?.title || '',
-});
+const typesetMathInSpecificContainer = async (containerRef) => {
+  if (process.client && containerRef.value) {
+    try {
+      await $ensureMathJaxReady();
 
-let expandListMenu = ref(true)
-let drawer = ref(false)
-let activeMenu = ref(null)
+      if (!window.MathJax || !window.MathJax.Hub) {
+        return;
+      }
+
+      let elementToProcess = null;
+      if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+        elementToProcess = containerRef.value.$el;
+      } else if (containerRef.value instanceof HTMLElement) {
+        elementToProcess = containerRef.value;
+      }
+
+      if (elementToProcess) {
+        await nextTick();
+        $renderMathInElement(elementToProcess);
+      }
+    } catch (error) {
+      console.error("Error during MathJax typesetting:", error);
+    }
+  }
+};
 onMounted(() => {
-  activeMenu.value = route.params.id
-  renderMathJax();
+  typesetMathInSpecificContainer(bookContentRef);
+  activeMenu.value = route.params.id;
   if (process.client) {
     window.addEventListener('scroll', handleScroll);
   }
 });
+
+watch(
+  () => tutorialInfo.value?.content,
+  (newContent, oldContent) => {
+    if (newContent && newContent !== oldContent) {
+      nextTick(() => {
+        typesetMathInSpecificContainer(bookContentRef);
+      });
+    }
+  }
+);
+
+
+const expandListMenu = ref(true);
+const drawer = ref(false);
+const activeMenu = ref(null);
 
 onBeforeUnmount(() => {
   if (process.client) {
@@ -293,54 +322,21 @@ onBeforeUnmount(() => {
   }
 });
 
-const renderMathJax = () => {
-  if (window.MathJax) {
-    window.MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["$", "$"],
-          ["\(", "\)"],
-        ],
-        displayMath: [
-          ["$$", "$$"],
-          ["\[", "\]"],
-        ],
-        processEscapes: true,
-        processEnvironments: true,
-      },
-      displayAlign: "center",
-      "HTML-CSS": {
-        styles: { ".MathJax_Display": { margin: 0 } },
-        linebreaks: { automatic: true },
-        availableFonts: ["Asana Math"],
-        preferredFont: "Asana Math",
-        webFont: "Asana Math-Web",
-        imageFont: null,
-      },
-    });
-
-    window.MathJax.Hub.Queue([
-      "Typeset",
-      window.MathJax.Hub,
-      mathJaxEl.value,
-    ]);
-  }
-};
-
-
 const handleScroll = () => {
   if (window.scrollY > 1000) expandListMenu.value = false;
   else expandListMenu.value = true;
 };
-
 
 const crashReportRef = ref(null);
 const openCrashReportDialog = () => {
     crashReportRef.value.dialog = true;
     crashReportRef.value.form.type = "tutorial";
 };
-</script>
 
+useHead({
+  title: tutorialInfo.value?.title || '',
+});
+</script>
 <style>
 .video-wrapper {
   width: 100%;
