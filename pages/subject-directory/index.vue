@@ -208,10 +208,10 @@ export default {
   },
   methods: {
     onSearchResult(data) {
-      this.resources = data.data.list;
+      this.resources = data.data.list ? data.data.list : [];
       this.lessonTitle = data.data.lesson_title ? data.data.lesson_title : "";
 
-      const filterTopical = data.data.list.filter(
+      const filterTopical = this.resources.filter(
         (item) => item.title == `Topical`
       );
       if (filterTopical && filterTopical.length > 0) {
