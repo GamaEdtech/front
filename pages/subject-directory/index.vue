@@ -32,6 +32,8 @@ export default {
     FastSearchPage,
   },
   async asyncData({ params, query, $axios }) {
+    console.log("dakhele tabe 1");
+
     const result = {
       isLoading: true,
       bookImage: null,
@@ -49,8 +51,11 @@ export default {
     };
 
     const subjectId = params.subject || query.subject;
+    console.log("dakhele tabe 2", subjectId);
+
     if (subjectId) {
       try {
+        console.log("ersal request");
         let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
         let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
         const [response, responsePapers] = await Promise.all([
@@ -58,6 +63,8 @@ export default {
           $axios.get(endpointPapers),
         ]);
 
+        console.log("response1", response);
+        console.log("response2", responsePapers);
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
@@ -88,9 +95,11 @@ export default {
           result.papersItemsTable = result.papersResults.data.list;
         }
       } catch (error) {
+        console.log("error", error);
         console.error("Error fetching data:", error);
         result.isLoading = false;
       } finally {
+        console.log("finalay akhar");
         result.loadingDataTable = false;
         result.loadingTopSection = false;
       }
