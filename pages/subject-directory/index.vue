@@ -56,15 +56,20 @@ export default {
     if (subjectId) {
       try {
         console.log("ersal request");
-        let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
-        let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
-        const [response, responsePapers] = await Promise.all([
-          $axios.get(endpointTopSectionData),
-          $axios.get(endpointPapers),
-        ]);
+        const baseURL = process.server
+          ? `https://core.gamatrain.com/api/v1/`
+          : `api/v1/`;
+        let endpointTopSectionData = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
+        let endpointPapers = `${baseURL}tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
+        // const [response, responsePapers] = await Promise.all([
+        //   $axios.get(endpointTopSectionData),
+        //   $axios.get(endpointPapers),
+        // ]);
+        const response = await $axios.get(endpointTopSectionData);
+        const responsePapers = await $axios.get(endpointPapers);
 
-        console.log("response1", response);
-        console.log("response2", responsePapers);
+        console.log("response1", response.data);
+        console.log("response2", responsePapers.data);
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
@@ -227,6 +232,7 @@ export default {
       }
     },
     onSearchPaper(data, isContinuePreviousSubject) {
+      console.log("response papaer extra page3", data);
       if (isContinuePreviousSubject) {
         this.papersItemsTable = [...this.papersItemsTable, ...data.data.list];
       } else {

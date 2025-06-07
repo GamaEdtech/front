@@ -369,6 +369,7 @@ export default {
         let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20&is_paper=true&directory=true`;
         this.$emit("changeLoadingInfinitScroll", true);
         const responsePapers = await this.$axios.get(endpointPapers);
+        console.log("response papaer extra page", responsePapers);
 
         this.$emit("result-papers", responsePapers.data, true);
       } catch (error) {

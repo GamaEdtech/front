@@ -179,6 +179,7 @@ export default {
       this.$emit("search-results", data);
     },
     onSearchPaper(data, isContinuePreviousSubject) {
+      console.log("response papaer extra page2", data);
       if (data.data.list.length == 0) {
         this.isReachToEndListPaper = true;
       }
