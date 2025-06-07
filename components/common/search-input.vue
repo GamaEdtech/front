@@ -65,5 +65,5 @@ const onInput = (event) => {
 </script>
 
 <style scoped>
-@import "./search-input.scss";
+@import "../../assets/scss/common/search-input.scss";
 </style>

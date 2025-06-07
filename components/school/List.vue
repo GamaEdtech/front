@@ -248,5 +248,5 @@ const loadPreviousPage = () => {
 </script>
 
 <style scoped>
-@import "./List.scss";
+@import "../../assets/scss/school/list.scss";
 </style>

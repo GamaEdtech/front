@@ -236,5 +236,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "./drop-down-input.scss";
+@import "../../assets/scss/common/drop-down-input.scss";
 </style>

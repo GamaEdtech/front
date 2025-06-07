@@ -68,5 +68,5 @@ const toggleOption = (option) => {
 </script>
 
 <style scoped>
-@import "./checkbox-input.scss";
+@import "../../assets/scss/common/checkbox-input.scss";
 </style>

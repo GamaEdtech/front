@@ -227,35 +227,32 @@
             </div>
           </div>
           <div class="cotainer-dropdown">
-            <dropDownInput
-              v-model="filterForm.country"
+            <gomboBox
+              label="Country"
               :items="filter.countryList"
-              placeholder="Country"
-              active-color="#ffb600"
+              v-model="filterForm.country"
+              :data-loading="!loadingCountry"
               @update:modelValue="countryChange"
-              :is-loading-data="loadingCountry"
             />
           </div>
           <div class="cotainer-dropdown">
-            <dropDownInput
-              v-model="filterForm.state"
+            <gomboBox
+              label="State"
               :items="filter.stateList"
-              placeholder="State"
-              active-color="#ffb600"
+              v-model="filterForm.state"
+              :data-loading="!loadingState"
               :disabled="!filterForm.country"
               @update:modelValue="stateChange"
-              :is-loading-data="loadingState"
             />
           </div>
           <div class="cotainer-dropdown">
-            <dropDownInput
-              v-model="filterForm.city"
+            <gomboBox
+              label="City"
               :items="filter.cityList"
-              placeholder="City"
-              active-color="#ffb600"
+              v-model="filterForm.city"
+              :data-loading="!loadingCity"
               :disabled="!filterForm.state"
               @update:modelValue="cityChange"
-              :is-loading-data="loadingCity"
             />
           </div>
         </div>
@@ -403,9 +400,10 @@ import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useClickOutside } from "~/composables/useClickOutside";
 
-import searchInput from "~/components/common/search-input/search-input.vue";
-import dropDownInput from "~/components/common/drop-down-input/drop-down-input.vue";
-import checkboxInput from "~/components/common/checkbox-input/checkbox-input.vue";
+import searchInput from "~/components/common/search-input.vue";
+import dropDownInput from "~/components/common/drop-down-input.vue";
+import checkboxInput from "~/components/common/checkbox-input.vue";
+import gomboBox from "~/components/common/gombo-box.vue";
 
 const props = defineProps({
   sortList: {
@@ -752,5 +750,5 @@ const closeFilterMobile = () => {
 </script>
 
 <style scoped>
-@import "./Filter.scss";
+@import "../../assets/scss/school/filter.scss";
 </style>

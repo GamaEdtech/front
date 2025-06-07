@@ -57,9 +57,9 @@
 import { onUnmounted } from "vue";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import schoolFilter from "~/components/school/filter/Filter.vue";
-import schoolList from "~/components/school/list/List.vue";
-import Map from "~/components/school/map/Map.vue";
+import schoolFilter from "~/components/school/Filter.vue";
+import schoolList from "~/components/school/List.vue";
+import Map from "~/components/school/Map.vue";
 
 useHead({
   titleTemplate: "%s",
@@ -458,5 +458,5 @@ const endDrag = () => {
 </script>
 
 <style scoped>
-@import "./index.scss";
+@import "../../assets/scss/school/index.scss";
 </style>

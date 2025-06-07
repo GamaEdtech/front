@@ -182,4 +182,6 @@ const getUserLocation = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@import "../../assets/scss/school/map.scss";
+</style>
