@@ -1,10 +1,8 @@
-<!-- in refactor proccess -->
-
 <template>
-  <div class="content-items">
+  <div class="content-items" ref="mathJaxContainerRef">
     <v-card
       class="mb-1 content-item rounded-sm"
-      v-for="(item, key) in items"
+      v-for="item in items"
       :key="item.id"
     >
       <v-card-text class="pb-0">
@@ -13,7 +11,7 @@
             <div class="item-img">
               <v-img
                 v-if="item.lesson_pic"
-                @error="imgErrorHandler(item, key)"
+                @error="imgErrorHandler(item)"
                 :src="item.lesson_pic"
                 :alt="item.lesson_title"
                 class="item-image"
@@ -38,33 +36,28 @@
               class="tutorial-content d-flex flex-column pl-3 justify-space-between"
             >
               <v-card-text class="pa-0">
-                <div
-                  class="item-content-title gama-text-button d-flex justify-space-between"
-                >
-                  <nuxt-link
-                    :to="`/qa/${item.id}/${item.title_url}`"
-                    ref="mathjaxEl"
-                  >
-                    {{ item.title }}
+                <div class="item-content-title gama-text-button d-flex justify-space-between">
+                  <nuxt-link :to="`/qa/${item.id}/${item.title_url}`">
+                    <span v-html="item.title"></span>
                   </nuxt-link>
                 </div>
                 <nuxt-link
                   class="item-content-subtitle gama-text-caption my-2 d-none d-sm-block"
                   :to="`/qa/${item.id}/${item.title_url}`"
                 >
-                  {{ item.question }}
+                  <span v-html="item.question"></span>
                 </nuxt-link>
                 <div class="mt-3">
                   <v-chip
                     class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
-                    :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
+                    :to="`/search?type=${route.query.type}&section=${item.section}&base=${item.base}&lesson=${item.lesson}`"
                   >
                     {{ item.lesson_title }}
                   </v-chip>
                   <v-chip
-                    :to="`/search?type=${$route.query.type}&section=${item.section}&base=${item.base}`"
+                    :to="`/search?type=${route.query.type}&section=${item.section}&base=${item.base}`"
                     class="mr-1 mb-1 blue-grey darken-1 white--text"
                     :x-small="display.xs"
                     :small="!display.xs"
@@ -75,48 +68,37 @@
                     :x-small="display.xs"
                     :small="!display.xs"
                     class="mr-1 mb-1 blue-grey darken-1 white--text"
-                    :to="`/search?type=${$route.query.type}&section=${item.section}`"
+                    :to="`/search?type=${route.query.type}&section=${item.section}`"
                   >
                     {{ item.section_title }}
                   </v-chip>
                 </div>
               </v-card-text>
-              <!--Item card footer-->
               <v-card-actions
                 class="item-content-footer pb-2 d-none d-sm-block"
-                    style="min-height: unset !important;"
+                style="min-height: unset !important;"
               >
                 <v-row>
                   <v-col cols="12" class="px-0">
                     <div class="d-flex pt-3 pt-md-0">
-                      <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
-                      >
+                      <div class="item-content-last-update gama-text-overline d-flex align-center mr-auto">
                         <i class="fa-solid fa-reply fa-xl"></i>
                         <span class="mx-2">
                           <span class="d-none d-sm-inline"> Reply: </span>
-                          <span class="date_string d-inline-block">
-                            {{ item.reply_num }}
-                          </span>
+                          <span class="date_string d-inline-block">{{ item.reply_num }}</span>
                         </span>
                       </div>
-                      <div
-                        class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
-                      >
+                      <div class="item-content-last-update gama-text-overline d-flex align-center mr-auto">
                         <i class="fa-solid fa-calendar-days fa-xl"></i>
                         <span class="mx-2">
                           <span class="d-none d-lg-inline"> Last update: </span>
-                          <span class="date_string d-inline-block">
-                            {{ $dayjs(item.up_date).fromNow() }}
-                          </span>
+                          <span class="date_string d-inline-block">{{ $dayjs(item.up_date).fromNow() }}</span>
                         </span>
                       </div>
                     </div>
                   </v-col>
                   <v-col cols="4">
-                    <div
-                      class="text-right align-right float-right d-flex align-content-center"
-                    >
+                    <div class="text-right align-right float-right d-flex align-content-center">
                       <nuxt-link icon :to="`/qa/${item.id}/${item.title_url}`">
                         <span
                           v-show="item.q_file_word"
@@ -133,7 +115,6 @@
                   </v-col>
                 </v-row>
               </v-card-actions>
-              <!--End item card footer-->
             </v-card>
           </div>
         </div>
@@ -142,26 +123,18 @@
         <v-row>
           <v-col cols="12" class="py-0">
             <div class="d-flex pt-2">
-              <div
-                class="item-content-last-update gama-text-overline d-flex align-center mr-auto ml-1"
-              >
+              <div class="item-content-last-update gama-text-overline d-flex align-center mr-auto ml-1">
                 <i class="fa-solid fa-reply"></i>
                 <span>
                   <span class="d-none d-lg-inline"> Reply: </span>
-                  <span class="date_string d-inline-block ml-1">
-                    {{ item.reply_num }}
-                  </span>
+                  <span class="date_string d-inline-block ml-1">{{ item.reply_num }}</span>
                 </span>
               </div>
-              <div
-                class="item-content-last-update gama-text-overline d-flex align-center mr-auto"
-              >
+              <div class="item-content-last-update gama-text-overline d-flex align-center mr-auto">
                 <i class="fa-solid fa-calendar-days"></i>
                 <span class="mx-2">
                   <span class="d-none d-lg-inline"> Last update: </span>
-                  <span class="date_string d-inline-block">
-                    {{ $dayjs(item.up_date).fromNow() }}
-                  </span>
+                  <span class="date_string d-inline-block">{{ $dayjs(item.up_date).fromNow() }}</span>
                 </span>
               </div>
             </div>
@@ -172,41 +145,80 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "q-a-list",
-  props: ["items"],
-  data() {
-    return {};
+<script setup lang="ts">
+import { ref, watch, nextTick, onMounted, type PropType } from 'vue';
+import { useNuxtApp, useRoute } from '#app';
+
+import { useGlobalDisplay } from '~/composables/useGlobalDisplay';
+
+interface QaItem {
+  id: number | string;
+  lesson_pic?: string;
+  lesson_title: string;
+  title: string;
+  question: string;
+  title_url: string;
+  section: string;
+  base: string;
+  lesson: string;
+  reply_num: number;
+  up_date: string;
+  q_file_word?: string;
+  q_file?: string;
+  section_title: string;
+  base_title: string;
+}
+
+const props = defineProps({
+  items: {
+    type: Array as PropType<QaItem[]>,
+    required: true,
   },
-  watch: {
-    items() {
-      this.renderMathJax();
-    },
-  },
-  mounted() {},
-  methods: {
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
+});
+
+const route = useRoute();
+
+const display = useGlobalDisplay();
+const { $dayjs } = useNuxtApp();
+
+const mathJaxContainerRef = ref<HTMLElement | null>(null);
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
+
+const typesetMathInContainer = async () => {
+  if (process.client && mathJaxContainerRef.value) {
+    try {
+      await $ensureMathJaxReady();
+      if (!window.MathJax || !window.MathJax.Hub) return;
+
+      const elementToProcess = mathJaxContainerRef.value;
+      
+      if (elementToProcess instanceof HTMLElement) {
+        await nextTick();
+        $renderMathInElement(elementToProcess);
       }
-    },
-    imgErrorHandler(item, key) {
-      this.items[key].lesson_pic = "";
-    },
-  },
-  computed: {
-    display() {
-      return useGlobalDisplay(); // Call the composable
-    },
-  },
+    } catch (error) {
+      console.error('Error during MathJax typesetting in q-a.vue:', error);
+    }
+  }
+};
+  
+onMounted(() => {
+  typesetMathInContainer();
+});
+
+watch(() => props.items, () => {
+  nextTick(() => {
+    typesetMathInContainer();
+  });
+}, { deep: true });
+
+
+const imgErrorHandler = (item: QaItem) => {
+  if (item) {
+    item.lesson_pic = '';
+  }
 };
 </script>
-
 <style scoped>
 
 .v-card>.v-card__progress+:not(.v-btn):not(.v-chip):not(.v-avatar), .v-card>:first-child:not(.v-btn):not(.v-chip):not(.v-avatar) {

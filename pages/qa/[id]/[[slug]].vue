@@ -125,7 +125,7 @@
                       <!--End score action-->
 
                       <v-col cols="12" md="11">
-                        <v-card color="#EEEEEE" flat class="fill-height">
+                        <v-card color="#EEEEEE" flat class="fill-height" ref="questionMathJaxContainerRef">
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3">
@@ -226,13 +226,10 @@
 
                                 <p
                                   class="mt-2 gama-text-body1"
-                                  ref="mathJaxEl"
+                                 
                                   v-html="
                                     contentData.question
-                                      ? contentData.question.replace(
-                                          /\n/g,
-                                          '<br />'
-                                        )
+                                      ? contentData.question
                                       : ''
                                   "
                                 />
@@ -422,7 +419,7 @@
                 </v-row>
 
                 <!--Answer section-->
-                <v-row>
+                <v-row ref="answersListMathJaxContainerRef">
                   <v-col cols="12" class="pt-0 px-sm-3 pt-sm-3">
                     <v-row v-for="answer in answer_list" :key="answer.id">
                       <!--Score action-->
@@ -595,9 +592,8 @@
                                 <div>
                                   <p
                                     class="mt-2 gama-text-body1"
-                                    ref="mathJaxEl"
                                     v-html="
-                                      answer.answer.replace(/\n/g, '<br />')
+                                      answer.answer
                                     "
                                   />
                                 </div>
@@ -951,6 +947,8 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 // import CrashReport from "~/components/common/crash-report.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
+import { useNuxtApp } from '#app';
+import { ref, reactive, watch, nextTick, onMounted, onUpdated, computed } from "vue";
 
 const replySchema = yup.object({
   answer: yup
@@ -979,11 +977,6 @@ const { data: contentData, error } = await useAsyncData(async () => {
 });
 
 useHead({
-  // script: [
-  //   {
-  //     src: `${config.public.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-  //   },
-  // ],
   title: contentData.value?.title || "Gama Train",
 });
 
@@ -1022,7 +1015,50 @@ const loading = reactive({
   similar_questions: true,
 });
 
-const mathJaxEl = ref([]);
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
+const questionMathJaxContainerRef = ref(null);
+const answersListMathJaxContainerRef = ref(null);
+
+const typesetMathInSpecificContainer = async (containerRef) => {
+  if (process.client && containerRef.value) {
+    try {
+      await $ensureMathJaxReady();
+
+      if (!window.MathJax || !window.MathJax.Hub) {
+        return;
+      }
+
+      let elementToProcess = null;
+      if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+        elementToProcess = containerRef.value.$el;
+      } else if (containerRef.value instanceof HTMLElement) {
+        elementToProcess = containerRef.value;
+      }
+
+      if (!elementToProcess) {
+        return;
+      }
+
+      await nextTick();
+
+      if (containerRef.value) {
+        let currentElement = null;
+        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+            currentElement = containerRef.value.$el;
+        } else if (containerRef.value instanceof HTMLElement) {
+            currentElement = containerRef.value;
+        }
+        if (currentElement) {
+            $renderMathInElement(currentElement);
+        } else {
+        }
+      } else {
+      }
+    } catch (error) {
+    }
+  } else {
+  }
+};
 const crashReport = ref(null);
 
 function increaseTextAreaHeight() {
@@ -1147,12 +1183,15 @@ const {
 
 async function reInit() {
   try {
-    // Refresh the async data to fetch the latest replies
-    await refreshReplies();
-    // Update answer_list with the fetched data
-    answer_list.value = repliesData.value.data.list;
+    await refreshReplies(); 
+    if (repliesData.value && repliesData.value.data) {
+      answer_list.value = repliesData.value.data.list || [];
+    } else {
+      answer_list.value = [];
+    }
   } catch (err) {
-    console.error(err);
+    console.error('Error in reInit fetching replies:', err);
+    answer_list.value = [];
   }
 }
 
@@ -1208,7 +1247,7 @@ async function submitScore(content_type, id, type) {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   } else {
     openAuthDialog("login");
@@ -1227,39 +1266,6 @@ function selectCorrectAnswer(id) {
       $toast.error("An error occured");
     });
 }
-
-function renderMathJax() {
-  if (window.MathJax) {
-    window.MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["$", "$"],
-          ["\\(", "\\)"],
-          ["\\(", "\\)"],
-          ["\\", "\\"],
-          ["(\\(", "\\))"],
-        ],
-        displayMath: [
-          ["$$", "$$"],
-          ["\\[", "\\]"],
-        ],
-        processEscapes: true,
-        processEnvironments: true,
-      },
-      displayAlign: "center",
-      "HTML-CSS": {
-        styles: { ".MathJax_Display": { margin: 0 } },
-        linebreaks: { automatic: true },
-        availableFonts: ["Asana Math"],
-        preferredFont: "Asana Math",
-        webFont: "Asana Math-Web",
-        imageFont: null,
-      },
-    });
-    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
-  }
-}
-
 // CrashReport component need to be refactor
 function openCrashReportDialog(id, type) {
   if (crashReport.value) {
@@ -1287,14 +1293,28 @@ function getSimilarQuestions() {
     });
 }
 
-onMounted(() => {
+onMounted(async () => {
   initBreadCrumb();
-  reInit();
+  await reInit();
   getSimilarQuestions();
-  setTimeout(() => {
-    renderMathJax();
-  }, 2000);
+  
+  await typesetMathInSpecificContainer(questionMathJaxContainerRef);
+  if (answer_list.value.length > 0) {
+    await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
+  }
 });
+watch(() => contentData.value?.question, async (newQuestionText) => {
+  if (newQuestionText) {
+    await typesetMathInSpecificContainer(questionMathJaxContainerRef);
+  }
+}, { immediate: false });
+
+watch(answer_list, async (newAnswers) => {
+  await nextTick();
+  if (newAnswers && newAnswers.length > 0) {
+    await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
+  }
+}, { deep: true });
 </script>
 
 <style lang="scss">
