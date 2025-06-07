@@ -64,9 +64,18 @@ export default {
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
-        result.lessonTitle = result.searchResults.data.lesson_title
-          ? result.searchResults.data.lesson_title
-          : "";
+        console.log("check lesson title -> data", result.searchResults.data);
+        console.log(
+          "check lesson title -> lesson title",
+          result.searchResults.data.lesson_title
+        );
+        if (
+          result.searchResults &&
+          result.searchResults.data &&
+          result.searchResults.data.lesson_title
+        ) {
+          result.lessonTitle = result.searchResults.data.lesson_title;
+        }
 
         if (
           result.searchResults &&
