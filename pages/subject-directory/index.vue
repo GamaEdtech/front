@@ -103,6 +103,24 @@ export default {
           result.papersItemsTable = result.papersResults.data.list;
         }
       } catch (error) {
+        if (error.response) {
+          // Server responded with a status outside 2xx
+          console.error("🔴 Response status:", error.response.status);
+          console.error(
+            "📄 Response data:",
+            JSON.stringify(error.response.data, null, 2)
+          );
+          console.error("📋 Response headers:", error.response.headers);
+        } else if (error.request) {
+          // Request was made but no response received
+          console.error(
+            "📡 No response received. Request object:",
+            error.request
+          );
+        } else {
+          // Error occurred in setting up the request
+          console.error("⚠️ Axios setup error:", error.message);
+        }
         console.error("Error fetching data:", error);
         result.isLoading = false;
       } finally {
