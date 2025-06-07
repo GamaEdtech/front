@@ -56,9 +56,7 @@ export default {
     if (subjectId) {
       try {
         console.log("ersal request");
-        const baseURL = process.server
-          ? `https://core.gamatrain.com/api/v1/`
-          : `api/v1/`;
+        const baseURL = process.server ? `api/v1/` : `api/v1/`;
         let endpointTopSectionData = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
         let endpointPapers = `${baseURL}tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
         // const [response, responsePapers] = await Promise.all([
