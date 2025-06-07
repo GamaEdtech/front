@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div>
-      <v-col cols="12" class="px-0 px-sm-2">
+      <v-col cols="12" class="px-0 px-sm-2 mt-md-16">
         <v-row>
           <v-col cols="12" class="pl-5">
             <span class="text-h4 teal--text">
@@ -15,85 +15,89 @@
         <v-row class="d-none d-md-flex">
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               v-model="filter.level"
               clearable
               :items="level_list"
               item-text="title"
               item-value="id"
               label="Curriculum"
-              outlined
+              variant="outlined"
+              color="primary"
             />
           </v-col>
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               v-model="filter.grade"
               clearable
               :items="grade_list"
               item-value="id"
               item-text="title"
               label="Grade"
-              outlined
+              variant="outlined"
+              color="primary"
             />
           </v-col>
           <v-col cols="12" md="3">
             <v-autocomplete
-              dense
+              density="compact"
               :items="lesson_list"
               item-value="id"
               item-text="title"
               v-model="filter.lesson"
               clearable
               label="Subject"
-              outlined
+              variant="outlined"
+              color="primary"
             />
           </v-col>
         </v-row>
         <!--End filter section-->
 
-        <v-card class="mt-3">
+        <v-card class="mt-3 p-4">
           <v-card-text class="px-sm-8 px-md-4">
             <v-row>
-              <v-col cols="12" class="px-0 px-sm-4 px-md-4">
+              <v-col cols="12" class="px-4">
                 <v-simple-table class="exams_table">
                   <template v-slot:default>
-                    <tbody>
+                    <tbody class="d-flex">
                       <tr
                         v-show="exam_list.length > 0"
                         v-for="item in exam_list"
                         :key="item.id"
+                        class="d-flex w-100 justify-space-between"
                       >
                         <td class="py-3">
                           <nuxt-link
                             :to="`/exam/${item.id}`"
-                            class="font-weight-bold"
+                            class="gtext-t5 font-weight-bold"
                             >{{ item.title }}</nuxt-link
                           >
                           <nuxt-link
                             :to="`/exam/participants/${item.id}`"
-                            class="mt-2 d-block"
+                            class="mt-2 d-block gtext-t5"
                           >
                             <span class="icong-student"></span>
                             Participants: {{ item.participants.total }}
                           </nuxt-link>
                         </td>
-                        <td class="text-right">
+                        <td class="text-right py-3">
                           <p>
                             {{ item.subdate }}
                           </p>
-                          <div>
-                            {{ showStatus(item.status) }}
+                          <div class="d-flex align-center">
+                            <p class="gtext-t6">{{ showStatus(item.status) }}</p>
                             <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <v-btn
-                                  icon
+                                  icon="mdi-delete"
                                   color="error"
                                   @click="openDeleteConfirmDialog(item.id)"
-                                  small
+                                  size="small"
                                   v-bind="props"
+                                  variant="text"
                                 >
-                                  <v-icon small> mdi-delete </v-icon>
                                 </v-btn>
                               </template>
                               <span>Delete</span>
@@ -101,12 +105,12 @@
                             <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <v-btn
-                                  icon
-                                  small
+                                  icon="mdi-note-edit-outline"
+                                  size="small"
                                   v-bind="props"
                                   :to="`/test-maker/edit/${item.id}`"
+                                  variant="text"
                                 >
-                                  <v-icon small> mdi-note-edit-outline </v-icon>
                                 </v-btn>
                               </template>
                               <span>Edit</span>
@@ -114,14 +118,12 @@
                             <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <v-btn
-                                  icon
-                                  small
+                                  icon="mdi-share-variant-outline"
+                                  size="small"
                                   color="primary"
                                   v-bind="props"
+                                  variant="text"
                                 >
-                                  <v-icon small>
-                                    mdi-share-variant-outline
-                                  </v-icon>
                                 </v-btn>
                               </template>
                               <span>Share</span>
@@ -133,17 +135,18 @@
                         v-show="
                           page_loading === false && exam_list.length === 0
                         "
+                        class="w-100"
                       >
-                        <td colspan="2">
-                          <p>Oops! no data found</p>
+                        <td colspan="2" class="d-flex text-center w-100">
+                          <p class="w-100">Oops! no data found</p>
                         </td>
                       </tr>
-                      <tr v-show="page_loading">
-                        <td colspan="2" class="text-center">
+                      <tr v-show="page_loading" class="w-100">
+                        <td colspan="2" class="text-center w-100 d-flex">
                           <v-progress-circular
                             :size="40"
                             :width="4"
-                            class="mt-12 mb-12"
+                            class="mt-12 mb-12 w-100"
                             color="orange"
                             indeterminate
                           />
@@ -197,205 +200,186 @@
   </v-container>
 </template>
 
-<script>
-export default {
+<script setup>
+
+// Define layout and page metadata
+definePageMeta({
   layout: "test-maker-layout",
-  name: "exams-manage",
-  // async asyncData({params,$axios}) {
-  //   const examData=await $axios.$get('/api/v1/exams');
-  //   return {examData};
-  // },
-  head() {
-    return {
-      title: "My Exams",
-    };
-  },
-  data() {
-    return {
-      filter: {
-        level: "",
-        grade: "",
-        lesson: "",
-      },
+});
 
-      level_list: [],
-      grade_list: [],
-      field_list: [],
-      lesson_list: [],
-      exam_list: [],
 
-      page_loading: false,
-      page: 1,
-      all_files_loaded: false,
+const { $toast,$store } = useNuxtApp()
+useHead({ title: 'My Exams' })
 
-      //Delete section
-      deleteConfirmDialog: false,
-      delete_loading: false,
-      delete_exam_id: null,
-      //End delete section
-    };
-  },
-  mounted() {
-    this.getTypeList("section");
-    this.getExams();
-    this.scroll();
-  },
-  watch: {
-    "filter.level"(val) {
-      this.filter.grade = "";
-      this.filter.lesson = "";
-      if (val) this.getTypeList("base", val);
+let filter = ref({
+  level: null,
+  grade: null,
+  lesson: null,
+})
 
-      this.page = 1;
-      this.all_files_loaded = false;
-      this.exam_list = [];
-      this.getExams();
-    },
-    "filter.grade"(val) {
-      this.filter.lesson = "";
-      if (val) this.getTypeList("lesson", val);
+let level_list = ref([])
+let grade_list = ref([])
+let lesson_list = ref([])
+let exam_list = ref([])
+let page_loading = ref(false)
+let page = ref(1)
+let all_files_loaded = ref(false)
+let deleteConfirmDialog =  ref(false)
+let delete_loading = ref(false)
+let delete_exam_id = ref(null)
+let timer = ref(null)
 
-      this.page = 1;
-      this.all_files_loaded = false;
-      this.exam_list = [];
-      this.getExams();
-    },
-    "filter.lesson"(val) {
-      this.page = 1;
-      this.all_files_loaded = false;
-      this.exam_list = [];
-      this.getExams();
-    },
-  },
-  methods: {
-    getTypeList(type, parent = "") {
-      var params = {
-        type: type,
-      };
-      if (type === "base") params.section_id = parent;
-      if (type === "lesson") {
-        params.base_id = parent;
+const getTypeList = async (type, parent = '') => {
+  const params = { type }
+  if (type === 'base') params.section_id = parent
+  if (type === 'lesson') params.base_id = parent
+
+  try {
+    const res = await $fetch('/api/v1/types/list', {
+      method: 'GET',
+      params,
+    })
+
+    if (type === 'section') {
+      level_list.value = res.data
+    } else if (type === 'base') {
+      grade_list.value = res.data
+    } else if (type === 'lesson') {
+      lesson_list.value = res.data
+    }
+  } catch (err) {
+    $toast.error(err)
+  }
+}
+
+
+const getExams = async () => {
+  if (!all_files_loaded.value) {
+    page_loading.value = true
+    try {
+      const response = await $fetch('/api/v1/exams', {
+        method: 'GET',
+        params: {
+          perpage: 20,
+          page: page.value,
+          section: filter.value.level,
+          base: filter.value.grade,
+          lesson: filter.value.lesson,
+        },
+      })
+
+      exam_list.value.push(...response.data.list)
+
+      if (response.data.list.length === 0) {
+        all_files_loaded.value = true
       }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      page_loading.value = false
+    }
+  }
+}
 
-      this.$fetch
-        .$get("/api/v1/types/list", {
-          params,
-        })
-        .then((res) => {
-          var data = {};
-          if (type === "section") {
-            this.level_list = res.data;
-          } else if (type === "base") {
-            this.grade_list = res.data;
-          } else if (type === "lesson") {
-            this.lesson_list = res.data;
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err);
-        });
-    },
-    getExams() {
-      if (!this.all_files_loaded) {
-        this.page_loading = true;
-        this.$fetch
-          .$get("/api/v1/exams", {
-            params: {
-              perpage: 20,
-              page: this.page,
-              section: this.filter.level,
-              base: this.filter.grade,
-              lesson: this.filter.lesson,
-            },
-          })
-          .then((response) => {
-            this.exam_list.push(...response.data.list);
+const scroll = () => {
+  window.onscroll = () => {
+    const scrollPosition = Math.max(
+      window.pageYOffset,
+      document.documentElement.scrollTop,
+      document.body.scrollTop
+    ) + window.innerHeight + 50
 
-            if (response.data.list.length === 0)
-              //For terminate auto load request
-              this.all_files_loaded = true;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => {
-            this.page_loading = false;
-          });
-      }
-    },
-    showStatus(id) {
-      if (id === "6") return "Under construction";
-      else if (id === "7") return "Published";
-    },
-    scroll() {
-      //For infinite loading
-      window.onscroll = () => {
-        //Scroll position
-        var scrollPosition =
-          Math.max(
-            window.pageYOffset,
-            document.documentElement.scrollTop,
-            document.body.scrollTop
-          ) +
-          window.innerHeight +
-          50;
-        let bottomOfWindow =
-          scrollPosition >= document.documentElement.offsetHeight;
+    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight
 
-        //Avoid the number of requests
-        if (this.timer) {
-          clearTimeout(this.timer);
-          this.timer = null;
-        }
+    if (timer) clearTimeout(timer)
 
-        //Load next page
-        if (bottomOfWindow && this.all_files_loaded === false) {
-          this.page_loading = true;
-          this.timer = setTimeout(() => {
-            this.page++;
-            this.getExams();
-          }, 800);
-        }
-      };
-    },
+    if (bottomOfWindow && !all_files_loaded.value) {
+      page_loading.value = true
+      timer = setTimeout(() => {
+        page.value++
+        getExams()
+      }, 800)
+    }
+  }
+}
 
-    openDeleteConfirmDialog(item_id) {
-      this.delete_exam_id = item_id;
-      this.deleteConfirmDialog = true;
-    },
-    async deleteExam() {
-      this.delete_loading = true;
-      await this.$fetch
-        .$delete(`/api/v1/exams/${this.delete_exam_id}`)
-        .then((response) => {
-          this.delete_exam_id = null;
-          this.deleteConfirmDialog = false;
+const showStatus = (id) => {
+  if (id === '6') return 'Under construction'
+  else if (id === '7') return 'Published'
+}
 
-          //Clear Exams global variable
-          this.$store.commit("user/setCurrentExamId", "");
-          this.$store.commit("user/setCurrentExamCode", "");
-          this.$store.commit("user/setCurrentExamId", "");
-          this.$store.commit("user/setPreviewTestList", []);
-          //End clear Exams global variable
+const openDeleteConfirmDialog = (item_id) => {
+  delete_exam_id.value = item_id
+  deleteConfirmDialog.value = true
+}
 
-          this.$toast.success("Deleted successfully");
-          this.exam_list = [];
-          this.getExams();
-        })
-        .catch((e) => {
-          this.delete_exam_id = null;
-          this.deleteConfirmDialog = false;
-        })
-        .finally(() => {
-          this.delete_loading = false;
-        });
-    },
-  },
-};
+const deleteExam = async () => {
+  delete_loading.value = true
+  try {
+    await $fetch(`/api/v1/exams/${delete_exam_id.value}`, {
+      method: 'DELETE',
+    })
+
+    delete_exam_id.value = null
+    deleteConfirmDialog.value = false
+
+    $store.commit('user/setCurrentExamId', '')
+    $store.commit('user/setCurrentExamCode', '')
+    $store.commit('user/setPreviewTestList', [])
+
+    $toast.success('Deleted successfully')
+
+    exam_list.value = []
+    getExams()
+  } catch (e) {
+    delete_exam_id.value = null
+    deleteConfirmDialog.value = false
+  } finally {
+    delete_loading.value = false
+  }
+}
+
+onMounted(() => {
+  getTypeList("section");
+  getExams("section");
+  scroll("section");
+})
+
+// Watchers
+watch(() => filter.value.level, (val) => {
+  filter.value.grade = ''
+  filter.value.lesson = ''
+  if (val) getTypeList('base', val)
+
+  page.value = 1
+  all_files_loaded.value = false
+  exam_list.value = []
+  getExams()
+})
+
+watch(() => filter.value.grade, (val) => {
+  filter.value.lesson = ''
+  if (val) getTypeList('lesson', val)
+
+  page.value = 1
+  all_files_loaded.value = false
+  exam_list.value = []
+  getExams()
+})
+
+watch(() => filter.value.lesson, () => {
+  page.value = 1
+  all_files_loaded.value = false
+  exam_list.value = []
+  getExams()
+})
 </script>
 
 <style scoped>
 p {
   font-size: 1.4rem;
+}
+:deep(.mdi){
+  font-size: 16px !important;
 }
 </style>
