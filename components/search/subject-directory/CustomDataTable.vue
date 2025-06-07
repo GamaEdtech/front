@@ -77,7 +77,8 @@
         >
 
         <v-chip
-          v-if="false"
+          v-if="item.sf_file"
+          @click="startDownload(`extra`, item)"
           small
           class="ma-1 chip-pill"
           color="#FFFAEB"
@@ -94,7 +95,8 @@
         >
 
         <v-chip
-          v-if="false"
+          v-if="item.in_file"
+          @click="startDownload(`extra`, item)"
           small
           class="ma-1 chip-pill"
           color="#FCF6F3"
@@ -118,8 +120,19 @@
         class="d-flex align-center justify-center v-chip--link"
         color="#F9F5FF"
         link
-        :to="`/exam/${item.exam_id}`"
+        v-if="item.exam_id"
+        v-for="(exam, index) in safeParseArray(item.exam_id)"
+        :key="index"
+        :to="`/exam/${exam}`"
         :disabled="!item.exam_id"
+      >
+        <v-icon color="#7F56D9"> mdi-clipboard-text-outline </v-icon>
+      </v-chip>
+      <v-chip
+        v-if="!item.exam_id"
+        class="d-flex align-center justify-center v-chip--link"
+        color="#F9F5FF"
+        :disabled="true"
       >
         <v-icon color="#7F56D9"> mdi-clipboard-text-outline </v-icon>
       </v-chip>
@@ -212,7 +225,8 @@
               >
               <!-- SF Chip -->
               <v-chip
-                v-if="false"
+                v-if="item.sf_file"
+                @click="startDownload(`extra`, item)"
                 x-small
                 class="chip-pill"
                 color="#FFFAEB"
@@ -231,7 +245,8 @@
               >
               <!-- IN Chip -->
               <v-chip
-                v-if="false"
+                v-if="item.in_file"
+                @click="startDownload(`extra`, item)"
                 x-small
                 class="chip-pill"
                 color="#FCF6F3"
@@ -254,15 +269,24 @@
                 color="#F9F5FF"
                 link
                 x-small
-                :to="`/exam/${item.exam_id}`"
+                v-if="item.exam_id"
+                v-for="(exam, index) in safeParseArray(item.exam_id)"
+                :key="index"
+                :to="`/exam/${exam}`"
                 :disabled="!item.exam_id"
               >
-                <v-icon
-                  x-small
-                  color="
-                    #7F56D9
-                  "
-                >
+                <v-icon x-small color="#7F56D9">
+                  mdi-clipboard-text-outline
+                </v-icon>
+              </v-chip>
+              <v-chip
+                v-if="!item.exam_id"
+                class="exam-hub-chip"
+                color="#F9F5FF"
+                x-small
+                :disabled="true"
+              >
+                <v-icon x-small color="#7F56D9">
                   mdi-clipboard-text-outline
                 </v-icon>
               </v-chip>
@@ -323,12 +347,22 @@ export default {
       this.isMobile = width < 768;
       this.isTablet = width >= 768 && width < 960;
     },
+    safeParseArray(stringList) {
+      try {
+        const parsed = JSON.parse(stringList);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    },
     startDownload(type, item) {
       let apiUrl = "";
       if (type === "q_word") apiUrl = `/api/v1/tests/download/${item.id}/word`;
       if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${item.id}/pdf`;
       if (type === "a_file")
         apiUrl = `/api/v1/tests/download/${item.id}/answer`;
+      if (type === "extra")
+        apiUrl = `/api/v1/tests/download/${item.id}/extra/${item.id}`;
       this.$axios
         .$get(apiUrl, {
           headers: {
@@ -437,7 +471,7 @@ export default {
   height: 30px !important;
   border-radius: 100%;
   cursor: pointer;
-  width: 100% !important;
+  display: inline-block !important;
 }
 
 .chip-pill {
@@ -675,6 +709,7 @@ export default {
 @media screen and (max-width: 960px) {
   .v-chip--link {
     width: 30px !important;
+    display: flex !important;
   }
 }
 </style>

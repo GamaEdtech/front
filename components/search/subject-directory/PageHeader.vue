@@ -181,6 +181,9 @@ export default {
       type: [String, Number],
       default: "28k",
     },
+    bookImage: {
+      type: String,
+    },
   },
 
   data() {
@@ -196,7 +199,6 @@ export default {
       showSubjectDialog: false,
       loader: true,
       searchResults: null,
-      bookImage: null,
       pageNumber: 1,
       isFirstTime: true,
     };
@@ -298,15 +300,21 @@ export default {
       this.$emit("subject-change", subject);
       this.selectedSubject = subject;
       this.setQueryParam();
-      this.isFirstTime = false;
       if (this.selectedBoard) {
         this.loader = false;
         this.isLoadingSubjects = false;
         // Call search API when subject is selected
         if (this.selectedBoard.id && subject?.id) {
-          await this.fetchSearchResults();
+          if (!this.$route.query.subject) {
+            await this.fetchSearchResults();
+          } else {
+            if (!this.isFirstTime) {
+              await this.fetchSearchResults();
+            }
+          }
         }
       }
+      this.isFirstTime = false;
     },
 
     /**
@@ -317,7 +325,7 @@ export default {
         this.searchLoader = true;
 
         let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${this.selectedSubject.id}`;
-        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20`;
+        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20&is_paper=true&directory=true`;
 
         this.$emit("changeLoadingTable", true);
         this.$emit("changeLoadingTopSection", true);
@@ -335,9 +343,9 @@ export default {
           this.searchResults.data.list.length > 0 &&
           this.searchResults.data.lesson_pic
         ) {
-          this.bookImage = this.searchResults.data.lesson_pic;
+          this.$emit("changeBookImage", this.searchResults.data.lesson_pic);
         } else {
-          this.bookImage = null;
+          this.$emit("changeBookImage", null);
         }
 
         this.$emit("changeLoadingTable", false);
@@ -348,8 +356,8 @@ export default {
         this.searchLoader = false;
       } catch (error) {
         console.error("Error fetching search results:", error);
-        this.bookImage = null;
         this.searchLoader = false;
+        this.$emit("changeBookImage", null);
         this.$emit("changeLoadingTable", false);
         this.$emit("changeLoadingTopSection", false);
       }
@@ -358,7 +366,7 @@ export default {
     async fetchPapersWithPaginate() {
       try {
         this.pageNumber += 1;
-        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20`;
+        let endpointPapers = `api/v1/tests/search?lesson=${this.selectedSubject.id}&page=${this.pageNumber}&perpage=20&is_paper=true&directory=true`;
         this.$emit("changeLoadingInfinitScroll", true);
         const responsePapers = await this.$axios.get(endpointPapers);
 
