@@ -18,6 +18,7 @@
       ref="pageHeader"
       @changeLoadingInfinitScroll="onChangeLoadingInfiniteScroll"
       @changeBookImage="onChangeBookImage"
+      @get-error="getError"
     >
       <!-- Desktop view -->
       <template slot="content">
@@ -179,10 +180,13 @@ export default {
       this.$emit("search-results", data);
     },
     onSearchPaper(data, isContinuePreviousSubject) {
-      if (data.data.list.length == 0) {
+      if (data.data && data.data.list && data.data.list.length == 0) {
         this.isReachToEndListPaper = true;
       }
       this.$emit("result-papers", data, isContinuePreviousSubject);
+    },
+    getError() {
+      this.isReachToEndListPaper = true;
     },
     onChangeBoard(board) {
       this.isReachToEndListPaper = false;

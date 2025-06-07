@@ -370,7 +370,16 @@ export default {
         this.$emit("changeLoadingInfinitScroll", true);
         const responsePapers = await this.$axios.get(endpointPapers);
 
-        this.$emit("result-papers", responsePapers.data, true);
+        if (
+          responsePapers.data &&
+          responsePapers.data.data &&
+          responsePapers.data.data.list
+        ) {
+          this.$emit("result-papers", responsePapers.data, true);
+        } else {
+          this.pageNumber -= 1;
+          this.$emit("get-error");
+        }
       } catch (error) {
         console.error("Error fetching search results:", error);
       } finally {

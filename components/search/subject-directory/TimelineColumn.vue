@@ -43,7 +43,7 @@ export default {
     getMarkerPosition(itemIndex, monthIndex = 0) {
       const heightSizeTableElement =
         window.innerWidth > 960 ? 57 : window.innerWidth > 768 ? 172.5 : 160;
-      return itemIndex * heightSizeTableElement + monthIndex * 30;
+      return itemIndex * heightSizeTableElement;
     },
   },
 };

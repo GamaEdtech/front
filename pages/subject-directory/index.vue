@@ -46,21 +46,27 @@ export default {
       papersItemsTable: [],
       loadingTopSection: true,
       loadingDataTable: true,
+      lessonTitle: "",
     };
 
     const subjectId = params.subject || query.subject;
+
     if (subjectId) {
       try {
-        let endpointTopSectionData = `api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
-        let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
-        const [response, responsePapers] = await Promise.all([
-          $axios.get(endpointTopSectionData),
-          $axios.get(endpointPapers),
-        ]);
+        const baseURL = process.server
+          ? `https://core.gamatrain.com/api/v1/`
+          : `api/v1/`;
+        let endpointTopSectionData = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
+        let endpointPapers = `${baseURL}tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
+        const response = await $axios.get(endpointTopSectionData);
+        const responsePapers = await $axios.get(endpointPapers);
 
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
+        result.lessonTitle = result.searchResults.data.lesson_title
+          ? result.searchResults.data.lesson_title
+          : "";
 
         if (
           result.searchResults &&
@@ -98,45 +104,40 @@ export default {
 
     return result;
   },
-  // head() {
-  //   return {
-  //     titleTemplate: "%s",
-  //     title:
-  //       "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
+  head() {
+    return {
+      titleTemplate: "%s",
+      title: `${this.lessonTitle} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
 
-  //     meta: [
-  //       {
-  //         hid: "apple-mobile-web-app-title",
-  //         name: "apple-mobile-web-app-title",
-  //         content:
-  //           "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
-  //       },
-  //       {
-  //         hid: "og:title",
-  //         name: "og:title",
-  //         content:
-  //           "{lesson title} Past Papers, Resources | Coursebook & Workbook – Free PDFs",
-  //       },
-  //       {
-  //         hid: "og:site_name",
-  //         name: "og:site_name",
-  //         content: "GamaTrain",
-  //       },
-  //       {
-  //         hid: "description",
-  //         name: "description",
-  //         content:
-  //           "Download free PDF resources for {lesson title}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.",
-  //       },
-  //       {
-  //         hid: "og:description",
-  //         name: "og:description",
-  //         content:
-  //           "Download free PDF resources for {lesson title}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.",
-  //       },
-  //     ],
-  //   };
-  // },
+      meta: [
+        {
+          hid: "apple-mobile-web-app-title",
+          name: "apple-mobile-web-app-title",
+          content: `${this.lessonTitle} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
+        },
+        {
+          hid: "og:title",
+          name: "og:title",
+          content: `${this.lessonTitle} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
+        },
+        {
+          hid: "og:site_name",
+          name: "og:site_name",
+          content: "GamaTrain",
+        },
+        {
+          hid: "description",
+          name: "description",
+          content: `Download free PDF resources for ${this.lessonTitle}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.`,
+        },
+        {
+          hid: "og:description",
+          name: "og:description",
+          content: `Download free PDF resources for ${this.lessonTitle}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.`,
+        },
+      ],
+    };
+  },
   data() {
     return {
       isLoading: true,
@@ -209,8 +210,10 @@ export default {
   },
   methods: {
     onSearchResult(data) {
-      this.resources = data.data.list;
-      const filterTopical = data.data.list.filter(
+      this.resources = data.data.list ? data.data.list : [];
+      this.lessonTitle = data.data.lesson_title ? data.data.lesson_title : "";
+
+      const filterTopical = this.resources.filter(
         (item) => item.title == `Topical`
       );
       if (filterTopical && filterTopical.length > 0) {
@@ -218,12 +221,14 @@ export default {
       }
     },
     onSearchPaper(data, isContinuePreviousSubject) {
-      if (isContinuePreviousSubject) {
-        this.papersItemsTable = [...this.papersItemsTable, ...data.data.list];
-      } else {
-        this.papersItemsTable = data.data.list;
+      if (data.data && data.data.list) {
+        if (isContinuePreviousSubject) {
+          this.papersItemsTable = [...this.papersItemsTable, ...data.data.list];
+        } else {
+          this.papersItemsTable = data.data.list;
+        }
+        this.generateTimeLine(isContinuePreviousSubject);
       }
-      this.generateTimeLine(isContinuePreviousSubject);
     },
     generateTimeLine(isContinuePreviousSubject) {
       if (!isContinuePreviousSubject) {
