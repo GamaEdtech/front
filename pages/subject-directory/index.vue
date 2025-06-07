@@ -55,7 +55,7 @@ export default {
       try {
         const baseURL = process.server
           ? `https://core.gamatrain.com/api/v1/`
-          : `api/v1/`;
+          : `/api/v1/`;
         let endpointTopSectionData = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
         let endpointPapers = `${baseURL}tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
         const response = await $axios.get(endpointTopSectionData);
@@ -64,9 +64,18 @@ export default {
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
-        result.lessonTitle = result.searchResults.data.lesson_title
-          ? result.searchResults.data.lesson_title
-          : "";
+        console.log("check lesson title -> data", result.searchResults.data);
+        console.log(
+          "check lesson title -> lesson title",
+          result.searchResults.data.lesson_title
+        );
+        if (
+          result.searchResults &&
+          result.searchResults.data &&
+          result.searchResults.data.lesson_title
+        ) {
+          result.lessonTitle = result.searchResults.data.lesson_title;
+        }
 
         if (
           result.searchResults &&
