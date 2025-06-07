@@ -64,11 +64,9 @@ export default {
         result.searchResults = response.data;
         result.papersResults = responsePapers.data;
         result.isLoading = false;
-        console.log("check lesson title -> data", result.searchResults.data);
-        console.log(
-          "check lesson title -> lesson title",
-          result.searchResults.data.lesson_title
-        );
+        console.log("response top section", response);
+        console.log("response table", responsePapers);
+        console.log("check lesson title -> data", result.searchResults);
         if (
           result.searchResults &&
           result.searchResults.data &&
