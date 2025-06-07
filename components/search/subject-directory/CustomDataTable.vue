@@ -78,7 +78,7 @@
 
         <v-chip
           v-if="item.sf_file"
-          @click="startDownload(`extra`, item)"
+          @click="startDownload(`sf_file`, item)"
           small
           class="ma-1 chip-pill"
           color="#FFFAEB"
@@ -96,7 +96,7 @@
 
         <v-chip
           v-if="item.in_file"
-          @click="startDownload(`extra`, item)"
+          @click="startDownload(`in_file`, item)"
           small
           class="ma-1 chip-pill"
           color="#FCF6F3"
@@ -226,7 +226,7 @@
               <!-- SF Chip -->
               <v-chip
                 v-if="item.sf_file"
-                @click="startDownload(`extra`, item)"
+                @click="startDownload(`sf_file`, item)"
                 x-small
                 class="chip-pill"
                 color="#FFFAEB"
@@ -246,7 +246,7 @@
               <!-- IN Chip -->
               <v-chip
                 v-if="item.in_file"
-                @click="startDownload(`extra`, item)"
+                @click="startDownload(`in_file`, item)"
                 x-small
                 class="chip-pill"
                 color="#FCF6F3"
@@ -361,8 +361,10 @@ export default {
       if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${item.id}/pdf`;
       if (type === "a_file")
         apiUrl = `/api/v1/tests/download/${item.id}/answer`;
-      if (type === "extra")
-        apiUrl = `/api/v1/tests/download/${item.id}/extra/${item.id}`;
+      if (type === "sf_file")
+        apiUrl = `/api/v1/tests/download/${item.id}/extra/${item.sf_file_id}`;
+      if (type === "in_file")
+        apiUrl = `/api/v1/tests/download/${item.id}/extra/${item.in_file_id}`;
       this.$axios
         .$get(apiUrl, {
           headers: {
