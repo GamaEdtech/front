@@ -538,6 +538,7 @@
         </v-col>
       </v-row>
       <common-related-portrait-content
+        pageType="multimedia"
         pageName="Multimedia"
         source="file"
         request="file"

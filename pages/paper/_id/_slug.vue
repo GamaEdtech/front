@@ -637,6 +637,7 @@
         </v-col>
       </v-row>
       <common-related-portrait-content
+        pageType="paper"
         pageName="Past Papers"
         source="test"
         request="test"
