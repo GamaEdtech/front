@@ -32,7 +32,7 @@
             :min-zoom="map.minZoom"
             :center="map.center"
             :class="topSlideClass.map"
-            @click="selectLocationDialog = true"
+            @click="showSelectLocationDialog = true"
             id="schoolDetailsMap"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
@@ -175,7 +175,7 @@
         <div v-if="galleryImages && galleryImages.length > 0">
           <v-carousel
             hide-delimiters
-            show-arrows-on-hover
+            show-arrows="hover"
             height="28.1rem"
             class="rounded-lg gallery-carousel"
             @click="openGalleryDialog"
@@ -1373,73 +1373,14 @@
     />
 
     <!-- Select Location dialog -->
-    <v-dialog
-      transition="dialog-bottom-transition"
-      v-model="selectLocationDialog"
-      fullscreen
-      style="z-index: 20001"
-    >
-      <v-card>
-        <v-card-text class="pt-6 pt-md-8 px-6 px-md-8">
-          <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">Location</div>
-            <v-spacer></v-spacer>
-            <v-btn icon variant="text"
-              ><v-icon size="20" @click="selectLocationDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
-          </div>
-        </v-card-text>
-
-        <div id="locationPickerMapContainer">
-          <client-only>
-            <l-map
-              ref="editSchoolMap"
-              :zoom="2"
-              :center="map.center"
-              id="mapSection"
-              @move="updateMarkerPosition"
-            >
-              <l-tile-layer :url="map.url"></l-tile-layer>
-              <l-marker ref="editMapMarker" :lat-lng="map.center">
-                <LIcon
-                  icon-url="/images/school-marker.png"
-                  :icon-size="[64, 64]"
-                  :icon-anchor="[16, 32]"
-                ></LIcon>
-              </l-marker>
-            </l-map>
-          </client-only>
-          <locationSearch
-            id="searchSection"
-            @locationSelected="goToSearchLocation"
-            rounded
-            label="Search anything"
-          />
-        </div>
-        <a
-          :href="`https://www.google.com/maps?q=${contentData.latitude}, ${contentData.longitude}`"
-          target="blank"
-          class="ml-1 blue--text"
-          >See on Google Map</a
-        >
-        <v-card-actions class="justify-center pb-13">
-          <v-btn
-            :loading="mapSubmitLoader"
-            @click="updateGeneralInfo('map')"
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            size="x-large"
-            color="primary"
-            variant="flat"
-            >Save</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <SelectLocationDialog
+      v-model="showSelectLocationDialog"
+      :contentData="contentData"
+      :map="map"
+      :mapSubmitLoader="mapSubmitLoader"
+      @update="handleSelectLocationUpdate"
+      @locationSelected="goToSearchLocation"
+    />
     <!-- End select location dialog -->
 
     <!-- Report School Issue Dialog -->
@@ -1461,6 +1402,7 @@ import GalleryDialog from "@/components/school/GalleryDialog.vue";
 import ReportDialog from "@/components/school/ReportDialog.vue";
 import Facilities from "@/components/school/detail/Facilities.vue";
 import { useDisplay } from "vuetify/lib/composables/display";
+import SelectLocationDialog from "@/components/common/SelectLocationDialog.vue";
 
 const nuxtApp = useNuxtApp();
 const route = useRoute();
@@ -1511,7 +1453,7 @@ const commentForm = reactive({
   facilitiesRate: 4.5,
   artisticActivitiesRate: 4,
 });
-const selectLocationDialog = ref(false);
+const showSelectLocationDialog = ref(false);
 const tourImg = ref(null);
 const loading = reactive({ submitComment: false, uploadTour: false });
 const mapSubmitLoader = ref(false);
@@ -1550,10 +1492,6 @@ const addressRule = [(v) => !!v || "Address is required"];
 const reportDialog = ref(false);
 const contentData = ref({});
 const ratingData = ref({});
-
-// Template refs for map and marker
-const editSchoolMap = ref(null);
-const editMapMarker = ref(null);
 
 // Data fetching
 const { data: contentDataRaw } = await useAsyncData("contentData", () =>
@@ -1622,27 +1560,9 @@ function changeSlide() {
     topSlideClass.tour = "center-image";
   }
 }
-function updateMarkerPosition() {
-  // Get the map and marker references
-  const mapInstance = editSchoolMap.value?.leafletObject;
-  const markerInstance = editMapMarker.value?.leafletObject;
-  if (!mapInstance || !markerInstance) return;
-  // Get the new center coordinates
-  const newCenter = mapInstance.getCenter();
-  // Update the marker position to the new center
-  markerInstance.setLatLng(newCenter);
-  mapMarkerData.value = newCenter;
-}
-function goToSearchLocation(val) {
-  const mapInstance = editSchoolMap.value?.leafletObject;
-  if (!mapInstance) return;
-  mapInstance.setView([val[0], val[1]], 12);
-  setTimeout(() => {
-    window.dispatchEvent(new Event("resize"));
-  }, 100);
-}
+
 function openLocationDialog() {
-  selectLocationDialog.value = true;
+  showSelectLocationDialog.value = true;
   setTimeout(() => {
     // Implement with template refs if needed
     window.dispatchEvent(new Event("resize"));
@@ -1994,7 +1914,7 @@ function updateGeneralInfo(value) {
       form.address = null;
       form.name = null;
       mapSubmitLoader.value = false;
-      selectLocationDialog.value = false;
+      showSelectLocationDialog.value = false;
       webSubmitLoader.value = false;
       emailSubmitLoader.value = false;
       phoneSubmitLoader.value = false;
@@ -2013,6 +1933,10 @@ onMounted(() => {
   loadGalleryImages();
   loadTourPanorama();
 });
+
+function handleSelectLocationUpdate(payload) {
+  updateGeneralInfo("map");
+}
 </script>
 
 <style scoped>
@@ -2270,27 +2194,6 @@ onMounted(() => {
         }
       }
     }
-  }
-}
-
-#locationPickerMapContainer {
-  position: relative;
-  overflow-x: hidden;
-
-  #mapSection {
-    width: 100%;
-    height: 80vh !important;
-  }
-
-  #searchSection {
-    position: absolute;
-    top: 1.6rem;
-    left: 0;
-    right: 0;
-    margin: auto;
-    z-index: 200002;
-    background: #fff;
-    max-width: 30rem;
   }
 }
 
