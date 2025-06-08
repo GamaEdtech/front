@@ -6,23 +6,23 @@
           v-if="contentData.pic"
           class="schoolDetailsImg"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
-          src="/images/school-default.png"
+          @click="openGalleryDialog"
+          :src="contentData.pic"
           alt="School image"
         />
         <div
           v-else
           class="enter-img-holder pointer"
           :class="topSlideClass.image"
-          @click="galleryDialog = true"
+          @click="openGalleryDialog"
         >
           <div class="text-center">
             <v-icon
-              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              :size="display.mdAndUp.value ? 48 : 24"
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-panorama-outline</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
         <client-only>
@@ -36,20 +36,70 @@
             id="schoolDetailsMap"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker
-              @click="$router.push(`/school/1`)"
-              :lat-lng="map.latLng"
-              :icon="map.schoolIcon"
-            ></l-marker>
+            <l-marker :lat-lng="map.latLng">
+              <LIcon
+                icon-url="/images/school-marker.png"
+                :icon-size="[64, 64]"
+                :icon-anchor="[16, 32]"
+              ></LIcon>
+            </l-marker>
           </l-map>
         </client-only>
 
-        <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr" :class="topSlideClass.tour">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
+        <div
+          class="position-relative under-image-right"
+          v-if="contentData.tour && !tourImgPreview"
+        >
+          <img
+            @click="openTourImgInput"
+            class="pointer schoolDetailsImg"
+            :src="contentData.tour"
+            alt="School image Preview"
+          />
+
+          <div class="upload-overlay">
+            <v-btn
+              @click="openTourImgInput"
+              class=""
+              icon
+              color="white"
+              variant="text"
+            >
+              <v-icon size="large"> mdi-pencil </v-icon>
+            </v-btn>
+          </div>
+        </div>
+        <div
+          v-else-if="tourImgPreview"
+          class="position-relative"
+          :class="topSlideClass.tour"
+        >
+          <img
+            class="pointer schoolDetailsImg"
+            :src="tourImgPreview"
+            alt="School image Preview"
+          />
+          <div class="upload-overlay">
+            <v-btn
+              color="primary"
+              small
+              fab
+              @click="uploadTourImage"
+              :loading="loading.uploadTour"
+              class="text-transform-none gtext-t6 font-weight-medium"
+            >
+              <v-icon small>mdi-cloud-upload</v-icon>
+            </v-btn>
+            <v-btn
+              color="error"
+              small
+              fab
+              @click="clearTourImage"
+              class="text-transform-none gtext-t6 font-weight-medium ml-sm-1"
+            >
+              <v-icon small>mdi-delete</v-icon>
+            </v-btn>
+          </div>
         </div>
         <div
           v-else
@@ -59,35 +109,108 @@
         >
           <div class="text-center">
             <v-icon
-              :size="$vuetify.breakpoint.mdAndUp ? 48 : 24"
+              :size="display.mdAndUp.value ? 48 : 24"
               class="primary-gray-300 mb-2 mb-md-10"
               >mdi-rotate-360</v-icon
             >
-            <p class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</p>
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
+          </div>
+        </div>
+
+        <div
+          v-if="galleryImages && galleryImages.length > 0"
+          :class="topSlideClass.image"
+        >
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="26.4rem"
+            class="gallery-carousel"
+            cycle
+            interval="3000"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image?.fileUri"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div
+          v-else
+          class="enter-img-holder pointer"
+          :class="topSlideClass.image"
+          @click="openGalleryDialog"
+        >
+          <div class="text-center">
+            <v-icon
+              :size="display.mdAndUp.value ? 48 : 24"
+              class="primary-gray-300 mb-2 mb-md-10"
+              >mdi-panorama-outline</v-icon
+            >
+            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
       </div>
     </v-row>
 
-    <v-row class="d-none d-md-flex">
+    <v-row class="d-none d-md-flex mt-15">
       <v-col cols="12" md="4">
-        <img
-          v-if="contentData.pic"
-          @click="galleryDialog = true"
-          class="pointer schoolDetailsImg"
-          src="/images/school-default.png"
-          alt="School image"
-        />
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          @click="galleryDialog = true"
-        >
+        <div v-if="galleryImages && galleryImages.length > 0">
+          <v-carousel
+            hide-delimiters
+            show-arrows-on-hover
+            height="28.1rem"
+            class="rounded-lg gallery-carousel"
+            @click="openGalleryDialog"
+            v-model="activeGalleryIndex"
+            @change="updateMainGalleryImage"
+          >
+            <v-carousel-item
+              v-for="(image, index) in galleryImages"
+              :key="index"
+              :src="image.fileUri"
+              eager
+              cover
+              class="pointer"
+              @click="openGalleryDialog"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-carousel-item>
+          </v-carousel>
+        </div>
+        <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
           <div class="text-center">
             <v-icon size="48" class="primary-gray-300 mb-10"
               >mdi-panorama-outline</v-icon
             >
             <p class="gtext-t4 primary-blue-500">Contribute</p>
+            <div class="mt-2 gtext-t6 primary-gray-400">
+              Accepted formats: JPG, PNG, WebP
+            </div>
           </div>
         </div>
       </v-col>
@@ -102,31 +225,96 @@
             @click="openLocationDialog"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker :lat-lng="map.latLng" :icon="map.schoolIcon"></l-marker>
+            <l-marker :lat-lng="map.latLng">
+              <LIcon
+                icon-url="/images/school-marker.png"
+                :icon-size="[64, 64]"
+                :icon-anchor="[16, 32]"
+              ></LIcon>
+            </l-marker>
           </l-map>
         </client-only>
       </v-col>
       <v-col cols="12" md="4">
-        <div v-if="contentData.tour">
-          <client-only>
-            <a-scene embedded id="schoolDetailsVr">
-              <a-sky src="/images/school-vr.png"></a-sky>
-            </a-scene>
-          </client-only>
-        </div>
-        <div v-else class="enter-img-holder pointer" @click="openTourImgInput">
-          <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10"
-              >mdi-rotate-360</v-icon
-            >
-            <p class="gtext-t4 primary-blue-500">Contribute</p>
+        <template v-if="contentData.tour && !tourImgPreview">
+          <div class="position-relative">
+            <img
+              class="pointer schoolDetailsImg"
+              :src="contentData.tour"
+              alt="School image Preview"
+            />
+            <div class="upload-overlay px-3">
+              <div class="px-3 d-flex justify-center align-center">
+                <v-btn
+                  @click="openTourImgInput"
+                  class=""
+                  icon
+                  color="white"
+                  variant="text"
+                >
+                  <v-icon size="large"> mdi-pencil </v-icon>
+                </v-btn>
+              </div>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <template v-if="tourImgPreview">
+            <div class="position-relative">
+              <img
+                class="pointer schoolDetailsImg"
+                :src="tourImgPreview"
+                alt="School image Preview"
+              />
+              <div class="upload-overlay px-3">
+                <div class="px-3 d-flex justify-center align-center">
+                  <v-btn
+                    small
+                    fab
+                    color="primary"
+                    @click="uploadTourImage"
+                    :loading="loading.uploadTour"
+                    class="text-transform-none gtext-t4 font-weight-medium mr-3"
+                  >
+                    <v-icon small>mdi-cloud-upload</v-icon>
+                    <!-- Upload Tour Image -->
+                  </v-btn>
+                  <v-btn
+                    small
+                    fab
+                    color="error"
+                    @click="clearTourImage"
+                    class="text-transform-none gtext-t4 font-weight-medium"
+                  >
+                    <v-icon small>mdi-delete</v-icon>
+                    <!-- Delete -->
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="enter-img-holder pointer" @click="openTourImgInput">
+              <div class="text-center">
+                <v-icon size="48" class="primary-gray-300 mb-10"
+                  >mdi-rotate-360</v-icon
+                >
+                <div class="gtext-t4 primary-blue-500">Contribute</div>
+                <div class="mt-2 gtext-t6 primary-gray-400">
+                  Accepted formats: JPG, PNG, WebP
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+
         <v-file-input
           class="d-none"
           v-model="tourImg"
           ref="tourImgRef"
+          accept="image/jpeg, image/png, image/jpg, image/webp"
           hide-details
+          @change="validateAndProcessImage"
         ></v-file-input>
       </v-col>
     </v-row>
@@ -139,7 +327,7 @@
             <div class="text-center">
               <div class="gama-text-body2 primary-gray-500 pt-1">
                 <v-icon small>mdi-update</v-icon>
-                {{ $moment(contentData.up_date).format("YY/MM/DD") }}
+                {{ $dayjs(contentData.up_date).format("YY/MM/DD") }}
               </div>
             </div>
           </v-col>
@@ -164,7 +352,12 @@
           </v-col>
           <v-col cols="3" class="text-right d-block d-md-none">
             <div class="rate-section gtext-t4 font-weight-semibold ml-1">
-              {{ contentData.score ? contentData.score : "New" }}
+              <!-- {{ contentData.score ? contentData.score : "New" }} -->
+              {{
+                ratingData.averageRate
+                  ? ratingData.averageRate.toFixed(1)
+                  : "New"
+              }}
               <v-icon size="20" color="primary"> mdi-star </v-icon>
             </div>
           </v-col>
@@ -174,7 +367,41 @@
         <v-row>
           <v-col cols="11" md="8">
             <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
-              {{ contentData.name }}
+              <div class="d-flex align-center flex-wrap">
+                <div v-show="!generalDataEditMode.name">
+                  {{ contentData.name }}
+                </div>
+                <v-btn
+                  v-if="!generalDataEditMode.name"
+                  @click="editGeneralInfo('name')"
+                  class="ml-4"
+                  icon
+                  color="blue-grey"
+                  variant="text"
+                >
+                  <v-icon size="large"> mdi-pencil </v-icon>
+                </v-btn>
+                <v-text-field
+                  v-model="form.name"
+                  v-if="generalDataEditMode.name"
+                  placeholder="Name"
+                  :rules="nameRule"
+                >
+                  <template slot="append-outer">
+                    <v-btn
+                      :loading="nameSubmitLoader"
+                      color="success"
+                      @click="updateGeneralInfo('name')"
+                      fab
+                      depressed
+                      x-small
+                    >
+                      <v-icon> mdi-check </v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </div>
+
               <span v-show="contentData.school_type_title"
                 >,
                 {{ contentData.school_type_title }}
@@ -188,12 +415,28 @@
             </h1>
           </v-col>
           <v-col cols="1" md="4">
-            <div class="float-right d-flex mt-1">
+            <div class="float-right d-flex align-center mt-1">
+              <span class="mr-3">
+                <v-icon
+                  @click="reportDialog = true"
+                  size="20"
+                  color="primary"
+                  plain
+                  class=""
+                  >mdi-alert-circle-outline</v-icon
+                >
+              </span>
               <v-icon size="20" class="primary-gray-300">mdi-heart</v-icon>
+
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                {{ contentData.score ? contentData.score : "New" }}
+                <!-- {{ contentData.score ? contentData.score : "New" }} -->
+                {{
+                  ratingData.averageRate
+                    ? ratingData.averageRate.toFixed(1)
+                    : "New"
+                }}
                 <v-icon size="20" color="primary"> mdi-star </v-icon>
               </div>
             </div>
@@ -203,23 +446,23 @@
         <v-row>
           <v-col cols="12" md="8">
             <div class="d-flex">
-              <v-sheet class="chips-container" v-scroll-x>
+              <v-sheet class="chips-container">
                 <v-chip
-                  v-if="contentData.countryTitle"
+                  v-show="contentData.countryTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.countryTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.stateTitle"
+                  v-show="contentData.stateTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
                   {{ contentData.stateTitle }}
                 </v-chip>
                 <v-chip
-                  v-if="contentData.cityTitle"
+                  v-show="contentData.cityTitle"
                   class="blue-grey darken-1 white--text"
                   small
                 >
@@ -272,79 +515,64 @@
               <div class="gtext-t2 font-weight-heavy primary-gray-800">
                 <span v-show="contentData.tuition_fee"
                   ><span class="gtext-t6">$</span>
-                  {{ $numberFormat(contentData.tuition_fee) }}</span
+                  {{ contentData.tuition_fee | numberFormat }}</span
                 >
                 <span v-show="!contentData.tuition_fee">(N/A)</span>
               </div>
             </div>
-            <div class="d-flex">
-              <div class="gtext-h5 primary-gray-600">
-                <div class="mb-4">Sports facilities</div>
-                <div>
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.sport_hall == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-basketball </v-icon>
-                  </v-btn>
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.dorm == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-bed </v-icon>
-                  </v-btn>
-
-                  <v-btn
-                    class="bg-primary-gray-800 white--text"
-                    :disabled="contentData.smart_class == '0'"
-                    height="56"
-                    width="56"
-                  >
-                    <v-icon size="24"> mdi-tablet-cellphone </v-icon>
-                  </v-btn>
-                </div>
-              </div>
-              <v-spacer />
-              <div
-                @click="facilitiesDialog = true"
-                class="gtext-t4 primary-blue-500 align-self-center pointer"
-              >
-                Contribute
-              </div>
-            </div>
+            <!-- <Facilities
+              :facilities="contentData.tags"
+              @open-auth-dialog="openAuthDialog"
+              @facilities-updated="refreshSchoolData"
+            /> -->
           </v-col>
           <v-col cols="12" md="4" id="main-info-section">
             <div class="d-flex info-itm ml-md-6">
               <div class="info-sign">
                 <v-icon color="primary"> mdi-web </v-icon>
               </div>
-              <div class="info-data">
+              <div class="info-data overflow-hidden">
                 <a
-                  v-show="contentData.webSite"
+                  v-show="contentData.webSite && !generalDataEditMode.website"
                   :href="normalizeURL(contentData.webSite)"
                   target="_blank"
-                  class="blue--text"
+                  class="blue--text overflow-hidden text-ellipsis flex-grow-1"
                 >
                   {{ contentData.webSite }}
                 </a>
-                <span
-                  v-show="!(contentData.webSite || generalDataEditMode.website)"
-                  @click="editGeneralInfo('website')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+                <template v-if="contentData.webSite">
+                  <v-btn
+                    v-if="!generalDataEditMode.website"
+                    @click="editGeneralInfo('website')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                    variant="text"
+                  >
+                    <v-icon size="large"> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="
+                      !(contentData.webSite || generalDataEditMode.website)
+                    "
+                    @click="editGeneralInfo('website')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
+                  v-model="form.web"
                   v-if="generalDataEditMode.website"
                   placeholder="Website"
+                  :rules="webUrlRule"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="webSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('website')"
                       fab
@@ -364,24 +592,44 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.email"
+                  class="flex-grow-1"
+                  v-show="contentData.email && !generalDataEditMode.email"
                   :href="`mailto:${contentData.email}`"
                 >
                   {{ contentData.email }}
                 </a>
-                <span
-                  v-show="!(contentData.email || generalDataEditMode.email)"
-                  @click="editGeneralInfo('email')"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.email">
+                  <v-btn
+                    v-if="!generalDataEditMode.email"
+                    @click="editGeneralInfo('email')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                    variant="text"
+                  >
+                    <v-icon size="large"> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    v-show="!(contentData.email || generalDataEditMode.email)"
+                    @click="editGeneralInfo('email')"
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
+                  :rules="emailRule"
+                  v-model="form.email"
                   v-if="generalDataEditMode.email"
                   placeholder="Email"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="emailSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('email')"
                       fab
@@ -401,26 +649,48 @@
               </div>
               <div class="info-data">
                 <a
-                  v-show="contentData.phoneNumber"
+                  class="flex-grow-1"
+                  v-show="
+                    contentData.phoneNumber && !generalDataEditMode.phone1
+                  "
                   :href="`tel: ${contentData.phoneNumber}`"
                 >
                   {{ contentData.phoneNumber }}
                 </a>
-                <span
-                  @click="editGeneralInfo('phone')"
-                  v-show="
-                    !(contentData.phoneNumber || generalDataEditMode.phone1)
-                  "
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
-                >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.phoneNumber">
+                  <v-btn
+                    v-if="!generalDataEditMode.phone1"
+                    @click="editGeneralInfo('phone')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                    variant="text"
+                  >
+                    <v-icon size="large"> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('phone')"
+                    v-show="
+                      !(contentData.phoneNumber || generalDataEditMode.phone1)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
+
                 <v-text-field
+                  :rules="phoneRule"
+                  v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
                   placeholder="Phone"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="phoneSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('phone')"
                       fab
@@ -439,23 +709,45 @@
                 <v-icon size="20" color="primary"> mdi-map-marker </v-icon>
               </div>
               <div class="info-data info-data-address">
-                <span v-show="contentData.address">{{
-                  contentData.address
-                }}</span>
                 <span
-                  @click="editGeneralInfo('address')"
-                  v-show="!(contentData.address || generalDataEditMode.address)"
-                  class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  class="flex-grow-1"
+                  v-show="contentData.address && !generalDataEditMode.address"
+                  >{{ contentData.address }}</span
                 >
-                  Contribute
-                </span>
+
+                <template v-if="contentData.address">
+                  <v-btn
+                    v-if="!generalDataEditMode.address"
+                    @click="editGeneralInfo('address')"
+                    class="ml-2"
+                    icon
+                    color="blue-grey"
+                    variant="text"
+                  >
+                    <v-icon size="large"> mdi-pencil </v-icon>
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <span
+                    @click="editGeneralInfo('address')"
+                    v-show="
+                      !(contentData.address || generalDataEditMode.address)
+                    "
+                    class="gtext-t4 primary-blue-500 align-self-center pointer"
+                  >
+                    Contribute
+                  </span>
+                </template>
 
                 <v-text-field
+                  v-model="form.address"
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
+                  :rules="addressRule"
                 >
                   <template slot="append-outer">
                     <v-btn
+                      :loading="addressSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('address')"
                       fab
@@ -768,17 +1060,8 @@
           <v-col cols="12">
             <v-slide-group
               class="slider py-sm-4"
-              :show-arrows="$vuetify.breakpoint.lgAndUp"
+              :show-arrows="display.lgAndUp.value"
             >
-              <!-- <div class="d-flex" v-if="isLoading">
-                <v-slide-item v-for="i in 10" :key="i">
-                  <v-skeleton-loader
-                    class="mx-auto slide-loading"
-                    type="card"
-                  ></v-skeleton-loader>
-                </v-slide-item>
-              </div> -->
-
               <v-slide-item>
                 <v-card rounded class="list-item" :to="`/school/`">
                   <v-card-text>
@@ -788,30 +1071,15 @@
                           <h2 class="gtext-t4 font-weight-semibold mb-4">
                             School name School nament
                           </h2>
-
-                          <!-- <v-chip class="primary">
-
-             </v-chip> -->
-
                           <v-chip
                             class="list-chip gtext-t5 font-weight-medium"
                             small
                           >
                             Pre-K
                           </v-chip>
-
-                          <!-- <v-chip class="primary">
-
-             </v-chip>
-
-             <v-chip class="primary">
-
-             </v-chip> -->
                         </div>
                         <div class="item-img float-right">
-                          <img
-                            :src="require('assets/images/default-school.png')"
-                          />
+                          <img src="/images/default-school.png" />
                         </div>
                       </div>
                       <v-divider class="mb-3" />
@@ -820,19 +1088,6 @@
                           <v-btn icon>
                             <v-icon> mdi-map-marker </v-icon>
                           </v-btn>
-
-                          <!-- <v-btn :disabled="!item.location" icon>
-                    <v-icon> mdi-map-marker </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.phone1" icon>
-                    <v-icon> mdi-phone </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.address" icon>
-                    <v-icon> mdi-email </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.site" icon>
-                    <v-icon> mdi-web </v-icon>
-                  </v-btn> -->
                         </div>
 
                         <div class="float-right d-flex mt-1">
@@ -847,9 +1102,7 @@
                             Update:
                             <span class="primary-gray-600">
                               {{
-                                $moment(contentData.up_date).format(
-                                  "YYYY/MM/DD"
-                                )
+                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
                               }}
                             </span>
                           </div>
@@ -868,30 +1121,15 @@
                           <h2 class="gtext-t4 font-weight-semibold mb-4">
                             School name School nament
                           </h2>
-
-                          <!-- <v-chip class="primary">
-
-             </v-chip> -->
-
                           <v-chip
                             class="list-chip gtext-t5 font-weight-medium"
                             small
                           >
                             Pre-K
                           </v-chip>
-
-                          <!-- <v-chip class="primary">
-
-             </v-chip>
-
-             <v-chip class="primary">
-
-             </v-chip> -->
                         </div>
                         <div class="item-img float-right">
-                          <img
-                            :src="require('assets/images/default-school.png')"
-                          />
+                          <img src="/images/default-school.png" />
                         </div>
                       </div>
                       <v-divider class="mb-3" />
@@ -900,26 +1138,12 @@
                           <v-btn icon>
                             <v-icon> mdi-map-marker </v-icon>
                           </v-btn>
-
-                          <!-- <v-btn :disabled="!item.location" icon>
-                    <v-icon> mdi-map-marker </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.phone1" icon>
-                    <v-icon> mdi-phone </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.address" icon>
-                    <v-icon> mdi-email </v-icon>
-                  </v-btn>
-                  <v-btn :disabled="!item.site" icon>
-                    <v-icon> mdi-web </v-icon>
-                  </v-btn> -->
                         </div>
 
                         <div class="float-right d-flex mt-1">
                           <div
                             class="rate-section gtext-t6 font-weight-semibold mr-1"
                           >
-                            <!-- {{ item.score }} -->
                             4
                             <v-icon color="primary"> mdi-star </v-icon>
                           </div>
@@ -927,9 +1151,7 @@
                             Update:
                             <span class="primary-gray-600">
                               {{
-                                $moment(contentData.up_date).format(
-                                  "YYYY/MM/DD"
-                                )
+                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
                               }}
                             </span>
                           </div>
@@ -951,7 +1173,7 @@
     <v-dialog
       transition="dialog-bottom-transition"
       v-model="leaveCommentDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
+      :fullscreen="display.xs.value"
       max-width="924"
       style="z-index: 1501"
     >
@@ -961,7 +1183,10 @@
             <div class="gtext-h5 priamry-gray-700">Leave a Comment</div>
             <v-spacer></v-spacer>
             <v-btn icon
-              ><v-icon size="20" @click="leaveCommentDialog = false"
+              ><v-icon
+                size="20"
+                @click="leaveCommentDialog = false"
+                variant="text"
                 >mdi-close</v-icon
               ></v-btn
             >
@@ -1106,7 +1331,7 @@
                   placeholder="Type your comment"
                   v-model="commentForm.comment"
                   outlined
-                  :rows="$vuetify.breakpoint.xs ? 10 : 22"
+                  :rows="display.xs.value ? 10 : 22"
                 />
                 <v-btn
                   x-small
@@ -1140,105 +1365,18 @@
     </v-dialog>
     <!-- End leave comment dialog -->
 
-    <!-- Gallery dialog -->
-    <v-dialog
-      transition="dialog-bottom-transition"
-      v-model="galleryDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
-      style="z-index: 20001"
-    >
-      <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-8">
-          <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">School images</div>
-            <v-spacer></v-spacer>
-            <v-btn icon
-              ><v-icon size="20" @click="galleryDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
-          </div>
-          <v-divider class="mb-12 mt-4" />
-          <v-row>
-            <v-col cols="12" md="7">
-              <img
-                v-if="contentData.pic"
-                class="schoolDetailsImg"
-                src="/images/school-default.png"
-                alt="School image"
-              />
-              <div
-                v-else
-                class="enter-img-holder pointer"
-                @click="galleryDialog = true"
-              >
-                <div class="text-center">
-                  <v-icon size="48" class="primary-gray-300 mb-10"
-                    >mdi-panorama-outline</v-icon
-                  >
-                  <p class="gtext-t4 primary-blue-500">No image</p>
-                </div>
-              </div>
-              <div class="text-center gtext-t5 font-weight-heavy mt-6">
-                0/<span class="gray--text">0</span>
-              </div>
-            </v-col>
-            <v-col cols="12" md="5">
-              <v-row>
-                <v-col
-                  v-if="contentData.pic"
-                  cols="4"
-                  class="pl-0"
-                  v-for="item in 5"
-                  :key="item"
-                >
-                  <img
-                    class="schoolThumbImg"
-                    src="/images/school-default.png"
-                    alt="School image"
-                  />
-                </v-col>
-                <v-col
-                  cols="4"
-                  align="center"
-                  justify="center"
-                  class="fill-height"
-                >
-                  <v-btn color="primary" fab depressed @click="openImgInput">
-                    <v-icon size="48"> mdi-plus </v-icon>
-                  </v-btn>
-                  <v-file-input
-                    class="d-none"
-                    v-model="imgInput"
-                    ref="imgInputRef"
-                    hide-details
-                  ></v-file-input>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions class="justify-center pb-13">
-          <v-btn
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            x-large
-            >Save</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End gallery dialog -->
+    <gallery-dialog
+      v-model="showGalleryDialog"
+      :contentData="contentData"
+      :images="galleryImages"
+      @refresh-gallery="loadGalleryImages"
+    />
 
     <!-- Select Location dialog -->
     <v-dialog
       transition="dialog-bottom-transition"
       v-model="selectLocationDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
+      fullscreen
       style="z-index: 20001"
     >
       <v-card>
@@ -1246,7 +1384,7 @@
           <div class="d-flex">
             <div class="gtext-h5 priamry-gray-700">Location</div>
             <v-spacer></v-spacer>
-            <v-btn icon
+            <v-btn icon variant="text"
               ><v-icon size="20" @click="selectLocationDialog = false"
                 >mdi-close</v-icon
               ></v-btn
@@ -1264,11 +1402,13 @@
               @move="updateMarkerPosition"
             >
               <l-tile-layer :url="map.url"></l-tile-layer>
-              <l-marker
-                ref="editMapMarker"
-                :lat-lng="map.center"
-                :icon="map.schoolIcon"
-              ></l-marker>
+              <l-marker ref="editMapMarker" :lat-lng="map.center">
+                <LIcon
+                  icon-url="/images/school-marker.png"
+                  :icon-size="[64, 64]"
+                  :icon-anchor="[16, 32]"
+                ></LIcon>
+              </l-marker>
             </l-map>
           </client-only>
           <locationSearch
@@ -1278,13 +1418,23 @@
             label="Search anything"
           />
         </div>
+        <a
+          :href="`https://www.google.com/maps?q=${contentData.latitude}, ${contentData.longitude}`"
+          target="blank"
+          class="ml-1 blue--text"
+          >See on Google Map</a
+        >
         <v-card-actions class="justify-center pb-13">
           <v-btn
+            :loading="mapSubmitLoader"
+            @click="updateGeneralInfo('map')"
             class="primary black--text text-transform-none gtext-t4 font-weight-medium"
             rounded
             width="100%"
             max-width="400"
-            x-large
+            size="x-large"
+            color="primary"
+            variant="flat"
             >Save</v-btn
           >
         </v-card-actions>
@@ -1292,431 +1442,577 @@
     </v-dialog>
     <!-- End select location dialog -->
 
-    <!-- Select facilites dialog -->
-    <v-dialog
-      transition="dialog-bottom-transition"
-      v-model="facilitiesDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
-      max-width="720"
-      style="z-index: 20001"
-    >
-      <v-card>
-        <v-card-text class="py-6 py-md-8 px-6 px-md-8">
-          <div class="d-flex">
-            <div class="gtext-h5 priamry-gray-700">Facilities</div>
-            <v-spacer></v-spacer>
-            <v-btn icon
-              ><v-icon size="20" @click="facilitiesDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
-          </div>
-          <v-divider class="mb-12 mt-4" />
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.sport_hall == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-basketball </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Sport hall</span>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.dorm == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-bed </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Dorm</span>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-btn
-                class="bg-primary-gray-800 white--text"
-                :disabled="contentData.smart_class == '0'"
-                height="56"
-                width="56"
-              >
-                <v-icon size="24"> mdi-tablet-cellphone </v-icon>
-              </v-btn>
-              <span class="gtext-t4 ml-4 font-weight-medium">Smart class</span>
-            </v-col>
-            <v-col cols="12" md="6"> </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions class="justify-center pb-13">
-          <v-btn
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-            rounded
-            width="100%"
-            max-width="400"
-            x-large
-            >Save</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End select facilites dialog -->
+    <!-- Report School Issue Dialog -->
+    <ReportDialog
+      v-model="reportDialog"
+      :school-id="$route.params.id"
+      @open-auth-dialog="openAuthDialog"
+    />
+    <!-- End Report School Issue Dialog -->
   </v-container>
 </template>
 
-<script>
-import locationSearch from "@/components/form/LocationSearch";
+<script setup>
+import { ref, reactive, computed, onMounted, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAsyncData, useNuxtApp } from "#imports";
+import locationSearch from "@/components/form/LocationSearch.vue";
+import GalleryDialog from "@/components/school/GalleryDialog.vue";
+import ReportDialog from "@/components/school/ReportDialog.vue";
+import Facilities from "@/components/school/detail/Facilities.vue";
+import { useDisplay } from "vuetify/lib/composables/display";
 
-export default {
-  name: "school-details",
-  auth: false,
-  data() {
-    return {
-      map: {
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        zoom: 10,
-        minZoom: 2,
-        center: [0, 0], // Initial map center coordinates
-        latLng: [0, 0],
-        object: null,
-        boundingBox: {},
-        schoolIcon: null,
-      },
+const nuxtApp = useNuxtApp();
+const route = useRoute();
+const router = useRouter();
+const display = useDisplay();
+// State
+const cropperDialog = ref(false);
+const map = reactive({
+  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  zoom: 10,
+  minZoom: 2,
+  center: [0, 0],
+  latLng: [0, 0],
+  object: null,
+  boundingBox: {},
+  schoolIcon: null,
+});
+const tourImgPreview = ref(null);
+const galleryImages = ref([]);
+const activeGalleryIndex = ref(0);
+const tourPanoramas = ref([]);
+const form = reactive({
+  web: "",
+  email: "",
+  phone: "",
+  address: "",
+  name: "",
+});
+const mapMarkerData = ref({});
+const rating = ref(3.5);
+const slideToggler = ref("map");
+const topSlideClass = reactive({
+  image: "under-image-left",
+  map: "center-image",
+  tour: "under-image-right",
+});
+const help_loading = ref(false);
+const leaveCommentDialog = ref(false);
+const showGalleryDialog = ref(false);
+const commentForm = reactive({
+  comment: "",
+  classesQualityRate: 4.5,
+  educationRate: 4,
+  itTrainingRate: 4,
+  safetyAndHappinessRate: 3.5,
+  behaviorRate: 4,
+  tuitionRatioRate: 5,
+  facilitiesRate: 4.5,
+  artisticActivitiesRate: 4,
+});
+const selectLocationDialog = ref(false);
+const tourImg = ref(null);
+const loading = reactive({ submitComment: false, uploadTour: false });
+const mapSubmitLoader = ref(false);
+const addressSubmitLoader = ref(false);
+const webSubmitLoader = ref(false);
+const emailSubmitLoader = ref(false);
+const phoneSubmitLoader = ref(false);
+const nameSubmitLoader = ref(false);
+const commentList = ref([]);
+const generalDataEditMode = reactive({
+  website: false,
+  email: false,
+  phone1: false,
+  address: false,
+  map: false,
+  name: false,
+});
+const webUrlRule = [
+  (v) =>
+    !v ||
+    /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+      v
+    ) ||
+    "Please enter a valid URL",
+  (v) => !v || v.length <= 255 || "URL must be less than 255 characters",
+];
+const emailRule = [
+  (v) => !!v || "Email is required",
+  (v) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
+    "Please enter a valid email address",
+];
+const phoneRule = [(v) => !!v || "Phone number is required"];
+const nameRule = [(v) => !!v || "Name is required"];
+const addressRule = [(v) => !!v || "Address is required"];
+const reportDialog = ref(false);
+const contentData = ref({});
+const ratingData = ref({});
 
-      rating: 3.5,
-      slideToggler: "map",
-      topSlideClass: {
-        image: "under-image-left",
-        map: "center-image",
-        tour: "under-image-right",
-      },
-      help_loading: false,
-      leaveCommentDialog: false,
-      galleryDialog: false,
-      facilitiesDialog: false,
+// Template refs for map and marker
+const editSchoolMap = ref(null);
+const editMapMarker = ref(null);
 
-      commentForm: {
-        comment: "",
-        classesQualityRate: 4.5,
-        educationRate: 4,
-        itTrainingRate: 4,
-        safetyAndHappinessRate: 3.5,
-        behaviorRate: 4,
-        tuitionRatioRate: 5,
-        facilitiesRate: 4.5,
-        artisticActivitiesRate: 4,
-      },
-      selectLocationDialog: false,
-      imgInput: null,
-      tourImg: null,
+// Data fetching
+const { data: contentDataRaw } = await useAsyncData("contentData", () =>
+  $fetch(`/api/v2/schools/${route.params.id}`)
+);
+const { data: ratingDataRaw } = await useAsyncData("ratingData", () =>
+  $fetch(`/api/v2/schools/${route.params.id}/rate`)
+);
+if (contentDataRaw.value?.succeeded) {
+  contentData.value = contentDataRaw.value.data;
+}
+if (ratingDataRaw.value?.succeeded) {
+  ratingData.value = ratingDataRaw.value.data;
+}
 
-      loading: {
-        submitComment: false,
-      },
+// Methods
+function convertRateToString(value) {
+  if (value > 3.5) return "Good";
+  else if (value > 2) return "Average";
+  else if (value <= 2) return "Poor";
+  else return "Unknown";
+}
+function openGalleryDialog() {
+  console.log("openGalleryDialog");
 
-      commentList: [],
-
-      generalDataEditMode: {
-        website: false,
-        email: false,
-        phone1: false,
-        address: false,
-      },
-    };
-  },
-  head() {
-    return {
-      title: this.contentData.name,
-      script: [
-        {
-          type: "application/ld+json",
-          json: {
-            "@context": "https://schema.org",
-            "@type": "School", // Change this based on your content type
-            name: this.contentData.name,
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: this.ratingData.averageRate
-                ? this.ratingData.averageRate.toFixed(1)
-                : 3,
-              reviewCount: this.ratingData.totalCount,
-            },
-          },
-        },
-      ],
-    };
-  },
-  components: {
-    locationSearch,
-  },
-  async asyncData({ params, $axios }) {
-    const baseURL = process.server
-      ? `https://api.gamaedtech.com/api/v1/`
-      : "/api/v2/";
-
-    const content = await $axios.$get(`${baseURL}schools/${params.id}`);
-    const rating = await $axios.$get(`${baseURL}schools/${params.id}/rate`);
-
-    var contentData = [];
-    var ratingData = [];
-
-    //Check data exist
-    if (content.succeeded) {
-      contentData = content.data;
+  if (galleryImages.value && galleryImages.value.length > 0) {
+    const currentIndex = activeGalleryIndex.value;
+    if (currentIndex >= 0 && currentIndex < galleryImages.value.length) {
+      contentData.value.pic = galleryImages.value[currentIndex];
     }
-    if (rating.succeeded) {
-      ratingData = rating.data;
-    }
+  }
+  showGalleryDialog.value = true;
+}
+function updateMainGalleryImage(index) {
+  activeGalleryIndex.value = index;
+  if (galleryImages.value && galleryImages.value.length > index) {
+    contentData.value.pic = galleryImages.value[index];
+  }
+}
+function refreshTourContent() {
+  const currentTour = contentData.value.tour;
+  contentData.value.tour = null;
+  nextTick(() => {
+    contentData.value.tour = currentTour;
+  });
+}
+function normalizeURL(url) {
+  if (!url) return "";
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return "http://" + url;
+  }
+  return url;
+}
+function changeSlide() {
+  if (slideToggler.value == "map") {
+    topSlideClass.image = "under-image-left";
+    topSlideClass.map = "center-image";
+    topSlideClass.tour = "under-image-right";
+  } else if (slideToggler.value == "image") {
+    topSlideClass.image = "center-image";
+    topSlideClass.map = "under-image-right";
+    topSlideClass.tour = "under-image-left";
+  } else if (slideToggler.value == "tour") {
+    topSlideClass.image = "under-image-right";
+    topSlideClass.map = "under-image-left";
+    topSlideClass.tour = "center-image";
+  }
+}
+function updateMarkerPosition() {
+  // Get the map and marker references
+  const mapInstance = editSchoolMap.value?.leafletObject;
+  const markerInstance = editMapMarker.value?.leafletObject;
+  if (!mapInstance || !markerInstance) return;
+  // Get the new center coordinates
+  const newCenter = mapInstance.getCenter();
+  // Update the marker position to the new center
+  markerInstance.setLatLng(newCenter);
+  mapMarkerData.value = newCenter;
+}
+function goToSearchLocation(val) {
+  const mapInstance = editSchoolMap.value?.leafletObject;
+  if (!mapInstance) return;
+  mapInstance.setView([val[0], val[1]], 12);
+  setTimeout(() => {
+    window.dispatchEvent(new Event("resize"));
+  }, 100);
+}
+function openLocationDialog() {
+  selectLocationDialog.value = true;
+  setTimeout(() => {
+    // Implement with template refs if needed
+    window.dispatchEvent(new Event("resize"));
+  }, 500);
+}
+const tourImgRef = ref(null);
 
-    return { contentData, ratingData };
-  },
-  mounted() {
-    this.map.schoolIcon = L.icon({
-      iconUrl: "/images/school-marker.png", // Replace with school marker icon
-      iconSize: [64, 64], // Adjust the size as needed
-      iconAnchor: [16, 32], // Adjust the anchor point as needed
-    });
-
-    this.map.center = [this.contentData.latitude, this.contentData.longitude];
-    this.map.latLng = [this.contentData.latitude, this.contentData.longitude];
-
-    //Load comments
-    this.loadComments();
-  },
-  methods: {
-    convertRateToString(value) {
-      if (value > 3.5) return "Good";
-      else if (value > 2) return "Average";
-      else if (value <= 2) return "Poor";
-      else return "Unknown";
+function openTourImgInput() {
+  if (tourImgRef.value) {
+    tourImgRef.value.click();
+  }
+}
+function validateAndProcessImage(file) {
+  if (!file) return;
+  const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+  if (!validTypes.includes(file.type)) {
+    nuxtApp.$toast?.error(
+      "Invalid file type. Please use JPG, PNG or WebP images."
+    );
+    tourImg.value = null;
+    return;
+  }
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    nuxtApp.$toast?.error("File too large. Maximum size is 5MB.");
+    tourImg.value = null;
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    tourImgPreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function uploadTourImage() {
+  if (!tourImg.value) {
+    nuxtApp.$toast?.error("Please select an image to upload");
+    return;
+  }
+  const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+  if (!validTypes.includes(tourImg.value.type)) {
+    nuxtApp.$toast?.error(
+      "Invalid file type. Please use JPG, PNG or WebP images."
+    );
+    return;
+  }
+  loading.uploadTour = true;
+  let formData = new FormData();
+  formData.append("File", tourImg.value);
+  formData.append("FileType", "Tour360");
+  $fetch(`/api/v2/schools/${route.params.id}/images/Tour360`, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
     },
-    normalizeURL(url) {
-      // Check if the URL starts with 'http://' or 'https://'
-      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
-        // If not, assume it's 'http://'
-        return "http://" + url;
-      }
-      // If it already has a protocol, leave it as is
-      return url;
-    },
-    changeSlide() {
-      if (this.slideToggler == "map") {
-        this.topSlideClass.image = "under-image-left";
-        this.topSlideClass.map = "center-image";
-        this.topSlideClass.tour = "under-image-right";
-      } else if (this.slideToggler == "image") {
-        this.topSlideClass.image = "center-image";
-        this.topSlideClass.map = "under-image-right";
-        this.topSlideClass.tour = "under-image-left";
-      } else if (this.slideToggler == "tour") {
-        this.topSlideClass.image = "under-image-right";
-        this.topSlideClass.map = "under-image-left";
-        this.topSlideClass.tour = "center-image";
-      }
-
-      const rootElement = this.$el;
-
-      // Finding an element with a specific class
-      const targetElement = rootElement.querySelector(".center-image");
-
-      // Manipulating the found element (for example, changing its color)
-      // if (targetElement) {
-      //   targetElement.style.opacity = "1";
-      // }
-    },
-
-    updateMarkerPosition() {
-      // Get the map and marker references
-      const map = this.$refs.editSchoolMap.mapObject;
-      const marker = this.$refs.editMapMarker.mapObject;
-
-      // Get the new center coordinates
-      const newCenter = map.getCenter();
-
-      // Update the marker position to the new center
-      marker.setLatLng(newCenter);
-    },
-    goToSearchLocation(val) {
-      const map = this.$refs.editSchoolMap.mapObject;
-      map.setView([val[0], val[1]], 12);
-
+  })
+    .then(() => {
+      nuxtApp.$toast?.success(
+        "Your 360° tour image has been successfully uploaded"
+      );
+      // Reload tour panorama
+      tourImg.value = null;
+      tourImgPreview.value = null;
       setTimeout(() => {
-        window.dispatchEvent(new Event("resize"));
-      }, 100);
-    },
-    openLocationDialog() {
-      this.selectLocationDialog = true;
-
-      setTimeout(() => {
-        const map = this.$refs.editSchoolMap.mapObject;
-        map.setView(this.map.center, 12);
-        window.dispatchEvent(new Event("resize"));
+        refreshTourContent();
+        // Optionally change slide
       }, 500);
-    },
-    openTourImgInput() {
-      this.$refs.tourImgRef.$el.querySelector("input").click();
-    },
-    openImgInput() {
-      this.$refs.imgInputRef.$el.querySelector("input").click();
-    },
-    submitComment() {
-      this.loading.submitComment = true;
-
-      this.$axios
-        .$post(
-          `/api/v2/schools/${this.$route.params.id}/comments`,
-          this.commentForm,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-            },
-          }
-        )
-        .then((response) => {
-          if (response.succeeded) {
-            this.$toast.success("Your comment has been successfully submitted");
-            this.loadComments();
-            this.leaveCommentDialog = false;
-          } else {
-            this.$toast.error(response?.errors[0]?.message);
-          }
-        })
-        .catch((err) => {
-          if (err.response.status == 401 || err.response.status == 403) {
-            this.openAuthDialog("login");
-          } else this.$toast.error("Something is wrong.");
-        })
-        .finally(() => {
-          this.loading.submitComment = false;
-        });
-    },
-    async sendToAI() {
-      const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.
-
-          ### **School Information:**
-          - **Name:** ${this.contentData.name}
-          - **Location:** ${this.contentData.countryTitle}, ${
-        this.contentData.stateTitle
-      }, ${this.contentData.cityTitle}
-          ${
-            this.contentData.webSite
-              ? `- **Website:** ${this.contentData.webSite}`
-              : ""
-          }
-
-          ### **Evaluation Criteria:**
-          Rate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).
-          \n1. Quality of classrooms and educational facilities
-          \n2. Teachers' proficiency and teaching effectiveness
-          \n3. Access to and use of computers and technology
-          \n4. Safety and overall atmosphere of the school
-          \n5. Behavior of school officials towards students
-          \n6. Affordability relative to the services provided
-          \n7. Availability of suitable sports facilities
-          \n8. Presence of art classes or counseling programs\n\n
-
-          ### **Response Format:**
-          Return a structured JSON object with:
-          - Category ratings as numbers (1-5) and it 8 items.
-          - A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school's actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing
-
-          Response Format: (Don't forget end of rating object close by })
-          \`\`\`json
-          {
-            "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",
-            "ratings": {
-              "classrooms_quality": ai_rate as number,
-              "teachers_proficiency": ai_rate as number,
-              "technology_access": ai_rate as number,
-              "school_safety": ai_rate as number,
-              "officials_behavior": ai_rate as number,
-              "affordability": ai_rate as number,
-              "sports_facilities": ai_rate as number,
-              "art_counseling": ai_rate as number
-            }
-          }
-          \`\`\`
-          `;
-
-      if (!localStorage.getItem("v2_token")) {
-        this.$toast.error("Login required to proceed.");
-        this.openAuthDialog("login");
-        return;
+    })
+    .catch((err) => {
+      if (err?.response?.status == 401 || err?.response?.status == 403) {
+        openAuthDialog("login");
+      } else {
+        nuxtApp.$toast?.error(err?.response?.data?.message || "Upload failed");
       }
-
-      if (!userComment) {
-        this.$toast.error("Sorry, insufficient data");
-        return;
+    })
+    .finally(() => {
+      loading.uploadTour = false;
+    });
+}
+function clearTourImage() {
+  tourImg.value = null;
+  tourImgPreview.value = null;
+  nuxtApp.$toast?.info("Image removed");
+}
+function isValidUrl(url) {
+  try {
+    new URL(url);
+    return /^https?:\/\//.test(url);
+  } catch (e) {
+    return false;
+  }
+}
+function isValidEmail(email) {
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  } catch (e) {
+    return false;
+  }
+}
+function isValidPhone(phone) {
+  try {
+    const phoneRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return phoneRegex.test(phone);
+  } catch (e) {
+    return false;
+  }
+}
+function isRequired(value) {
+  try {
+    return !!value.trim();
+  } catch (e) {
+    return false;
+  }
+}
+function submitComment() {
+  loading.submitComment = true;
+  $fetch(`/api/v2/schools/${route.params.id}/comments`, {
+    method: "POST",
+    body: { ...commentForm },
+    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
+  })
+    .then((response) => {
+      if (response.succeeded) {
+        nuxtApp.$toast?.success("Your comment has been successfully submitted");
+        loadComments();
+        leaveCommentDialog.value = false;
+      } else {
+        nuxtApp.$toast?.error(response?.errors[0]?.message);
       }
-      this.help_loading = true;
-      try {
-        const apiResponse = await this.$axios.$post("/api/chatgpt", {
-          userComment,
-        });
-
-        // Remove the code block formatting (```json\n) and parse the JSON string
-        const cleanedResponse = apiResponse.response
-          .replace(/^\s*```json[\s\S]*?\n/, "") // Remove the opening markdown
-          .replace(/```$/, ""); // Remove the closing markdown
-
-        // Now parse the cleaned response as JSON
-        const parsedResponse = JSON.parse(cleanedResponse);
-
-        // Extract ratings and description
-        const ratings = parsedResponse.ratings;
-        this.commentForm.comment = parsedResponse.description;
-
-        // Example of how to use ratings in your code
-        this.commentForm.classesQualityRate = ratings.classrooms_quality; // 4
-        this.commentForm.educationRate = ratings.teachers_proficiency; // 5
-        this.commentForm.itTrainingRate = ratings.technology_access; // 3
-        this.commentForm.safetyAndHappinessRate = ratings.school_safety; // 4
-        this.commentForm.behaviorRate = ratings.officials_behavior; // 5
-        this.commentForm.tuitionRatioRate = ratings.affordability; // 3
-        this.commentForm.facilitiesRate = ratings.sports_facilities; // 4
-        this.commentForm.artisticActivitiesRate = ratings.art_counseling; // 2
-
-        // this.commentForm.safetyAndHappinessRate = ratings.sc;
-      } catch {
-        this.$toast.error("Error: Failed to get AI response.");
-        this.aiResponse = "Failed to get AI response.";
-      } finally {
-        this.help_loading = false;
+    })
+    .catch((err) => {
+      if (err?.response?.status == 401 || err?.response?.status == 403) {
+        openAuthDialog("login");
+      } else nuxtApp.$toast?.error("Something is wrong.");
+    })
+    .finally(() => {
+      loading.submitComment = false;
+    });
+}
+async function sendToAI() {
+  const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.\n\n### **School Information:**\n- **Name:** ${
+    contentData.value.name
+  }\n- **Location:** ${contentData.value.countryTitle}, ${
+    contentData.value.stateTitle
+  }, ${contentData.value.cityTitle}\n${
+    contentData.value.webSite
+      ? `- **Website:** ${contentData.value.webSite}`
+      : ""
+  }\n\n### **Evaluation Criteria:**\nRate each of the following aspects on a scale of 1 to 5 stars (as numbers) from sources like OpenStreetMap, Google Maps, and the school's official website, then provide a brief comment base on The following aspects for school (don't repeat school name and location in comment).\n1. Quality of classrooms and educational facilities\n2. Teachers' proficiency and teaching effectiveness\n3. Access to and use of computers and technology\n4. Safety and overall atmosphere of the school\n5. Behavior of school officials towards students\n6. Affordability relative to the services provided\n7. Availability of suitable sports facilities\n8. Presence of art classes or counseling programs\n\n### **Response Format:**\nReturn a structured JSON object with:\n- Category ratings as numbers (1-5) and it 8 items.\n- A short, engaging, fact-based description including emojis (min:350 char, max 400 char), Not rely solely on the ratings but should reflect the school's actual characteristics and unique features., Highlight both strengths and weaknesses of the school, providing a balanced perspective, Use emojis to make it more appealing\n\nResponse Format: (Don't forget end of rating object close by })\n\n\u0060\u0060\u0060json\n{\n  "description": "🏫 Cornerstone Preparatory School offers a great learning environment with skilled teachers and strong safety measures. However, technology access and arts programs could be improved.",\n  "ratings": {\n    "classrooms_quality": ai_rate as number,\n    "teachers_proficiency": ai_rate as number,\n    "technology_access": ai_rate as number,\n    "school_safety": ai_rate as number,\n    "officials_behavior": ai_rate as number,\n    "affordability": ai_rate as number,\n    "sports_facilities": ai_rate as number,\n    "art_counseling": ai_rate as number\n  }\n}\n\u0060\u0060\u0060\n`;
+  if (!localStorage.getItem("v2_token")) {
+    nuxtApp.$toast?.error("Login required to proceed.");
+    openAuthDialog("login");
+    return;
+  }
+  if (!userComment) {
+    nuxtApp.$toast?.error("Sorry, insufficient data");
+    return;
+  }
+  help_loading.value = true;
+  try {
+    const apiResponse = await $fetch("/api/chatgpt", {
+      method: "POST",
+      body: { userComment },
+    });
+    const cleanedResponse = apiResponse.response
+      .replace(/^\s*```json[\s\S]*?\n/, "")
+      .replace(/```$/, "");
+    const parsedResponse = JSON.parse(cleanedResponse);
+    const ratings = parsedResponse.ratings;
+    commentForm.comment = parsedResponse.description;
+    commentForm.classesQualityRate = ratings.classrooms_quality;
+    commentForm.educationRate = ratings.teachers_proficiency;
+    commentForm.itTrainingRate = ratings.technology_access;
+    commentForm.safetyAndHappinessRate = ratings.school_safety;
+    commentForm.behaviorRate = ratings.officials_behavior;
+    commentForm.tuitionRatioRate = ratings.affordability;
+    commentForm.facilitiesRate = ratings.sports_facilities;
+    commentForm.artisticActivitiesRate = ratings.art_counseling;
+  } catch {
+    nuxtApp.$toast?.error("Error: Failed to get AI response.");
+  } finally {
+    help_loading.value = false;
+  }
+}
+function openAuthDialog(val) {
+  router.push({ query: { auth_form: val } });
+}
+function loadComments() {
+  $fetch(`/api/v2/schools/${route.params.id}/comments`, {
+    params: {
+      "PagingDto.PageFilter.Size": 20,
+    },
+  })
+    .then((response) => {
+      commentList.value = response.data.list;
+    })
+    .catch(() => {});
+}
+function loadGalleryImages() {
+  $fetch(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
+    .then((response) => {
+      galleryImages.value = [...response.data].reverse();
+      if (galleryImages.value.length >= 1) {
+        contentData.value.pic = galleryImages.value[0].fileUri;
+      } else {
+        contentData.value.pic = null;
       }
-    },
+    })
+    .catch(() => {});
+}
+function loadTourPanorama() {
+  $fetch(`/api/v2/schools/${route.params.id}/images/Tour360`)
+    .then((response) => {
+      tourPanoramas.value = response.data;
+      if (tourPanoramas.value.length >= 1) {
+        contentData.value.tour =
+          tourPanoramas.value[tourPanoramas.value.length - 1].fileUri;
+      } else {
+        contentData.value.tour = null;
+      }
+    })
+    .catch(() => {});
+}
+function editGeneralInfo(value) {
+  if (value == "website") {
+    form.web = contentData.value.webSite || "";
+    generalDataEditMode.website = true;
+  } else if (value == "email") {
+    form.email = contentData.value.email || "";
+    generalDataEditMode.email = true;
+  } else if (value == "phone") {
+    form.phone = contentData.value.phoneNumber || "";
+    generalDataEditMode.phone1 = true;
+  } else if (value == "address") {
+    form.address = contentData.value.address || "";
+    generalDataEditMode.address = true;
+  } else if (value == "map") {
+    generalDataEditMode.map = true;
+  } else if (value == "name") {
+    form.name = contentData.value.name || "";
+    generalDataEditMode.name = true;
+  }
+}
+function updateGeneralInfo(value) {
+  let formData = {};
+  if (value == "website") {
+    if (!isValidUrl(form.web)) {
+      nuxtApp.$toast?.error("Please enter a valid website URL");
+      return;
+    }
+    generalDataEditMode.website = false;
+    formData = { webSite: form.web ?? null };
+  }
+  if (value == "email") {
+    if (!isValidEmail(form.email)) {
+      nuxtApp.$toast?.error("Please enter a valid Email");
+      return;
+    }
+    generalDataEditMode.email = false;
+    formData = { email: form.email ?? null };
+  }
+  if (value == "phone") {
+    if (!isRequired(form.phone)) {
+      nuxtApp.$toast?.error("Please enter a valid Phone Number");
+      return;
+    }
+    generalDataEditMode.phone1 = false;
+    formData = { phoneNumber: form.phone ?? null };
+  }
+  if (value == "address") {
+    if (!isRequired(form.address)) {
+      nuxtApp.$toast?.error(
+        "Please enter a valid address (minimum 10 characters)"
+      );
+      return;
+    }
+    generalDataEditMode.address = false;
+    formData = { address: form.address ?? null };
+  }
+  if (value == "name") {
+    if (!isRequired(form.name)) {
+      nuxtApp.$toast?.error("Please enter a valid Name");
+      return;
+    }
+    generalDataEditMode.name = false;
+    formData = { name: form.name ?? null };
+  }
+  if (value == "map") {
+    generalDataEditMode.map = false;
+    formData = {
+      latitude: mapMarkerData.value.lat,
+      longitude: mapMarkerData.value.lng,
+    };
+  }
+  let loaderRef = {
+    website: webSubmitLoader,
+    email: emailSubmitLoader,
+    phone: phoneSubmitLoader,
+    address: addressSubmitLoader,
+    name: nameSubmitLoader,
+    map: mapSubmitLoader,
+  }[value];
+  if (loaderRef) loaderRef.value = true;
+  $fetch(`/api/v2/schools/${route.params.id}/contributions`, {
+    method: "POST",
+    body: formData,
+    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
+  })
+    .then(async (response) => {
+      if (response.succeeded) {
+        switch (value) {
+          case "name":
+            contentData.value.name = form.name;
+            break;
+          case "website":
+            contentData.value.webSite = form.web;
+            break;
+          case "phone":
+            contentData.value.phoneNumber = form.phone;
+            break;
+          case "address":
+            contentData.value.address = form.address;
+            break;
+          case "email":
+            contentData.value.email = form.email;
+            break;
+          default:
+            break;
+        }
+        nuxtApp.$toast?.success(
+          "Your contribution has been successfully submitted"
+        );
+      } else {
+        nuxtApp.$toast?.error(response?.errors[0]?.message);
+      }
+    })
+    .catch((err) => {
+      if (err?.response?.status == 401 || err?.response?.status == 403) {
+        openAuthDialog("login");
+      } else nuxtApp.$toast?.error(err?.response?.data?.message);
+    })
+    .finally(() => {
+      form.web = null;
+      form.email = null;
+      form.phone = null;
+      form.address = null;
+      form.name = null;
+      mapSubmitLoader.value = false;
+      selectLocationDialog.value = false;
+      webSubmitLoader.value = false;
+      emailSubmitLoader.value = false;
+      phoneSubmitLoader.value = false;
+      addressSubmitLoader.value = false;
+      nameSubmitLoader.value = false;
+    });
+}
+function refreshSchoolData() {}
 
-    openAuthDialog(val) {
-      this.$router.push({ query: { auth_form: val } });
-    },
-    loadComments() {
-      this.$axios
-        .$get(`/api/v2/schools/${this.$route.params.id}/comments`, {
-          params: {
-            "PagingDto.PageFilter.Size": 20,
-          },
-        })
-        .then((response) => {
-          this.commentList = response.data.list;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    editGeneralInfo(value) {
-      if (value == "website") this.generalDataEditMode.website = true;
-      else if (value == "email") this.generalDataEditMode.email = true;
-      else if (value == "phone") this.generalDataEditMode.phone1 = true;
-      else if (value == "address") this.generalDataEditMode.address = true;
-    },
-    updateGeneralInfo(value) {
-      if (value == "website") this.generalDataEditMode.website = false;
-      else if (value == "email") this.generalDataEditMode.email = false;
-      else if (value == "phone") this.generalDataEditMode.phone1 = false;
-      else if (value == "address") this.generalDataEditMode.address = false;
-    },
-  },
-};
+onMounted(() => {
+  if (contentData.value.latitude && contentData.value.longitude) {
+    map.center = [contentData.value.latitude, contentData.value.longitude];
+    map.latLng = [contentData.value.latitude, contentData.value.longitude];
+  }
+  loadComments();
+  loadGalleryImages();
+  loadTourPanorama();
+});
 </script>
 
 <style scoped>
@@ -1729,6 +2025,39 @@ export default {
   max-height: 26.4rem;
   overflow: hidden;
   z-index: 0;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 0.6rem;
+  padding: 1rem;
+}
+
+@media (max-width: 600px) {
+  .upload-overlay {
+    flex-direction: column;
+  }
+
+  .upload-overlay .v-btn {
+    margin: 0.25rem 0;
+    flex-shrink: 0;
+  }
+
+  .upload-overlay .v-icon {
+    font-size: 1.2rem !important;
+  }
 }
 
 .data-container {
@@ -1747,14 +2076,15 @@ export default {
   margin: auto;
   z-index: 3;
   right: 0 !important;
-  width: 80% !important;
+  width: 70% !important;
   max-height: 26.4rem;
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
 
-.center-image.enter-img-holder {
+.center-image.enter-img-holder,
+.center-image.position-relative {
   border-right: 1px solid white;
   border-left: 1px solid white;
 }
@@ -1768,45 +2098,23 @@ export default {
 }
 
 .under-image-left {
-  left: -35%;
+  left: -32%;
   z-index: 1;
 }
 
-.under-image-left.enter-img-holder p {
+.under-image-left.enter-img-holder p,
+.under-image-left.position-relative p {
   max-width: 2rem;
 }
 
 .under-image-right {
-  right: -35%;
+  right: -32%;
   z-index: 2;
 }
 
-.under-image-right.enter-img-holder p {
+.under-image-right.enter-img-holder p,
+.under-image-right.position-relative p {
   max-width: 2rem;
-}
-
-.schoolDetailsImg {
-  height: 28.1rem;
-  max-height: 28.1rem;
-  width: 100%;
-  border-radius: 0.6rem;
-}
-
-.enter-img-holder {
-  background: #f2f4f7;
-  height: 28.1rem;
-  width: 100%;
-  border-radius: 0.6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.schoolThumbImg {
-  width: 100%;
-  height: 6.4247rem;
-  max-height: 6.4247rem;
-  border-radius: 0.4rem;
 }
 
 #schoolDetailsVr {
@@ -1818,6 +2126,7 @@ export default {
 #schoolDetailsVr .a-canvas {
   border-radius: 0.6rem !important;
 }
+
 #schoolDetailsMap {
   border-radius: 0.6rem;
   height: 28.1rem;
@@ -1833,6 +2142,7 @@ export default {
 #main-info-section {
   .info-itm {
     margin-bottom: 0.8rem;
+
     .info-sign {
       width: 5.6rem;
       min-width: 5.6rem;
@@ -1860,6 +2170,7 @@ export default {
       align-items: center;
       margin-left: 0.4rem;
     }
+
     .info-data-address {
       max-height: 12rem;
     }
@@ -1870,9 +2181,11 @@ export default {
   width: 16rem;
   height: 16rem;
 }
+
 .score-title {
   min-width: 22rem !important;
 }
+
 #score-results {
   .rate-title {
     width: 14rem;
@@ -1891,6 +2204,7 @@ export default {
 
 #score-form {
   padding: 0;
+
   .score-title {
     width: 15rem;
     margin-right: 1rem;
@@ -1932,7 +2246,8 @@ export default {
   font-size: 5rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 9.6rem; /* 192% */
+  line-height: 9.6rem;
+  /* 192% */
   letter-spacing: 1.95rem;
 }
 
@@ -1942,6 +2257,7 @@ export default {
     margin-bottom: 2rem;
     margin-left: 0.8rem;
     margin-right: 0.8rem;
+
     .item-info {
       .main-data {
         height: 8rem;
@@ -1963,7 +2279,7 @@ export default {
 
   #mapSection {
     width: 100%;
-    height: 44rem;
+    height: 80vh !important;
   }
 
   #searchSection {
@@ -1983,13 +2299,16 @@ export default {
   overflow-x: auto;
   width: 75%;
   padding-top: 0.4rem;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: transparent transparent; /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: transparent transparent;
+  /* Firefox */
 }
 
 /* Webkit (Chrome, Safari) */
 .chips-container::-webkit-scrollbar {
-  width: 5px; /* Adjust width as needed */
+  width: 5px;
+  /* Adjust width as needed */
 }
 
 .chips-container::-webkit-scrollbar-thumb {
@@ -2009,5 +2328,33 @@ export default {
     white-space: normal;
     width: 80%;
   }
+}
+
+.schoolDetailsImg {
+  height: 28.1rem;
+  max-height: 28.1rem;
+  width: 100%;
+  border-radius: 0.6rem;
+}
+
+.enter-img-holder {
+  background: #f2f4f7;
+  height: 28.1rem;
+  width: 100%;
+  border-radius: 0.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-carousel {
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+/* Target the carousel navigation arrows */
+.gallery-carousel .v-window__prev,
+.gallery-carousel .v-window__next {
+  z-index: 10;
 }
 </style>
