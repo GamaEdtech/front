@@ -1,20 +1,4 @@
 {
-  "version": 2,
-
-  "builds": [
-    {
-      "src": "nuxt.config.js",
-      "use": "@nuxtjs/vercel-builder",
-      "config": {
-        "includeFiles": ["server/middleware/sitemap.js"],
-        "functions": {
-          "serverMiddleware/data-to-xml.js": {
-            "maxDuration": 300
-          }
-        }
-      }
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/v1/:path*",

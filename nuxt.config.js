@@ -1,4 +1,5 @@
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   // Add compatibility date to fix the warning
