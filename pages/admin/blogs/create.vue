@@ -498,6 +498,11 @@ export default {
       formData.append("Slug", this.slug);
       formData.append("Body", this.blog.content);
       formData.append("Summary", this.blog.summary);
+
+      if (this.keywords.length >= 1) {
+        formData.append("Keywords", this.keywords.join(","));
+      }
+
       let publishDate;
       if (this.blog.publishTime === "Immediately") {
         publishDate = new Date().toISOString();
