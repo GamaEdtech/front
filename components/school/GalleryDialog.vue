@@ -1,12 +1,10 @@
 <template>
-  <!-- Gallery dialog -->
   <div>
     <v-dialog
       v-model="dialogVisible"
       transition="dialog-bottom-transition"
       :fullscreen="display.xs.value"
       max-width="720"
-      style="z-index: 20001"
     >
       <v-card>
         <v-card-text class="py-6 py-md-8 px-6 px-md-8">
@@ -115,7 +113,7 @@
                   <v-file-input
                     class="d-none"
                     v-model="imgInput"
-                    @change="validateAndOpenCropper"
+                    @update:modelValue="validateAndOpenCropper"
                     ref="imgInputRef"
                     accept="image/jpeg, image/png, image/jpg, image/webp"
                     hide-details
@@ -136,6 +134,7 @@
               width="100%"
               max-width="400"
               size="x-large"
+              color="primary"
               :loading="saveLoading"
               :disabled="!pendingUpload"
               >{{
@@ -152,13 +151,11 @@
     </v-dialog>
     <cropper-dialog
       @croppedData="croppedData"
-      v-model="cropperDialog"
+      v-model="showCropperDialog"
       :file_url="crop_file_url"
       :confirm_loading="crop_confirm_loading"
     />
   </div>
-
-  <!-- End gallery dialog -->
 </template>
 
 <script setup>
@@ -191,7 +188,7 @@ const dialogVisible = computed({
 const imgInput = ref(null);
 const crop_confirm_loading = ref(false);
 const crop_file_url = ref("");
-const cropperDialog = ref(false);
+const showCropperDialog = ref(false);
 const mainImage = ref(null);
 const selectedImageIndex = ref(0);
 const pendingUpload = ref(null);
@@ -233,12 +230,13 @@ async function uploadImage() {
   const filesToUpload = Array.isArray(pendingUpload.value)
     ? pendingUpload.value
     : [pendingUpload.value];
+
   try {
     const uploadPromises = filesToUpload.map((file) => {
       const formData = new FormData();
       formData.append("File", file);
       formData.append("FileType", "SimpleImage");
-      return $fetch(`/api/v2/schools/${route.params.id}/images`, {
+      return useFetch(`/api/v2/schools/${route.params.id}/images`, {
         method: "POST",
         body: formData,
         headers: {
@@ -324,7 +322,7 @@ function validateAndOpenCropper(files) {
 
 function openCropper(file) {
   crop_file_url.value = URL.createObjectURL(file);
-  if (crop_file_url.value) cropperDialog.value = true;
+  if (crop_file_url.value) showCropperDialog.value = true;
 }
 
 function openAuthDialog(val) {
@@ -348,7 +346,7 @@ function croppedData(data) {
   if (currentCropIndex.value < pendingUploads.value.length) {
     openCropper(pendingUploads.value[currentCropIndex.value]);
   } else {
-    cropperDialog.value = false;
+    showCropperDialog.value = false;
     const fileCount = pendingUpload.value.length;
     $toast.info(
       `${fileCount} ${

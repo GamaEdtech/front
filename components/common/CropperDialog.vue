@@ -1,42 +1,26 @@
 <template>
-  <!--Cropper dialog-->
-
   <v-dialog
+    v-model="dialogVisible"
     transition="dialog-bottom-transition"
     max-width="600"
-    :value="value"
-    @input="$emit('input', $event)"
   >
     <v-card id="img-cropper-dialog">
-      <v-card-text class="pa-0">
-        <v-col v-if="crop_file_loading" cols="12" class="text-center">
-          <v-progress-circular
-            :size="40"
-            :width="4"
-            class="mt-12 mb-12"
-            color="orange"
-            indeterminate
-          />
-        </v-col>
-        <div v-else>
-          <cropper
-            :src="file_url"
-            :stencil-props="stencil_props"
-            image-restriction="stencil"
-            @change="cropFile"
-          />
-        </div>
-      </v-card-text>
+      <cropper
+        :src="file_url"
+        :stencil-props="stencil_props"
+        image-restriction="stencil"
+        @change="cropFile"
+      />
       <v-card-actions
         style="position: sticky; bottom: 0; left: 0; right: 0"
         class="pa-0"
       >
         <v-btn
-          dark
           class="primary black--text text-transform-none gtext-t4 font-weight-medium"
-          x-large
+          size="x-large"
           :loading="confirm_loading"
           block
+          variant="flat"
           @click="emitFile()"
         >
           Confirm
@@ -44,47 +28,50 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-  <!--End cropper dialog-->
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from "vue";
 import "vue-advanced-cropper/dist/style.css";
 
-export default {
-  props: {
-    value: {
-      type: Boolean,
-      default: false,
-    },
-    file_url: {
-      type: String,
-      default: "",
-    },
-    stencil_props: {
-      type: Object,
-      default: () => ({ width: 400, height: 300, resizable: false }),
-    },
-    confirm_loading: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
   },
-  data() {
-    return {
-      crop_file_loading: false,
-      cropped_data: "",
-    };
+  file_url: {
+    type: String,
+    default: "",
   },
-  methods: {
-    cropFile({ coordinates, canvas, image }) {
-      canvas.toBlob((blob) => {
-        this.cropped_data = blob; // Keep the Blob as is (no format conversion)
-      }, "image/webp");
-    },
-    emitFile() {
-      this.$emit("croppedData", this.cropped_data);
-    },
+  stencil_props: {
+    type: Object,
+    default: () => ({ width: 400, height: 150, resizable: false }),
   },
-};
+  confirm_loading: {
+    type: Boolean,
+    default: false,
+  },
+});
+const emit = defineEmits(["update:modelValue", "croppedData"]);
+
+const dialogVisible = computed({
+  get: () => props.modelValue,
+  set: (value) => emit("update:modelValue", value),
+});
+
+const crop_file_loading = ref(false);
+const cropped_data = ref(null);
+
+function cropFile({ coordinates, canvas, image }) {
+  if (!canvas) return;
+  crop_file_loading.value = true;
+  canvas.toBlob((blob) => {
+    cropped_data.value = blob;
+    crop_file_loading.value = false;
+  }, "image/webp");
+}
+
+function emitFile() {
+  emit("croppedData", cropped_data.value);
+}
 </script>
