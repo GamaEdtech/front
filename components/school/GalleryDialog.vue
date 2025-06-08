@@ -101,12 +101,13 @@
                 >
                   <v-btn
                     color="primary"
-                    fab
                     depressed
                     @click="openImgInput"
                     :class="{ 'pulse-animation': images.length === 0 }"
+                    icon
+                    size="large"
                   >
-                    <v-icon size="48"> mdi-plus </v-icon>
+                    <v-icon size="48" color="white"> mdi-plus </v-icon>
                   </v-btn>
                   <div class="mt-2 gtext-t6 primary-gray-400 text-center">
                     JPG, PNG, WebP
@@ -131,9 +132,10 @@
               @click="handleCloseDialog"
               class="primary black--text text-transform-none gtext-t4 font-weight-medium"
               rounded
+              variant="flat"
               width="100%"
               max-width="400"
-              x-large
+              size="x-large"
               :loading="saveLoading"
               :disabled="!pendingUpload"
               >{{
