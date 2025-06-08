@@ -11,7 +11,7 @@
       :style="{ height: `${CardHeight}` }"
     >
       <v-slide-item v-for="item in data" :key="item.id">
-        <nuxt-link :to="`/${pageName}/${item.id}/${item.title_url}`">
+        <nuxt-link :to="`/${pageType}/${item.id}/${item.title_url}`">
           <common-related-portrait-content-card
             :cardPicture="item.thumb_pic || fallbackImage"
             :cardTitle="item.title"
@@ -33,6 +33,9 @@ export default {
     };
   },
   props: {
+    pageType: {
+      type: String,
+    },
     pageName: {
       type: String,
     },
@@ -78,9 +81,9 @@ export default {
   },
   computed: {
     CardHeight() {
-      if (this.pageName === "paper") {
+      if (this.pageType === "paper") {
         return "243px";
-      } else if (this.pageName === "multimedia") {
+      } else if (this.pageType === "multimedia") {
         return "120px";
       }
     },
