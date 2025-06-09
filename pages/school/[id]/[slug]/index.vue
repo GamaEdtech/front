@@ -12,102 +12,18 @@
           :class="topSlideClass.tour"
           :content="contentData"
         ></school-detail-school-tour>
-        <div
-          v-if="galleryImages && galleryImages.length > 0"
+        <school-detail-image-gallery
+          :content="contentData"
           :class="topSlideClass.image"
-        >
-          <v-carousel
-            hide-delimiters
-            show-arrows-on-hover
-            height="26.4rem"
-            class="gallery-carousel"
-            cycle
-            interval="3000"
-            @click="openGalleryDialog"
-            v-model="activeGalleryIndex"
-            @change="updateMainGalleryImage"
-          >
-            <v-carousel-item
-              v-for="(image, index) in galleryImages"
-              :key="index"
-              :src="image?.fileUri"
-              eager
-              cover
-              class="pointer"
-              @click="openGalleryDialog"
-            >
-              <template v-slot:placeholder>
-                <v-row class="fill-height ma-0" align="center" justify="center">
-                  <v-progress-circular
-                    indeterminate
-                    color="primary"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-carousel-item>
-          </v-carousel>
-        </div>
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          :class="topSlideClass.image"
-          @click="openGalleryDialog"
-        >
-          <div class="text-center">
-            <v-icon
-              :size="display.mdAndUp.value ? 48 : 24"
-              class="primary-gray-300 mb-2 mb-md-10"
-              >mdi-panorama-outline</v-icon
-            >
-            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
-          </div>
-        </div>
+        ></school-detail-image-gallery>
       </div>
     </v-row>
 
     <v-row class="d-none d-md-flex mt-15">
       <v-col cols="12" md="4">
-        <div v-if="galleryImages && galleryImages.length > 0">
-          <v-carousel
-            hide-delimiters
-            show-arrows="hover"
-            height="28.1rem"
-            class="rounded-lg gallery-carousel"
-            @click="openGalleryDialog"
-            v-model="activeGalleryIndex"
-            @change="updateMainGalleryImage"
-          >
-            <v-carousel-item
-              v-for="(image, index) in galleryImages"
-              :key="index"
-              :src="image.fileUri"
-              eager
-              cover
-              class="pointer"
-              @click="openGalleryDialog"
-            >
-              <template v-slot:placeholder>
-                <v-row class="fill-height ma-0" align="center" justify="center">
-                  <v-progress-circular
-                    indeterminate
-                    color="primary"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-carousel-item>
-          </v-carousel>
-        </div>
-        <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
-          <div class="text-center">
-            <v-icon size="48" class="primary-gray-300 mb-10"
-              >mdi-panorama-outline</v-icon
-            >
-            <p class="gtext-t4 primary-blue-500">Contribute</p>
-            <div class="mt-2 gtext-t6 primary-gray-400">
-              Accepted formats: JPG, PNG, WebP
-            </div>
-          </div>
-        </div>
+        <school-detail-image-gallery
+          :content="contentData"
+        ></school-detail-image-gallery>
       </v-col>
       <v-col cols="12" md="4">
         <school-detail-school-map
@@ -249,12 +165,7 @@
       v-model="showLeaveCommentDialog"
       :contentData="contentData"
     />
-    <school-detail-gallery-dialog
-      v-model="showGalleryDialog"
-      :contentData="contentData"
-      :images="galleryImages"
-      @refresh-gallery="loadGalleryImages"
-    />
+
     <school-detail-report-dialog
       v-model="reportDialog"
       :school-id="$route.params.id"
@@ -264,14 +175,8 @@
 </template>
 
 <script setup>
-import { useDisplay } from "vuetify/lib/composables/display";
-
-const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
-const display = useDisplay();
-const galleryImages = ref([]);
-const activeGalleryIndex = ref(0);
 const tourPanoramas = ref([]);
 const slideToggler = ref("map");
 const topSlideClass = reactive({
@@ -280,7 +185,6 @@ const topSlideClass = reactive({
   tour: "under-image-right",
 });
 const showLeaveCommentDialog = ref(false);
-const showGalleryDialog = ref(false);
 const commentList = ref([]);
 const reportDialog = ref(false);
 const contentData = ref({});
@@ -300,21 +204,6 @@ if (ratingDataRaw.value?.succeeded) {
   ratingData.value = ratingDataRaw.value.data;
 }
 
-function openGalleryDialog() {
-  if (galleryImages.value && galleryImages.value.length > 0) {
-    const currentIndex = activeGalleryIndex.value;
-    if (currentIndex >= 0 && currentIndex < galleryImages.value.length) {
-      contentData.value.pic = galleryImages.value[currentIndex];
-    }
-  }
-  showGalleryDialog.value = true;
-}
-function updateMainGalleryImage(index) {
-  activeGalleryIndex.value = index;
-  if (galleryImages.value && galleryImages.value.length > index) {
-    contentData.value.pic = galleryImages.value[index];
-  }
-}
 function changeSlide() {
   if (slideToggler.value == "map") {
     topSlideClass.image = "under-image-left";
@@ -344,18 +233,6 @@ function loadComments() {
     })
     .catch(() => {});
 }
-function loadGalleryImages() {
-  $fetch(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
-    .then((response) => {
-      galleryImages.value = [...response.data].reverse();
-      if (galleryImages.value.length >= 1) {
-        contentData.value.pic = galleryImages.value[0].fileUri;
-      } else {
-        contentData.value.pic = null;
-      }
-    })
-    .catch(() => {});
-}
 function loadTourPanorama() {
   $fetch(`/api/v2/schools/${route.params.id}/images/Tour360`)
     .then((response) => {
@@ -373,7 +250,6 @@ function refreshSchoolData() {}
 
 onMounted(() => {
   loadComments();
-  loadGalleryImages();
   loadTourPanorama();
 });
 </script>
@@ -465,16 +341,6 @@ onMounted(() => {
   max-width: 2rem;
 }
 
-#schoolDetailsVr {
-  height: 28.1rem;
-  max-height: 28.1rem;
-  width: 100%;
-}
-
-#schoolDetailsVr .a-canvas {
-  border-radius: 0.6rem !important;
-}
-
 @media (min-width: 960px) {
   .data-container {
     margin-top: 1rem;
@@ -486,13 +352,6 @@ onMounted(() => {
   }
 }
 
-.schoolDetailsImg {
-  height: 28.1rem;
-  max-height: 28.1rem;
-  width: 100%;
-  border-radius: 0.6rem;
-}
-
 .enter-img-holder {
   background: #f2f4f7;
   height: 28.1rem;
@@ -501,16 +360,5 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.gallery-carousel {
-  border-radius: 0.6rem;
-  cursor: pointer;
-}
-
-/* Target the carousel navigation arrows */
-.gallery-carousel .v-window__prev,
-.gallery-carousel .v-window__next {
-  z-index: 10;
 }
 </style>
