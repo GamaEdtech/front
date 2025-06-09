@@ -10,9 +10,8 @@
             :class="[
               'mr-2 mb-1',
               facility.selected
-                ? 'bg-primary-gray-800 white--text'
-                : 'bg-primary-gray-300 gray--text',
-              ,
+                ? 'bg-primary-gray-800 text-white'
+                : 'bg-primary-gray-300 text-gray',
             ]"
             height="56"
             width="56"
@@ -33,7 +32,7 @@
     <v-dialog
       transition="dialog-bottom-transition"
       v-model="facilitiesDialog"
-      :fullscreen="$vuetify.breakpoint.xs"
+      :fullscreen="display.xs.value"
       max-width="720"
       style="z-index: 20001"
     >
@@ -42,11 +41,9 @@
           <div class="d-flex">
             <div class="gtext-h5 priamry-gray-700">Facilities</div>
             <v-spacer></v-spacer>
-            <v-btn icon
-              ><v-icon size="20" @click="facilitiesDialog = false"
-                >mdi-close</v-icon
-              ></v-btn
-            >
+            <v-btn variant="text" icon @click="facilitiesDialog = false">
+              <v-icon size="20">mdi-close</v-icon>
+            </v-btn>
           </div>
           <v-divider class="mb-12 mt-4" />
           <v-row>
@@ -54,8 +51,8 @@
               <v-btn
                 :class="[
                   tag.selected
-                    ? 'bg-primary-gray-800 white--text'
-                    : 'bg-primary-gray-300 gray--text',
+                    ? 'bg-primary-gray-800 text-white'
+                    : 'bg-blue-grey-lighten-4 text-gray',
                 ]"
                 height="56"
                 width="56"
@@ -71,11 +68,13 @@
         </v-card-text>
         <v-card-actions class="justify-center pb-13">
           <v-btn
-            class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+            class="black--text text-transform-none gtext-t4 font-weight-medium"
             rounded
+            color="primary"
             width="100%"
             max-width="400"
-            x-large
+            size="x-large"
+            variant="flat"
             :loading="loader"
             @click="saveFacilities"
             >Save</v-btn
@@ -86,107 +85,99 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "school-facilities",
-  props: {
-    facilities: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      tags: [],
-      facilitiesDialog: false,
-      selectedTags: [],
-      loader: false,
-    };
-  },
-  computed: {
-    displayFacilities() {
-      return this.tags.filter((tag) => tag.selected);
-    },
-  },
-  methods: {
-    async getTags() {
-      await this.$axios
-        .$get("/api/v2/tags/School")
-        .then((res) => {
-          console.log("res", res);
-          this.tags = res.data.map((tag) => {
-            const isSelected =
-              this.facilities &&
-              this.facilities.some((facility) => facility.id === tag.id);
-            return {
-              ...tag,
-              selected: isSelected,
-            };
-          });
+<script setup>
+import { useNuxtApp } from "#app";
+import { useDisplay } from "vuetify/lib/composables/display";
 
-          this.selectedTags = this.tags
-            .filter((tag) => tag.selected)
-            .map((tag) => tag.id);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+const props = defineProps({
+  facilities: {
+    type: Array,
+    default: () => [],
+  },
+});
+const emit = defineEmits(["facilities-updated", "open-auth-dialog"]);
 
-    toggleTag(tag) {
-      tag.selected = !tag.selected;
-      if (tag.selected) {
-        this.selectedTags.push(tag.id);
-      } else {
-        this.selectedTags = this.selectedTags.filter((id) => id !== tag.id);
+const tags = ref([]);
+const facilitiesDialog = ref(false);
+const selectedTags = ref([]);
+const loader = ref(false);
+const route = useRoute();
+const nuxtApp = useNuxtApp();
+const display = useDisplay();
+
+const displayFacilities = computed(() =>
+  tags.value.filter((tag) => tag.selected)
+);
+
+async function getTags() {
+  try {
+    const res = await $fetch("/api/v2/tags/School");
+    console.log("res", res.data);
+
+    tags.value = res.data.map((tag) => {
+      const isSelected =
+        props.facilities &&
+        props.facilities.some((facility) => facility.id === tag.id);
+      return {
+        ...tag,
+        selected: isSelected,
+      };
+    });
+    selectedTags.value = tags.value
+      .filter((tag) => tag.selected)
+      .map((tag) => tag.id);
+  } catch (err) {
+    // Optionally handle error
+  }
+}
+
+function toggleTag(tag) {
+  tag.selected = !tag.selected;
+  if (tag.selected) {
+    selectedTags.value.push(tag.id);
+  } else {
+    selectedTags.value = selectedTags.value.filter((id) => id !== tag.id);
+  }
+}
+
+async function saveFacilities() {
+  loader.value = true;
+  try {
+    const response = await nuxtApp.$fetch(
+      `/api/v2/schools/${route.params.id}/contributions`,
+      {
+        method: "POST",
+        body: { tags: selectedTags.value },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
+        },
       }
-      console.log("this.selectedTags", this.selectedTags);
-    },
+    );
+    if (response.succeeded) {
+      nuxtApp.$toast?.success(
+        "Your contribution has been successfully submitted"
+      );
+      facilitiesDialog.value = false;
+      emit("facilities-updated");
+    } else {
+      nuxtApp.$toast?.error(
+        response?.errors?.[0]?.message || "Failed to update facilities"
+      );
+    }
+  } catch (err) {
+    if (
+      err.response &&
+      (err.response.status === 401 || err.response.status === 403)
+    ) {
+      emit("open-auth-dialog", "login");
+      nuxtApp.$toast?.error("Please login to update facilities");
+    } else {
+      nuxtApp.$toast?.error("Failed to update facilities");
+    }
+  } finally {
+    loader.value = false;
+  }
+}
 
-    saveFacilities() {
-      this.loader = true;
-      this.$axios
-        .$post(
-          `/api/v2/schools/${this.$route.params.id}/contributions`,
-          {
-            tags: this.selectedTags,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-            },
-          }
-        )
-        .then((response) => {
-          if (response.succeeded) {
-            this.$toast.success(
-              "Your contribution has been successfully submitted"
-            );
-            this.facilitiesDialog = false;
-            this.$emit("facilities-updated");
-          } else {
-            this.$toast.error(
-              response?.errors?.[0]?.message || "Failed to update facilities"
-            );
-          }
-          this.loader = false;
-        })
-        .catch((err) => {
-          if (
-            err.response &&
-            (err.response.status === 401 || err.response.status === 403)
-          ) {
-            this.$emit("open-auth-dialog", "login");
-            this.$toast.error("Please login to update facilities");
-          } else {
-            this.$toast.error("Failed to update facilities");
-          }
-          this.loader = false;
-        });
-    },
-  },
-  mounted() {
-    this.getTags();
-  },
-};
+onMounted(getTags);
 </script>

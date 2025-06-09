@@ -386,17 +386,18 @@
                   v-if="generalDataEditMode.name"
                   placeholder="Name"
                   :rules="nameRule"
+                  variant="underlined"
                 >
-                  <template slot="append-outer">
+                  <template #append-inner>
                     <v-btn
                       :loading="nameSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('name')"
-                      fab
-                      depressed
-                      x-small
+                      variant="flat"
+                      size="x-small"
+                      icon
                     >
-                      <v-icon> mdi-check </v-icon>
+                      <v-icon size="large"> mdi-check </v-icon>
                     </v-btn>
                   </template>
                 </v-text-field>
@@ -445,86 +446,13 @@
 
         <v-row>
           <v-col cols="12" md="8">
-            <div class="d-flex">
-              <v-sheet class="chips-container">
-                <v-chip
-                  v-show="contentData.countryTitle"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.countryTitle }}
-                </v-chip>
-                <v-chip
-                  v-show="contentData.stateTitle"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.stateTitle }}
-                </v-chip>
-                <v-chip
-                  v-show="contentData.cityTitle"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.cityTitle }}
-                </v-chip>
-                <v-chip
-                  v-if="contentData.schoolType && contentData.schoolType.name"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData?.schoolType?.name }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?school_type=${contentData.school_type}`"
-                  v-if="contentData.school_type_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.school_type_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?section=${contentData.section}`"
-                  v-if="contentData.section_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.section_title }}
-                </v-chip>
-                <v-chip
-                  :to="`/school?coed_status=${contentData.sex}`"
-                  v-if="contentData.sex_title"
-                  class="blue-grey darken-1 white--text"
-                  small
-                >
-                  {{ contentData.sex_title }}
-                </v-chip>
-              </v-sheet>
-              <v-spacer />
-
-              <div class="gtext-t4 primary-blue-500">Contribute</div>
-            </div>
-
-            <div class="d-flex mt-11 mb-9">
-              <div class="gtext-h5 gtext-md-h5 primary-gray-600">
-                Tuition fee
-              </div>
-              <v-spacer />
-              <!-- <div class="gtext-t4 primary-blue-500">Contribute</div> -->
-
-              <div class="gtext-t2 font-weight-heavy primary-gray-800">
-                <span v-show="contentData.tuition_fee"
-                  ><span class="gtext-t6">$</span>
-                  {{ contentData.tuition_fee | numberFormat }}</span
-                >
-                <span v-show="!contentData.tuition_fee">(N/A)</span>
-              </div>
-            </div>
-            <!-- <Facilities
+            <SchoolChips :contentData="contentData" />
+            <TuitionInfo :contentData="contentData" />
+            <Facilities
               :facilities="contentData.tags"
               @open-auth-dialog="openAuthDialog"
               @facilities-updated="refreshSchoolData"
-            /> -->
+            />
           </v-col>
           <v-col cols="12" md="4" id="main-info-section">
             <div class="d-flex info-itm ml-md-6">
@@ -569,17 +497,18 @@
                   v-if="generalDataEditMode.website"
                   placeholder="Website"
                   :rules="webUrlRule"
+                  variant="underlined"
                 >
-                  <template slot="append-outer">
+                  <template #append-inner>
                     <v-btn
                       :loading="webSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('website')"
-                      fab
-                      depressed
-                      x-small
+                      variant="flat"
+                      size="x-small"
+                      icon
                     >
-                      <v-icon> mdi-check </v-icon>
+                      <v-icon size="large"> mdi-check </v-icon>
                     </v-btn>
                   </template>
                 </v-text-field>
@@ -626,17 +555,18 @@
                   v-model="form.email"
                   v-if="generalDataEditMode.email"
                   placeholder="Email"
+                  variant="underlined"
                 >
-                  <template slot="append-outer">
+                  <template #append-inner>
                     <v-btn
                       :loading="emailSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('email')"
-                      fab
-                      depressed
-                      x-small
+                      variant="flat"
+                      size="x-small"
+                      icon
                     >
-                      <v-icon> mdi-check </v-icon>
+                      <v-icon size="large"> mdi-check </v-icon>
                     </v-btn>
                   </template>
                 </v-text-field>
@@ -687,17 +617,18 @@
                   v-model="form.phone"
                   v-if="generalDataEditMode.phone1"
                   placeholder="Phone"
+                  variant="underlined"
                 >
-                  <template slot="append-outer">
+                  <template #append-inner>
                     <v-btn
                       :loading="phoneSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('phone')"
-                      fab
-                      depressed
-                      x-small
+                      variant="flat"
+                      size="x-small"
+                      icon
                     >
-                      <v-icon> mdi-check </v-icon>
+                      <v-icon size="large"> mdi-check </v-icon>
                     </v-btn>
                   </template>
                 </v-text-field>
@@ -744,17 +675,18 @@
                   v-if="generalDataEditMode.address"
                   placeholder="Enter address"
                   :rules="addressRule"
+                  variant="underlined"
                 >
-                  <template slot="append-outer">
+                  <template #append-inner>
                     <v-btn
                       :loading="addressSubmitLoader"
                       color="success"
                       @click="updateGeneralInfo('address')"
-                      fab
-                      depressed
-                      x-small
+                      variant="flat"
+                      size="x-small"
+                      icon
                     >
-                      <v-icon> mdi-check </v-icon>
+                      <v-icon size="large"> mdi-check </v-icon>
                     </v-btn>
                   </template>
                 </v-text-field>
@@ -777,117 +709,7 @@
         <!-- End recent comments -->
 
         <!-- Similar schools -->
-        <v-row id="similar-schools" v-show="false">
-          <v-col cols="12">
-            <h3 class="gtext-h5 primary-gray-600">Similar schools</h3>
-          </v-col>
-          <v-col cols="12">
-            <v-slide-group
-              class="slider py-sm-4"
-              :show-arrows="display.lgAndUp.value"
-            >
-              <v-slide-item>
-                <v-card rounded class="list-item" :to="`/school/`">
-                  <v-card-text>
-                    <div class="item-info">
-                      <div class="main-data">
-                        <div class="float-left">
-                          <h2 class="gtext-t4 font-weight-semibold mb-4">
-                            School name School nament
-                          </h2>
-                          <v-chip
-                            class="list-chip gtext-t5 font-weight-medium"
-                            small
-                          >
-                            Pre-K
-                          </v-chip>
-                        </div>
-                        <div class="item-img float-right">
-                          <img src="/images/default-school.png" />
-                        </div>
-                      </div>
-                      <v-divider class="mb-3" />
-                      <div class="item-footer">
-                        <div class="float-left">
-                          <v-btn icon>
-                            <v-icon> mdi-map-marker </v-icon>
-                          </v-btn>
-                        </div>
-
-                        <div class="float-right d-flex mt-1">
-                          <div
-                            class="rate-section gtext-t6 font-weight-semibold mr-1"
-                          >
-                            <!-- {{ item.score }} -->
-                            4
-                            <v-icon color="primary"> mdi-star </v-icon>
-                          </div>
-                          <div class="gtext-t6 primary-gray-300">
-                            Update:
-                            <span class="primary-gray-600">
-                              {{
-                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
-                              }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-slide-item>
-              <v-slide-item>
-                <v-card rounded class="list-item" :to="`/school/`">
-                  <v-card-text>
-                    <div class="item-info">
-                      <div class="main-data">
-                        <div class="float-left">
-                          <h2 class="gtext-t4 font-weight-semibold mb-4">
-                            School name School nament
-                          </h2>
-                          <v-chip
-                            class="list-chip gtext-t5 font-weight-medium"
-                            small
-                          >
-                            Pre-K
-                          </v-chip>
-                        </div>
-                        <div class="item-img float-right">
-                          <img src="/images/default-school.png" />
-                        </div>
-                      </div>
-                      <v-divider class="mb-3" />
-                      <div class="item-footer">
-                        <div class="float-left">
-                          <v-btn icon>
-                            <v-icon> mdi-map-marker </v-icon>
-                          </v-btn>
-                        </div>
-
-                        <div class="float-right d-flex mt-1">
-                          <div
-                            class="rate-section gtext-t6 font-weight-semibold mr-1"
-                          >
-                            4
-                            <v-icon color="primary"> mdi-star </v-icon>
-                          </div>
-                          <div class="gtext-t6 primary-gray-300">
-                            Update:
-                            <span class="primary-gray-600">
-                              {{
-                                $dayjs(contentData.up_date).format("YYYY/MM/DD")
-                              }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-slide-item>
-            </v-slide-group>
-          </v-col>
-        </v-row>
+        <SimilarSchools :similarSchools="similarSchools" />
         <!-- End similar schools -->
       </v-col>
     </v-row>
@@ -930,10 +752,6 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAsyncData, useNuxtApp } from "#imports";
-import locationSearch from "@/components/form/LocationSearch.vue";
 import GalleryDialog from "@/components/school/GalleryDialog.vue";
 import ReportDialog from "@/components/school/ReportDialog.vue";
 import Facilities from "@/components/school/detail/Facilities.vue";
@@ -942,13 +760,14 @@ import SelectLocationDialog from "@/components/common/SelectLocationDialog.vue";
 import LeaveCommentDialog from "@/components/common/LeaveCommentDialog.vue";
 import UsersScore from "@/components/common/UsersScore.vue";
 import RecentComments from "@/components/common/RecentComments.vue";
+import SimilarSchools from "@/components/common/SimilarSchools.vue";
+import TuitionInfo from "@/components/common/TuitionInfo.vue";
+import SchoolChips from "@/components/common/SchoolChips.vue";
 
 const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const display = useDisplay();
-// State
-const cropperDialog = ref(false);
 const map = reactive({
   url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   zoom: 10,
@@ -1030,6 +849,7 @@ const addressRule = [(v) => !!v || "Address is required"];
 const reportDialog = ref(false);
 const contentData = ref({});
 const ratingData = ref({});
+const similarSchools = [];
 
 // Data fetching
 const { data: contentDataRaw } = await useAsyncData("contentData", () =>
@@ -1045,16 +865,7 @@ if (ratingDataRaw.value?.succeeded) {
   ratingData.value = ratingDataRaw.value.data;
 }
 
-// Methods
-function convertRateToString(value) {
-  if (value > 3.5) return "Good";
-  else if (value > 2) return "Average";
-  else if (value <= 2) return "Poor";
-  else return "Unknown";
-}
 function openGalleryDialog() {
-  console.log("openGalleryDialog");
-
   if (galleryImages.value && galleryImages.value.length > 0) {
     const currentIndex = activeGalleryIndex.value;
     if (currentIndex >= 0 && currentIndex < galleryImages.value.length) {
@@ -1565,28 +1376,6 @@ function handleSelectLocationUpdate(payload) {
 
     .info-data-address {
       max-height: 12rem;
-    }
-  }
-}
-
-#similar-schools {
-  .list-item {
-    height: 15rem;
-    margin-bottom: 2rem;
-    margin-left: 0.8rem;
-    margin-right: 0.8rem;
-
-    .item-info {
-      .main-data {
-        height: 8rem;
-
-        .item-img img {
-          width: 10.7rem;
-          height: 8.1rem;
-          flex-shrink: 0;
-          border-radius: 0.4rem;
-        }
-      }
     }
   }
 }

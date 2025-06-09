@@ -33,9 +33,9 @@
           <div class="w-md-80 mx-md-auto">
             <div class="mb-3 primary-gray-900 font-size-16">Description</div>
             <v-textarea
-              background-color="white"
+              bg-color="white"
               v-model="reportForm.description"
-              outlined
+              variant="outlined"
               placeholder="Enter here..."
               :rules="[
                 (v) => v.length >= 25 || 'Enter at least 25 characters.',
