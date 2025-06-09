@@ -61,12 +61,12 @@
               <v-col cols="12" class="px-4">
                 <v-simple-table class="exams_table">
                   <template v-slot:default>
-                    <tbody class="d-flex">
+                    <tbody class="d-flex flex-column">
                       <tr
                         v-show="exam_list.length > 0"
                         v-for="item in exam_list"
                         :key="item.id"
-                        class="d-flex w-100 justify-space-between"
+                        class="d-flex w-100 justify-space-between border-b-sm"
                       >
                         <td class="py-3">
                           <nuxt-link
