@@ -26,26 +26,11 @@
           </div>
         </div>
         <client-only>
-          <l-map
-            ref="schoolMap"
-            :zoom="map.zoom"
-            :min-zoom="map.minZoom"
-            :center="map.center"
+          <school-detail-school-map
+            :content="contentData"
             :class="topSlideClass.map"
-            @click="showSelectLocationDialog = true"
-            id="schoolDetailsMap"
-          >
-            <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker :lat-lng="map.latLng">
-              <LIcon
-                icon-url="/images/school-marker.png"
-                :icon-size="[64, 64]"
-                :icon-anchor="[16, 32]"
-              ></LIcon>
-            </l-marker>
-          </l-map>
+          ></school-detail-school-map>
         </client-only>
-
         <div
           class="position-relative under-image-right"
           v-if="contentData.tour && !tourImgPreview"
@@ -116,7 +101,6 @@
             <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
           </div>
         </div>
-
         <div
           v-if="galleryImages && galleryImages.length > 0"
           :class="topSlideClass.image"
@@ -215,25 +199,9 @@
         </div>
       </v-col>
       <v-col cols="12" md="4">
-        <client-only>
-          <l-map
-            ref="schoolMap"
-            :zoom="map.zoom"
-            :min-zoom="map.minZoom"
-            :center="map.center"
-            id="schoolDetailsMap"
-            @click="openLocationDialog"
-          >
-            <l-tile-layer :url="map.url"></l-tile-layer>
-            <l-marker :lat-lng="map.latLng">
-              <LIcon
-                icon-url="/images/school-marker.png"
-                :icon-size="[64, 64]"
-                :icon-anchor="[16, 32]"
-              ></LIcon>
-            </l-marker>
-          </l-map>
-        </client-only>
+        <school-detail-school-map
+          :content="contentData"
+        ></school-detail-school-map>
       </v-col>
       <v-col cols="12" md="4">
         <template v-if="contentData.tour && !tourImgPreview">
@@ -445,17 +413,6 @@
       @refresh-gallery="loadGalleryImages"
     />
 
-    <!-- Select Location dialog -->
-    <SelectLocationDialog
-      v-model="showSelectLocationDialog"
-      :contentData="contentData"
-      :map="map"
-      :mapSubmitLoader="mapSubmitLoader"
-      @update="handleSelectLocationUpdate"
-      @locationSelected="goToSearchLocation"
-    />
-    <!-- End select location dialog -->
-
     <!-- Report School Issue Dialog -->
     <ReportDialog
       v-model="reportDialog"
@@ -471,7 +428,6 @@ import GalleryDialog from "@/components/school/GalleryDialog.vue";
 import ReportDialog from "@/components/school/ReportDialog.vue";
 import Facilities from "@/components/school/detail/Facilities.vue";
 import { useDisplay } from "vuetify/lib/composables/display";
-import SelectLocationDialog from "@/components/common/SelectLocationDialog.vue";
 import LeaveCommentDialog from "@/components/common/LeaveCommentDialog.vue";
 import UsersScore from "@/components/common/UsersScore.vue";
 import RecentComments from "@/components/common/RecentComments.vue";
@@ -483,28 +439,10 @@ const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const display = useDisplay();
-const map = reactive({
-  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  zoom: 10,
-  minZoom: 2,
-  center: [0, 0],
-  latLng: [0, 0],
-  object: null,
-  boundingBox: {},
-  schoolIcon: null,
-});
 const tourImgPreview = ref(null);
 const galleryImages = ref([]);
 const activeGalleryIndex = ref(0);
 const tourPanoramas = ref([]);
-const form = reactive({
-  web: "",
-  email: "",
-  phone: "",
-  address: "",
-  name: "",
-});
-const mapMarkerData = ref({});
 const slideToggler = ref("map");
 const topSlideClass = reactive({
   image: "under-image-left",
@@ -513,31 +451,14 @@ const topSlideClass = reactive({
 });
 const showLeaveCommentDialog = ref(false);
 const showGalleryDialog = ref(false);
-
-const showSelectLocationDialog = ref(false);
 const tourImg = ref(null);
 const loading = reactive({ uploadTour: false });
-const mapSubmitLoader = ref(false);
-const addressSubmitLoader = ref(false);
-const webSubmitLoader = ref(false);
-const emailSubmitLoader = ref(false);
-const phoneSubmitLoader = ref(false);
-const nameSubmitLoader = ref(false);
 const commentList = ref([]);
-const generalDataEditMode = reactive({
-  website: false,
-  email: false,
-  phone1: false,
-  address: false,
-  map: false,
-  name: false,
-});
 const reportDialog = ref(false);
 const contentData = ref({});
 const ratingData = ref({});
 const similarSchools = [];
 
-// Data fetching
 const { data: contentDataRaw } = await useAsyncData("contentData", () =>
   $fetch(`/api/v2/schools/${route.params.id}`)
 );
@@ -590,13 +511,6 @@ function changeSlide() {
   }
 }
 
-function openLocationDialog() {
-  showSelectLocationDialog.value = true;
-  setTimeout(() => {
-    // Implement with template refs if needed
-    window.dispatchEvent(new Event("resize"));
-  }, 500);
-}
 const tourImgRef = ref(null);
 
 function openTourImgInput() {
@@ -678,30 +592,6 @@ function clearTourImage() {
   tourImgPreview.value = null;
   nuxtApp.$toast?.info("Image removed");
 }
-function isValidUrl(url) {
-  try {
-    new URL(url);
-    return /^https?:\/\//.test(url);
-  } catch (e) {
-    return false;
-  }
-}
-function isValidEmail(email) {
-  try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  } catch (e) {
-    return false;
-  }
-}
-
-function isRequired(value) {
-  try {
-    return !!value.trim();
-  } catch (e) {
-    return false;
-  }
-}
 function openAuthDialog(val) {
   router.push({ query: { auth_form: val } });
 }
@@ -741,134 +631,13 @@ function loadTourPanorama() {
     })
     .catch(() => {});
 }
-function updateGeneralInfo(value) {
-  let formData = {};
-  if (value == "website") {
-    if (!isValidUrl(form.web)) {
-      nuxtApp.$toast?.error("Please enter a valid website URL");
-      return;
-    }
-    generalDataEditMode.website = false;
-    formData = { webSite: form.web ?? null };
-  }
-  if (value == "email") {
-    if (!isValidEmail(form.email)) {
-      nuxtApp.$toast?.error("Please enter a valid Email");
-      return;
-    }
-    generalDataEditMode.email = false;
-    formData = { email: form.email ?? null };
-  }
-  if (value == "phone") {
-    if (!isRequired(form.phone)) {
-      nuxtApp.$toast?.error("Please enter a valid Phone Number");
-      return;
-    }
-    generalDataEditMode.phone1 = false;
-    formData = { phoneNumber: form.phone ?? null };
-  }
-  if (value == "address") {
-    if (!isRequired(form.address)) {
-      nuxtApp.$toast?.error(
-        "Please enter a valid address (minimum 10 characters)"
-      );
-      return;
-    }
-    generalDataEditMode.address = false;
-    formData = { address: form.address ?? null };
-  }
-  if (value == "name") {
-    if (!isRequired(form.name)) {
-      nuxtApp.$toast?.error("Please enter a valid Name");
-      return;
-    }
-    generalDataEditMode.name = false;
-    formData = { name: form.name ?? null };
-  }
-  if (value == "map") {
-    generalDataEditMode.map = false;
-    formData = {
-      latitude: mapMarkerData.value.lat,
-      longitude: mapMarkerData.value.lng,
-    };
-  }
-  let loaderRef = {
-    website: webSubmitLoader,
-    email: emailSubmitLoader,
-    phone: phoneSubmitLoader,
-    address: addressSubmitLoader,
-    name: nameSubmitLoader,
-    map: mapSubmitLoader,
-  }[value];
-  if (loaderRef) loaderRef.value = true;
-  $fetch(`/api/v2/schools/${route.params.id}/contributions`, {
-    method: "POST",
-    body: formData,
-    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
-  })
-    .then(async (response) => {
-      if (response.succeeded) {
-        switch (value) {
-          case "name":
-            contentData.value.name = form.name;
-            break;
-          case "website":
-            contentData.value.webSite = form.web;
-            break;
-          case "phone":
-            contentData.value.phoneNumber = form.phone;
-            break;
-          case "address":
-            contentData.value.address = form.address;
-            break;
-          case "email":
-            contentData.value.email = form.email;
-            break;
-          default:
-            break;
-        }
-        nuxtApp.$toast?.success(
-          "Your contribution has been successfully submitted"
-        );
-      } else {
-        nuxtApp.$toast?.error(response?.errors[0]?.message);
-      }
-    })
-    .catch((err) => {
-      if (err?.response?.status == 401 || err?.response?.status == 403) {
-        openAuthDialog("login");
-      } else nuxtApp.$toast?.error(err?.response?.data?.message);
-    })
-    .finally(() => {
-      form.web = null;
-      form.email = null;
-      form.phone = null;
-      form.address = null;
-      form.name = null;
-      mapSubmitLoader.value = false;
-      showSelectLocationDialog.value = false;
-      webSubmitLoader.value = false;
-      emailSubmitLoader.value = false;
-      phoneSubmitLoader.value = false;
-      addressSubmitLoader.value = false;
-      nameSubmitLoader.value = false;
-    });
-}
 function refreshSchoolData() {}
 
 onMounted(() => {
-  if (contentData.value.latitude && contentData.value.longitude) {
-    map.center = [contentData.value.latitude, contentData.value.longitude];
-    map.latLng = [contentData.value.latitude, contentData.value.longitude];
-  }
   loadComments();
   loadGalleryImages();
   loadTourPanorama();
 });
-
-function handleSelectLocationUpdate(payload) {
-  updateGeneralInfo("map");
-}
 </script>
 
 <style scoped>
@@ -981,13 +750,6 @@ function handleSelectLocationUpdate(payload) {
 
 #schoolDetailsVr .a-canvas {
   border-radius: 0.6rem !important;
-}
-
-#schoolDetailsMap {
-  border-radius: 0.6rem;
-  height: 28.1rem;
-  max-height: 28.1rem;
-  width: 100%;
 }
 
 @media (min-width: 960px) {

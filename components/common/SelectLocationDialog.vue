@@ -23,6 +23,7 @@
             :center="map.center"
             id="mapSection"
             @move="updateMarkerPosition"
+            :use-global-leaflet="false"
           >
             <l-tile-layer :url="map.url"></l-tile-layer>
             <l-marker ref="editMapMarker" :lat-lng="map.center">
@@ -97,13 +98,14 @@ const dialogVisible = computed({
 
 const editSchoolMap = ref(null);
 const editMapMarker = ref(null);
-
+const newCenterData = ref(null);
 function updateMarkerPosition() {
   const mapInstance = editSchoolMap.value?.leafletObject;
   const markerInstance = editMapMarker.value?.leafletObject;
   if (!mapInstance || !markerInstance) return;
   const newCenter = mapInstance.getCenter();
   markerInstance.setLatLng(newCenter);
+  newCenterData.value = newCenter;
 }
 
 function goToSearchLocation(val) {
@@ -116,7 +118,7 @@ function goToSearchLocation(val) {
 }
 
 function emitUpdate() {
-  emit("update");
+  emit("update", newCenterData.value);
 }
 </script>
 
