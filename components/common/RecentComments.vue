@@ -24,10 +24,11 @@
             </div>
             <div class="float-right">
               <v-rating
-                :value="comment.averageRate"
+                v-model="comment.averageRate"
                 background-color="orange lighten-3"
                 color="orange"
                 half-increments
+                hover
                 size="24"
                 readonly
               ></v-rating>
@@ -39,14 +40,29 @@
           </div>
           <div class="pb-8">
             <div class="float-left">
-              <v-btn class="bg-primary-gray-700 white--text mr-6" fab x-small>
-                <v-icon size="14"> mdi-thumb-down </v-icon>
+              <v-btn
+                class="bg-primary-gray-700 white--text mr-6"
+                variant="fab"
+                size="x-small"
+                icon
+              >
+                <v-icon size="14" color="white"> mdi-thumb-down </v-icon>
               </v-btn>
-              <v-btn class="bg-primary-gray-700 white--text mr-6" fab x-small>
-                <v-icon size="14"> mdi-thumb-up </v-icon>
+              <v-btn
+                class="bg-primary-gray-700 white--text mr-6"
+                variant="fab"
+                size="x-small"
+                icon
+              >
+                <v-icon size="14" color="white"> mdi-thumb-up </v-icon>
               </v-btn>
-              <v-btn class="bg-primary-blue-500 white--text" fab x-small>
-                <v-icon size="14"> mdi-forum </v-icon>
+              <v-btn
+                class="bg-primary-blue-500 white--text"
+                variant="fab"
+                size="x-small"
+                icon
+              >
+                <v-icon size="14" color="white"> mdi-forum </v-icon>
               </v-btn>
             </div>
             <div class="float-right gtext-t5">
