@@ -173,13 +173,13 @@ export default defineNuxtConfig({
   routeRules: {
     "/test-maker/**": { ssr: false, prerender: true },
     "/api/v1/**": {
-      proxy: "https://core.gamatrain.com/api/v1/**",
+      proxy: process.env.NUXT_PROXY_API_BASE_URL,
     },
     "/api/v2/**": {
-      proxy: "https://sandbox.gamaedtech.com/api/v1/**",
+      proxy: process.env.NUXT_PROXY_API2_BASE_URL,
     },
     "/uploads/**": {
-      proxy: "https://core.gamatrain.com/uploads/**",
+      proxy: process.env.NUXT_PROXY_UPLOAD_URL,
     },
   },
 

@@ -111,14 +111,16 @@ const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const imageClass = ref(null);
+const emit = defineEmits(["fetch"]);
 const props = defineProps({
   content: {},
   class: {},
+  images: {},
 });
 const contentData = ref(props.content);
-const galleryImages = ref([]);
 const activeGalleryIndex = ref(0);
 const showGalleryDialog = ref(false);
+const galleryImages = ref(props.images);
 
 watch(
   () => props.class,
@@ -126,38 +128,24 @@ watch(
     imageClass.value = val;
   }
 );
-
-function loadGalleryImages() {
-  $fetch(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
-    .then((response) => {
-      galleryImages.value = [...response.data].reverse();
-      if (galleryImages.value.length >= 1) {
-        contentData.value.pic = galleryImages.value[0].fileUri;
-      } else {
-        contentData.value.pic = null;
-      }
-    })
-    .catch(() => {});
-}
-function openGalleryDialog() {
-  if (galleryImages.value && galleryImages.value.length > 0) {
-    const currentIndex = activeGalleryIndex.value;
-    if (currentIndex >= 0 && currentIndex < galleryImages.value.length) {
-      contentData.value.pic = galleryImages.value[currentIndex];
-    }
+watch(
+  () => props.images,
+  (val) => {
+    galleryImages.value = val;
   }
+);
+
+function openGalleryDialog() {
   showGalleryDialog.value = true;
 }
 function updateMainGalleryImage(index) {
   activeGalleryIndex.value = index;
-  if (galleryImages.value && galleryImages.value.length > index) {
-    contentData.value.pic = galleryImages.value[index];
-  }
+}
+function loadGalleryImages() {
+  emit("fetch");
 }
 
-onMounted(() => {
-  loadGalleryImages();
-});
+onMounted(() => {});
 </script>
 
 <style scoped>

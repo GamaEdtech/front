@@ -15,6 +15,7 @@
         <school-detail-image-gallery
           :content="contentData"
           :class="topSlideClass.image"
+          @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </div>
     </v-row>
@@ -23,6 +24,8 @@
       <v-col cols="12" md="4">
         <school-detail-image-gallery
           :content="contentData"
+          :images="galleryImages"
+          @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </v-col>
       <v-col cols="12" md="4">
@@ -190,7 +193,7 @@ const reportDialog = ref(false);
 const contentData = ref({});
 const ratingData = ref({});
 const similarSchools = [];
-
+const galleryImages = ref([]);
 const { data: contentDataRaw } = await useAsyncData("contentData", () =>
   $fetch(`/api/v2/schools/${route.params.id}`)
 );
@@ -248,9 +251,18 @@ function loadTourPanorama() {
 }
 function refreshSchoolData() {}
 
+function loadGalleryImages() {
+  $fetch(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
+    .then((response) => {
+      galleryImages.value = [...response.data].reverse();
+    })
+    .catch(() => {});
+}
+
 onMounted(() => {
   loadComments();
   loadTourPanorama();
+  loadGalleryImages();
 });
 </script>
 
