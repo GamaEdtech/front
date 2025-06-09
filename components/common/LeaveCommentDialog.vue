@@ -204,16 +204,24 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  commentForm: {
-    type: Object,
-    required: true,
-  },
   contentData: {
     type: Object,
     required: true,
   },
 });
+
 const emit = defineEmits(["update:modelValue", "submitted"]);
+const commentForm = reactive({
+  comment: "",
+  classesQualityRate: 4.5,
+  educationRate: 4,
+  itTrainingRate: 4,
+  safetyAndHappinessRate: 3.5,
+  behaviorRate: 4,
+  tuitionRatioRate: 5,
+  facilitiesRate: 4.5,
+  artisticActivitiesRate: 4,
+});
 const dialogVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
@@ -286,15 +294,15 @@ async function sendToAI() {
       .replace(/```$/, "");
     const parsedResponse = JSON.parse(cleanedResponse);
     const ratings = parsedResponse.ratings;
-    props.commentForm.comment = parsedResponse.description;
-    props.commentForm.classesQualityRate = ratings.classrooms_quality;
-    props.commentForm.educationRate = ratings.teachers_proficiency;
-    props.commentForm.itTrainingRate = ratings.technology_access;
-    props.commentForm.safetyAndHappinessRate = ratings.school_safety;
-    props.commentForm.behaviorRate = ratings.officials_behavior;
-    props.commentForm.tuitionRatioRate = ratings.affordability;
-    props.commentForm.facilitiesRate = ratings.sports_facilities;
-    props.commentForm.artisticActivitiesRate = ratings.art_counseling;
+    commentForm.value.comment = parsedResponse.description;
+    commentForm.value.classesQualityRate = ratings.classrooms_quality;
+    commentForm.value.educationRate = ratings.teachers_proficiency;
+    commentForm.value.itTrainingRate = ratings.technology_access;
+    commentForm.value.safetyAndHappinessRate = ratings.school_safety;
+    commentForm.value.behaviorRate = ratings.officials_behavior;
+    commentForm.value.tuitionRatioRate = ratings.affordability;
+    commentForm.value.facilitiesRate = ratings.sports_facilities;
+    commentForm.value.artisticActivitiesRate = ratings.art_counseling;
   } catch {
     nuxtApp.$toast?.error("Error: Failed to get AI response.");
   } finally {
@@ -309,7 +317,7 @@ async function submitComment() {
       `/api/v2/schools/${route.params.id}/comments`,
       {
         method: "POST",
-        body: { ...props.commentForm },
+        body: { ...commentForm.value },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
         },

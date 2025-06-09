@@ -78,4 +78,9 @@ const props = defineProps({
   flex-shrink: 0;
   border-radius: 0.4rem;
 }
+
+.list-chip {
+  background: var(--primary-warning-50, #fffaeb) !important;
+  color: var(--primary-yellow-gama-500, #ffb600) !important;
+}
 </style>

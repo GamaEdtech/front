@@ -1,0 +1,115 @@
+<template>
+  <h1 class="gtext-h4 gtext-sm-h4 gtext-lg-h4">
+    <div class="d-flex align-center flex-wrap">
+      <div v-show="!generalDataEditMode.name">
+        {{ contentData.name }}
+      </div>
+      <v-btn
+        v-if="!generalDataEditMode.name"
+        @click="handleEdit"
+        class="ml-4"
+        icon
+        color="blue-grey"
+        variant="text"
+      >
+        <v-icon size="large"> mdi-pencil </v-icon>
+      </v-btn>
+      <v-text-field
+        v-model="form.name"
+        v-if="generalDataEditMode.name"
+        placeholder="Name"
+        :rules="[(v) => !!v || 'Name is required']"
+        variant="underlined"
+      >
+        <template #append-inner>
+          <v-btn
+            :loading="nameSubmitLoader"
+            color="success"
+            @click="handleUpdate"
+            variant="flat"
+            size="x-small"
+            icon
+          >
+            <v-icon size="large"> mdi-check </v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
+    </div>
+    <span v-show="contentData.school_type_title">
+      ,
+      {{ contentData.school_type_title }}
+    </span>
+    <span v-show="contentData.section_title">
+      , {{ contentData.section_title }}
+    </span>
+    <span v-show="contentData.area_title">
+      , {{ contentData.area_title }}
+    </span>
+  </h1>
+</template>
+
+<script setup>
+const emit = defineEmits(["edit", "update"]);
+const props = defineProps({
+  content: {
+    type: Object,
+    required: true,
+  },
+});
+const nuxtApp = useNuxtApp();
+const route = useRoute();
+const router = useRouter();
+const contentData = ref(props.content);
+const nameSubmitLoader = ref(false);
+const generalDataEditMode = reactive({
+  name: false,
+});
+const form = reactive({
+  name: "",
+});
+function handleEdit() {
+  form.name = contentData.value.name || "";
+  generalDataEditMode.name = true;
+}
+function isRequired(value) {
+  try {
+    return !!value.trim();
+  } catch (e) {
+    return false;
+  }
+}
+function handleUpdate() {
+  let formData = {};
+  if (!isRequired(form.name)) {
+    nuxtApp.$toast?.error("Please enter a valid Name");
+    return;
+  }
+  generalDataEditMode.name = false;
+  formData = { name: form.name ?? null };
+  nameSubmitLoader.value = true;
+  $fetch(`/api/v2/schools/${route.params.id}/contributions`, {
+    method: "POST",
+    body: formData,
+    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
+  })
+    .then(async (response) => {
+      if (response.succeeded) {
+        nuxtApp.$toast?.success(
+          "Your contribution has been successfully submitted"
+        );
+        contentData.value.name = form.name;
+        emit("update", form.value);
+      } else {
+        nuxtApp.$toast?.error(response?.errors[0]?.message);
+      }
+    })
+    .catch((err) => {
+      if (err?.response?.status == 401 || err?.response?.status == 403) {
+      } else nuxtApp.$toast?.error(err?.response?.data?.message);
+    })
+    .finally(() => {
+      form.name = null;
+      nameSubmitLoader.value = false;
+    });
+}
+</script>

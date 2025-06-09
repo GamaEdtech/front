@@ -63,3 +63,30 @@ const props = defineProps({
   },
 });
 </script>
+
+<style scoped>
+.chips-container {
+  white-space: nowrap;
+  overflow-x: auto;
+  width: 75%;
+  padding-top: 0.4rem;
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: transparent transparent;
+  /* Firefox */
+}
+
+/* Webkit (Chrome, Safari) */
+.chips-container::-webkit-scrollbar {
+  width: 5px;
+  /* Adjust width as needed */
+}
+
+.chips-container::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.chips-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+</style>
