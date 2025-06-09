@@ -3,7 +3,7 @@
     v-model="dialogVisible"
     transition="dialog-bottom-transition"
     fullscreen
-    style="z-index: 20001"
+    z-index="2000"
   >
     <v-card>
       <v-card-text class="pt-6 pt-md-8 px-6 px-md-8">
@@ -15,7 +15,8 @@
           </v-btn>
         </div>
       </v-card-text>
-      <div id="locationPickerMapContainer">
+
+      <div class="locationPickerMapContainer">
         <client-only>
           <l-map
             ref="editSchoolMap"
@@ -36,7 +37,6 @@
           </l-map>
         </client-only>
         <locationSearch
-          id="searchSection"
           @locationSelected="goToSearchLocation"
           rounded
           label="Search anything"
@@ -45,7 +45,7 @@
       <a
         :href="`https://www.google.com/maps?q=${contentData.latitude},${contentData.longitude}`"
         target="_blank"
-        class="ml-1 blue--text"
+        class="ml-1 text-blue text-decoration-none"
       >
         See on Google Map
       </a>
@@ -99,6 +99,7 @@ const dialogVisible = computed({
 const editSchoolMap = ref(null);
 const editMapMarker = ref(null);
 const newCenterData = ref(null);
+
 function updateMarkerPosition() {
   const mapInstance = editSchoolMap.value?.leafletObject;
   const markerInstance = editMapMarker.value?.leafletObject;
@@ -107,7 +108,6 @@ function updateMarkerPosition() {
   markerInstance.setLatLng(newCenter);
   newCenterData.value = newCenter;
 }
-
 function goToSearchLocation(val) {
   const mapInstance = editSchoolMap.value?.leafletObject;
   if (!mapInstance) return;
@@ -116,31 +116,19 @@ function goToSearchLocation(val) {
     window.dispatchEvent(new Event("resize"));
   }, 100);
 }
-
 function emitUpdate() {
   emit("update", newCenterData.value);
 }
 </script>
 
-<style scoped>
-#locationPickerMapContainer {
+<style>
+.locationPickerMapContainer {
   position: relative;
   overflow-x: hidden;
 
   #mapSection {
     width: 100%;
     height: 80vh !important;
-  }
-
-  #searchSection {
-    position: absolute;
-    top: 1.6rem;
-    left: 0;
-    right: 0;
-    margin: auto;
-    z-index: 200002;
-    background: #fff;
-    max-width: 30rem;
   }
 }
 </style>

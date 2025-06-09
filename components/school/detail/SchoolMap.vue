@@ -1,27 +1,28 @@
 <template>
-  <client-only>
-    <l-map
-      ref="schoolMap"
-      :zoom="map.zoom"
-      :min-zoom="map.minZoom"
-      :class="class"
-      :center="map.center"
-      id="schoolDetailsMap"
-      @click="openLocationDialog"
-      :use-global-leaflet="false"
-    >
-      <l-tile-layer :url="map.url"></l-tile-layer>
-      <l-marker :lat-lng="map.latLng">
-        <LIcon
-          :icon-url="map.schoolIcon"
-          :icon-size="[64, 64]"
-          :icon-anchor="[16, 32]"
-        ></LIcon>
-      </l-marker>
-    </l-map>
-  </client-only>
+  <div :class="mapClass">
+    <client-only>
+      <l-map
+        ref="schoolMap"
+        :zoom="map.zoom"
+        :min-zoom="map.minZoom"
+        :center="map.center"
+        id="schoolDetailsMap"
+        @click="openLocationDialog"
+        :use-global-leaflet="false"
+      >
+        <l-tile-layer :url="map.url"></l-tile-layer>
+        <l-marker :lat-lng="map.latLng">
+          <LIcon
+            :icon-url="map.schoolIcon"
+            :icon-size="[64, 64]"
+            :icon-anchor="[16, 32]"
+          ></LIcon>
+        </l-marker>
+      </l-map>
+      <div>{{ mapClass }}</div>
+    </client-only>
+  </div>
 
-  <!-- Select Location dialog -->
   <SelectLocationDialog
     v-model="showSelectLocationDialog"
     :contentData="contentData"
@@ -30,10 +31,10 @@
     @update="handleSelectLocationUpdate"
     @locationSelected="goToSearchLocation"
   />
-  <!-- End select location dialog -->
 </template>
 
 <script setup>
+import { ref, reactive, onMounted, watch } from "vue";
 import SelectLocationDialog from "@/components/common/SelectLocationDialog.vue";
 const props = defineProps({
   class: {},
@@ -42,6 +43,7 @@ const props = defineProps({
     required: true,
   },
 });
+const schoolMap = ref(null);
 const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
@@ -59,6 +61,8 @@ const map = reactive({
   boundingBox: {},
   schoolIcon: "/images/school-marker.png",
 });
+const mapClass = ref(props.class);
+
 function openLocationDialog() {
   showSelectLocationDialog.value = true;
   setTimeout(() => {
@@ -101,9 +105,14 @@ function handleUpdate() {
     });
 }
 
+watch(
+  () => props.class,
+  (val) => {
+    mapClass.value = val;
+  }
+);
+
 onMounted(() => {
-  console.log("contentData.value", contentData.value);
-  console.log("prop content", props.content);
   if (contentData.value.latitude && contentData.value.longitude) {
     map.center = [contentData.value.latitude, contentData.value.longitude];
     map.latLng = [contentData.value.latitude, contentData.value.longitude];
@@ -114,7 +123,7 @@ onMounted(() => {
 <style scoped>
 #schoolDetailsMap {
   border-radius: 0.6rem;
-  height: 28.1rem;
+  height: 28.1rem !important;
   max-height: 28.1rem;
   width: 100%;
 }

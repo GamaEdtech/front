@@ -5,19 +5,21 @@
     v-model="selectedItem"
     :loading="loading"
     :items="items"
+    color="primary"
     hide-details
-    item-text="display_name"
+    theme="light"
+    variant="solo"
+    item-title="display_name"
     item-value="location"
-    :search-input.sync="search"
-    :label="label"
-    :placeholder="placeholder"
+    @update:search="search = $event"
+    :placeholder="props.placeholder"
     @keydown="toggleSearch(true)"
-    :solo="solo"
-    :rounded="rounded"
     prepend-inner-icon="mdi-magnify"
-    outlined
+    rounded
+    density="comfortable"
+    return-object
   >
-    <template v-slot:no-data>
+    <template #no-data>
       <v-list-item>
         <v-list-item-title>
           Type something to start
@@ -36,12 +38,15 @@ const props = defineProps({
   label: String,
   solo: String,
   rounded: Boolean,
-  placeholder: String,
+  placeholder: {
+    type: String,
+    default: "Search anything ..",
+  },
 });
 const emit = defineEmits(["locationSelected"]);
 
-const search = ref("");
-const selectedItem = ref("");
+const search = ref(null);
+const selectedItem = ref(null);
 const items = ref([]);
 const loading = ref(false);
 const timer = ref(null);
@@ -84,21 +89,6 @@ function toggleSearch(val) {
   searchToggle.value = val;
 }
 
-function addAndSetItem(location) {
-  items.value = [];
-  let item = {};
-  item["display_name"] =
-    location.locationName.substr(0, 38) +
-    (location.locationName.length > 38 ? "..." : "");
-  item["location"] = [location.lat + "", location.lng + ""];
-  items.value[items.value.length] = item;
-  selectedItem.value = items.value[items.value.length - 1].location;
-  render.value = false;
-  nextTick(() => {
-    render.value = true;
-  });
-}
-
 onMounted(() => {
   timer.value = setTimeout(() => {}, waitTime);
 });
@@ -113,8 +103,18 @@ watch(search, (val) => {
 });
 
 watch(selectedItem, (val) => {
-  if (val && searchToggle.value) emit("locationSelected", val);
+  if (val && searchToggle.value) emit("locationSelected", val.location);
 });
 </script>
 
-<style scoped></style>
+<style>
+.locationField {
+  position: absolute;
+  top: 1.6rem;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 200002 !important;
+  max-width: 30rem;
+}
+</style>

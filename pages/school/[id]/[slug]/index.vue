@@ -302,19 +302,40 @@
           <v-col cols="6" class="text-center d-block d-md-none">
             <v-btn-toggle
               style="order: 2"
+              size="x-small"
               v-model="slideToggler"
-              rounded
+              rounded="xl"
+              color="white"
+              base-color="grey-lighten-3"
+              selected-class="bg-white"
               active-class="bg-white"
-              @change="changeSlide"
+              @update:modelValue="changeSlide"
+              class="school-head-toggle"
+              border
             >
-              <v-btn small class="text-transform-none gtext-t5" value="image">
-                Image
+              <v-btn
+                color="white"
+                size="x-small"
+                class="text-transform-none gtext-t5 text-white"
+                value="image"
+              >
+                <span class="text-black"> Image</span>
               </v-btn>
-              <v-btn small class="text-transform-none gtext-t5" value="map">
-                Map
+              <v-btn
+                color="white"
+                size="x-small"
+                class="text-transform-none gtext-t5 text-white"
+                value="map"
+              >
+                <span class="text-black"> Map</span>
               </v-btn>
-              <v-btn small class="text-transform-none gtext-t5" value="tour">
-                Tour
+              <v-btn
+                color="white"
+                size="x-small"
+                class="text-transform-none gtext-t5 text-white"
+                value="tour"
+              >
+                <span class="text-black"> Tour</span>
               </v-btn>
             </v-btn-toggle>
           </v-col>
@@ -335,7 +356,7 @@
           <v-col cols="11" md="8">
             <common-school-title :content="contentData" />
           </v-col>
-          <v-col cols="1" md="4">
+          <v-col cols="1" md="4" class="align-self-center">
             <div class="float-right d-flex align-center mt-1">
               <span class="mr-3">
                 <v-icon
@@ -352,7 +373,6 @@
               <div
                 class="d-none d-md-block rate-section gtext-t4 font-weight-semibold ml-4"
               >
-                <!-- {{ contentData.score ? contentData.score : "New" }} -->
                 {{
                   ratingData.averageRate
                     ? ratingData.averageRate.toFixed(1)
@@ -641,6 +661,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.school-head-toggle {
+  height: 28px !important;
+}
+
 .top-slide-container {
   position: fixed;
   margin-top: 5.4rem;
@@ -683,6 +707,13 @@ onMounted(() => {
   .upload-overlay .v-icon {
     font-size: 1.2rem !important;
   }
+  /* .top-slide-container {
+    margin-top: 2.4rem;
+  }
+
+  .data-container {
+    margin-top: 27rem;
+  } */
 }
 
 .data-container {
