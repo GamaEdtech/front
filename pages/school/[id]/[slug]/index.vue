@@ -2,29 +2,6 @@
   <v-container id="school-details">
     <v-row class="d-flex d-md-none">
       <div class="top-slide-container">
-        <img
-          v-if="contentData.pic"
-          class="schoolDetailsImg"
-          :class="topSlideClass.image"
-          @click="openGalleryDialog"
-          :src="contentData.pic"
-          alt="School image"
-        />
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          :class="topSlideClass.image"
-          @click="openGalleryDialog"
-        >
-          <div class="text-center">
-            <v-icon
-              :size="display.mdAndUp.value ? 48 : 24"
-              class="primary-gray-300 mb-2 mb-md-10"
-              >mdi-panorama-outline</v-icon
-            >
-            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
-          </div>
-        </div>
         <client-only>
           <school-detail-school-map
             :content="contentData"
