@@ -212,7 +212,7 @@
         <!-- General data section -->
         <v-row>
           <v-col cols="11" md="8">
-            <common-school-title :content="contentData" />
+            <school-detail-school-title :content="contentData" />
           </v-col>
           <v-col cols="1" md="4" class="align-self-center">
             <div class="float-right d-flex align-center mt-1">
@@ -241,77 +241,53 @@
             </div>
           </v-col>
         </v-row>
-
         <v-row>
           <v-col cols="12" md="8">
-            <SchoolChips :contentData="contentData" />
-            <TuitionInfo :contentData="contentData" />
-            <Facilities
+            <school-detail-school-chips :contentData="contentData" />
+            <school-detail-tuition-info :contentData="contentData" />
+            <school-detail-facilities
               :facilities="contentData.tags"
               @open-auth-dialog="openAuthDialog"
               @facilities-updated="refreshSchoolData"
             />
           </v-col>
           <v-col cols="12" md="4" id="main-info-section">
-            <common-school-main-info :content="contentData" />
+            <school-detail-school-main-info :content="contentData" />
           </v-col>
         </v-row>
 
         <!-- End general data section -->
 
-        <!-- Users score -->
-        <UsersScore
+        <school-detail-users-score
           :ratingData="ratingData"
           @leave-comment="showLeaveCommentDialog = true"
         />
-        <!-- End users score -->
-
-        <!-- Recent comments -->
-        <RecentComments :commentList="commentList" />
-        <!-- End recent comments -->
-
-        <!-- Similar schools -->
-        <SimilarSchools :similarSchools="similarSchools" />
-        <!-- End similar schools -->
+        <school-detail-recent-comments :commentList="commentList" />
+        <school-detail-similar-schools :similarSchools="similarSchools" />
       </v-col>
     </v-row>
     <!-- End data container -->
 
-    <!-- Leave comment dialog -->
-    <LeaveCommentDialog
+    <school-detail-leave-comment-dialog
       v-model="showLeaveCommentDialog"
       :contentData="contentData"
     />
-    <!-- End leave comment dialog -->
-
-    <gallery-dialog
+    <school-detail-gallery-dialog
       v-model="showGalleryDialog"
       :contentData="contentData"
       :images="galleryImages"
       @refresh-gallery="loadGalleryImages"
     />
-
-    <!-- Report School Issue Dialog -->
-    <ReportDialog
+    <school-detail-report-dialog
       v-model="reportDialog"
       :school-id="$route.params.id"
       @open-auth-dialog="openAuthDialog"
     />
-    <!-- End Report School Issue Dialog -->
   </v-container>
 </template>
 
 <script setup>
-import GalleryDialog from "@/components/school/GalleryDialog.vue";
-import ReportDialog from "@/components/school/ReportDialog.vue";
-import Facilities from "@/components/school/detail/Facilities.vue";
 import { useDisplay } from "vuetify/lib/composables/display";
-import LeaveCommentDialog from "@/components/common/LeaveCommentDialog.vue";
-import UsersScore from "@/components/common/UsersScore.vue";
-import RecentComments from "@/components/common/RecentComments.vue";
-import SimilarSchools from "@/components/common/SimilarSchools.vue";
-import TuitionInfo from "@/components/common/TuitionInfo.vue";
-import SchoolChips from "@/components/common/SchoolChips.vue";
 
 const nuxtApp = useNuxtApp();
 const route = useRoute();
