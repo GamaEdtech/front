@@ -31,76 +31,10 @@
             :class="topSlideClass.map"
           ></school-detail-school-map>
         </client-only>
-        <div
-          class="position-relative under-image-right"
-          v-if="contentData.tour && !tourImgPreview"
-        >
-          <img
-            @click="openTourImgInput"
-            class="pointer schoolDetailsImg"
-            :src="contentData.tour"
-            alt="School image Preview"
-          />
-
-          <div class="upload-overlay">
-            <v-btn
-              @click="openTourImgInput"
-              class=""
-              icon
-              color="white"
-              variant="text"
-            >
-              <v-icon size="large"> mdi-pencil </v-icon>
-            </v-btn>
-          </div>
-        </div>
-        <div
-          v-else-if="tourImgPreview"
-          class="position-relative"
+        <school-detail-school-tour
           :class="topSlideClass.tour"
-        >
-          <img
-            class="pointer schoolDetailsImg"
-            :src="tourImgPreview"
-            alt="School image Preview"
-          />
-          <div class="upload-overlay">
-            <v-btn
-              color="primary"
-              small
-              fab
-              @click="uploadTourImage"
-              :loading="loading.uploadTour"
-              class="text-transform-none gtext-t6 font-weight-medium"
-            >
-              <v-icon small>mdi-cloud-upload</v-icon>
-            </v-btn>
-            <v-btn
-              color="error"
-              small
-              fab
-              @click="clearTourImage"
-              class="text-transform-none gtext-t6 font-weight-medium ml-sm-1"
-            >
-              <v-icon small>mdi-delete</v-icon>
-            </v-btn>
-          </div>
-        </div>
-        <div
-          v-else
-          class="enter-img-holder pointer"
-          :class="topSlideClass.tour"
-          @click="openTourImgInput"
-        >
-          <div class="text-center">
-            <v-icon
-              :size="display.mdAndUp.value ? 48 : 24"
-              class="primary-gray-300 mb-2 mb-md-10"
-              >mdi-rotate-360</v-icon
-            >
-            <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
-          </div>
-        </div>
+          :content="contentData"
+        ></school-detail-school-tour>
         <div
           v-if="galleryImages && galleryImages.length > 0"
           :class="topSlideClass.image"
@@ -204,86 +138,10 @@
         ></school-detail-school-map>
       </v-col>
       <v-col cols="12" md="4">
-        <template v-if="contentData.tour && !tourImgPreview">
-          <div class="position-relative">
-            <img
-              class="pointer schoolDetailsImg"
-              :src="contentData.tour"
-              alt="School image Preview"
-            />
-            <div class="upload-overlay px-3">
-              <div class="px-3 d-flex justify-center align-center">
-                <v-btn
-                  @click="openTourImgInput"
-                  class=""
-                  icon
-                  color="white"
-                  variant="text"
-                >
-                  <v-icon size="large"> mdi-pencil </v-icon>
-                </v-btn>
-              </div>
-            </div>
-          </div>
-        </template>
-        <template v-else>
-          <template v-if="tourImgPreview">
-            <div class="position-relative">
-              <img
-                class="pointer schoolDetailsImg"
-                :src="tourImgPreview"
-                alt="School image Preview"
-              />
-              <div class="upload-overlay px-3">
-                <div class="px-3 d-flex justify-center align-center">
-                  <v-btn
-                    small
-                    fab
-                    color="primary"
-                    @click="uploadTourImage"
-                    :loading="loading.uploadTour"
-                    class="text-transform-none gtext-t4 font-weight-medium mr-3"
-                  >
-                    <v-icon small>mdi-cloud-upload</v-icon>
-                    <!-- Upload Tour Image -->
-                  </v-btn>
-                  <v-btn
-                    small
-                    fab
-                    color="error"
-                    @click="clearTourImage"
-                    class="text-transform-none gtext-t4 font-weight-medium"
-                  >
-                    <v-icon small>mdi-delete</v-icon>
-                    <!-- Delete -->
-                  </v-btn>
-                </div>
-              </div>
-            </div>
-          </template>
-          <template v-else>
-            <div class="enter-img-holder pointer" @click="openTourImgInput">
-              <div class="text-center">
-                <v-icon size="48" class="primary-gray-300 mb-10"
-                  >mdi-rotate-360</v-icon
-                >
-                <div class="gtext-t4 primary-blue-500">Contribute</div>
-                <div class="mt-2 gtext-t6 primary-gray-400">
-                  Accepted formats: JPG, PNG, WebP
-                </div>
-              </div>
-            </div>
-          </template>
-        </template>
-
-        <v-file-input
-          class="d-none"
-          v-model="tourImg"
-          ref="tourImgRef"
-          accept="image/jpeg, image/png, image/jpg, image/webp"
-          hide-details
-          @change="validateAndProcessImage"
-        ></v-file-input>
+        <school-detail-school-tour
+          :content="contentData"
+          @fetch="loadTourPanorama"
+        ></school-detail-school-tour>
       </v-col>
     </v-row>
 
@@ -459,7 +317,6 @@ const nuxtApp = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const display = useDisplay();
-const tourImgPreview = ref(null);
 const galleryImages = ref([]);
 const activeGalleryIndex = ref(0);
 const tourPanoramas = ref([]);
@@ -471,8 +328,6 @@ const topSlideClass = reactive({
 });
 const showLeaveCommentDialog = ref(false);
 const showGalleryDialog = ref(false);
-const tourImg = ref(null);
-const loading = reactive({ uploadTour: false });
 const commentList = ref([]);
 const reportDialog = ref(false);
 const contentData = ref({});
@@ -507,14 +362,6 @@ function updateMainGalleryImage(index) {
     contentData.value.pic = galleryImages.value[index];
   }
 }
-function refreshTourContent() {
-  const currentTour = contentData.value.tour;
-  contentData.value.tour = null;
-  nextTick(() => {
-    contentData.value.tour = currentTour;
-  });
-}
-
 function changeSlide() {
   if (slideToggler.value == "map") {
     topSlideClass.image = "under-image-left";
@@ -529,88 +376,6 @@ function changeSlide() {
     topSlideClass.map = "under-image-left";
     topSlideClass.tour = "center-image";
   }
-}
-
-const tourImgRef = ref(null);
-
-function openTourImgInput() {
-  if (tourImgRef.value) {
-    tourImgRef.value.click();
-  }
-}
-function validateAndProcessImage(file) {
-  if (!file) return;
-  const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-  if (!validTypes.includes(file.type)) {
-    nuxtApp.$toast?.error(
-      "Invalid file type. Please use JPG, PNG or WebP images."
-    );
-    tourImg.value = null;
-    return;
-  }
-  const maxSize = 5 * 1024 * 1024;
-  if (file.size > maxSize) {
-    nuxtApp.$toast?.error("File too large. Maximum size is 5MB.");
-    tourImg.value = null;
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    tourImgPreview.value = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-function uploadTourImage() {
-  if (!tourImg.value) {
-    nuxtApp.$toast?.error("Please select an image to upload");
-    return;
-  }
-  const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-  if (!validTypes.includes(tourImg.value.type)) {
-    nuxtApp.$toast?.error(
-      "Invalid file type. Please use JPG, PNG or WebP images."
-    );
-    return;
-  }
-  loading.uploadTour = true;
-  let formData = new FormData();
-  formData.append("File", tourImg.value);
-  formData.append("FileType", "Tour360");
-  $fetch(`/api/v2/schools/${route.params.id}/images/Tour360`, {
-    method: "POST",
-    body: formData,
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-    },
-  })
-    .then(() => {
-      nuxtApp.$toast?.success(
-        "Your 360° tour image has been successfully uploaded"
-      );
-      // Reload tour panorama
-      tourImg.value = null;
-      tourImgPreview.value = null;
-      setTimeout(() => {
-        refreshTourContent();
-        // Optionally change slide
-      }, 500);
-    })
-    .catch((err) => {
-      if (err?.response?.status == 401 || err?.response?.status == 403) {
-        openAuthDialog("login");
-      } else {
-        nuxtApp.$toast?.error(err?.response?.data?.message || "Upload failed");
-      }
-    })
-    .finally(() => {
-      loading.uploadTour = false;
-    });
-}
-function clearTourImage() {
-  tourImg.value = null;
-  tourImgPreview.value = null;
-  nuxtApp.$toast?.info("Image removed");
 }
 function openAuthDialog(val) {
   router.push({ query: { auth_form: val } });
@@ -680,40 +445,14 @@ onMounted(() => {
   position: relative;
 }
 
-.upload-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 0.6rem;
-  padding: 1rem;
-}
-
 @media (max-width: 600px) {
-  .upload-overlay {
-    flex-direction: column;
-  }
-
-  .upload-overlay .v-btn {
-    margin: 0.25rem 0;
-    flex-shrink: 0;
-  }
-
-  .upload-overlay .v-icon {
-    font-size: 1.2rem !important;
-  }
-  /* .top-slide-container {
+  .top-slide-container {
     margin-top: 2.4rem;
   }
 
   .data-container {
-    margin-top: 27rem;
-  } */
+    margin-top: 27rem !important;
+  }
 }
 
 .data-container {

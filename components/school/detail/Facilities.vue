@@ -112,8 +112,6 @@ const displayFacilities = computed(() =>
 async function getTags() {
   try {
     const res = await $fetch("/api/v2/tags/School");
-    console.log("res", res.data);
-
     tags.value = res.data.map((tag) => {
       const isSelected =
         props.facilities &&
@@ -126,9 +124,7 @@ async function getTags() {
     selectedTags.value = tags.value
       .filter((tag) => tag.selected)
       .map((tag) => tag.id);
-  } catch (err) {
-    // Optionally handle error
-  }
+  } catch (err) {}
 }
 
 function toggleTag(tag) {
@@ -143,7 +139,7 @@ function toggleTag(tag) {
 async function saveFacilities() {
   loader.value = true;
   try {
-    const response = await nuxtApp.$fetch(
+    const response = await $fetch(
       `/api/v2/schools/${route.params.id}/contributions`,
       {
         method: "POST",
@@ -169,7 +165,6 @@ async function saveFacilities() {
       err.response &&
       (err.response.status === 401 || err.response.status === 403)
     ) {
-      emit("open-auth-dialog", "login");
       nuxtApp.$toast?.error("Please login to update facilities");
     } else {
       nuxtApp.$toast?.error("Failed to update facilities");

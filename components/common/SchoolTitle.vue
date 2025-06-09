@@ -14,26 +14,28 @@
       >
         <v-icon size="large"> mdi-pencil </v-icon>
       </v-btn>
-      <v-text-field
-        v-model="form.name"
-        v-if="generalDataEditMode.name"
-        placeholder="Name"
-        :rules="[(v) => !!v || 'Name is required']"
-        variant="underlined"
-      >
-        <template #append-inner>
-          <v-btn
-            :loading="nameSubmitLoader"
-            color="success"
-            @click="handleUpdate"
-            variant="flat"
-            size="x-small"
-            icon
-          >
-            <v-icon size="large"> mdi-check </v-icon>
-          </v-btn>
-        </template>
-      </v-text-field>
+      <div class="w-70 w-md-100">
+        <v-text-field
+          v-model="form.name"
+          v-if="generalDataEditMode.name"
+          placeholder="Name"
+          :rules="[(v) => !!v || 'Name is required']"
+          variant="underlined"
+        >
+          <template #append-inner>
+            <v-btn
+              :loading="nameSubmitLoader"
+              color="success"
+              @click="handleUpdate"
+              variant="flat"
+              size="x-small"
+              icon
+            >
+              <v-icon size="large"> mdi-check </v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
+      </div>
     </div>
     <span v-show="contentData.school_type_title">
       ,
