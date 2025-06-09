@@ -294,15 +294,15 @@ async function sendToAI() {
       .replace(/```$/, "");
     const parsedResponse = JSON.parse(cleanedResponse);
     const ratings = parsedResponse.ratings;
-    commentForm.value.comment = parsedResponse.description;
-    commentForm.value.classesQualityRate = ratings.classrooms_quality;
-    commentForm.value.educationRate = ratings.teachers_proficiency;
-    commentForm.value.itTrainingRate = ratings.technology_access;
-    commentForm.value.safetyAndHappinessRate = ratings.school_safety;
-    commentForm.value.behaviorRate = ratings.officials_behavior;
-    commentForm.value.tuitionRatioRate = ratings.affordability;
-    commentForm.value.facilitiesRate = ratings.sports_facilities;
-    commentForm.value.artisticActivitiesRate = ratings.art_counseling;
+    commentForm.comment = parsedResponse.description;
+    commentForm.classesQualityRate = ratings.classrooms_quality;
+    commentForm.educationRate = ratings.teachers_proficiency;
+    commentForm.itTrainingRate = ratings.technology_access;
+    commentForm.safetyAndHappinessRate = ratings.school_safety;
+    commentForm.behaviorRate = ratings.officials_behavior;
+    commentForm.tuitionRatioRate = ratings.affordability;
+    commentForm.facilitiesRate = ratings.sports_facilities;
+    commentForm.artisticActivitiesRate = ratings.art_counseling;
   } catch {
     nuxtApp.$toast?.error("Error: Failed to get AI response.");
   } finally {
@@ -317,7 +317,7 @@ async function submitComment() {
       `/api/v2/schools/${route.params.id}/comments`,
       {
         method: "POST",
-        body: { ...commentForm.value },
+        body: { ...commentForm },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
         },
