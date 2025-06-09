@@ -348,15 +348,6 @@ async function submitComment() {
     width: 15rem;
     margin-right: 1rem;
   }
-
-  .bullet {
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 0.4rem;
-    background: #ffb600;
-    margin-top: 1.2rem;
-    margin-right: 0.8rem;
-  }
 }
 
 .score-title {
