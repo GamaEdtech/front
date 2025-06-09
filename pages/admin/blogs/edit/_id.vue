@@ -473,6 +473,12 @@ export default {
           this.slug =
             response.data.slug ||
             this.$slugGenerator.convert(this.blog.title || "");
+          this.keywords = response.data.keywords
+            ? response.data.keywords
+                .split(",")
+                .map((k) => k.trim())
+                .filter(Boolean)
+            : [];
           await this.$nextTick();
           if (this.$refs.contentProvider) {
             this.$refs.contentProvider.validate();
@@ -635,6 +641,11 @@ export default {
       formData.append("Slug", this.slug);
       formData.append("Body", this.blog.content);
       formData.append("Summary", this.blog.summary);
+
+      if (this.keywords.length >= 1) {
+        formData.append("Keywords", this.keywords.join(","));
+      }
+
       let publishDate;
       if (this.blog.publishTime === "Immediately") {
         publishDate = new Date().toISOString();
@@ -649,7 +660,9 @@ export default {
       formData.append("VisibilityType", this.blog.visibility);
       this.blog.categories.forEach((id) => formData.append("Tags[]", id));
 
-      formData.append("Image", this.blog.image ? this.blog.image : "");
+      if (this.blog.image) {
+        formData.append("Image", this.blog.image);
+      }
 
       try {
         const response = await this.$axios.$put(
