@@ -285,7 +285,7 @@ async function sendToAI() {
   }
   helpLoading.value = true;
   try {
-    const apiResponse = await nuxtApp.$fetch("/api/chatgpt", {
+    const apiResponse = await $fetch("/api/chatgpt", {
       method: "POST",
       body: { userComment },
     });
@@ -313,7 +313,7 @@ async function sendToAI() {
 async function submitComment() {
   submitLoading.value = true;
   try {
-    const response = await nuxtApp.$fetch(
+    const response = await $fetch(
       `/api/v2/schools/${route.params.id}/comments`,
       {
         method: "POST",
