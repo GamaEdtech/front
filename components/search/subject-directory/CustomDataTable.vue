@@ -17,7 +17,9 @@
     <!-- Column Classification -->
     <template v-slot:[`item.name`]="{ item }">
       <span class="font-weight-normal text--primary-gray-600">{{
-        item.test_type_title
+        item.variant
+          ? item.test_type_title + item.variant
+          : item.test_type_title
       }}</span>
     </template>
 
@@ -171,7 +173,11 @@
           <div class="mobile-card">
             <div class="paper-info">
               <!-- Display paper info directly -->
-              <span class="paper-info-part">{{ item.test_type_title }}</span>
+              <span class="paper-info-part">{{
+                item.variant
+                  ? item.test_type_title + item.variant
+                  : item.test_type_title
+              }}</span>
             </div>
             <div class="paper-info">
               <span class="paper-info-part">{{ item.edu_year }}</span>
