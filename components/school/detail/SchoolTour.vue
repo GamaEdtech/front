@@ -55,11 +55,12 @@
       @click="openTourImgInput"
     >
       <div class="text-center">
-        <v-icon
-          :size="display.mdAndUp.value ? 48 : 24"
-          class="primary-gray-300 mb-2 mb-md-10"
-          >mdi-rotate-360</v-icon
-        >
+        <client-only>
+          <v-icon :size="iconSize" class="primary-gray-300 mb-2 mb-md-10"
+            >mdi-rotate-360</v-icon
+          >
+        </client-only>
+
         <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
       </div>
     </div>
@@ -148,6 +149,7 @@
 
 <script setup>
 import { useDisplay } from "vuetify/lib/composables/display";
+import { computed, ref, watch, nextTick } from "vue";
 
 const props = defineProps({
   content: {},
@@ -165,6 +167,9 @@ const contentData = ref(props.content);
 const tourImgPreview = ref(null);
 const tourImg = ref(null);
 const tourImgRef = ref(null);
+
+// Use a computed property for icon size to avoid hydration mismatch
+const iconSize = computed(() => (display.mdAndUp.value ? 48 : 24));
 
 function validateAndProcessImage(file) {
   if (!file) return;

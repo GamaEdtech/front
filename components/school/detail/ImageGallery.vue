@@ -43,11 +43,13 @@
       @click="openGalleryDialog"
     >
       <div class="text-center">
-        <v-icon
-          :size="display.mdAndUp.value ? 48 : 24"
-          class="primary-gray-300 mb-2 mb-md-10"
-          >mdi-panorama-outline</v-icon
-        >
+        <client-only>
+          <v-icon
+            :size="display.mdAndUp.value ? 48 : 24"
+            class="primary-gray-300 mb-2 mb-md-10"
+            >mdi-panorama-outline</v-icon
+          >
+        </client-only>
         <div class="gtext-t6 gtext-md-t4 primary-blue-500">Contribute</div>
       </div>
     </div>
@@ -85,9 +87,11 @@
     </template>
     <div v-else class="enter-img-holder pointer" @click="openGalleryDialog">
       <div class="text-center">
-        <v-icon size="48" class="primary-gray-300 mb-10"
-          >mdi-panorama-outline</v-icon
-        >
+        <client-only>
+          <v-icon size="48" class="primary-gray-300 mb-10"
+            >mdi-panorama-outline</v-icon
+          >
+        </client-only>
         <p class="gtext-t4 primary-blue-500">Contribute</p>
         <div class="mt-2 gtext-t6 primary-gray-400">
           Accepted formats: JPG, PNG, WebP

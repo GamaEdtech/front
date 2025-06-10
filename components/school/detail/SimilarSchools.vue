@@ -5,7 +5,7 @@
     </v-col>
     <v-col cols="12">
       <v-slide-group class="slider py-sm-4" :show-arrows="true">
-        <v-slide-item v-for="(item, idx) in similarSchools" :key="idx">
+        <v-slide-group-item v-for="(item, idx) in similarSchools" :key="idx">
           <v-card rounded class="list-item" :to="`/school/${item.id}`">
             <v-card-text>
               <div class="item-info">
@@ -47,7 +47,7 @@
               </div>
             </v-card-text>
           </v-card>
-        </v-slide-item>
+        </v-slide-group-item>
       </v-slide-group>
     </v-col>
   </v-row>

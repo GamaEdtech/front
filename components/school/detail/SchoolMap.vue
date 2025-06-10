@@ -29,7 +29,6 @@
     :map="map"
     :mapSubmitLoader="mapSubmitLoader"
     @update="handleSelectLocationUpdate"
-    @locationSelected="goToSearchLocation"
   />
 </template>
 
