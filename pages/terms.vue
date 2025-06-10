@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main">
     <v-container fluid id="terms-page-header">
       <v-container>
         <v-row>
@@ -16,50 +16,43 @@
     <v-container id="terms-data-container">
       <v-row>
         <v-col cols="12">
-          <v-text-field
-            he
-            class="rounded-ts pr-0"
-            dense
-            outlined
-            hide-details
-            v-model="searchQuery"
-            label="Search"
-          >
-            <template slot="append-outer">
-              <v-btn dense color="#FFB300" class="white--text">
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
-            </template>
-          </v-text-field>
+          <div class="d-flex justify-center">
+            <div class="w-100 w-sm-auto d-flex gap-4 justify-center align-center">
+              <v-text-field v-model="searchQuery" rounded="s-pill" variant="outlined" color="#ffb600" icon-color=""
+                label="Search">
+              </v-text-field>
+              <div class="pt-4 h-100">
+                <v-btn height="100%" dense color="#FFB300" class="white--text search">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
         </v-col>
       </v-row>
 
       <v-row id="list-rows">
         <v-col cols="12" md="3">
-          <v-card flat id="terms-navigation" class="mx-auto">
-            <v-navigation-drawer absolute width="100%" permanent>
-              <v-list>
-                <v-list-item
-                  active-class="active-title"
-                  v-for="(item, index) in termsSection"
-                  :key="index"
-                  :to="`#${item.id}`"
-                >
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-navigation-drawer>
+          <v-card id="terms-navigation" class="mx-auto">
+            <v-list height="100%">
+              <v-list-item active-class="active-title" :active="isItemActive(item)"
+                v-for="(item, index) in filteredItems" :value="item" :key="index" @click="scrollToSection(item.id)"
+                style="cursor: pointer;">
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
           </v-card>
         </v-col>
         <v-col cols="12" md="9">
           <v-card flat class="mx-auto">
             <v-card-text>
-              <div v-for="(item, index) in termsSection" :key="index">
-                <div :id="item.id" class="py-8"></div>
+              <div v-for="(item, index) in filteredItems" :key="index">
+                <div :id="item.id" class="section-anchor"></div>
                 <h2 class="gama-text-h4">
                   {{ item.title }}
                 </h2>
                 <div v-html="item.describe"></div>
+                <div class="section-spacer"></div>
               </div>
             </v-card-text>
           </v-card>
@@ -112,7 +105,12 @@ export default {
   data() {
     return {
       searchQuery: "",
-      activeBookmark: null,
+      activeSection: null,
+      currentHash: '',
+      isClient: false,
+      observer: null,
+      isScrolling: false,
+      scrollTimeout: null,
       termsSection: [
         {
           id: "introduction",
@@ -238,49 +236,122 @@ export default {
       ],
     };
   },
-  mounted() {
-    this.observeDiv("introduction");
-    this.observeDiv("registration");
-    this.observeDiv("content-guidelines");
-  },
-  methods: {
-    observeDiv(targetId) {
-      const targetDiv = document.getElementById(targetId);
 
+  mounted() {
+    this.isClient = true;
+
+    // Set initial active section
+    this.activeSection = this.termsSection[0].id;
+
+    // Initialize intersection observer
+    this.initializeObserver();
+
+    // Handle initial hash if present
+    if (this.$route.hash) {
+      const targetId = this.$route.hash.replace('#', '');
+      if (this.termsSection.find(item => item.id === targetId)) {
+        this.activeSection = targetId;
+        this.$nextTick(() => {
+          this.scrollToSection(targetId, false);
+        });
+      }
+    }
+  },
+
+  beforeDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
+  },
+
+  methods: {
+    initializeObserver() {
       const options = {
-        root: null, // Use the viewport as the root
-        rootMargin: "0px", // Adjusted root margin
-        threshold: 0, // Fully in viewport
+        root: null,
+        rootMargin: '-20% 0px -70% 0px', // Only trigger when section is in the top 30% of viewport
+        threshold: 0
       };
 
-      const observer = new IntersectionObserver(
-        (entries) => this.handleIntersection(entries, targetId),
-        options
-      );
-      observer.observe(targetDiv);
-    },
-    handleIntersection(entries, targetId) {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          // The target div is fully in the viewport
-          this.$router.push({ hash: targetId });
+      this.observer = new IntersectionObserver((entries) => {
+        if (this.isScrolling) return; // Don't update during programmatic scrolling
 
-          // Stop observing the target div after alert
-          this.stopObserving(targetId);
+        // Find the section that's most visible
+        let mostVisibleEntry = null;
+        let maxRatio = 0;
+
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            mostVisibleEntry = entry;
+          }
+        });
+
+        if (mostVisibleEntry) {
+          const sectionId = mostVisibleEntry.target.id;
+          if (sectionId && sectionId !== this.activeSection) {
+            this.activeSection = sectionId;
+            this.updateHash(sectionId);
+          }
         }
+      }, options);
+
+      // Observe all sections
+      this.$nextTick(() => {
+        this.termsSection.forEach(section => {
+          const element = document.getElementById(section.id);
+          if (element) {
+            this.observer.observe(element);
+          }
+        });
+      });
+    },
+
+    updateHash(sectionId) {
+      // Update route hash without causing scroll
+      if (this.$route.hash !== `#${sectionId}`) {
+        this.$router.replace({
+          path: this.$route.path,
+          hash: `#${sectionId}`,
+        });
       }
     },
-    stopObserving(targetId) {
-      const targetDiv = document.getElementById(targetId);
-      if (targetDiv) {
-        const observer = this.observers[targetId];
-        if (observer) {
-          observer.unobserve(targetDiv);
-        }
+
+    scrollToSection(sectionId, smooth = true) {
+      this.isScrolling = true;
+      this.activeSection = sectionId;
+
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const headerOffset = 100; // Adjust based on your fixed header height
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: smooth ? 'smooth' : 'auto'
+        });
+
+        this.updateHash(sectionId);
       }
+
+      // Reset scrolling flag after animation
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout);
+      }
+      this.scrollTimeout = setTimeout(() => {
+        this.isScrolling = false;
+      }, smooth ? 1000 : 100);
     },
+
+    isItemActive(item) {
+      if (!this.isClient) return false;
+      return this.activeSection === item.id;
+    }
   },
-  watch: {},
+
   computed: {
     filteredItems() {
       if (!this.searchQuery) {
@@ -288,14 +359,38 @@ export default {
       }
       const query = this.searchQuery.toLowerCase();
       return this.termsSection.filter((item) =>
-        item.title.toLowerCase().includes(query)
+        item.title.toLowerCase().includes(query) ||
+        item.describe.toLowerCase().includes(query)
       );
-    },
+    }
   },
+
+  watch: {
+    '$route.hash': {
+      handler(newHash) {
+        if (this.isClient && !this.isScrolling) {
+          const targetId = newHash.replace('#', '');
+          if (targetId && this.termsSection.find(item => item.id === targetId)) {
+            this.activeSection = targetId;
+          }
+        }
+      },
+      immediate: false
+    }
+  }
 };
 </script>
 
-<style>
+<style scoped>
+.section-anchor {
+  padding-top: 8rem;
+  margin-top: -8rem;
+}
+
+.section-spacer {
+  height: 4rem;
+}
+
 #terms-page-header {
   height: 20rem;
   background: #24292f;
@@ -320,6 +415,45 @@ export default {
   }
 }
 
+.main {
+  :deep(.v-list-item-title) {
+    font-size: 2.5rem;
+    font-weight: 500 !important;
+  }
+
+  :deep(.v-list-item-title) {
+    padding: 2rem 2rem;
+  }
+
+  :deep(.v-list-item) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  :deep(.v-list-item):hover {
+    background-color: #bdbdbd86;
+  }
+
+  :deep(.v-list),
+  :deep(.v-list-item__overlay) {
+    background-color: #f4f4f4 !important;
+  }
+
+  :deep(.search) {
+    border-radius: 7px 50px 50px 7px;
+    margin-left: 1rem;
+    font-size: larger;
+  }
+
+  :deep(.v-label) {
+    font-size: medium !important;
+  }
+}
+
+.active-title:hover {
+  background-color: transparent !important;
+}
+
 #terms-data-container {
   margin-bottom: 1.5rem;
 
@@ -328,10 +462,9 @@ export default {
     min-height: auto;
     height: 4rem !important;
     border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
-
     margin: 1.6rem auto 1.6rem auto;
 
-    .v-input__control > .v-input__slot {
+    .v-input__control>.v-input__slot {
       min-height: auto;
       height: 4rem !important;
 
@@ -384,16 +517,16 @@ export default {
             line-height: normal;
           }
         }
+      }
 
-        .active-title::before {
-          content: "";
-          display: block;
-          width: 0.4rem;
-          height: 100%;
-          border-radius: 0.4rem;
-          background: #ffb600;
-          opacity: 1;
-        }
+      .active-title::before {
+        content: "";
+        display: block;
+        width: 0.4rem;
+        height: 100%;
+        border-radius: 0.4rem;
+        background: #ffb600;
+        opacity: 1;
       }
     }
   }
@@ -419,11 +552,9 @@ export default {
       width: 42.8rem;
       min-height: auto;
       height: 4rem !important;
-      border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
-
       margin: 1.6rem auto 1.6rem auto;
 
-      .v-input__control > .v-input__slot {
+      .v-input__control>.v-input__slot {
         min-height: auto;
         height: 4rem !important;
 
@@ -483,21 +614,6 @@ export default {
             background: #ffb600;
             opacity: 1;
           }
-
-          /* .v-list-item::after {
-            position: absolute;
-            bottom: 0;
-            content: "";
-            display: block;
-            width: 80%;
-            height: 0.1rem;
-            left: 0;
-            right: 0;
-            margin: auto;
-            border-radius: 0.4rem;
-            background: #fff;
-            opacity: 1;
-          } */
         }
       }
     }
@@ -537,10 +653,9 @@ export default {
       min-height: auto;
       height: 4rem !important;
       border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
-
       margin: 1.6rem auto 1.6rem auto;
 
-      .v-input__control > .v-input__slot {
+      .v-input__control>.v-input__slot {
         min-height: auto;
         height: 4rem !important;
 
@@ -580,8 +695,6 @@ export default {
         height: 64.2rem;
 
         .v-navigation-drawer {
-          /* background: rgba(36, 41, 47, 0.05); */
-
           .v-list-item {
             padding: 2.4rem;
 
