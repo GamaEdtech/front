@@ -390,6 +390,24 @@
                         }}
                       </v-btn>
                     </div>
+                    <div
+                      v-if="
+                        contentData.files.extra &&
+                        contentData.files.extra.length > 0
+                      "
+                    >
+                      <v-btn
+                        v-for="(extra, index) in contentData.files.extra"
+                        :key="index"
+                        @click="startDownload('extra', extra.id)"
+                        block
+                        color="blue"
+                        class="mb-2"
+                      >
+                        {{ extra.type_title ? extra.type_title : "Extra" }}
+                        {{ extra.price > 0 ? "| $" + extra.price : "" }}
+                      </v-btn>
+                    </div>
                     <v-btn
                       v-if="
                         contentData.exams && contentData.exams[0].status != 7
@@ -491,6 +509,23 @@
                     ? "| $" + contentData.files.word.price
                     : ""
                 }}
+              </v-btn>
+            </div>
+            <div
+              v-if="
+                contentData.files.extra && contentData.files.extra.length > 0
+              "
+            >
+              <v-btn
+                v-for="(extra, index) in contentData.files.extra"
+                :key="index"
+                @click="startDownload('extra', extra.id)"
+                block
+                color="blue"
+                class="mb-2"
+              >
+                {{ extra.type_title ? extra.type_title : "Extra" }}
+                {{ extra.price > 0 ? "| $" + extra.price : "" }}
               </v-btn>
             </div>
           </v-col>
@@ -768,6 +803,7 @@ export default {
   },
   mounted() {
     this.grabRandomTestCode();
+
     //Init gallery image
     if (this.contentData) {
       if (this.contentData.thumb_pic)
@@ -1068,7 +1104,7 @@ export default {
     },
     //Download file
 
-    startDownload(type) {
+    startDownload(type, extraId) {
       //if (this.$auth.loggedIn) {
       this.download_loading = true;
       let apiUrl = "";
@@ -1078,6 +1114,8 @@ export default {
         apiUrl = `/api/v1/tests/download/${this.$route.params.id}/pdf`;
       if (type === "a_file")
         apiUrl = `/api/v1/tests/download/${this.$route.params.id}/answer`;
+      if (type === "extra")
+        apiUrl = `/api/v1/tests/download/${this.$route.params.id}/extra/${extraId}`;
       this.$axios
         .$get(apiUrl, {
           headers: {
