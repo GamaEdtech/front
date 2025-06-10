@@ -202,7 +202,7 @@ const galleryDialog = ref(false);
 const router = useRouter();
 const route = useRoute();
 const display = useDisplay();
-const { $toast, $fetch } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 function handleSelectedImage(row, index) {
   mainImage.value = row.fileUri;
@@ -236,32 +236,44 @@ async function uploadImage() {
       const formData = new FormData();
       formData.append("File", file);
       formData.append("FileType", "SimpleImage");
-      return useFetch(`/api/v2/schools/${route.params.id}/images`, {
+      return $fetch(`/api/v2/schools/${route.params.id}/images`, {
         method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
         },
-      });
+      })
+        .then((response) => {
+          return response;
+        })
+        .catch((error) => {
+          $toast.error("Error uploading file: Unauthorized", {
+            containerClass: "toast-dialog-notif",
+          });
+          throw error;
+        });
     });
-    const responses = await Promise.all(uploadPromises);
-    const newImageUrls = responses
-      .filter((response) => response && response.url)
-      .map((response) => response.url);
-    if (newImageUrls.length > 0) {
-      const updatedImages = [...newImageUrls, ...props.images];
-      emit("update:images", updatedImages);
-    }
-    $toast.success(
-      `Your images have been submitted but need to be reviewed by the community before being shown`,
-      { containerClass: "toast-dialog-notif" }
-    );
-    pendingUpload.value = null;
-    pendingUploads.value = [];
-    pendingPreviews.value = [];
-    currentCropIndex.value = 0;
-    dialogVisible.value = false;
-    emit("refresh-gallery");
+
+    try {
+      const responses = await Promise.all(uploadPromises);
+      const newImageUrls = responses
+        .filter((response) => response && response.url)
+        .map((response) => response.url);
+      if (newImageUrls.length > 0) {
+        const updatedImages = [...newImageUrls, ...props.images];
+        emit("update:images", updatedImages);
+      }
+      $toast.success(
+        `Your images have been submitted but need to be reviewed by the community before being shown`,
+        { containerClass: "toast-dialog-notif" }
+      );
+      pendingUpload.value = null;
+      pendingUploads.value = [];
+      pendingPreviews.value = [];
+      currentCropIndex.value = 0;
+      dialogVisible.value = false;
+      emit("refresh-gallery");
+    } catch (error) {}
   } catch (err) {
     if (err.response?.status == 401 || err.response?.status == 403) {
       openAuthDialog("login");
