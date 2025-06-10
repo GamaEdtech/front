@@ -127,6 +127,22 @@
         :isLoading="isLoadingResources"
       />
     </v-row>
+
+    <v-row
+      class="container-table-time-line d-flex flex-row justify-space-between justify-lg-space-between"
+    >
+      <v-col cols="10">
+        <paperTable
+          :desktopHeader="headerPapersTableDesktop"
+          :mobileHeaders="headerPapersTableMobile"
+          :isLoadingPapers="isLoadingPapers"
+          :isLoadingInfiniteScroll="isLoadingInfiniteScroll"
+          :isAllDataLoaded="isAllPapersLoaded"
+          :data="papers"
+          @loadNextPageData="fetchNextPagePapers"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -136,6 +152,7 @@ import { useDisplay } from "vuetify";
 
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import resources from "~/components/subject-directory/resources.vue";
+import paperTable from "~/components/subject-directory/paper-table.vue";
 
 const { sm, xs } = useDisplay();
 
@@ -183,7 +200,7 @@ const isLoadingSubjects = ref(true);
 // End Subject Section
 
 // Start Section Resources
-const isLoadingResources = ref(true);
+const isLoadingResources = ref(false);
 
 const titleLesson = ref("");
 const resourcesData = ref([]);
@@ -193,12 +210,76 @@ const topicalData = ref({
   items: [],
 });
 const imageLesson = ref(null);
+// End Section Resources
+
+// Start Section Papers
+const isLoadingPapers = ref(false);
+const isLoadingInfiniteScroll = ref(false);
+const isAllPapersLoaded = ref(false);
+const pageNumber = ref(1);
+const perPage = 20;
+const papers = ref([]);
+const headerPapersTableDesktop = [
+  {
+    title: "Classification",
+    align: "start",
+    value: "name",
+    icon: "mdi-format-list-bulleted",
+  },
+  {
+    title: "Year",
+    align: "center",
+    value: "year",
+    icon: "mdi-format-list-bulleted",
+  },
+  {
+    title: "Term",
+    align: "center",
+    value: "term",
+    icon: "mdi-format-list-bulleted",
+  },
+  {
+    title: "Download Files",
+    align: "center",
+    value: "downloadFilesContains",
+  },
+  {
+    title: "ExamHub",
+    align: "center",
+    value: "examHubIcon",
+  },
+];
+const headerPapersTableMobile = [
+  { title: "Classification", value: "classification" },
+  { title: "Year", value: "year" },
+  { title: "Term", value: "term" },
+];
+const subjectId = "4190";
+const fetchNextPagePapers = async () => {
+  try {
+    isLoadingInfiniteScroll.value = true;
+    pageNumber.value += 1;
+    let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=${pageNumber.value}&perpage=20&is_paper=true&directory=true`;
+    const responsePapers = await $fetch(endpointPapers);
+    console.log("jadid", responsePapers);
+    if (responsePapers) {
+      if (responsePapers.data.list.length < perPage) {
+        isAllPapersLoaded.value = true;
+      }
+      papers.value = [...papers.value, ...responsePapers.data.list];
+    }
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+  } finally {
+    isLoadingInfiniteScroll.value = false;
+  }
+};
 
 onMounted(async () => {
-  const subjectId = "4190";
+  isLoadingResources.value = true;
   let endpointResources = `/api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
   const responseResource = await $fetch(endpointResources);
-  console.log("responseResource", responseResource);
+  // console.log("responseResource", responseResource);
   if (responseResource.data) {
     titleLesson.value = responseResource.data.lesson_title;
     imageLesson.value = responseResource.data.lesson_pic;
@@ -211,6 +292,16 @@ onMounted(async () => {
     }
   }
   isLoadingResources.value = false;
+
+  isLoadingPapers.value = true;
+  let endpointPapers = `/api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
+  const responsePapers = await $fetch(endpointPapers);
+  console.log("responsePapers", responsePapers);
+  if (responsePapers.data) {
+    papers.value = responsePapers.data.list;
+  }
+
+  isLoadingPapers.value = false;
 });
 </script>
 
