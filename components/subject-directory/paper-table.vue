@@ -431,7 +431,7 @@ const detectNeedLoadMoreData = () => {
 }
 
 .tablet-view .mobile-headers {
-  width: calc(100% - 80px);
+  width: 100%;
 }
 
 .tablet-view .mobile-card {

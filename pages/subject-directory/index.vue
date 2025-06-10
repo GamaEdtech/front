@@ -142,17 +142,22 @@
           @loadNextPageData="fetchNextPagePapers"
         />
       </v-col>
+      <v-col cols="2">
+        <timeline :timeline="timelineData" :isLoading="loadingTimeline" />
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
+import moment from "moment";
 import { useDisplay } from "vuetify";
 
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import resources from "~/components/subject-directory/resources.vue";
 import paperTable from "~/components/subject-directory/paper-table.vue";
+import timeline from "~/components/subject-directory/timeline.vue";
 
 const { sm, xs } = useDisplay();
 
@@ -255,6 +260,10 @@ const headerPapersTableMobile = [
   { title: "Term", value: "term" },
 ];
 const subjectId = "4190";
+
+const loadingTimeline = ref(true);
+const timelineData = ref([]);
+
 const fetchNextPagePapers = async () => {
   try {
     isLoadingInfiniteScroll.value = true;
@@ -267,12 +276,51 @@ const fetchNextPagePapers = async () => {
         isAllPapersLoaded.value = true;
       }
       papers.value = [...papers.value, ...responsePapers.data.list];
+
+      generateTimeLine();
     }
   } catch (error) {
     console.error("Error fetching search results:", error);
   } finally {
     isLoadingInfiniteScroll.value = false;
   }
+};
+
+const generateTimeLine = () => {
+  const sortedItems = [...papers.value].sort((a, b) => {
+    const yearDiff = parseInt(b.edu_year) - parseInt(a.edu_year);
+    if (yearDiff !== 0) return yearDiff;
+    return parseInt(b.edu_month) - parseInt(a.edu_month);
+  });
+
+  const timelineMap = {};
+  let positionCounter = 0;
+  sortedItems.forEach((item) => {
+    const year = parseInt(item.edu_year);
+    const monthNumber = parseInt(item.edu_month);
+    const month = moment()
+      .month(monthNumber - 1)
+      .format("MMM");
+
+    if (!timelineMap[year]) {
+      timelineMap[year] = { months: new Set(), positions: [] };
+    }
+
+    if (!timelineMap[year].months.has(month)) {
+      timelineMap[year].positions.push(positionCounter);
+    }
+
+    timelineMap[year].months.add(month);
+    positionCounter++;
+  });
+
+  timelineData.value = Object.keys(timelineMap)
+    .sort((a, b) => b - a)
+    .map((year) => ({
+      year: parseInt(year),
+      months: Array.from(timelineMap[year].months),
+      positions: timelineMap[year].positions,
+    }));
 };
 
 onMounted(async () => {
@@ -299,8 +347,10 @@ onMounted(async () => {
   console.log("responsePapers", responsePapers);
   if (responsePapers.data) {
     papers.value = responsePapers.data.list;
+    generateTimeLine();
   }
 
+  loadingTimeline.value = false;
   isLoadingPapers.value = false;
 });
 </script>
