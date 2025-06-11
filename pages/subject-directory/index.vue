@@ -7,94 +7,11 @@
     <!-- End BreadCrumb -->
 
     <v-row class="justify-space-between flex-wrap">
-      <!-- Start Select Category -->
+      <!-- Start Filter -->
       <v-col cols="8" sm="5" md="8">
-        <div class="mb-4 d-inline-flex align-center flex-wrap">
-          <div>
-            <template v-if="isLoadingBoard">
-              <div class="d-inline-flex mt-2">
-                <v-skeleton-loader
-                  min-width="200"
-                  type="heading"
-                ></v-skeleton-loader>
-              </div>
-            </template>
-            <template v-else>
-              <div class="d-inline-flex flex-row align-center cursor-pointer">
-                <span class="w-100 gama-text-h3 font-weight-semibold">
-                  {{
-                    selectedBoard?.name
-                      ? selectedBoard?.name
-                      : selectedBoard?.title
-                  }}
-                </span>
-                <v-icon size="18" color="black" class="mx-2">
-                  mdi-menu-down
-                </v-icon>
-              </div>
-            </template>
-          </div>
-          <div>
-            <template v-if="isLoadingGrades">
-              <div class="d-inline-flex mt-2">
-                <v-skeleton-loader
-                  min-width="200"
-                  type="heading"
-                ></v-skeleton-loader>
-              </div>
-            </template>
-            <template v-else>
-              <div class="d-inline-flex flex-row align-center cursor-pointer">
-                <span
-                  v-if="selectedGrade"
-                  class="w-100 gama-text-h3 font-weight-semibold"
-                >
-                  {{ selectedGrade?.name }}
-                </span>
-                <v-icon
-                  v-if="selectedBoard"
-                  size="18"
-                  color="black"
-                  class="mx-2"
-                >
-                  mdi-menu-down
-                </v-icon>
-              </div>
-            </template>
-          </div>
-          <div>
-            <template v-if="isLoadingSubjects">
-              <div class="d-inline-flex mt-2">
-                <v-skeleton-loader
-                  type="heading"
-                  min-width="200"
-                ></v-skeleton-loader>
-              </div>
-            </template>
-            <template v-else>
-              <div
-                class="d-inline-flex flex-row align-center mb-4 mb-md-0 cursor-pointer"
-              >
-                <span
-                  v-if="selectedSubject"
-                  class="w-100 gama-text-h3 font-weight-semibold"
-                >
-                  {{ selectedSubject?.name }}
-                </span>
-                <v-icon
-                  v-if="selectedSubject"
-                  size="18"
-                  color="black"
-                  class="mx-2"
-                >
-                  mdi-menu-down
-                </v-icon>
-              </div>
-            </template>
-          </div>
-        </div>
+        <filterPapers />
       </v-col>
-      <!-- End Select Category -->
+      <!-- End Filter -->
 
       <!-- Start Image Lesson -->
       <v-col cols="12" sm="4" md="4" class="position-relative">
@@ -158,6 +75,7 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import resources from "~/components/subject-directory/resources.vue";
 import paperTable from "~/components/subject-directory/paper-table.vue";
 import timeline from "~/components/subject-directory/timeline.vue";
+import filterPapers from "~/components/subject-directory/filter-papers.vue";
 
 const { sm, xs } = useDisplay();
 
@@ -180,29 +98,6 @@ const breadsCrumb = [
     name: "type",
   },
 ];
-
-// Start Board Section
-const selectedBoard = ref({
-  name: "bboard",
-});
-const isLoadingBoard = ref(true);
-
-// End Board Section
-
-// Start Grade Section
-const selectedGrade = ref({
-  name: "gggrade",
-});
-const isLoadingGrades = ref(true);
-// End Grade Section
-
-// Start Subject Section
-const selectedSubject = ref({
-  name: "sssubject",
-});
-const isLoadingSubjects = ref(true);
-
-// End Subject Section
 
 // Start Section Resources
 const isLoadingResources = ref(false);
@@ -261,16 +156,12 @@ const headerPapersTableMobile = [
 ];
 const subjectId = "4190";
 
-const loadingTimeline = ref(true);
-const timelineData = ref([]);
-
 const fetchNextPagePapers = async () => {
   try {
     isLoadingInfiniteScroll.value = true;
     pageNumber.value += 1;
     let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=${pageNumber.value}&perpage=20&is_paper=true&directory=true`;
     const responsePapers = await $fetch(endpointPapers);
-    console.log("jadid", responsePapers);
     if (responsePapers) {
       if (responsePapers.data.list.length < perPage) {
         isAllPapersLoaded.value = true;
@@ -285,7 +176,11 @@ const fetchNextPagePapers = async () => {
     isLoadingInfiniteScroll.value = false;
   }
 };
+// End Section Papers
 
+// Start Section Timeline
+const loadingTimeline = ref(true);
+const timelineData = ref([]);
 const generateTimeLine = () => {
   const sortedItems = [...papers.value].sort((a, b) => {
     const yearDiff = parseInt(b.edu_year) - parseInt(a.edu_year);
@@ -323,11 +218,12 @@ const generateTimeLine = () => {
     }));
 };
 
+// End Section Timeline
+
 onMounted(async () => {
   isLoadingResources.value = true;
   let endpointResources = `/api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
   const responseResource = await $fetch(endpointResources);
-  // console.log("responseResource", responseResource);
   if (responseResource.data) {
     titleLesson.value = responseResource.data.lesson_title;
     imageLesson.value = responseResource.data.lesson_pic;
@@ -344,7 +240,6 @@ onMounted(async () => {
   isLoadingPapers.value = true;
   let endpointPapers = `/api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
   const responsePapers = await $fetch(endpointPapers);
-  console.log("responsePapers", responsePapers);
   if (responsePapers.data) {
     papers.value = responsePapers.data.list;
     generateTimeLine();
