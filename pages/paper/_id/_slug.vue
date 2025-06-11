@@ -733,16 +733,18 @@ export default {
       description: this.contentData?.description || "GamaEdtech",
     };
 
+    const canonicalUrl = this.contentData.title_url
+      ? `https://gamatrain.com/paper/${this.contentData.id}/${this.contentData.title_url}`
+      : `https://gamatrain.com/paper/${this.contentData.id}`;
+
     return {
       title: this.contentData.title,
-      // link: [
-      //   {
-      //     rel: "canonical",
-      //     href: this.contentData.title_url
-      //       ? `https://gamatrain.com/paper/${this.contentData.id}/${this.contentData.title_url}`
-      //       : `https://gamatrain.com/paper/${this.contentData.id}`,
-      //   },
-      // ],
+      link: [
+        {
+          rel: "canonical",
+          href: canonicalUrl,
+        },
+      ],
       script: [
         {
           hid: "json-ld-schema", // Helps avoid duplicate script tags
