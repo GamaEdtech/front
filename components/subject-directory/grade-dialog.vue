@@ -166,7 +166,7 @@ const getItemInitialWordTitle = (item) => {
   color: #344054;
 }
 /* Highlighted text styling */
-.highlighted-text {
+:deep(.highlighted-text) {
   background-color: rgba(255, 179, 0, 0.3);
   font-weight: bold;
   border-radius: 2px;
