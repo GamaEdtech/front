@@ -18,7 +18,7 @@
       <!-- Column Classification -->
       <template #[`item.name`]="{ item }">
         <span class="font-weight-medium text-grey-darken-2">{{
-          item.variant
+          item.variant && item.variant != "0"
             ? item.test_type_title + item.variant
             : item.test_type_title
         }}</span>
@@ -144,7 +144,7 @@
             <div class="mobile-card">
               <div class="paper-info">
                 <span class="paper-info-part">{{
-                  item.variant
+                  item.variant && item.variant != "0"
                     ? item.test_type_title + item.variant
                     : item.test_type_title
                 }}</span>

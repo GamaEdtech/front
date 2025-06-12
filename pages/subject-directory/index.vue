@@ -8,20 +8,32 @@
 
     <v-row class="justify-space-between flex-wrap">
       <!-- Start Filter -->
-      <v-col cols="8" sm="5" md="8">
-        <filterPapers />
+      <v-col cols="12" sm="8" md="8">
+        <filterPapers
+          @changeStatusLoading="changeLoadingStatus"
+          @changeSubject="changeSubject"
+          @changeFilterForBreadCrumb="changeFilterForBreadCrumb"
+        />
       </v-col>
       <!-- End Filter -->
+    </v-row>
+
+    <v-row class="flex-column-reverse flex-sm-row">
+      <resources
+        :topicalData="topicalData"
+        :data="resourcesData"
+        :isLoading="isLoadingResources"
+      />
 
       <!-- Start Image Lesson -->
-      <v-col cols="12" sm="4" md="4" class="position-relative">
+      <v-col cols="12" sm="4" md="4" class="position-relative mt-0 mt-sm-n15">
         <template v-if="isLoadingResources">
           <v-skeleton-loader type="image"></v-skeleton-loader>
         </template>
         <template v-else>
           <template v-if="imageLesson">
             <div
-              :class="`d-flex justify-center w-100 h-100 mx-auto max-height-image ${positionClass}`"
+              :class="`d-flex justify-center w-100 h-100 mx-auto max-height-image`"
             >
               <NuxtImg
                 width="300px"
@@ -29,20 +41,11 @@
                 placeholder
                 class="rounded-lg w-100 h-100"
               />
-              <!-- <img :src="imageLesson" eager contain class="rounded-lg w-100" /> -->
             </div>
           </template>
         </template>
       </v-col>
       <!-- End Image Lesson -->
-    </v-row>
-
-    <v-row>
-      <resources
-        :topicalData="topicalData"
-        :data="resourcesData"
-        :isLoading="isLoadingResources"
-      />
     </v-row>
 
     <v-row
@@ -67,9 +70,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import moment from "moment";
-import { useDisplay } from "vuetify";
+import { useRoute } from "vue-router";
 
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import resources from "~/components/subject-directory/resources.vue";
@@ -77,30 +80,58 @@ import paperTable from "~/components/subject-directory/paper-table.vue";
 import timeline from "~/components/subject-directory/timeline.vue";
 import filterPapers from "~/components/subject-directory/filter-papers.vue";
 
-const { sm, xs } = useDisplay();
-
-const positionClass = computed(() =>
-  sm.value || xs.value ? `position-relative` : `position-absolute`
-);
+const route = useRoute();
 
 // Initial State Bread Crumb
-const breadsCrumb = [
+const breadsCrumb = ref([
   {
     text: "Subject Directory",
     disabled: true,
     href: "/search?type=test",
     name: "type",
   },
-  {
-    text: "CIE",
-    disabled: false,
-    href: "/search?type=test",
-    name: "type",
-  },
-];
+]);
+
+const changeFilterForBreadCrumb = (board, grade, subject) => {
+  if (board) {
+    const newBoard = {
+      text: board.title,
+      disabled: true,
+      href: `/search?type=test&section=${board.id}`,
+      name: "board",
+    };
+    breadsCrumb.value = breadsCrumb.value.filter((item) => item.name == "type");
+    breadsCrumb.value.push(newBoard);
+  }
+  if (grade) {
+    const newGrade = {
+      text: grade.title,
+      disabled: true,
+      href: `/search?type=test&base=${grade.id}`,
+      name: "grade",
+    };
+    breadsCrumb.value = breadsCrumb.value.filter(
+      (item) => item.name == "type" || item.name == "board"
+    );
+    breadsCrumb.value.push(newGrade);
+  }
+  if (subject) {
+    const newSubject = {
+      text: subject.title,
+      disabled: true,
+      href: `/search?type=test&lesson=${subject.id}`,
+      name: "subject",
+    };
+    breadsCrumb.value = breadsCrumb.value.filter(
+      (item) =>
+        item.name == "type" || item.name == "board" || item.name == "grade"
+    );
+    breadsCrumb.value.push(newSubject);
+  }
+};
 
 // Start Section Resources
-const isLoadingResources = ref(false);
+const isLoadingResources = ref(true);
 
 const titleLesson = ref("");
 const resourcesData = ref([]);
@@ -113,12 +144,13 @@ const imageLesson = ref(null);
 // End Section Resources
 
 // Start Section Papers
-const isLoadingPapers = ref(false);
+const isLoadingPapers = ref(true);
 const isLoadingInfiniteScroll = ref(false);
 const isAllPapersLoaded = ref(false);
 const pageNumber = ref(1);
 const perPage = 20;
 const papers = ref([]);
+const selectedSubjectId = ref(route.query.subject ? route.query.subject : "");
 const headerPapersTableDesktop = [
   {
     title: "Classification",
@@ -154,26 +186,27 @@ const headerPapersTableMobile = [
   { title: "Year", value: "year" },
   { title: "Term", value: "term" },
 ];
-const subjectId = "4190";
 
 const fetchNextPagePapers = async () => {
-  try {
-    isLoadingInfiniteScroll.value = true;
-    pageNumber.value += 1;
-    let endpointPapers = `api/v1/tests/search?lesson=${subjectId}&page=${pageNumber.value}&perpage=20&is_paper=true&directory=true`;
-    const responsePapers = await $fetch(endpointPapers);
-    if (responsePapers) {
-      if (responsePapers.data.list.length < perPage) {
-        isAllPapersLoaded.value = true;
-      }
-      papers.value = [...papers.value, ...responsePapers.data.list];
+  if (selectedSubjectId.value && selectedSubjectId.value.length > 0) {
+    try {
+      isLoadingInfiniteScroll.value = true;
+      pageNumber.value += 1;
+      let endpointPapers = `api/v1/tests/search?lesson=${selectedSubjectId.value}&page=${pageNumber.value}&perpage=20&is_paper=true&directory=true`;
+      const responsePapers = await $fetch(endpointPapers);
+      if (responsePapers) {
+        if (responsePapers.data.list.length < perPage) {
+          isAllPapersLoaded.value = true;
+        }
+        papers.value = [...papers.value, ...responsePapers.data.list];
 
-      generateTimeLine();
+        generateTimeLine();
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      isLoadingInfiniteScroll.value = false;
     }
-  } catch (error) {
-    console.error("Error fetching search results:", error);
-  } finally {
-    isLoadingInfiniteScroll.value = false;
   }
 };
 // End Section Papers
@@ -220,39 +253,187 @@ const generateTimeLine = () => {
 
 // End Section Timeline
 
-onMounted(async () => {
-  isLoadingResources.value = true;
-  let endpointResources = `/api/v1/tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
-  const responseResource = await $fetch(endpointResources);
-  if (responseResource.data) {
-    titleLesson.value = responseResource.data.lesson_title;
-    imageLesson.value = responseResource.data.lesson_pic;
-    resourcesData.value = responseResource.data.list;
-    const filterTopical = resourcesData.value.filter(
-      (item) => item.title === "Topical"
-    );
-    if (filterTopical.length > 0) {
-      topicalData.value.items = filterTopical[0].items;
+const { data: lessonData, status } = await useAsyncData(
+  "lessonData",
+  async () => {
+    let resourcesData;
+    let papersData;
+    const subjectId = route.params.subject || route.query.subject;
+    if (subjectId) {
+      try {
+        const baseURL = `/api/v1/` || "https://core.gamatrain.com/api/v1/";
+        let endpointResources = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
+
+        const responseResource = await $fetch(endpointResources);
+        if (responseResource.data) {
+          resourcesData = responseResource.data;
+        }
+        let endpointPapers = `${baseURL}tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
+        const responsePapers = await $fetch(endpointPapers);
+        if (responsePapers.data) {
+          papersData = responsePapers.data.list;
+        }
+      } catch (error) {
+        if (error.response) {
+          console.error("🔴 Response status:", error.response.status);
+          console.error(
+            "📄 Response data:",
+            JSON.stringify(error.response.data, null, 2)
+          );
+          console.error("📋 Response headers:", error.response.headers);
+        } else if (error.request) {
+          console.error(
+            "📡 No response received. Request object:",
+            error.request
+          );
+        } else {
+          console.error("⚠️ Setup error:", error.message);
+        }
+        console.error("Error fetching data:", error);
+      } finally {
+      }
     }
+    return { resourcesData, papersData };
+  }
+);
+
+if (lessonData.value?.resourcesData) {
+  titleLesson.value = lessonData.value.resourcesData.lesson_title;
+  imageLesson.value = lessonData.value.resourcesData.lesson_pic;
+  resourcesData.value = lessonData.value.resourcesData.list;
+  const filterTopical = resourcesData.value.filter(
+    (item) => item.title === "Topical"
+  );
+  if (filterTopical.length > 0) {
+    topicalData.value.items = filterTopical[0].items;
   }
   isLoadingResources.value = false;
+}
 
-  isLoadingPapers.value = true;
-  let endpointPapers = `/api/v1/tests/search?lesson=${subjectId}&page=1&perpage=20&is_paper=true&directory=true`;
-  const responsePapers = await $fetch(endpointPapers);
-  if (responsePapers.data) {
-    papers.value = responsePapers.data.list;
+if (lessonData.value?.papersData) {
+  papers.value = lessonData.value.papersData;
+  isLoadingPapers.value = false;
+}
+
+onMounted(async () => {
+  if (!route.query.subject) {
+    console.log("inja");
+    isLoadingResources.value = true;
+    isLoadingPapers.value = true;
+    loadingTimeline.value = true;
+  }
+  if (papers.value.length > 0) {
     generateTimeLine();
   }
-
   loadingTimeline.value = false;
-  isLoadingPapers.value = false;
+});
+
+const changeLoadingStatus = () => {
+  isLoadingResources.value = true;
+  isLoadingPapers.value = true;
+  loadingTimeline.value = true;
+};
+
+const resetParameter = () => {
+  timelineData.value = [];
+  papers.value = [];
+  isAllPapersLoaded.value = false;
+  pageNumber.value = 1;
+  titleLesson.value = "";
+  resourcesData.value = [];
+  topicalData.value.items = [];
+  imageLesson.value = null;
+};
+
+const fetchDataForNewSubject = async (subject) => {
+  try {
+    isLoadingResources.value = true;
+    isLoadingPapers.value = true;
+    let endpointResources = `/api/v1/tests/search?is_paper=false&directory=true&lesson=${subject.id}`;
+    let endpointPapers = `/api/v1/tests/search?lesson=${subject.id}&page=1&perpage=20&is_paper=true&directory=true`;
+
+    const [responseResource, responsePapers] = await Promise.all([
+      $fetch(endpointResources),
+      $fetch(endpointPapers),
+    ]);
+
+    if (responseResource.data) {
+      titleLesson.value = responseResource.data.lesson_title;
+      imageLesson.value = responseResource.data.lesson_pic;
+      resourcesData.value = responseResource.data.list;
+      const filterTopical = resourcesData.value.filter(
+        (item) => item.title === "Topical"
+      );
+      if (filterTopical.length > 0) {
+        topicalData.value.items = filterTopical[0].items;
+      }
+    }
+
+    if (responsePapers.data) {
+      papers.value = responsePapers.data.list;
+      generateTimeLine();
+    }
+  } catch (error) {
+    console.error("error", error);
+  } finally {
+    isLoadingResources.value = false;
+    loadingTimeline.value = false;
+    isLoadingPapers.value = false;
+  }
+};
+
+const changeSubject = (subject) => {
+  console.log("main subject", subject);
+  resetParameter();
+  if (subject && subject.id) {
+    selectedSubjectId.value = subject.id;
+    fetchDataForNewSubject(subject);
+  } else {
+    isLoadingResources.value = false;
+    loadingTimeline.value = false;
+    isLoadingPapers.value = false;
+  }
+};
+
+// SEO
+useHead({
+  titleTemplate: "%s",
+  title: `${titleLesson.value} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
+
+  meta: [
+    {
+      hid: "apple-mobile-web-app-title",
+      name: "apple-mobile-web-app-title",
+      content: `${titleLesson.value} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
+    },
+    {
+      hid: "og:title",
+      name: "og:title",
+      content: `${titleLesson.value} Past Papers, Resources | Coursebook & Workbook – Free PDFs`,
+    },
+    {
+      hid: "og:site_name",
+      name: "og:site_name",
+      content: "GamaTrain",
+    },
+    {
+      hid: "description",
+      name: "description",
+      content: `Download free PDF resources for ${titleLesson.value}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.`,
+    },
+    {
+      hid: "og:description",
+      name: "og:description",
+      content: `Download free PDF resources for ${titleLesson.value}, including coursebook, workbook, study guide, and past papers with mark schemes. Updated for 2024 & 2025 exams.`,
+    },
+  ],
 });
 </script>
 
 <style scoped>
 .margin-top-handle {
   margin-top: 64px;
+  min-height: calc(100vh - 64px);
 }
 .max-height-image {
   max-width: 250px;
@@ -262,6 +443,7 @@ onMounted(async () => {
 @media (min-width: 960px) {
   .margin-top-handle {
     margin-top: 6.4rem;
+    min-height: calc(100vh - 6.4rem);
   }
 }
 </style>

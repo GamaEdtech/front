@@ -1,6 +1,8 @@
 <template>
   <div
-    class="timeline-column position-relative d-flex flex-column align-center text-center h-100"
+    :class="`timeline-column position-relative d-flex flex-column align-center text-center h-100 ${
+      !isLoading && timeline.length == 0 ? `hide-line` : ``
+    }`"
   >
     <div v-if="isLoading" class="d-flex flex-column align-center w-100">
       <v-skeleton-loader
@@ -72,6 +74,9 @@ const getMarkerPosition = (itemIndex, yearIndex, monthIndex = 0) => {
   background-color: #e4e7ec;
   transform: translateX(-50%);
   z-index: 0;
+}
+.hide-line::before {
+  display: none;
 }
 
 .timeline-year {

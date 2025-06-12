@@ -1,97 +1,97 @@
 <template>
   <!-- Start Loader Skeleton -->
-  <v-col cols="12" md="8" v-if="isLoading" class="d-flex flex-column">
+  <v-col cols="12" sm="8" md="8" v-if="isLoading" class="d-flex flex-column">
     <v-skeleton-loader v-for="item in 4" type="paragraph"></v-skeleton-loader>
   </v-col>
   <!-- End Loader Skeleton -->
 
-  <div class="d-block" v-if="!isLoading && data.length > 0">
-    <v-col cols="12" md="8">
-      <!-- Start Resource Section -->
-      <v-list lines="two" class="d-block list-item-resource">
-        <template v-for="(resource, index) in data" :key="`desktop-${index}`">
-          <v-list-item
-            class="pa-0"
-            v-if="
-              resource.items &&
-              resource.items.length > 0 &&
-              resource.title != `Topical`
-            "
-          >
-            <template v-slot:prepend>
-              <v-icon
-                color="#ffb600"
-                size="24"
-                v-if="resource.useCustomIcon"
-                :class="resource.icon"
-              ></v-icon>
-              <v-icon color="#ffb600" size="24" v-else>{{
-                getMaterialIcon(resource.icon)
-              }}</v-icon>
-            </template>
-
-            <v-list-item-title class="text-h6 text-md-h4 font-weight-bold">
-              {{ resource.title }}
-            </v-list-item-title>
-            <div class="container-links">
-              <NuxtLink
-                class="font-weight-medium primary-subtitle-500"
-                v-for="(item, j) in resource.items"
-                :key="j"
-                :to="`/paper/${item.id}/${item.title_url}`"
-              >
-                {{
-                  item.title.length > 50
-                    ? item.title.slice(0, 50) + "..."
-                    : item.title
-                }}.
-              </NuxtLink>
-            </div>
-            <v-divider class="my-2" />
-          </v-list-item>
-        </template>
-      </v-list>
-      <!-- End Resource Section -->
-
-      <!-- Start Topical Section -->
-      <v-list
-        v-if="topicalData.items.length > 0"
-        class="d-inline-flex flex-col flex-md-row align-center flex-wrap list-item-resource"
-      >
+  <!-- <div class="d-block" v-if="!isLoading && data.length > 0"> -->
+  <v-col cols="12" sm="8" md="8" v-if="!isLoading && data.length > 0">
+    <!-- Start Resource Section -->
+    <v-list lines="two" class="d-block list-item-resource">
+      <template v-for="(resource, index) in data" :key="`desktop-${index}`">
         <v-list-item
-          class="pa-0 d-inline-flex flex-row align-center"
-          style="min-height: fit-content"
+          class="pa-0"
+          v-if="
+            resource.items &&
+            resource.items.length > 0 &&
+            resource.title != `Topical`
+          "
         >
           <template v-slot:prepend>
-            <v-icon color="#ffb600" size="24">mdi-book-open-variant</v-icon>
+            <v-icon
+              color="#ffb600"
+              size="24"
+              v-if="resource.useCustomIcon"
+              :class="resource.icon"
+            ></v-icon>
+            <v-icon color="#ffb600" size="24" v-else>{{
+              getMaterialIcon(resource.icon)
+            }}</v-icon>
           </template>
 
-          <v-list-item-title class="text-h6 text-md-h4 font-weight-bold">{{
-            topicalData.label
-          }}</v-list-item-title>
-        </v-list-item>
-        <div class="container-topical-chip">
-          <v-chip-group>
-            <v-chip
-              v-for="(topical, index) in topicalData.items"
-              :key="index"
-              class="text-h6 text-white bg-grey-lighten-1"
-              small
+          <v-list-item-title class="text-h6 text-md-h4 font-weight-bold">
+            {{ resource.title }}
+          </v-list-item-title>
+          <div class="container-links">
+            <NuxtLink
+              class="font-weight-medium primary-subtitle-500"
+              v-for="(item, j) in resource.items"
+              :key="j"
+              :to="`/paper/${item.id}/${item.title_url}`"
             >
-              <NuxtLink :to="`/paper/${topical.id}/${topical.title_url}`">
-                {{
-                  topical.title.length > 50
-                    ? topical.title.slice(0, 50) + "..."
-                    : topical.title
-                }}
-              </NuxtLink>
-            </v-chip>
-          </v-chip-group>
-        </div>
-      </v-list>
-      <!-- End Topical Section -->
-    </v-col>
-  </div>
+              {{
+                item.title.length > 50
+                  ? item.title.slice(0, 50) + "..."
+                  : item.title
+              }}.
+            </NuxtLink>
+          </div>
+          <v-divider class="my-2" />
+        </v-list-item>
+      </template>
+    </v-list>
+    <!-- End Resource Section -->
+
+    <!-- Start Topical Section -->
+    <v-list
+      v-if="topicalData.items.length > 0"
+      class="d-inline-flex flex-col flex-md-row align-center flex-wrap list-item-resource"
+    >
+      <v-list-item
+        class="pa-0 d-inline-flex flex-row align-center"
+        style="min-height: fit-content"
+      >
+        <template v-slot:prepend>
+          <v-icon color="#ffb600" size="24">mdi-book-open-variant</v-icon>
+        </template>
+
+        <v-list-item-title class="text-h6 text-md-h4 font-weight-bold">{{
+          topicalData.label
+        }}</v-list-item-title>
+      </v-list-item>
+      <div class="container-topical-chip">
+        <v-chip-group>
+          <v-chip
+            v-for="(topical, index) in topicalData.items"
+            :key="index"
+            class="text-h6 text-white bg-grey-lighten-1"
+            small
+          >
+            <NuxtLink :to="`/paper/${topical.id}/${topical.title_url}`">
+              {{
+                topical.title.length > 50
+                  ? topical.title.slice(0, 50) + "..."
+                  : topical.title
+              }}
+            </NuxtLink>
+          </v-chip>
+        </v-chip-group>
+      </div>
+    </v-list>
+    <!-- End Topical Section -->
+  </v-col>
+  <!-- </div> -->
 </template>
 
 <script setup>

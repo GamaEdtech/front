@@ -95,6 +95,12 @@ import OCRIcon from "~/assets/images/boards/OCR.svg";
 import GamaIcon from "~/assets/images/boards/Gama.svg";
 import ScientificIcon from "~/assets/images/boards/Scientific Competition.svg";
 
+const emit = defineEmits([
+  "changeSubject",
+  "changeStatusLoading",
+  "changeFilterForBreadCrumb",
+]);
+
 const router = useRouter();
 const route = useRoute();
 
@@ -105,6 +111,16 @@ onMounted(async () => {
   setGrade();
   await fetchSubject();
   setSubject();
+  emit(
+    "changeFilterForBreadCrumb",
+    selectedBoard.value,
+    selectedGrade.value,
+    selectedSubject.value
+  );
+  if (!route.query.subject) {
+    console.log("nabod query mount filter");
+    emit("changeSubject", selectedSubject.value);
+  }
   updateQueryParam();
 });
 
@@ -184,6 +200,7 @@ const setDefaltBoard = () => {
 const boardChange = async (board) => {
   if (board.id != selectedBoard.value) {
     console.log("boardChange", board);
+    emit("changeStatusLoading");
     selectedBoard.value = board;
     selectedGrade.value = null;
     selectedSubject.value = null;
@@ -192,7 +209,14 @@ const boardChange = async (board) => {
     isLoadingGrades.value = false;
     await fetchSubject();
     setDefaltSubject();
+    emit(
+      "changeFilterForBreadCrumb",
+      selectedBoard.value,
+      selectedGrade.value,
+      selectedSubject.value
+    );
     isLoadingSubjects.value = false;
+    emit("changeSubject", selectedSubject.value);
     updateQueryParam();
   }
 };
@@ -247,11 +271,19 @@ const setDefaltGrade = () => {
 const gradeChange = async (grade) => {
   if (grade.id != selectedGrade.value.id) {
     console.log("grade", grade);
+    emit("changeStatusLoading");
     selectedGrade.value = grade;
     selectedSubject.value = null;
     await fetchSubject();
     setDefaltSubject();
     isLoadingSubjects.value = false;
+    emit(
+      "changeFilterForBreadCrumb",
+      selectedBoard.value,
+      selectedGrade.value,
+      selectedSubject.value
+    );
+    emit("changeSubject", selectedSubject.value);
     updateQueryParam();
   }
 };
@@ -308,7 +340,15 @@ const setDefaltSubject = () => {
 const subjectChange = (subject) => {
   if (subject.id != selectedSubject.value.id) {
     console.log("subject", subject);
+    emit("changeStatusLoading");
     selectedSubject.value = subject;
+    emit(
+      "changeFilterForBreadCrumb",
+      selectedBoard.value,
+      selectedGrade.value,
+      selectedSubject.value
+    );
+    emit("changeSubject", selectedSubject.value);
     updateQueryParam();
   }
 };
