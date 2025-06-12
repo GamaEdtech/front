@@ -5,19 +5,21 @@
     v-model="selectedItem"
     :loading="loading"
     :items="items"
+    color="primary"
     hide-details
-    item-text="display_name"
+    theme="light"
+    variant="solo"
+    item-title="display_name"
     item-value="location"
-    :search-input.sync="search"
-    :label="label"
-    :placeholder="placeholder"
+    @update:search="search = $event"
+    :placeholder="props.placeholder"
     @keydown="toggleSearch(true)"
-    :solo="solo"
-    :rounded="rounded"
     prepend-inner-icon="mdi-magnify"
-    outlined
+    rounded
+    density="comfortable"
+    return-object
   >
-    <template v-slot:no-data>
+    <template #no-data>
       <v-list-item>
         <v-list-item-title>
           Type something to start
@@ -28,94 +30,91 @@
   </v-autocomplete>
 </template>
 
-<script>
-export default {
-  name: "LocationField",
-  data() {
-    return {
-      search: "",
-      selectedItem: "",
-      items: [],
-      loading: false,
-      timer: null,
-      waitTime: 750,
-      searchToggle: false,
-      render: true,
-    };
+<script setup>
+import { ref, watch, nextTick, onMounted } from "vue";
+import { useNuxtApp } from "#app";
+
+const props = defineProps({
+  label: String,
+  solo: String,
+  rounded: Boolean,
+  placeholder: {
+    type: String,
+    default: "Search anything ..",
   },
-  props: { label: "", solo: "", rounded: false, placeholder: "" },
-  methods: {
-    async searchLocation(search) {
-      this.loading = true;
-      let searchLocation = await this.$fetch.get(
-        "https://nominatim.openstreetmap.org/search.php",
-        {
-          params: {
-            q: search,
-            format: "json",
-          },
-          headers: {
-            "Accept-Language": "en;q=0.3",
-          },
-        }
-      );
-      if (searchLocation.status === 200) {
-        this.items = [];
-        for (let i = 0; i < searchLocation.data.length; i++) {
-          this.items[i] = {};
-          this.items[i]["display_name"] =
-            searchLocation.data[i].display_name.substr(0, 38) +
-            (searchLocation.data[i].display_name.length > 38 ? "..." : "");
-          this.items[i]["location"] = [
-            searchLocation.data[i].lat,
-            searchLocation.data[i].lon,
-          ];
-        }
-        this.loading = false;
+});
+const emit = defineEmits(["locationSelected"]);
+
+const search = ref(null);
+const selectedItem = ref(null);
+const items = ref([]);
+const loading = ref(false);
+const timer = ref(null);
+const waitTime = 750;
+const searchToggle = ref(false);
+const render = ref(true);
+
+async function searchLocation(searchVal) {
+  loading.value = true;
+  try {
+    const searchLocation = await $fetch(
+      "https://nominatim.openstreetmap.org/search.php",
+      {
+        params: {
+          q: searchVal,
+          format: "json",
+        },
+        headers: {
+          "Accept-Language": "en;q=0.3",
+        },
       }
-    },
-    toggleSearch(val) {
-      this.searchToggle = val;
-    },
-    addAndSetItem(location) {
-      this.items = [];
+    );
+    items.value = [];
+    for (let i = 0; i < searchLocation.length; i++) {
+      items.value[i] = {};
+      items.value[i]["display_name"] =
+        searchLocation[i].display_name.substr(0, 38) +
+        (searchLocation[i].display_name.length > 38 ? "..." : "");
+      items.value[i]["location"] = [
+        searchLocation[i].lat,
+        searchLocation[i].lon,
+      ];
+    }
+  } finally {
+    loading.value = false;
+  }
+}
 
-      let item = {};
-      item["display_name"] =
-        location.locationName.substr(0, 38) +
-        (location.locationName.length > 38 ? "..." : "");
-      item["location"] = [location.lat + "", location.lng + ""];
+function toggleSearch(val) {
+  searchToggle.value = val;
+}
 
-      this.items[this.items.length] = item;
-      this.selectedItem = this.items[this.items.length - 1].location;
+onMounted(() => {
+  timer.value = setTimeout(() => {}, waitTime);
+});
 
-      // refresh the autocomplete
-      this.render = false;
-      this.$nextTick(() => {
-        this.render = true;
-      });
-    },
-  },
-  mounted() {
-    this.timer = setTimeout(() => {}, this.waitTime);
-  },
-  watch: {
-    search(val) {
-      if (val && this.searchToggle) {
-        // Clear timer
-        clearTimeout(this.timer);
+watch(search, (val) => {
+  if (val && searchToggle.value) {
+    clearTimeout(timer.value);
+    timer.value = setTimeout(() => {
+      if (val !== selectedItem.value) searchLocation(val);
+    }, waitTime);
+  }
+});
 
-        // Set Timer
-        this.timer = setTimeout(() => {
-          val !== this.selectedItem && this.searchLocation(val);
-        }, this.waitTime);
-      }
-    },
-    selectedItem(val) {
-      val && this.searchToggle && this.$emit("locationSelected", val);
-    },
-  },
-};
+watch(selectedItem, (val) => {
+  if (val && searchToggle.value) emit("locationSelected", val.location);
+});
 </script>
 
-<style scoped></style>
+<style>
+.locationField {
+  position: absolute;
+  top: 1.6rem;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 200002 !important;
+  max-width: 30rem;
+}
+</style>
