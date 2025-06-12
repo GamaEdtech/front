@@ -261,7 +261,7 @@ const { data: lessonData, status } = await useAsyncData(
     const subjectId = route.params.subject || route.query.subject;
     if (subjectId) {
       try {
-        const baseURL = `/api/v1/` || "https://core.gamatrain.com/api/v1/";
+        const baseURL = `/api/v1/`;
         let endpointResources = `${baseURL}tests/search?is_paper=false&directory=true&lesson=${subjectId}`;
 
         const responseResource = await $fetch(endpointResources);
