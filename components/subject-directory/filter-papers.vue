@@ -118,7 +118,6 @@ onMounted(async () => {
     selectedSubject.value
   );
   if (!route.query.subject) {
-    console.log("nabod query mount filter");
     emit("changeSubject", selectedSubject.value);
   }
   updateQueryParam();
@@ -151,7 +150,6 @@ const fetchBoards = async () => {
   try {
     isLoadingBoard.value = true;
     const responseBoard = await $fetch("api/v1/types/list/?type=section");
-    console.log("responseBoard", responseBoard);
     if (responseBoard.data) {
       boards.value = responseBoard.data.map((item, index) => ({
         ...item,
@@ -199,7 +197,6 @@ const setDefaltBoard = () => {
 
 const boardChange = async (board) => {
   if (board.id != selectedBoard.value) {
-    console.log("boardChange", board);
     emit("changeStatusLoading");
     selectedBoard.value = board;
     selectedGrade.value = null;
@@ -239,7 +236,6 @@ const fetchGrade = async () => {
     const responseGrade = await $fetch(
       `api/v1/types/list/?type=base&section_id=${selectedBoard.value.id}`
     );
-    console.log("responseGrade", responseGrade);
     if (responseGrade.data) {
       grades.value = responseGrade.data;
     }
@@ -270,7 +266,6 @@ const setDefaltGrade = () => {
 
 const gradeChange = async (grade) => {
   if (grade.id != selectedGrade.value.id) {
-    console.log("grade", grade);
     emit("changeStatusLoading");
     selectedGrade.value = grade;
     selectedSubject.value = null;
@@ -306,7 +301,6 @@ const fetchSubject = async () => {
     const responseSubject = await $fetch(
       `api/v1/types/list/?type=lesson&base_id=${selectedGrade.value.id}`
     );
-    console.log("responseSubject", responseSubject);
     if (responseSubject.data) {
       subjects.value = responseSubject.data;
     }
@@ -339,7 +333,6 @@ const setDefaltSubject = () => {
 
 const subjectChange = (subject) => {
   if (subject.id != selectedSubject.value.id) {
-    console.log("subject", subject);
     emit("changeStatusLoading");
     selectedSubject.value = subject;
     emit(

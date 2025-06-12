@@ -370,7 +370,6 @@ const detectNeedLoadMoreData = () => {
       !props.isLoadingPapers &&
       !props.isAllDataLoaded
     ) {
-      console.log("omad to view");
       emit("loadNextPageData");
     }
   }

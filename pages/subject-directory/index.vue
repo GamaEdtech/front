@@ -317,7 +317,6 @@ if (lessonData.value?.papersData) {
 
 onMounted(async () => {
   if (!route.query.subject) {
-    console.log("inja");
     isLoadingResources.value = true;
     isLoadingPapers.value = true;
     loadingTimeline.value = true;
@@ -383,7 +382,6 @@ const fetchDataForNewSubject = async (subject) => {
 };
 
 const changeSubject = (subject) => {
-  console.log("main subject", subject);
   resetParameter();
   if (subject && subject.id) {
     selectedSubjectId.value = subject.id;
