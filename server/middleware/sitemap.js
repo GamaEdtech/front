@@ -14,6 +14,18 @@ export default defineEventHandler(async (event) => {
     "blog",
   ];
 
+  // 1. Check for /sitemap/{type}-index first
+  const contentTypeMatch = contentTypes.find(
+    (type) => url === `/sitemap/${type}-index`
+  );
+  if (contentTypeMatch) {
+    res.setHeader("Content-Type", "application/xml");
+    const xmlData = await generateSitemapIndex(contentTypeMatch);
+    res.end(xmlData);
+    return;
+  }
+
+  // 2. Then handle /sitemap and /sitemap.xml
   if (url === "/sitemap" || url === "/sitemap.xml") {
     res.setHeader("Content-Type", "application/xml");
     const staticLinks = [
@@ -36,7 +48,10 @@ export default defineEventHandler(async (event) => {
     xml += "\n</urlset>";
     res.end(xml);
     return;
-  } else if (url.startsWith("/sitemap")) {
+  }
+
+  // 3. Then handle other /sitemap routes (e.g. /sitemap/paper-1)
+  if (url.startsWith("/sitemap")) {
     // Handle individual sitemaps
     const { pathname, search } = parseURL(url);
     const query = getQuery(search);
@@ -48,20 +63,10 @@ export default defineEventHandler(async (event) => {
       let xmlData = await fetchPaginatedData(contentType, page);
       xmlData = convertDataToXML(xmlData, contentType);
       res.end(xmlData);
+      return;
     } else {
       // Pass to the next handler
       return;
-    }
-  } else if (url.startsWith("/sitemap")) {
-    // Check if the request is for a sitemap index
-    const contentTypeMatch = contentTypes.find((type) =>
-      url.startsWith(`/sitemap/${type}-index`)
-    );
-    if (contentTypeMatch) {
-      res.setHeader("Content-Type", "application/xml");
-
-      const xmlData = await generateSitemapIndex(contentTypeMatch);
-      res.end(xmlData);
     }
   }
 });
