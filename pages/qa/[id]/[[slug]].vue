@@ -25,10 +25,10 @@
           <div class="detail my-md-8">
             <v-row>
               <v-col cols="12" md="9" class="pt-0 px-sm-3 pt-sm-3">
-                <!-- 
-                Ask question button 
+                <!--
+                Ask question button
                 (All $vuetify plugin
-                replaced with display ) 
+                replaced with display )
                 -->
                 <div class="text-left d-block d-md-none">
                   <v-btn
@@ -125,7 +125,12 @@
                       <!--End score action-->
 
                       <v-col cols="12" md="11">
-                        <v-card color="#EEEEEE" flat class="fill-height" ref="questionMathJaxContainerRef">
+                        <v-card
+                          color="#EEEEEE"
+                          flat
+                          class="fill-height"
+                          ref="questionMathJaxContainerRef"
+                        >
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3">
@@ -226,7 +231,6 @@
 
                                 <p
                                   class="mt-2 gama-text-body1"
-                                 
                                   v-html="
                                     contentData.question
                                       ? contentData.question
@@ -592,9 +596,7 @@
                                 <div>
                                   <p
                                     class="mt-2 gama-text-body1"
-                                    v-html="
-                                      answer.answer
-                                    "
+                                    v-html="answer.answer"
                                   />
                                 </div>
                               </v-col>
@@ -947,8 +949,16 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 // import CrashReport from "~/components/common/crash-report.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
-import { useNuxtApp } from '#app';
-import { ref, reactive, watch, nextTick, onMounted, onUpdated, computed } from "vue";
+import { useNuxtApp } from "#app";
+import {
+  ref,
+  reactive,
+  watch,
+  nextTick,
+  onMounted,
+  onUpdated,
+  computed,
+} from "vue";
 
 const replySchema = yup.object({
   answer: yup
@@ -1029,7 +1039,10 @@ const typesetMathInSpecificContainer = async (containerRef) => {
       }
 
       let elementToProcess = null;
-      if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+      if (
+        containerRef.value.$el &&
+        containerRef.value.$el instanceof HTMLElement
+      ) {
         elementToProcess = containerRef.value.$el;
       } else if (containerRef.value instanceof HTMLElement) {
         elementToProcess = containerRef.value;
@@ -1043,19 +1056,21 @@ const typesetMathInSpecificContainer = async (containerRef) => {
 
       if (containerRef.value) {
         let currentElement = null;
-        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
-            currentElement = containerRef.value.$el;
+        if (
+          containerRef.value.$el &&
+          containerRef.value.$el instanceof HTMLElement
+        ) {
+          currentElement = containerRef.value.$el;
         } else if (containerRef.value instanceof HTMLElement) {
-            currentElement = containerRef.value;
+          currentElement = containerRef.value;
         }
         if (currentElement) {
-            $renderMathInElement(currentElement);
+          $renderMathInElement(currentElement);
         } else {
         }
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   } else {
   }
 };
@@ -1070,7 +1085,7 @@ function initBreadCrumb() {
   while (breads.value.length > 1) {
     breads.value.pop();
   }
-  
+
   if (contentData.value && Object.keys(contentData.value).length > 0) {
     breads.value.push(
       {
@@ -1183,14 +1198,14 @@ const {
 
 async function reInit() {
   try {
-    await refreshReplies(); 
+    await refreshReplies();
     if (repliesData.value && repliesData.value.data) {
       answer_list.value = repliesData.value.data.list || [];
     } else {
       answer_list.value = [];
     }
   } catch (err) {
-    console.error('Error in reInit fetching replies:', err);
+    console.error("Error in reInit fetching replies:", err);
     answer_list.value = [];
   }
 }
@@ -1297,27 +1312,35 @@ onMounted(async () => {
   initBreadCrumb();
   await reInit();
   getSimilarQuestions();
-  
+
   await typesetMathInSpecificContainer(questionMathJaxContainerRef);
   if (answer_list.value.length > 0) {
     await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
   }
 });
-watch(() => contentData.value?.question, async (newQuestionText) => {
-  if (newQuestionText) {
-    await typesetMathInSpecificContainer(questionMathJaxContainerRef);
-  }
-}, { immediate: false });
+watch(
+  () => contentData.value?.question,
+  async (newQuestionText) => {
+    if (newQuestionText) {
+      await typesetMathInSpecificContainer(questionMathJaxContainerRef);
+    }
+  },
+  { immediate: false }
+);
 
-watch(answer_list, async (newAnswers) => {
-  await nextTick();
-  if (newAnswers && newAnswers.length > 0) {
-    await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
-  }
-}, { deep: true });
+watch(
+  answer_list,
+  async (newAnswers) => {
+    await nextTick();
+    if (newAnswers && newAnswers.length > 0) {
+      await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
+    }
+  },
+  { deep: true }
+);
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // Manipulate some Vuetify & bootstrap styles
 #qa-details-content .v-text-field--outlined .v-input__prepend-outer,
 .v-text-field--outlined .v-input__append-outer {

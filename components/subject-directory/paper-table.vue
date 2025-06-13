@@ -34,9 +34,7 @@
       <!-- Column Month -->
       <template #[`item.term`]="{ item }">
         <span class="font-weight-medium text-grey-darken-2">{{
-          moment()
-            .month(Number(item.edu_month) - 1)
-            .format("MMMM")
+          getMonthName(item.edu_month)
         }}</span>
       </template>
 
@@ -154,9 +152,7 @@
               </div>
               <div class="paper-info">
                 <span class="paper-info-part">{{
-                  moment()
-                    .month(Number(item.edu_month) - 1)
-                    .format("MMMM")
+                  getMonthName(item.edu_month)
                 }}</span>
               </div>
               <div class="paper-chips">
@@ -264,7 +260,6 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
-import moment from "moment";
 
 const props = defineProps({
   desktopHeader: {
@@ -294,6 +289,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["loadNextPageData"]);
+
+const nuxtApp = useNuxtApp();
 
 onMounted(() => {
   checkScreenSize();
@@ -374,9 +371,16 @@ const detectNeedLoadMoreData = () => {
     }
   }
 };
+
+function getMonthName(monthNumber) {
+  return nuxtApp
+    .$dayjs()
+    .month(Number(monthNumber) - 1)
+    .format("MMMM");
+}
 </script>
 
-<style>
+<style scoped>
 .custom-table th {
   background-color: var(--primary-grey-100, #f2f4f7);
   color: #344054;
