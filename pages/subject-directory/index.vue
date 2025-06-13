@@ -71,7 +71,6 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import moment from "moment";
 import { useRoute } from "vue-router";
 
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
@@ -81,6 +80,7 @@ import timeline from "~/components/subject-directory/timeline.vue";
 import filterPapers from "~/components/subject-directory/filter-papers.vue";
 
 const route = useRoute();
+const nuxtApp = useNuxtApp();
 
 // Initial State Bread Crumb
 const breadsCrumb = ref([
@@ -226,7 +226,8 @@ const generateTimeLine = () => {
   sortedItems.forEach((item) => {
     const year = parseInt(item.edu_year);
     const monthNumber = parseInt(item.edu_month);
-    const month = moment()
+    const month = nuxtApp
+      .$dayjs()
       .month(monthNumber - 1)
       .format("MMM");
 

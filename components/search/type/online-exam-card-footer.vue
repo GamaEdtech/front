@@ -44,7 +44,7 @@
           <p class="mx-2">
             <span class="d-none d-md-inline"> Updated: </span>
             <span class="date_string d-inline-block">
-              {{ $moment(contentData.up_date).fromNow() }}
+              {{ $dayjs(contentData.up_date).fromNow() }}
             </span>
           </p>
         </div>
@@ -53,11 +53,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ["contentData"],
-  name: "online-exam-card-footer",
-};
+<script setup>
+const props = defineProps({
+  contentData: {},
+});
 </script>
 
 <style scoped></style>
