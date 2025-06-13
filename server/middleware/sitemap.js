@@ -87,7 +87,7 @@ async function generateSitemapIndex(contentType) {
 }
 // Fetch the total number of pages for a content type
 async function getTotalPages(contentType) {
-  const itemsPerPage = 50;
+  const itemsPerPage = 1000;
   const baseUrl = "https://core.gamatrain.com/api/v1/";
   let apiUrl;
 
@@ -128,7 +128,7 @@ async function getTotalPages(contentType) {
 
 // Fetch paginated data for a content type
 async function fetchPaginatedData(contentType, page) {
-  const itemsPerPage = 50;
+  const itemsPerPage = 1000;
   const oldBaseUrl = "https://core.gamatrain.com/api/v1/";
   const baseUrl = "https://api.gamaedtech.com/api/v1/";
   let apiUrl;
