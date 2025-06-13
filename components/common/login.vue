@@ -2,7 +2,6 @@
 import { navigateTo } from "nuxt/app";
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
-import { useAuth } from "~/composables/useAuth";
 
 const { $toast } = useNuxtApp();
 
@@ -158,6 +157,8 @@ const submit = handleSubmit(async () => {
       identity_holder.value = false;
       otp_holder.value = true;
       countDownTimer();
+    } else if (data.data.type == "register") {
+      goToRegister();
     } else {
       submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
@@ -249,22 +250,17 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
-  console.log("submitLoginV2", old_token);
-
-  // Make POST request to v2 authentication endpoint using $fetch
   const result = await $fetch("/api/v2/identities/tokens/old", {
     method: "POST",
     body: { token: old_token },
   });
   if (result.succeeded) {
-    // Store authentication token in local storage for v2 API
     localStorage.setItem("v2_token", result.data.token);
   } else if (
     result.errors.length &&
     (result.errors[0].message === "UserNotFound" ||
       result.errors[0].message === "Invalid Token")
   ) {
-    // Use refs for password and identity
     let pass = password.value.value ? password.value.value : generatePassword();
     let identityVal = identity.value.value
       ? identity.value.value
@@ -273,16 +269,19 @@ async function submitLoginV2(old_token) {
   }
 }
 
-// Placeholder for generatePassword if not defined
 function generatePassword() {
   // Generate a random password (example)
   return Math.random().toString(36).slice(-8);
 }
 
-// Placeholder for registerV2 if not defined
 async function registerV2(identity, pass) {
-  // Implement registration logic for v2 here
-  // Example: await $axios.$post('/api/v2/register', { identity, pass });
+  const result = await $fetch("/api/v2/identities/register", {
+    method: "POST",
+    body: { email: identity, password: pass, confirmPassword: pass },
+  });
+  if (result.succeeded) {
+    await submitLoginV2(useAuth().getUserToken());
+  }
 }
 </script>
 
