@@ -124,7 +124,6 @@ export default defineNuxtConfig({
       });
     },
   ],
-
   // Development modules
   devtools: { enabled: true },
 
@@ -188,9 +187,6 @@ export default defineNuxtConfig({
     host: "0.0.0.0",
     port: 3000,
   },
-
-  // Server middleware
-  serverMiddleware: ["~/server/middleware/sitemap.js"],
 
   // SSR configuration
   ssr: true,
