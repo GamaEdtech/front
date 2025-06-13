@@ -3,6 +3,7 @@ import { parseURL, getQuery } from "ufo";
 export default defineEventHandler(async (event) => {
   const { req, res } = event.node;
   const url = req.url;
+  const { pathname } = parseURL(url);
 
   // List of content types for sitemap
   const contentTypes = [
@@ -15,59 +16,55 @@ export default defineEventHandler(async (event) => {
     "school",
   ];
 
-  // 1. Check for /sitemap/{type}-index first
-  const contentTypeMatch = contentTypes.find(
-    (type) => url === `/sitemap/${type}-index`
-  );
-  if (contentTypeMatch) {
-    res.setHeader("Content-Type", "application/xml");
-    const xmlData = await generateSitemapIndex(contentTypeMatch);
-    res.end(xmlData);
-    return;
-  }
-
-  // 2. Then handle /sitemap and /sitemap.xml
-  if (url === "/sitemap" || url === "/sitemap.xml") {
-    res.setHeader("Content-Type", "application/xml");
-    const staticLinks = [
-      "https://gamatrain.com/",
-      "https://gamatrain.com/about-us",
-      "https://gamatrain.com/services",
-      "https://gamatrain.com/faq",
-      "https://gamatrain.com/search?type=test",
-      "https://gamatrain.com/search?type=learnfiles",
-      "https://gamatrain.com/search?type=question",
-      "https://gamatrain.com/search?type=azmoon",
-      "https://gamatrain.com/search?type=dars",
-      "https://gamatrain.com/blog",
-      "https://gamatrain.com/school",
-    ];
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-    for (const link of staticLinks) {
-      xml += `\n  <url>\n    <loc>${link}</loc>\n  </url>`;
-    }
-    xml += "\n</urlset>";
-    res.end(xml);
-    return;
-  }
-
-  // 3. Then handle other /sitemap routes (e.g. /sitemap/paper-1)
+  // Handle sitemap routes
   if (url.startsWith("/sitemap")) {
-    // Handle individual sitemaps
-    const { pathname, search } = parseURL(url);
-    const query = getQuery(search);
-    const contentType = pathname.split("/")[2];
+    const contentIdentity = pathname.split("/")[2]; // e.g., "paper" from "/sitemap/paper"
 
+    if (!contentIdentity) {
+      // Handle /sitemap and /sitemap.xml
+      res.setHeader("Content-Type", "application/xml");
+      const staticLinks = [
+        "https://gamatrain.com/",
+        "https://gamatrain.com/about-us",
+        "https://gamatrain.com/services",
+        "https://gamatrain.com/faq",
+        "https://gamatrain.com/search?type=test",
+        "https://gamatrain.com/search?type=learnfiles",
+        "https://gamatrain.com/search?type=question",
+        "https://gamatrain.com/search?type=azmoon",
+        "https://gamatrain.com/search?type=dars",
+        "https://gamatrain.com/blog",
+        "https://gamatrain.com/school",
+      ];
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+      for (const link of staticLinks) {
+        xml += `\n  <url>\n    <loc>${link}</loc>\n  </url>`;
+      }
+      xml += "\n</urlset>";
+      res.end(xml);
+      return;
+    }
+
+    // Handle content type sitemaps
+    const contentType = contentIdentity.split("-")[0];
     if (contentTypes.includes(contentType)) {
       res.setHeader("Content-Type", "application/xml");
-      const page = parseInt(query.page, 10) || 1;
-      let xmlData = await fetchPaginatedData(contentType, page);
-      xmlData = convertDataToXML(xmlData, contentType);
-      res.end(xmlData);
-      return;
-    } else {
-      // Pass to the next handler
-      return;
+
+      if (contentIdentity.endsWith("-index")) {
+        // Generate sitemap index
+        const xmlData = await generateSitemapIndex(contentType);
+        res.end(xmlData);
+        return;
+      }
+
+      // Handle paginated sitemaps
+      const pageNum = parseInt(contentIdentity.split("-")[1], 10);
+      if (!isNaN(pageNum)) {
+        let xmlData = await fetchPaginatedData(contentType, pageNum);
+        xmlData = convertDataToXML(xmlData, contentType);
+        res.end(xmlData);
+        return;
+      }
     }
   }
 });
