@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     "exam",
     "tutorial",
     "blog",
+    "school",
   ];
 
   // 1. Check for /sitemap/{type}-index first
@@ -112,12 +113,19 @@ async function getTotalPages(contentType) {
     case "blog":
       apiUrl = `${baseUrl}blogs/search?page=1&perpage=${itemsPerPage}`;
       break;
+    case "school":
+      apiUrl = `https://api.gamaedtech.com/api/v1/schools?PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true`;
+      break;
     default:
       return 0;
   }
 
   const response = await $fetch(apiUrl);
-  const totalItems = parseInt(response.data.num, 10);
+  // const totalItems = parseInt(response.data.num, 10);
+  const totalItems =
+    contentType == "school"
+      ? parseInt(response.data.totalRecordsCount)
+      : parseInt(response.data.num, 10);
   return Math.ceil(totalItems / itemsPerPage);
 }
 
@@ -146,11 +154,23 @@ async function fetchPaginatedData(contentType, page) {
     case "blog":
       apiUrl = `${baseUrl}blogs/search`;
       break;
+    case "school":
+      apiUrl = `${baseUrl}schools`;
+      break;
     default:
       return [];
   }
 
-  const finalUrl = `${apiUrl}&page=${page}&perpage=${itemsPerPage}`;
+  let finalUrl = `${apiUrl}&page=${page}&perpage=${itemsPerPage}&ineedmore=1`;
+  if (contentType == "blog") {
+    finalUrl = `${apiUrl}?page=${page}&perpage=${itemsPerPage}&ineedmore=1`;
+  }
+  let pageNum = page > 0 ? page - 1 : 0;
+  if (contentType == "school")
+    finalUrl = `${apiUrl}?PagingDto.PageFilter.Size=${itemsPerPage}&PagingDto.PageFilter.Skip=${
+      pageNum * itemsPerPage
+    }&PagingDto.PageFilter.ReturnTotalRecordsCount=true&HasScore=true`;
+
   const response = await $fetch(finalUrl);
   return response.data.list || [];
 }
@@ -158,21 +178,26 @@ async function fetchPaginatedData(contentType, page) {
 // Convert data to XML format for sitemaps
 function convertDataToXML(data, contentType) {
   let title = "";
+  let modifyDate = "";
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
   data.forEach((item) => {
     title = item.title_url;
+    modifyDate = item.up_date;
     if (contentType === "blog") {
       title = item.title
         .trim()
         .replace(/ (?!$)/g, "-")
         .replace(/\//g, "-")
         .toLowerCase();
+    } else if (contentType === "school") {
+      title = item.slug;
+      modifyDate = item.lastModifyDate;
     }
 
     xml += `<url>
             <loc>https://gamatrain.com/${contentType}/${item.id}/${title}</loc>
-            <lastmod>${formatDate(item.up_date)}</lastmod>
+            <lastmod>${formatDate(modifyDate)}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.8</priority>
         </url>`;
