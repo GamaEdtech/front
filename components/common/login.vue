@@ -1,15 +1,14 @@
 <script setup>
-import {navigateTo } from 'nuxt/app';
+import { navigateTo } from "nuxt/app";
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
-const { $toast } = useNuxtApp()
-
+const { $toast } = useNuxtApp();
 
 const props = defineProps({
-  dialog: Boolean
-})
+  dialog: Boolean,
+});
 const passVisible = ref(false);
 const login_loading = ref(false);
 const validationSchema = yup.object().shape({
@@ -28,119 +27,118 @@ const password = useField("password");
 const otp = ref("");
 const otp_loading = ref(false);
 const countDown = ref(60);
-let timerId = ref(null)
+let timerId = ref(null);
 const sendOtpBtnStatus = ref(true);
 
 const google_login_loading = ref(true);
 const identity_holder = ref(true);
 const otp_holder = ref(false);
-const googleLoginBtn = ref(null)
+const googleLoginBtn = ref(null);
 
-watch(countDown ,(val) => {
-      //When user wait 10 second
-      if (val === 0) sendOtpBtnStatus.value = false;
+watch(countDown, (val) => {
+  //When user wait 10 second
+  if (val === 0) sendOtpBtnStatus.value = false;
 
-      //When user request new otp code
-      if (val === 60) countDownTimer();
-    });
+  //When user request new otp code
+  if (val === 60) countDownTimer();
+});
 
 async function handleCredentialResponse(value) {
   const auth = useAuth();
   try {
-    const response = await $fetch(
-      '/api/v1/users/googleAuth',{
-        method:'POST',
+    const response = await $fetch("/api/v1/users/googleAuth", {
+      method: "POST",
       body: new URLSearchParams({
         id_token: value.credential,
       }),
-      }
-    )
+    });
 
-    if(response.status === 1){
+    if (response.status === 1) {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
+      submitLoginV2(response.data.jwtToken);
       closeDialog();
-      navigateTo('/user');
+      navigateTo("/user");
     }
   } catch (err) {
-    const status = err?.response?.status
+    const status = err?.response?.status;
 
     if (status === 401) {
-      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+      $toast.error(useNuxtApp().$t("LOGIN_WRONG_DATA"));
     } else if (status === 500 || status === 504) {
-      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+      $toast.error(useNuxtApp().$t("REQUEST_FAILED"));
     }
   }
 }
 
+watch(
+  () => props.dialog,
+  (isOpen) => {
+    if (isOpen) {
+      google_login_loading.value = true;
+      setTimeout(() => {
+        if (window.google?.accounts?.id && googleLoginBtn.value) {
+          window.google.accounts.id.initialize({
+            client_id:
+              "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
+            callback: handleCredentialResponse,
+            auto_select: true,
+          });
 
-watch(() => props.dialog, (isOpen) => {
-  if (isOpen) {
-    google_login_loading.value = true
-    setTimeout(() => {
-    if (window.google?.accounts?.id && googleLoginBtn.value) {
-      window.google.accounts.id.initialize({
-        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
-        callback: handleCredentialResponse,
-        auto_select: true
-      })
+          window.google.accounts.id.renderButton(googleLoginBtn.value, {
+            text: "Login",
+            size: "large",
+            width: "252",
+            theme: "outline",
+          });
 
-      window.google.accounts.id.renderButton(googleLoginBtn.value, {
-        text: 'Login',
-        size: 'large',
-        width: '252',
-        theme: 'outline'
-      })
-
-      google_login_loading.value = false
+          google_login_loading.value = false;
+        }
+      }, 4000);
     }
-  }, 4000)
   }
-})
+);
 
-onMounted(() =>{
+onMounted(() => {
   setTimeout(() => {
     if (window.google?.accounts?.id && googleLoginBtn.value) {
       window.google.accounts.id.initialize({
-        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        client_id:
+          "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
         callback: handleCredentialResponse,
-        auto_select: true
-      })
+        auto_select: true,
+      });
 
       window.google.accounts.id.renderButton(googleLoginBtn.value, {
-        text: 'Login',
-        size: 'large',
-        width: '252',
-        theme: 'outline'
-      })
+        text: "Login",
+        size: "large",
+        width: "252",
+        theme: "outline",
+      });
 
-      google_login_loading.value = false
+      google_login_loading.value = false;
     }
-  }, 4000)
-})
-
+  }, 4000);
+});
 
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
-  try{
-    const response = await $fetch('/api/v1/users/', {
-      method: 'POST',
+  try {
+    const response = await $fetch("/api/v1/users/", {
+      method: "POST",
       body: new URLSearchParams({
-        'type' : 'resend_code',
-        'identity' : identity.value,
+        type: "resend_code",
+        identity: identity.value,
       }),
-  });
+    });
     countDownTimer();
     sendOtpBtnStatus.value = true;
-    $toast.success('Otp code sent again');
-  }
-  catch(error){
+    $toast.success("Otp code sent again");
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
   }
 };
 
@@ -150,111 +148,150 @@ const submit = handleSubmit(async () => {
   try {
     const response = await auth.login({
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        identity: identity.value.value,
-        pass: password.value.value,
-      });
-    
+      identity: identity.value.value,
+      pass: password.value.value,
+    });
+
     const data = await response;
     if (data.data.type == "loginByOTP") {
       $toast.success("Otp code sent");
       identity_holder.value = false;
-      otp_holder.value = true; 
+      otp_holder.value = true;
       countDownTimer();
     } else {
-        $toast.success("Logged in successfully");
-        auth.setUserToken(response.data.jwtToken);
-        closeDialog()
-        navigateTo('/user')
+      submitLoginV2(response.data.jwtToken);
+      $toast.success("Logged in successfully");
+      auth.setUserToken(response.data.jwtToken);
+      closeDialog();
+      navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-  }
-  finally{
-    login_loading.value = false
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  } finally {
+    login_loading.value = false;
   }
 });
 
 const onFinish = async () => {
   const auth = useAuth();
-  try{
-    const response = await $fetch(
-      "/api/v1/users/login",{
-      method: 'POST',
+  try {
+    const response = await $fetch("/api/v1/users/login", {
+      method: "POST",
       body: new URLSearchParams({
         type: "confirm",
         identity: identity.value.value,
         pass: password.value.value,
         code: otp.value,
-      })
+      }),
     });
-    if(response.status === 1){
+    if (response.status === 1) {
+      await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo('/user');
+      navigateTo("/user");
     }
-    }
-  catch(error){
+  } catch (error) {
     const errorData = error?.response?._data;
-
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-    }
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
   }
+};
 
 const countDownTimer = () => {
   if (timerId) {
-    clearTimeout(timerId)
-    timerId = null
+    clearTimeout(timerId);
+    timerId = null;
   }
-  countDown.value = 60
-  tick()
-}
+  countDown.value = 60;
+  tick();
+};
 
 const tick = () => {
   if (countDown.value > 0) {
     timerId = setTimeout(() => {
-      countDown.value -= 1
-      tick()
-    }, 1000)
+      countDown.value -= 1;
+      tick();
+    }, 1000);
   } else {
-    timerId = null 
+    timerId = null;
   }
-}
+};
 
-const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
+const emit = defineEmits([
+  "switchToRegister",
+  "switchToRecover",
+  "update:dialog",
+]);
 
 function goToRegister() {
-  emit('switchToRegister')
+  emit("switchToRegister");
 }
 
 function goToRecover() {
-  emit('switchToRecover')
+  emit("switchToRecover");
 }
 
 function closeDialog() {
   identity_holder.value = true;
-  otp_holder.value = false; 
+  otp_holder.value = false;
   login_loading.value = false;
-  handleReset()
-  emit('update:dialog', false)
+  handleReset();
+  emit("update:dialog", false);
 }
 
 const recheckEnteredIdentity = () => {
   otp_holder.value = false;
   identity_holder.value = true;
 };
+
+async function submitLoginV2(old_token) {
+  console.log("submitLoginV2", old_token);
+
+  // Make POST request to v2 authentication endpoint using $fetch
+  const result = await $fetch("/api/v2/identities/tokens/old", {
+    method: "POST",
+    body: { token: old_token },
+  });
+  if (result.succeeded) {
+    // Store authentication token in local storage for v2 API
+    localStorage.setItem("v2_token", result.data.token);
+  } else if (
+    result.errors.length &&
+    (result.errors[0].message === "UserNotFound" ||
+      result.errors[0].message === "Invalid Token")
+  ) {
+    // Use refs for password and identity
+    let pass = password.value.value ? password.value.value : generatePassword();
+    let identityVal = identity.value.value
+      ? identity.value.value
+      : useAuth().user?.email || "";
+    await registerV2(identityVal, pass);
+  }
+}
+
+// Placeholder for generatePassword if not defined
+function generatePassword() {
+  // Generate a random password (example)
+  return Math.random().toString(36).slice(-8);
+}
+
+// Placeholder for registerV2 if not defined
+async function registerV2(identity, pass) {
+  // Implement registration logic for v2 here
+  // Example: await $axios.$post('/api/v2/register', { identity, pass });
+}
 </script>
 
 <template>
-  <v-dialog v-model="props.dialog" max-width="300px" @click:outside="closeDialog">
+  <v-dialog
+    v-model="props.dialog"
+    max-width="300px"
+    @click:outside="closeDialog"
+  >
     <v-card>
       <v-card-title>
         <span class="text-h5">Login</span>
@@ -302,9 +339,7 @@ const recheckEnteredIdentity = () => {
                       required
                       :error-messages="password.errorMessage.value"
                     />
-                    <p @click="goToRecover" class="pointer">
-                      Forget password
-                    </p>
+                    <p @click="goToRecover" class="pointer">Forget password</p>
                   </v-col>
                   <v-col cols="12">
                     <v-divider class="mb-3" />
@@ -373,8 +408,6 @@ const recheckEnteredIdentity = () => {
     </v-card>
   </v-dialog>
 </template>
-
-
 
 <style scoped>
 .btn-google {
