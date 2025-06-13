@@ -132,27 +132,28 @@ async function getTotalPages(contentType) {
 // Fetch paginated data for a content type
 async function fetchPaginatedData(contentType, page) {
   const itemsPerPage = 50;
-  const baseUrl = "https://core.gamatrain.com/api/v1/";
+  const oldBaseUrl = "https://core.gamatrain.com/api/v1/";
+  const baseUrl = "https://api.gamaedtech.com/api/v1/";
   let apiUrl;
 
   switch (contentType) {
     case "paper":
-      apiUrl = `${baseUrl}search?type=test`;
+      apiUrl = `${oldBaseUrl}search?type=test`;
       break;
     case "qa":
-      apiUrl = `${baseUrl}search?type=question`;
+      apiUrl = `${oldBaseUrl}search?type=question`;
       break;
     case "multimedia":
-      apiUrl = `${baseUrl}search?type=learnfiles`;
+      apiUrl = `${oldBaseUrl}search?type=learnfiles`;
       break;
     case "exam":
-      apiUrl = `${baseUrl}search?type=azmoon`;
+      apiUrl = `${oldBaseUrl}search?type=azmoon`;
       break;
     case "tutorial":
-      apiUrl = `${baseUrl}search?type=dars`;
+      apiUrl = `${oldBaseUrl}search?type=dars`;
       break;
     case "blog":
-      apiUrl = `${baseUrl}blogs/search`;
+      apiUrl = `${oldBaseUrl}blogs/search`;
       break;
     case "school":
       apiUrl = `${baseUrl}schools`;
