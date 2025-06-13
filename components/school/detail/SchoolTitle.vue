@@ -89,11 +89,8 @@ function handleUpdate() {
   generalDataEditMode.name = false;
   formData = { name: form.name ?? null };
   nameSubmitLoader.value = true;
-  $fetch(`/api/v2/schools/${route.params.id}/contributions`, {
-    method: "POST",
-    body: formData,
-    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
-  })
+  useApiService
+    .post(`/api/v2/schools/${route.params.id}/contributions`, formData)
     .then(async (response) => {
       if (response.succeeded) {
         nuxtApp.$toast?.success(

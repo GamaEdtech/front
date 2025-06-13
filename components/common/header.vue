@@ -392,7 +392,8 @@ watch(
   () => route.query.auth_form,
   (val) => {
     if (val === "login") {
-      login_modal.value.login_dialog = true;
+      // login_modal.value.login_dialog = true;
+      openLoginDialog();
       router.push({ query: {} });
     } else if (val == "register") {
       register_modal.value.register_dialog = true;

@@ -21,7 +21,7 @@ export const useApiService = (
   opts?: UseFetchOptions
 ): Promise<void> | void => {
   const config = useRuntimeConfig();
-  const headers = authHeader();
+  const headers = authHeader(request);
   const apiFetch = $fetch.create({
     baseURL: config.public.baseURL,
     credentials: "include",
@@ -37,6 +37,8 @@ export const useApiService = (
     onResponseError({ request, response, options }) {
       if (response?.status == 401) {
         console.log("onResponseError", response);
+        const router = useRouter();
+        router.push({ query: { auth_form: "login" } });
       }
     },
     onRequest({ request, options }) {
@@ -50,13 +52,19 @@ export const useApiService = (
   return apiFetch(request);
 };
 
-export const authHeader = (val = null) => {
-  // const authStore = useAuthStore();
-  // const token = useCookie('token').value
-  // if (authStore.isLoggedIn) {
-  //     return { Authorization: `Bearer ${token.access_token}` };
-  // } else {}
+export const authHeader = (req = null) => {
+  const auth = useAuth();
+  if (req.includes("v2")) {
+    if (auth.isAuthenticated.value) {
+      return { Authorization: `Bearer ${localStorage.getItem("v2_token")}` };
+    } else {
+      return { Authorization: `Bearer ${auth.getUserToken()}` };
+    }
+  } else {
+    return {};
+  }
 };
+
 export const get = (
   request: string,
   params?: SearchParameters,

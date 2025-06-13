@@ -111,7 +111,7 @@ const displayFacilities = computed(() =>
 
 async function getTags() {
   try {
-    const res = await $fetch("/api/v2/tags/School");
+    const res = await useApiService.get("/api/v2/tags/School");
     tags.value = res.data.map((tag) => {
       const isSelected =
         props.facilities &&
@@ -139,15 +139,9 @@ function toggleTag(tag) {
 async function saveFacilities() {
   loader.value = true;
   try {
-    const response = await $fetch(
+    const response = await useApiService.post(
       `/api/v2/schools/${route.params.id}/contributions`,
-      {
-        method: "POST",
-        body: { tags: selectedTags.value },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-        },
-      }
+      { tags: selectedTags.value }
     );
     if (response.succeeded) {
       nuxtApp.$toast?.success(

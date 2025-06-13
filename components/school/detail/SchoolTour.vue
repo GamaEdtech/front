@@ -211,13 +211,8 @@ function uploadTourImage() {
   let formData = new FormData();
   formData.append("File", tourImg.value);
   formData.append("FileType", "Tour360");
-  $fetch(`/api/v2/schools/${route.params.id}/images`, {
-    method: "POST",
-    body: formData,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-    },
-  })
+  useApiService
+    .post(`/api/v2/schools/${route.params.id}/images`, formData)
     .then(() => {
       nuxtApp.$toast?.success(
         "Your 360° tour image has been successfully uploaded"
