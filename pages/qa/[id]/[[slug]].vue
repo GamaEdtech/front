@@ -950,6 +950,8 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
+const { isAuthenticated } = useAuth();
+
 import {
   ref,
   reactive,
@@ -1123,7 +1125,7 @@ function convertSlug(text) {
 }
 
 function openQuestionForm() {
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     router.push({ path: "/user/question/create" });
   } else {
     openAuthDialog("login");
@@ -1242,7 +1244,7 @@ function openDeleteReplyConfirmDialog(item_id) {
 
 async function submitScore(content_type, id, type) {
   // const auth = useAuth();
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     let api = `/api/v1/questions/score/${id}/${type}`;
     if (content_type === "reply")
       api = `/api/v1/questionReplies/score/${id}/${type}`;

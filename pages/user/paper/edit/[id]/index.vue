@@ -374,7 +374,7 @@
 </template>
 
 <script setup>
-const { $auth, $toast } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 // Define layout
 definePageMeta({
@@ -919,7 +919,7 @@ watch(
 
 const startDownload = async (type, extra_id = "") => {
   const auth = useAuth();
-  if (auth.loggedIn) {
+  if (auth.isAuthenticated.value) {
     download_loading.value = true;
     let apiUrl = "";
 
@@ -943,7 +943,7 @@ const startDownload = async (type, extra_id = "") => {
           err.response.data.status == 0 &&
           err.response.data.error == "creditNotEnough"
         ) {
-          useToast().info("No enough credit");
+          $toast.info("No enough credit");
         }
       }
     } finally {

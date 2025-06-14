@@ -129,6 +129,7 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuth();
 const user = useUser();
+const { $toast } = useNuxtApp();
 
 // Component data
 const contentData = ref({});
@@ -285,7 +286,7 @@ const startDownload = async () => {
         err.response.data.status == 0 &&
         err.response.data.error == "creditNotEnough"
       ) {
-        useToast().info("No enough credit");
+        $toast.info("No enough credit");
       }
     } else if (err.response?.status == 403) {
       router.push({ query: { auth_form: "login" } });

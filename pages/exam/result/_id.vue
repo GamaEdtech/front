@@ -501,7 +501,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
-import { useToast } from "vue-toastification";
 import PieChart from "@/components/chart/PieChart";
 import CrashReport from "~/components/common/crash-report.vue";
 
@@ -516,8 +515,7 @@ useHead({
 });
 
 const route = useRoute();
-const toast = useToast();
-
+const { $toast } = useNuxtApp();
 // State
 const contentData = ref([]);
 const chartData = ref({});
@@ -609,7 +607,7 @@ const startDownload = async () => {
         err.response.data.status === 0 &&
         err.response.data.error === "creditNotEnough"
       ) {
-        toast.info("No enough credit");
+        $toast.info("No enough credit");
       }
     }
   } finally {

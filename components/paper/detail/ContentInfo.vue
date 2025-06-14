@@ -163,6 +163,7 @@ const props = defineProps({
     required: true,
   },
 });
+const { $toast } = useNuxtApp();
 const auth = useAuth();
 const user = useUser();
 const rating = ref(4.5);
@@ -185,7 +186,6 @@ const openCrashReport = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
-
 const startDownload = async (type) => {
   download_loading.value = true;
   let apiUrl = "";
@@ -206,7 +206,7 @@ const startDownload = async (type) => {
         err.response.data.status == 0 &&
         err.response.data.error == "creditNotEnough"
       ) {
-        useToast().info("No enough credit");
+        $toast.info("No enough credit");
       }
     }
   } finally {

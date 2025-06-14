@@ -2565,7 +2565,7 @@ const getExamTests = async () => {
     // Try a fallback with simpler params if the first request failed
     try {
       // Show a toast notification about the fallback
-      useToast().info(
+      nuxtApp.$toast.info(
         "Some filters were ignored due to an error. Trying with simplified parameters."
       );
 
@@ -2597,7 +2597,7 @@ const getExamTests = async () => {
       console.error("Error in fallback test fetch:", fallbackError);
 
       // Final fallback - try with minimal params or handle the error gracefully
-      useToast().error(
+      nuxtApp.$toast.error(
         "Could not load tests. Please try again later or contact support."
       );
 
@@ -2998,7 +2998,9 @@ const handleClearTopic = () => {
 const loadExamTypes = async () => {
   try {
     // First try to get exam types from the API
-    const res = await useApiService.get("/api/v1/types/list", { type: "exam_type" });
+    const res = await useApiService.get("/api/v1/types/list", {
+      type: "exam_type",
+    });
 
     if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
       test_type_list.value = res.data;
@@ -3042,7 +3044,9 @@ const getCurrentExamInfo = async () => {
   }
 
   try {
-    const response = await useApiService.get(`/api/v1/exams/info/${exam_id.value}`);
+    const response = await useApiService.get(
+      `/api/v1/exams/info/${exam_id.value}`
+    );
 
     if (response.data) {
       const examData = response.data;
@@ -3141,11 +3145,15 @@ const updateQuestion = async () => {
   // For now, assuming form.file_original is managed correctly (e.g., path or new file object)
 
   try {
-    await useApiService.put(`/api/v1/exams/${exam_id.value}`,urlencodeFormData(submissionForm), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    await useApiService.put(
+      `/api/v1/exams/${exam_id.value}`,
+      urlencodeFormData(submissionForm),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     nuxtApp.$toast.success("Exam updated successfully");
     test_step.value = 2; // Move to tests step

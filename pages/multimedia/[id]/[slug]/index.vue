@@ -3,7 +3,6 @@
     <!-- Start : Category -->
     <common-category />
     <!-- End:Category -->
-
     <!--  Start: breadcrumb  -->
     <section>
       <v-container class="py-0">
@@ -216,7 +215,8 @@
 
 <script setup>
 import { useFetch, useAsyncData } from "#app";
-import FileSaver from "file-saver";
+const auth = useAuth();
+const { user } = useUser();
 
 definePageMeta({
   auth: false,
@@ -225,7 +225,7 @@ definePageMeta({
 const preview_gallery = ref(null);
 const route = useRoute();
 const router = useRouter();
-const { $auth, $toast } = useNuxtApp();
+const { $toast } = useNuxtApp();
 const contentData = ref({});
 const editMode = reactive({
   title: false,
@@ -257,11 +257,7 @@ const previewLinkData = computed(() => {
 });
 
 const isLoggedIn = computed(() => {
-  return $auth?.loggedIn ?? false;
-});
-
-const user = computed(() => {
-  return $auth?.user ?? null;
+  return auth.isAuthenticated.value ?? false;
 });
 
 useHead(() => ({
@@ -437,12 +433,11 @@ function openAuthDialog(val) {
 async function startDownload(type) {
   download_loading.value = true;
   const apiUrl = `/api/v1/files/download/${route.params.id}`;
-
   try {
-    const { data } = await useFetch(apiUrl);
-    if (data.value) {
-      FileSaver.saveAs(data.value.url, data.value.name);
-    }
+    const response = await useApiService.get(apiUrl);
+    const FileSaver = await import("file-saver");
+    await FileSaver.saveAs(response.data.url, response.data.name);
+    download_loading.value = false;
   } catch (err) {
     if (err.response?.status == 400) {
       if (
@@ -451,11 +446,8 @@ async function startDownload(type) {
       ) {
         $toast.info("No enough credit");
       }
-    } else if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     }
   } finally {
-    download_loading.value = false;
   }
 }
 
