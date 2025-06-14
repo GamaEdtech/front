@@ -104,17 +104,6 @@
         </v-container>
       </section>
 
-      <!--Mobile order section-->
-      <!-- <paper-detail-mobile-order
-        :contentData="contentData"
-        :is-logged-in="auth.isAuthenticated.value"
-        :user-credit="user?.user && user?.user?.credit"
-        :is-free="isFree"
-        @download="startDownload"
-        @open-auth="openAuthDialog"
-      /> -->
-      <!--End mobile order section-->
-
       <!--  End: detail  -->
     </template>
   </div>
@@ -122,8 +111,6 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
-const auth = useAuth();
-const user = useUser();
 const paperId = computed(() => {
   if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];

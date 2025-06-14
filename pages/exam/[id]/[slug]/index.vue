@@ -3,7 +3,6 @@
     <!-- Start : Category -->
     <common-category />
     <!-- End:Category -->
-
     <!--  Start: breadcrumb  -->
     <section>
       <v-container class="py-0">
@@ -80,8 +79,8 @@
               <!--  Description   -->
               <exam-detail-description-section
                 :content-data="contentData"
-                :is-logged-in="$auth.loggedIn"
-                :credit="$auth.user?.credit || 0"
+                :is-logged-in="auth.isAuthenticated.value"
+                :credit="user?.user.value.credit || 0"
                 @login="openAuthDialog('login')"
                 @register="openAuthDialog('register')"
               />
@@ -89,8 +88,8 @@
             <v-col md="3">
               <exam-detail-sidebar-details
                 :content-data="contentData"
-                :is-logged-in="$auth.loggedIn"
-                :credit="$auth.user?.credit || 0"
+                :is-logged-in="auth.isAuthenticated.value"
+                :credit="user?.user.value.credit || 0"
                 :download-loading="download_loading"
                 @download="startDownload"
                 @login="openAuthDialog('login')"
@@ -108,8 +107,8 @@
       v-if="!dataFetching"
       :exam-id="contentData.id"
       :exam-prices="contentData.price"
-      :is-logged-in="$auth.loggedIn"
-      :credit="$auth.user?.credit || 0"
+      :is-logged-in="auth.isAuthenticated.value"
+      :credit="user?.user.value.credit || 0"
       :user-exam-status="contentData.examUserData?.status || 0"
       :download-loading="download_loading"
       @download="startDownload"
@@ -128,7 +127,8 @@
 // Get api, router, and route
 const route = useRoute();
 const router = useRouter();
-const { $auth } = useNuxtApp();
+const auth = useAuth();
+const user = useUser();
 
 // Component data
 const contentData = ref({});
