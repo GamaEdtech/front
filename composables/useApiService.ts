@@ -30,7 +30,7 @@ export const useApiService = (
       // Process the response data
     },
     onResponseError({ request, response, options }) {
-      if (response?.status == 401) {
+      if (response?.status == 401 || response?.status == 403) {
         const router = useRouter();
         router.push({ query: { auth_form: "login" } });
       }
