@@ -307,13 +307,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       section_list.value = response.data;
@@ -370,14 +364,15 @@ const submitContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
-    const response = await $fetch("/api/v1/files", {
-      method: "POST",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.post(
+      "/api/v1/files",
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The multimedia is duplicated");
@@ -426,13 +421,7 @@ const uploadFile = async (value) => {
   fileFormData.append("file", value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: fileFormData,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post("/api/v1/upload", fileFormData);
 
     formData.file = response.data[0].file.name;
     $toast.success("File uploaded successfully");

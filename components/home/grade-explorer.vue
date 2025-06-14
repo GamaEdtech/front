@@ -974,7 +974,7 @@ export default {
 
     async getQuestions() {
       try {
-        const res = await $fetch("/api/v1/home/questions");
+        const res = await useApiService.get("/api/v1/home/questions");
         this.questions = res.data;
       } catch (err) {
         console.error(err);
@@ -985,7 +985,7 @@ export default {
 
     async getPapers() {
       try {
-        const res = await $fetch("/api/v1/home/tests");
+        const res = await useApiService.get("/api/v1/home/tests");
         this.papers = res.data;
       } catch (err) {
         console.error(err);

@@ -3,8 +3,14 @@
     <!--Start: menu button-->
     <v-btn
       class="d-block d-md-none px-5"
-      style="z-index: 10 ; bottom: 16px; right: 16px; height: 52px;
-      position: fixed; font-weight: 500;"
+      style="
+        z-index: 10;
+        bottom: 16px;
+        right: 16px;
+        height: 52px;
+        position: fixed;
+        font-weight: 500;
+      "
       min-width="40"
       x-large
       color="teal"
@@ -12,9 +18,11 @@
       rounded
       @click.stop="drawer = !drawer"
     >
-      <v-icon style="font-size: 24px;"> mdi-format-list-numbered </v-icon>
+      <v-icon style="font-size: 24px"> mdi-format-list-numbered </v-icon>
       <v-slide-x-reverse-transition>
-        <span v-show="expandListMenu" style="font-size: 1.5rem;" class="text-h6">&nbsp;List</span>
+        <span v-show="expandListMenu" style="font-size: 1.5rem" class="text-h6"
+          >&nbsp;List</span
+        >
       </v-slide-x-reverse-transition>
     </v-btn>
     <!--End: menu button-->
@@ -177,17 +185,14 @@
                 class="sidebar-nav pa-5"
                 width="320"
               >
-              <common-TutorialTree
+                <common-TutorialTree
                   v-if="filteredTree.length"
                   :items="filteredTree"
                   :is-root-level="true"
                 />
               </v-navigation-drawer>
               <div class="book-content" ref="bookContentRef">
-                <div
-                  class="bookText e-mathjax"
-                  v-html="tutorialInfo.content"
-                />
+                <div class="bookText e-mathjax" v-html="tutorialInfo.content" />
               </div>
             </div>
           </v-col>
@@ -224,9 +229,16 @@
   </div>
 </template>
 <script setup>
-import { useRuntimeConfig } from 'nuxt/app';
-import { useNuxtApp } from '#app';
-import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue';
+import { useRuntimeConfig } from "nuxt/app";
+import { useNuxtApp } from "#app";
+import {
+  ref,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+} from "vue";
 
 const config = useRuntimeConfig();
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
@@ -235,36 +247,47 @@ const bookContentRef = ref(null);
 const route = useRoute();
 
 // Fetch tutorial data
-let { data: tutorialInfo, error: tutorialError } = await useAsyncData('tutorialInfo', async () => {
-  try {
-    const response = await $fetch(`/api/v1/tutorials/${route.params.id}`);
-    return response.data;
-  } catch (e) {
-    throw e;
+let { data: tutorialInfo, error: tutorialError } = await useAsyncData(
+  "tutorialInfo",
+  async () => {
+    try {
+      const response = await useApiService.get(
+        `/api/v1/tutorials/${route.params.id}`
+      );
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
   }
-});
-
-// Fetch lesson tree
-const { data: lessonTree, error: lessonTreeError } = await useAsyncData('lessonTree', async () => {
-  try {
-    if (!tutorialInfo.value?.lesson) return null;
-    const response = await $fetch(`/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`);
-    return response.data;
-  } catch (e) {
-    throw e;
-  }
-});
-
-const filteredTree = computed(() =>
-  lessonTree.value?.list?.filter(
-    x => (x.tutorials?.length > 0) || (x.chapters?.length > 0)
-  ) || []
 );
 
-const lessonInfo = tutorialInfo.value?.title?.split('|') || [];
+// Fetch lesson tree
+const { data: lessonTree, error: lessonTreeError } = await useAsyncData(
+  "lessonTree",
+  async () => {
+    try {
+      if (!tutorialInfo.value?.lesson) return null;
+      const response = await useApiService.get(
+        `/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`
+      );
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
+  }
+);
+
+const filteredTree = computed(
+  () =>
+    lessonTree.value?.list?.filter(
+      (x) => x.tutorials?.length > 0 || x.chapters?.length > 0
+    ) || []
+);
+
+const lessonInfo = tutorialInfo.value?.title?.split("|") || [];
 const lesson = {
-  title: lessonInfo[0] || '',
-  topic_title: lessonInfo[1] || ''
+  title: lessonInfo[0] || "",
+  topic_title: lessonInfo[1] || "",
 };
 
 const typesetMathInSpecificContainer = async (containerRef) => {
@@ -277,7 +300,10 @@ const typesetMathInSpecificContainer = async (containerRef) => {
       }
 
       let elementToProcess = null;
-      if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+      if (
+        containerRef.value.$el &&
+        containerRef.value.$el instanceof HTMLElement
+      ) {
         elementToProcess = containerRef.value.$el;
       } else if (containerRef.value instanceof HTMLElement) {
         elementToProcess = containerRef.value;
@@ -296,7 +322,7 @@ onMounted(() => {
   typesetMathInSpecificContainer(bookContentRef);
   activeMenu.value = route.params.id;
   if (process.client) {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
   }
 });
 
@@ -311,14 +337,13 @@ watch(
   }
 );
 
-
 const expandListMenu = ref(true);
 const drawer = ref(false);
 const activeMenu = ref(null);
 
 onBeforeUnmount(() => {
   if (process.client) {
-    window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener("scroll", handleScroll);
   }
 });
 
@@ -329,12 +354,12 @@ const handleScroll = () => {
 
 const crashReportRef = ref(null);
 const openCrashReportDialog = () => {
-    crashReportRef.value.dialog = true;
-    crashReportRef.value.form.type = "tutorial";
+  crashReportRef.value.dialog = true;
+  crashReportRef.value.form.type = "tutorial";
 };
 
 useHead({
-  title: tutorialInfo.value?.title || '',
+  title: tutorialInfo.value?.title || "",
 });
 </script>
 <style>

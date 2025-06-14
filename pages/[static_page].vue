@@ -19,7 +19,7 @@ export default {
     if (params.static_page == "terms-and-conditions") param = "terms";
     else param = params.static_page;
 
-    const page_info = await $fetch(`/api/v1/pages/${param}`);
+    const page_info = await useApiService.get(`/api/v1/pages/${param}`);
 
     if (!page_info.data.title)
       error({ statusCode: 404, message: "Page not found" });

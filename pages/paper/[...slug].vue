@@ -108,8 +108,8 @@
       <!--Mobile order section-->
       <paper-detail-mobile-order
         :contentData="contentData"
-        :is-logged-in="$auth.loggedIn"
-        :user-credit="$auth.user && $auth.user.credit"
+        :is-logged-in="auth.isAuthenticated.value"
+        :user-credit="user?.user && user?.user?.credit"
         :is-free="isFree"
         @download="startDownload"
         @open-auth="openAuthDialog"
@@ -123,7 +123,8 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
-
+const auth = useAuth();
+const user = useUser();
 const paperId = computed(() => {
   if (!route.params.id || !route.params.id.length) return null;
   return route.params.slug[0];
@@ -261,8 +262,8 @@ const startDownload = (type) => {
   if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${paperId.value}/pdf`;
   if (type === "a_file")
     apiUrl = `/api/v1/tests/download/${paperId.value}/answer`;
-  $fetch
-    .$get(apiUrl)
+  useApiService
+    .get(apiUrl)
     .then((response) => {
       var FileSaver = require("file-saver");
       FileSaver.saveAs(response.data.url, response.data.name);

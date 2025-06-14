@@ -25,18 +25,12 @@ export const useApiService = (
   const apiFetch = $fetch.create({
     baseURL: config.public.baseURL,
     credentials: "include",
-    headers: {
-      ...headers,
-      Accept: "application/json",
-    },
-    // headers: { "Content-Type": "application/json" },
 
     onResponse({ request, response, options }) {
       // Process the response data
     },
     onResponseError({ request, response, options }) {
       if (response?.status == 401) {
-        console.log("onResponseError", response);
         const router = useRouter();
         router.push({ query: { auth_form: "login" } });
       }
@@ -48,20 +42,23 @@ export const useApiService = (
       // Handle the request errors
     },
     ...opts,
+    headers: {
+      ...(opts?.headers || {}),
+      ...headers,
+      Accept: "application/json",
+    },
   });
   return apiFetch(request);
 };
 
 export const authHeader = (req = null) => {
   const auth = useAuth();
-  if (req.includes("v2")) {
-    if (auth.isAuthenticated.value) {
+  if (auth.isAuthenticated.value) {
+    if (req.includes("v2")) {
       return { Authorization: `Bearer ${localStorage.getItem("v2_token")}` };
     } else {
       return { Authorization: `Bearer ${auth.getUserToken()}` };
     }
-  } else {
-    return {};
   }
 };
 

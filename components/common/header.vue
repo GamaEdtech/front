@@ -300,7 +300,7 @@ const search = () => {
 
   timer.value = setTimeout(() => {
     if (searchKey.value && allDataLoaded.value == false)
-      $fetch("/api/v1/search/text", {
+      useApiService.get("/api/v1/search/text", {
         params: {
           query: searchKey.value,
           page: pageNum.value,

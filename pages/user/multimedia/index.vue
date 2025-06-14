@@ -327,18 +327,12 @@ const getMultimediaList = async () => {
     page_loading.value = true;
 
     try {
-      const response = await $fetch("/api/v1/files", {
-        method: "GET",
-        params: {
-          perpage: 20,
-          page: page.value,
-          section: filter.level,
-          base: filter.grade,
-          lesson: filter.lesson,
-        },
-        headers: {
-          Authorization: `Bearer ${userToken.value}`,
-        },
+      const response = await useApiService.get("/api/v1/files", {
+        perpage: 20,
+        page: page.value,
+        section: filter.level,
+        base: filter.grade,
+        lesson: filter.lesson,
       });
 
       multimedia_list.value.push(...response.data.list);
@@ -374,13 +368,7 @@ const getTypeList = async (type, parent = "") => {
   if (type === "lesson") params.base_id = parent;
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       level_list.value = response.data;
@@ -470,12 +458,7 @@ const deleteMultimedia = async () => {
   delete_loading.value = true;
 
   try {
-    await $fetch(`/api/v1/files/${deleteId.value}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    await useApiService.remove(`/api/v1/files/${deleteId.value}`);
 
     multimedia_list.value.splice(delete_multimedia_index.value, 1);
     deleteId.value = null;

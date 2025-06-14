@@ -45,12 +45,12 @@ watch(countDown, (val) => {
 async function handleCredentialResponse(value) {
   const auth = useAuth();
   try {
-    const response = await $fetch("/api/v1/users/googleAuth", {
-      method: "POST",
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/googleAuth",
+      new URLSearchParams({
         id_token: value.credential,
-      }),
-    });
+      })
+    );
 
     if (response.status === 1) {
       $toast.success("Logged in successfully");
@@ -123,13 +123,13 @@ onMounted(() => {
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
   try {
-    const response = await $fetch("/api/v1/users/", {
-      method: "POST",
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/",
+      new URLSearchParams({
         type: "resend_code",
         identity: identity.value,
-      }),
-    });
+      })
+    );
     countDownTimer();
     sendOtpBtnStatus.value = true;
     $toast.success("Otp code sent again");
@@ -179,15 +179,15 @@ const submit = handleSubmit(async () => {
 const onFinish = async () => {
   const auth = useAuth();
   try {
-    const response = await $fetch("/api/v1/users/login", {
-      method: "POST",
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/login",
+      new URLSearchParams({
         type: "confirm",
         identity: identity.value.value,
         pass: password.value.value,
         code: otp.value,
-      }),
-    });
+      })
+    );
     if (response.status === 1) {
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
@@ -250,9 +250,8 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
-  const result = await $fetch("/api/v2/identities/tokens/old", {
-    method: "POST",
-    body: { token: old_token },
+  const result = await useApiService.post("/api/v2/identities/tokens/old", {
+    token: old_token,
   });
   if (result.succeeded) {
     localStorage.setItem("v2_token", result.data.token);
@@ -275,9 +274,10 @@ function generatePassword() {
 }
 
 async function registerV2(identity, pass) {
-  const result = await $fetch("/api/v2/identities/register", {
-    method: "POST",
-    body: { email: identity, password: pass, confirmPassword: pass },
+  const result = await useApiService.post("/api/v2/identities/register", {
+    email: identity,
+    password: pass,
+    confirmPassword: pass,
   });
   if (result.succeeded) {
     await submitLoginV2(useAuth().getUserToken());

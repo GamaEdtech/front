@@ -1,5 +1,6 @@
 <template>
-  <v-container id="school-details">
+  <template v-if="status === 'pending'"> </template>
+  <v-container v-else-if="contentData" id="school-details">
     <v-row class="d-flex d-md-none">
       <div class="top-slide-container">
         <client-only>
@@ -190,22 +191,74 @@ const topSlideClass = reactive({
 const showLeaveCommentDialog = ref(false);
 const commentList = ref([]);
 const reportDialog = ref(false);
-const contentData = ref({});
-const ratingData = ref({});
+const contentData = ref(null);
+const ratingData = ref(null);
 const similarSchools = [];
 const galleryImages = ref([]);
-const { data: contentDataRaw } = await useAsyncData("contentData", () =>
-  $fetch(`/api/v2/schools/${route.params.id}`)
+
+const fetchSchoolData = async () => {
+  try {
+    const response = await useApiService.get(
+      `/api/v2/schools/${route.params.id}`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return null;
+  }
+};
+
+const fetchRatingData = async () => {
+  try {
+    const response = await useApiService.get(
+      `/api/v2/schools/${route.params.id}/rate`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching rating data:", error);
+    return null;
+  }
+};
+
+const {
+  data: contentDataRaw,
+  status,
+  refresh,
+} = await useAsyncData("contentData", () => fetchSchoolData(), {
+  server: true,
+  lazy: false,
+  immediate: true,
+});
+
+const {
+  data: ratingDataRaw,
+  status: ratingStatus,
+  refresh: refreshRating,
+} = await useAsyncData("ratingData", () => fetchRatingData(), {
+  server: true,
+  lazy: false,
+  immediate: true,
+});
+
+watch(
+  () => contentDataRaw.value,
+  (newData) => {
+    if (newData?.data) {
+      contentData.value = newData.data;
+    }
+  },
+  { immediate: true }
 );
-const { data: ratingDataRaw } = await useAsyncData("ratingData", () =>
-  $fetch(`/api/v2/schools/${route.params.id}/rate`)
+
+watch(
+  () => ratingDataRaw.value,
+  (newData) => {
+    if (newData?.data) {
+      ratingData.value = newData.data;
+    }
+  },
+  { immediate: true }
 );
-if (contentDataRaw.value?.succeeded) {
-  contentData.value = contentDataRaw.value.data;
-}
-if (ratingDataRaw.value?.succeeded) {
-  ratingData.value = ratingDataRaw.value.data;
-}
 
 function changeSlide() {
   if (slideToggler.value == "map") {
@@ -226,18 +279,18 @@ function openAuthDialog(val) {
   router.push({ query: { auth_form: val } });
 }
 function loadComments() {
-  $fetch(`/api/v2/schools/${route.params.id}/comments`, {
-    params: {
+  useApiService
+    .get(`/api/v2/schools/${route.params.id}/comments`, {
       "PagingDto.PageFilter.Size": 20,
-    },
-  })
+    })
     .then((response) => {
       commentList.value = response.data.list;
     })
     .catch(() => {});
 }
 function loadTourPanorama() {
-  $fetch(`/api/v2/schools/${route.params.id}/images/Tour360`)
+  useApiService
+    .get(`/api/v2/schools/${route.params.id}/images/Tour360`)
     .then((response) => {
       tourPanoramas.value = response.data;
       if (tourPanoramas.value.length >= 1) {
@@ -252,7 +305,8 @@ function loadTourPanorama() {
 function refreshSchoolData() {}
 
 function loadGalleryImages() {
-  $fetch(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
+  useApiService
+    .get(`/api/v2/schools/${route.params.id}/images/SimpleImage`)
     .then((response) => {
       galleryImages.value = [...response.data].reverse();
     })

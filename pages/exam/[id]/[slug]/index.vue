@@ -159,7 +159,7 @@ const galleryHelpData = ref({
 async function fetchExamData() {
   try {
     const { id } = route.params;
-    const response = await $fetch(`/api/v1/exams/${id}`);
+    const response = await useApiService.get(`/api/v1/exams/${id}`);
 
     if (response.status === 1 && response.data) {
       return response.data;
@@ -274,7 +274,9 @@ const copyUrl = () => {
 const startDownload = async () => {
   download_loading.value = true;
   try {
-    const response = await $fetch(`/api/v1/exams/download/${route.params.id}`);
+    const response = await useApiService.get(
+      `/api/v1/exams/download/${route.params.id}`
+    );
     const FileSaver = await import("file-saver");
     FileSaver.saveAs(response.data.url, response.data.name);
   } catch (err) {

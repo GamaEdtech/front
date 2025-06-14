@@ -85,11 +85,7 @@ const getUserInfo = async () => {
         ? "/api/v1/teachers/dashboard"
         : "/api/v1/students/dashboard";
 
-    const data = await $fetch(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
+    const data = await useApiService.get(apiUrl);
 
     if (data.data) {
       userInfo.value = data.data;

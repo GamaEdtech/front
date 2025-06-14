@@ -47,7 +47,7 @@
             </v-toolbar>
           </div>
           <v-card-text>
-       
+
             <v-row class="mt-4">
               <v-col cols="12" md="3">
                 <v-autocomplete
@@ -89,10 +89,10 @@
                 />
               </v-col>
             </v-row>
-     
+
 
           </v-card-text>
-  
+
           <v-card-actions
             style="position: sticky; bottom: 0; left: 0; right: 0"
           >
@@ -326,10 +326,7 @@ const getTypeList = async (type, parent = "") => {
   if (type === "lesson") params.base_id = parent;
 
   try {
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-    });
+    const res = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       level_list.value = res.data;
@@ -348,15 +345,12 @@ const getAlbumList = async () => {
     page_loading.value = true;
 
     try {
-      const response = await $fetch("/api/v1/albums", {
-        method: "GET",
-        params: {
-          perpage: 12,
-          page: page.value,
-          section: filter.level,
-          base: filter.grade,
-          lesson: filter.lesson,
-        },
+      const response = await useApiService.get("/api/v1/albums", {
+        perpage: 12,
+        page: page.value,
+        section: filter.level,
+        base: filter.grade,
+        lesson: filter.lesson,
       });
 
       let result = response.data.list;

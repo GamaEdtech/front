@@ -1,7 +1,7 @@
 <template>
   <v-container class="create-test-container">
     <v-row class="mt-4">
-      <v-col cols="6" class="d-flex align-center mb-4" >
+      <v-col cols="6" class="d-flex align-center mb-4">
         <span class="icon icong-azmoon text-h3 text-teal mx-1"></span>
         <h1 class="text-md-h4 text-h5 text-teal">Update Online Exam</h1>
       </v-col>
@@ -14,14 +14,22 @@
           size="small"
           @click="confirmDeleteDialog = true"
           class="mr-1"
-          style="font-size: 15px; font-weight: 500; display: inline-block !important"
+          style="
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-block !important;
+          "
         />
         <v-btn
           variant="outlined"
           icon="mdi-printer-eye"
           size="small"
           @click="printPreviewDialog = !printPreviewDialog"
-          style="font-size: 15px; font-weight: 500; display: inline-block !important"
+          style="
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-block !important;
+          "
         />
       </v-col>
     </v-row>
@@ -31,14 +39,17 @@
         { title: 'Header', value: 1 },
         { title: 'Tests', value: 2 },
         { title: 'Review', value: 3 },
-        { title: 'Publish', value: 4, disabled: !isExamPublished || tests.length < 5 },
+        {
+          title: 'Publish',
+          value: 4,
+          disabled: !isExamPublished || tests.length < 5,
+        },
       ]"
       v-model="test_step"
       editable
       color="teal"
       hide-actions
       @update:model-value="handleStepChange"
-      
     >
       <template #[`item.1`]>
         <v-card flat class="mt-4 pb-10">
@@ -521,10 +532,7 @@
                           </v-chip>
                         </v-col>
                       </v-row>
-                      <div
-                        id="test-question"
-                        v-html="item.question"
-                      ></div>
+                      <div id="test-question" v-html="item.question"></div>
                       <img :src="item.q_file" />
 
                       <div
@@ -534,7 +542,7 @@
                           item.type == 'descriptive'
                         "
                       >
-                        <div  v-html="item.answer_full"></div>
+                        <div v-html="item.answer_full"></div>
                         <img
                           v-show="item.answer_full_file"
                           :src="item.answer_full_file"
@@ -551,9 +559,8 @@
                           </v-icon>
                           <span>1)</span>
                           <span
-                          
-                          v-show="item.answer_a"
-                          v-html="item.answer_a"
+                            v-show="item.answer_a"
+                            v-html="item.answer_a"
                           ></span>
                           <img v-show="item.a_file" :src="item.a_file" />
                         </div>
@@ -567,7 +574,6 @@
                           </v-icon>
                           <span>2)</span>
                           <span
-                            
                             v-show="item.answer_b"
                             v-html="item.answer_b"
                           ></span>
@@ -583,7 +589,6 @@
                           </v-icon>
                           <span>3)</span>
                           <span
-                            
                             v-show="item.answer_c"
                             v-html="item.answer_c"
                           ></span>
@@ -599,7 +604,6 @@
                           </v-icon>
                           <span>4)</span>
                           <span
-                            
                             v-show="item.answer_d"
                             v-html="item.answer_d"
                           ></span>
@@ -629,13 +633,19 @@
                             <v-icon color="error">mdi-delete</v-icon>
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="blue" size="x-large">mdi-bullhorn-outline</v-icon>
+                            <v-icon color="blue" size="x-large"
+                              >mdi-bullhorn-outline</v-icon
+                            >
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="green" size="x-large">mdi-eye</v-icon>
+                            <v-icon color="green" size="x-large"
+                              >mdi-eye</v-icon
+                            >
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
-                            <v-icon color="red" size="x-large">mdi-video</v-icon>
+                            <v-icon color="red" size="x-large"
+                              >mdi-video</v-icon
+                            >
                           </v-btn>
                         </v-col>
                         <v-col cols="6" class="text-right">
@@ -643,8 +653,12 @@
                             color="blue"
                             density="compact"
                             size="large"
-                            style="text-transform: none; font-size: 13px;"
-                            v-if="!tests.some(id => String(id) === String(item.id))"
+                            style="text-transform: none; font-size: 13px"
+                            v-if="
+                              !tests.some(
+                                (id) => String(id) === String(item.id)
+                              )
+                            "
                             @click="applyTest(item, 'add')"
                           >
                             <v-icon size="small">mdi-plus</v-icon>
@@ -654,8 +668,10 @@
                             color="red"
                             density="compact"
                             size="large"
-                            style="text-transform: none; font-size: 13px;"
-                            v-if="tests.some(id => String(id) === String(item.id))"
+                            style="text-transform: none; font-size: 13px"
+                            v-if="
+                              tests.some((id) => String(id) === String(item.id))
+                            "
                             @click="applyTest(item, 'remove')"
                           >
                             <v-icon size="small">mdi-minus</v-icon>
@@ -732,39 +748,36 @@
       <template #[`item.3`]>
         <v-card flat class="pb-10 test-list">
           <v-card-text id="preview-dialog">
-          <v-row>
+            <v-row>
               <v-col cols="12">
                 <p class="text-h4 font-weight-bold">{{ form.title }}</p>
               </v-col>
-                <v-col cols="4">Question's num: {{ tests.length }}</v-col>
-                <v-col cols="4">Duration: {{ form.duration }}</v-col>
-                <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
-                <v-col cols="12">
-                  <v-chip
+              <v-col cols="4">Question's num: {{ tests.length }}</v-col>
+              <v-col cols="4">Duration: {{ form.duration }}</v-col>
+              <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
+              <v-col cols="12">
+                <v-chip
                   size="x-large"
                   label
                   variant="outlined"
                   rounded
-                    density="compact"
+                  density="compact"
                   class="text-white"
-                    style="
-                      background-color: #b30a29;
-                    font-size: 15px;
-                    "
-                  >
+                  style="background-color: #b30a29; font-size: 15px"
+                >
                   Topics:
                 </v-chip>
-                </v-col>
-                <v-col
+              </v-col>
+              <v-col
                 cols="4"
-                  v-for="(item, index) in topicTitleArr"
-                  :key="index"
-                >
-                  {{ item }}
-                </v-col>
+                v-for="(item, index) in topicTitleArr"
+                :key="index"
+              >
+                {{ item }}
+              </v-col>
               <v-col cols="12">
                 <v-divider />
-            </v-col>
+              </v-col>
             </v-row>
             <v-row ref="mathJaxStep3ReviewContainerRef">
               <v-col cols="12" v-show="previewTestList.length">
@@ -788,7 +801,9 @@
                           class="mb-4"
                         >
                           <div class="d-flex align-center">
-                            <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
+                            <v-icon class="mr-2"
+                              >mdi-alert-circle-outline</v-icon
+                            >
                             <span>{{ item.question }}</span>
                             <v-spacer></v-spacer>
                             <v-btn
@@ -803,14 +818,10 @@
                             </v-btn>
                           </div>
                         </v-alert>
-                        
+
                         <!-- Regular test display for non-error items -->
                         <template v-else>
-                          <div
-                            id="test-question"
-                            
-                            v-html="item.question"
-                          />
+                          <div id="test-question" v-html="item.question" />
                           <img v-if="item.q_file" :src="item.q_file" />
 
                           <div
@@ -820,7 +831,7 @@
                               item.type == 'descriptive'
                             "
                           >
-                            <div  v-html="item.answer_full" />
+                            <div v-html="item.answer_full" />
                             <img
                               v-show="item.answer_full_file"
                               :src="item.answer_full_file"
@@ -830,42 +841,38 @@
                             <div class="answer">
                               <span>1)</span>
                               <span
-                                  
-                                  v-show="item.answer_a"
-                                  v-html="item.answer_a"
+                                v-show="item.answer_a"
+                                v-html="item.answer_a"
                               ></span>
                               <img v-show="item.a_file" :src="item.a_file" />
                             </div>
                             <div class="answer">
                               <span>2)</span>
                               <span
-                                  
-                                  v-show="item.answer_b"
-                                  v-html="item.answer_b"
+                                v-show="item.answer_b"
+                                v-html="item.answer_b"
                               ></span>
                               <img v-show="item.b_file" :src="item.b_file" />
                             </div>
                             <div class="answer">
                               <span>3)</span>
                               <span
-                                  
-                                  v-show="item.answer_c"
-                                  v-html="item.answer_c"
+                                v-show="item.answer_c"
+                                v-html="item.answer_c"
                               ></span>
                               <img v-show="item.c_file" :src="item.c_file" />
                             </div>
                             <p class="answer">
                               <span>4)</span>
                               <span
-                                  
-                                  v-show="item.answer_d"
-                                  v-html="item.answer_d"
+                                v-show="item.answer_d"
+                                v-html="item.answer_d"
                               />
                               <img v-show="item.d_file" :src="item.d_file" />
                             </p>
                           </div>
                         </template>
-                        
+
                         <!-- Only show action buttons for non-error items -->
                         <v-row v-if="!item.isPlaceholder && !item.error">
                           <v-col cols="6">
@@ -889,7 +896,11 @@
                               color="blue"
                               density="compact"
                               size="large"
-                              v-if="!tests.some(id => String(id) === String(item.id))"
+                              v-if="
+                                !tests.some(
+                                  (id) => String(id) === String(item.id)
+                                )
+                              "
                               @click="applyTest(item, 'add')"
                               style="text-transform: none; font-size: 13px"
                             >
@@ -900,9 +911,17 @@
                               color="red"
                               density="compact"
                               size="large"
-                              v-if="tests.some(id => String(id) === String(item.id))"
+                              v-if="
+                                tests.some(
+                                  (id) => String(id) === String(item.id)
+                                )
+                              "
                               @click="applyTest(item, 'remove')"
-                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
+                              style="
+                                text-transform: none;
+                                font-size: 13px;
+                                margin-inline: 5px;
+                              "
                             >
                               <v-icon size="small"> mdi-minus </v-icon>
                               Delete
@@ -926,42 +945,42 @@
 
             <!--Publish button-->
             <v-row>
-            <v-col cols="12">
-              <v-row>
-                <v-col cols="12" md="6" class="pb-0">
-                  <v-btn
-                    @click="publishTest"
-                    :disabled="tests.length < 5"
-                    :loading="publish_loading"
-                    size="large"
+              <v-col cols="12">
+                <v-row>
+                  <v-col cols="12" md="6" class="pb-0">
+                    <v-btn
+                      @click="publishTest"
+                      :disabled="tests.length < 5"
+                      :loading="publish_loading"
+                      size="large"
                       density="compact"
-                    color="teal"
+                      color="teal"
                       class="white--text"
-                    block
+                      block
                       style="text-transform: none; font-size: 13px !important"
                     >
                       <span v-show="tests.length < 5"
                         >Add at least {{ 5 - tests.length }} more tests</span
                       >
                       <span v-show="tests.length >= 5">Publish</span>
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    size="large"
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-btn
+                      size="large"
                       variant="outlined"
-                    density="compact"
+                      density="compact"
                       color="error"
                       to="/user/exam"
                       block
                       style="font-size: 13px !important; text-transform: none"
-                  >
-                    Discard
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+                    >
+                      Discard
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
             <!--End publish button-->
           </v-card-text>
         </v-card>
@@ -1024,19 +1043,19 @@
         transition="dialog-bottom-transition"
       >
         <v-card class="test-list">
-        <v-toolbar color="teal" dark>
-          <v-btn icon @click="printPreviewDialog = false">
+          <v-toolbar color="teal" dark>
+            <v-btn icon @click="printPreviewDialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-            <v-btn
-              style="text-transform: none; font-size: 13px; font-weight: 500"
-              variant="text"
-              @click="printPreviewDialog = false"
-            >
-              Ok
-            </v-btn>
+              <v-btn
+                style="text-transform: none; font-size: 13px; font-weight: 500"
+                variant="text"
+                @click="printPreviewDialog = false"
+              >
+                Ok
+              </v-btn>
             </v-toolbar-items>
           </v-toolbar>
           <v-card-text ref="mathJaxPrintDialogContainerRef" id="preview-dialog">
@@ -1048,21 +1067,18 @@
               <v-col cols="4">Duration: {{ form.duration }}</v-col>
               <v-col cols="4">Level: {{ calcLevel(form.level) }}</v-col>
               <v-col cols="12">
-              <v-chip
+                <v-chip
                   size="x-large"
-                label
+                  label
                   variant="outlined"
                   rounded
                   density="compact"
                   class="text-white"
-                style="
-                  background-color: #b30a29;
-                    font-size: 15px;
-                "
-              >
+                  style="background-color: #b30a29; font-size: 15px"
+                >
                   Topics:
                 </v-chip>
-            </v-col>
+              </v-col>
               <v-col
                 cols="4"
                 v-for="(item, index) in topicTitleArr"
@@ -1076,13 +1092,13 @@
             </v-row>
             <v-row ref="mathJaxPrintDialogContainerRef">
               <v-col cols="12" v-if="previewTestList.length">
-                <draggable 
-                  v-model="previewTestList" 
+                <draggable
+                  v-model="previewTestList"
                   @end="previewDragEnd"
                   item-key="id"
                   handle=".drag-handle"
                 >
-                <template #item="{ element: item }">
+                  <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
                         <!-- Add a special display for placeholder/error items -->
@@ -1096,7 +1112,9 @@
                           class="mb-4"
                         >
                           <div class="d-flex align-center">
-                            <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
+                            <v-icon class="mr-2"
+                              >mdi-alert-circle-outline</v-icon
+                            >
                             <span>{{ item.question }}</span>
                             <v-spacer></v-spacer>
                             <v-btn
@@ -1111,13 +1129,10 @@
                             </v-btn>
                           </div>
                         </v-alert>
-                        
+
                         <!-- Regular test display for non-error items -->
                         <template v-else>
-                          <div
-                            id="test-question"
-                            v-html="item.question"
-                          />
+                          <div id="test-question" v-html="item.question" />
                           <img v-if="item.q_file" :src="item.q_file" />
 
                           <div
@@ -1127,7 +1142,7 @@
                               item.type == 'descriptive'
                             "
                           >
-                            <div  v-html="item.answer_full" />
+                            <div v-html="item.answer_full" />
                             <img
                               v-show="item.answer_full_file"
                               :src="item.answer_full_file"
@@ -1137,42 +1152,38 @@
                             <div class="answer">
                               <span>1)</span>
                               <span
-                                  
-                                  v-show="item.answer_a"
-                                  v-html="item.answer_a"
+                                v-show="item.answer_a"
+                                v-html="item.answer_a"
                               ></span>
                               <img v-show="item.a_file" :src="item.a_file" />
                             </div>
                             <div class="answer">
                               <span>2)</span>
                               <span
-                                  
-                                  v-show="item.answer_b"
-                                  v-html="item.answer_b"
+                                v-show="item.answer_b"
+                                v-html="item.answer_b"
                               ></span>
                               <img v-show="item.b_file" :src="item.b_file" />
                             </div>
                             <div class="answer">
                               <span>3)</span>
                               <span
-                                  
-                                  v-show="item.answer_c"
-                                  v-html="item.answer_c"
+                                v-show="item.answer_c"
+                                v-html="item.answer_c"
                               ></span>
                               <img v-show="item.c_file" :src="item.c_file" />
                             </div>
                             <p class="answer">
                               <span>4)</span>
                               <span
-                                  
-                                  v-show="item.answer_d"
-                                  v-html="item.answer_d"
+                                v-show="item.answer_d"
+                                v-html="item.answer_d"
                               />
                               <img v-show="item.d_file" :src="item.d_file" />
                             </p>
                           </div>
                         </template>
-                        
+
                         <!-- Only show action buttons for non-error items -->
                         <v-row v-if="!item.isPlaceholder && !item.error">
                           <v-col cols="6">
@@ -1196,7 +1207,11 @@
                               color="blue"
                               density="compact"
                               size="large"
-                              v-if="!tests.some(id => String(id) === String(item.id))"
+                              v-if="
+                                !tests.some(
+                                  (id) => String(id) === String(item.id)
+                                )
+                              "
                               @click="applyTest(item, 'add')"
                               style="text-transform: none; font-size: 13px"
                             >
@@ -1207,9 +1222,17 @@
                               color="red"
                               density="compact"
                               size="large"
-                              v-if="tests.some(id => String(id) === String(item.id))"
+                              v-if="
+                                tests.some(
+                                  (id) => String(id) === String(item.id)
+                                )
+                              "
                               @click="applyTest(item, 'remove')"
-                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
+                              style="
+                                text-transform: none;
+                                font-size: 13px;
+                                margin-inline: 5px;
+                              "
                             >
                               <v-icon size="small"> mdi-minus </v-icon>
                               Delete
@@ -1237,14 +1260,34 @@
     <v-row>
       <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
         <v-card class="px-5 py-3">
-          <v-card-title class="text-h5 px-0" style="font-size: 13px; word-break: break-word; white-space: normal;">
+          <v-card-title
+            class="text-h5 px-0"
+            style="font-size: 13px; word-break: break-word; white-space: normal"
+          >
             Are you sure of deleting the online exam?
           </v-card-title>
-          <v-card-text class="px-0 py-1 " style="font-size: 11px; word-break: break-word; white-space: normal; color: rgba(0, 0, 0, 0.6);">
+          <v-card-text
+            class="px-0 py-1"
+            style="
+              font-size: 11px;
+              word-break: break-word;
+              white-space: normal;
+              color: rgba(0, 0, 0, 0.6);
+            "
+          >
             If you are sure about the deletion, click Agree button.
           </v-card-text>
-          <v-card-actions style="min-height: 35px !important; padding: 0px !important;">
-            <v-btn text color="error" @click="confirmDeleteDialog = false" style="text-transform: none; font-size: 13px"> Disagree </v-btn>
+          <v-card-actions
+            style="min-height: 35px !important; padding: 0px !important"
+          >
+            <v-btn
+              text
+              color="error"
+              @click="confirmDeleteDialog = false"
+              style="text-transform: none; font-size: 13px"
+            >
+              Disagree
+            </v-btn>
             <v-btn
               color="green darken-1"
               text
@@ -1304,7 +1347,7 @@ import { useRuntimeConfig } from "nuxt/app";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
 import { useState } from "#app";
-import { useNuxtApp } from '#app'; 
+import { useNuxtApp } from "#app";
 import { defineRule } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import draggable from "vuedraggable";
@@ -1427,11 +1470,10 @@ const test_type_list = ref([]);
 const test_list = ref([]);
 const selected_topics = ref([]);
 
-
 // MathJax refs
-const mathJaxStep2ListContainerRef = ref()
-const mathJaxStep3ReviewContainerRef = ref()
-const mathJaxPrintDialogContainerRef = ref() 
+const mathJaxStep2ListContainerRef = ref();
+const mathJaxStep3ReviewContainerRef = ref();
+const mathJaxPrintDialogContainerRef = ref();
 
 // Static data
 const year_list = ref([
@@ -1546,15 +1588,15 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     };
 
     // Set up parameters based on type
-  if (type === "base") params.section_id = parent;
-  if (type === "lesson") params.base_id = parent;
-  if (type === "topic") params.lesson_id = parent;
-  if (type === "area") params.state_id = parent;
+    if (type === "base") params.section_id = parent;
+    if (type === "lesson") params.base_id = parent;
+    if (type === "topic") params.lesson_id = parent;
+    if (type === "area") params.state_id = parent;
 
-  if (type === "school") {
-    params.section_id = form.section;
-    params.area_id = form.area;
-  }
+    if (type === "school") {
+      params.section_id = form.section;
+      params.area_id = form.area;
+    }
 
     // Add loading state if needed
     const loadingTarget =
@@ -1579,50 +1621,43 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
     }
 
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params: params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const res = await useApiService.get("/api/v1/types/list", params);
 
     if (res && res.data) {
-    if (type === "section") {
+      if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
         } else {
-      level_list.value = res.data;
-      filter_level_list.value = res.data;
+          level_list.value = res.data;
+          filter_level_list.value = res.data;
         }
-    } else if (type === "base") {
+      } else if (type === "base") {
         if (trigger === "filter") {
           filter_grade_list.value = res.data;
         } else {
-      grade_list.value = res.data;
-      filter_grade_list.value = res.data;
+          grade_list.value = res.data;
+          filter_grade_list.value = res.data;
         }
-    } else if (type === "lesson") {
+      } else if (type === "lesson") {
         if (trigger === "filter") {
           filter_lesson_list.value = res.data;
         } else {
-      lesson_list.value = res.data;
-      filter_lesson_list.value = res.data;
+          lesson_list.value = res.data;
+          filter_lesson_list.value = res.data;
         }
-    } else if (type === "topic") {
-      topic_list.value = res.data;
-    } else if (type === "exam_type") {
+      } else if (type === "topic") {
+        topic_list.value = res.data;
+      } else if (type === "exam_type") {
         // Make sure we're properly assigning the exam_type data
-      test_type_list.value = res.data;
+        test_type_list.value = res.data;
+      } else if (type === "state") {
+        state_list.value = res.data;
+      } else if (type === "area") {
+        area_list.value = res.data;
+      } else if (type === "school") {
+        school_list.value = res.data;
+      }
 
-    } else if (type === "state") {
-      state_list.value = res.data;
-    } else if (type === "area") {
-      area_list.value = res.data;
-    } else if (type === "school") {
-      school_list.value = res.data;
-    }
-    
       generateTitle();
     }
   } catch (err) {
@@ -1678,34 +1713,35 @@ const submitQuestion = async () => {
     submit_loading.value = false;
     return;
   }
-  
+
   // Arrange to form data
   let formData = new FormData();
   for (let key in form) {
     if (key !== "topics") formData.append(key, form[key]);
   }
-  
+
   if (form.topics.length) {
     for (let key in form.topics) {
       formData.append("topics[]", form.topics[key]);
-  }
+    }
   }
 
   try {
-    const response = await $fetch("/api/v1/exams", {
-      method: "POST",
-      body: urlencodeFormData(formData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post(
+      "/api/v1/exams",
+      urlencodeFormData(formData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     nuxtApp.$toast.success("Exam created successfully");
 
     exam_id.value = response.data.id;
-      exam_code.value = response.data.code;
-      
+    exam_code.value = response.data.code;
+
     // Set in store
     const userState = useState("user");
     userState.value = {
@@ -1762,10 +1798,7 @@ const uploadFile = async (file_name) => {
   formData.append("file", file_original.value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await useApiService.post("/api/v1/upload", formData);
 
     if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
@@ -1783,12 +1816,9 @@ const publishTest = async () => {
   publish_loading.value = true;
 
   try {
-    const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.put(
+      `/api/v1/exams/publish/${exam_id.value}`
+    );
 
     if (response.status === 1) {
       // Store the published exam ID for share link
@@ -1858,25 +1888,26 @@ const submitTest = async () => {
     }
 
     const formData = new URLSearchParams();
-    tests.value.forEach(id => {
+    tests.value.forEach((id) => {
       formData.append("tests[]", String(id));
     });
 
-    await $fetch(`/api/v1/exams/tests/${exam_id.value}`, {
-      method: "PUT",
-      body: formData.toString(),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-    
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await useApiService.put(
+      `/api/v1/exams/tests/${exam_id.value}`,
+      formData.toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        },
+      }
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
     await handleRefreshPreviewList(); // MODIFIED HERE
-    
+
     nuxtApp.$toast.success("Tests updated successfully");
   } catch (err) {
-    console.error('Failed to update tests:', err);
+    console.error("Failed to update tests:", err);
     nuxtApp.$toast.error("Failed to update tests");
   }
 };
@@ -1884,12 +1915,7 @@ const submitTest = async () => {
 // Helper function to fetch details for a single test by its ID
 const fetchTestDetails = async (testId) => {
   try {
-    const response = await $fetch(`/api/v1/examTests/${testId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get(`/api/v1/examTests/${testId}`);
 
     if (response && response.status === 1 && response.data) {
       return response.data;
@@ -1907,14 +1933,14 @@ const handleRefreshPreviewList = async () => {
   if (!exam_id.value) {
     previewTestList.value = [];
     if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = 0;
+      createForm.value.examTestListLength = 0;
     }
     return;
   }
 
   test_loading.value = true;
   try {
-    const currentTestIds = tests.value.map(id => String(id));
+    const currentTestIds = tests.value.map((id) => String(id));
 
     if (currentTestIds.length === 0) {
       previewTestList.value = [];
@@ -1925,73 +1951,86 @@ const handleRefreshPreviewList = async () => {
       return;
     }
 
-    const response = await $fetch(`/api/v1/examTests`, {
-      method: "GET",
-      params: { exam_id: exam_id.value }, 
-      headers: { Authorization: `Bearer ${userToken.value}` },
+    const response = await useApiService.get(`/api/v1/examTests`, {
+      exam_id: exam_id.value,
     });
 
     let fetchedApiTests = [];
     if (response && response.status === 1) {
-      fetchedApiTests = Array.isArray(response.data) ? response.data : (response.data?.list || []);
+      fetchedApiTests = Array.isArray(response.data)
+        ? response.data
+        : response.data?.list || [];
     }
 
     const fetchedDetailsMap = new Map(
-      fetchedApiTests.map(test => [String(test.id), test])
+      fetchedApiTests.map((test) => [String(test.id), test])
     );
 
-    const newPreviewListConstructionPromises = currentTestIds.map(async (testId) => {
-      if (fetchedDetailsMap.has(testId)) {
-        return fetchedDetailsMap.get(testId);
-      } else {
-        console.warn(`Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`);
-        const individualDetails = await fetchTestDetails(testId);
-        if (individualDetails) {
-          return individualDetails;
+    const newPreviewListConstructionPromises = currentTestIds.map(
+      async (testId) => {
+        if (fetchedDetailsMap.has(testId)) {
+          return fetchedDetailsMap.get(testId);
         } else {
-          console.error(`Failed to fetch details for ${testId} even individually. Creating placeholder.`);
-          // Mark these placeholders clearly so we can handle them in the UI
-          return { 
-            id: testId, 
-            question: `Test ${testId} could not be loaded. It may have been deleted or you may not have permission to view it.`, 
-            type: 'error', 
-            isPlaceholder: true, 
-            owner: false,  // Don't show edit buttons for placeholders
-            error: true    // Add an error flag to clearly identify this as an error state
-          };
+          console.warn(
+            `Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`
+          );
+          const individualDetails = await fetchTestDetails(testId);
+          if (individualDetails) {
+            return individualDetails;
+          } else {
+            console.error(
+              `Failed to fetch details for ${testId} even individually. Creating placeholder.`
+            );
+            // Mark these placeholders clearly so we can handle them in the UI
+            return {
+              id: testId,
+              question: `Test ${testId} could not be loaded. It may have been deleted or you may not have permission to view it.`,
+              type: "error",
+              isPlaceholder: true,
+              owner: false, // Don't show edit buttons for placeholders
+              error: true, // Add an error flag to clearly identify this as an error state
+            };
+          }
         }
       }
-    });
+    );
 
-    const constructedList = (await Promise.all(newPreviewListConstructionPromises)).filter(Boolean);
+    const constructedList = (
+      await Promise.all(newPreviewListConstructionPromises)
+    ).filter(Boolean);
 
     // Ensure the order of previewTestList matches tests.value
-    previewTestList.value = currentTestIds.map(id => {
-        return constructedList.find(test => String(test.id) === id);
-    }).filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
-
+    previewTestList.value = currentTestIds
+      .map((id) => {
+        return constructedList.find((test) => String(test.id) === id);
+      })
+      .filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
   } catch (err) {
     console.error("Error in handleRefreshPreviewList during API call:", err);
     nuxtApp.$toast.error("Error refreshing preview list.");
     // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
     if (tests.value.length > 0 && previewTestList.value.length === 0) {
-        const fallbackPromises = tests.value.map(async (id) => {
-            const details = await fetchTestDetails(String(id));
-            return details || { 
-              id: String(id), 
-              question: `Test ${id} could not be loaded. It may have been deleted.`, 
-              type: 'error', 
-              isPlaceholder: true, 
-              owner: false, 
-              error: true 
-            };
-        });
-        previewTestList.value = (await Promise.all(fallbackPromises)).filter(Boolean);
+      const fallbackPromises = tests.value.map(async (id) => {
+        const details = await fetchTestDetails(String(id));
+        return (
+          details || {
+            id: String(id),
+            question: `Test ${id} could not be loaded. It may have been deleted.`,
+            type: "error",
+            isPlaceholder: true,
+            owner: false,
+            error: true,
+          }
+        );
+      });
+      previewTestList.value = (await Promise.all(fallbackPromises)).filter(
+        Boolean
+      );
     }
   } finally {
     test_loading.value = false;
     if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
+      createForm.value.examTestListLength = tests.value.length;
     }
   }
 };
@@ -2001,30 +2040,32 @@ const handleRefreshPreviewList = async () => {
  */
 const handleTestRefresh = async () => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    tests.value = tests.value.map(id => String(id));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    tests.value = tests.value.map((id) => String(id));
     await handleRefreshPreviewList(); // MODIFIED HERE
-    
+
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
-    
+
     if (testListSwitch.value) {
       filter.page = 1;
       test_list.value = [];
       all_tests_loaded.value = false;
       await getExamTests();
     }
-    
+
     if (previewTestList.value.length > 0) {
-      nuxtApp.$toast.success(`Tests updated: ${tests.value.length} tests in exam`);
+      nuxtApp.$toast.success(
+        `Tests updated: ${tests.value.length} tests in exam`
+      );
     } else {
-      nuxtApp.$toast.info('Refreshing test list...');
+      nuxtApp.$toast.info("Refreshing test list...");
       await submitTest(); // This will call handleRefreshPreviewList again
-      }
-    } catch (err) {
-    console.error('Error in handleTestRefresh:', err);
-    nuxtApp.$toast.error('Error refreshing test list');
+    }
+  } catch (err) {
+    console.error("Error in handleTestRefresh:", err);
+    nuxtApp.$toast.error("Error refreshing test list");
   }
 };
 
@@ -2067,9 +2108,9 @@ const applyTest = async (item, type = null) => {
 
     // Convert item.id to string for consistent comparison
     const testId = String(item.id);
-    
+
     // Check if the test ID exists in the array (using string comparison)
-    const testExists = tests.value.some(id => String(id) === testId);
+    const testExists = tests.value.some((id) => String(id) === testId);
 
     // Check if we need to add or remove the test
     const shouldAdd = type === "add" || (!type && !testExists);
@@ -2081,7 +2122,7 @@ const applyTest = async (item, type = null) => {
       nuxtApp.$toast.success("Test added to exam");
     } else if (shouldRemove) {
       // Remove the test from the tests array (using string comparison)
-      tests.value = tests.value.filter(id => String(id) !== testId);
+      tests.value = tests.value.filter((id) => String(id) !== testId);
       nuxtApp.$toast.success("Test removed from exam");
     }
 
@@ -2100,17 +2141,17 @@ watch(
     if (newTest && exam_id.value) {
       // Convert to string for consistent comparison - IDs might be numbers or strings
       const newTestId = String(newTest);
-      
+
       // First check if this test is already in our list to avoid duplicates
       // Make sure we're comparing strings to strings for consistency
-      if (tests.value.some(id => String(id) === newTestId)) {
+      if (tests.value.some((id) => String(id) === newTestId)) {
         lastCreatedTest.value = null;
         return;
       }
 
       // Add the new test to the tests array - association already done in child component
       tests.value.push(newTestId);
-      
+
       // Reset the lastCreatedTest after processing
       lastCreatedTest.value = null;
     }
@@ -2319,7 +2360,7 @@ watch(
     if (val === null || val === undefined) {
       filter.testsHasVideo = 0;
     }
-    
+
     // Reset pagination and test list before loading new data
     filter.page = 1;
     test_list.value = [];
@@ -2370,14 +2411,14 @@ watch(
 onMounted(async () => {
   // Get user token for API calls
   userToken.value = auth.getUserToken();
-  
+
   // Ensure filter.testsHasVideo is set to 0 at initialization
   if (filter.testsHasVideo === null || filter.testsHasVideo === undefined) {
     filter.testsHasVideo = 0;
   }
 
   await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
-  
+
   await getTypeList("section");
   if (form.section) {
     await getTypeList("base", form.section);
@@ -2405,7 +2446,7 @@ onMounted(async () => {
   } else {
     // Default to step 1 if no specific active query or if it's an existing exam being edited
     // For edit, we might want to default to step 2 if exam_id is present
-    test_step.value = exam_id.value ? 2 : 1; 
+    test_step.value = exam_id.value ? 2 : 1;
   }
   if (test_step.value === 2 && testListSwitch.value) {
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
@@ -2414,7 +2455,6 @@ onMounted(async () => {
     await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
   }
 });
-
 
 onUpdated(async () => {
   if (test_step.value === 2 && testListSwitch.value) {
@@ -2439,13 +2479,15 @@ const deleteExamTest = async () => {
   delete_exam_test_loading.value = true;
 
   try {
-    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/json",
-      },
-      method: "DELETE",
-    });
+    await useApiService.remove(
+      `/api/v1/examTests/${delete_exam_test_id.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     nuxtApp.$toast.success("Deleted successfully");
 
@@ -2475,36 +2517,39 @@ const deleteExamTest = async () => {
 const getExamTests = async () => {
   // If already loading or all tests loaded, don't make another request
   if (test_loading.value || all_tests_loaded.value) return;
-  
+
   test_loading.value = true;
-  
+
   // Build query params, ensuring testsHasVideo is always a number
   const params = {
     lesson: filter.lesson,
     topic: filter.topic,
     myTests: filter.myTests,
     // Ensure testsHasVideo is always a number (0 if null/undefined/cleared)
-    testsHasVideo: filter.testsHasVideo === null || filter.testsHasVideo === undefined ? 0 : filter.testsHasVideo,
+    testsHasVideo:
+      filter.testsHasVideo === null || filter.testsHasVideo === undefined
+        ? 0
+        : filter.testsHasVideo,
     page: filter.page,
-    perpage: filter.perpage
+    perpage: filter.perpage,
   };
-  
+
   // Remove undefined or null values (except testsHasVideo which we've already handled)
-  Object.keys(params).forEach(key => {
-    if (key !== 'testsHasVideo' && (params[key] === undefined || params[key] === null)) {
+  Object.keys(params).forEach((key) => {
+    if (
+      key !== "testsHasVideo" &&
+      (params[key] === undefined || params[key] === null)
+    ) {
       delete params[key];
     }
   });
 
   try {
     // First attempt with all parameters
-    const response = await $fetch('/api/v1/examTests', {
-      method: 'GET',
-      params
-    });
-    
+    const response = await useApiService.get("/api/v1/examTests", params);
+
     test_list.value.push(...response.data.list);
-    
+
     // Update exam test list length
     if (createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
@@ -2512,30 +2557,32 @@ const getExamTests = async () => {
 
     // Check if we've loaded all tests
     all_tests_loaded.value = response.data.list.length === 0;
-    
+
     return response;
   } catch (error) {
-    console.error('Error getting exam tests:', error);
-    
+    console.error("Error getting exam tests:", error);
+
     // Try a fallback with simpler params if the first request failed
     try {
       // Show a toast notification about the fallback
-      useToast().info('Some filters were ignored due to an error. Trying with simplified parameters.');
-      
+      useToast().info(
+        "Some filters were ignored due to an error. Trying with simplified parameters."
+      );
+
       // Simplified params - just keep the essential ones
       const fallbackParams = {
         lesson: filter.lesson,
         page: filter.page,
-        perpage: filter.perpage
+        perpage: filter.perpage,
       };
-      
-      console.log('Retrying with simplified params:', fallbackParams);
-      
-      const fallbackResponse = await $fetch('/api/v1/examTests', {
-        method: 'GET',
-        params: fallbackParams
-      });
-      
+
+      console.log("Retrying with simplified params:", fallbackParams);
+
+      const fallbackResponse = await useApiService.get(
+        "/api/v1/examTests",
+        fallbackParams
+      );
+
       test_list.value.push(...fallbackResponse.data.list);
       // Update exam test list length
       if (createForm.value) {
@@ -2544,17 +2591,19 @@ const getExamTests = async () => {
 
       // Check if we've loaded all tests
       all_tests_loaded.value = fallbackResponse.data.list.length === 0;
-      
+
       return fallbackResponse;
     } catch (fallbackError) {
-      console.error('Error in fallback test fetch:', fallbackError);
-      
+      console.error("Error in fallback test fetch:", fallbackError);
+
       // Final fallback - try with minimal params or handle the error gracefully
-      useToast().error('Could not load tests. Please try again later or contact support.');
-      
+      useToast().error(
+        "Could not load tests. Please try again later or contact support."
+      );
+
       // Mark as loaded to prevent further requests
       all_tests_loaded.value = true;
-      
+
       return { data: { list: [] } };
     }
   } finally {
@@ -2571,39 +2620,41 @@ const deleteOnlineExam = async () => {
   deleteLoading.value = true;
 
   try {
-    const response = await $fetch(`/api/v1/exams/${exam_id.value}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await useApiService.remove(
+      `/api/v1/exams/${exam_id.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    if(response.data.message === "done"){
-    nuxtApp.$toast.success("Deleted successfully");
+    if (response.data.message === "done") {
+      nuxtApp.$toast.success("Deleted successfully");
 
-    // Reset all values
-    exam_id.value = "";
-    exam_code.value = "";
+      // Reset all values
+      exam_id.value = "";
+      exam_code.value = "";
 
-    // Reset tests
-    tests.value = [];
-    previewTestList.value = [];
+      // Reset tests
+      tests.value = [];
+      previewTestList.value = [];
 
-    // Reset state in user store
-    const userState = useState("user");
-    userState.value = {
-      ...userState.value,
-      currentExamId: "",
-      currentExamCode: "",
-    };
+      // Reset state in user store
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: "",
+        currentExamCode: "",
+      };
 
-    // Reset form and data
-    resetForm();
+      // Reset form and data
+      resetForm();
 
-    // Reset to first step
-    test_step.value = 1;
-  }
+      // Reset to first step
+      test_step.value = 1;
+    }
   } catch (err) {
     nuxtApp.$toast.error(err.message || "Error deleting exam");
     console.error("Error deleting exam:", err);
@@ -2722,7 +2773,6 @@ const resetForm = () => {
   grade_list.value = [];
   lesson_list.value = [];
   topic_list.value = [];
-  
 
   // Reset file inputs
   file_original.value = null;
@@ -2790,7 +2840,6 @@ const handlePublish = () => {
   }
 };
 
-
 // Change from ref to computed
 const test_share_link = computed(() => {
   if (process.server) {
@@ -2816,8 +2865,8 @@ watch(
       topic_list.value = [];
 
       // Reset pagination and test list
-    filter.page = 1;
-    test_list.value = [];
+      filter.page = 1;
+      test_list.value = [];
       all_tests_loaded.value = true;
     }
   }
@@ -2843,32 +2892,38 @@ watch(
   }
 );
 
+watch(
+  test_list,
+  async () => {
+    if (test_step.value === 2 && testListSwitch.value) {
+      await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+    }
+  },
+  { deep: true }
+);
 
-watch(test_list, async () => {
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-}, { deep: true });
-
-watch(previewTestList, async () => {
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
-  }
-  if (printPreviewDialog.value) {
-    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
-  }
-}, { deep: true });
+watch(
+  previewTestList,
+  async () => {
+    if (test_step.value === 3) {
+      await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    }
+    if (printPreviewDialog.value) {
+      await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+    }
+  },
+  { deep: true }
+);
 
 watch(printPreviewDialog, async (isDialogVisible) => {
   if (isDialogVisible) {
-    await nextTick(); 
+    await nextTick();
     await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
   }
 });
 
-
 watch(test_step, async (newStep, oldStep) => {
-  await nextTick(); 
+  await nextTick();
   if (newStep === 2 && testListSwitch.value) {
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   } else if (newStep === 3) {
@@ -2878,7 +2933,7 @@ watch(test_step, async (newStep, oldStep) => {
 
 watch(testListSwitch, async (isSwitchedOn) => {
   if (test_step.value === 2 && isSwitchedOn) {
-    await nextTick(); 
+    await nextTick();
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   }
 });
@@ -2934,7 +2989,7 @@ const handleClearTopic = () => {
   all_tests_loaded.value = false;
 
   // Load tests with new filter
-    getExamTests();
+  getExamTests();
 };
 
 /**
@@ -2943,13 +2998,7 @@ const handleClearTopic = () => {
 const loadExamTypes = async () => {
   try {
     // First try to get exam types from the API
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params: { type: "exam_type" },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const res = await useApiService.get("/api/v1/types/list", { type: "exam_type" });
 
     if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
       test_type_list.value = res.data;
@@ -2988,36 +3037,32 @@ const getCurrentExamInfo = async () => {
   exam_id.value = route.params.id;
   if (!exam_id.value) {
     nuxtApp.$toast.error("Exam ID is missing from route.");
-    router.push('/user/exam'); // Redirect if no ID
+    router.push("/user/exam"); // Redirect if no ID
     return;
   }
-  
+
   try {
-    const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
-    
+    const response = await useApiService.get(`/api/v1/exams/info/${exam_id.value}`);
+
     if (response.data) {
       const examData = response.data;
-      tests.value = examData.tests?.map(id => String(id)) || [];
-    
-    // Set form data in sequence to trigger proper cascading updates
+      tests.value = examData.tests?.map((id) => String(id)) || [];
+
+      // Set form data in sequence to trigger proper cascading updates
       form.section = examData.section || "";
       if (form.section) await getTypeList("base", form.section);
-      
+
       form.base = examData.base || "";
       if (form.base) await getTypeList("lesson", form.base);
-      
+
       form.lesson = examData.lesson || "";
       if (form.lesson) await getTypeList("topic", form.lesson);
-      
+
       // Ensure topics are correctly mapped to string IDs for selected_topics
       // and for the form.topics array.
       // The API might return topics as an array of objects or just an array of IDs.
       if (examData.topics && Array.isArray(examData.topics)) {
-        form.topics = examData.topics.map(topic => String(topic.id || topic));
+        form.topics = examData.topics.map((topic) => String(topic.id || topic));
         selected_topics.value = form.topics; // Sync with topic selector
       } else {
         form.topics = [];
@@ -3026,48 +3071,46 @@ const getCurrentExamInfo = async () => {
       if (form.topics.length) await getTopicTitleList();
 
       form.exam_type = examData.exam_type || examData.azmoon_type || "";
-      form.paperID = examData.paperID || '';
+      form.paperID = examData.paperID || "";
       form.duration = examData.duration || examData.azmoon_time || 3;
-      form.title = examData.title || '';
-      form.level = examData.level || '2'; // Default to '2' if not provided
-      form.edu_year = examData.edu_year ? parseInt(examData.edu_year) : '';
-      form.edu_month = examData.edu_month ? parseInt(examData.edu_month) : '';
-      form.state = examData.state || '';
-      form.area = examData.area || '';
-      form.school = examData.school || '';
+      form.title = examData.title || "";
+      form.level = examData.level || "2"; // Default to '2' if not provided
+      form.edu_year = examData.edu_year ? parseInt(examData.edu_year) : "";
+      form.edu_month = examData.edu_month ? parseInt(examData.edu_month) : "";
+      form.state = examData.state || "";
+      form.area = examData.area || "";
+      form.school = examData.school || "";
       form.holding_time = examData.holding_time || false;
       form.negative_point = examData.negative_point || false;
       form.holding_level = examData.holding_level || 4;
 
-
       if (examData.file_original) {
         file_original_path.value = examData.file_original;
       }
-      exam_code.value = examData.code || '';
+      exam_code.value = examData.code || "";
 
       // If createForm component is used, ensure its state is updated
-    if (createForm.value) {
+      if (createForm.value) {
         createForm.value.examEditMode = true; // Let child know it's in edit context
         // Pass relevant exam data to createForm if it needs it directly
         // e.g., createForm.value.setInitialExamData(examData);
         // Or rely on its own getCurrentExamInfo if that's robust
-      if (typeof createForm.value.getCurrentExamInfo === "function") {
-             // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
-         }
-         if ("examTestListLength" in createForm.value) {
-            createForm.value.examTestListLength = tests.value.length;
-         }
+        if (typeof createForm.value.getCurrentExamInfo === "function") {
+          // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
+        }
+        if ("examTestListLength" in createForm.value) {
+          createForm.value.examTestListLength = tests.value.length;
+        }
       }
-
     } else {
       nuxtApp.$toast.error("Failed to load exam data. No data in response.");
-      router.push('/user/exam');
+      router.push("/user/exam");
     }
   } catch (err) {
     console.error("Error fetching exam info:", err);
     nuxtApp.$toast.error("Failed to load exam information. Please try again.");
     // Consider redirecting or providing a retry mechanism
-    // router.push('/user/exam'); 
+    // router.push('/user/exam');
   }
 };
 
@@ -3077,16 +3120,20 @@ const getCurrentExamInfo = async () => {
 const updateQuestion = async () => {
   submit_loading.value = true;
 
-  if (!validateForm()) { // Assuming validateForm is defined elsewhere or you mean validateHeaderForm
+  if (!validateForm()) {
+    // Assuming validateForm is defined elsewhere or you mean validateHeaderForm
     submit_loading.value = false;
     return;
   }
-  
+
   let submissionForm = new FormData();
   for (const key in form) {
     if (key === "topics") {
-      form.topics.forEach(topicId => submissionForm.append("topics[]", String(topicId)));
-    } else if (form[key] !== null && form[key] !== undefined) { // Append only if value exists
+      form.topics.forEach((topicId) =>
+        submissionForm.append("topics[]", String(topicId))
+      );
+    } else if (form[key] !== null && form[key] !== undefined) {
+      // Append only if value exists
       submissionForm.append(key, form[key]);
     }
   }
@@ -3094,23 +3141,21 @@ const updateQuestion = async () => {
   // For now, assuming form.file_original is managed correctly (e.g., path or new file object)
 
   try {
-    await $fetch(`/api/v1/exams/${exam_id.value}`, {
-      method: "PUT", // Usually PUT for updates, but your server might expect POST with _method=PUT
-      body: urlencodeFormData(submissionForm), // Ensure this matches server expectation (form-data or urlencoded)
+    await useApiService.put(`/api/v1/exams/${exam_id.value}`,urlencodeFormData(submissionForm), {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${userToken.value}`,
       },
     });
-    
+
     nuxtApp.$toast.success("Exam updated successfully");
     test_step.value = 2; // Move to tests step
-    await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Brief delay
     await handleRefreshPreviewList(); // MODIFIED HERE
-
   } catch (error) {
     console.error("Error updating exam:", error);
-    nuxtApp.$toast.error(error.response?.data?.message || "Error updating exam");
+    nuxtApp.$toast.error(
+      error.response?.data?.message || "Error updating exam"
+    );
   } finally {
     submit_loading.value = false;
   }
@@ -3131,41 +3176,43 @@ const validateForm = () => {
     nuxtApp.$toast.error("Please select a Grade");
     return false;
   }
-  
+
   if (!form.lesson) {
     nuxtApp.$toast.error("Please select a Subject");
     return false;
   }
-  
+
   if (!form.topics || form.topics.length === 0) {
     nuxtApp.$toast.error("Please select at least one topic");
     return false;
   }
-  
+
   if (!form.title) {
     nuxtApp.$toast.error("Title is required");
     return false;
   }
-  
+
   if (!form.duration) {
     nuxtApp.$toast.error("Test duration is required");
     return false;
   }
-  
+
   return true;
 };
 
 // Add this function to the script section
 const removeErrorTest = (testId) => {
   // Remove the test from the tests array
-  tests.value = tests.value.filter(id => String(id) !== String(testId));
-  
+  tests.value = tests.value.filter((id) => String(id) !== String(testId));
+
   // Also remove it from the preview list
-  previewTestList.value = previewTestList.value.filter(test => String(test.id) !== String(testId));
-  
+  previewTestList.value = previewTestList.value.filter(
+    (test) => String(test.id) !== String(testId)
+  );
+
   // Update the backend
   submitTest();
-  
+
   // Show a toast message
   nuxtApp.$toast.success(`Removed test ${testId} from exam`);
 };
@@ -3178,7 +3225,7 @@ watch(
     if (val === null || val === undefined) {
       filter.testsHasVideo = 0;
     }
-    
+
     // Reset pagination and test list before loading new data
     filter.page = 1;
     test_list.value = [];
@@ -3186,11 +3233,14 @@ watch(
     getExamTests();
   }
 );
-const typesetMathInSpecificContainer = async (containerRef ) => {
+const typesetMathInSpecificContainer = async (containerRef) => {
   if (process.client && containerRef.value && window.MathJax) {
     let elementToProcess = null;
 
-    if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+    if (
+      containerRef.value.$el &&
+      containerRef.value.$el instanceof HTMLElement
+    ) {
       elementToProcess = containerRef.value.$el;
     } else if (containerRef.value instanceof HTMLElement) {
       elementToProcess = containerRef.value;
@@ -3200,11 +3250,14 @@ const typesetMathInSpecificContainer = async (containerRef ) => {
       return;
     }
     try {
-      await $ensureMathJaxReady(); 
-      await nextTick(); 
-      if (containerRef.value) { 
+      await $ensureMathJaxReady();
+      await nextTick();
+      if (containerRef.value) {
         let currentElementForProcessing = null;
-        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+        if (
+          containerRef.value.$el &&
+          containerRef.value.$el instanceof HTMLElement
+        ) {
           currentElementForProcessing = containerRef.value.$el;
         } else if (containerRef.value instanceof HTMLElement) {
           currentElementForProcessing = containerRef.value;
@@ -3215,7 +3268,7 @@ const typesetMathInSpecificContainer = async (containerRef ) => {
         }
       }
     } catch (error) {
-      console.error('MathJax Error:', error);
+      console.error("MathJax Error:", error);
     }
   }
 };
@@ -3354,9 +3407,8 @@ const typesetMathInSpecificContainer = async (containerRef ) => {
 .textFiledLink .v-field--variant-outlined .v-field__outline {
   border-top-left-radius: 20px !important;
   border-top-right-radius: 20px !important;
-  
 }
-.textFiledLink:deep(input){
+.textFiledLink:deep(input) {
   padding-left: 20px !important;
 }
 .v-btn {

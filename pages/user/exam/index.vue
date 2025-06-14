@@ -87,7 +87,9 @@
                             {{ item.subdate }}
                           </p>
                           <div class="d-flex align-center">
-                            <p class="gtext-t6">{{ showStatus(item.status) }}</p>
+                            <p class="gtext-t6">
+                              {{ showStatus(item.status) }}
+                            </p>
                             <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <v-btn
@@ -201,185 +203,187 @@
 </template>
 
 <script setup>
-
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
 });
 
-
-const { $toast,$store } = useNuxtApp()
-useHead({ title: 'My Exams' })
+const { $toast, $store } = useNuxtApp();
+useHead({ title: "My Exams" });
 
 let filter = ref({
   level: null,
   grade: null,
   lesson: null,
-})
+});
 
-let level_list = ref([])
-let grade_list = ref([])
-let lesson_list = ref([])
-let exam_list = ref([])
-let page_loading = ref(false)
-let page = ref(1)
-let all_files_loaded = ref(false)
-let deleteConfirmDialog =  ref(false)
-let delete_loading = ref(false)
-let delete_exam_id = ref(null)
-let timer = ref(null)
+let level_list = ref([]);
+let grade_list = ref([]);
+let lesson_list = ref([]);
+let exam_list = ref([]);
+let page_loading = ref(false);
+let page = ref(1);
+let all_files_loaded = ref(false);
+let deleteConfirmDialog = ref(false);
+let delete_loading = ref(false);
+let delete_exam_id = ref(null);
+let timer = ref(null);
 
-const getTypeList = async (type, parent = '') => {
-  const params = { type }
-  if (type === 'base') params.section_id = parent
-  if (type === 'lesson') params.base_id = parent
+const getTypeList = async (type, parent = "") => {
+  const params = { type };
+  if (type === "base") params.section_id = parent;
+  if (type === "lesson") params.base_id = parent;
 
   try {
-    const res = await $fetch('/api/v1/types/list', {
-      method: 'GET',
-      params,
-    })
+    const res = await useApiService.get("/api/v1/types/list", params);
 
-    if (type === 'section') {
-      level_list.value = res.data
-    } else if (type === 'base') {
-      grade_list.value = res.data
-    } else if (type === 'lesson') {
-      lesson_list.value = res.data
+    if (type === "section") {
+      level_list.value = res.data;
+    } else if (type === "base") {
+      grade_list.value = res.data;
+    } else if (type === "lesson") {
+      lesson_list.value = res.data;
     }
   } catch (err) {
-    $toast.error(err)
+    $toast.error(err);
   }
-}
-
+};
 
 const getExams = async () => {
   if (!all_files_loaded.value) {
-    page_loading.value = true
+    page_loading.value = true;
     try {
-      const response = await $fetch('/api/v1/exams', {
-        method: 'GET',
-        params: {
-          perpage: 20,
-          page: page.value,
-          section: filter.value.level,
-          base: filter.value.grade,
-          lesson: filter.value.lesson,
-        },
-      })
+      const response = await useApiService.get("/api/v1/exams", {
+        perpage: 20,
+        page: page.value,
+        section: filter.value.level,
+        base: filter.value.grade,
+        lesson: filter.value.lesson,
+      });
 
-      exam_list.value.push(...response.data.list)
+      exam_list.value.push(...response.data.list);
 
       if (response.data.list.length === 0) {
-        all_files_loaded.value = true
+        all_files_loaded.value = true;
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      page_loading.value = false
+      page_loading.value = false;
     }
   }
-}
+};
 
 const scroll = () => {
   window.onscroll = () => {
-    const scrollPosition = Math.max(
-      window.pageYOffset,
-      document.documentElement.scrollTop,
-      document.body.scrollTop
-    ) + window.innerHeight + 50
+    const scrollPosition =
+      Math.max(
+        window.pageYOffset,
+        document.documentElement.scrollTop,
+        document.body.scrollTop
+      ) +
+      window.innerHeight +
+      50;
 
-    const bottomOfWindow = scrollPosition >= document.documentElement.offsetHeight
+    const bottomOfWindow =
+      scrollPosition >= document.documentElement.offsetHeight;
 
-    if (timer) clearTimeout(timer)
+    if (timer) clearTimeout(timer);
 
     if (bottomOfWindow && !all_files_loaded.value) {
-      page_loading.value = true
+      page_loading.value = true;
       timer = setTimeout(() => {
-        page.value++
-        getExams()
-      }, 800)
+        page.value++;
+        getExams();
+      }, 800);
     }
-  }
-}
+  };
+};
 
 const showStatus = (id) => {
-  if (id === '6') return 'Under construction'
-  else if (id === '7') return 'Published'
-}
+  if (id === "6") return "Under construction";
+  else if (id === "7") return "Published";
+};
 
 const openDeleteConfirmDialog = (item_id) => {
-  delete_exam_id.value = item_id
-  deleteConfirmDialog.value = true
-}
+  delete_exam_id.value = item_id;
+  deleteConfirmDialog.value = true;
+};
 
 const deleteExam = async () => {
-  delete_loading.value = true
+  delete_loading.value = true;
   try {
-    await $fetch(`/api/v1/exams/${delete_exam_id.value}`, {
-      method: 'DELETE',
-    })
+    await useApiService.remove(`/api/v1/exams/${delete_exam_id.value}`);
 
-    delete_exam_id.value = null
-    deleteConfirmDialog.value = false
+    delete_exam_id.value = null;
+    deleteConfirmDialog.value = false;
 
-    $store.commit('user/setCurrentExamId', '')
-    $store.commit('user/setCurrentExamCode', '')
-    $store.commit('user/setPreviewTestList', [])
+    $store.commit("user/setCurrentExamId", "");
+    $store.commit("user/setCurrentExamCode", "");
+    $store.commit("user/setPreviewTestList", []);
 
-    $toast.success('Deleted successfully')
+    $toast.success("Deleted successfully");
 
-    exam_list.value = []
-    getExams()
+    exam_list.value = [];
+    getExams();
   } catch (e) {
-    delete_exam_id.value = null
-    deleteConfirmDialog.value = false
+    delete_exam_id.value = null;
+    deleteConfirmDialog.value = false;
   } finally {
-    delete_loading.value = false
+    delete_loading.value = false;
   }
-}
+};
 
 onMounted(() => {
   getTypeList("section");
   getExams("section");
   scroll("section");
-})
+});
 
 // Watchers
-watch(() => filter.value.level, (val) => {
-  filter.value.grade = ''
-  filter.value.lesson = ''
-  if (val) getTypeList('base', val)
+watch(
+  () => filter.value.level,
+  (val) => {
+    filter.value.grade = "";
+    filter.value.lesson = "";
+    if (val) getTypeList("base", val);
 
-  page.value = 1
-  all_files_loaded.value = false
-  exam_list.value = []
-  getExams()
-})
+    page.value = 1;
+    all_files_loaded.value = false;
+    exam_list.value = [];
+    getExams();
+  }
+);
 
-watch(() => filter.value.grade, (val) => {
-  filter.value.lesson = ''
-  if (val) getTypeList('lesson', val)
+watch(
+  () => filter.value.grade,
+  (val) => {
+    filter.value.lesson = "";
+    if (val) getTypeList("lesson", val);
 
-  page.value = 1
-  all_files_loaded.value = false
-  exam_list.value = []
-  getExams()
-})
+    page.value = 1;
+    all_files_loaded.value = false;
+    exam_list.value = [];
+    getExams();
+  }
+);
 
-watch(() => filter.value.lesson, () => {
-  page.value = 1
-  all_files_loaded.value = false
-  exam_list.value = []
-  getExams()
-})
+watch(
+  () => filter.value.lesson,
+  () => {
+    page.value = 1;
+    all_files_loaded.value = false;
+    exam_list.value = [];
+    getExams();
+  }
+);
 </script>
 
 <style scoped>
 p {
   font-size: 1.4rem;
 }
-:deep(.mdi){
+:deep(.mdi) {
   font-size: 16px !important;
 }
 </style>

@@ -291,7 +291,9 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-if="tests.length > 5 && exam_id" class="ml-2 text-success"
+                  <span
+                    v-if="tests.length > 5 && exam_id"
+                    class="ml-2 text-success"
                     >Ready to publish!</span
                   >
                   <span v-else class="ml-2 text-success"
@@ -471,14 +473,14 @@
                 @scroll="onScroll"
               >
                 <v-card-text>
-                  <v-row  ref="mathJaxStep2ListContainerRef">
+                  <v-row ref="mathJaxStep2ListContainerRef">
                     <v-col
                       v-for="item in test_list"
                       :key="item.id"
                       cols="12"
                       v-show="test_list.length > 0"
                     >
-                      <v-row class="mb-2" >
+                      <v-row class="mb-2">
                         <v-col cols="12">
                           <v-chip
                             v-if="item.lesson_title"
@@ -528,10 +530,7 @@
                           </v-chip>
                         </v-col>
                       </v-row>
-                      <div
-                        id="test-question"
-                        v-html="item.question"
-                      ></div>
+                      <div id="test-question" v-html="item.question"></div>
                       <img :src="item.q_file" />
 
                       <div
@@ -541,7 +540,7 @@
                           item.type == 'descriptive'
                         "
                       >
-                        <div  v-html="item.answer_full"></div>
+                        <div v-html="item.answer_full"></div>
                         <img
                           v-show="item.answer_full_file"
                           :src="item.answer_full_file"
@@ -587,7 +586,7 @@
                             mdi-check
                           </v-icon>
                           <span>3)</span>
-                          <span      
+                          <span
                             v-show="item.answer_c"
                             v-html="item.answer_c"
                           ></span>
@@ -602,7 +601,7 @@
                             mdi-check
                           </v-icon>
                           <span>4)</span>
-                          <span       
+                          <span
                             v-show="item.answer_d"
                             v-html="item.answer_d"
                           ></span>
@@ -619,7 +618,7 @@
                             v-if="item.owner == true"
                             style="text-transform: none; font-size: 13px"
                           >
-                            <v-icon >mdi-pencil</v-icon>
+                            <v-icon>mdi-pencil</v-icon>
                           </v-btn>
                           <v-btn
                             icon
@@ -629,9 +628,7 @@
                             @click="openTestDeleteConfirmDialog(item.id)"
                             style="text-transform: none; font-size: 13px"
                           >
-                            <v-icon color="error"
-                              >mdi-delete</v-icon
-                            >
+                            <v-icon color="error">mdi-delete</v-icon>
                           </v-btn>
                           <v-btn icon variant="text" density="compact">
                             <v-icon color="blue" size="x-large"
@@ -654,7 +651,7 @@
                             color="blue"
                             density="compact"
                             size="large"
-                            style="text-transform: none; font-size: 13px;"
+                            style="text-transform: none; font-size: 13px"
                             v-if="
                               !tests.some(
                                 (id) => String(id) === String(item.id)
@@ -669,7 +666,7 @@
                             color="red"
                             density="compact"
                             size="large"
-                            style="text-transform: none; font-size: 13px;"
+                            style="text-transform: none; font-size: 13px"
                             v-if="
                               tests.some((id) => String(id) === String(item.id))
                             "
@@ -764,10 +761,7 @@
                   rounded
                   density="compact"
                   class="text-white"
-                  style="
-                    background-color: #b30a29;
-                    font-size: 15px;
-                  "
+                  style="background-color: #b30a29; font-size: 15px"
                 >
                   Topics:
                 </v-chip>
@@ -794,10 +788,7 @@
                   <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
-                        <div
-                          id="test-question"
-                          v-html="item.question"
-                        />
+                        <div id="test-question" v-html="item.question" />
                         <img :src="item.q_file" />
 
                         <div
@@ -807,7 +798,7 @@
                             item.type == 'descriptive'
                           "
                         >
-                          <div  v-html="item.answer_full" />
+                          <div v-html="item.answer_full" />
                           <img
                             v-show="item.answer_full_file"
                             :src="item.answer_full_file"
@@ -817,7 +808,6 @@
                           <div class="answer">
                             <span>1)</span>
                             <span
-                              
                               v-show="item.answer_a"
                               v-html="item.answer_a"
                             ></span>
@@ -826,7 +816,6 @@
                           <div class="answer">
                             <span>2)</span>
                             <span
-                              
                               v-show="item.answer_b"
                               v-html="item.answer_b"
                             ></span>
@@ -835,7 +824,6 @@
                           <div class="answer">
                             <span>3)</span>
                             <span
-                              
                               v-show="item.answer_c"
                               v-html="item.answer_c"
                             ></span>
@@ -844,7 +832,6 @@
                           <p class="answer">
                             <span>4)</span>
                             <span
-                              
                               v-show="item.answer_d"
                               v-html="item.answer_d"
                             />
@@ -886,7 +873,11 @@
                               size="large"
                               v-if="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
-                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
+                              style="
+                                text-transform: none;
+                                font-size: 13px;
+                                margin-inline: 5px;
+                              "
                             >
                               <v-icon size="large"> mdi-minus </v-icon>
                               Delete
@@ -1040,10 +1031,7 @@
                   rounded
                   density="compact"
                   class="text-white"
-                  style="
-                    background-color: #b30a29;
-                    font-size: 15px;
-                  "
+                  style="background-color: #b30a29; font-size: 15px"
                 >
                   Topics:
                 </v-chip>
@@ -1070,10 +1058,7 @@
                   <template #item="{ element: item }">
                     <v-row :key="item.id">
                       <v-col cols="12">
-                        <div
-                          id="test-question" 
-                          v-html="item.question"
-                        />
+                        <div id="test-question" v-html="item.question" />
                         <img :src="item.q_file" />
 
                         <div
@@ -1083,7 +1068,7 @@
                             item.type == 'descriptive'
                           "
                         >
-                          <div  v-html="item.answer_full" />
+                          <div v-html="item.answer_full" />
                           <img
                             v-show="item.answer_full_file"
                             :src="item.answer_full_file"
@@ -1108,7 +1093,7 @@
                           </div>
                           <div class="answer">
                             <span>3)</span>
-                            <span    
+                            <span
                               v-show="item.answer_c"
                               v-html="item.answer_c"
                             ></span>
@@ -1157,7 +1142,11 @@
                               size="large"
                               v-if="tests.find((x) => x == item.id)"
                               @click="applyTest(item, 'remove')"
-                              style="text-transform: none; font-size: 13px; margin-inline: 5px"
+                              style="
+                                text-transform: none;
+                                font-size: 13px;
+                                margin-inline: 5px;
+                              "
                             >
                               <v-icon size="large"> mdi-minus </v-icon>
                               Delete
@@ -1185,14 +1174,34 @@
     <v-row>
       <v-dialog v-model="confirmDeleteDialog" persistent max-width="290">
         <v-card class="px-5 py-3">
-          <v-card-title class="text-h5 px-0" style="font-size: 13px; word-break: break-word; white-space: normal;">
+          <v-card-title
+            class="text-h5 px-0"
+            style="font-size: 13px; word-break: break-word; white-space: normal"
+          >
             Are you sure of deleting the online exam?
           </v-card-title>
-          <v-card-text class="px-0 py-1 " style="font-size: 11px; word-break: break-word; white-space: normal; color: rgba(0, 0, 0, 0.6);">
+          <v-card-text
+            class="px-0 py-1"
+            style="
+              font-size: 11px;
+              word-break: break-word;
+              white-space: normal;
+              color: rgba(0, 0, 0, 0.6);
+            "
+          >
             If you are sure about the deletion, click Agree button.
           </v-card-text>
-          <v-card-actions style="min-height: 35px !important; padding: 0px !important;">
-            <v-btn text color="error" @click="confirmDeleteDialog = false" style="text-transform: none; font-size: 13px"> Disagree </v-btn>
+          <v-card-actions
+            style="min-height: 35px !important; padding: 0px !important"
+          >
+            <v-btn
+              text
+              color="error"
+              @click="confirmDeleteDialog = false"
+              style="text-transform: none; font-size: 13px"
+            >
+              Disagree
+            </v-btn>
             <v-btn
               color="green darken-1"
               text
@@ -1207,7 +1216,7 @@
       </v-dialog>
     </v-row>
     <!--Delete exam test confirm dialog-->
-    <v-dialog v-model="deleteTestConfirmDialog" max-width="290" persistent >
+    <v-dialog v-model="deleteTestConfirmDialog" max-width="290" persistent>
       <v-card class="pa-0">
         <v-card-title class="mt-2 text-h5" style="font-size: 13px">
           Are you sure?
@@ -1252,7 +1261,7 @@ import { useRuntimeConfig } from "nuxt/app";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
 import { useState } from "#app";
-import { useNuxtApp } from '#app'; 
+import { useNuxtApp } from "#app";
 import { defineRule } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import draggable from "vuedraggable";
@@ -1376,9 +1385,9 @@ const test_list = ref([]);
 const selected_topics = ref([]);
 
 // MathJax refs
-const mathJaxStep2ListContainerRef = ref()
-const mathJaxStep3ReviewContainerRef = ref()
-const mathJaxPrintDialogContainerRef = ref() 
+const mathJaxStep2ListContainerRef = ref();
+const mathJaxStep3ReviewContainerRef = ref();
+const mathJaxPrintDialogContainerRef = ref();
 // Static data
 const year_list = ref([
   2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013,
@@ -1525,13 +1534,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
     }
 
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params: params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const res = await useApiService.get("/api/v1/types/list",params);
 
     if (res && res.data) {
       if (type === "section") {
@@ -1637,14 +1640,15 @@ const submitQuestion = async () => {
   }
 
   try {
-    const response = await $fetch("/api/v1/exams", {
-      method: "POST",
-      body: urlencodeFormData(formData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post(
+      "/api/v1/exams",
+      urlencodeFormData(formData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     nuxtApp.$toast.success("Exam created successfully");
 
@@ -1707,10 +1711,7 @@ const uploadFile = async (file_name) => {
   formData.append("file", file_original.value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await useApiService.post("/api/v1/upload", formData);
 
     if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
@@ -1728,12 +1729,9 @@ const publishTest = async () => {
   publish_loading.value = true;
 
   try {
-    const response = await $fetch(`/api/v1/exams/publish/${exam_id.value}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.put(
+      `/api/v1/exams/publish/${exam_id.value}`
+    );
 
     if (response.status === 1) {
       // Store the published exam ID for share link
@@ -1811,20 +1809,18 @@ const submitTest = async (skipListRefresh = false) => {
       formData.append("tests[]", String(id));
     });
 
-    await $fetch(
+    await useApiService.put(
       `/api/v1/exams/tests/${exam_id.value}`,
+      formData.toString(),
       {
-        method: "PUT",
-        body: formData.toString(),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Authorization: `Bearer ${userToken.value}`,
         },
       }
     );
     await new Promise((resolve) => setTimeout(resolve, 300));
     await handleRefreshPreviewList();
-    
+
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
@@ -1837,12 +1833,7 @@ const submitTest = async (skipListRefresh = false) => {
 // Helper function to fetch details for a single test by its ID
 const fetchTestDetails = async (testId) => {
   try {
-    const response = await $fetch(`/api/v1/examTests/${testId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get(`/api/v1/examTests/${testId}`);
 
     if (response && response.status === 1 && response.data) {
       return response.data;
@@ -1860,14 +1851,14 @@ const handleRefreshPreviewList = async () => {
   if (!exam_id.value) {
     previewTestList.value = [];
     if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = 0;
+      createForm.value.examTestListLength = 0;
     }
     return;
   }
 
   test_loading.value = true;
   try {
-    const currentTestIds = tests.value.map(id => String(id));
+    const currentTestIds = tests.value.map((id) => String(id));
 
     if (currentTestIds.length === 0) {
       previewTestList.value = [];
@@ -1878,62 +1869,87 @@ const handleRefreshPreviewList = async () => {
       return;
     }
 
-    const response = await $fetch(`/api/v1/examTests`, {
-      method: "GET",
-      params: { exam_id: exam_id.value }, // This should fetch all tests linked to the exam
-      headers: { Authorization: `Bearer ${userToken.value}` },
+    const response = await useApiService.get(`/api/v1/examTests`, {
+      exam_id: exam_id.value,
     });
 
     let fetchedApiTests = [];
     if (response && response.status === 1) {
-      fetchedApiTests = Array.isArray(response.data) ? response.data : (response.data?.list || []);
+      fetchedApiTests = Array.isArray(response.data)
+        ? response.data
+        : response.data?.list || [];
     }
 
     const fetchedDetailsMap = new Map(
-      fetchedApiTests.map(test => [String(test.id), test])
+      fetchedApiTests.map((test) => [String(test.id), test])
     );
 
-    const newPreviewListConstructionPromises = currentTestIds.map(async (testId) => {
-      if (fetchedDetailsMap.has(testId)) {
-        return fetchedDetailsMap.get(testId);
-      } else {
-        // Test is in local `tests.value` but not in the bulk API response.
-        // This could be a newly added test not yet fully reflected, or an orphaned ID.
-        // Attempt to fetch its details directly.
-        console.warn(`Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`);
-        const individualDetails = await fetchTestDetails(testId);
-        if (individualDetails) {
-          return individualDetails;
+    const newPreviewListConstructionPromises = currentTestIds.map(
+      async (testId) => {
+        if (fetchedDetailsMap.has(testId)) {
+          return fetchedDetailsMap.get(testId);
         } else {
-          // If even individual fetch fails, create a placeholder indicating an issue.
-          console.error(`Failed to fetch details for ${testId} even individually. Creating placeholder.`);
-          return { id: testId, question: `Issue loading test ${testId}`, type: 'error', isPlaceholder: true, owner: true }; // Assuming owner if it's in tests.value
+          // Test is in local `tests.value` but not in the bulk API response.
+          // This could be a newly added test not yet fully reflected, or an orphaned ID.
+          // Attempt to fetch its details directly.
+          console.warn(
+            `Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`
+          );
+          const individualDetails = await fetchTestDetails(testId);
+          if (individualDetails) {
+            return individualDetails;
+          } else {
+            // If even individual fetch fails, create a placeholder indicating an issue.
+            console.error(
+              `Failed to fetch details for ${testId} even individually. Creating placeholder.`
+            );
+            return {
+              id: testId,
+              question: `Issue loading test ${testId}`,
+              type: "error",
+              isPlaceholder: true,
+              owner: true,
+            }; // Assuming owner if it's in tests.value
+          }
         }
       }
-    });
+    );
 
-    const constructedList = (await Promise.all(newPreviewListConstructionPromises)).filter(Boolean);
+    const constructedList = (
+      await Promise.all(newPreviewListConstructionPromises)
+    ).filter(Boolean);
 
     // Ensure the order of previewTestList matches tests.value
-    previewTestList.value = currentTestIds.map(id => {
-        return constructedList.find(test => String(test.id) === id);
-    }).filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
-
+    previewTestList.value = currentTestIds
+      .map((id) => {
+        return constructedList.find((test) => String(test.id) === id);
+      })
+      .filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
   } catch (err) {
     console.error("Error in handleRefreshPreviewList during API call:", err);
     nuxtApp.$toast.error("Error refreshing preview list.");
     // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
     if (tests.value.length > 0 && previewTestList.value.length === 0) {
-        const fallbackPromises = tests.value.map(async (id) => {
-            const details = await fetchTestDetails(String(id));
-            return details || { id: String(id), question: `Loading error for ${id}`, type: 'error', isPlaceholder: true, owner: true };
-        });
-        previewTestList.value = (await Promise.all(fallbackPromises)).filter(Boolean);
+      const fallbackPromises = tests.value.map(async (id) => {
+        const details = await fetchTestDetails(String(id));
+        return (
+          details || {
+            id: String(id),
+            question: `Loading error for ${id}`,
+            type: "error",
+            isPlaceholder: true,
+            owner: true,
+          }
+        );
+      });
+      previewTestList.value = (await Promise.all(fallbackPromises)).filter(
+        Boolean
+      );
     }
   } finally {
     test_loading.value = false;
     if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
+      createForm.value.examTestListLength = tests.value.length;
     }
   }
 };
@@ -1951,15 +1967,13 @@ const getCurrentExamInfo = async () => {
     test_step.value = 2;
 
     try {
-      const response = await $fetch(`/api/v1/exams/info/${exam_id.value}`, {
-        headers: {
-          Authorization: `Bearer ${userToken.value}`,
-        },
-      });
+      const response = await useApiService.get(
+        `/api/v1/exams/info/${exam_id.value}`
+      );
 
       // Set tests array from response
       if (response.data?.tests?.length) {
-        tests.value = response.data.tests.map(id => String(id)); // Ensure string IDs
+        tests.value = response.data.tests.map((id) => String(id)); // Ensure string IDs
       } else {
         tests.value = [];
       }
@@ -1988,7 +2002,7 @@ const getCurrentExamInfo = async () => {
       if (response.data.file_original) {
         file_original_path.value = response.data.file_original;
       }
-      
+
       // Other form fields from response.data if necessary
       form.exam_type = response.data.exam_type || "";
       form.level = response.data.level || "2";
@@ -1998,7 +2012,6 @@ const getCurrentExamInfo = async () => {
       form.edu_year = response.data.edu_year || "";
       form.edu_month = response.data.edu_month || "";
       // ... any other fields that should be populated from exam info
-
     } catch (err) {
       nuxtApp.$toast.error("Failed to load exam information");
       console.error("Error fetching exam info:", err);
@@ -2036,22 +2049,21 @@ const onScroll = () => {
 
 // Apply test to the exam (add or remove)
 const applyTest = async (item, type = null) => {
+  if (tests.value.find((x) => x == item.id) && type === "remove") {
+    tests.value.splice(tests.value.indexOf(item.id), 1);
 
-    if (tests.value.find((x) => x == item.id) && type === "remove") {
-        tests.value.splice(tests.value.indexOf(item.id), 1);
+    //Remove from preview
+    // this.$store.commit('user/removePreviewTestList', item.id);
 
-        //Remove from preview
-        // this.$store.commit('user/removePreviewTestList', item.id);
+    submitTest();
+  }
+  if (!tests.value.find((x) => x == item.id) && type === "add") {
+    tests.value.push(item.id);
 
-        submitTest();
-      }
-      if (!tests.value.find((x) => x == item.id) && type === "add") {
-        tests.value.push(item.id);
-
-        //Add to preview list
-        // this.$store.commit('user/addPreviewTestList', item)
-        submitTest();
-      }
+    //Add to preview list
+    // this.$store.commit('user/addPreviewTestList', item)
+    submitTest();
+  }
 };
 
 // Watch for newly created tests and add them to the current exam
@@ -2075,7 +2087,7 @@ watch(
       // Always update the preview list when a new test is created
       // This ensures the Review section is always up to date
       await submitTest();
-      
+
       // Show success message
       nuxtApp.$toast.success("Test added to exam");
 
@@ -2367,7 +2379,7 @@ onMounted(async () => {
   // If we have an exam ID, get its tests
   if (exam_id.value) {
     await handleRefreshPreviewList();
-    
+
     // Make sure the examTestListLength is properly initialized
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
@@ -2406,31 +2418,38 @@ onUpdated(async () => {
   }
 });
 
-watch(test_list, async () => {
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-}, { deep: true });
+watch(
+  test_list,
+  async () => {
+    if (test_step.value === 2 && testListSwitch.value) {
+      await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+    }
+  },
+  { deep: true }
+);
 
-watch(previewTestList, async () => {
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
-  }
-  if (printPreviewDialog.value) {
-    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
-  }
-}, { deep: true });
+watch(
+  previewTestList,
+  async () => {
+    if (test_step.value === 3) {
+      await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    }
+    if (printPreviewDialog.value) {
+      await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+    }
+  },
+  { deep: true }
+);
 
 watch(printPreviewDialog, async (isDialogVisible) => {
   if (isDialogVisible) {
-    await nextTick(); 
+    await nextTick();
     await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
   }
 });
 
-
 watch(test_step, async (newStep, oldStep) => {
-  await nextTick(); 
+  await nextTick();
   if (newStep === 2 && testListSwitch.value) {
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   } else if (newStep === 3) {
@@ -2440,7 +2459,7 @@ watch(test_step, async (newStep, oldStep) => {
 
 watch(testListSwitch, async (isSwitchedOn) => {
   if (test_step.value === 2 && isSwitchedOn) {
-    await nextTick(); 
+    await nextTick();
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   }
 });
@@ -2455,12 +2474,9 @@ const deleteExamTest = async () => {
   delete_exam_test_loading.value = true;
 
   try {
-    await $fetch(`/api/v1/examTests/${delete_exam_test_id.value}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    await useApiService.remove(
+      `/api/v1/examTests/${delete_exam_test_id.value}`
+    );
 
     nuxtApp.$toast.success("Deleted successfully");
 
@@ -2493,16 +2509,13 @@ const getExamTests = async () => {
   test_loading.value = true;
 
   try {
-    const response = await $fetch("/api/v1/examTests", {
-      method: "GET",
-      params: {
-        lesson: filter.lesson,
-        topic: filter.topic,
-        myTests: filter.myTests,
-        testsHasVideo: filter.testsHasVideo,
-        page: filter.page,
-        perpage: filter.perpage,
-      },
+    const response = await useApiService.get("/api/v1/examTests", {
+      lesson: filter.lesson,
+      topic: filter.topic,
+      myTests: filter.myTests,
+      testsHasVideo: filter.testsHasVideo,
+      page: filter.page,
+      perpage: filter.perpage,
     });
 
     const newTests = response?.data?.list || [];
@@ -2538,37 +2551,34 @@ const deleteOnlineExam = async () => {
   deleteLoading.value = true;
 
   try {
-    const response =  await $fetch(`/api/v1/exams/${exam_id.value}`, {
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-      method: "DELETE",
-    });
-    if(response.data.message === "done"){
-    nuxtApp.$toast.success("Deleted successfully");
+    const response = await useApiService.remove(
+      `/api/v1/exams/${exam_id.value}`
+    );
+    if (response.data.message === "done") {
+      nuxtApp.$toast.success("Deleted successfully");
 
-    // Reset all values
-    exam_id.value = "";
-    exam_code.value = "";
-    isExamPublished.value = false;
+      // Reset all values
+      exam_id.value = "";
+      exam_code.value = "";
+      isExamPublished.value = false;
 
-    // Reset tests
-    tests.value = [];
-    previewTestList.value = [];
+      // Reset tests
+      tests.value = [];
+      previewTestList.value = [];
 
-    // Reset state in user store
-    const userState = useState("user");
-    userState.value = {
-      ...userState.value,
-      currentExamId: "",
-      currentExamCode: "",
-    };
+      // Reset state in user store
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: "",
+        currentExamCode: "",
+      };
 
-    // Reset form and data
-    resetForm();
+      // Reset form and data
+      resetForm();
 
-    // Reset to first step
-    test_step.value = 1;
+      // Reset to first step
+      test_step.value = 1;
     }
   } catch (err) {
     nuxtApp.$toast.error(err.message || "Error deleting exam");
@@ -2650,23 +2660,29 @@ const handleStepChange = (newStep) => {
   if (newStep === 3 && exam_id.value) {
     test_step.value = newStep;
     nuxtApp.$toast.info("Loading test data...");
-    handleRefreshPreviewList().then(() => {
-      if (previewTestList.value.length === 0 && tests.value.length > 0) {
-        nuxtApp.$toast.warning("Retrying test data load...");
-        setTimeout(() => {
-          handleRefreshPreviewList().then(() => {
-            if (previewTestList.value.length > 0) {
-              nuxtApp.$toast.success(`Loaded ${previewTestList.value.length} tests`);
-            }
-          });
-        }, 1000);
-      } else if (previewTestList.value.length > 0) {
-        nuxtApp.$toast.success(`Loaded ${previewTestList.value.length} tests`);
-      }
-    }).catch(err => {
-      console.error("Error loading test data:", err);
-      nuxtApp.$toast.error("Error loading test data");
-    });
+    handleRefreshPreviewList()
+      .then(() => {
+        if (previewTestList.value.length === 0 && tests.value.length > 0) {
+          nuxtApp.$toast.warning("Retrying test data load...");
+          setTimeout(() => {
+            handleRefreshPreviewList().then(() => {
+              if (previewTestList.value.length > 0) {
+                nuxtApp.$toast.success(
+                  `Loaded ${previewTestList.value.length} tests`
+                );
+              }
+            });
+          }, 1000);
+        } else if (previewTestList.value.length > 0) {
+          nuxtApp.$toast.success(
+            `Loaded ${previewTestList.value.length} tests`
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading test data:", err);
+        nuxtApp.$toast.error("Error loading test data");
+      });
     return;
   }
 
@@ -2895,12 +2911,8 @@ const handleClearTopic = () => {
 const loadExamTypes = async () => {
   try {
     // First try to get exam types from the API
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params: { type: "exam_type" },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
+    const res = await useApiService.get("/api/v1/types/list", {
+      type: "exam_type",
     });
 
     if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
@@ -2958,11 +2970,14 @@ const handleTestRefresh = async () => {
     nuxtApp.$toast.error("Error refreshing test list");
   }
 };
-const typesetMathInSpecificContainer = async (containerRef ) => {
+const typesetMathInSpecificContainer = async (containerRef) => {
   if (process.client && containerRef.value && window.MathJax) {
     let elementToProcess = null;
 
-    if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+    if (
+      containerRef.value.$el &&
+      containerRef.value.$el instanceof HTMLElement
+    ) {
       elementToProcess = containerRef.value.$el;
     } else if (containerRef.value instanceof HTMLElement) {
       elementToProcess = containerRef.value;
@@ -2972,11 +2987,14 @@ const typesetMathInSpecificContainer = async (containerRef ) => {
       return;
     }
     try {
-      await $ensureMathJaxReady(); 
-      await nextTick(); 
-      if (containerRef.value) { 
+      await $ensureMathJaxReady();
+      await nextTick();
+      if (containerRef.value) {
         let currentElementForProcessing = null;
-        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+        if (
+          containerRef.value.$el &&
+          containerRef.value.$el instanceof HTMLElement
+        ) {
           currentElementForProcessing = containerRef.value.$el;
         } else if (containerRef.value instanceof HTMLElement) {
           currentElementForProcessing = containerRef.value;
@@ -2987,7 +3005,7 @@ const typesetMathInSpecificContainer = async (containerRef ) => {
         }
       }
     } catch (error) {
-      console.error('MathJax Error:', error);
+      console.error("MathJax Error:", error);
     }
   }
 };
@@ -2999,9 +3017,11 @@ watch(
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
     }
-    if (exam_id.value && 
-        (newTests.length !== oldTests?.length || 
-         JSON.stringify(newTests) !== JSON.stringify(oldTests))) {
+    if (
+      exam_id.value &&
+      (newTests.length !== oldTests?.length ||
+        JSON.stringify(newTests) !== JSON.stringify(oldTests))
+    ) {
       setTimeout(() => {
         handleRefreshPreviewList();
       }, 300);
@@ -3144,9 +3164,8 @@ watch(
 .textFiledLink .v-field--variant-outlined .v-field__outline {
   border-top-left-radius: 20px !important;
   border-top-right-radius: 20px !important;
-  
 }
-.textFiledLink:deep(input){
+.textFiledLink:deep(input) {
   padding-left: 20px !important;
 }
 .v-btn {

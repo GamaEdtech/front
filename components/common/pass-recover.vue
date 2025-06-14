@@ -1,240 +1,218 @@
 <script setup>
-import { useAuth } from '~/composables/useAuth';
-import { useForm, useField } from 'vee-validate'
-import * as yup from 'yup'
+import { useAuth } from "~/composables/useAuth";
+import { useForm, useField } from "vee-validate";
+import * as yup from "yup";
 
 // Yup validation for password + confirm password
 const validationSchema = yup.object({
   password: yup
     .string()
-    .required('Password is required')
-    .min(4, 'Password must be at least 4 characters'),
-    
+    .required("Password is required")
+    .min(4, "Password must be at least 4 characters"),
+
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
-})
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
+});
 
 // Set up form and fields
 const { handleSubmit, errors } = useForm({
   validationSchema,
-})
+});
 
-const { $toast } = useNuxtApp()
+const { $toast } = useNuxtApp();
 
 const props = defineProps({
-  dialog: Boolean
-})
+  dialog: Boolean,
+});
 
-let pass_recover_dialog = ref(false)
-let google_register_loading =  ref(true)
-let show1 = ref(false)
+let pass_recover_dialog = ref(false);
+let google_register_loading = ref(true);
+let show1 = ref(false);
 const confirmPassword = useField("confirmPassword");
 const password = useField("password");
-let passRecoverLoading = ref(false)
+let passRecoverLoading = ref(false);
 
-let otp = ref("")
-let identity = ref("")
-let otp_loading = ref(false)
-let countDown = ref(60)
-let timerId = ref(null)
-let sendOtpBtnStatus = ref(true)
+let otp = ref("");
+let identity = ref("");
+let otp_loading = ref(false);
+let countDown = ref(60);
+let timerId = ref(null);
+let sendOtpBtnStatus = ref(true);
 
-let identityHolder = ref(true)
-let otpHolder = ref(false)
-let selectPassHolder = ref(false)
-let googleRegisterBtn = ref(null)
+let identityHolder = ref(true);
+let otpHolder = ref(false);
+let selectPassHolder = ref(false);
+let googleRegisterBtn = ref(null);
 
+watch(countDown, (val) => {
+  //When user wait 10 second
+  if (val === 0) sendOtpBtnStatus.value = false;
 
-watch(countDown ,(val) => {
-      //When user wait 10 second
-      if (val === 0) sendOtpBtnStatus.value = false;
+  //When user request new otp code
+  if (val === 60) countDownTimer();
+});
 
-      //When user request new otp code
-      if (val === 60) countDownTimer();
-    });
-
-
-onMounted(() =>{
+onMounted(() => {
   setTimeout(() => {
     if (window.google?.accounts?.id && googleRegisterBtn.value) {
       window.google.accounts.id.initialize({
-        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        client_id:
+          "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
         callback: handleCredentialResponse,
-        auto_select: true
-      })
+        auto_select: true,
+      });
 
       window.google.accounts.id.renderButton(googleRegisterBtn.value, {
-        text: 'Login',
-        size: 'large',
-        width: '252',
-        theme: 'outline'
-      })
+        text: "Login",
+        size: "large",
+        width: "252",
+        theme: "outline",
+      });
 
-      google_register_loading.value = false
+      google_register_loading.value = false;
     }
-  }, 4000)
-})
-
+  }, 4000);
+});
 
 async function handleCredentialResponse(value) {
   const auth = useAuth();
   try {
-    const response = await $fetch(
-      '/api/v1/users/googleAuth',{
-        method:'POST',
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/googleAuth",
+      new URLSearchParams({
         id_token: value.credential,
-      }),
-      }
-    )
+      })
+    );
 
-    if(response.status === 1){
+    if (response.status === 1) {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo('/user');
+      navigateTo("/user");
     }
   } catch (err) {
-    const status = err?.response?.status
+    const status = err?.response?.status;
 
     if (status === 401) {
-      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+      $toast.error(useNuxtApp().$t("LOGIN_WRONG_DATA"));
     } else if (status === 500 || status === 504) {
-      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+      $toast.error(useNuxtApp().$t("REQUEST_FAILED"));
     }
   }
 }
 
-
 // Handle OTP request
-const requestPassRecover = async ()  => {
+const requestPassRecover = async () => {
   passRecoverLoading.value = true;
   const auth = useAuth();
-  try{
-        await auth.forgotPassword({
-        identity : identity.value
-    })
+  try {
+    await auth.forgotPassword({
+      identity: identity.value,
+    });
     $toast.success("Otp code sent");
     identityHolder.value = false;
     otpHolder.value = true;
     countDownTimer();
-  } catch(error){
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
   }
 };
 
-
 // Handle OTP confirmation
-const onFinish = async() => {
-  try{
-    const response = await $fetch('/api/v1/users/recovery', {
-    method: 'POST',
-    body: new URLSearchParams({
-      'type': 'confirm',
-    'identity': identity.value,
-    'code': otp.value,
-    }),
-  });
-    if(response.status ===1){
+const onFinish = async () => {
+  try {
+    const response = await useApiService.post(
+      "/api/v1/users/recovery",
+      new URLSearchParams({
+        type: "confirm",
+        identity: identity.value,
+        code: otp.value,
+      })
+    );
+    if (response.status === 1) {
       otpHolder.value = false;
       selectPassHolder.value = true;
       passRecoverLoading.value = false;
     }
-  }
-
-  catch (error) {
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
   }
 };
 
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
-  try{
-    const response = await $fetch('/api/v1/users/recovery', {
-      method: 'POST',
-      body: new URLSearchParams({
-        'type' : 'resend_code',
-        'identity' : identity.value,
-      }),
-  });
+  try {
+    const response = await useApiService.post(
+      "/api/v1/users/recovery",
+      new URLSearchParams({
+        type: "resend_code",
+        identity: identity.value,
+      })
+    );
     countDown.value = 60;
     sendOtpBtnStatus.value = true;
-    $toast.success('Otp code sent again');
-  }
-  catch(error){
+    $toast.success("Otp code sent again");
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
   }
 };
-
 
 // Timer for countdown
 const countDownTimer = () => {
   if (timerId) {
-    clearTimeout(timerId)
-    timerId = null
+    clearTimeout(timerId);
+    timerId = null;
   }
-  countDown.value = 60
-  tick()
-}
+  countDown.value = 60;
+  tick();
+};
 
 const tick = () => {
   if (countDown.value > 0) {
     timerId = setTimeout(() => {
-      countDown.value -= 1
-      tick()
-    }, 1000)
+      countDown.value -= 1;
+      tick();
+    }, 1000);
   } else {
-    timerId = null 
+    timerId = null;
   }
-}
-
+};
 
 //Final register (level 3: receive password from user)
-const submit = handleSubmit( async () => {
+const submit = handleSubmit(async () => {
   passRecoverLoading.value = true;
-  try{
-     await $fetch('/api/v1/users/recovery', {
-      method: 'POST',
-      body: new URLSearchParams({
-        'type' : 'resetpass',
-        'identity' : identity.value,
-        'pass' : password.value.value
-      }),
-    });
+  try {
+    await useApiService.post(
+      "/api/v1/users/recovery",
+      new URLSearchParams({
+        type: "resetpass",
+        identity: identity.value,
+        pass: password.value.value,
+      })
+    );
 
-    $toast.success('Password reset successfully');
-    closeDialog()
- 
-  }
-  catch(error){
+    $toast.success("Password reset successfully");
+    closeDialog();
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-  }
-  finally{
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  } finally {
     passRecoverLoading.value = false;
   }
-}) 
+});
 
 // Cancel password recovery
 const cancelPassRecover = () => {
@@ -244,24 +222,27 @@ const cancelPassRecover = () => {
   selectPassHolder.value = false;
 };
 
-const emit = defineEmits(['switchToRegister','switchToRecover','update:dialog'])
+const emit = defineEmits([
+  "switchToRegister",
+  "switchToRecover",
+  "update:dialog",
+]);
 // Switch to login page
 const switchToLogin = () => {
-  emit('switchToLogin');
+  emit("switchToLogin");
 };
 
 // Switch to register page
 const switchToRegister = () => {
-  emit('switchToRegister');
+  emit("switchToRegister");
 };
 
 function closeDialog() {
   identityHolder.value = true;
   otpHolder.value = false;
   selectPassHolder.value = false;
-  emit('update:dialog', false)
+  emit("update:dialog", false);
 }
-
 </script>
 <template>
   <v-dialog
@@ -326,9 +307,7 @@ function closeDialog() {
                 </v-row>
                 <v-row>
                   <v-col cols="6" lg="6">
-                    <v-btn outlined @click="closeDialog">
-                      Cancel
-                    </v-btn>
+                    <v-btn outlined @click="closeDialog"> Cancel </v-btn>
                   </v-col>
                   <v-col cols="6" lg="6">
                     <v-btn
@@ -391,7 +370,9 @@ function closeDialog() {
                         label="Password"
                         v-model="password.value.value"
                         outlined
-                        :error-messages="errors.password ? [errors.password] : []"
+                        :error-messages="
+                          errors.password ? [errors.password] : []
+                        "
                         dense
                         :type="show1 ? 'text' : 'password'"
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -410,7 +391,9 @@ function closeDialog() {
                       <v-text-field
                         v-model="confirmPassword.value.value"
                         type="password"
-                        :error-messages="errors.confirmPassword ? [errors.confirmPassword] : []"
+                        :error-messages="
+                          errors.confirmPassword ? [errors.confirmPassword] : []
+                        "
                         label="Confirm password"
                         dense
                         outlined
@@ -422,9 +405,7 @@ function closeDialog() {
 
                   <v-row>
                     <v-col cols="6" lg="6">
-                      <v-btn outlined @click="closeDialog">
-                        Cancel
-                      </v-btn>
+                      <v-btn outlined @click="closeDialog"> Cancel </v-btn>
                     </v-col>
                     <v-col cols="6" lg="6">
                       <v-btn
@@ -449,8 +430,6 @@ function closeDialog() {
     </v-card>
   </v-dialog>
 </template>
-
-
 
 <style scoped>
 .btn-google {
