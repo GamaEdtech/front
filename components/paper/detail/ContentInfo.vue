@@ -148,7 +148,7 @@
   <paper-detail-mobile-order
     :contentData="contentData"
     :is-logged-in="auth.isAuthenticated.value"
-    :user-credit="user?.user && user?.user.value.credit"
+    :user-credit="user?.user.value && user?.user.value?.credit"
     :is-free="isFree"
     :loading="download_loading"
     @download="startDownload"

@@ -80,7 +80,7 @@
               <exam-detail-description-section
                 :content-data="contentData"
                 :is-logged-in="auth.isAuthenticated.value"
-                :credit="user?.user.value.credit || 0"
+                :credit="user?.user.value?.credit || 0"
                 @login="openAuthDialog('login')"
                 @register="openAuthDialog('register')"
               />
@@ -89,7 +89,7 @@
               <exam-detail-sidebar-details
                 :content-data="contentData"
                 :is-logged-in="auth.isAuthenticated.value"
-                :credit="user?.user.value.credit || 0"
+                :credit="user?.user.value?.credit || 0"
                 :download-loading="download_loading"
                 @download="startDownload"
                 @login="openAuthDialog('login')"
@@ -108,7 +108,7 @@
       :exam-id="contentData.id"
       :exam-prices="contentData.price"
       :is-logged-in="auth.isAuthenticated.value"
-      :credit="user?.user.value.credit || 0"
+      :credit="user?.user.value?.credit || 0"
       :user-exam-status="contentData.examUserData?.status || 0"
       :download-loading="download_loading"
       @download="startDownload"
