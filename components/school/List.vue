@@ -94,7 +94,7 @@
                   <div class="gtext-t6 primary-gray-300">
                     <v-icon>mdi-update</v-icon>
                     <span class="primary-gray-600">{{
-                      $moment(item.lastModifyDate).format("YYYY-MM-DD")
+                      $dayjs(item.lastModifyDate).format("YYYY-MM-DD")
                     }}</span>
                   </div>
                 </div>

@@ -950,6 +950,7 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
+
 const { isAuthenticated } = useAuth();
 
 import {
@@ -1340,7 +1341,7 @@ watch(
 );
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // Manipulate some Vuetify & bootstrap styles
 #qa-details-content .v-text-field--outlined .v-input__prepend-outer,
 .v-text-field--outlined .v-input__append-outer {
