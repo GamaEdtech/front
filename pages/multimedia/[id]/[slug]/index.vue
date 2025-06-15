@@ -477,13 +477,15 @@ async function updateDetails() {
   formData.append("description", contentData.value?.description);
 
   try {
-    const { data } = await useFetch(`/api/v1/files/${route.params.id}`, {
-      method: "PUT",
-      body: urlencodeFormData(formData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const { data } = await useApiService.put(
+      `/api/v1/files/${route.params.id}`,
+      urlencodeFormData(formData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (data.value?.id == 0 && data.value?.repeated) {
       $toast.info("The multimedia is duplicated");
@@ -492,7 +494,6 @@ async function updateDetails() {
     }
   } catch (err) {
     if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status == 400) {
       $toast.error(err.response.data.message);
     }

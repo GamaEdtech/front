@@ -288,10 +288,7 @@ const startDownload = async () => {
       ) {
         $toast.info("No enough credit");
       }
-    } else if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     }
-    console.log(err);
   } finally {
     download_loading.value = false;
   }

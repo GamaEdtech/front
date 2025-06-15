@@ -318,7 +318,6 @@ const submitQuestion = async () => {
     }
   } catch (err) {
     if (err.response?.status === 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || "Error submitting question");
     }

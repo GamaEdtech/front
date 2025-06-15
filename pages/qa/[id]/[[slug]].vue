@@ -1159,9 +1159,6 @@ async function submitReply(values, { resetForm }) {
     // $toast.success("Reply submit successfully");
   } catch (err) {
     $toast.error(err.response.data.message);
-    if (err.response.status === 403) {
-      router.push({ query: { auth_form: "login" } });
-    }
   } finally {
     loading.reply_form = false;
   }
