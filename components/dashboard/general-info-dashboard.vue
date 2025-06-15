@@ -133,12 +133,8 @@ watch(
 const updateUsername = async () => {
   if (!username.value || username.value.length < 6) return;
   try {
-    const { data } = await $fetch("/api/v1/users/username", {
-      method: "PUT",
-      body: { username: username.value },
-      headers: {
-        Authorization: `Bearer ${auth.getUserToken()}`,
-      },
+    const { data } = await useApiService.put("/api/v1/users/username", {
+      username: username.value,
     });
     userInfoData.value.username = username.value;
     errors.value = [];

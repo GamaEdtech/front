@@ -9,6 +9,7 @@
               block
               color="primary"
               class="mb-2"
+              :loading="loading"
             >
               Download Question Doc
               {{
@@ -24,6 +25,7 @@
               class="mb-2 white--text font-weight-bold"
               block
               color="#E60012"
+              :loading="loading"
             >
               Question Paper
               {{
@@ -40,6 +42,7 @@
               @click="$emit('download', 'a_file')"
               block
               color="teal accent-3"
+              :loading="loading"
             >
               Mark Scheme
               {{
@@ -54,6 +57,7 @@
               block
               color="primary"
               class="mb-2"
+              :loading="loading"
             >
               Download Answer Doc
               {{
@@ -116,6 +120,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emits = defineEmits(["download", "open-auth"]);
@@ -130,6 +138,8 @@ const emits = defineEmits(["download", "open-auth"]);
   background: #f6f8fa !important;
   border-top: 0.1rem solid #e1e2e3;
   width: 100%;
+  left: 0;
+  right: 0;
 }
 
 .order-btn-holder .v-btn {

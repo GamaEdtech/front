@@ -374,7 +374,7 @@
 </template>
 
 <script setup>
-const { $auth, $toast } = useNuxtApp();
+const { $toast } = useNuxtApp();
 
 // Define layout
 definePageMeta({
@@ -657,7 +657,6 @@ const updateQuestion = async () => {
     }
   } catch (err) {
     if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status == 400) {
       $toast.error(err.response.data.message);
     }
@@ -917,9 +916,9 @@ watch(
   }
 );
 
-const startDownload = (type, extra_id = "") => {
+const startDownload = async (type, extra_id = "") => {
   const auth = useAuth();
-  if (auth.loggedIn) {
+  if (auth.isAuthenticated.value) {
     download_loading.value = true;
     let apiUrl = "";
 
@@ -932,32 +931,22 @@ const startDownload = (type, extra_id = "") => {
     } else if (type === "extra") {
       apiUrl = `/api/v1/tests/download/${route.params.id}/extra/${extra_id}`;
     }
-
-    useFetch(apiUrl, {
-      method: "GET",
-    })
-      .then((response) => {
-        var FileSaver = require("file-saver");
-        FileSaver.saveAs(
-          response.data.value.data.url,
-          response.data.value.data.name
-        );
-      })
-      .catch((err) => {
-        if (err.response?.status == 400) {
-          if (
-            err.response.data.status == 0 &&
-            err.response.data.error == "creditNotEnough"
-          ) {
-            $toast.info("No enough credit");
-          }
-        } else if (err.response?.status == 403) {
-          router.push({ query: { auth_form: "login" } });
+    try {
+      const response = await useApiService.get(apiUrl);
+      const FileSaver = await import("file-saver");
+      FileSaver.saveAs(response.data.url, response.data.name);
+      download_loading.value = false;
+    } catch (err) {
+      if (err.response?.status == 400) {
+        if (
+          err.response.data.status == 0 &&
+          err.response.data.error == "creditNotEnough"
+        ) {
+          $toast.info("No enough credit");
         }
-      })
-      .finally(() => {
-        download_loading.value = false;
-      });
+      }
+    } finally {
+    }
   } else {
     router.push({ query: { auth_form: "login" } });
   }

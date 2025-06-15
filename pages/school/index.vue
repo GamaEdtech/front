@@ -407,8 +407,8 @@ const getUserLocation = () => {
 const getSchoolList = async (side) => {
   schoolLoading.value = true;
   if (allDataLoaded.value == false)
-    $fetch("/api/v2/schools", {
-      params: {
+    useApiService
+      .get("/api/v2/schools", {
         "PagingDto.PageFilter.Skip": (filter.value.page - 1) * perPage,
         "PagingDto.PageFilter.Size": perPage,
         "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
@@ -438,8 +438,7 @@ const getSchoolList = async (side) => {
           : route.query.lng
           ? route.query.lng
           : filter.value.lng,
-      },
-    })
+      })
       .then((response) => {
         resultCount.value = response.data.totalRecordsCount;
         schoolFilter.value.resultCount = resultCount;
@@ -597,12 +596,11 @@ const endDrag = (e) => {
   isExpanded.value = true;
 };
 const grabLocation = (type, title) => {
-  $fetch("https://nominatim.openstreetmap.org/search", {
-    params: {
+  useApiService
+    .get("https://nominatim.openstreetmap.org/search", {
       q: title,
       format: "json",
-    },
-  })
+    })
     .then((response) => {
       if (response) {
         var itm = response.find((x) => x.addresstype == type);

@@ -307,12 +307,9 @@ const fetchMultimediaData = async () => {
   isInitialLoad.value = true;
 
   try {
-    const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get(
+      `/api/v1/files/${multimediaData.id}`
+    );
 
     // Set multimedia data
     const data = response.data;
@@ -433,13 +430,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       section_list.value = response.data;
@@ -512,14 +503,15 @@ const updateContent = async () => {
   formSubmitData.set("free_available", formData.free_available ? 1 : 0);
 
   try {
-    const response = await $fetch(`/api/v1/files/${multimediaData.id}`, {
-      method: "PUT",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.put(
+      `/api/v1/files/${multimediaData.id}`,
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The multimedia is duplicated");
@@ -529,7 +521,6 @@ const updateContent = async () => {
     }
   } catch (err) {
     if (err.response?.status === 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || "Error updating multimedia");
     } else {
@@ -568,13 +559,7 @@ const uploadFile = async (value) => {
   fileFormData.append("file", value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: fileFormData,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post("/api/v1/upload", fileFormData);
 
     // Get file information from the upload response
     const fileInfo = response.data[0].file;
@@ -681,11 +666,9 @@ const download_loading = ref(false);
 const startDownload = async () => {
   download_loading.value = true;
   try {
-    const response = await $fetch(`/api/v1/files/download/${route.params.id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get(
+      `/api/v1/files/download/${route.params.id}`
+    );
     const FileSaver = await import("file-saver");
     FileSaver.saveAs(response.data.url, response.data.name);
   } catch (err) {
@@ -694,10 +677,9 @@ const startDownload = async () => {
         err.response.data.status == 0 &&
         err.response.data.error == "creditNotEnough"
       ) {
-        useToast().info("No enough credit");
+        $toast.info("No enough credit");
       }
     } else if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     }
   } finally {
     download_loading.value = false;

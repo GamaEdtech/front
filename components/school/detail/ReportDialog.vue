@@ -113,12 +113,11 @@ async function submitReport() {
   reportSubmitLoader.value = true;
   const reportData = { description: reportForm.value.description };
   try {
-    const token = localStorage.getItem("v2_token");
-    const response = await $fetch(`/api/v2/schools/${props.schoolId}/issues`, {
-      method: "POST",
-      body: reportData,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await useApiService.post(
+      `/api/v2/schools/${props.schoolId}/issues`,
+      reportData
+    );
+
     if (response.succeeded) {
       nuxtApp.$toast?.success("Thanks for your report!");
       dialogVisible.value = false;

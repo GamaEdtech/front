@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 // Define layout and page metadata
@@ -269,13 +269,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       section_list.value = response.data;
@@ -350,14 +344,15 @@ const updateContent = async () => {
   }
 
   try {
-    const response = await $fetch(`/api/v1/questions/${route.params.id}`, {
-      method: "PUT",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.put(
+      `/api/v1/questions/${route.params.id}`,
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The question is duplicated");
@@ -368,7 +363,6 @@ const updateContent = async () => {
   } catch (err) {
     console.error("Update error:", err);
     if (err.response?.status === 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || "Error updating question");
     } else {
@@ -402,13 +396,7 @@ const uploadFile = async (value) => {
   fileFormData.append("file", value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: fileFormData,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post("/api/v1/upload", fileFormData);
 
     formData.file = response.data[0].file.name;
     $toast.success("File uploaded successfully");
@@ -445,4 +433,4 @@ onMounted(async () => {
   font-weight: bolder !important;
   color: blue !important;
 }
-</style> 
+</style>

@@ -950,6 +950,9 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
+
+const { isAuthenticated } = useAuth();
+
 import {
   ref,
   reactive,
@@ -1123,7 +1126,7 @@ function convertSlug(text) {
 }
 
 function openQuestionForm() {
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     router.push({ path: "/user/question/create" });
   } else {
     openAuthDialog("login");
@@ -1142,7 +1145,7 @@ async function submitReply(values, { resetForm }) {
   };
 
   try {
-    await $fetch.$post(
+    await useApiService.post(
       "/api/v1/questionReplies",
       querystring.stringify(payload),
       {
@@ -1157,9 +1160,6 @@ async function submitReply(values, { resetForm }) {
     // $toast.success("Reply submit successfully");
   } catch (err) {
     $toast.error(err.response.data.message);
-    if (err.response.status === 403) {
-      router.push({ query: { auth_form: "login" } });
-    }
   } finally {
     loading.reply_form = false;
   }
@@ -1242,13 +1242,13 @@ function openDeleteReplyConfirmDialog(item_id) {
 
 async function submitScore(content_type, id, type) {
   // const auth = useAuth();
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     let api = `/api/v1/questions/score/${id}/${type}`;
     if (content_type === "reply")
       api = `/api/v1/questionReplies/score/${id}/${type}`;
 
-    await $fetch
-      .$post(api)
+    await useApiService
+      .post(api)
       .then((response) => {
         if (response.status === 1) {
           if (content_type === "question")
@@ -1270,8 +1270,8 @@ async function submitScore(content_type, id, type) {
 }
 
 function selectCorrectAnswer(id) {
-  $fetch
-    .$post(`/api/v1/questionReplies/select/${id}`)
+  useApiService
+    .post(`/api/v1/questionReplies/select/${id}`)
     .then((response) => {
       $toast.success("Select successfully");
       window.scrollTo(0, 0);
@@ -1296,7 +1296,8 @@ function openCrashReportDialog(id, type) {
 }
 
 function getSimilarQuestions() {
-  $fetch(`/api/v1/questions/related/${route.params.id}`)
+  useApiService
+    .get(`/api/v1/questions/related/${route.params.id}`)
     .then((response) => {
       similarQuestions.value = response.data.list;
     })

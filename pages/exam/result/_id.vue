@@ -498,202 +498,209 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 import PieChart from "@/components/chart/PieChart";
 import CrashReport from "~/components/common/crash-report.vue";
 
-export default {
-  name: "exam-result",
-  components: { CrashReport, PieChart },
-  head() {
-    return {
-      title: "Online exam result",
-      script: [
-        {
-          src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
-        },
-      ],
-    };
-  },
-  async asyncData({ params, $axios }) {
-    // This could also be an action dispatch
-    const content = await $axios.$get(`/api/v1/exams/result/${params.id}`);
-    var contentData = [];
+// Head configuration
+useHead({
+  title: "Online exam result",
+  script: [
+    {
+      src: `${process.env.API_BASE_URL}/assets/packages/MathJax/MathJax.js?config=TeX-MML-AM_CHTML`,
+    },
+  ],
+});
 
-    //Check data exist
+const route = useRoute();
+const { $toast } = useNuxtApp();
+// State
+const contentData = ref([]);
+const chartData = ref({});
+const download_loading = ref(false);
+const mathJaxEl = ref(null);
+const crash_report = ref(null);
+
+const dialog = ref({
+  questionDetails: {
+    status: false,
+    question: "",
+    q_file: "",
+    true_answer: "",
+    user_answer: "",
+    id: "",
+    answer_a: "",
+    a_file: "",
+    answer_b: "",
+    b_file: "",
+    answer_c: "",
+    c_file: "",
+    answer_d: "",
+    d_file: "",
+  },
+});
+
+const report_type_list = [
+  {
+    value: 1,
+    label: "The selected option in the answer sheet is not correct.",
+  },
+  { value: 2, label: "There is more than one correct option." },
+  { value: 3, label: "None of the options are correct." },
+  { value: 4, label: "There are typos in questions or options." },
+  { value: 5, label: "This test is similar to another test in the same test." },
+  { value: 6, label: "There are problems in the descriptive answer." },
+  { value: 7, label: "This test is out of budget or topic." },
+  { value: 8, label: "Other cases" },
+];
+
+// Fetch data
+const fetchData = async () => {
+  try {
+    const content = await useApiService.get(
+      `/api/v1/exams/result/${route.params.id}`
+    );
     if (content.status === 1) {
-      contentData = content.data;
-    }
+      contentData.value = content.data;
 
-    let chartData = {
-      labels: [" Correct answers", " Wrong answers", " No answer"],
-      datasets: [
-        {
-          borderColor: "#e1e2e3",
-          backgroundColor: ["#4CAF50", "#F44336", "#FFFFFF"],
-          data: [
-            contentData.answerStats.total.true,
-            contentData.answerStats.total.false,
-            contentData.answerStats.total.noAnswer,
-          ],
-        },
-      ],
-    };
-
-    return { contentData, chartData };
-  },
-  data() {
-    return {
-      contentData: [],
-      chartData: {},
-      download_loading: false,
-      dialog: {
-        questionDetails: {
-          status: false,
-        },
-      },
-      report_type_list: [
-        {
-          value: 1,
-          label: "The selected option in the answer sheet is not correct.",
-        },
-        {
-          value: 2,
-          label: "There is more than one correct option.",
-        },
-        {
-          value: 3,
-          label: "None of the options are correct.",
-        },
-        {
-          value: 4,
-          label: "There are typos in questions or options.",
-        },
-        {
-          value: 5,
-          label: "This test is similar to another test in the same test.",
-        },
-        {
-          value: 6,
-          label: "There are problems in the descriptive answer.",
-        },
-        {
-          value: 7,
-          label: "This test is out of budget or topic.",
-        },
-        {
-          value: 8,
-          label: "Other cases",
-        },
-      ],
-    };
-  },
-  mounted() {
-    //Delete current exam from local storage
-    const allExamStats = JSON.parse(localStorage.getItem("allExamStats"));
-    var index = allExamStats.findIndex((x) => x.id == this.contentData.exam.id);
-    if (index !== -1) {
-      this.$delete(allExamStats, index);
-      localStorage.setItem("allExamStats", JSON.stringify(allExamStats));
-    }
-    //End delete current exam from local storage
-  },
-  methods: {
-    //Download file
-    startDownload() {
-      this.download_loading = true;
-      this.$fetch
-        .$get(`/api/v1/exams/download/${this.contentData.exam.id}`)
-        .then((response) => {
-          var FileSaver = require("file-saver");
-          FileSaver.saveAs(response.data.url, response.data.name);
-        })
-        .catch((err) => {
-          if (err.response.status == 400) {
-            if (
-              err.response.data.status == 0 &&
-              err.response.data.error == "creditNotEnough"
-            ) {
-              this.$toast.info("No enough credit");
-            }
-          } else if (err.response.status == 403) {
-            this.$router.push({ query: { auth_form: "login" } });
-          }
-          console.log(err);
-        })
-        .finally(() => {
-          this.download_loading = false;
-        });
-    },
-    //End download file
-
-    //Show question details
-    questionDetails(item) {
-      this.dialog.questionDetails.question = item.question;
-      this.dialog.questionDetails.q_file = item.q_file;
-      this.dialog.questionDetails.true_answer = item.true_answer;
-      this.dialog.questionDetails.user_answer = item.user_answer;
-      this.dialog.questionDetails.id = item.id;
-
-      this.dialog.questionDetails.answer_a = item.answer_a;
-      this.dialog.questionDetails.a_file = item.a_file;
-
-      this.dialog.questionDetails.answer_b = item.answer_b;
-      this.dialog.questionDetails.b_file = item.b_file;
-
-      this.dialog.questionDetails.answer_c = item.answer_c;
-      this.dialog.questionDetails.c_file = item.c_file;
-
-      this.dialog.questionDetails.answer_d = item.answer_d;
-      this.dialog.questionDetails.d_file = item.d_file;
-
-      setTimeout(() => {
-        this.renderMathJax();
-      }, 1);
-
-      this.dialog.questionDetails.status = true;
-    },
-    //End show question details
-
-    renderMathJax() {
-      if (window.MathJax) {
-        window.MathJax.Hub.Config({
-          tex2jax: {
-            inlineMath: [
-              ["$", "$"],
-              ["\(", "\)"],
+      chartData.value = {
+        labels: [" Correct answers", " Wrong answers", " No answer"],
+        datasets: [
+          {
+            borderColor: "#e1e2e3",
+            backgroundColor: ["#4CAF50", "#F44336", "#FFFFFF"],
+            data: [
+              contentData.value.answerStats.total.true,
+              contentData.value.answerStats.total.false,
+              contentData.value.answerStats.total.noAnswer,
             ],
-            displayMath: [
-              ["$$", "$$"],
-              ["\[", "\]"],
-            ],
-            processEscapes: true,
-            processEnvironments: true,
           },
-          // Center justify equations in code and markdown cells. Elsewhere
-          // we use CSS to left justify single line equations in code cells.
-          displayAlign: "center",
-          "HTML-CSS": {
-            styles: { ".MathJax_Display": { margin: 0 } },
-            linebreaks: { automatic: true },
-          },
-        });
-        MathJax.Hub.Queue([
-          "Typeset",
-          window.MathJax.Hub,
-          this.$refs.mathJaxEl,
-        ]);
-      }
-    },
-
-    openCrashReportDialog() {
-      this.dialog.questionDetails.status = false;
-      this.$refs.crash_report.dialog = true;
-      this.$refs.crash_report.form.id = this.dialog.questionDetails.id;
-      this.$refs.crash_report.form.type = "examTest";
-    },
-  },
+        ],
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching exam result:", error);
+  }
 };
+
+// Methods
+const startDownload = async () => {
+  download_loading.value = true;
+  try {
+    const response = await useApiService.get(
+      `/api/v1/exams/download/${contentData.value.exam.id}`
+    );
+    const link = document.createElement("a");
+    link.href = response.data.url;
+    link.setAttribute("download", response.data.name);
+    link.setAttribute("type", "application/pdf");
+    link.setAttribute("target", "_blank");
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    if (err.response?.status === 400) {
+      if (
+        err.response.data.status === 0 &&
+        err.response.data.error === "creditNotEnough"
+      ) {
+        $toast.info("No enough credit");
+      }
+    }
+  } finally {
+    download_loading.value = false;
+  }
+};
+
+const questionDetails = (item) => {
+  dialog.value.questionDetails = {
+    ...dialog.value.questionDetails,
+    question: item.question,
+    q_file: item.q_file,
+    true_answer: item.true_answer,
+    user_answer: item.user_answer,
+    id: item.id,
+    answer_a: item.answer_a,
+    a_file: item.a_file,
+    answer_b: item.answer_b,
+    b_file: item.b_file,
+    answer_c: item.answer_c,
+    c_file: item.c_file,
+    answer_d: item.answer_d,
+    d_file: item.d_file,
+    status: true,
+  };
+
+  nextTick(() => {
+    renderMathJax();
+  });
+};
+
+const renderMathJax = () => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [
+          ["$", "$"],
+          ["\\(", "\\)"],
+        ],
+        displayMath: [
+          ["$$", "$$"],
+          ["\\[", "\\]"],
+        ],
+        processEscapes: true,
+        processEnvironments: true,
+      },
+      displayAlign: "center",
+      "HTML-CSS": {
+        styles: { ".MathJax_Display": { margin: 0 } },
+        linebreaks: { automatic: true },
+      },
+    });
+    MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, mathJaxEl.value]);
+  }
+};
+
+const openCrashReportDialog = () => {
+  dialog.value.questionDetails.status = false;
+  crash_report.value.dialog = true;
+  crash_report.value.form.id = dialog.value.questionDetails.id;
+  crash_report.value.form.type = "examTest";
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  fetchData();
+
+  // Delete current exam from local storage
+  const allExamStats = JSON.parse(localStorage.getItem("allExamStats"));
+  const index = allExamStats?.findIndex(
+    (x) => x.id === contentData.value.exam.id
+  );
+  if (index !== -1) {
+    allExamStats.splice(index, 1);
+    localStorage.setItem("allExamStats", JSON.stringify(allExamStats));
+  }
+});
+
+onBeforeUnmount(() => {
+  // Cleanup if needed
+});
 </script>
 
-<style scoped></style>
+<style scoped>
+.true_answer {
+  color: #4caf50;
+}
+
+.false_answer {
+  color: #f44336;
+}
+
+.pointer {
+  cursor: pointer;
+}
+</style>

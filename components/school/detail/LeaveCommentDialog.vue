@@ -313,15 +313,9 @@ async function sendToAI() {
 async function submitComment() {
   submitLoading.value = true;
   try {
-    const response = await $fetch(
+    const response = await useApiService.post(
       `/api/v2/schools/${route.params.id}/comments`,
-      {
-        method: "POST",
-        body: { ...commentForm },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-        },
-      }
+      { ...commentForm }
     );
     if (response.succeeded) {
       nuxtApp.$toast?.success("Your comment has been successfully submitted");

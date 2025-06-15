@@ -152,16 +152,12 @@ const updateDetails = () => {
   formData.append("title", titleModel.value);
   formData.append("description", descriptionModel.value);
 
-  $fetch
-    .$put(
-      `/api/v1/tests/${route.params.slug[0]}`,
-      urlencodeFormData(formData),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    )
+  useApiService
+    .put(`/api/v1/tests/${route.params.slug[0]}`, urlencodeFormData(formData), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
     .then((response) => {
       if (response.data.id == 0 && response.data.repeated) {
         $toast.info("The paper is duplicated");
