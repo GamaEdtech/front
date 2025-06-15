@@ -15,6 +15,7 @@ Our mission is to democratize access to quality education by leveraging cutting-
 ## Why Open Source?  
 We believe in the power of collaboration and transparency. By being open-source, Gama EdTech encourages developers, educators, and enthusiasts to contribute to the project, ensuring it evolves to meet the needs of the educational community.  
 
+
 ## Get Started  
 1. Clone the repository:  
    ```bash
@@ -31,3 +32,13 @@ We believe in the power of collaboration and transparency. By being open-source,
     $ pm2 start
 
     ```
+
+
+
+## License
+
+This project is licensed under the GNU General Public License v2.0 or later (GPL-2.0+).
+
+It uses [CKEditor 5](https://ckeditor.com/ckeditor-5) under the same license.
+
+See the [LICENSE.md](./LICENSE.md) file for full details.
