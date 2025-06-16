@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-
+const { isAuthenticated } = useAuth();
 const props = defineProps({
   fileExt: {
     type: String,
@@ -60,7 +60,7 @@ function openAuthDialog(type) {
 }
 
 const isLoggedIn = computed(() => {
-  return $auth?.loggedIn ?? false;
+  return isAuthenticated.value ?? false;
 });
 </script>
 

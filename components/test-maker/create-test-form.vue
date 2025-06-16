@@ -814,7 +814,11 @@ const props = defineProps({
 /**
  * Component emits
  */
-const emit = defineEmits(["update:updateTestList", "update:goToPreviewStep", "update:refreshTests"]);
+const emit = defineEmits([
+  "update:updateTestList",
+  "update:goToPreviewStep",
+  "update:refreshTests",
+]);
 
 /**
  * Get Nuxt app services and utilities
@@ -1128,10 +1132,7 @@ const getTypeList = async (type, parent = "") => {
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
     }
 
-    const res = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-    });
+    const res = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       level_list.value = res.data;
@@ -1166,21 +1167,21 @@ const resetFormFields = () => {
   form.question = "";
   form.q_file_base64 = "";
   form.q_file = null;
-  
+
   form.answer_full = "";
   form.answer_full_file_base64 = "";
   form.answer_full_file = null;
-  
+
   form.true_answer = "";
   form.testImgAnswers = false;
   form.answer_type = "text";
-  
+
   // Reset answer text fields
   form.answer_a = "";
   form.answer_b = "";
   form.answer_c = "";
   form.answer_d = "";
-  
+
   // Reset answer image fields
   form.a_file_base64 = "";
   form.b_file_base64 = "";
@@ -1190,7 +1191,7 @@ const resetFormFields = () => {
   form.b_file = null;
   form.c_file = null;
   form.d_file = null;
-  
+
   // Reset hidden form data
   form_hidden_data.q_file = null;
   form_hidden_data.answer_full_file = null;
@@ -1198,37 +1199,39 @@ const resetFormFields = () => {
   form_hidden_data.b_file = null;
   form_hidden_data.c_file = null;
   form_hidden_data.d_file = null;
-  
+
   // Reset UI state
   text_answer.value = true;
   photo_answer.value = false;
-  
+
   // Reset file inputs
   if (questionInput.value && questionInput.value.$el) {
-    const fileInput = questionInput.value.$el.querySelector('input[type="file"]');
+    const fileInput =
+      questionInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (answerFullInput.value && answerFullInput.value.$el) {
-    const fileInput = answerFullInput.value.$el.querySelector('input[type="file"]');
+    const fileInput =
+      answerFullInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (aInput.value && aInput.value.$el) {
     const fileInput = aInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (bInput.value && bInput.value.$el) {
     const fileInput = bInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (cInput.value && cInput.value.$el) {
     const fileInput = cInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
   }
-  
+
   if (dInput.value && dInput.value.$el) {
     const fileInput = dInput.value.$el.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = null;
@@ -1388,22 +1391,21 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
     // Add a simulated delay for easier debugging in console
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const response = await $fetch("/api/v1/examTests", {
-      method: "POST",
-      body: formData,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    }).catch((error) => {
-      console.error("Network error details:", {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
+    const response = await useApiService
+      .post("/api/v1/examTests", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .catch((error) => {
+        console.error("Network error details:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+        });
+        throw error;
       });
-      throw error;
-    });
 
     if (response.status == 1) {
       $toast.success("Created successfully");
@@ -1425,73 +1427,85 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
             examTestsFormData.append("tests[]", createdTestId);
 
             // Make API call to associate test with exam
-            const associationResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
-              method: "PUT",
-              body: examTestsFormData,
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${userToken.value}`,
-              },
-            });
-          
+            const associationResponse = await useApiService.put(
+              `/api/v1/exams/tests/${currentExamId}`,
+              examTestsFormData,
+              {
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+              }
+            );
+
             if (associationResponse && associationResponse.status === 1) {
               emit("update:updateTestList", createdTestId);
-              
+
               // Increment the exam test list length
               examTestListLength.value++;
-              
+
               // Force parent to refresh tests list
               emit("update:refreshTests");
-              
+
               // Notify user of success
               $toast.success("Test created and added to exam successfully");
             } else {
-              console.warn("API returned error for test association:", associationResponse);
-              
+              console.warn(
+                "API returned error for test association:",
+                associationResponse
+              );
+
               // Try a second time with a different approach if the first attempt failed
               try {
                 // Wait a moment before retrying
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise((resolve) => setTimeout(resolve, 500));
 
                 // Try again with a different content type
-                const retryResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
-                  method: "PUT",
-                  body: JSON.stringify({ tests: [createdTestId] }),
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userToken.value}`,
-                  },
-                });
+                const retryResponse = await useApiService.put(
+                  `/api/v1/exams/tests/${currentExamId}`,
+                  JSON.stringify({ tests: [createdTestId] }),
+                  {
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
                 if (retryResponse && retryResponse.status === 1) {
                   // Notify parent component about the new test
                   emit("update:updateTestList", createdTestId);
                   examTestListLength.value++;
-                  
+
                   // Force parent to refresh tests list
                   emit("update:refreshTests");
-                  
+
                   $toast.success("Test created and added to exam successfully");
                 } else {
                   // If retry also failed, still emit the event to let parent component try
                   emit("update:updateTestList", createdTestId);
-                  $toast.warning("Test created but couldn't be added to exam automatically. Please try adding it manually.");
+                  $toast.warning(
+                    "Test created but couldn't be added to exam automatically. Please try adding it manually."
+                  );
                 }
               } catch (retryErr) {
-                console.error("Error in retry attempt for test association:", retryErr);
+                console.error(
+                  "Error in retry attempt for test association:",
+                  retryErr
+                );
                 // Still emit the event to let parent component try
                 emit("update:updateTestList", createdTestId);
-                $toast.warning("Test created but couldn't be added to exam automatically");
+                $toast.warning(
+                  "Test created but couldn't be added to exam automatically"
+                );
               }
             }
           } catch (err) {
             console.error("Error adding test to exam:", err);
-            
+
             // Enhanced error logging
             if (err.response) {
               console.error("Error response status:", err.response.status);
               console.error("Error response data:", err.response.data);
             }
-            
+
             // Still emit the event to let parent component try
             emit("update:updateTestList", createdTestId);
             $toast.error("Test created but couldn't be added to exam");
@@ -1668,11 +1682,9 @@ const getCurrentExamInfo = async () => {
 
   if (currentExamId) {
     try {
-      const response = await $fetch(`/api/v1/exams/info/${currentExamId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken.value}`,
-        },
-      });
+      const response = await useApiService.get(
+        `/api/v1/exams/info/${currentExamId}`
+      );
 
       // Set form data from response - important to set in sequence
       if (response.data.section) {
@@ -1725,9 +1737,12 @@ const getCurrentExamInfo = async () => {
  */
 const getBase64FromUrl = async (url) => {
   try {
-    const response = await $fetch(url.replace(process.env.FILE_BASE_URL, ""), {
-      responseType: "blob",
-    });
+    const response = await useApiService.get(
+      url.replace(process.env.FILE_BASE_URL, ""),
+      {
+        responseType: "blob",
+      }
+    );
     file_original_path.value = URL.createObjectURL(response);
   } catch (err) {
     console.error(err);
@@ -1942,14 +1957,12 @@ watch(
   { deep: true }
 );
 
-
 /**
  * Initialize on mount
  */
 onMounted(async () => {
   // Initialize user token
   userToken.value = auth.getUserToken();
-
 
   getCurrentExamInfo();
   // Set default values for answer type
@@ -2029,12 +2042,9 @@ const submitCrop = async () => {
       params.append("file_base64", fileBase64);
 
       // Send API request
-      const response = await $fetch("/api/v1/upload", {
-        method: "POST",
-        body: params,
+      const response = await useApiService.post("/api/v1/upload", params, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Bearer ${userToken.value}`,
         },
       });
 
@@ -2197,7 +2207,11 @@ const validateQuestionField = (value) => {
 const manualSubmit = async () => {
   clearFieldValidationErrors();
 
-  if (!form.topic && selected_topics.value && selected_topics.value.length > 0) {
+  if (
+    !form.topic &&
+    selected_topics.value &&
+    selected_topics.value.length > 0
+  ) {
     form.topic = parseInt(selected_topics.value[0]);
   }
 
@@ -2237,21 +2251,19 @@ const manualSubmit = async () => {
 
   // Add file fields if they exist
   if (form.q_file) formData.append("q_file", form.q_file);
-  if (form.answer_full_file) formData.append("answer_full_file", form.answer_full_file);
+  if (form.answer_full_file)
+    formData.append("answer_full_file", form.answer_full_file);
   if (form.a_file) formData.append("a_file", form.a_file);
   if (form.b_file) formData.append("b_file", form.b_file);
   if (form.c_file) formData.append("c_file", form.c_file);
   if (form.d_file) formData.append("d_file", form.d_file);
-  
+
   try {
     const { $toast } = useNuxtApp();
-    
-    const response = await $fetch("/api/v1/examTests", {
-      method: "POST",
-      body: formData,
+
+    const response = await useApiService.post("/api/v1/examTests", formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${userToken.value}`,
       },
     });
 
@@ -2271,23 +2283,25 @@ const manualSubmit = async () => {
           // STEP 2: Associate test with exam - PUT to /api/v1/exams/tests/{exam_id}
           const examTestsFormData = new URLSearchParams();
           examTestsFormData.append("tests[]", createdTestId);
-          
-          const associationResponse = await $fetch(`/api/v1/exams/tests/${currentExamId}`, {
-            method: "PUT",
-            body: examTestsFormData,
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${userToken.value}`,
-            },
-          });
+
+          const associationResponse = await useApiService.put(
+            `/api/v1/exams/tests/${currentExamId}`,
+            examTestsFormData,
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            }
+          );
           emit("update:updateTestList", createdTestId);
           examTestListLength.value++;
           emit("update:refreshTests");
-          
+
           if ($toast) $toast.success("Test added to exam successfully");
         } catch (err) {
           console.error("Error associating test with exam:", err);
-          if ($toast) $toast.error("Test created but couldn't be added to exam");
+          if ($toast)
+            $toast.error("Test created but couldn't be added to exam");
         }
       } else {
         // Not in exam edit mode, just emit the events
@@ -2298,7 +2312,8 @@ const manualSubmit = async () => {
       // Reset form fields
       resetFormFields();
     } else {
-      if ($toast) $toast.error(response.message || "An error occurred, try again");
+      if ($toast)
+        $toast.error(response.message || "An error occurred, try again");
     }
   } catch (err) {
     const { $toast } = useNuxtApp();

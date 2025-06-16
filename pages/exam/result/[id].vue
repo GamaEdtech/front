@@ -393,7 +393,6 @@
                   <v-btn icon @click="openCrashReportDialog"
                     ><v-icon color="blue">mdi-bullhorn-outline</v-icon></v-btn
                   >
-                  {{ dialog }}
                   <NuxtLink :to="`/test/${dialog.id}`"
                     ><v-btn icon
                       ><v-icon color="green">mdi-eye</v-icon></v-btn

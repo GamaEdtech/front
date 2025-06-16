@@ -355,11 +355,8 @@ function handleUpdate(value) {
     address: addressSubmitLoader,
   }[value];
   if (loaderRef) loaderRef.value = true;
-  $fetch(`/api/v2/schools/${route.params.id}/contributions`, {
-    method: "POST",
-    body: formData,
-    headers: { Authorization: `Bearer ${localStorage.getItem("v2_token")}` },
-  })
+  useApiService
+    .post(`/api/v2/schools/${route.params.id}/contributions`, formData)
     .then(async (response) => {
       if (response.succeeded) {
         nuxtApp.$toast?.success(

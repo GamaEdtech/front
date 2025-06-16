@@ -2,7 +2,7 @@
   <div id="question-submit-form" class="mt-4">
     <v-col cols="12" class="px-2 px-sm-2 px-md-0">
       <v-row>
-        <v-col cols="12" class="pl-5 ">
+        <v-col cols="12" class="pl-5">
           <span class="text-h4" style="color: #009688">
             Forum Submission Form</span
           >
@@ -167,7 +167,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 
@@ -249,13 +249,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       section_list.value = response.data;
@@ -306,14 +300,15 @@ const submitQuestion = async () => {
       formSubmitData.append("topics[]", formData.topics[key]);
 
   try {
-    const response = await $fetch("/api/v1/questions", {
-      method: "POST",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.post(
+      "/api/v1/questions",
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (response.data.id === 0 && response.data.repeated) {
       $toast.info("The question is duplicated");
@@ -323,7 +318,6 @@ const submitQuestion = async () => {
     }
   } catch (err) {
     if (err.response?.status === 403) {
-      router.push({ query: { auth_form: "login" } });
     } else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || "Error submitting question");
     }
@@ -356,13 +350,7 @@ const uploadFile = async (value) => {
   fileFormData.append("file", value);
 
   try {
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: fileFormData,
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    const response = await useApiService.post("/api/v1/upload", fileFormData);
 
     formData.file = response.data[0].file.name;
     $toast.success("File uploaded successfully");
@@ -439,5 +427,4 @@ onMounted(() => {
   font-weight: bolder !important;
   color: blue !important;
 }
-
 </style>

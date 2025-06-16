@@ -118,12 +118,17 @@ export default defineNuxtConfig({
     "@nuxtjs/leaflet",
     "nuxt-gtag",
     "@nuxt/image",
+    "@nuxtjs/leaflet",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
   ],
+  leaflet: {
+    markerCluster: true,
+  },
+
   // Development modules
   devtools: { enabled: true },
 
@@ -184,7 +189,6 @@ export default defineNuxtConfig({
 
   // Development server configuration
   devServer: {
-    host: "0.0.0.0",
     port: 3000,
   },
 

@@ -236,13 +236,8 @@ async function uploadImage() {
       const formData = new FormData();
       formData.append("File", file);
       formData.append("FileType", "SimpleImage");
-      return $fetch(`/api/v2/schools/${route.params.id}/images`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("v2_token")}`,
-        },
-      })
+      return useApiService
+        .post(`/api/v2/schools/${route.params.id}/images`, formData)
         .then((response) => {
           return response;
         })

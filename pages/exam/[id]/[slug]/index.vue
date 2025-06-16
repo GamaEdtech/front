@@ -3,7 +3,6 @@
     <!-- Start : Category -->
     <common-category />
     <!-- End:Category -->
-
     <!--  Start: breadcrumb  -->
     <section>
       <v-container class="py-0">
@@ -80,8 +79,8 @@
               <!--  Description   -->
               <exam-detail-description-section
                 :content-data="contentData"
-                :is-logged-in="$auth.loggedIn"
-                :credit="$auth.user?.credit || 0"
+                :is-logged-in="auth.isAuthenticated.value"
+                :credit="user?.user.value?.credit || 0"
                 @login="openAuthDialog('login')"
                 @register="openAuthDialog('register')"
               />
@@ -89,8 +88,8 @@
             <v-col md="3">
               <exam-detail-sidebar-details
                 :content-data="contentData"
-                :is-logged-in="$auth.loggedIn"
-                :credit="$auth.user?.credit || 0"
+                :is-logged-in="auth.isAuthenticated.value"
+                :credit="user?.user.value?.credit || 0"
                 :download-loading="download_loading"
                 @download="startDownload"
                 @login="openAuthDialog('login')"
@@ -108,8 +107,8 @@
       v-if="!dataFetching"
       :exam-id="contentData.id"
       :exam-prices="contentData.price"
-      :is-logged-in="$auth.loggedIn"
-      :credit="$auth.user?.credit || 0"
+      :is-logged-in="auth.isAuthenticated.value"
+      :credit="user?.user.value?.credit || 0"
       :user-exam-status="contentData.examUserData?.status || 0"
       :download-loading="download_loading"
       @download="startDownload"
@@ -128,7 +127,9 @@
 // Get api, router, and route
 const route = useRoute();
 const router = useRouter();
-const { $auth } = useNuxtApp();
+const auth = useAuth();
+const user = useUser();
+const { $toast } = useNuxtApp();
 
 // Component data
 const contentData = ref({});
@@ -159,7 +160,7 @@ const galleryHelpData = ref({
 async function fetchExamData() {
   try {
     const { id } = route.params;
-    const response = await $fetch(`/api/v1/exams/${id}`);
+    const response = await useApiService.get(`/api/v1/exams/${id}`);
 
     if (response.status === 1 && response.data) {
       return response.data;
@@ -274,7 +275,9 @@ const copyUrl = () => {
 const startDownload = async () => {
   download_loading.value = true;
   try {
-    const response = await $fetch(`/api/v1/exams/download/${route.params.id}`);
+    const response = await useApiService.get(
+      `/api/v1/exams/download/${route.params.id}`
+    );
     const FileSaver = await import("file-saver");
     FileSaver.saveAs(response.data.url, response.data.name);
   } catch (err) {
@@ -283,12 +286,9 @@ const startDownload = async () => {
         err.response.data.status == 0 &&
         err.response.data.error == "creditNotEnough"
       ) {
-        useToast().info("No enough credit");
+        $toast.info("No enough credit");
       }
-    } else if (err.response?.status == 403) {
-      router.push({ query: { auth_form: "login" } });
     }
-    console.log(err);
   } finally {
     download_loading.value = false;
   }

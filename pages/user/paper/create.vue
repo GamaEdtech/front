@@ -440,10 +440,7 @@ const getTypeList = async (type, parent = "") => {
   }
 
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params,
-    });
+    const response = await useApiService.get("/api/v1/types/list", params);
 
     if (type === "section") {
       section_list.value = response.data;
@@ -478,11 +475,8 @@ const getTypeList = async (type, parent = "") => {
 
 const getExtraFileType = async () => {
   try {
-    const response = await $fetch("/api/v1/types/list", {
-      method: "GET",
-      params: {
-        type: "test_extra_file",
-      },
+    const response = await useApiService.get("/api/v1/types/list", {
+      type: "test_extra_file",
     });
     extra_type_list.value = response.data;
   } catch (error) {
@@ -516,13 +510,15 @@ const submitQuestion = async () => {
   //End arrange to form data
 
   try {
-    const response = await $fetch("/api/v1/tests", {
-      method: "POST",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.post(
+      "/api/v1/tests",
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if (response.data.id == 0 && response.data.repeated)
       $toast.info("The paper is duplicated");
@@ -652,10 +648,7 @@ const uploadFile = async (file_name, ev, index = "") => {
       fileFormData.append("file", value);
     }
 
-    const response = await $fetch("/api/v1/upload", {
-      method: "POST",
-      body: fileFormData,
-    });
+    const response = await useApiService.post("/api/v1/upload", fileFormData);
 
     if (file_name == "file_pdf") formData.file_pdf = response.data[0].file.name;
     else if (file_name == "file_word")
