@@ -33,12 +33,9 @@
                 v-for="(item, n) in slideItems"
                 :key="n"
               >
-                <v-card flat :to="`/blog/${item.id}`">
+                <v-card flat :to="`/blog/${item.id}/${item.title}`">
                   <v-card
                     flat
-                    @mouseover="toggleHover('enter', n)"
-                    @mouseleave="toggleHover('leave', n)"
-                    class="ma-1"
                   >
                     <v-img :src="item.pic" />
                     <v-card-title>
@@ -54,7 +51,7 @@
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
-                    <nuxt-link :to="`/blog/${item.id}`">Read more</nuxt-link>
+                    <nuxt-link :to="`/blog/${item.id}/${item.slug}`">Read more</nuxt-link>
                   </div>
                 </v-card>
               </v-slide-group-item>
@@ -109,10 +106,38 @@ const truncateBody = (text) => {
 loadBlog();
 </script>
 
-<style>
+<style scoped>
 #blog-list-container {
   margin: 2.4rem auto 2.4rem auto;
   height: 33rem;
+
+  :deep(.v-card-title){
+    -webkit-backdrop-filter: blur(7.5px);
+    backdrop-filter: blur(7.5px);
+    background: rgba(36, 41, 47, .7);
+    border-radius: 0 0 6px 6px;
+    bottom: 0;
+    color: #fff;
+    font-family: "Inter";
+    height: 4.9rem;
+    left: 0;
+    margin: 0 auto;
+    max-height: 4.9rem;
+    padding-bottom: 5rem !important;
+    padding-top: .6rem !important;
+    position: absolute;
+    right: 0;
+  }
+
+  :deep(.gama-text-button){
+    text-wrap: wrap;
+    color: #fff;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
 
   #main-title {
     color: #354053;
