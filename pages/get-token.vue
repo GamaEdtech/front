@@ -28,6 +28,9 @@
       <token-how-buy-section />
     </section>
     <section>
+      <token-stats-section />
+    </section>
+    <section>
       <token-faq />
     </section>
   </div>

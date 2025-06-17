@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="token-market__section">
+    <section class="token-market__section mt-5">
       <div class="token-market__head">
         <div class="d-flex align-center flex-column py-8">
           <h2 class="token-market__title">$GET FAQ’s</h2>
