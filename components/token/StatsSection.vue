@@ -88,13 +88,13 @@
         </div>
 
         <v-row class="mt-2 mx-5">
-          <v-col cols="4" sm="3" class="d-flex flex-column h-100">
+          <v-col cols="4" sm="3" class="d-flex flex-column h-100 px-2 py-0">
             <div>
               <div class="stats-section-chart__card">
                 <div class="stats-section-chart__box">$0.00892</div>
               </div>
               <div class="stats-section-chart__coins flex-grow-1">
-                <div class="d-flex align-center mb-3 mb-md-4">
+                <div class="d-flex align-center mb-2 mb-md-4">
                   <img
                     src="/images/token/token-get.png"
                     alt="GET"
@@ -102,7 +102,7 @@
                   />
                   <span class="token-label">GET</span>
                 </div>
-                <div class="d-flex align-center mb-3 mb-md-4">
+                <div class="d-flex align-center mb-2 mb-md-4">
                   <img
                     src="/images/token/token-usdc.png"
                     alt="USDC"
@@ -110,7 +110,7 @@
                   />
                   <span class="token-label">USDC</span>
                 </div>
-                <div class="d-flex align-center mb-3 mb-md-4">
+                <div class="d-flex align-center mb-2 mb-md-4">
                   <img
                     src="/images/token/token-usdt.png"
                     alt="USDT"
@@ -129,7 +129,7 @@
               </div>
             </div>
           </v-col>
-          <v-col cols="8" sm="9">
+          <v-col cols="8" sm="9" class="px-2 py-0">
             <iframe
               class="stats-section-chart__iframe h-100"
               width="100%"
@@ -156,8 +156,7 @@ const display = useDisplay();
   border: 1px solid #1c3771;
   border-radius: 8px;
   margin-top: 10px;
-  padding: 15px 15px;
-  /* height: 140px; */
+  padding: 5px 5px;
   height: 100%;
 }
 .token-icon {
@@ -172,7 +171,7 @@ const display = useDisplay();
 .stats-section-chart__card {
   border-radius: 8px;
   border: 2px solid #f8ba23;
-  padding: 8px 10px;
+  padding: 4px 4px;
 }
 .stats-section-chart__box {
   border-radius: 6px;
@@ -226,7 +225,7 @@ const display = useDisplay();
   color: #0e1037;
   font-weight: 800;
   margin-top: 7px;
-  font-size: 10px;
+  font-size: 9px;
 }
 .stats-section-stats__card--value {
   background: #05122e;
@@ -255,7 +254,11 @@ const display = useDisplay();
   font-size: 10px;
 }
 @media (min-width: 600px) {
+  .stats-section-chart__coins {
+    padding: 15px 15px;
+  }
   .stats-section-chart__card {
+    padding: 8px 10px;
   }
   .stats-section-chart__box {
     font-size: 20px;

@@ -108,11 +108,7 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "TokenomicsSection",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 .tokenomics-section {

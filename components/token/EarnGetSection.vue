@@ -19,36 +19,29 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "EarnGetSection",
-  data() {
-    return {
-      cards: [
-        {
-          title: "Teachers",
-          desc: "Create content and upload learning materials",
-          img: "/images/token/teachers.png",
-        },
-        {
-          title: "Students",
-          desc: "Use the system and submit assignments",
-          img: "/images/token/students.png",
-        },
-        {
-          title: "Developers",
-          desc: "Contribute to the development process",
-          img: "/images/token/developers.png",
-        },
-        {
-          title: "Community",
-          desc: "Use social media to help others learn about Gamatrain",
-          img: "/images/token/community.png",
-        },
-      ],
-    };
+<script setup>
+const cards = ref([
+  {
+    title: "Teachers",
+    desc: "Create content and upload learning materials",
+    img: "/images/token/teachers.png",
   },
-};
+  {
+    title: "Students",
+    desc: "Use the system and submit assignments",
+    img: "/images/token/students.png",
+  },
+  {
+    title: "Developers",
+    desc: "Contribute to the development process",
+    img: "/images/token/developers.png",
+  },
+  {
+    title: "Community",
+    desc: "Use social media to help others learn about Gamatrain",
+    img: "/images/token/community.png",
+  },
+]);
 </script>
 
 <style scoped>

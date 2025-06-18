@@ -39,11 +39,7 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "ProfitBuybackSection",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 .profit-buyback-section {

@@ -37,11 +37,7 @@
     </section>
   </div>
 </template>
-<script>
-export default {
-  name: "HowGetTokenSection",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 .can-get-section {

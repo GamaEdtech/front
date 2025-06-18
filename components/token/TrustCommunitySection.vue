@@ -52,28 +52,21 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "TrustCommunitySection",
-  data() {
-    return {
-      items: [
-        {
-          img: "/images/token/trust.png",
-          text: "Trust",
-        },
-        {
-          img: "/images/token/transparency.png",
-          text: "Transparency",
-        },
-        {
-          img: "/images/token/shared.png",
-          text: "Shared Accountability",
-        },
-      ],
-    };
+<script setup>
+const items = ref([
+  {
+    img: "/images/token/trust.png",
+    text: "Trust",
   },
-};
+  {
+    img: "/images/token/transparency.png",
+    text: "Transparency",
+  },
+  {
+    img: "/images/token/shared.png",
+    text: "Shared Accountability",
+  },
+]);
 </script>
 
 <style scoped>

@@ -33,11 +33,7 @@
     </section>
   </div>
 </template>
-<script>
-export default {
-  name: "TokenAboutSection",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 .about-get-section {

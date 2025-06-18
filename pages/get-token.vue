@@ -33,6 +33,9 @@
     <section>
       <token-faq />
     </section>
+    <section>
+      <token-economy-section />
+    </section>
   </div>
 </template>
 

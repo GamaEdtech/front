@@ -75,7 +75,7 @@
             <img
               src="/images/token/token.png"
               alt="Token"
-              class="token-image d-none d-md-block"
+              class="token-image d-none d-md-block horizontal-coin"
             />
           </v-col>
         </v-row>
@@ -237,5 +237,30 @@ onMounted(() => {
   }
 }
 @media (min-width: 960px) {
+}
+.rotating-coin {
+  animation: rotate-coin 4s linear infinite;
+  will-change: transform;
+}
+@keyframes rotate-coin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.horizontal-coin {
+  animation: move-horizontal 4s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes move-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(60px); /* Adjust distance as needed */
+  }
 }
 </style>

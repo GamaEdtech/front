@@ -47,11 +47,7 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "TokenPurchase",
-};
-</script>
+<script setup></script>
 
 <style scoped>
 .token-purchase-bg {
