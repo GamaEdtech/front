@@ -1,9 +1,16 @@
-<template>
+ <template>
   <v-container class="test-maker">
     <v-container>
-      <v-row class="mt-8">
+      <v-row class="mt-14">
         <v-col cols="12" md="12">
-          <span class="text-h4 text-teal">
+          <span
+            class="text-teal"
+            style="
+              font-size: 2.125rem !important;
+              letter-spacing: 0.0073529412em !important;
+              line-height: 2.5rem;
+            "
+          >
             <span
               class="fa-solid fa-file"
               style="font-size: 2rem !important; margin-inline: 0.5rem"
@@ -13,7 +20,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-card class="mb-16">
+    <v-card elevation="2" class="mb-16">
       <v-card-text>
         <v-container>
           <v-row>
@@ -21,29 +28,23 @@
               <ClientOnly>
                 <v-table class="exams_table">
                   <thead>
-                    <tr>
+                    <tr style="color: rgba(0, 0, 0, 0.6)">
                       <th class="text-left text-h5">Participant</th>
                       <th class="text-center text-h5">
-                        <v-icon
-                          class="d-block d-md-none"
-                          icon="fa-regular fa-circle-play"
-                          size="x-large"
+                        <span
+                          class="d-block d-md-none fa-regular fa-circle-play fa-lg"
                         />
                         <span class="d-none d-md-block">Start time</span>
                       </th>
                       <th class="text-center text-h5">
-                        <v-icon
-                          class="d-block d-md-none"
-                          icon="fa-regular fa-clock"
-                          size="x-large"
+                        <span
+                          class="d-block d-md-none fa-regular fa-clock fa-lg"
                         />
                         <span class="d-none d-md-block">Test duration</span>
                       </th>
                       <th class="text-center text-h5">
-                        <v-icon
-                          class="d-block d-md-none"
-                          icon="fa-regular fa-circle-stop"
-                          size="x-large"
+                        <span
+                          class="d-block d-md-none fa-regular fa-circle-stop fa-lg"
                         />
                         <span class="d-none d-md-block">Response time</span>
                       </th>
@@ -73,21 +74,46 @@
 
           <v-row class="mt-8">
             <v-col class="d-none d-md-block" md="12">
-              <span class="mr-4"
-                ><span class="text-green fa-solid fa-circle-check" /> : Correct
-                answer
+              <span class="mr-2">
+                <i class="fa-solid fa-circle-check fa-lg text-green"></i>
+                : Correct answers
               </span>
-              <span class="mr-4"
-                ><span class="text-red fa-regular fa-times-circle" /> : Wrong
-                answer</span
-              >
-              <span class="mr-4"
-                ><span class="text-green fa-regular fa-circle-check" /> :
-                Correct option</span
-              >
-              <span class="mr-4"
-                ><span class="fa-regular fa-circle" /> : No answer</span
-              >
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-times-circle fa-lg text-red"></i>
+                : Wrong answer
+              </span>
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-circle-check fa-lg text-green"></i>
+                : Correct option
+              </span>
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-circle fa-lg"></i>
+                : No answer
+              </span>
+            </v-col>
+            <v-col cols="6" class="d-block d-md-none">
+              <span class="mr-2">
+                <i class="fa-solid fa-circle-check fa-lg text-green"></i>
+                : Correct answers
+              </span>
+            </v-col>
+            <v-col cols="6" class="d-block d-md-none">
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-times-circle fa-lg text-red"></i>
+                : Wrong answer
+              </span>
+            </v-col>
+            <v-col cols="6" class="d-block d-md-none">
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-circle-check fa-lg text-green"></i>
+                : Correct option
+              </span>
+            </v-col>
+            <v-col cols="6" class="d-block d-md-none">
+              <span class="mr-2 my-1">
+                <i class="fa-regular fa-circle fa-lg"></i>
+                : No answer
+              </span>
             </v-col>
           </v-row>
 
@@ -95,7 +121,7 @@
             <v-col cols="12" md="4">
               <v-table class="exams_table">
                 <thead>
-                  <tr>
+                  <tr style="color: rgba()">
                     <th class="text-left text-h5">#</th>
                     <th class="text-center text-h5">1</th>
                     <th class="text-center text-h5">2</th>
@@ -117,7 +143,7 @@
                           item.user_answer == option &&
                           item.true_answer == option
                         "
-                        class="text-green fa-solid fa-circle-check"
+                        class="text-green fa-solid fa-circle-check fa-lg"
                         size="large"
                       />
                       <span
@@ -125,15 +151,19 @@
                           item.user_answer == option &&
                           item.true_answer != option
                         "
-                        class="text-red fa-regular fa-times-circle"
+                        class="text-red fa-regular fa-times-circle fa-lg"
                         size="large"
                       />
                       <span
                         v-else-if="item.true_answer == option"
-                        class="text-green fa-regular fa-circle-check"
+                        class="text-green fa-regular fa-circle-check fa-lg"
                         size="large"
                       />
-                      <span v-else icon="fa-regular fa-circle" size="large" />
+                      <span
+                        v-else
+                        class="fa-regular fa-circle fa-lg"
+                        size="large"
+                      />
                     </td>
                   </tr>
                 </tbody>
@@ -148,19 +178,17 @@
                         <th class="text-left text-h5">Lesson</th>
                         <th class="text-center text-h5">Count</th>
                         <th class="text-center text-h5">
-                          <v-icon
-                            class="text-green"
-                            icon="fa-solid fa-circle-check"
+                          <span
+                            class="text-green fa-solid fa-circle-check fa-lg"
                           />
                         </th>
                         <th class="text-center text-h5">
-                          <v-icon
-                            class="text-red"
-                            icon="fa-solid fa-times-circle"
+                          <span
+                            class="text-red fa-solid fa-times-circle fa-lg"
                           />
                         </th>
                         <th class="text-center text-h5">
-                          <v-icon icon="fa-regular fa-circle" />
+                          <span class="fa-regular fa-circle fa-lg" />
                         </th>
                         <th class="text-center text-h5">%</th>
                       </tr>
@@ -207,10 +235,8 @@
                     <tbody>
                       <tr>
                         <td>
-                          <v-icon
-                            class="text-green"
-                            icon="fa-solid fa-circle-check"
-                            size="large"
+                          <span
+                            class="text-green fa-solid fa-circle-check fa-lg"
                           />&nbsp; Correct answers:
                         </td>
                         <td class="text-center">
@@ -219,10 +245,8 @@
                       </tr>
                       <tr>
                         <td>
-                          <v-icon
-                            class="text-red"
-                            icon="fa-regular fa-times-circle"
-                            size="large"
+                          <span
+                            class="text-red fa-regular fa-times-circle fa-lg"
                           />&nbsp; Wrong answers:
                         </td>
                         <td class="text-center">
@@ -231,10 +255,8 @@
                       </tr>
                       <tr>
                         <td>
-                          <v-icon
-                            icon="fa-regular fa-circle"
-                            size="large"
-                          />&nbsp; No answer:
+                          <span class="fa-regular fa-circle fa-lg" />&nbsp; No
+                          answer:
                         </td>
                         <td class="text-center">
                           {{ contentData.answerStats.total.noAnswer }}
@@ -243,11 +265,35 @@
                       <tr>
                         <td>Rank in country:</td>
                         <td
-                          v-if="contentData.rank && contentData.rank.total"
                           class="text-center"
+                          v-if="contentData.rank && contentData.rank.total"
                         >
-                          <strong>{{ contentData.rank.total.user }}</strong> of
-                          {{ contentData.rank.total.total }}
+                          <strong>
+                            {{ contentData.rank.total.user }}
+                          </strong>
+                          of {{ contentData.rank.total.total }} participants
+                        </td>
+                        <td v-else class="text-center">-</td>
+                      </tr>
+                      <tr>
+                        <td>Rank in state:</td>
+                        <td
+                          class="text-center"
+                          v-if="contentData.rank && contentData.rank.state"
+                        >
+                          <strong>{{ contentData.rank.state.user }}</strong>
+                          of {{ contentData.rank.state.total }} participants
+                        </td>
+                        <td class="text-center" v-else>-</td>
+                      </tr>
+                      <tr>
+                        <td>Rank in area:</td>
+                        <td
+                          class="text-center"
+                          v-if="contentData.rank && contentData.rank.area"
+                        >
+                          <strong> {{ contentData.rank.area.user }}</strong>
+                          of {{ contentData.rank.area.total }} participants
                         </td>
                         <td v-else class="text-center">-</td>
                       </tr>
@@ -255,22 +301,31 @@
                   </v-table>
                   <v-btn
                     :loading="download_loading"
+                    class="mt-8 p-4"
                     block
-                    class="mt-6"
+                    rounded="1"
+                    density="compact"
+                    size="large"
+                    variant="flat"
                     color="error"
                     @click="startDownload"
+                    style="color: #fff !important"
                   >
-                    Download PDF file with key |
-                    {{
-                      contentData.price.price > 0
-                        ? `$${contentData.price.price}`
-                        : "Free"
-                    }}
+                    <div
+                      style="font-size: 14px !important; text-transform: none"
+                    >
+                      Download PDF file with key |
+                      {{
+                        contentData.price.price > 0
+                          ? `$${contentData.price.price}`
+                          : "Free"
+                      }}
+                    </div>
                   </v-btn>
                 </v-col>
-                <!-- <v-col cols="12" md="6">
-                   <pie-chart v-if="chartData.datasets" :chart-data="chartData" />
-                </v-col> -->
+                <v-col cols="12" md="6" style="height: 250px">
+                  <pie-chart :chart-data="chartData" />
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -283,11 +338,20 @@
         <v-card>
           <v-card-text class="py-4" ref="dialogMathJaxContainerRef">
             <v-col class="test-list" cols="12">
-              <div v-html="dialog.question" />
+              <div
+                id="test-question"
+                style="
+                  color: rgba(0, 0, 0, 0.6);
+                  font-size: 1.8rem !important;
+                  font-weight: bold !important;
+                  line-height: 2.2rem;
+                  margin-bottom: 1rem;
+                "
+                v-html="dialog.question"
+              />
               <img
                 v-if="dialog.q_file && dialog.q_file !== '0'"
                 :src="dialog.q_file"
-                class="mt-2 answer-img"
               />
 
               <div class="mt-4">
@@ -306,7 +370,7 @@
                     icon="mdi-close"
                     size="large"
                   />
-                  <span>1)</span>
+                  <span>1)&nbsp;</span>
                   <span v-html="dialog.answer_a"></span>
                   <img
                     v-if="dialog.a_file && dialog.a_file !== '0'"
@@ -330,7 +394,7 @@
                     icon="mdi-close"
                     size="large"
                   />
-                  <span>2)</span>
+                  <span>2)&nbsp;</span>
                   <span v-html="dialog.answer_b"></span>
                   <img
                     v-if="dialog.b_file && dialog.b_file !== '0'"
@@ -354,7 +418,7 @@
                     icon="mdi-close"
                     size="large"
                   />
-                  <span>3)</span>
+                  <span>3)&nbsp;</span>
                   <span v-html="dialog.answer_c"></span>
                   <img
                     v-if="dialog.c_file && dialog.c_file !== '0'"
@@ -378,7 +442,7 @@
                     icon="mdi-close"
                     size="large"
                   />
-                  <span>4)</span>
+                  <span>4)&nbsp;</span>
                   <span v-html="dialog.answer_d" />
                   <img
                     v-if="dialog.d_file && dialog.d_file !== '0'"
@@ -390,20 +454,30 @@
 
               <v-row class="mt-3">
                 <v-col cols="10">
-                  <v-btn icon @click="openCrashReportDialog"
-                    ><v-icon color="blue">mdi-bullhorn-outline</v-icon></v-btn
-                  >
+                  <v-btn
+                    variant="text"
+                    icon="mdi-bullhorn-outline"
+                    color="blue"
+                    style="font-size: 15px"
+                    @click="openCrashReportDialog"
+                  ></v-btn>
                   <NuxtLink :to="`/test/${dialog.id}`"
-                    ><v-btn icon
-                      ><v-icon color="green">mdi-eye</v-icon></v-btn
-                    ></NuxtLink
-                  >
+                    ><v-btn
+                      color="green"
+                      variant="text"
+                      style="font-size: 15px"
+                      icon="mdi-eye"
+                    ></v-btn
+                  ></NuxtLink>
                 </v-col>
                 <v-col class="text-right" cols="2">
                   <v-btn
                     color="red"
-                    variant="text"
+                    variant="outlined"
+                    density="comfortable"
+                    size="large"
                     @click="dialog.status = false"
+                    style="text-transform: none !important; font-size: 13px"
                     >Close</v-btn
                   >
                 </v-col>
@@ -424,10 +498,10 @@
 
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, nextTick, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useHead } from "#app";
-// import PieChart from "@/components/chart/PieChart";
+import PieChart from "@/components/chart/PieChart";
 import CrashReport from "~/components/common/crash-report.vue";
 import { useAuth } from "~/composables/useAuth";
 
@@ -522,20 +596,14 @@ const { data: contentData } = await useAsyncData(
   }
 );
 
-if (!contentData.value) {
-  throw createError({
-    statusCode: 404,
-    message: "Exam result could not be found.",
-    fatal: true,
-  });
-}
-
 const startDownload = async () => {
   download_loading.value = true;
   try {
     const response = await $fetch(
       `/api/v1/exams/download/${contentData.value.exam.id}`
     );
+    // Use dynamic import for file-saver
+    const FileSaver = await import("file-saver");
     FileSaver.saveAs(response.data.url, response.data.name);
   } catch (err) {
     if (
@@ -552,13 +620,26 @@ const startDownload = async () => {
 
 const chartData = computed(() => {
   const stats = contentData.value?.answerStats?.total;
-  if (!stats) return {};
+  if (!stats) {
+    // Return a valid empty chart data object
+    return {
+      labels: ["Correct answers", "Wrong answers", "No answer"],
+      datasets: [
+        {
+          borderColor: "#e1e2e3",
+          backgroundColor: ["#4CAF50", "#F44336", "#EEEEEE"],
+          data: [0, 0, 0],
+        },
+      ],
+    };
+  }
+
   return {
     labels: ["Correct answers", "Wrong answers", "No answer"],
     datasets: [
       {
         borderColor: "#e1e2e3",
-        backgroundColor: ["#4CAF50", "#F44336", "#EEEEEE"],
+        backgroundColor: ["#4CAF50", "#F44336", "#fff"],
         data: [stats.true || 0, stats.false || 0, stats.noAnswer || 0],
       },
     ],
@@ -618,5 +699,22 @@ onMounted(() => {
 
 .false_answer {
   color: red;
+}
+
+.fa-lg {
+  font-size: large !important;
+}
+
+@media (max-width: 960px) {
+  :deep(.chart-container) {
+    height: 200px !important;
+  }
+}
+table > thead > tr > th {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+table > tbody > tr:hover {
+  background-color: #eeeeee !important;
 }
 </style>
