@@ -122,6 +122,10 @@ export default {
               title: "Exam",
               link: "/search?type=azmoon",
             },
+            {
+              title: "$GET Token",
+              link: "/get-token",
+            },
           ],
         },
       ],
