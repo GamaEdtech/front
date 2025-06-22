@@ -12,7 +12,14 @@
           future.
         </p>
       </div>
-      <v-btn class="economy-btn" color="white" size="large" elevation="0">
+      <v-btn
+        class="economy-btn"
+        color="white"
+        size="large"
+        elevation="0"
+        target="_blank"
+        href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
+      >
         Get Started Now
       </v-btn>
     </v-container>

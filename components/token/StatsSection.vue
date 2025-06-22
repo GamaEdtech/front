@@ -131,7 +131,7 @@
           </v-col>
           <v-col cols="8" sm="9" class="px-2 py-0">
             <iframe
-              class="stats-section-chart__iframe h-100"
+              class="stats-section-chart__iframe"
               width="100%"
               src="https://birdeye.so/tv-widget/GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv?chain=solana&viewMode=pair&chartInterval=1D&chartType=Candle&chartTimezone=Etc%2FUTC&chartLeftToolbar=show&theme=dark"
               frameborder="0"
@@ -188,7 +188,7 @@ const display = useDisplay();
   text-align: center;
 }
 .stats-section-chart__iframe {
-  /* height: 180px; */
+  height: 145px;
 }
 .stats-section-stats__card {
   border-radius: 8px;
@@ -254,6 +254,9 @@ const display = useDisplay();
   font-size: 10px;
 }
 @media (min-width: 600px) {
+  .stats-section-chart__iframe {
+    height: 100%;
+  }
   .stats-section-chart__coins {
     padding: 15px 15px;
   }

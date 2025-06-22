@@ -43,7 +43,7 @@
               </div>
               <div class="mb-1">
                 <span class="hero-token__price text-white"
-                  >${{ animatedPrice }}</span
+                  >${{ finalPrice }}</span
                 >
               </div>
               <div class="mb-6">
@@ -51,6 +51,8 @@
               </div>
               <div class="d-flex align-center">
                 <v-btn
+                  target="_blank"
+                  href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
                   :size="`${display.xs.value ? 'large' : 'x-large'}`"
                   class="buy-btn mr-4"
                   rounded
@@ -58,6 +60,7 @@
                   >Buy $GET Now</v-btn
                 >
                 <v-btn
+                  to="/whitepaper"
                   class="whitepaper-btn"
                   rounded
                   :size="`${display.xs.value ? 'large' : 'x-large'}`"
@@ -85,38 +88,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
 import { useDisplay } from "vuetify";
 const display = useDisplay();
-const finalPrice = 0.002546; // your real price
-const animatedPrice = ref(0);
-const liveTradingCount = ref(0);
-const targetCount = 24;
+const finalPrice = ref(0);
+
+const fetchTokenPrice = async () => {
+  const data = await $fetch(
+    "https://api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
+  );
+  finalPrice.value = Object.values(data.data)[0]["price"];
+};
 
 onMounted(() => {
-  const duration = 1200; // ms
-  const frameRate = 60;
-  const totalFrames = Math.round((duration / 1000) * frameRate);
-  let frame = 0;
-
-  const animate = () => {
-    frame++;
-    const progress = Math.min(frame / totalFrames, 1);
-    animatedPrice.value = +(finalPrice * progress).toFixed(6);
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    }
-  };
-
-  animate();
-
-  let current = 0;
-  const stepTime = Math.abs(Math.floor(duration / targetCount));
-  const timer = setInterval(() => {
-    current += 1;
-    liveTradingCount.value = current;
-    if (current >= targetCount) clearInterval(timer);
-  }, stepTime);
+  fetchTokenPrice();
 });
 </script>
 

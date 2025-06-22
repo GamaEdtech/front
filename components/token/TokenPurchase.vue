@@ -12,8 +12,8 @@
         <div class="d-flex justify-center align-center flex-column mt-8">
           <div class="token-purchase__title mb-1">Buy now on</div>
           <a
-            href="https://jup.ag/swap/SOL-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
             target="_blank"
+            href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
             rel="noopener noreferrer"
             class="token-purchase__btn"
           >
