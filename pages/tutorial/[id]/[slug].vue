@@ -340,6 +340,7 @@ watch(
 const expandListMenu = ref(true);
 const drawer = ref(false);
 const activeMenu = ref(null);
+const requestURL = ref(useRequestURL().host);
 
 onBeforeUnmount(() => {
   if (process.client) {
@@ -360,6 +361,12 @@ const openCrashReportDialog = () => {
 
 useHead({
   title: tutorialInfo.value?.title || "",
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/tutorial/${tutorialInfo.value.id}/${tutorialInfo.value.title_url}`,
+    },
+  ],
 });
 </script>
 <style>

@@ -195,6 +195,8 @@ const contentData = ref(null);
 const ratingData = ref(null);
 const similarSchools = [];
 const galleryImages = ref([]);
+const requestURL = ref(useRequestURL().host);
+const { $slugGenerator } = useNuxtApp();
 
 const fetchSchoolData = async () => {
   try {
@@ -249,6 +251,17 @@ watch(
   },
   { immediate: true }
 );
+
+useHead(() => ({
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/school/${
+        contentData.value?.id
+      }/${$slugGenerator(contentData.value?.name)}`,
+    },
+  ],
+}));
 
 watch(
   () => ratingDataRaw.value,
