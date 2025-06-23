@@ -41,10 +41,7 @@
                 <div
                   class="item-content-title gama-text-button d-flex justify-space-between"
                 >
-                  <nuxt-link
-                    rel="canonical"
-                    :to="`/exam/${item.id}/${item.title_url}`"
-                  >
+                  <nuxt-link :to="`/exam/${item.id}/${item.title_url}`">
                     {{ item.title }}
                   </nuxt-link>
                 </div>
@@ -153,7 +150,6 @@
                       class="text-right align-right float-right d-flex align-content-center"
                     >
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/exam/${item.id}/${item.title_url}`"
                       >
@@ -163,7 +159,6 @@
                         ></span>
                       </nuxt-link>
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/exam/${item.id}/${item.title_url}`"
                       >

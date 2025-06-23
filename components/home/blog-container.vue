@@ -54,9 +54,7 @@
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
-                    <nuxt-link :to="`/blog/${item.id}`" rel="canonical"
-                      >Read more</nuxt-link
-                    >
+                    <nuxt-link :to="`/blog/${item.id}`">Read more</nuxt-link>
                   </div>
                 </v-card>
               </v-slide-group-item>

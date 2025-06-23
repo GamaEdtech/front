@@ -39,15 +39,11 @@
                 <div
                   class="item-content-title gama-text-button d-flex justify-space-between"
                 >
-                  <nuxt-link
-                    rel="canonical"
-                    :to="`/qa/${item.id}/${item.title_url}`"
-                  >
+                  <nuxt-link :to="`/qa/${item.id}/${item.title_url}`">
                     <span v-html="item.title"></span>
                   </nuxt-link>
                 </div>
                 <nuxt-link
-                  rel="canonical"
                   class="item-content-subtitle gama-text-caption my-2 d-none d-sm-block"
                   :to="`/qa/${item.id}/${item.title_url}`"
                 >
@@ -115,21 +111,13 @@
                     <div
                       class="text-right align-right float-right d-flex align-content-center"
                     >
-                      <nuxt-link
-                        rel="canonical"
-                        icon
-                        :to="`/qa/${item.id}/${item.title_url}`"
-                      >
+                      <nuxt-link icon :to="`/qa/${item.id}/${item.title_url}`">
                         <span
                           v-show="item.q_file_word"
                           class="fa-solid fa-file-word fa-2xl blue--text"
                         ></span>
                       </nuxt-link>
-                      <nuxt-link
-                        rel="canonical"
-                        icon
-                        :to="`/qa/${item.id}/${item.title_url}`"
-                      >
+                      <nuxt-link icon :to="`/qa/${item.id}/${item.title_url}`">
                         <span
                           v-show="item.q_file"
                           class="fa-solid fa-file-pdf fa-2xl red--text pl-1"
@@ -179,7 +167,6 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, type PropType } from "vue";
-import { useNuxtApp, useRoute } from "#app";
 
 import { useGlobalDisplay } from "~/composables/useGlobalDisplay";
 

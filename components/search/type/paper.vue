@@ -46,15 +46,11 @@
                 <div
                   class="item-content-title gama-text-button d-flex justify-space-between"
                 >
-                  <nuxt-link
-                    rel="canonical"
-                    :to="`/paper/${item.id}/${item.title_url}`"
-                  >
+                  <nuxt-link :to="`/paper/${item.id}/${item.title_url}`">
                     {{ item.title }}
                   </nuxt-link>
                 </div>
                 <nuxt-link
-                  rel="canonical"
                   class="item-content-subtitle gama-text-caption my-2 d-none d-sm-block"
                   :to="`/paper/${item.id}/${item.title_url}`"
                 >
@@ -137,7 +133,6 @@
                       class="text-right align-right float-right d-flex align-content-center"
                     >
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/paper/${item.id}/${item.title_url}`"
                       >
@@ -147,7 +142,6 @@
                         ></span>
                       </nuxt-link>
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/paper/${item.id}/${item.title_url}`"
                       >
@@ -206,21 +200,13 @@
           </v-col>
           <v-col cols="2" class="py-2">
             <div class="text-right align-right float-right d-flex">
-              <nuxt-link
-                rel="canonical"
-                icon
-                :to="`/paper/${item.id}/${item.title_url}`"
-              >
+              <nuxt-link icon :to="`/paper/${item.id}/${item.title_url}`">
                 <span
                   v-show="item.q_file_word"
                   class="fa-solid fa-file-word fa-lg blue--text"
                 ></span>
               </nuxt-link>
-              <nuxt-link
-                rel="canonical"
-                icon
-                :to="`/paper/${item.id}/${item.title_url}`"
-              >
+              <nuxt-link icon :to="`/paper/${item.id}/${item.title_url}`">
                 <span
                   v-show="item.q_file"
                   class="fa-solid fa-file-pdf fa-lg red--text pl-1"

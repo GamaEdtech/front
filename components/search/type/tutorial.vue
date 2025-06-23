@@ -42,7 +42,6 @@
                   class="item-content-title gama-text-button d-flex justify-space-between"
                 >
                   <nuxt-link
-                    rel="canonical"
                     :to="`/tutorial/${item.id}/${item.title_url}`"
                     class="font-weight-bold"
                   >
@@ -50,7 +49,6 @@
                   </nuxt-link>
                 </div>
                 <nuxt-link
-                  rel="canonical"
                   class="item-content-subtitle gama-text-caption my-2 d-none d-sm-block"
                   :to="`/tutorial/${item.id}/${item.title_url}`"
                 >
@@ -127,7 +125,6 @@
                       class="text-right align-right float-right d-flex align-content-center"
                     >
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/tutorial/${item.id}/${item.title_url}`"
                       >
@@ -137,7 +134,6 @@
                         ></span>
                       </nuxt-link>
                       <nuxt-link
-                        rel="canonical"
                         icon
                         :to="`/tutorial/${item.id}/${item.title_url}`"
                       >
