@@ -96,34 +96,43 @@ import { useRoute, useRouter } from "vue-router";
 
 // SEO
 useHead({
-  title: "White Paper: GamaTrain's Vision for EdTech Innovation",
+  title: "White Paper | GamaTrain",
   meta: [
     {
-      hid: "apple-mobile-web-app-title",
-      name: "apple-mobile-web-app-title",
-      content: "White Paper: GamaTrain's Vision for EdTech Innovation",
-    },
-    {
-      hid: "og:title",
-      name: "og:title",
-      content: "White Paper: GamaTrain's Vision for EdTech Innovation",
-    },
-    {
-      hid: "og:site_name",
-      name: "og:site_name",
-      content: "GamaTrain",
-    },
-    {
-      hid: "description",
       name: "description",
       content:
-        "Explore GamaTrain's comprehensive White Paper detailing our innovative approach to revolutionizing education technology, creating value, and building a sustainable ecosystem for students and educators worldwide.",
+        "GamaEdTech White Paper - GET into School: Gamified, Decentralized, Unlimited",
     },
     {
-      hid: "og:description",
-      name: "og:description",
+      name: "keywords",
       content:
-        "Explore GamaTrain's comprehensive White Paper detailing our innovative approach to revolutionizing education technology, creating value, and building a sustainable ecosystem for students and educators worldwide.",
+        "GamaEdTech, white paper, blockchain education, GET token, NFT education, gamified learning",
+    },
+  ],
+});
+
+useSeoMeta({
+  ogTitle: "GamaEdTech White Paper - GET into School",
+  ogDescription:
+    "Explore GamaTrain's comprehensive White Paper detailing our innovative approach to revolutionizing education technology",
+  ogImage: "/images/gamatrain-logo.png",
+  ogUrl: "/whitepaper",
+  twitterTitle: "GamaEdTech White Paper - GET into School",
+  twitterDescription:
+    "Learn about our gamified, decentralized educational platform powered by blockchain technology",
+  twitterImage: "/images/gamatrain-logo.png",
+  twitterCard: "summary_large_image",
+});
+
+useHead({
+  htmlAttrs: {
+    lang: "en",
+  },
+  link: [
+    {
+      rel: "icon",
+      type: "image/x-icon",
+      href: "/favicon-dark.ico",
     },
   ],
 });
