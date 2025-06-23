@@ -130,7 +130,7 @@ const router = useRouter();
 const auth = useAuth();
 const user = useUser();
 const { $toast } = useNuxtApp();
-
+const requestURL = ref(useRequestURL().href);
 // Component data
 const contentData = ref({});
 const crash_report = ref(null);
@@ -198,6 +198,12 @@ const {
 // Set page title
 useHead(() => ({
   title: contentData.value?.title || "Exam Details",
+  link: [
+    {
+      rel: "canonical",
+      href: requestURL.value,
+    },
+  ],
 }));
 
 // Method to initialize breadcrumbs

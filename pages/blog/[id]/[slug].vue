@@ -100,7 +100,7 @@ const { $slugGenerator } = useNuxtApp();
 const route = useRoute();
 const blogId = route.params.id;
 const { xs, sm } = useDisplay();
-
+const requestURL = ref(useRequestURL().href);
 const {
   data: contentData,
   pending,
@@ -118,6 +118,12 @@ const {
 // SEO
 useHead({
   title: contentData.value?.title,
+  link: [
+    {
+      rel: "canonical",
+      href: requestURL.value,
+    },
+  ],
 });
 
 const share = async () => {

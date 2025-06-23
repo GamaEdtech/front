@@ -195,6 +195,16 @@ const contentData = ref(null);
 const ratingData = ref(null);
 const similarSchools = [];
 const galleryImages = ref([]);
+const requestURL = ref(useRequestURL().href);
+
+useHead(() => ({
+  link: [
+    {
+      rel: "canonical",
+      href: requestURL.value,
+    },
+  ],
+}));
 
 const fetchSchoolData = async () => {
   try {

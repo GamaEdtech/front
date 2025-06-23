@@ -111,6 +111,7 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
+const requestURL = ref(useRequestURL().href);
 const paperId = computed(() => {
   if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];
@@ -159,7 +160,6 @@ const schemaData = computed(() => ({
   url: route.fullPath || "",
   description: contentData.value?.description || "GamaEdtech",
 }));
-
 useHead({
   title: contentData.value?.title,
   script: [
@@ -167,6 +167,12 @@ useHead({
       hid: "json-ld-schema",
       innerHTML: JSON.stringify(schemaData.value),
       type: "application/ld+json",
+    },
+  ],
+  link: [
+    {
+      rel: "canonical",
+      href: requestURL.value,
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {

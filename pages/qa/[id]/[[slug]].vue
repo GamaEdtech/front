@@ -952,7 +952,6 @@ import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
 
 const { isAuthenticated } = useAuth();
-
 import {
   ref,
   reactive,
@@ -973,6 +972,7 @@ const replySchema = yup.object({
 const route = useRoute();
 const router = useRouter();
 const config = useRuntimeConfig();
+const requestURL = ref(useRequestURL().href);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
@@ -991,6 +991,12 @@ const { data: contentData, error } = await useAsyncData(async () => {
 
 useHead({
   title: contentData.value?.title || "Gama Train",
+  link: [
+    {
+      rel: "canonical",
+      href: requestURL.value,
+    },
+  ],
 });
 
 // Reactive States
