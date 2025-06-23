@@ -972,7 +972,7 @@ const replySchema = yup.object({
 const route = useRoute();
 const router = useRouter();
 const config = useRuntimeConfig();
-const requestURL = ref(useRequestURL().href);
+const requestURL = ref(useRequestURL().host);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
@@ -994,7 +994,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: requestURL.value,
+      href: `${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
 });

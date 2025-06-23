@@ -340,7 +340,7 @@ watch(
 const expandListMenu = ref(true);
 const drawer = ref(false);
 const activeMenu = ref(null);
-const requestURL = ref(useRequestURL().href);
+const requestURL = ref(useRequestURL().host);
 
 onBeforeUnmount(() => {
   if (process.client) {
@@ -364,7 +364,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: requestURL.value,
+      href: `${requestURL.value}/tutorial/${tutorialInfo.value.id}/${tutorialInfo.value.title_url}`,
     },
   ],
 });

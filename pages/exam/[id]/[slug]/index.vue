@@ -130,7 +130,7 @@ const router = useRouter();
 const auth = useAuth();
 const user = useUser();
 const { $toast } = useNuxtApp();
-const requestURL = ref(useRequestURL().href);
+const requestURL = ref(useRequestURL().host);
 // Component data
 const contentData = ref({});
 const crash_report = ref(null);
@@ -182,6 +182,10 @@ const {
   async () => {
     try {
       const data = await fetchExamData();
+      if (data) {
+        contentData.value = data;
+        initBreadCrumb();
+      }
       return data;
     } catch (err) {
       return null;
@@ -194,17 +198,6 @@ const {
     watch: [() => route.params.id],
   }
 );
-
-// Set page title
-useHead(() => ({
-  title: contentData.value?.title || "Exam Details",
-  link: [
-    {
-      rel: "canonical",
-      href: requestURL.value,
-    },
-  ],
-}));
 
 // Method to initialize breadcrumbs
 function initBreadCrumb() {
@@ -255,18 +248,15 @@ function updateGalleryData() {
   };
 }
 
-// Watch for data changes and update contentData
-watch(
-  asyncContentData,
-  (newData) => {
-    if (newData) {
-      contentData.value = newData;
-      updateGalleryData();
-      initBreadCrumb();
-    }
-  },
-  { immediate: true }
-);
+useHead(() => ({
+  title: contentData.value?.title || "Exam Details",
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/exam/${contentData.value?.id}/${contentData.value?.title_url}`,
+    },
+  ],
+}));
 
 // Methods
 const openAuthDialog = (val) => {
@@ -306,12 +296,14 @@ const openCrashReportDialog = () => {
 };
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
   // If data is already available, update the state
-  if (asyncContentData.value && !contentData.value?.id) {
-    contentData.value = asyncContentData.value;
-    updateGalleryData();
-    initBreadCrumb();
+  if (!contentData.value || Object.keys(contentData.value).length === 0) {
+    if (asyncContentData.value) {
+      contentData.value = asyncContentData.value;
+      updateGalleryData();
+      initBreadCrumb();
+    }
   }
 });
 
