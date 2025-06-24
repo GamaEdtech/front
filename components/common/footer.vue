@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4">
+  <div class="mt-4" id="footer-container">
     <v-footer>
       <v-container id="footer" class="px-0">
         <v-row>
@@ -121,6 +121,10 @@ export default {
             {
               title: "Exam",
               link: "/search?type=azmoon",
+            },
+            {
+              title: "$GET Token",
+              link: "/get-token",
             },
           ],
         },

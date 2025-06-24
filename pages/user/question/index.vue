@@ -51,7 +51,7 @@
       </v-row> -->
       <!-- End filter section -->
 
-      <v-card class="mt-3 px-4  px-md-0">
+      <v-card class="mt-3 px-4 px-md-0">
         <v-card-title class="text-h4 px-0 px-md-4">
           <v-row class="py-2">
             <v-col cols="12" class="text-left">
@@ -217,25 +217,39 @@
     </v-col>
 
     <!-- Delete dialog -->
-    <v-dialog v-model="deleteConfirmDialog" max-width="290" >
+    <v-dialog v-model="deleteConfirmDialog" max-width="290">
       <v-card class="py-2 px-2">
-        <v-card-title class="px-4" style="font-size: 1.4rem;"> Are you sure? </v-card-title>
+        <v-card-title class="px-4" style="font-size: 1.4rem">
+          Are you sure?
+        </v-card-title>
 
-        <v-card-text class="px-4 pt-0 pb-1" style="color: rgba(0, 0, 0, .6)">
+        <v-card-text class="px-4 pt-0 pb-1" style="color: rgba(0, 0, 0, 0.6)">
           <p>If you are sure to delete, click Yes.</p>
         </v-card-text>
 
         <v-card-actions class="pt-4">
           <v-spacer></v-spacer>
 
-          <v-btn variant="text" style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"  @click="deleteConfirmDialog = false">
+          <v-btn
+            variant="text"
+            style="
+              font-size: 1.4rem !important;
+              letter-spacing: inherit !important;
+              text-transform: none !important;
+            "
+            @click="deleteConfirmDialog = false"
+          >
             No
           </v-btn>
 
           <v-btn
             color="green-darken-1"
             variant="text"
-            style="font-size: 1.4rem !important; letter-spacing: inherit !important; text-transform: none !important;"
+            style="
+              font-size: 1.4rem !important;
+              letter-spacing: inherit !important;
+              text-transform: none !important;
+            "
             :loading="delete_loading"
             @click="deleteQuestion()"
           >
@@ -249,7 +263,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
 const auth = useAuth();
 // Define layout and page metadata
@@ -301,19 +315,14 @@ const getQuestionList = () => {
   if (!all_files_loaded.value) {
     page_loading.value = true;
 
-    $fetch("/api/v1/questions", {
-      method: "GET",
-      params: {
+    useApiService
+      .get("/api/v1/questions", {
         perpage: 20,
         page: page.value,
         section: filter.level,
         base: filter.grade,
         lesson: filter.lesson,
-      },
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    })
+      })
       .then((response) => {
         question_list.value.push(...response.data.list);
 
@@ -357,14 +366,8 @@ const getTypeList = (type, parent = "") => {
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
 
-
-  $fetch("/api/v1/types/list", {
-    method: "GET",
-    params,
-    headers: {
-      Authorization: `Bearer ${userToken.value}`,
-    },
-  })
+  useApiService
+    .get("/api/v1/types/list", params)
     .then((response) => {
       if (type === "section") {
         level_list.value = response.data;
@@ -456,15 +459,8 @@ const openDeleteConfirmDialog = (item_id, index) => {
 const deleteQuestion = async () => {
   delete_loading.value = true;
 
-
-
   try {
-    await $fetch(`/api/v1/questions/${delete_question_id.value}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${userToken.value}`,
-      },
-    });
+    await useApiService.remove(`/api/v1/questions/${delete_question_id.value}`);
     question_list.value.splice(delete_question_index.value, 1);
     delete_question_id.value = null;
     delete_question_index.value = null;

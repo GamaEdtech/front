@@ -1,245 +1,231 @@
 <script setup>
-import { useAuth } from '~/composables/useAuth';
+import { useAuth } from "~/composables/useAuth";
 
-const { $toast } = useNuxtApp()
+const { $toast } = useNuxtApp();
 const props = defineProps({
-  dialog: Boolean
-})
+  dialog: Boolean,
+});
 
-let register_dialog = ref(false)
-let google_register_loading = ref(true)
-let show1 = ref(false)
-let password = ref("")
-let confirmPassword = ref("")
-let register_loading = ref(false)
-let googleRegisterBtn = ref(null)
-let timerId = ref(null)
+let register_dialog = ref(false);
+let google_register_loading = ref(true);
+let show1 = ref(false);
+let password = ref("");
+let confirmPassword = ref("");
+let register_loading = ref(false);
+let googleRegisterBtn = ref(null);
+let timerId = ref(null);
 
-let otp = ref("")
-let identity = ref("")
-let otp_loading = ref(false)
-let countDown = ref(60)
-let sendOtpBtnStatus= ref(true)
-let identity_holder = ref(true)
-let otp_holder = ref(false)
-let select_pass_holder = ref(false)
+let otp = ref("");
+let identity = ref("");
+let otp_loading = ref(false);
+let countDown = ref(60);
+let sendOtpBtnStatus = ref(true);
+let identity_holder = ref(true);
+let otp_holder = ref(false);
+let select_pass_holder = ref(false);
 
-
-
-onMounted(() =>{
+onMounted(() => {
   setTimeout(() => {
     if (window.google?.accounts?.id && googleRegisterBtn.value) {
       window.google.accounts.id.initialize({
-        client_id: '231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com',
+        client_id:
+          "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
         callback: handleCredentialResponse,
-        auto_select: true
-      })
+        auto_select: true,
+      });
 
       window.google.accounts.id.renderButton(googleRegisterBtn.value, {
-        text: 'Login',
-        size: 'large',
-        width: '252',
-        theme: 'outline'
-      })
+        text: "Login",
+        size: "large",
+        width: "252",
+        theme: "outline",
+      });
 
-      google_register_loading.value = false
+      google_register_loading.value = false;
     }
-  }, 4000)
-})
+  }, 4000);
+});
 
 watch(countDown, (val) => {
   //When user wait 10 second
-  if (val === 0) sendOtpBtnStatus.value = false
+  if (val === 0) sendOtpBtnStatus.value = false;
   //When user request new otp code
-  if (val === 60) countDownTimer()
-})
+  if (val === 60) countDownTimer();
+});
 
-
-const emit = defineEmits(['switchToRegister','update:dialog'])
+const emit = defineEmits(["switchToRegister", "update:dialog"]);
 // Switch to login page
 const switchToLogin = () => {
-  emit('switchToLogin');
+  emit("switchToLogin");
 };
 function closeDialog() {
-  register_dialog.value = false
-  identity_holder.value = true
-  otp_holder.value = false
-  select_pass_holder.value = false
-  emit('update:dialog', false)
+  register_dialog.value = false;
+  identity_holder.value = true;
+  otp_holder.value = false;
+  select_pass_holder.value = false;
+  emit("update:dialog", false);
 }
 
 const recheckEnteredIdentity = () => {
-  otp_holder.value = false
-  identity_holder.value = true
-}
+  otp_holder.value = false;
+  identity_holder.value = true;
+};
 
 const cancelRegister = () => {
-  register_dialog.value = false
-  identity_holder.value = true
-  otp_holder.value = false
-  select_pass_holder.value = false
-}
+  register_dialog.value = false;
+  identity_holder.value = true;
+  otp_holder.value = false;
+  select_pass_holder.value = false;
+};
 
 const requestRegister = async () => {
-  register_loading.value = true
-  try{
-    const response = await $fetch('/api/v1/users/register',{
-      method : 'POST',
-      body: new URLSearchParams({
-      type: "request",
-      identity: identity.value,
-    })})
-    if(response.status === 1){
-      $toast.success("Otp code sent")
-      identity_holder.value = false
-      otp_holder.value = true
+  register_loading.value = true;
+  try {
+    const response = await useApiService.post(
+      "/api/v1/users/register",
+      new URLSearchParams({
+        type: "request",
+        identity: identity.value,
+      })
+    );
+    if (response.status === 1) {
+      $toast.success("Otp code sent");
+      identity_holder.value = false;
+      otp_holder.value = true;
       countDownTimer();
-    }else{
-      $toast.error(response.message)
+    } else {
+      $toast.error(response.message);
     }
+  } catch (error) {
+    const errorData = error?.response?._data;
+
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  } finally {
+    register_loading.value = false;
   }
-    catch (error) {
-      const errorData = error?.response?._data;
-
-      if(error?.response?.status === 400)
-        $toast.error(errorData.message);
-      else
-        $toast.error('Something went wrong.')
-    }
-    finally{
-      register_loading.value = false
-    }
-}
-
+};
 
 const onFinish = async () => {
   try {
-    const response = await $fetch('/api/v1/users/register', {
-      method: 'POST',
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/register",
+      new URLSearchParams({
         type: "confirm",
         identity: identity.value,
         code: otp.value,
       })
-    })
-    if(response.status === 1){
-      otp_holder.value = false
-      select_pass_holder.value = true
-    }}
-  catch(error) {
+    );
+    if (response.status === 1) {
+      otp_holder.value = false;
+      select_pass_holder.value = true;
+    }
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-    }
-}
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  }
+};
 
 const sendOtpCodeAgain = async () => {
   try {
-    const response = await $fetch('/api/v1/users/register',{
-      method : 'POST',
-      body: new URLSearchParams({
-      type: "resend_code",
-      identity: identity.value,
-    })
-    })
+    const response = await useApiService.post(
+      "/api/v1/users/register",
+      new URLSearchParams({
+        type: "resend_code",
+        identity: identity.value,
+      })
+    );
     countDownTimer();
-    sendOtpBtnStatus.value = true
-    $toast.success("Otp code sent again")}
-  catch(error) {
+    sendOtpBtnStatus.value = true;
+    $toast.success("Otp code sent again");
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-      
-    }
-}
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  }
+};
 
 const countDownTimer = () => {
   if (timerId) {
-    clearTimeout(timerId)
-    timerId = null
+    clearTimeout(timerId);
+    timerId = null;
   }
-  countDown.value = 60
-  tick()
-}
+  countDown.value = 60;
+  tick();
+};
 
 const tick = () => {
   if (countDown.value > 0) {
     timerId = setTimeout(() => {
-      countDown.value -= 1
-      tick()
-    }, 1000)
+      countDown.value -= 1;
+      tick();
+    }, 1000);
   } else {
-    timerId = null 
+    timerId = null;
   }
-}
+};
 
 const finalRegister = async () => {
-  register_loading.value = true
+  register_loading.value = true;
   const auth = useAuth();
-  try{
+  try {
     await auth.register({
       identity: identity.value,
       pass: password.value,
-    })
-    $toast.success("Registered successfully")
-    register_dialog.value = false
-    identity_holder.value = true
-    otp_holder.value = false
-    select_pass_holder.value = false
-    }
-  catch(error) {
+    });
+    $toast.success("Registered successfully");
+    register_dialog.value = false;
+    identity_holder.value = true;
+    otp_holder.value = false;
+    select_pass_holder.value = false;
+  } catch (error) {
     const errorData = error?.response?._data;
 
-    if(error?.response?.status === 400)
-      $toast.error(errorData.message);
-    else
-      $toast.error('Something went wrong.')
-    }
-  finally{
-      register_loading.value = false
-      closeDialog();
-    }
-}
-
+    if (error?.response?.status === 400) $toast.error(errorData.message);
+    else $toast.error("Something went wrong.");
+  } finally {
+    register_loading.value = false;
+    closeDialog();
+  }
+};
 
 async function handleCredentialResponse(value) {
   const auth = useAuth();
   try {
-    const response = await $fetch(
-      '/api/v1/users/googleAuth',{
-        method:'POST',
-      body: new URLSearchParams({
+    const response = await useApiService.post(
+      "/api/v1/users/googleAuth",
+      new URLSearchParams({
         id_token: value.credential,
-      }),
-      }
-    )
+      })
+    );
 
-    if(response.status === 1){
+    if (response.status === 1) {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo('/user');
+      navigateTo("/user");
     }
   } catch (err) {
-    const status = err?.response?.status
+    const status = err?.response?.status;
 
     if (status === 401) {
-      $toast.error(useNuxtApp().$t('LOGIN_WRONG_DATA'))
+      $toast.error(useNuxtApp().$t("LOGIN_WRONG_DATA"));
     } else if (status === 500 || status === 504) {
-      $toast.error(useNuxtApp().$t('REQUEST_FAILED'))
+      $toast.error(useNuxtApp().$t("REQUEST_FAILED"));
     }
   }
 }
-
 </script>
 <template>
-  <v-dialog v-model="props.dialog" max-width="300px" style="z-index: 20001" @click:outside="closeDialog">
+  <v-dialog
+    v-model="props.dialog"
+    max-width="300px"
+    style="z-index: 20001"
+    @click:outside="closeDialog"
+  >
     <v-card>
       <v-card-title>
         <span class="text-h5">Register</span>
@@ -420,8 +406,6 @@ async function handleCredentialResponse(value) {
     </v-card>
   </v-dialog>
 </template>
-
-
 
 <style scoped>
 .btn-google {

@@ -1,5 +1,10 @@
 <template>
-  <div class="breadcrumbs-container">
+  <div
+    class="breadcrumbs-container"
+    :style="{
+      backgroundColor: backgroundColor,
+    }"
+  >
     <v-breadcrumbs
       class="flex-wrap"
       :items="breadItems"
@@ -18,6 +23,10 @@ const props = defineProps({
   breads: {
     type: Array,
     default: () => [],
+  },
+  backgroundColor: {
+    type: String,
+    default: "#f5f5f5",
   },
 });
 
@@ -38,7 +47,6 @@ const breadItems = computed(() => {
 
 <style scoped>
 .breadcrumbs-container {
-  background: #f5f5f5 !important;
   border-radius: 8px;
   padding: 8px;
 }

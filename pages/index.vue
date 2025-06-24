@@ -208,8 +208,7 @@ const stats = ref(null);
 
 const fetchStats = async () => {
   try {
-    const response = await $fetch("/api/v1/home/stats");
-
+    const response = await useApiService.get("/api/v1/home/stats");
     stats.value = response?.data;
   } catch (error) {
     console.error("Failed to fetch stats:", error);

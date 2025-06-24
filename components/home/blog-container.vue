@@ -87,7 +87,7 @@ const toggleHover = (action, n) => {
 const loadBlog = async () => {
   isLoading.value = true;
   try {
-    const response = await $fetch("/api/v1/home/news"); // Use Nuxt's $fetch
+    const response = await useApiService.get("/api/v1/home/news");
     slideItems.value = response.data;
   } catch (err) {
     console.error(err);

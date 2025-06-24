@@ -62,7 +62,7 @@
       <v-col cols="12" class="pb-0">
         <div v-if="contentData?.files?.word.exist">
           <v-btn
-            @click="$emit('download', 'q_word')"
+            @click="startDownload('q_word')"
             block
             color="primary"
             class="mb-2"
@@ -77,10 +77,11 @@
         </div>
         <div v-if="contentData?.files.pdf.exist">
           <v-btn
-            @click="$emit('download', 'q_pdf')"
+            @click="startDownload('q_pdf')"
             class="mb-2 white--text font-weight-bold"
             block
             color="#E60012"
+            :loading="download_loading"
           >
             {{ contentData?.test_type_title }}
             {{
@@ -94,7 +95,7 @@
           <v-btn
             v-show="contentData?.files.answer.ext == 'pdf'"
             class="mb-2 font-weight-bold"
-            @click="$emit('download', 'a_file')"
+            @click="startDownload('a_file')"
             block
             color="teal accent-3"
           >
@@ -107,7 +108,7 @@
           </v-btn>
           <v-btn
             v-show="contentData?.files.answer.ext == 'word'"
-            @click="$emit('download', 'a_file')"
+            @click="startDownload('a_file')"
             block
             color="primary"
             class="mb-2"
@@ -143,6 +144,16 @@
     </v-row>
     <common-crash-report ref="crash_report" />
   </v-card>
+  <!--Mobile order section-->
+  <paper-detail-mobile-order
+    :contentData="contentData"
+    :is-logged-in="auth.isAuthenticated.value"
+    :user-credit="user?.user.value && user?.user.value?.credit"
+    :is-free="isFree"
+    :loading="download_loading"
+    @download="startDownload"
+  />
+  <!--End mobile order section-->
 </template>
 
 <script setup>
@@ -152,14 +163,54 @@ const props = defineProps({
     required: true,
   },
 });
-
+const { $toast } = useNuxtApp();
+const auth = useAuth();
+const user = useUser();
 const rating = ref(4.5);
 const crash_report = ref(null);
-const emits = defineEmits(["download", "crash-report"]);
+const emits = defineEmits(["crash-report"]);
+const download_loading = ref(false);
+
+const isFree = computed(() => {
+  if (!props.contentData) return true;
+  if (
+    props.contentData.files.answer.price > 0 &&
+    props.contentData.files.pdf.price > 0 &&
+    props.contentData.files.word.price > 0
+  )
+    return false;
+  else return true;
+});
 
 const openCrashReport = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
+};
+const startDownload = async (type) => {
+  download_loading.value = true;
+  let apiUrl = "";
+  if (type === "q_word")
+    apiUrl = `/api/v1/tests/download/${props.contentData?.id}/word`;
+  if (type === "q_pdf")
+    apiUrl = `/api/v1/tests/download/${props.contentData?.id}/pdf`;
+  if (type === "a_file")
+    apiUrl = `/api/v1/tests/download/${props.contentData?.id}/answer`;
+  try {
+    const response = await useApiService.get(apiUrl);
+    const FileSaver = await import("file-saver");
+    await FileSaver.saveAs(response.data.url, response.data.name);
+    download_loading.value = false;
+  } catch (err) {
+    if (err.response?.status == 400) {
+      if (
+        err.response.data.status == 0 &&
+        err.response.data.error == "creditNotEnough"
+      ) {
+        $toast.info("No enough credit");
+      }
+    }
+  } finally {
+  }
 };
 defineExpose({
   crash_report,

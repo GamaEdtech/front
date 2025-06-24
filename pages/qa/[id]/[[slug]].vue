@@ -25,10 +25,10 @@
           <div class="detail my-md-8">
             <v-row>
               <v-col cols="12" md="9" class="pt-0 px-sm-3 pt-sm-3">
-                <!-- 
-                Ask question button 
+                <!--
+                Ask question button
                 (All $vuetify plugin
-                replaced with display ) 
+                replaced with display )
                 -->
                 <div class="text-left d-block d-md-none">
                   <v-btn
@@ -125,7 +125,12 @@
                       <!--End score action-->
 
                       <v-col cols="12" md="11">
-                        <v-card color="#EEEEEE" flat class="fill-height" ref="questionMathJaxContainerRef">
+                        <v-card
+                          color="#EEEEEE"
+                          flat
+                          class="fill-height"
+                          ref="questionMathJaxContainerRef"
+                        >
                           <v-card-text class="d-flex fill-height">
                             <v-row>
                               <v-col cols="12" class="px-sm-3">
@@ -226,7 +231,6 @@
 
                                 <p
                                   class="mt-2 gama-text-body1"
-                                 
                                   v-html="
                                     contentData.question
                                       ? contentData.question
@@ -592,9 +596,7 @@
                                 <div>
                                   <p
                                     class="mt-2 gama-text-body1"
-                                    v-html="
-                                      answer.answer
-                                    "
+                                    v-html="answer.answer"
                                   />
                                 </div>
                               </v-col>
@@ -947,8 +949,18 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 // import CrashReport from "~/components/common/crash-report.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
-import { useNuxtApp } from '#app';
-import { ref, reactive, watch, nextTick, onMounted, onUpdated, computed } from "vue";
+import { useNuxtApp } from "#app";
+
+const { isAuthenticated } = useAuth();
+import {
+  ref,
+  reactive,
+  watch,
+  nextTick,
+  onMounted,
+  onUpdated,
+  computed,
+} from "vue";
 
 const replySchema = yup.object({
   answer: yup
@@ -960,6 +972,7 @@ const replySchema = yup.object({
 const route = useRoute();
 const router = useRouter();
 const config = useRuntimeConfig();
+const requestURL = ref(useRequestURL().host);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
@@ -978,6 +991,12 @@ const { data: contentData, error } = await useAsyncData(async () => {
 
 useHead({
   title: contentData.value?.title || "Gama Train",
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
+    },
+  ],
 });
 
 // Reactive States
@@ -1029,7 +1048,10 @@ const typesetMathInSpecificContainer = async (containerRef) => {
       }
 
       let elementToProcess = null;
-      if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
+      if (
+        containerRef.value.$el &&
+        containerRef.value.$el instanceof HTMLElement
+      ) {
         elementToProcess = containerRef.value.$el;
       } else if (containerRef.value instanceof HTMLElement) {
         elementToProcess = containerRef.value;
@@ -1043,19 +1065,21 @@ const typesetMathInSpecificContainer = async (containerRef) => {
 
       if (containerRef.value) {
         let currentElement = null;
-        if (containerRef.value.$el && containerRef.value.$el instanceof HTMLElement) {
-            currentElement = containerRef.value.$el;
+        if (
+          containerRef.value.$el &&
+          containerRef.value.$el instanceof HTMLElement
+        ) {
+          currentElement = containerRef.value.$el;
         } else if (containerRef.value instanceof HTMLElement) {
-            currentElement = containerRef.value;
+          currentElement = containerRef.value;
         }
         if (currentElement) {
-            $renderMathInElement(currentElement);
+          $renderMathInElement(currentElement);
         } else {
         }
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   } else {
   }
 };
@@ -1070,7 +1094,7 @@ function initBreadCrumb() {
   while (breads.value.length > 1) {
     breads.value.pop();
   }
-  
+
   if (contentData.value && Object.keys(contentData.value).length > 0) {
     breads.value.push(
       {
@@ -1108,7 +1132,7 @@ function convertSlug(text) {
 }
 
 function openQuestionForm() {
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     router.push({ path: "/user/question/create" });
   } else {
     openAuthDialog("login");
@@ -1127,7 +1151,7 @@ async function submitReply(values, { resetForm }) {
   };
 
   try {
-    await $fetch.$post(
+    await useApiService.post(
       "/api/v1/questionReplies",
       querystring.stringify(payload),
       {
@@ -1142,9 +1166,6 @@ async function submitReply(values, { resetForm }) {
     // $toast.success("Reply submit successfully");
   } catch (err) {
     $toast.error(err.response.data.message);
-    if (err.response.status === 403) {
-      router.push({ query: { auth_form: "login" } });
-    }
   } finally {
     loading.reply_form = false;
   }
@@ -1183,14 +1204,14 @@ const {
 
 async function reInit() {
   try {
-    await refreshReplies(); 
+    await refreshReplies();
     if (repliesData.value && repliesData.value.data) {
       answer_list.value = repliesData.value.data.list || [];
     } else {
       answer_list.value = [];
     }
   } catch (err) {
-    console.error('Error in reInit fetching replies:', err);
+    console.error("Error in reInit fetching replies:", err);
     answer_list.value = [];
   }
 }
@@ -1227,13 +1248,13 @@ function openDeleteReplyConfirmDialog(item_id) {
 
 async function submitScore(content_type, id, type) {
   // const auth = useAuth();
-  if (auth.loggedIn) {
+  if (isAuthenticated.value) {
     let api = `/api/v1/questions/score/${id}/${type}`;
     if (content_type === "reply")
       api = `/api/v1/questionReplies/score/${id}/${type}`;
 
-    await $fetch
-      .$post(api)
+    await useApiService
+      .post(api)
       .then((response) => {
         if (response.status === 1) {
           if (content_type === "question")
@@ -1255,8 +1276,8 @@ async function submitScore(content_type, id, type) {
 }
 
 function selectCorrectAnswer(id) {
-  $fetch
-    .$post(`/api/v1/questionReplies/select/${id}`)
+  useApiService
+    .post(`/api/v1/questionReplies/select/${id}`)
     .then((response) => {
       $toast.success("Select successfully");
       window.scrollTo(0, 0);
@@ -1281,7 +1302,8 @@ function openCrashReportDialog(id, type) {
 }
 
 function getSimilarQuestions() {
-  $fetch(`/api/v1/questions/related/${route.params.id}`)
+  useApiService
+    .get(`/api/v1/questions/related/${route.params.id}`)
     .then((response) => {
       similarQuestions.value = response.data.list;
     })
@@ -1297,27 +1319,35 @@ onMounted(async () => {
   initBreadCrumb();
   await reInit();
   getSimilarQuestions();
-  
+
   await typesetMathInSpecificContainer(questionMathJaxContainerRef);
   if (answer_list.value.length > 0) {
     await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
   }
 });
-watch(() => contentData.value?.question, async (newQuestionText) => {
-  if (newQuestionText) {
-    await typesetMathInSpecificContainer(questionMathJaxContainerRef);
-  }
-}, { immediate: false });
+watch(
+  () => contentData.value?.question,
+  async (newQuestionText) => {
+    if (newQuestionText) {
+      await typesetMathInSpecificContainer(questionMathJaxContainerRef);
+    }
+  },
+  { immediate: false }
+);
 
-watch(answer_list, async (newAnswers) => {
-  await nextTick();
-  if (newAnswers && newAnswers.length > 0) {
-    await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
-  }
-}, { deep: true });
+watch(
+  answer_list,
+  async (newAnswers) => {
+    await nextTick();
+    if (newAnswers && newAnswers.length > 0) {
+      await typesetMathInSpecificContainer(answersListMathJaxContainerRef);
+    }
+  },
+  { deep: true }
+);
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // Manipulate some Vuetify & bootstrap styles
 #qa-details-content .v-text-field--outlined .v-input__prepend-outer,
 .v-text-field--outlined .v-input__append-outer {

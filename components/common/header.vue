@@ -44,6 +44,12 @@ const menuItems = [
     icon: "mdi-information",
     icon_color: "",
   },
+  {
+    title: "$GET Token",
+    link: "/get-token",
+    icon: "mdi-currency-usd",
+    icon_color: "",
+  },
   // {
   //   title: "Offers",
   //   link: "/offers",
@@ -78,6 +84,11 @@ const menuLink = [
   {
     title: "FAQ",
     link: "/faq",
+    icon: "",
+  },
+  {
+    title: "$GET Token",
+    link: "/get-token",
     icon: "",
   },
   // {
@@ -300,12 +311,13 @@ const search = () => {
 
   timer.value = setTimeout(() => {
     if (searchKey.value && allDataLoaded.value == false)
-      $fetch("/api/v1/search/text", {
-        params: {
-          query: searchKey.value,
-          page: pageNum.value,
-        },
-      })
+      useApiService
+        .get("/api/v1/search/text", {
+          params: {
+            query: searchKey.value,
+            page: pageNum.value,
+          },
+        })
         .then((response) => {
           searchCount.value = response.data.num;
           searchResults.value.push(...response.data.list);
@@ -392,7 +404,8 @@ watch(
   () => route.query.auth_form,
   (val) => {
     if (val === "login") {
-      login_modal.value.login_dialog = true;
+      // login_modal.value.login_dialog = true;
+      openLoginDialog();
       router.push({ query: {} });
     } else if (val == "register") {
       register_modal.value.register_dialog = true;

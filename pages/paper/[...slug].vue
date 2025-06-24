@@ -92,7 +92,6 @@
               <v-col sm="7" md="4" lg="3">
                 <paper-detail-content-info
                   :contentData="contentData"
-                  @download="startDownload"
                   @crash-report="openCrashReportDialog"
                 >
                   <template #share-dialog>
@@ -105,17 +104,6 @@
         </v-container>
       </section>
 
-      <!--Mobile order section-->
-      <paper-detail-mobile-order
-        :contentData="contentData"
-        :is-logged-in="$auth.loggedIn"
-        :user-credit="$auth.user && $auth.user.credit"
-        :is-free="isFree"
-        @download="startDownload"
-        @open-auth="openAuthDialog"
-      />
-      <!--End mobile order section-->
-
       <!--  End: detail  -->
     </template>
   </div>
@@ -123,9 +111,11 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
+const requestURL = ref(useRequestURL().host);
+console.log("useRequestURL()", useRequestURL());
 
 const paperId = computed(() => {
-  if (!route.params.id || !route.params.id.length) return null;
+  if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];
 });
 
@@ -173,6 +163,15 @@ const schemaData = computed(() => ({
   description: contentData.value?.description || "GamaEdtech",
 }));
 
+const previewImages = ref([]);
+const galleryHelpData = ref({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
+
 useHead({
   title: contentData.value?.title,
   script: [
@@ -182,18 +181,15 @@ useHead({
       type: "application/ld+json",
     },
   ],
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+    },
+  ],
   __dangerouslyDisableSanitizersByTagID: {
     "json-ld-schema": ["innerHTML"],
   },
-});
-
-const previewImages = ref([]);
-const galleryHelpData = ref({
-  state: "",
-  section: "",
-  base: "",
-  course: "",
-  lesson: "",
 });
 
 if (contentData.value) {
@@ -218,7 +214,6 @@ const breads = ref([
   },
 ]);
 
-const download_loading = ref(false);
 const display = useGlobalDisplay();
 
 const initBreadCrumb = () => {
@@ -249,59 +244,10 @@ watchEffect(() => {
   }
 });
 
-const openAuthDialog = (val) => {
-  router.push({ query: { auth_form: val } });
-};
-
-const startDownload = (type) => {
-  download_loading.value = true;
-  let apiUrl = "";
-  if (type === "q_word")
-    apiUrl = `/api/v1/tests/download/${paperId.value}/word`;
-  if (type === "q_pdf") apiUrl = `/api/v1/tests/download/${paperId.value}/pdf`;
-  if (type === "a_file")
-    apiUrl = `/api/v1/tests/download/${paperId.value}/answer`;
-  $fetch
-    .$get(apiUrl)
-    .then((response) => {
-      var FileSaver = require("file-saver");
-      FileSaver.saveAs(response.data.url, response.data.name);
-    })
-    .catch((err) => {
-      if (err.response.status == 400) {
-        if (
-          err.response.data.status == 0 &&
-          err.response.data.error == "creditNotEnough"
-        ) {
-          this.$toast.info("No enough credit");
-        }
-      } else if (err.response.status == 403) {
-        openAuthDialog("login");
-      }
-    })
-    .finally(() => {
-      download_loading.value = false;
-    });
-};
-
 const openCrashReportDialog = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
-
-const isFree = computed(() => {
-  if (!contentData.value) return true;
-
-  if (
-    contentData.value.files.answer.price > 0 &&
-    contentData.value.files.pdf.price > 0 &&
-    contentData.value.files.word.price > 0
-  )
-    return false;
-  else return true;
-});
 </script>
 
-<style>
-/* Styles removed as they're now in component files */
-</style>
+<style></style>

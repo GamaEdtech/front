@@ -1,0 +1,48 @@
+@use "../app.scss" as style;
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 14px;
+        .checkbox-icon {
+            min-width: 24px;
+            min-height: 24px;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            .check-mark {
+                display: block;
+                width: 6px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+                margin-top: -2px;
+            }
+        }
+
+        .single {
+            border-radius: 50%;
+        }
+        .multiple {
+            border-radius: 4px;
+        }
+        .checked {
+            border-color: #ffb600;
+            background-color: #ffb600;
+        }
+        .checkbox-label {
+            font-weight: 500;
+            user-select: none;
+            @include style.responsive-size(font-size, 18px, 18px, 14px, 14px);
+        }
+    }
+}

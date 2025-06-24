@@ -10,10 +10,21 @@
                 <div class="w-100">
                   <div class="description-holder my-4">
                     <ClientOnly>
-                      <v-col class="test-list" cols="12" ref="mathJaxContainerRef">
+                      <v-col
+                        class="test-list"
+                        cols="12"
+                        ref="mathJaxContainerRef"
+                      >
                         <div v-if="contentData">
-                          <div v-html="contentData.question" class="question mb-2" />
-                          <img class="answer-img" :src="contentData.q_file" v-if="contentData.q_file" />
+                          <div
+                            v-html="contentData.question"
+                            class="question mb-2"
+                          />
+                          <img
+                            class="answer-img"
+                            :src="contentData.q_file"
+                            v-if="contentData.q_file"
+                          />
 
                           <v-radio-group
                             v-model="selectedOption"
@@ -23,26 +34,40 @@
                             <v-radio
                               value="1"
                               class="pl-2"
-                              :class="{ 'true-answer': isCorrectAnswer(1), 'false-answer': isIncorrectAnswer(1) }"
+                              :class="{
+                                'true-answer': isCorrectAnswer(1),
+                                'false-answer': isIncorrectAnswer(1),
+                              }"
                             >
                               <template #label>
                                 <div class="answer">
                                   <span>1)&nbsp;</span>
                                   <span v-html="contentData.answer_a"></span>
-                                  <img v-show="contentData.a_file" class="answer-img" :src="contentData.a_file" />
+                                  <img
+                                    v-show="contentData.a_file"
+                                    class="answer-img"
+                                    :src="contentData.a_file"
+                                  />
                                 </div>
                               </template>
                             </v-radio>
                             <v-radio
                               value="2"
                               class="pl-2"
-                              :class="{ 'true-answer': isCorrectAnswer(2), 'false-answer': isIncorrectAnswer(2) }"
+                              :class="{
+                                'true-answer': isCorrectAnswer(2),
+                                'false-answer': isIncorrectAnswer(2),
+                              }"
                             >
                               <template #label>
                                 <div class="answer">
                                   <span>2)&nbsp;</span>
                                   <span v-html="contentData.answer_b"></span>
-                                  <img v-show="contentData.b_file" :src="contentData.b_file" class="answer-img" />
+                                  <img
+                                    v-show="contentData.b_file"
+                                    :src="contentData.b_file"
+                                    class="answer-img"
+                                  />
                                 </div>
                               </template>
                             </v-radio>
@@ -50,13 +75,20 @@
                               value="3"
                               v-if="contentData.type === 'fourchoice'"
                               class="pl-2"
-                              :class="{ 'true-answer': isCorrectAnswer(3), 'false-answer': isIncorrectAnswer(3) }"
+                              :class="{
+                                'true-answer': isCorrectAnswer(3),
+                                'false-answer': isIncorrectAnswer(3),
+                              }"
                             >
                               <template #label>
                                 <div class="answer">
                                   <span>3)&nbsp;</span>
                                   <span v-html="contentData.answer_c"></span>
-                                  <img v-show="contentData.c_file" class="answer-img" :src="contentData.c_file" />
+                                  <img
+                                    v-show="contentData.c_file"
+                                    class="answer-img"
+                                    :src="contentData.c_file"
+                                  />
                                 </div>
                               </template>
                             </v-radio>
@@ -64,25 +96,38 @@
                               value="4"
                               v-if="contentData.type === 'fourchoice'"
                               class="pl-2"
-                              :class="{ 'true-answer': isCorrectAnswer(4), 'false-answer': isIncorrectAnswer(4) }"
+                              :class="{
+                                'true-answer': isCorrectAnswer(4),
+                                'false-answer': isIncorrectAnswer(4),
+                              }"
                             >
                               <template #label>
                                 <div class="answer">
                                   <span>4)&nbsp;</span>
                                   <span v-html="contentData.answer_d" />
-                                  <img v-show="contentData.d_file" class="answer-img" :src="contentData.d_file" />
+                                  <img
+                                    v-show="contentData.d_file"
+                                    class="answer-img"
+                                    :src="contentData.d_file"
+                                  />
                                 </div>
                               </template>
                             </v-radio>
                           </v-radio-group>
 
                           <v-expansion-panels
-                            v-if="contentData.answer_full || contentData.answer_full_file"
+                            v-if="
+                              contentData.answer_full ||
+                              contentData.answer_full_file
+                            "
                             class="mt-4"
                             v-model="fullAnswerPanel"
                           >
                             <v-expansion-panel class="light-green">
-                              <v-expansion-panel-title @click="showAnswer" class="text-h5 font-weight-bold">
+                              <v-expansion-panel-title
+                                @click="showAnswer"
+                                class="text-h5 font-weight-bold"
+                              >
                                 Show answer
                               </v-expansion-panel-title>
                               <v-expansion-panel-text class="light-green">
@@ -100,15 +145,28 @@
                           <v-row class="mt-3">
                             <v-col cols="10">
                               <v-btn icon @click="openCrashReportDialog">
-                                <v-icon color="blue">mdi-bullhorn-outline</v-icon>
+                                <v-icon color="blue"
+                                  >mdi-bullhorn-outline</v-icon
+                                >
                               </v-btn>
                             </v-col>
                           </v-row>
                         </div>
                       </v-col>
                       <template #fallback>
-                        <div style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                          <v-progress-circular indeterminate color="teal" size="50"></v-progress-circular>
+                        <div
+                          style="
+                            min-height: 200px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                          "
+                        >
+                          <v-progress-circular
+                            indeterminate
+                            color="teal"
+                            size="50"
+                          ></v-progress-circular>
                         </div>
                       </template>
                     </ClientOnly>
@@ -120,34 +178,48 @@
         </div>
       </v-container>
     </section>
-    <common-crash-report ref="crashReportRef" :report_type_list="report_type_list" />
+    <common-crash-report
+      ref="crashReportRef"
+      :report_type_list="report_type_list"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, type Ref } from 'vue';
-import { useAsyncData, useNuxtApp, useRoute, createError, useHead } from '#app';
-import CommonCrashReport from '~/components/common/crash-report.vue';
+import { ref, computed, watch, nextTick, onMounted, type Ref } from "vue";
+import { useAsyncData, useNuxtApp, useRoute, createError, useHead } from "#app";
+import CommonCrashReport from "~/components/common/crash-report.vue";
 
 const route = useRoute();
-const { data: contentData } = await useAsyncData(`test-${route.params.id}`, async () => {
-  try {
-    const content = await $fetch<any>(`/api/v1/examTests/${route.params.id}`, {
-      params: { full: true },
-    });
-    return content?.status === 1 ? content.data : null;
-  } catch (e: any) {
-    throw createError({ statusCode: e?.response?.status || 500, message: 'Error loading test', fatal: true });
+const { data: contentData } = await useAsyncData(
+  `test-${route.params.id}`,
+  async () => {
+    try {
+      const content = await useApiService.get(
+        `/api/v1/examTests/${route.params.id}`,
+        { full: true }
+      );
+      return content?.status === 1 ? content.data : null;
+    } catch (e: any) {
+      throw createError({
+        statusCode: e?.response?.status || 500,
+        message: "Error loading test",
+        fatal: true,
+      });
+    }
   }
-});
+);
 
 if (!contentData.value) {
-  throw createError({ statusCode: 404, message: 'Test not found', fatal: true });
+  throw createError({
+    statusCode: 404,
+    message: "Test not found",
+    fatal: true,
+  });
 }
 
-
 useHead({
-  title: computed(() => contentData.value?.title || 'Online Test'),
+  title: computed(() => contentData.value?.title || "Online Test"),
 });
 
 const selectedOption = ref<string | null>(null);
@@ -168,7 +240,7 @@ const report_type_list = ref([
   },
   {
     value: 4,
-      label: "There are typos in questions or options.",
+    label: "There are typos in questions or options.",
   },
   {
     value: 5,
@@ -187,7 +259,7 @@ const report_type_list = ref([
     label: "Other cases",
   },
 ]);
-  
+
 const mathJaxContainerRef = ref<HTMLElement | null>(null);
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
 
@@ -196,22 +268,25 @@ const typesetMathInContainer = async () => {
     try {
       await $ensureMathJaxReady();
       if (!window.MathJax || !window.MathJax.Hub) return;
-      
-      const elementToProcess = (mathJaxContainerRef.value as any).$el ?? mathJaxContainerRef.value;
-      
+
+      const elementToProcess =
+        (mathJaxContainerRef.value as any).$el ?? mathJaxContainerRef.value;
+
       if (elementToProcess instanceof HTMLElement) {
         await nextTick();
         $renderMathInElement(elementToProcess);
       }
     } catch (err) {
-      console.error('Error during MathJax typesetting:', err);
+      console.error("Error during MathJax typesetting:", err);
     }
   }
 };
 
 watch(mathJaxContainerRef, (newEl) => {
   if (newEl) {
-    console.log('[Ref Watcher] MathJax container is now available in DOM. Typesetting...');
+    console.log(
+      "[Ref Watcher] MathJax container is now available in DOM. Typesetting..."
+    );
     typesetMathInContainer();
   }
 });
@@ -224,18 +299,24 @@ watch(fullAnswerPanel, (newValue) => {
   }
 });
 
-
 const isMultipleChoice = computed(() => {
   const type = contentData.value?.type;
-  return type === 'fourchoice' || type === 'twochoice' || type === 'tf';
+  return type === "fourchoice" || type === "twochoice" || type === "tf";
 });
 
 const isCorrectAnswer = (option: number): boolean => {
-  return !!(selectedOption.value && Number(option) === Number(contentData.value?.true_answer));
+  return !!(
+    selectedOption.value &&
+    Number(option) === Number(contentData.value?.true_answer)
+  );
 };
 
 const isIncorrectAnswer = (option: number): boolean => {
-  return !!(selectedOption.value && Number(option) === Number(selectedOption.value) && Number(option) !== Number(contentData.value?.true_answer));
+  return !!(
+    selectedOption.value &&
+    Number(option) === Number(selectedOption.value) &&
+    Number(option) !== Number(contentData.value?.true_answer)
+  );
 };
 
 const showAnswer = () => {
@@ -250,7 +331,7 @@ const openCrashReportDialog = () => {
   if (crashReportRef.value) {
     crashReportRef.value.dialog = true;
     crashReportRef.value.form.id = route.params.id;
-    crashReportRef.value.form.type = 'examTest';
+    crashReportRef.value.form.type = "examTest";
   }
 };
 </script>

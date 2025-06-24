@@ -60,8 +60,8 @@ export default {
   },
   methods: {
     async getNews() {
-      await this.$fetch
-        .$get("/api/v1/home/news")
+      await useApiService
+        .get("/api/v1/home/news")
         .then((res) => {
           this.news = res.data;
         })

@@ -98,6 +98,10 @@ html {
   width: 70% !important;
 }
 
+.w-80 {
+  width: 80% !important;
+}
+
 //Alignment
 .justify-content-center {
   justify-content: center;
@@ -2482,6 +2486,9 @@ body {
 }
 
 @media only screen and (min-width: 960px) {
+  .font-weight-lg-regular {
+    font-weight: 400 !important;
+  }
   // md size
   .gama-text-h1 {
     color: #354053;
@@ -2648,6 +2655,26 @@ body {
 
   .w-md-40 {
     width: 40% !important;
+  }
+
+  .w-md-50 {
+    width: 50% !important;
+  }
+
+  .w-md-60 {
+    width: 60% !important;
+  }
+
+  .w-md-70 {
+    width: 70% !important;
+  }
+
+  .w-md-80 {
+    width: 80% !important;
+  }
+
+  .w-md-100 {
+    width: 100% !important;
   }
 
   .content-item {
@@ -4574,6 +4601,6 @@ body {
   background-color: #f5f5f5;
   color: rgba(0, 0, 0, 0.87);
 }
-.break-word{
+.break-word {
   word-break: break-word;
 }

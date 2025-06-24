@@ -273,16 +273,14 @@ const getPaperList = () => {
     page_loading.value = true;
 
     // Direct token in the request headers
-    $fetch("/api/v1/tests", {
-      method: "GET",
-      params: {
+    useApiService
+      .get("/api/v1/tests", {
         perpage: 20,
         page: page.value,
         section: filter.level,
         base: filter.grade,
         lesson: filter.lesson,
-      },
-    })
+      })
       .then((response) => {
         paper_list.value.push(...response.data.list);
 
@@ -326,10 +324,8 @@ const getTypeList = (type, parent = "") => {
   if (type === "base") params.section_id = parent;
   if (type === "lesson") params.base_id = parent;
 
-  $fetch("/api/v1/types/list", {
-    method: "GET",
-    params,
-  })
+  useApiService
+    .get("/api/v1/types/list", params)
     .then((response) => {
       // Process the direct response
       if (type === "section") {
@@ -423,10 +419,7 @@ const deletePaper = async () => {
   delete_loading.value = true;
 
   try {
-    // Use $fetch instead of useFetch for consistency
-    await $fetch(`/api/v1/tests/${delete_paper_id.value}`, {
-      method: "DELETE",
-    });
+    await useApiService.remove(`/api/v1/tests/${delete_paper_id.value}`);
     paper_list.value.splice(delete_paper_index.value, 1);
     delete_paper_id.value = null;
     delete_paper_index.value = null;
