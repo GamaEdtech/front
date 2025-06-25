@@ -111,6 +111,9 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
+const requestURL = ref(useRequestURL().host);
+console.log("useRequestURL()", useRequestURL());
+
 const paperId = computed(() => {
   if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];
@@ -160,6 +163,15 @@ const schemaData = computed(() => ({
   description: contentData.value?.description || "GamaEdtech",
 }));
 
+const previewImages = ref([]);
+const galleryHelpData = ref({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
+
 useHead({
   title: contentData.value?.title,
   script: [
@@ -169,18 +181,15 @@ useHead({
       type: "application/ld+json",
     },
   ],
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+    },
+  ],
   __dangerouslyDisableSanitizersByTagID: {
     "json-ld-schema": ["innerHTML"],
   },
-});
-
-const previewImages = ref([]);
-const galleryHelpData = ref({
-  state: "",
-  section: "",
-  base: "",
-  course: "",
-  lesson: "",
 });
 
 if (contentData.value) {
