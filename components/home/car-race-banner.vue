@@ -14,7 +14,8 @@
                         Learning has never been this exciting! Get behind the wheel, think fast, choose the right path,
                         and speed ahead. Play, learn, and become a champion!
                     </p>
-                    <v-btn rounded class="primary gama-btn mt-8" to="/school">School finder</v-btn>
+                    <v-btn size="large" rounded class="primary gama-btn mt-8 font-xl" to="/game/car-racing">Let's
+                        Go!</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -25,5 +26,10 @@
 .gama-text-body1 {
     color: #6e7781;
     text-align: left;
+}
+
+.gama-btn {
+    font-size: large !important;
+    font-weight: 500;
 }
 </style>

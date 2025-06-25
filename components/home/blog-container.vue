@@ -8,9 +8,7 @@
           </v-col>
           <v-col cols="6" class="text-right">
             <div class="d-none d-md-inline">
-              <v-btn rounded outlined large to="/blog" class="gama-btn"
-                >Go to blog</v-btn
-              >
+              <v-btn variant="outlined" rounded outlined size="large" to="/blog" class="gama-btn">Go to blog</v-btn>
             </div>
             <v-btn rounded to="/blog" text class="d-inline d-md-none seeAllBtn">
               See all
@@ -21,22 +19,13 @@
             <v-slide-group class="slider py-sm-4" :show-arrows="lgAndUp">
               <div class="d-flex" v-if="isLoading">
                 <v-slide-group-item v-for="i in 10" :key="i">
-                  <v-skeleton-loader
-                    class="mx-auto slide-loading"
-                    type="card"
-                  ></v-skeleton-loader>
+                  <v-skeleton-loader class="mx-auto slide-loading" type="card"></v-skeleton-loader>
                 </v-slide-group-item>
               </div>
 
-              <v-slide-group-item
-                v-else
-                v-for="(item, n) in slideItems"
-                :key="n"
-              >
+              <v-slide-group-item v-else v-for="(item, n) in slideItems" :key="n">
                 <v-card flat :to="`/blog/${item.id}/${item.title}`">
-                  <v-card
-                    flat
-                  >
+                  <v-card flat>
                     <v-img :src="item.pic" />
                     <v-card-title>
                       <span class="gama-text-button" v-if="!isHovered[n]">
@@ -137,6 +126,10 @@ loadBlog();
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+  }
+
+  :deep(.v-img__img--contain){
+    object-fit: cover;
   }
 
   #main-title {
