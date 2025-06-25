@@ -255,12 +255,8 @@ const openCrashReportDialog = () => {
   crash_report.value.form.type = "test";
 };
 const grabRandomTestCode = () => {
-  if (
-    contentData.value &&
-    contentData.value.exams &&
-    contentData.value.exams[0].id
-  ) {
-    $fetch(`/api/v1/examTests/randomByExamId/${contentData.value.exams[0].id}`)
+  if (contentData.value && contentData.value.lesson) {
+    $fetch(`/api/v1/examTests/random?lesson=${contentData.value.lesson}`)
       .then((response) => {
         if (response.data.code) {
           retriveRandomTest(response.data.code);
