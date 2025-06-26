@@ -200,7 +200,7 @@ const fetchCategoryCounts = async () => {
     params.append("type", "test");
     params.append("page", "1");
     params.append("section", selectedBoard.value.id);
-    params.append("base", selectedGrade.value.id);
+    params.append("base", selectedGrade.value);
     const requestUrl = `/api/v1/search?${params.toString()}`;
     const response = await $fetch(requestUrl);
     if (
