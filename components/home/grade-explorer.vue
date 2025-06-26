@@ -178,7 +178,19 @@ const fetchInitialData = async () => {
     ...item,
     img: boardImgs.value[index % boardImgs.value.length],
   }));
-  selectedBoard.value = boardList.value[0];
+
+  // Try to restore selectedBoard from localStorage
+  let storedBoard = null;
+  try {
+    storedBoard = JSON.parse(localStorage.getItem("selectedBoard"));
+  } catch (e) {}
+  if (storedBoard && storedBoard.id) {
+    // Find the matching board in the new boardList by id
+    const match = boardList.value.find((b) => b.id === storedBoard.id);
+    selectedBoard.value = match || boardList.value[0];
+  } else {
+    selectedBoard.value = boardList.value[0];
+  }
   fetchGradeList();
 };
 const fetchGradeList = async () => {
@@ -239,6 +251,13 @@ watch(
   },
   {
     immediate: true,
+  }
+);
+
+watch(
+  () => selectedBoard.value,
+  (val) => {
+    localStorage.setItem("selectedBoard", JSON.stringify(selectedBoard.value));
   }
 );
 
