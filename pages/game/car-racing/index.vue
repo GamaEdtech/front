@@ -1,28 +1,35 @@
 <template>
-  <div class="main-div-car-racing">
-    <canvas id="canvas" class="wrbgl"></canvas>
+  <div
+    class="w-100 height-main-div d-flex justify-center align-center position-relative"
+  >
+    <canvas id="canvas" class="wrbgl position-absolute left-0 top-0"></canvas>
 
     <div class="top-items">
-      <button
-        :disabled="isShowGuidMenu"
-        :class="`pause-btn ${
-          stepGuidMenu == `pause` || !isShowGuidMenu ? `` : `fade`
-        }`"
+      <v-btn
+        size="large"
+        color="#ffb300"
+        icon
+        :readonly="isShowGuidMenu"
+        :class="`${stepGuidMenu == `pause` || !isShowGuidMenu ? `` : `fade`}`"
         @click="setPlayingStatus(false)"
       >
-        <v-icon class="highligth" large color="white"> mdi-pause </v-icon>
+        <v-icon size="x-large" color="white">mdi-pause</v-icon>
+      </v-btn>
+      <div class="description-guid" v-if="stepGuidMenu == `pause`">
+        You Can Stop The Game
 
-        <div class="description-guid" v-if="stepGuidMenu == `pause`">
-          You Can Stop The Game
+        <v-btn
+          color="#ffb300"
+          rounded="lg"
+          size="large"
+          height="30"
+          class="text-white"
+          @click="changeStepGuid($event, `questionBox`)"
+        >
+          Next
+        </v-btn>
+      </div>
 
-          <button
-            class="btn-next-guid btn"
-            @click="changeStepGuid($event, `questionBox`)"
-          >
-            Next
-          </button>
-        </div>
-      </button>
       <div
         :class="[
           'question-box',
@@ -35,12 +42,16 @@
         <div class="description-guid" v-if="stepGuidMenu == `questionBox`">
           You Can See The Current Question
 
-          <button
-            class="btn-next-guid btn"
+          <v-btn
+            color="#ffb300"
+            rounded="lg"
+            size="large"
+            height="30"
+            class="text-white"
             @click="changeStepGuid($event, `timerScore`)"
           >
             Next
-          </button>
+          </v-btn>
         </div>
       </div>
 
@@ -59,49 +70,44 @@
 
         <div class="score-div">
           <span class="score-text">{{ score }}</span>
-          <v-icon class="icon-score highligth" color="#ed8a19">
-            mdi-star
-          </v-icon>
+          <v-icon class="icon-score" color="#ed8a19"> mdi-star </v-icon>
         </div>
         <div :class="['timer-box', { danger: timerDanger }]">
           {{ Math.ceil(timer) }}
         </div>
-        <button
-          :disabled="isShowGuidMenu"
-          class="camera-btn btn"
+
+        <v-btn
+          size="large"
+          color="#ffb300"
+          icon
+          :readonly="isShowGuidMenu"
           @click="changeCameraMode"
         >
-          <v-icon
-            class="highligth"
-            large
-            color="white"
-            v-if="cameraMode == `default`"
-          >
+          <v-icon size="x-large" color="white" v-if="cameraMode == `default`">
             mdi-webcam
           </v-icon>
 
-          <v-icon
-            class="highligth"
-            large
-            color="white"
-            v-if="cameraMode == `close`"
-          >
+          <v-icon size="x-large" color="white" v-if="cameraMode == `close`">
             mdi-camera
           </v-icon>
-        </button>
+        </v-btn>
 
         <div
           class="description-guid score-time"
           v-if="stepGuidMenu == `timerScore`"
         >
-          You Can See The Remainin time , Score and changing Mode Camera.
+          You Can See The Remaining time , Score, Gems and changing Mode Camera.
 
-          <button
-            class="btn-next-guid btn"
+          <v-btn
+            color="#ffb300"
+            rounded="lg"
+            size="large"
+            height="30"
+            class="text-white"
             @click="changeStepGuid($event, `play`)"
           >
             Next
-          </button>
+          </v-btn>
         </div>
       </div>
     </div>
@@ -118,25 +124,30 @@
       :class="`overlay-pause ${isShowGuidMenu ? `zindex-less` : ``}`"
       v-if="!isPlayingGame && resultGame == `pending`"
     >
-      <button
-        :disabled="isShowGuidMenu"
-        :class="`play-btn btn ${
-          stepGuidMenu == `play` || !isShowGuidMenu ? `` : `fade`
-        }`"
+      <v-btn
+        size="large"
+        color="#ffb300"
+        icon
+        :readonly="isShowGuidMenu"
+        :class="`${stepGuidMenu == `play` || !isShowGuidMenu ? `` : `fade`}`"
         @click="setPlayingStatus(true)"
       >
-        <v-icon class="highligth" large color="white"> mdi-play </v-icon>
-      </button>
+        <v-icon size="x-large" color="white"> mdi-play </v-icon>
+      </v-btn>
 
       <div class="description-guid play-game" v-if="stepGuidMenu == `play`">
-        You Can see Play the game
+        You Can Play the game
 
-        <button
-          class="btn-next-guid btn"
+        <v-btn
+          color="#ffb300"
+          rounded="lg"
+          size="large"
+          height="30"
+          class="text-white"
           @click="changeStepGuid($event, `ChangeLaneBtn`)"
         >
           Next
-        </button>
+        </v-btn>
       </div>
     </div>
 
@@ -148,34 +159,44 @@
         >
           {{ resultGame == "failed" ? "Game Over!" : "Great!" }}
         </span>
-
-        <span v-if="level == maxLevel" class="status-text success-text">
-          Congratulations,Complete All Level
+        <span v-if="level != maxLevel" class="status-text">
+          Your Level Is {{ level }}
         </span>
 
-        <button
+        <span v-if="level == maxLevel" class="status-text success-text">
+          Congratulations <br />
+          Complete All Level
+        </span>
+
+        <v-btn
+          size="large"
+          color="#ffb300"
+          icon
           v-if="resultGame == `failed` && level != maxLevel"
-          class="reset-btn btn"
           @click="resetGame"
         >
-          <v-icon class="highligth" large color="white"> mdi-refresh </v-icon>
-        </button>
+          <v-icon size="x-large" color="white"> mdi-refresh </v-icon>
+        </v-btn>
 
-        <button
+        <v-btn
+          size="large"
+          color="#ffb300"
+          icon
           v-if="level == maxLevel"
-          class="reset-btn btn"
           @click="resetWholeGame"
         >
-          <v-icon class="highligth" large color="white"> mdi-refresh </v-icon>
-        </button>
+          <v-icon size="x-large" color="white"> mdi-refresh </v-icon>
+        </v-btn>
 
-        <button
+        <v-btn
+          size="large"
+          color="#ffb300"
+          icon
           v-if="resultGame == `success` && level != maxLevel"
-          class="reset-btn btn"
           @click="loadNextLevel"
         >
-          <v-icon class="highligth" large color="white"> mdi-play </v-icon>
-        </button>
+          <v-icon size="x-large" color="white"> mdi-skip-next </v-icon>
+        </v-btn>
       </div>
     </div>
 
@@ -198,37 +219,41 @@
         stepGuidMenu == `ChangeLaneBtn` || !isShowGuidMenu ? `` : `fade`
       }`"
     >
-      <button
-        :disabled="isShowGuidMenu"
+      <v-btn
+        size="large"
+        color="#ffb300"
+        icon
+        :readonly="isShowGuidMenu"
         @click="changeLane(-1)"
-        class="change-lane-btn btn"
       >
-        <v-icon class="highligth" large color="white">
-          mdi-arrow-left-bold
-        </v-icon>
-      </button>
-      <button
-        :disabled="isShowGuidMenu"
+        <v-icon size="x-large" color="white"> mdi-arrow-left-bold </v-icon>
+      </v-btn>
+      <v-btn
+        size="large"
+        color="#ffb300"
+        icon
+        :readonly="isShowGuidMenu"
         @click="changeLane(1)"
-        class="change-lane-btn btn"
       >
-        <v-icon class="highligth" large color="white">
-          mdi-arrow-right-bold
-        </v-icon>
-      </button>
+        <v-icon size="x-large" color="white"> mdi-arrow-right-bold </v-icon>
+      </v-btn>
 
       <div
         class="description-guid guid-btn-change-lane"
         v-if="stepGuidMenu == `ChangeLaneBtn`"
       >
-        You Can Change Lane the car
+        You Can Change Lane Car
 
-        <button
-          class="btn-next-guid btn"
+        <v-btn
+          color="#ffb300"
+          rounded="lg"
+          size="large"
+          height="30"
+          class="text-white"
           @click="changeStepGuid($event, `Finish`)"
         >
           Finish
-        </button>
+        </v-btn>
       </div>
     </div>
   </div>
@@ -240,6 +265,7 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 // Reactive state
 const experience = ref(null);
 const ExperienceModule = ref(null);
+// question status : error,success,normal
 const questionStatus = ref("normal");
 const questions = ref([
   {
@@ -268,13 +294,19 @@ const timer = ref(40);
 const timerDanger = ref(false);
 const isPlayingGame = ref(false);
 const score = ref(0);
+
+// reslut game option : success,failed,pending
 const resultGame = ref("pending");
 const isLoading = ref(true);
 const currentCountFirstPlay = ref(3);
 const showCounterFirstPlay = ref(false);
 const isFirstTimePlayingGame = ref(true);
+
+// camera mocde : close,default
 const cameraMode = ref("default");
 const isShowGuidMenu = ref(false);
+
+// Step Guid Menu : pause,questionBox,timerScore,play,ChangeLaneBtn,Finish
 const stepGuidMenu = ref("Finish");
 const isUpdateTimer = ref(true);
 const countGemCollected = ref(0);
@@ -541,6 +573,12 @@ const onGemColocted = () => {
 
 // Lifecycle hooks
 onMounted(() => {
+  // hide footer
+  const footer = document.getElementById("footer-container");
+  if (footer) {
+    footer.style.display = "none";
+  }
+
   const hasSeenGuide = localStorage.getItem("hasSeenGuideMenu");
   if (!hasSeenGuide) {
     stepGuidMenu.value = "pause";
@@ -573,342 +611,23 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  const footer = document.getElementById("footer-container");
+  if (footer) {
+    footer.style.display = "unset";
+  }
   if (experience.value) {
     experience.value.destroy();
     experience.value = null;
   }
 });
 </script>
-<!-- <script>
-export default {
-  data() {
-    return {
-      experience: null,
-      ExperienceModule: null,
-      questionStatus: "normal",
-      questions: [
-        {
-          text: "10 - 2 =",
-          choices: ["4", "22", "45", "8"],
-          indexAnswer: 3,
-        },
-        {
-          text: "22 * 2 =",
-          choices: ["4", "44", "81", "95"],
-          indexAnswer: 1,
-        },
-        {
-          text: "1 + 1 =",
-          choices: ["2", "15", "56", "64"],
-          indexAnswer: 0,
-        },
-        {
-          text: "9 * 8 =",
-          choices: ["72", "35", "12", "64"],
-          indexAnswer: 0,
-        },
-      ],
-      currentQuestionIndex: 0,
-      timer: 40,
-      timerDanger: false,
-      isPlayingGame: false,
-      score: 0,
-      resultGame: "pending",
-      isLoading: true,
-      currentCountFirstPlay: 3,
-      showCounterFirstPlay: false,
-      isFirstTimePlayingGame: true,
-      cameraMode: "default",
-      isShowGuidMenu: false,
-      stepGuidMenu: "Finish",
-      isUpdateTimer: true,
-      countGemCollected: 0,
-      showGemAnimation: false,
-      gemAnimationStyle: {},
-      animationGemCollectDuration: 1500,
-      level: 1,
-      maxLevel: 4,
-    };
-  },
-  mounted() {
-    const hasSeenGuide = localStorage.getItem("hasSeenGuideMenu");
-    if (!hasSeenGuide) {
-      this.stepGuidMenu = "pause";
-      this.isShowGuidMenu = true;
-      localStorage.setItem("hasSeenGuideMenu", "true");
-    }
-    import("@/threeJsExperience/car-racing/Experience.js")
-      .then((module) => {
-        this.ExperienceModule = module.default;
-        this.experience = new this.ExperienceModule(
-          document.getElementById("canvas"),
-          this.questions,
-          this.level,
-          {
-            onQuestionChange: this.onQuestionChange,
-            onQuestionStatusChange: (status) =>
-              this.onQuestionStatusChange(status),
-            onTimerUpdate: (delta) => this.onTimerUpdate(delta),
-            onScoreChange: (bonus) => this.onScoreChange(bonus),
-            onResultGameChange: (result) => this.onResultGameChange(result),
-            onChangeSceneReady: this.onChangeSceneReady,
-            onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
-            onGemColocted: this.onGemColocted,
-          }
-        );
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
-  },
-  destroyed() {
-    this.experience.destroy();
-    this.experience = null;
-  },
-  methods: {
-    onChangeSceneReady() {
-      this.isLoading = false;
-    },
-    changeStepGuid(event, step) {
-      event.stopImmediatePropagation();
-      this.stepGuidMenu = step;
-      if (step == "Finish") {
-        this.isShowGuidMenu = false;
-      }
-    },
-    changeLane(direction) {
-      this.experience.changeLane(direction);
-    },
-
-    setPlayingStatus(status) {
-      if (this.isFirstTimePlayingGame) {
-        this.isFirstTimePlayingGame = false;
-        this.showCounterFirstPlay = true;
-        this.nextCount();
-        this.isPlayingGame = status;
-
-        setTimeout(() => {
-          this.experience.setPlayingStatus(status);
-        }, 3000);
-      } else {
-        this.isPlayingGame = status;
-        this.experience.setPlayingStatus(status);
-      }
-    },
-    onQuestionChange() {
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.currentQuestionIndex += 1;
-      }
-    },
-    onQuestionStatusChange(status) {
-      this.questionStatus = status;
-      setTimeout(() => {
-        this.questionStatus = "normal";
-      }, 3000);
-    },
-    onChangeIsUpdateTimer(state) {
-      this.isUpdateTimer = state;
-    },
-    onTimerUpdate(delta) {
-      if (this.timer > 0) {
-        if (this.isUpdateTimer) {
-          this.timer -= delta;
-
-          if (this.timer <= 10 && !this.timerDanger) {
-            this.timerDanger = true;
-          }
-        }
-      } else {
-        this.timer = 0;
-        this.timerDanger = false;
-
-        this.setPlayingStatus(false);
-        this.resultGame = "failed";
-      }
-    },
-    onScoreChange(bonus) {
-      this.score += bonus;
-    },
-    onResultGameChange(result) {
-      if (result.status == "success") {
-        this.setPlayingStatus(false);
-        this.resultGame = "success";
-      }
-    },
-    resetGame() {
-      this.isUpdateTimer = true;
-      this.isLoading = true;
-      this.experience.resetGame();
-      this.currentQuestionIndex = 0;
-      this.timer = 40;
-      this.questionStatus = "normal";
-      this.timerDanger = false;
-      this.score = 0;
-      this.resultGame = "pending";
-      this.setPlayingStatus(true);
-      this.currentCountFirstPlay = 3;
-
-      setTimeout(() => {
-        this.setPlayingStatus(false);
-        this.isLoading = false;
-        this.isFirstTimePlayingGame = true;
-      }, 1000);
-    },
-    resetWholeGame() {
-      this.level = 1;
-      this.isUpdateTimer = true;
-      this.isLoading = true;
-      this.score = 0;
-      this.countGemCollected = 0;
-      this.currentQuestionIndex = 0;
-      this.timer = 40;
-      this.questionStatus = "normal";
-      this.timerDanger = false;
-      this.resultGame = "pending";
-      this.setPlayingStatus(true);
-      this.currentCountFirstPlay = 3;
-      this.experience.destroy();
-      this.experience = null;
-      this.experience = new this.ExperienceModule(
-        document.getElementById("canvas"),
-        this.questions,
-        this.level,
-        {
-          onQuestionChange: this.onQuestionChange,
-          onQuestionStatusChange: (status) =>
-            this.onQuestionStatusChange(status),
-          onTimerUpdate: (delta) => this.onTimerUpdate(delta),
-          onScoreChange: (bonus) => this.onScoreChange(bonus),
-          onResultGameChange: (result) => this.onResultGameChange(result),
-          onChangeSceneReady: this.onChangeSceneReady,
-          onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
-          onGemColocted: this.onGemColocted,
-        }
-      );
-
-      setTimeout(() => {
-        this.setPlayingStatus(false);
-        this.isLoading = false;
-        this.isFirstTimePlayingGame = true;
-      }, 1000);
-    },
-    loadNextLevel() {
-      if (this.level < this.maxLevel) {
-        this.level += 1;
-        this.isUpdateTimer = true;
-        this.isLoading = true;
-        this.currentQuestionIndex = 0;
-        this.timer = 40;
-        this.questionStatus = "normal";
-        this.timerDanger = false;
-        this.resultGame = "pending";
-        this.setPlayingStatus(true);
-        this.currentCountFirstPlay = 3;
-        this.experience.destroy();
-        this.experience = null;
-        this.experience = new this.ExperienceModule(
-          document.getElementById("canvas"),
-          this.questions,
-          this.level,
-          {
-            onQuestionChange: this.onQuestionChange,
-            onQuestionStatusChange: (status) =>
-              this.onQuestionStatusChange(status),
-            onTimerUpdate: (delta) => this.onTimerUpdate(delta),
-            onScoreChange: (bonus) => this.onScoreChange(bonus),
-            onResultGameChange: (result) => this.onResultGameChange(result),
-            onChangeSceneReady: this.onChangeSceneReady,
-            onChangeIsUpdateTimer: (state) => this.onChangeIsUpdateTimer(state),
-            onGemColocted: this.onGemColocted,
-          }
-        );
-
-        setTimeout(() => {
-          this.setPlayingStatus(false);
-          this.isLoading = false;
-          this.isFirstTimePlayingGame = true;
-        }, 1000);
-      }
-    },
-
-    nextCount() {
-      if (this.currentCountFirstPlay > 1) {
-        setTimeout(() => {
-          this.currentCountFirstPlay--;
-        }, 500);
-      } else {
-        setTimeout(() => {
-          this.currentCountFirstPlay = 0;
-          this.showCounterFirstPlay = false;
-        }, 500);
-      }
-    },
-    changeCameraMode() {
-      if (this.cameraMode == "default") {
-        this.experience.changeCameraMode("close");
-        this.cameraMode = "close";
-      } else {
-        this.experience.changeCameraMode("default");
-        this.cameraMode = "default";
-      }
-    },
-    async startAnimationGemCollect() {
-      const startX = window.innerWidth / 2;
-      const startY = window.innerHeight / 2;
-      const gemElement = document.querySelector(".gems-show");
-      if (gemElement) {
-        const gemRect = gemElement.getBoundingClientRect();
-        const endX = gemRect.left + gemRect.width / 2;
-        const endY = gemRect.top + gemRect.height / 2;
-
-        this.gemAnimationStyle = {
-          left: `${startX}px`,
-          top: `${startY}px`,
-          opacity: "1",
-          transform: "scale(1)",
-        };
-        this.showGemAnimation = true;
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            this.gemAnimationStyle = {
-              left: `${endX}px`,
-              top: `${endY}px`,
-              opacity: "0",
-              transform: "scale(0.8)",
-              transition: `all ${this.animationGemCollectDuration}ms ease-out`,
-            };
-            resolve();
-          }, 50);
-        });
-
-        await new Promise((resolve) =>
-          setTimeout(resolve, this.animationGemCollectDuration)
-        );
-        this.showGemAnimation = false;
-      }
-    },
-    onGemColocted() {
-      this.countGemCollected += 1;
-      this.startAnimationGemCollect();
-    },
-  },
-};
-</script> -->
 
 <style scoped>
-.main-div-car-racing {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.height-main-div {
+  height: 100dvh;
 }
 
 .wrbgl {
-  position: absolute;
-  top: 0;
-  left: 0;
   outline: none;
   z-index: 2;
 }
@@ -923,22 +642,6 @@ export default {
   bottom: 20px;
   width: 100%;
   z-index: 3;
-}
-
-.change-lane-btn {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-
-.change-lane-btn:active {
-  transform: scale(0.96);
 }
 
 /* top items */
@@ -1046,11 +749,11 @@ export default {
 
 /* timer section */
 .timer-box {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
+  background: #ffb300;
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  font-size: 24px;
+  width: 56px;
+  height: 56px;
+  font-size: 20px;
   font-weight: 800;
   color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -1080,59 +783,6 @@ export default {
   }
 }
 
-/* mode camera */
-.camera-btn {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-
-/* pause icon */
-.pause-btn {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
-  border: none;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  /* Safari */
-  -ms-user-select: none;
-  /* IE 10 and IE 11 */
-  user-select: none;
-  /* Standard syntax */
-  border: none;
-}
-
-.btn {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  /* Safari */
-  -ms-user-select: none;
-  /* IE 10 and IE 11 */
-  user-select: none;
-  /* Standard syntax */
-  border: none;
-  border: none;
-  outline: none;
-}
-
-.btn:active {
-  transform: scale(0.9);
-}
-
 /* overlay menu  */
 .overlay-pause {
   position: absolute;
@@ -1151,28 +801,6 @@ export default {
   z-index: 2;
 }
 
-.play-btn {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-
-.highligth {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  /* Safari */
-  -ms-user-select: none;
-  /* IE 10 and IE 11 */
-  user-select: none;
-  /* Standard syntax */
-}
-
 /* overlay result game */
 .overlay-result-game {
   position: absolute;
@@ -1189,7 +817,7 @@ export default {
 
 .modal-status {
   width: 90%;
-  max-width: 260px;
+  max-width: 320px;
   height: 90%;
   max-height: 260px;
   display: flex;
@@ -1206,7 +834,7 @@ export default {
 }
 
 .success-modal {
-  border: 4px solid rgb(88, 233, 88);
+  border: 4px solid rgb(255 179 0);
 }
 
 .status-text {
@@ -1219,19 +847,8 @@ export default {
 }
 
 .success-text {
-  color: rgb(88, 233, 88);
-}
-
-.reset-btn {
-  background: linear-gradient(135deg, #ffeaa7, #ff8400);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
+  color: #4bb543;
+  text-align: center;
 }
 
 /* overlay loading */
@@ -1323,21 +940,11 @@ export default {
   position: absolute;
   top: 100px;
   padding: 10px;
-  left: 40px;
+  left: 10px;
   row-gap: 20px;
   z-index: 10;
-}
-
-.btn-next-guid {
-  width: 80px;
-  height: 30px;
-  background-color: #ff9e00;
-  border: none;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  border-radius: 10px;
+  min-width: 200px;
+  text-align: start;
 }
 
 .play-game {
@@ -1411,34 +1018,18 @@ export default {
     flex-direction: column;
     row-gap: 10px;
   }
+  .score-time {
+    left: -120px;
+    top: 280px;
+  }
 }
 
 /* responsive mobile */
 @media screen and (max-width: 480px) {
-  .change-lane-btn {
-    width: 80px;
-    height: 80px;
-  }
-
-  .play-btn {
-    width: 60px;
-    height: 60px;
-  }
-
-  .camera-btn {
-    width: 60px;
-    height: 60px;
-  }
-
-  .pause-btn {
-    width: 60px;
-    height: 60px;
-  }
-
   .timer-box {
-    width: 60px;
-    height: 60px;
-    font-size: 16px;
+    width: 56px;
+    height: 56px;
+    font-size: 14px;
   }
 
   .question-box {
@@ -1457,8 +1048,8 @@ export default {
   }
 
   .score-time {
-    left: -100px;
-    top: 220px;
+    left: -120px;
+    top: 260px;
   }
 
   .buttons-div {
