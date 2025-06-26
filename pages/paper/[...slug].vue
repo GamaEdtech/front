@@ -103,8 +103,15 @@
           </div>
         </v-container>
       </section>
-
       <!--  End: detail  -->
+
+      <!-- Test Section -->
+      <div v-if="randomTestContent">
+        <v-divider class="mt-4 mx-auto" style="width: 80%" />
+        <test-details :content-data="randomTestContent" />
+        <v-divider class="mt-1 mx-auto" style="width: 80%" />
+      </div>
+      <!--  End: Test Section  -->
     </template>
   </div>
 </template>
@@ -112,8 +119,7 @@
 const route = useRoute();
 const router = useRouter();
 const requestURL = ref(useRequestURL().host);
-console.log("useRequestURL()", useRequestURL());
-
+const randomTestContent = ref(null);
 const paperId = computed(() => {
   if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];
@@ -248,6 +254,28 @@ const openCrashReportDialog = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
+const grabRandomTestCode = () => {
+  if (contentData.value && contentData.value.lesson) {
+    $fetch(`/api/v1/examTests/random?lesson=${contentData.value.lesson}`)
+      .then((response) => {
+        if (response.data.code) {
+          retriveRandomTest(response.data.code);
+        }
+      })
+      .catch((err) => {});
+  }
+};
+const retriveRandomTest = (code) => {
+  $fetch(`/api/v1/examTests/${code}`)
+    .then((response) => {
+      randomTestContent.value = response.data;
+    })
+    .catch((err) => {});
+};
+
+onMounted(() => {
+  grabRandomTestCode();
+});
 </script>
 
 <style></style>
