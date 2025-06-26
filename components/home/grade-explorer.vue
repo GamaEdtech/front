@@ -1,97 +1,107 @@
 <template>
   <v-container id="content-stats-container">
-    <v-card flat>
-      <v-card-text>
-        <div class="ex-selector">
-          <div class="ex-board-select">
-            <v-select
-              color="#4C4AFF"
-              base-color="#4C4AFF"
-              bg-color="#4C4AFF"
-              v-model="selectedBoard"
-              :items="boardList"
-              density="compact"
-              item-title="title"
-              item-value="id"
-              @update:modelValue="fetchGradeList"
-              hide-details
-              return-object
-            >
-              <template v-slot:selection="{ item, props }">
-                <div class="d-flex align-center ex-select-board-label pr-5">
-                  <div>
-                    <v-avatar size="small">
-                      <v-img :src="selectedBoard.img" />
-                    </v-avatar>
-                  </div>
-                  <div class="pl-2 ex-select-board-label">
-                    <span class="ex-select-board-title">
-                      {{ selectedBoard.title }}
-                    </span>
-                  </div>
+    <div>
+      <div class="board-hint-row" v-show="showBoardHint">
+        <div class="board-hint">
+          <div class="hint-container">
+            <div class="hint">
+              <div class="pt-14">
+                <div class="px-5">Select your Board!</div>
+                <div class="arrow pt-3">
+                  <img src="/images/select-board-arrow.svg" alt="" />
                 </div>
-              </template>
-            </v-select>
-          </div>
-          <div class="ex-grade-select">
-            <v-select
-              color="#4C4AFF"
-              base-color="#4C4AFF"
-              bg-color="#4C4AFF"
-              v-model="selectedGrade"
-              :items="gradeList"
-              density="compact"
-              item-title="title"
-              item-value="id"
-              hide-details
-            >
-            </v-select>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="mt-10">
-          <v-row justify="center">
-            <v-col
-              cols="12"
-              sm="4"
-              md="3"
-              lg="2"
-              v-for="category in categories"
+      </div>
+      <div class="ex-selector">
+        <div class="ex-board-select">
+          <v-select
+            color="#4C4AFF"
+            base-color="#4C4AFF"
+            bg-color="#4C4AFF"
+            v-model="selectedBoard"
+            :items="boardList"
+            density="compact"
+            item-title="title"
+            item-value="id"
+            @update:modelValue="fetchGradeList"
+            hide-details
+            return-object
+            @update:focused="handleBoardFocused"
+          >
+            <template v-slot:selection="{ item, props }">
+              <div class="d-flex align-center ex-select-board-label pr-5">
+                <div>
+                  <v-avatar size="small">
+                    <v-img :src="selectedBoard.img" />
+                  </v-avatar>
+                </div>
+                <div class="pl-2 ex-select-board-label">
+                  <span class="ex-select-board-title">
+                    {{ selectedBoard.title }}
+                  </span>
+                </div>
+              </div>
+            </template>
+          </v-select>
+        </div>
+        <div class="ex-grade-select">
+          <v-select
+            :disabled="gradeLoader"
+            color="#4C4AFF"
+            base-color="#4C4AFF"
+            bg-color="#4C4AFF"
+            v-model="selectedGrade"
+            :items="gradeList"
+            density="compact"
+            item-title="title"
+            item-value="id"
+            hide-details
+          >
+          </v-select>
+        </div>
+      </div>
+      <div class="mt-10">
+        <v-row justify="center">
+          <v-col cols="12" sm="4" md="3" lg="2" v-for="category in categories">
+            <nuxt-link
+              :to="`/search?type=${category.type}&section=${selectedBoard?.id}&base=${selectedGrade}`"
             >
-              <nuxt-link to="/">
-                <div class="ex-category__card">
-                  <div class="d-flex align-center">
-                    <div class="ex-category__card--title mb-sm-4 pr-6 pr-md-0">
-                      {{ category.stat }}
-                    </div>
-                    <span class="d-sm-none">
+              <div class="ex-category__card">
+                <div class="d-flex align-center">
+                  <div class="ex-category__card--title mb-sm-4 pr-6 pr-md-0">
+                    {{ category.stat }}
+                  </div>
+                  <span class="d-sm-none">
+                    <v-icon size="x-large" color="#D0D5DD"
+                      >mdi-chevron-right</v-icon
+                    >
+                  </span>
+                </div>
+
+                <div class="d-flex align-center order-first order-sm-last">
+                  <div class="ex-category__card--icon">
+                    <span class="stat-icon" :class="category.icon"></span>
+                  </div>
+                  <div class="d-flex align-center pl-1">
+                    <span class="ex-category__card--subtitle">
+                      {{ category.title }}
+                    </span>
+                    <span class="pl-1 d-none d-sm-block">
                       <v-icon size="x-large" color="#D0D5DD"
                         >mdi-chevron-right</v-icon
                       >
                     </span>
                   </div>
-
-                  <div class="d-flex align-center order-first order-sm-last">
-                    <div class="ex-category__card--icon">
-                      <span class="stat-icon" :class="category.icon"></span>
-                    </div>
-                    <div class="d-flex align-center pl-1">
-                      <span class="ex-category__card--subtitle">
-                        {{ category.title }}
-                      </span>
-                      <span class="pl-1 d-none d-sm-block">
-                        <v-icon size="x-large" color="#D0D5DD"
-                          >mdi-chevron-right</v-icon
-                        >
-                      </span>
-                    </div>
-                  </div>
                 </div>
-              </nuxt-link>
-            </v-col>
-          </v-row>
-        </div>
-      </v-card-text>
-    </v-card>
+              </div>
+            </nuxt-link>
+          </v-col>
+        </v-row>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -102,6 +112,7 @@ import AQAIcon from "~/assets/images/boards/AQA.svg";
 import OCRIcon from "~/assets/images/boards/OCR.svg";
 import GamaIcon from "~/assets/images/boards/Gama.svg";
 import ScientificIcon from "~/assets/images/boards/Scientific Competition.svg";
+import { ref, watch, onMounted } from "vue";
 
 const props = defineProps({
   stats: {},
@@ -109,30 +120,35 @@ const props = defineProps({
 
 const categories = ref([
   {
+    type: "learnfiles",
     key: "files",
     stat: "220",
     title: "Multimedia",
     icon: "icon-multimedia",
   },
   {
+    type: "azmoon",
     key: "exams",
     stat: "410",
     title: "QuizHub",
     icon: "icon-exam",
   },
   {
+    type: "test",
     key: "tests",
     stat: "34,519",
     title: "Past Paper",
     icon: "icon-paper",
   },
   {
+    type: "question",
     key: "questions",
     stat: "+1,000",
     title: "Forum",
     icon: "icon-q-a",
   },
   {
+    type: "dars",
     key: "tutorial",
     stat: "50",
     title: "Tutorial",
@@ -153,6 +169,7 @@ const boardImgs = ref([
   GamaIcon,
   ScientificIcon,
 ]);
+const showBoardHint = ref(false);
 
 const fetchInitialData = async () => {
   let params = { type: "section" };
@@ -186,7 +203,6 @@ const fetchCategoryCounts = async () => {
     params.append("base", selectedGrade.value.id);
     const requestUrl = `/api/v1/search?${params.toString()}`;
     const response = await $fetch(requestUrl);
-    console.log("response.data.types_stats", response.data.types_stats);
     if (
       response &&
       response.status === 1 &&
@@ -210,11 +226,15 @@ const fetchCategoryCounts = async () => {
     }
   } catch (error) {}
 };
-
+const handleBoardFocused = () => {
+  if (selectedBoard.value && showBoardHint.value) {
+    localStorage.setItem("boardHintShown", "true");
+    showBoardHint.value = false;
+  }
+};
 watch(
   () => selectedGrade.value,
   (val) => {
-    console.log("val", val);
     fetchCategoryCounts();
   },
   {
@@ -224,11 +244,98 @@ watch(
 
 onMounted(() => {
   fetchInitialData();
-  console.log("stats", props.stats);
+  if (localStorage.getItem("boardHintShown") === "true") {
+    showBoardHint.value = false;
+  } else {
+    showBoardHint.value = true;
+  }
 });
 </script>
 
 <style scoped>
+.board-hint {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  left: 5%;
+  bottom: 0;
+}
+.hint-container {
+  position: relative;
+  width: 242px;
+  /* height: 119px; */
+  opacity: 0;
+  background: rgba(18, 183, 106, 0.5);
+  display: flex;
+  justify-content: center;
+  border-radius: 120px 120px 0 0;
+  animation: hintGrowIn 0.2s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 both,
+    waveHeightOnly 2.5s ease-in-out 0.7s infinite alternate;
+}
+
+@keyframes hintGrowIn {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    height: 119px;
+    opacity: 1;
+  }
+}
+
+@keyframes waveHeightOnly {
+  0% {
+    height: 119px;
+  }
+  50% {
+    height: 126px;
+  }
+  100% {
+    height: 119px;
+  }
+}
+
+.hint {
+  position: absolute;
+  width: 208px;
+  height: 101px;
+  background-color: #00c171;
+  border-radius: 120px 120px 0 0;
+  bottom: 0;
+  width: 85%;
+  height: 85%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  text-align: center;
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.hint-overlay {
+  position: absolute;
+  width: 140px; /* Slightly smaller */
+  height: 70px; /* Slightly smaller */
+  top: 5px; /* Centered inside */
+  left: 5px;
+  background-color: #ffffff; /* Inner white layer */
+  border-radius: 70px 70px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00c171; /* Text color matching outer border */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
 .stat-icon {
   font-size: 2.3rem;
 }
@@ -270,6 +377,16 @@ onMounted(() => {
   border: 1px solid rgba(242, 244, 247, 1);
   padding: 2rem 1.5rem;
   border-radius: 24px;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s,
+    background 0.2s;
+}
+.ex-category__card:hover {
+  box-shadow: 0 8px 24px 0 rgba(76, 74, 255, 0.1),
+    0 1.5px 6px 0 rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px) scale(1.03);
+  border-color: #ffb600;
+  background: #f8faff;
+  cursor: pointer;
 }
 .ex-select-board-label {
   display: inline-flex;
@@ -283,7 +400,16 @@ onMounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.board-hint-row {
+  max-width: 556px;
+  position: relative;
+  height: 10px;
+  width: 100%;
+  margin: 0 auto;
+}
 .ex-selector {
+  z-index: 1;
+  position: relative;
   display: flex;
   align-items: center;
   background: #4c4aff;
