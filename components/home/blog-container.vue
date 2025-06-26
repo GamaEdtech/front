@@ -10,10 +10,10 @@
             <div class="d-none d-md-inline">
               <v-btn variant="outlined" rounded outlined size="large" to="/blog" class="gama-btn">Go to blog</v-btn>
             </div>
-            <v-btn variant="flat" to="/blog" text class="d-inline d-md-none seeAllBtn">
+            <router-link to="/blog" class="d-inline d-md-none seeAllBtn">
               <span class="content"> See all</span>
               <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
+            </router-link>
           </v-col>
           <v-col cols="12" class="px-md-0">
             <v-slide-group class="slider py-sm-4" :show-arrows="lgAndUp">
@@ -146,6 +146,18 @@ loadBlog();
   .seeAllBtn {
     padding-right: 0;
     float: right;
+
+    :hover{
+      background-color: transparent;
+    }
+
+    :active{
+      background-color: transparent;
+    }
+
+    :focus{
+      background-color: transparent;
+    }
 
     .content {
       text-transform: none;
