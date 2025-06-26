@@ -420,40 +420,93 @@ const whitepaperSection = ref([
   },
   {
     id: "get-token",
-    title: "GET Token Economy",
+    title: "Use Case of the GET Token",
     describe:
       "<p class='gama-text-body1'>" +
-      "The GET token serves as the economic backbone of the Gama ecosystem, powering transactions, incentivizing contributions, and aligning the interests of all stakeholders—from learners to educators, content creators, and platform developers." +
+      "The GET Token is the lifeblood of the GamaEdTech ecosystem. As a native digital currency on the Solana blockchain, it enables a decentralized, transparent, and efficient economy that powers every aspect of the Gama learning experience." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>💰 Token Utility</strong></p>" +
+      "<p class='gama-text-body1'><strong>🛒 1. Payment for Courses and Content</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "GET tokens facilitate various transactions within the platform: accessing premium content, purchasing NFT diplomas, rewarding content creators, paying for assessments, and more. The token creates a seamless economic environment where value flows directly between participants." +
+      "Learners use GET tokens to enroll in courses, unlock gamified lessons, access premium content, and upgrade their learning experience. This creates a direct value loop between the learner and the platform." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>🏅 Reward Systems</strong></p>" +
+      "<p class='gama-text-body1'><strong>🧑‍🏫 2. Rewards for Educators and Content Creators</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "Content creators, teachers, and community contributors earn GET tokens based on the quality, popularity, and effectiveness of their contributions. This aligns incentives toward creating engaging, high-quality educational experiences." +
+      "Teachers, curriculum designers, and developers who create interactive lessons, gamified challenges, and assessment tools receive GET tokens as compensation. This ensures fair incentives and encourages community-driven content creation." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📱 Accessible Wallets</strong></p>" +
+      "<p class='gama-text-body1'><strong>🎨 3. Crowdsourced Content Funding</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "User-friendly crypto wallets are integrated into the Gama platform, making it easy for even blockchain novices to manage their GET tokens. These wallets also store NFT certifications and diplomas." +
+      "Educators can propose new content or modules, and the community can vote and fund those proposals using GET tokens. This DAO-style governance drives innovation from the grassroots level." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>🌊 Liquidity Pools</strong></p>" +
+      "<p class='gama-text-body1'><strong>🧩 4. Microtransactions in the Learning Experience</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "Gama will establish liquidity pools on decentralized exchanges to ensure GET tokens can be easily exchanged with other cryptocurrencies or fiat currencies. This creates a vibrant, flexible economy around educational activities." +
+      "Learners may spend GET tokens for additional attempts at a test, custom avatars, unlocking side quests, or receiving extra mentorship hours, enhancing personalization and fun." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>🏭 Token Distribution</strong></p>" +
+      "<p class='gama-text-body1'><strong>🎓 5. Certification Fees</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "The initial token distribution is carefully designed to balance the needs of the platform, early adopters, development team, and future growth. The majority of tokens are allocated to reward ecosystem participants and ensure the long-term sustainability of the platform." +
+      "Upon completing each level, learners receive an NFT certificate minted on the blockchain, with minting fees paid in GET tokens. These certificates are permanent and verifiable records of their achievement." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>🛡️ Governance</strong></p>" +
+      "<p class='gama-text-body1'><strong>🤝 6. Community Engagement and Incentives</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "GET token holders can participate in platform governance, voting on key decisions like feature prioritization, content standards, and economic parameters. This creates a democratic approach to educational platform management." +
+      "Active users — such as community moderators, top forum contributors, or testers of new features — can earn GET tokens for their efforts. This builds an engaged and self-sustaining user base." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>📈 7. Governance & Voting</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "Holders of GET tokens can vote on platform upgrades, content priorities, and fund allocation. This decentralized governance ensures that the platform evolves in alignment with its users' needs." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>💼 8. Partnership Transactions</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "Institutions or partners integrating Gama into their educational systems can pay licensing or white-labeling fees using GET tokens. This drives broader adoption and liquidity." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'>" +
+      "By integrating GET tokens into every layer of the GamaEdTech platform, we are not only creating a sustainable digital economy but also ensuring value returns directly to those who contribute to the ecosystem's growth." +
+      "</p>",
+  },
+  {
+    id: "tokenomics",
+    title: "Tokenomics of GET",
+    describe:
+      "<p class='gama-text-body1'>" +
+      "The total supply of GET Token is fixed at 10 billion (10,000,000,000 GET), deployed on the Solana blockchain to ensure high-speed, low-fee transactions and scalability. The tokenomics structure is designed to balance long-term project sustainability, community growth, investor trust, and ecosystem incentives." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>🔹 Total Supply: 10,000,000,000 GET</strong></p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>📦 Allocation Breakdown</strong></p>" +
+      "<table style='width:100%; border-collapse: collapse; margin-bottom: 20px;'>" +
+      "<tr style='background-color: #f4f4f4;'><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Category</th><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Allocation</th><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Lock & Vesting Details</th></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>🔒 Liquidity Pool</td><td style='padding: 10px; border: 1px solid #ddd;'>10%</td><td style='padding: 10px; border: 1px solid #ddd;'>Permanently locked (LP tokens burned)</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>💼 Private & Strategic Investors</td><td style='padding: 10px; border: 1px solid #ddd;'>10%</td><td style='padding: 10px; border: 1px solid #ddd;'>Vested over 6 years with a 1-year cliff (0% release in Year 1)</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>👥 Community (Development and Rewards)</td><td style='padding: 10px; border: 1px solid #ddd;'>60%</td><td style='padding: 10px; border: 1px solid #ddd;'>Unlocked over 6 years (1B tokens per year for a total of 6 years)</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>🧑‍🏫 Founders</td><td style='padding: 10px; border: 1px solid #ddd;'>20%</td><td style='padding: 10px; border: 1px solid #ddd;'>Locked for 6 years, released gradually starting Year 3</td></tr>" +
+      "</table>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>⏳ Vesting Schedule Summary</strong></p>" +
+      "<table style='width:100%; border-collapse: collapse; margin-bottom: 20px;'>" +
+      "<tr style='background-color: #f4f4f4;'><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Year</th><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Investors</th><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Community (Development and Rewards)</th><th style='padding: 10px; text-align: left; border: 1px solid #ddd;'>Founders</th></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y1</td><td style='padding: 10px; border: 1px solid #ddd;'>Locked</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>0</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y2</td><td style='padding: 10px; border: 1px solid #ddd;'>0.2B</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>0</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y3</td><td style='padding: 10px; border: 1px solid #ddd;'>0.2B</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>0</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y4</td><td style='padding: 10px; border: 1px solid #ddd;'>0.2B</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>~1.3B</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y5</td><td style='padding: 10px; border: 1px solid #ddd;'>0.2B</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>~0.3B</td></tr>" +
+      "<tr><td style='padding: 10px; border: 1px solid #ddd;'>Y6</td><td style='padding: 10px; border: 1px solid #ddd;'>0.2B</td><td style='padding: 10px; border: 1px solid #ddd;'>1B</td><td style='padding: 10px; border: 1px solid #ddd;'>~0.3B</td></tr>" +
+      "</table>" +
+      "<p class='gama-text-body1'>This process will continue via buybacks and be locked on December 30th at year-end.</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>💡 Key Token Principles</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- <strong>Deflation-Friendly:</strong> No inflation beyond the original 10B supply. Burn mechanisms may be added by community vote.<br>" +
+      "- <strong>Locked Liquidity = Trust:</strong> With liquidity permanently locked, GET becomes more secure and attractive to exchanges and investors.<br>" +
+      "- <strong>Gradual Unlocking:</strong> Prevents token dumps and aligns all stakeholders for the long term.<br>" +
+      "- <strong>Community Ownership:</strong> The largest share is for educators, developers, and learners contributing to the platform." +
       "</p>",
   },
   {
@@ -461,52 +514,157 @@ const whitepaperSection = ref([
     title: "Development Roadmap",
     describe:
       "<p class='gama-text-body1'>" +
-      "GamaEdTech follows a structured development roadmap that outlines key milestones and growth phases. This timeline ensures transparent progress tracking while maintaining flexibility to adapt to user feedback and technological advancements." +
+      "The roadmap for GamaEdTech outlines a multi-phase journey from infrastructure setup to global adoption. Each phase is designed to build upon the previous, ensuring a stable, scalable, and community-driven evolution of the platform." +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📌 Phase 1: Foundation (Q3-Q4 2023)</strong></p>" +
+      "<p class='gama-text-body1'><strong>✅ Phase 1: Foundation & Token Launch (Q1–Q2 2025)</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "- Platform architecture design and core development<br>" +
-      "- Smart contract development and security audits<br>" +
-      "- Initial GET token distribution<br>" +
-      "- Alpha testing with limited user base<br>" +
-      "- Establishment of content creator network" +
+      "- Ideation and team formation<br>" +
+      "- Core platform architecture design<br>" +
+      "- Launch of $GET Token on Solana blockchain<br>" +
+      "- Liquidity pool creation and permanent locking<br>" +
+      "- Private investor onboarding and legal structuring<br>" +
+      "- Initial community formation (early educators, developers)" +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📌 Phase 2: Launch & Growth (Q1-Q2 2024)</strong></p>" +
+      "<p class='gama-text-body1'><strong>🚀 Phase 2: Platform MVP & Community Growth (Q3–Q4 2025)</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "- Public beta release of the platform<br>" +
-      "- Launch of first complete learning levels (1-3)<br>" +
-      "- Introduction of GET token on exchanges<br>" +
-      "- Mobile app development<br>" +
-      "- Initial partnerships with educational institutions" +
+      "- MVP release of GamaEdTech platform<br>" +
+      "- Open-source publishing of core codebase<br>" +
+      "- Launch of early gamified learning modules<br>" +
+      "- First cohort of teachers and content creators onboarded<br>" +
+      "- Community NFT issuance begins (for achievements & levels)<br>" +
+      "- Awareness campaigns and educational events<br>" +
+      "- Release of governance framework draft" +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📌 Phase 3: Expansion (Q3-Q4 2024)</strong></p>" +
+      "<p class='gama-text-body1'><strong>🌱 Phase 3: Expansion & Adoption (2026)</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "- Release of levels 4-8<br>" +
-      "- Implementation of advanced AI tutoring systems<br>" +
-      "- Enhanced blockchain verification for credentials<br>" +
-      "- Content creator marketplace launch<br>" +
-      "- Integration with major education platforms" +
+      "- Full version of the GamaEdTech platform<br>" +
+      "- Mobile app launch (iOS and Android)<br>" +
+      "- Strategic partnerships with schools and educational NGOs<br>" +
+      "- Global community scaling (focus on underserved regions)<br>" +
+      "- DAO governance trial implementation<br>" +
+      "- Launch of educator/reviewer incentive program using GET<br>" +
+      "- Rollout of additional Level-Up content & assessments" +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📌 Phase 4: Maturity (2025)</strong></p>" +
+      "<p class='gama-text-body1'><strong>🌐 Phase 4: Ecosystem Scaling (2027)</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "- Complete 12-level educational journey available<br>" +
-      "- Global recognition campaign for Gama NFT diplomas<br>" +
-      "- Decentralized governance implementation<br>" +
-      "- Regional adaptation and localization<br>" +
-      "- Advanced analytics and personalization features" +
+      "- Cross-border educational certification support<br>" +
+      "- Integration with external learning and testing platforms<br>" +
+      "- GET staking mechanism for governance and content moderation<br>" +
+      "- Start of multi-language expansion (Arabic, Spanish, etc.)<br>" +
+      "- AI-driven adaptive learning integration" +
       "</p>" +
       "<br>" +
-      "<p class='gama-text-body1'><strong>📌 Phase 5: Ecosystem (2026 and beyond)</strong></p>" +
+      "<p class='gama-text-body1'><strong>🎓 Phase 5: Global Recognition & Decentralization (2028 and Beyond)</strong></p>" +
       "<p class='gama-text-body1'>" +
-      "- Integration with metaverse learning environments<br>" +
-      "- Enhanced interoperability with other blockchain credentials<br>" +
-      "- Employer verification network<br>" +
-      "- Higher education bridge programs<br>" +
-      "- Research and innovation incubator" +
+      "- Official recognition of GamaEdTech diplomas by partner universities<br>" +
+      "- Fully decentralized platform managed by DAO<br>" +
+      "- Large-scale onboarding of learners from 100+ countries<br>" +
+      "- Expansion of GET token use in educational finance systems<br>" +
+      "- Research collaborations with global educational institutions<br>" +
+      '- Hosting of annual "Gama Summit" for open-source education leaders' +
+      "</p>",
+  },
+  {
+    id: "team",
+    title: "Team",
+    describe:
+      "<p class='gama-text-body1'>" +
+      "GamaEdTech is built by a diverse team of educators, technologists, blockchain experts, and open-source contributors. We are united by a shared mission: to revolutionize global education by making it gamified, accessible, and equitable through blockchain technology." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>Founders & Core Team</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- <strong>Educational Experts:</strong> Former teachers, curriculum designers, and education reform advocates with a deep understanding of learning needs across age groups.<br>" +
+      "- <strong>Developers & Blockchain Engineers:</strong> Experienced Solana-based smart contract developers, front-end/full-stack engineers, and security auditors.<br>" +
+      "- <strong>Gamification Designers:</strong> Game developers and behavioral experts focused on crafting engaging learning experiences.<br>" +
+      "- <strong>Product & Strategy Leads:</strong> Professionals with a track record of scaling edtech platforms and managing distributed, community-driven products.<br>" +
+      "- <strong>Legal & Compliance Advisors:</strong> Ensuring our framework complies with educational, data, and crypto regulations internationally." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>Community Contributors</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- Educators, students, and open-source contributors from around the world help develop, localize, and improve the platform.<br>" +
+      "- Content creators, animators, and scenario writers fuel the gamified learning ecosystem.<br>" +
+      "- DAO participants shape governance and decision-making for the platform's future." +
+      "</p>",
+  },
+  {
+    id: "funding",
+    title: "Funding & Capital Allocation",
+    describe:
+      "<p class='gama-text-body1'>" +
+      "Our funding strategy is designed to support long-term sustainability while aligning stakeholder interests transparently." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>Initial Capital Structure</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- Total Supply of GET Token: 10 billion<br>" +
+      "- Valuation at Launch: ~$200,000 USD<br>" +
+      "- Liquidity Pool: 10% (1 billion GET) permanently locked<br>" +
+      "- Founders: 20% (2 billion GET), locked for 6 years<br>" +
+      "- Investors Allocation: 10% (1 billion GET), locked for 6 years<br>" +
+      "- Community (Development and Reward) Allocation: 60% (6 billion GET), vested at 1 billion per year for 6 years. This process will continue via buybacks and be locked on December 30th at year-end." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>Funding Sources</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- Private Round: Strategic investors aligned with educational impact<br>" +
+      "- Grants: Applications for blockchain, open-source, and education-focused grants<br>" +
+      "- Platform Revenue: the platform uses a gamified system where users can earn or lose $GET. Progressing through the game requires spending $GET, and obtaining certificates also incurs a $GET cost. Additional revenue is generated through sources such as Google Ads and advertisements on the YouTube channel. All revenue is funneled through a buyback mechanism and shared among token holders.<br>" +
+      "- Token Utility: As demand for GET grows through usage, value cycles back into the ecosystem" +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>Use of Funds</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "- 30% Product Development & Engineering<br>" +
+      "- 25% Content Production (educational games, videos, assessments)<br>" +
+      "- 15% Marketing & Community Building<br>" +
+      "- 15% Operational & Legal Costs<br>" +
+      "- 10% Strategic Partnerships & Onboarding<br>" +
+      "- 5% Reserve for contingencies and future needs" +
+      "</p>",
+  },
+  {
+    id: "equity",
+    title: "Commitment to Educational Equity",
+    describe:
+      "<p class='gama-text-body1'>" +
+      "At GamaEdTech, our foundational belief is that education is a human right—not a privilege. We are committed to creating a global learning ecosystem that removes the systemic barriers often present in traditional education systems, such as geographic isolation, socioeconomic limitations, and outdated pedagogical models." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>🌍 Accessibility for All</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "<strong>Anytime, Anywhere Learning:</strong> Our platform is web-based and device-agnostic, allowing learners from remote or underserved areas to access high-quality educational content 24/7.<br>" +
+      "<strong>Multilingual Support:</strong> Gama will progressively support multiple languages, ensuring inclusivity for non-English-speaking communities.<br>" +
+      "<strong>Offline Access Plans:</strong> We are developing light versions of our platform that can function in low-bandwidth environments or via periodic synchronization." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>🧠 Personalized, Non-Linear Learning</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      'Instead of forcing all learners through the same standardized curriculum, Gama enables flexible, level-based progression. Students "level up" based on skills mastered, not based on age or location.<br><br>' +
+      "This creates a fairer educational environment where learners from disadvantaged backgrounds can progress at their own pace and overcome gaps caused by traditional schooling methods." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>💡 Open Content & Open Source</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "GamaEdTech supports a community-driven, open-source development model to build the platform collaboratively and transparently.<br><br>" +
+      "Educators and developers from any region can contribute to or localize educational content and tools, ensuring cultural relevance and inclusiveness.<br><br>" +
+      "We also plan to incentivize contributions via GET tokens, creating opportunities for teachers and content creators in underserved regions to earn income by participating in the ecosystem." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>🎓 Equal Recognition via Blockchain</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "Each learner earns verifiable educational credentials (NFTs) upon completing learning levels, regardless of where they are in the world.<br><br>" +
+      "These NFTs act as decentralized, tamper-proof diplomas that allow students to pursue higher education or employment based on merit—not based on institutional prestige or geography." +
+      "</p>" +
+      "<br>" +
+      "<p class='gama-text-body1'><strong>🤖 AI-Powered Assistance</strong></p>" +
+      "<p class='gama-text-body1'>" +
+      "Gama will leverage AI to provide tailored support for students with learning difficulties, neurodivergent needs, or other educational challenges, helping close the achievement gap." +
       "</p>",
   },
   {
