@@ -88,6 +88,11 @@ export default class Camera {
             this.instance.position.set(this.smoothX, this.positionY, this.calculatePositionZ(this.smoothX))
             this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
 
+            // // position from top
+            //            // this.instance.position.set(this.smoothX, this.positionY + 5, this.calculatePositionZ(this.smoothX))
+            //            // this.instance.lookAt(this.smoothX + this.options.distanceLookAtCamera, this.positionY, this.calculatePositionZ(this.smoothX + this.options.distanceLookAtCamera))
+
+
             const targetFov = 75 + this.options.carBaseSpeed * 0.5
             this.instance.fov = MathUtils.lerp(this.instance.fov, targetFov, 0.1)
         } else {

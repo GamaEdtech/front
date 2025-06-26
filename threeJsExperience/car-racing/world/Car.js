@@ -48,7 +48,7 @@ export default class Car {
 
 
         this.isIncreaseSpeedPhase = false
-        this.UpperSpeed = this.options.carBaseSpeed + 8
+        this.UpperSpeed = this.options.carBaseSpeed + 4
         this.isDecreasingPhase = false
         this.directionLastSuccessRotation = 1
 
@@ -56,11 +56,21 @@ export default class Car {
         this.gemCheckIndex = 0;
 
 
+        this.springCompress = 0.6
+        this.bodyDrop = 0.8
+        this.durationLanding = 1
+        this.progressLanding = 0
+        this.isLanding = false
 
 
         window.addEventListener("keydown", (event) => {
             // if (event.code === "ArrowUp") {
             //     this.moveForward()
+
+
+            //     // this.jumpStartY = 0.6
+            //     // this.jumpProgress = 0
+            //     // this.isJumping = true
             // }
             if (event.code === "ArrowLeft") {
                 this.changeLane(-1)
@@ -165,12 +175,27 @@ export default class Car {
         this.mesh.position.y = 0.5
         this.scene.add(this.mesh)
         this.wheels = {}
+        this.springs = {}
         this.mesh.traverse((child) => {
             if (child.name == 'backWheel') {
                 this.wheels.back = child.children[0]
             } else if (child.name == 'frontWheel') {
                 this.wheels.front = child.children[0]
                 this.wheels.pivotFront = child
+            }
+            else if (child.name == 'springBackLeft') {
+                this.springs.springBackLeft = child.children[0]
+            }
+            else if (child.name == 'springBackRight') {
+                this.springs.springBackRight = child.children[0]
+            }
+            else if (child.name == 'springFrontLeft') {
+                this.springs.springFrontLeft = child.children[0]
+            }
+            else if (child.name == 'springFrontRight') {
+                this.springs.springFrontRight = child.children[0]
+            } else if (child.name == 'Body') {
+                this.bodyCar = child.children[0]
             }
         })
     }
@@ -224,7 +249,7 @@ export default class Car {
     }
 
     increseSpeedSuccessPhase() {
-        this.speed = MathUtils.lerp(this.speed, this.UpperSpeed, 0.06)
+        this.speed = MathUtils.lerp(this.speed, this.UpperSpeed, 15 * (this.time.delta / 1000))
 
         if (Math.ceil(this.speed) == this.UpperSpeed) {
             this.isIncreaseSpeedPhase = false
@@ -234,8 +259,8 @@ export default class Car {
     }
 
     decreaseSpeedAndDriftSuccessPhase() {
-        this.speed = MathUtils.lerp(this.speed, this.options.carBaseSpeed, 0.01)
-        this.wrongAnswerRotationY = this.wrongAnswerRotationY + (-1 * this.directionLastSuccessRotation * 0.02)
+        this.speed = MathUtils.lerp(this.speed, this.options.carBaseSpeed, (this.time.delta / 1000))
+        this.wrongAnswerRotationY = this.wrongAnswerRotationY + (-1 * this.directionLastSuccessRotation * (this.time.delta / 1000) * 2)
         this.currentLane = MathUtils.lerp(this.currentLane, this.currentLane + this.directionLastSuccessRotation, 0.02)
 
         if (this.wrongAnswerRotationY <= -Math.PI || this.wrongAnswerRotationY >= Math.PI) {
@@ -247,35 +272,64 @@ export default class Car {
         }
     }
 
-
-
-    reverseStep() {
-        if (this.positionX > this.reverseStartX - this.reverseDistance) {
-            this.positionX -= this.reverseSpeed
-            this.wrongAnswerRotationY += this.reverseRotationSpeed
-            if (this.wrongAnswerRotationY >= Math.PI * 2 * 3) {
-                this.wrongAnswerRotationY = 0
-            }
+    reverseStep(delta) {
+        const currentX = this.positionX
+        const endX = this.reverseStartX - this.reverseDistance
+        if (currentX > endX) {
+            this.positionX -= this.reverseSpeed * delta
+            const t = (this.reverseStartX - this.positionX) / this.reverseDistance
+            this.wrongAnswerRotationY = t * Math.PI * 2
         } else {
             this.isReversing = false
             this.wrongAnswerRotationY = 0
         }
     }
 
-    jumpStep() {
-        this.jumpProgress += 1
+    playSpringEffect(delta) {
+        this.progressLanding += delta
+        const t = this.progressLanding / this.durationLanding
+        const damping = Math.exp(-6 * t)
+        const bounce = damping * Math.cos(10 * t * Math.PI)
+
+        this.bodyCar.position.y = -bounce * this.bodyDrop
+
+        for (const key in this.springs) {
+            const spring = this.springs[key]
+            spring.scale.y = 1 - bounce * this.springCompress
+        }
+
+        if (this.progressLanding > this.durationLanding) {
+            this.bodyCar.position.y = 0
+            for (const key in this.springs) {
+                this.springs[key].scale.y = 1
+            }
+            this.isLanding = false
+            this.progressLanding = 0
+        }
+    }
+
+    jumpStep(delta) {
+        this.jumpProgress += delta
 
         const t = this.jumpProgress / this.jumpDuration
-        const jumpCurve = Math.sin(Math.PI * t)
-        this.mesh.position.y = this.jumpStartY + jumpCurve * this.jumpHeight
-        this.correctAnswerRotationY = Math.PI * 2 * t
+        const clampedT = Math.min(t, 1)
 
-        if (this.jumpProgress >= this.jumpDuration) {
+        const jumpCurve = 4 * this.jumpHeight * clampedT * (1 - clampedT)
+
+        this.mesh.position.y = this.jumpStartY + jumpCurve
+        this.correctAnswerRotationY = Math.PI * 2 * clampedT
+
+        if (!this.isLanding && t >= 0.95) {
+            this.isLanding = true
+        }
+        if (t >= 1) {
             this.isJumping = false
             this.mesh.position.y = this.jumpStartY
             this.correctAnswerRotationY = 0
+            this.jumpProgress = 0
         }
     }
+
 
     checkGemCollision() {
         if (this.gemCheckIndex >= this.gemsInformation.length) return;
@@ -323,11 +377,15 @@ export default class Car {
         this.checkGemCollision()
 
         if (this.isReversing) {
-            this.reverseStep()
+            this.reverseStep(this.time.delta / 1000)
         }
 
         if (this.isJumping) {
-            this.jumpStep()
+            this.jumpStep(this.time.delta / 1000)
+        }
+
+        if (this.isLanding) {
+            this.playSpringEffect(this.time.delta / 1000)
         }
     }
     setDebug() {

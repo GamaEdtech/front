@@ -126,16 +126,17 @@ export default class Experience {
 
             // car
             carBaseSpeed: 1 + level * 2,
+
             offsetXStart: 15,
             laneLerpSpeed: 3,
             distanceCameraFromCar: window.innerWidth < 480 ? 12 : 7,
             cameraYPosition: window.innerWidth < 480 ? 3 : 2,
             distanceLookAtCamera: window.innerWidth < 480 ? 13 : 5,
             reverseDistanceWrongAnswer: 15,
-            reverseSpeedWrongAnswer: 0.5,
-            reverseRotationSpeedWrongAnswer: Math.PI / 20,
-            jumpHeightCorrectAnswer: 1,
-            jumpDurationCorrectAnswer: 80, // frame per second
+            reverseSpeedWrongAnswer: 15,
+            reverseRotationSpeedWrongAnswer: 5,
+            jumpHeightCorrectAnswer: 1.5,
+            jumpDurationCorrectAnswer: 1, // frame per second
 
             // levels questions
             questions: questions,
