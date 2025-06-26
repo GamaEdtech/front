@@ -10,8 +10,8 @@
             <div class="d-none d-md-inline">
               <v-btn variant="outlined" rounded outlined size="large" to="/blog" class="gama-btn">Go to blog</v-btn>
             </div>
-            <v-btn rounded to="/blog" text class="d-inline d-md-none seeAllBtn">
-              See all
+            <v-btn variant="flat" to="/blog" text class="d-inline d-md-none seeAllBtn">
+              <span class="content"> See all</span>
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
           </v-col>
@@ -24,7 +24,7 @@
               </div>
 
               <v-slide-group-item v-else v-for="(item, n) in slideItems" :key="n">
-                <v-card flat :to="`/blog/${item.id}/${item.title}`">
+                <v-card flat :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
                   <v-card flat>
                     <v-img :src="item.pic" />
                     <v-card-title>
@@ -40,7 +40,7 @@
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
-                    <nuxt-link :to="`/blog/${item.id}/${item.slug}`">Read more</nuxt-link>
+                    <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">Read more</nuxt-link>
                   </div>
                 </v-card>
               </v-slide-group-item>
@@ -57,6 +57,7 @@ import { useDisplay } from "vuetify";
 
 // Using Vuetify's breakpoint system
 const { lgAndUp, sm, xs } = useDisplay();
+const { $slugGenerator } = useNuxtApp();
 
 // Reactive properties
 const model = ref(null);
@@ -146,9 +147,9 @@ loadBlog();
     padding-right: 0;
     float: right;
 
-    .v-btn__content {
+    .content {
       text-transform: none;
-      color: #6e7781;
+      color: #888a8b;
       font-family: Inter;
       font-size: 1.4rem;
       font-style: normal;
