@@ -1,1358 +1,361 @@
-<!-- in refactor proccess -->
 <template>
   <v-container id="content-stats-container">
     <v-card flat>
       <v-card-text>
-        <v-row>
-          <v-col cols="2" sm="2" class="px-0">
-            <v-sheet
-              v-if="stats.length <= 16 && gradeSizes.length"
-              class="text-right"
-              id="stats-handler"
-              ref="statsHandler"
+        <div class="ex-selector">
+          <div class="ex-board-select">
+            <v-select
+              color="#4C4AFF"
+              base-color="#4C4AFF"
+              bg-color="#4C4AFF"
+              v-model="selectedBoard"
+              :items="boardList"
+              density="compact"
+              item-title="title"
+              item-value="id"
+              @update:modelValue="fetchGradeList"
+              hide-details
+              return-object
             >
-              <div
-                v-for="(item, index) in stats"
-                :key="index"
-                @touchstart="handleTouchStart(index)"
-                @touchend="handleTouchEnd(index)"
-                @touchmove="handleTouchMove"
-                @mousemove="handleMouseMove"
-                @mousedown="handleMouseDown(index)"
-                @mouseup="handleMouseUp(index)"
-                :ref="`handler${index}`"
-              >
-                <v-btn
-                  @click="handleBtnClick(index)"
-                  class="my-0 white--text grade-btn"
-                  :class="[
-                    index == 7 ? 'rounded-pill active' : 'rounded-s-xl',
-                    currentIndex == index ? 'handlerShadow' : '',
-                  ]"
-                  v-if="shouldDisplayButton(index)"
-                  :color="gradeColors[index]"
-                  :style="`font-weight:600;
-                           font-size:${gradeSizes[index].fontSize}px;
-                           width:${gradeSizes[index].width}px!important;
-                           min-width:${gradeSizes[index].width}px!important;
-                           height:${gradeSizes[index].height}px`"
-                >
-                  {{
-                    truncateGradeTitle(
-                      gradeHandlerTitle(item.base_title),
-                      index
-                    )
-                  }}
-                </v-btn>
-                <div
-                  v-if="index == 7"
-                  :style="`font-size:${gradeSizes[index].fontSize}px;height:${gradeSizes[index].height}px;width:${gradeSizes[index].width}px`"
-                />
-              </div>
-            </v-sheet>
-          </v-col>
-          <v-col cols="10" sm="10" class="pl-0">
-            <v-card id="grade-details-card">
-              <div>
-                <v-row class="stats-details d-none d-md-flex">
-                  <v-col md="6" class="pb-0 pb-sm-6">
-                    <nuxt-link
-                      :to="`/search?type=test&section=${stats[7].section}&base=${stats[7].base}`"
-                      class="label"
-                    >
-                      <span class="stat-icon icon-paper"></span>
-                      Past Papers
-
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
-                    </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].tests) }}</div>
-                  </v-col>
-                  <v-col md="6" class="pb-0 pb-sm-6">
-                    <nuxt-link
-                      :to="`/search?type=learnfiles&section=${stats[7].section}&base=${stats[7].base}`"
-                      class="label"
-                    >
-                      <span class="stat-icon icon-multimedia"></span>
-                      Multimedia
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
-                    </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].files) }}</div>
-                  </v-col>
-                  <v-col md="6" class="pb-0 pb-sm-6">
-                    <nuxt-link
-                      :to="`/search?type=azmoon&section=${stats[7].section}&base=${stats[7].base}`"
-                      class="label"
-                    >
-                      <span class="stat-icon icon-exam"></span>
-                      QuizHub
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
-                    </nuxt-link>
-                    <div class="stat">+{{ $numberFormat(stats[7].exams) }}</div>
-                  </v-col>
-                  <v-col md="6" class="pb-0 pb-sm-6">
-                    <nuxt-link
-                      :to="`/search?type=question&section=${stats[7].section}&base=${stats[7].base}`"
-                      class="label"
-                    >
-                      <span class="stat-icon icon-q-a"></span>
-                      Forum
-                      <v-icon class="stat-arrow" size="20" color="#D0D7DE"
-                        >mdi-chevron-right</v-icon
-                      >
-                    </nuxt-link>
-                    <div class="stat">
-                      +{{ $numberFormat(stats[7].questions) }}
+              <template v-slot:selection="{ item, props }">
+                <div class="d-flex align-center ex-select-board-label pr-5">
+                  <div>
+                    <v-avatar size="small">
+                      <v-img :src="selectedBoard.img" />
+                    </v-avatar>
+                  </div>
+                  <div class="pl-2 ex-select-board-label">
+                    <span class="ex-select-board-title">
+                      {{ selectedBoard.title }}
+                    </span>
+                  </div>
+                </div>
+              </template>
+            </v-select>
+          </div>
+          <div class="ex-grade-select">
+            <v-select
+              color="#4C4AFF"
+              base-color="#4C4AFF"
+              bg-color="#4C4AFF"
+              v-model="selectedGrade"
+              :items="gradeList"
+              density="compact"
+              item-title="title"
+              item-value="id"
+              hide-details
+            >
+            </v-select>
+          </div>
+        </div>
+        <div class="mt-10">
+          <v-row justify="center">
+            <v-col
+              cols="12"
+              sm="4"
+              md="3"
+              lg="2"
+              v-for="category in categories"
+            >
+              <nuxt-link to="/">
+                <div class="ex-category__card">
+                  <div class="d-flex align-center">
+                    <div class="ex-category__card--title mb-sm-4 pr-6 pr-md-0">
+                      {{ category.stat }}
                     </div>
-                  </v-col>
-                </v-row>
+                    <span class="d-sm-none">
+                      <v-icon size="x-large" color="#D0D5DD"
+                        >mdi-chevron-right</v-icon
+                      >
+                    </span>
+                  </div>
 
-                <v-row class="stats-details d-flex d-md-none">
-                  <v-col cols="12">
-                    <v-row>
-                      <v-col cols="7" class="py-0">
-                        <nuxt-link
-                          :to="`/search?type=test&section=${stats[7].section}&base=${stats[7].base}`"
-                          class="label"
-                        >
-                          <span class="stat-icon icon-paper"></span>
-                          Past Papers
-                        </nuxt-link>
-                        <div class="date-holder">{{ showDate() }}</div>
-                      </v-col>
-                      <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ $numberFormat(stats[7].tests) }}</span
-                        >
-                        <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
-                          >mdi-chevron-right</v-icon
-                        >
-                      </v-col>
-                      <v-col cols="12" class="pt-0">
-                        <v-divider />
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="7" class="py-0">
-                        <nuxt-link
-                          :to="`/search?type=learnfiles&section=${stats[7].section}&base=${stats[7].base}`"
-                          class="label"
-                        >
-                          <span class="stat-icon icon-multimedia"></span>
-                          Multimedia
-                        </nuxt-link>
-                        <div class="date-holder pb-0">{{ showDate() }}</div>
-                      </v-col>
-                      <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ $numberFormat(stats[7].files) }}</span
-                        >
-                        <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
-                          >mdi-chevron-right</v-icon
-                        >
-                      </v-col>
-                      <v-col cols="12" class="pt-0">
-                        <v-divider />
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="7" class="py-0">
-                        <nuxt-link
-                          :to="`/search?type=azmoon&section=${stats[7].section}&base=${stats[7].base}`"
-                          class="label"
-                        >
-                          <span class="stat-icon icon-exam"></span>
-                          QuizHub
-                        </nuxt-link>
-                        <div class="date-holder pb-0">{{ showDate() }}</div>
-                      </v-col>
-                      <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ $numberFormat(stats[7].exams) }}</span
-                        >
-                        <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
-                          >mdi-chevron-right</v-icon
-                        >
-                      </v-col>
-                      <v-col cols="12" class="pt-0">
-                        <v-divider />
-                      </v-col>
-                    </v-row>
-
-                    <v-row>
-                      <v-col cols="7" class="py-0">
-                        <nuxt-link
-                          :to="`/search?type=question&section=${stats[7].section}&base=${stats[7].base}`"
-                          class="label"
-                        >
-                          <span class="stat-icon icon-q-a"></span>
-                          Forum
-                        </nuxt-link>
-                        <div class="date-holder">{{ showDate() }}</div>
-                      </v-col>
-                      <v-col cols="5" class="text-right pt-0">
-                        <span class="stat"
-                          >+{{ $numberFormat(stats[7].questions) }}</span
-                        >
-                        <v-icon size="20" class="pl-sm-4" color="#D0D7DE"
-                          >mdi-chevron-right</v-icon
-                        >
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-row>
-              </div>
-
-              <v-divider
-                class="d-none d-md-block"
-                style="margin-top: 94px; margin-bottom: 1.2rem"
-              />
-
-              <div class="d-none d-md-block">
-                <v-row>
-                  <v-col cols="6" md="6">
-                    <h4 class="section-title gama-text-h5">Last questions</h4>
-                    <div v-if="questionLoading">
-                      <v-row class="latest-card" v-for="i in 3" :key="i">
-                        <v-col cols="12">
-                          <v-skeleton-loader
-                            type="list-item-avatar"
-                          ></v-skeleton-loader>
-                        </v-col>
-                      </v-row>
+                  <div class="d-flex align-center order-first order-sm-last">
+                    <div class="ex-category__card--icon">
+                      <span class="stat-icon" :class="category.icon"></span>
                     </div>
-                    <v-card
-                      class="latest-card"
-                      v-else
-                      flat
-                      v-for="item in questions.slice(0, 3)"
-                      :key="item.id"
-                    >
-                      <v-row>
-                        <v-col cols="1">
-                          <v-avatar class="my-3" size="32" rounded="0">
-                            <v-img :src="item.avatar"></v-img>
-                          </v-avatar>
-                        </v-col>
-                        <v-col cols="11">
-                          <v-card-title>
-                            <nuxt-link
-                              class="gama-text-caption"
-                              :to="`/qa/${item.id}`"
-                            >
-                              <span v-html="item.title"></span>
-                            </nuxt-link>
-                          </v-card-title>
-
-                          <v-card-subtitle>
-                            <v-row>
-                              <v-col
-                                cols="8"
-                                class="owner-container gama-text-overline"
-                              >
-                                By:
-                                {{
-                                  getFullName(item.first_name, item.last_name)
-                                }}
-                              </v-col>
-                              <v-col
-                                cols="4"
-                                class="subdate-container gama-text-overline"
-                              >
-                                <v-icon size="12">mdi-calendar</v-icon>
-                                {{ $dayjs(item.subdate).format("MMM DD") }}
-                              </v-col>
-                            </v-row>
-                          </v-card-subtitle>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                  <v-col cols="6" md="6">
-                    <h4 class="section-title gama-text-h5">
-                      Last Uploaded File
-                    </h4>
-                    <div v-if="paperLoading">
-                      <v-row class="latest-card" v-for="i in 3" :key="i">
-                        <v-col cols="12">
-                          <v-skeleton-loader
-                            type="list-item-avatar"
-                          ></v-skeleton-loader>
-                        </v-col>
-                      </v-row>
+                    <div class="d-flex align-center pl-1">
+                      <span class="ex-category__card--subtitle">
+                        {{ category.title }}
+                      </span>
+                      <span class="pl-1 d-none d-sm-block">
+                        <v-icon size="x-large" color="#D0D5DD"
+                          >mdi-chevron-right</v-icon
+                        >
+                      </span>
                     </div>
-                    <v-card
-                      v-else
-                      class="latest-card"
-                      flat
-                      v-for="item in papers.slice(0, 3)"
-                      :key="item.id"
-                    >
-                      <v-row>
-                        <v-col cols="1">
-                          <v-avatar class="my-3" size="32" rounded="0">
-                            <v-img :src="item.avatar"></v-img>
-                          </v-avatar>
-                        </v-col>
-                        <v-col cols="11">
-                          <v-card-title>
-                            <nuxt-link
-                              class="gama-text-caption"
-                              :to="`paper/${item.id}`"
-                            >
-                              <span v-html="item.title"></span>
-                            </nuxt-link>
-                          </v-card-title>
-
-                          <v-card-subtitle>
-                            <v-row>
-                              <v-col
-                                cols="8"
-                                class="owner-container gama-text-overline"
-                              >
-                                By:
-                                {{
-                                  getFullName(item.first_name, item.last_name)
-                                }}
-                              </v-col>
-                              <v-col
-                                cols="4"
-                                class="subdate-container gama-text-overline"
-                              >
-                                <v-icon size="12">mdi-calendar</v-icon>
-                                {{ $dayjs(item.subdate).format("MMM DD") }}
-                              </v-col>
-                            </v-row>
-                          </v-card-subtitle>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
+                  </div>
+                </div>
+              </nuxt-link>
+            </v-col>
+          </v-row>
+        </div>
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 
-<script>
-export default {
-  name: "grade-explorer-component",
-  props: {
-    stats: {
-      default: [],
-    },
+<script setup>
+import cieIcon from "~/assets/images/boards/CIE.svg";
+import edexcelIcon from "~/assets/images/boards/Edexcel.svg";
+import AQAIcon from "~/assets/images/boards/AQA.svg";
+import OCRIcon from "~/assets/images/boards/OCR.svg";
+import GamaIcon from "~/assets/images/boards/Gama.svg";
+import ScientificIcon from "~/assets/images/boards/Scientific Competition.svg";
+
+const props = defineProps({
+  stats: {},
+});
+
+const categories = ref([
+  {
+    key: "files",
+    stat: "220",
+    title: "Multimedia",
+    icon: "icon-multimedia",
   },
-  data() {
-    return {
-      statsSlideVal: 6,
-      gradeColors: [
-        "#FF6498",
-        "#FD7DD2",
-        "#FF4DFF",
-        "#C24DFF",
-        "#8649FF",
-        "#4C4AFF",
-        "#4A87FF",
-        "#4AC2FF",
-        "#42EDEE",
-        "#49F182",
-        "#43E343",
-        "#76E43D",
-        "#E9E90A",
-        "#EEB23A",
-        "#F8864B",
-        "#FC4F4E",
-      ],
-      gradeSizesArr: {
-        xs: [
-          {
-            width: 32,
-            height: 32,
-            fontSize: 10,
-          },
-          {
-            width: 32,
-            height: 32,
-            fontSize: 10,
-          },
-          {
-            width: 41,
-            height: 20,
-            fontSize: 10,
-          },
-          {
-            width: 46,
-            height: 23,
-            fontSize: 12,
-          },
-
-          {
-            width: 50,
-            height: 25,
-            fontSize: 14,
-          },
-          {
-            width: 55,
-            height: 31,
-            fontSize: 16,
-          },
-          {
-            width: 60,
-            height: 34,
-            fontSize: 22,
-          },
-          {
-            width: 101,
-            height: 46,
-            fontSize: 22,
-          },
-          {
-            width: 64,
-            height: 38,
-            fontSize: 20,
-          },
-          {
-            width: 60,
-            height: 34,
-            fontSize: 18,
-          },
-          {
-            width: 55,
-            height: 32,
-            fontSize: 16,
-          },
-          {
-            width: 50,
-            height: 25,
-            fontSize: 14,
-          },
-          {
-            width: 46,
-            height: 23,
-            fontSize: 12,
-          },
-          {
-            width: 41,
-            height: 19,
-            fontSize: 10,
-          },
-          {
-            width: 52,
-            height: 18,
-            fontSize: 8,
-          },
-          {
-            width: 52,
-            height: 18,
-            fontSize: 8,
-          },
-        ],
-        sm: [
-          {
-            width: 35,
-            height: 17,
-            fontSize: 8,
-          },
-          {
-            width: 35,
-            height: 17,
-            fontSize: 8,
-          },
-          {
-            width: 40,
-            height: 19,
-            fontSize: 10,
-          },
-          {
-            width: 44,
-            height: 22,
-            fontSize: 12,
-          },
-          {
-            width: 49,
-            height: 26,
-            fontSize: 14,
-          },
-          {
-            width: 54,
-            height: 30,
-            fontSize: 16,
-          },
-          {
-            width: 59,
-            height: 33,
-            fontSize: 18,
-          },
-          {
-            width: 107,
-            height: 46,
-            fontSize: 22,
-          },
-          {
-            width: 62,
-            height: 37,
-            fontSize: 20,
-          },
-          {
-            width: 59,
-            height: 33,
-            fontSize: 18,
-          },
-          {
-            width: 54,
-            height: 31,
-            fontSize: 16,
-          },
-          {
-            width: 49,
-            height: 26,
-            fontSize: 14,
-          },
-          {
-            width: 44,
-            height: 22,
-            fontSize: 12,
-          },
-          {
-            width: 40,
-            height: 18,
-            fontSize: 10,
-          },
-          {
-            width: 35,
-            height: 17,
-            fontSize: 8,
-          },
-          {
-            width: 52,
-            height: 18,
-            fontSize: 8,
-          },
-        ],
-        md: [
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 14,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 180,
-            height: 64,
-            fontSize: 24,
-          },
-          {
-            width: 140,
-            height: 51.865,
-            fontSize: 22,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 16,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-        ],
-        lg: [
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 14,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 180,
-            height: 64,
-            fontSize: 24,
-          },
-          {
-            width: 140,
-            height: 51.865,
-            fontSize: 22,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 16,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-        ],
-        xl: [
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 14,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 180,
-            height: 64,
-            fontSize: 24,
-          },
-          {
-            width: 140,
-            height: 51.865,
-            fontSize: 22,
-          },
-          {
-            width: 130,
-            height: 47.355,
-            fontSize: 20,
-          },
-          {
-            width: 120,
-            height: 42.845,
-            fontSize: 18,
-          },
-          {
-            width: 110,
-            height: 36.08,
-            fontSize: 16,
-          },
-          {
-            width: 100,
-            height: 31.57,
-            fontSize: 16,
-          },
-          {
-            width: 90,
-            height: 27.06,
-            fontSize: 12,
-          },
-          {
-            width: 80,
-            height: 22.55,
-            fontSize: 10,
-          },
-          {
-            width: 70,
-            height: 18.04,
-            fontSize: 8,
-          },
-        ],
-      },
-
-      questions: [],
-      questionLoading: true,
-      papers: [],
-      paperLoading: true,
-      intervalId: null,
-
-      startIndex: -1,
-      currentIndex: -1,
-      isMouseDown: false,
-      easeSlide: "",
-    };
+  {
+    key: "exams",
+    stat: "410",
+    title: "QuizHub",
+    icon: "icon-exam",
   },
-  methods: {
-    showDate() {
-      if (
-        this.$dayjs(this.stats[7].last_update).format("MMM,DD YYYY") !==
-        "Invalid date"
-      )
-        return this.$dayjs(this.stats[7].last_update).format("MMM,DD YYYY");
-    },
-    shouldDisplayButton(index) {
-      // Determine whether to display the button based on screen size and specific indexes
-      if (this.display.xs) return ![0, 1, 14, 15].includes(index);
-      else if (this.display.sm) return ![0, 15].includes(index);
-      else return true;
-    },
-    handleBtnClick(index) {
-      this.stopInterval(); // Clear the interval using the interval ID
-
-      const deltaIndex = 7 - index;
-      if (deltaIndex > 0) {
-        for (let i = 0; i < deltaIndex; i++) {
-          setTimeout(() => {
-            this.currentIndex = index + i + 1;
-            var pop_color = this.gradeColors.pop();
-            var pop_data = this.stats.pop();
-            this.gradeColors.unshift(pop_color);
-            this.stats.unshift(pop_data);
-          }, 200 * i + 1);
-        }
-      } else if (deltaIndex < 0) {
-        for (let i = 0; i > deltaIndex; i--) {
-          setTimeout(() => {
-            this.currentIndex = index + i - 1;
-            var splice_color = this.gradeColors.splice(0, 1);
-
-            var splice_data = this.stats.splice(0, 1);
-
-            this.gradeColors.push(...splice_color);
-            this.stats.push(...splice_data);
-          }, 200 * Math.abs(i) + 1);
-        }
-      }
-    },
-
-    handleMouseDown(index) {
-      this.isMouseDown = true;
-      this.startIndex = index;
-      // event.preventDefault();
-      // this.stopInterval(); // Clear the interval using the interval ID
-    },
-    handleMouseUp(event) {
-      this.isMouseDown = false;
-      this.startIndex = -1;
-      this.currentIndex = -1;
-    },
-    handleMouseMove(event) {
-      if (this.isMouseDown) {
-        this.stopInterval();
-        event.preventDefault();
-
-        // Get the touch coordinates
-        const touchX = event.clientX;
-        const touchY = event.clientY;
-
-        // Loop through the buttons and check if the touch is over a button
-        for (let index = 0; index < this.stats.length; index++) {
-          const buttonRef = this.$refs[`handler${index}`][0];
-          const rect = buttonRef.getBoundingClientRect();
-
-          if (
-            touchX >= rect.left &&
-            touchX <= rect.right &&
-            touchY >= rect.top &&
-            touchY <= rect.bottom
-          ) {
-            this.currentIndex = index;
-
-            // Set the index of the touched button
-            if (index > this.startIndex) {
-              var pop_color = this.gradeColors.pop();
-              var pop_data = this.stats.pop();
-              this.gradeColors.unshift(pop_color);
-              this.stats.unshift(pop_data);
-            } else if (index < this.startIndex) {
-              var splice_color = this.gradeColors.splice(0, 1);
-
-              var splice_data = this.stats.splice(0, 1);
-
-              this.gradeColors.push(...splice_color);
-              this.stats.push(...splice_data);
-            }
-
-            this.startIndex = index;
-            return; // Stop checking once a button is found
-          }
-        }
-
-        // Reset the touchIndex if the touch is not over any button
-        this.startIndex = -1;
-      }
-    },
-
-    handleTouchStart(index) {
-      this.startIndex = index;
-      // this.stopInterval(); // Clear the interval using the interval ID
-      // this.touchStartY = event.touches[0].clientY;
-    },
-
-    handleTouchEnd(event) {
-      this.startIndex = -1;
-      this.currentIndex = -1;
-      // this.touchStartY = 0;
-    },
-
-    handleTouchMove(event) {
-      this.stopInterval();
-      event.preventDefault();
-
-      // Get the touch coordinates
-      const touchX = event.touches[0].clientX;
-      const touchY = event.touches[0].clientY;
-
-      // Loop through the buttons and check if the touch is over a button
-      for (let index = 0; index < this.stats.length; index++) {
-        const buttonRef = this.$refs[`handler${index}`][0];
-        const rect = buttonRef.getBoundingClientRect();
-
-        if (
-          touchX >= rect.left &&
-          touchX <= rect.right &&
-          touchY >= rect.top &&
-          touchY <= rect.bottom
-        ) {
-          this.currentIndex = index;
-
-          // Set the index of the touched button
-          if (index > this.startIndex) {
-            var pop_color = this.gradeColors.pop();
-            var pop_data = this.stats.pop();
-            this.gradeColors.unshift(pop_color);
-            this.stats.unshift(pop_data);
-          } else if (index < this.startIndex) {
-            console.log(index);
-            var splice_color = this.gradeColors.splice(0, 1);
-
-            var splice_data = this.stats.splice(0, 1);
-
-            this.gradeColors.push(...splice_color);
-            this.stats.push(...splice_data);
-          }
-
-          this.startIndex = index;
-          return; // Stop checking once a button is found
-        }
-      }
-
-      // Reset the touchIndex if the touch is not over any button
-      this.startIndex = -1;
-    },
-
-    handleAutoCycle() {
-      this.intervalId = setInterval(() => {
-        var splice_color = this.gradeColors.splice(0, 1);
-
-        var splice_data = this.stats.splice(0, 1);
-
-        this.gradeColors.push(...splice_color);
-        this.stats.push(...splice_data);
-      }, 6000);
-    },
-
-    stopInterval() {
-      clearInterval(this.intervalId); // Clear the interval using the interval ID
-    },
-
-    async getQuestions() {
-      try {
-        const res = await useApiService.get("/api/v1/home/questions");
-        this.questions = res.data;
-      } catch (err) {
-        console.error(err);
-      } finally {
-        this.questionLoading = false;
-      }
-    },
-
-    async getPapers() {
-      try {
-        const res = await useApiService.get("/api/v1/home/tests");
-        this.papers = res.data;
-      } catch (err) {
-        console.error(err);
-      } finally {
-        this.paperLoading = false;
-      }
-    },
-
-    truncateGradeTitle(title, index) {
-      var cutLength = 3;
-      if (this.display.xs) cutLength = 3;
-      else if (this.display.sm) cutLength = 3;
-      else if (this.display.md) cutLength = 3;
-      else cutLength = 9;
-      if (index == 7) cutLength = cutLength + 2;
-      return title.length > cutLength
-        ? title.slice(0, cutLength) + "..."
-        : title;
-    },
-    getFullName(firstName, lastName) {
-      return `${firstName} ${lastName}`;
-    },
-    gradeHandlerTitle(title) {
-      if (this.display.xs || this.display.sm || this.display.md)
-        return title.replace(" Grade", "");
-      else return title;
-    },
+  {
+    key: "tests",
+    stat: "34,519",
+    title: "Past Paper",
+    icon: "icon-paper",
   },
-  computed: {
-    display() {
-      return useGlobalDisplay(); // Call the composable
-    },
-    gradeSizes() {
-      return this.gradeSizesArr[this.display.name.value];
-    },
+  {
+    key: "questions",
+    stat: "+1,000",
+    title: "Forum",
+    icon: "icon-q-a",
   },
-
-  mounted() {
-    //this.handleAutoCycle();
-
-    //tmp to shift until any group have content
-    var splice_data = this.stats.splice(0, 5);
-    this.stats.push(...splice_data);
-    //end tmp
-
-    this.getQuestions();
-    this.getPapers();
+  {
+    key: "tutorial",
+    stat: "50",
+    title: "Tutorial",
+    icon: "icon-tutorial",
   },
-  beforeDestroy() {
-    this.stopInterval(); // Stop the interval when the component is about to be unmounted
-  },
+]);
+const selectLoader = ref(true);
+const boardList = ref([]);
+const gradeList = ref([]);
+const gradeLoader = ref(false);
+const selectedBoard = ref(null);
+const selectedGrade = ref(null);
+const boardImgs = ref([
+  cieIcon,
+  edexcelIcon,
+  AQAIcon,
+  OCRIcon,
+  GamaIcon,
+  ScientificIcon,
+]);
+
+const fetchInitialData = async () => {
+  let params = { type: "section" };
+  const response = await $fetch(`/api/v1/types/list`, { params });
+  boardList.value = response.data.map((item, index) => ({
+    ...item,
+    img: boardImgs.value[index % boardImgs.value.length],
+  }));
+  selectedBoard.value = boardList.value[0];
+  fetchGradeList();
 };
+const fetchGradeList = async () => {
+  try {
+    gradeLoader.value = true;
+    let params = { type: "base" };
+    params.section_id = selectedBoard.value.id;
+    const response = await $fetch(`/api/v1/types/list`, { params });
+    gradeList.value = response.data;
+    selectedGrade.value = response.data[0].id;
+  } catch (error) {
+  } finally {
+    gradeLoader.value = false;
+  }
+};
+const fetchCategoryCounts = async () => {
+  try {
+    const params = new URLSearchParams();
+    params.append("type", "test");
+    params.append("page", "1");
+    params.append("section", selectedBoard.value.id);
+    params.append("base", selectedGrade.value.id);
+    const requestUrl = `/api/v1/search?${params.toString()}`;
+    const response = await $fetch(requestUrl);
+    console.log("response.data.types_stats", response.data.types_stats);
+    if (
+      response &&
+      response.status === 1 &&
+      response.data &&
+      response.data.types_stats
+    ) {
+      categories.value.find((cat, i) => cat.key == "tests").stat =
+        parseInt(response.data.types_stats.test) || 0;
+
+      categories.value.find((cat, i) => cat.key == "files").stat =
+        parseInt(response.data.types_stats.learnfiles) || 0;
+
+      categories.value.find((cat, i) => cat.key == "exams").stat =
+        parseInt(response.data.types_stats.azmoon) || 0;
+
+      categories.value.find((cat, i) => cat.key == "questions").stat =
+        parseInt(response.data.types_stats.question) || 0;
+
+      categories.value.find((cat, i) => cat.key == "tutorial").stat =
+        parseInt(response.data.types_stats.tutorial) || 0;
+    }
+  } catch (error) {}
+};
+
+watch(
+  () => selectedGrade.value,
+  (val) => {
+    console.log("val", val);
+    fetchCategoryCounts();
+  },
+  {
+    immediate: true,
+  }
+);
+
+onMounted(() => {
+  fetchInitialData();
+  console.log("stats", props.stats);
+});
 </script>
 
-<style>
-#content-stats-container .v-btn {
-  text-transform: unset !important;
-
-  .v-btn__content {
-    font-family: Inter !important;
-    font-weight: 500 !important;
-  }
+<style scoped>
+.stat-icon {
+  font-size: 2.3rem;
 }
-
-#content-stats-container #stats-handler {
-  position: relative;
+.icon-multimedia {
+  color: #02b719;
 }
-
-#content-stats-container #stats-handler .active {
-  position: absolute;
-  right: -1.6rem;
-  font-weight: 750;
-  z-index: 2;
+.icon-paper {
+  color: #2e90fa;
 }
-
-#content-stats-container #stats-handler .rounded-pill {
-  border-radius: 10rem;
+.icon-exam {
+  color: #7c4dff;
 }
-
-#content-stats-container #stats-handler .rounded-s-xl {
-  border-radius: 10rem 0 0rem 10rem;
+.icon-q-a {
+  color: #fdb022;
 }
-
-#content-stats-container #grade-details-card {
-  height: 35rem;
-  padding: 1.6rem;
-  border-radius: 0rem 2rem 2rem 0rem;
+.icon-tutorial {
+  color: #2e90fa;
 }
-
-#content-stats-container #grade-details-card .v-card__text {
-  padding: 3rem !important;
-}
-
-#content-stats-container #grade-details-card .stats-details {
-  height: 28.4rem;
-
-  .row {
-    height: 7.6rem;
-  }
-}
-
-#content-stats-container #grade-details-card .label {
-  text-decoration: none;
-  color: #424a53;
-  text-align: center;
-  font-family: Inter;
-  font-size: 1.4rem;
-  font-style: normal;
+.ex-category__card--title {
+  color: #344054;
+  font-size: 20px;
   font-weight: 700;
-  line-height: normal;
-  position: relative;
-  margin-left: 3.2rem;
 }
-
-#content-stats-container #grade-details-card .date-holder {
-  margin-left: 2.4rem;
-  color: #6e7781;
-  font-size: 1.2rem;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 3.8rem;
+.ex-category__card--subtitle {
+  color: #667085;
+  font-size: 16px;
+  font-weight: 500;
 }
-
-#content-stats-container #grade-details-card .stat {
-  color: #6e7781;
-  font-size: 1.2rem;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 4.4rem;
+.ex-category__card {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1),
+    rgba(249, 250, 251, 1)
+  );
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(242, 244, 247, 1);
+  padding: 2rem 1.5rem;
+  border-radius: 24px;
 }
-
-#content-stats-container #grade-details-card .label .stat-icon {
-  position: absolute;
-  color: #ffb300 !important;
-  left: -2.5rem;
-  top: -0.2rem;
-  font-size: 2rem;
+.ex-select-board-label {
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: inherit;
+  line-height: inherit;
+  max-width: 100%;
 }
-
-#content-stats-container #grade-details-card .section-title {
-  color: #6e7781;
-  margin-bottom: 0.5rem;
-  opacity: 0.5;
-}
-
-#content-stats-container #grade-details-card .latest-card .col {
-  padding-top: 0.3rem;
-}
-
-#content-stats-container #grade-details-card .latest-card .gama-text-caption {
-  color: #6e7781;
-  text-decoration: none;
+.ex-select-board-title {
   overflow: hidden;
-  white-space: nowrap;
-  width: inherit;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-#content-stats-container #grade-details-card .latest-card .v-img__img {
-  border-radius: 10rem;
+.ex-selector {
+  display: flex;
+  align-items: center;
+  background: #4c4aff;
+  max-width: 556px;
+  justify-content: flex-start;
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
+  border-radius: 16px;
 }
-
-#content-stats-container {
-  #grade-details-card {
-    .latest-card {
-      .v-card__subtitle {
-        .owner-container {
-          text-align: left;
-          color: #afb8c1;
-          padding-bottom: 0rem;
-          padding-top: 0.8rem;
-          width: inherit;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-
-        .subdate-container {
-          text-align: right !important;
-          color: #6e7781;
-          margin-bottom: 0;
-          padding-bottom: 0;
-          padding-top: 0.8rem;
-        }
-      }
-
-      .v-skeleton-loader__list-item-avatar {
-        padding-left: 0;
-        padding-right: 0;
-
-        .v-skeleton-loader__avatar {
-          width: 3.2rem;
-          height: 3.2rem;
-        }
-      }
-    }
-  }
+.ex-board-select {
+  width: 120px;
+  min-width: 130px;
+  position: relative;
 }
-
-#content-stats-container .handlerShadow {
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
-    rgba(0, 0, 0, 0.15) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px;
+.ex-board-select::after {
+  content: "";
+  width: 1px;
+  height: 32px;
+  background-color: #9ea5d1;
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.ex-grade-select {
+  padding-left: 10px;
+  max-width: 450px;
+  flex-grow: 1;
 }
 
 @media (min-width: 600px) {
-  #content-stats-container {
-    max-width: 90%;
+  .ex-category__card {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 1),
+      rgba(249, 250, 251, 1)
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(242, 244, 247, 1);
+    padding: 3rem 1rem;
+    border-radius: 24px;
   }
-
-  #content-stats-container .v-btn {
-    color: #fff;
-    font-family: "Inter";
-    font-size: 1.6rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 4.4rem;
+  .ex-board-select {
+    width: 200px;
+    position: relative;
   }
-
-  #content-stats-container #stats-handler {
-    top: 0;
+  .ex-board-select::after {
+    content: "";
+    width: 1px;
+    height: 32px;
+    background-color: #9ea5d1;
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
-
-  #content-stats-container #stats-handler .active {
-    right: -2rem;
-  }
-
-  #content-stats-container #grade-details-card {
-    height: 37.6rem;
-    width: 88.8%;
-    padding: 2.5rem 3rem 3rem 3rem;
-    border-radius: 0rem 2rem 2rem 0rem;
-  }
-
-  #content-stats-container #grade-details-card .stats-details {
-    height: 28.4rem;
-
-    .row {
-      height: 7.6rem;
-
-      .v-icon.primary--text {
-        font-size: 2rem !important;
-      }
-
-      .label {
-        color: #424a53;
-        font-family: Inter;
-        font-size: 1.4rem;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-      }
-
-      .stat {
-        color: #6e7781;
-        font-size: 1.4rem;
-        font-style: normal;
-        font-weight: 300;
-        line-height: 4.4rem;
-      }
-
-      .date-holder {
-        margin-left: 3rem;
-        color: #6e7781;
-        font-size: 1.4rem;
-        font-style: normal;
-        font-weight: 300;
-        line-height: 3.8rem;
-      }
-
-      .stat-icon {
-        font-size: 2.4rem;
-        left: -3rem;
-      }
-    }
-  }
-
-  #content-stats-container #grade-details-card .section-title {
-    color: #6e7781;
-
-    line-height: 4.4rem;
-  }
-
-  #content-stats-container #grade-details-card .latest-card {
-    .v-card-title {
-      .title {
-        color: #6e7781;
-        text-decoration: none;
-        font-size: 1.2rem;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 2rem;
-      }
-    }
-
-    .v-img__img {
-      border-radius: 10rem;
-    }
-
-    .v-card-subtitle {
-      .owner-container {
-        text-align: left;
-        color: #afb8c1;
-      }
-
-      .subdate-container {
-        text-align: right !important;
-        color: #6e7781;
-      }
-    }
+  .ex-grade-select {
+    padding-left: 30px;
+    width: 450px;
   }
 }
-
 @media (min-width: 960px) {
-  #content-stats-container {
-    #stats-handler {
-      top: 0;
-
-      .active {
-        right: -2.6rem;
-      }
-    }
-
-    #grade-details-card {
-      height: 56.6rem;
-      padding: 5rem;
-      border-radius: 0rem 2rem 2rem 0rem;
-
-      .stats-details {
-        height: 16rem;
-
-        .label {
-          color: #424a53;
-          font-family: Inter;
-          font-size: 1.8rem;
-          font-style: normal;
-          font-weight: 600;
-          line-height: normal;
-          position: relative;
-          margin-left: 3.6rem;
-
-          .stat-icon {
-            position: absolute;
-            left: -3.6rem;
-            top: -0.5rem;
-            font-size: 3.2rem;
-          }
-        }
-
-        .date-holder {
-          margin-left: 3rem;
-          color: #6e7781;
-          font-size: 1rem;
-          font-style: normal;
-          font-weight: 300;
-          line-height: 4.4rem;
-        }
-
-        .stat {
-          color: #6e7781;
-          font-size: 1.4rem;
-          font-style: normal;
-          font-weight: 300;
-          line-height: 4.4rem;
-          margin-left: 3rem;
-        }
-      }
-    }
+  .ex-category__card--title {
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .ex-category__card--subtitle {
+    font-size: 14px;
+    font-weight: 500;
   }
 }
 </style>
