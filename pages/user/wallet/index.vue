@@ -42,6 +42,11 @@ import TransactionChart from '~/components/user/wallet/TransactionChart.vue';
 import BalanceCard from '~/components/user/wallet/BalanceCard.vue';
 import TransactionHistory from '~/components/user/wallet/TransactionHistory.vue';
 
+// Page metadata
+definePageMeta({
+  layout: 'dashboard-layout'
+});
+
 // Define reactive state
 const showMobileChart = ref(false);
 
@@ -50,10 +55,6 @@ const toggleMobileChart = () => {
   showMobileChart.value = !showMobileChart.value;
 };
 
-// Page metadata
-definePageMeta({
-  layout: 'dashboardLayout',
-});
 </script>
 
 <style scoped>
