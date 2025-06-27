@@ -4,9 +4,16 @@
       class="container-button-load-previous-data"
       v-if="pageNumberForLoadPreviousData != 1 && !isInitialLoading"
     >
-      <button @click="loadPreviousPage" class="load-previous-button">
+      <v-btn
+        @click="loadPreviousPage"
+        class="text-h5 text-md-h4"
+        height="50"
+        variant="outlined"
+        color="#ffb300"
+        rounded="xl"
+      >
         Load Previous Data
-      </button>
+      </v-btn>
     </div>
     <div
       :class="`container-list-div ${
@@ -104,27 +111,31 @@
             </div>
           </div>
           <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <button class="button-link" :disabled="!school.hasLocation">
+          <div
+            class="w-100 d-flex align-center justify-space-between mt-3 flex-wrap ga-5"
+          >
+            <div class="d-flex align-center">
+              <v-btn variant="text" icon :disabled="!school.hasLocation">
                 <v-icon size="x-large"> mdi-map-marker </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasPhon">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasPhon">
                 <v-icon size="x-large"> mdi-phone </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasEmail">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasEmail">
                 <v-icon size="x-large"> mdi-email </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasWebsite">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasWebsite">
                 <v-icon size="x-large"> mdi-web </v-icon>
-              </button>
+              </v-btn>
             </div>
-            <div class="rate-update">
-              <div class="rate-section gtext-t6 font-weight-semibold">
+            <div class="d-flex align-center ga-2">
+              <div
+                class="d-flex align-center ga-2 gtext-t6 font-weight-semibold"
+              >
                 <v-icon size="x-large" color="primary"> mdi-star </v-icon>
                 {{ school.score ? school.score.toFixed(1) : "New" }}
               </div>
-              <div class="rate-section gtext-t6 primary-gray-300">
+              <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
                 <v-icon size="x-large">mdi-update</v-icon>
                 <span class="primary-gray-600">
                   {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}

@@ -97,33 +97,6 @@
                     background-color: #e4e6e9;
                     margin-top: 10px;
                 }
-                .links-rate {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-top: 10px;
-                    flex-wrap: wrap;
-                    row-gap: 20px;
-                    .link-icons {
-                        display: flex;
-                        align-items: center;
-                        column-gap: 16px;
-                        .button-link:disabled {
-                            opacity: 0.5;
-                        }
-                    }
-                    .rate-update {
-                        display: flex;
-                        align-items: center;
-                        column-gap: 6px;
-                        .rate-section {
-                            display: flex;
-                            align-items: center;
-                            column-gap: 6px;
-                        }
-                    }
-                }
             }
             .skeleton-loader {
                 position: relative;
@@ -255,21 +228,6 @@
         margin-bottom: 10px;
         z-index: 3;
         @include style.responsive-size(background-color, #f2f4f7, white, white, white);
-        .load-previous-button {
-            border-radius: 28px;
-            background-color: transparent;
-            border: 2px solid #ffb300;
-            outline: none;
-            font-weight: 600;
-            color: #ffb300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            column-gap: 10px;
-            @include style.responsive-size(width, 260px, 260px, 180px, 180px);
-            @include style.responsive-size(height, 60px, 60px, 40px, 40px);
-            @include style.responsive-size(font-size, 20px, 20px, 16px, 16px);
-        }
     }
 }
 .closed-list {

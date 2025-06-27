@@ -12,14 +12,20 @@
             :disable="isExpandMap"
           />
         </div>
-        <div class="button-sort-filter-mobile">
-          <button class="btn-filter" @click="openFilterMobile">
-            <v-icon x-large color="#000000">mdi-filter</v-icon>
-          </button>
-
-          <button disabled class="btn-filter" @click="openSortNav($event)">
-            <v-icon x-large color="#000000">mdi-filter-variant</v-icon>
-          </button>
+        <div class="d-flex d-lg-none justify-end w-33">
+          <v-btn size="small" icon @click="openFilterMobile" color="#f2f4f7">
+            <v-icon size="x-large" color="#000000">mdi-filter</v-icon>
+          </v-btn>
+          <v-btn
+            size="small"
+            variant="text"
+            disabled
+            icon
+            @click="openSortNav($event)"
+            color="#f2f4f7"
+          >
+            <v-icon size="x-large" color="#000000">mdi-filter-variant</v-icon>
+          </v-btn>
         </div>
         <div class="filter-options-div">
           <div
@@ -335,11 +341,20 @@
             />
           </div>
         </div>
-        <div class="button-apply-cancel">
-          <button class="btn-cancel" @click="closeFilterMobile">Cancel</button>
-          <button class="btn-apply" @click="applyFilterMobie">
+        <div class="w-100 mt-8 d-flex align-center justify-center ga-3">
+          <v-btn @click="closeFilterMobile" variant="text" class="text-h4">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="#ffb600"
+            rounded="xl"
+            height="50"
+            width="160"
+            @click="applyFilterMobie"
+            class="text-h4"
+          >
             Apply filter
-          </button>
+          </v-btn>
         </div>
       </div>
     </div>

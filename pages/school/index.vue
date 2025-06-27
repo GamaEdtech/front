@@ -1,10 +1,17 @@
 <template>
   <div class="main-school-list-div">
     <div class="map-div">
-      <button @click="changeStatusExpandMap" class="list-view-button">
-        <v-icon color="#000000" size="16">mdi-menu</v-icon>
+      <v-btn
+        @click="changeStatusExpandMap"
+        class="list-view-button mt-16 ml-12 position-absolute d-none d-lg-flex pa-6 text-h4"
+        height="50"
+        elevation="4"
+        prepend-icon="mdi-menu"
+        color="#ffffff"
+        rounded="xl"
+      >
         List view
-      </button>
+      </v-btn>
 
       <Map
         :items="newSchoolForMarkersOnMap"
@@ -33,10 +40,17 @@
         :is-expand-map="isExpandMapInDesktop"
       />
       <div class="container-div-button" v-if="!isExpandMapInDesktop">
-        <button @click="changeStatusExpandMap" class="map-view-button">
-          <v-icon size="16">mdi-map-marker</v-icon>
+        <v-btn
+          @click="changeStatusExpandMap"
+          class="text-h4"
+          elevation="4"
+          prepend-icon="mdi-map-marker"
+          color="rgb(18, 183, 106)"
+          rounded="xl"
+          height="50"
+        >
           Map view
-        </button>
+        </v-btn>
       </div>
       <schoolList
         :school-list="schools"
