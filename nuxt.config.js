@@ -1,6 +1,6 @@
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
-import glsl from 'vite-plugin-glsl';
+import glsl from "vite-plugin-glsl";
 
 export default defineNuxtConfig({
   // Add compatibility date to fix the warning
@@ -149,9 +149,7 @@ export default defineNuxtConfig({
 
   // Vite configuration
   vite: {
-    plugins: [
-      glsl()
-    ],
+    plugins: [glsl()],
     vue: {
       template: {
         transformAssetUrls,
@@ -193,7 +191,7 @@ export default defineNuxtConfig({
 
   // Development server configuration
   devServer: {
-    port: 3000,
+    port: 3002,
   },
 
   // SSR configuration
