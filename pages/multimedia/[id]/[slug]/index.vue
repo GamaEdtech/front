@@ -208,6 +208,12 @@
         <v-col cols="12" md="6"> </v-col>
         <v-col cols="12" md="6"> </v-col>
       </v-row>
+      <common-related-portrait-content
+        pageType="multimedia"
+        pageName="Multimedia"
+        source="file"
+        request="file"
+      />
     </v-container>
     <section class="feed"></section>
   </div>
