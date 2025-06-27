@@ -117,10 +117,15 @@
     </v-container>
     <!--End school service banner-->
 
+    
+    <!-- Car Race container -->
+    <home-car-race-banner />
+    <!-- End Car Race container -->
+    
     <!-- Stats container -->
     <home-stats-banner />
     <!-- End stats container -->
-
+    
     <!-- Blog container -->
     <home-blog-container />
     <!-- End blog container -->
