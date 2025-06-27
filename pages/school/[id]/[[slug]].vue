@@ -252,16 +252,16 @@ watch(
   { immediate: true }
 );
 
-useHead(() => ({
-  link: [
-    {
-      rel: "canonical",
-      href: `${requestURL.value}/school/${
-        contentData.value?.id
-      }/${$slugGenerator(contentData.value?.name)}`,
-    },
-  ],
-}));
+// useHead(() => ({
+//   link: [
+//     {
+//       rel: "canonical",
+//       href: `${requestURL.value}/school/${
+//         contentData.value?.id
+//       }/${$slugGenerator(contentData.value?.name)}`,
+//     },
+//   ],
+// }));
 
 watch(
   () => ratingDataRaw.value,
