@@ -58,13 +58,10 @@ const schoolIcon = ref(null);
 const isMapReady = ref(false);
 const isModuleImport = ref(false);
 
-onMounted(async () => {
+onMounted(() => {
   getUserLocation();
 
-  const leafletModule = await import("leaflet");
-  const L = leafletModule.default || leafletModule;
-  await import("leaflet.markercluster");
-
+  const L = window.L;
   schoolIcon.value = L.icon({
     iconUrl: "/images/school-marker.png",
     iconSize: [40, 40],
