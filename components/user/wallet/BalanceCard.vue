@@ -13,10 +13,11 @@
 
       <div v-if="loading" class="balance-amount d-flex align-center">
         <v-skeleton-loader
-          type="text"
-          width="250"
-          height="60"
-          class="mt-2"
+          type="image"
+          width="100"
+          height="30"
+          class="my-2"
+          color="grey"
         ></v-skeleton-loader>
       </div>
 
