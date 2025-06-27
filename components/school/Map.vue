@@ -58,24 +58,22 @@ const schoolIcon = ref(null);
 const isMapReady = ref(false);
 const isModuleImport = ref(false);
 
-onMounted(async () => {
+onMounted(() => {
   getUserLocation();
 
-  const L = await import("leaflet");
-  await import("leaflet.markercluster");
-
-  isModuleImport.value = true;
-  if (isMapReady.value) {
-    map.value.leafletObject.setView(center.value);
-    setMarkers();
-  }
-
+  const L = window.L;
   schoolIcon.value = L.icon({
     iconUrl: "/images/school-marker.png",
     iconSize: [40, 40],
     iconAnchor: [12, 25],
     popupAnchor: [1, -25],
   });
+
+  isModuleImport.value = true;
+  if (isMapReady.value) {
+    map.value.leafletObject.setView(center.value);
+    setMarkers();
+  }
 });
 
 const onMapReady = () => {
@@ -122,7 +120,7 @@ const setMarkers = async () => {
   markers.forEach((marker) => {
     marker.on("click", (event) => {
       if (event.target.options.alt) {
-        router.push(`/school/${event.target.options.alt}`);
+        window.open(`/school/${event.target.options.alt}`, "_blank");
       }
     });
   });

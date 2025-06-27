@@ -109,14 +109,23 @@
       />
         </v-container>
       </section>
-
       <!--  End: detail  -->
+
+      <!-- Test Section -->
+      <div v-if="randomTestContent">
+        <v-divider class="mt-4 mx-auto" style="width: 80%" />
+        <test-details :content-data="randomTestContent" />
+        <v-divider class="mt-1 mx-auto" style="width: 80%" />
+      </div>
+      <!--  End: Test Section  -->
     </template>
   </div>
 </template>
 <script setup>
 const route = useRoute();
 const router = useRouter();
+const requestURL = ref(useRequestURL().host);
+const randomTestContent = ref(null);
 const paperId = computed(() => {
   if (!route.params.slug || !route.params.slug.length) return null;
   return route.params.slug[0];
@@ -166,6 +175,15 @@ const schemaData = computed(() => ({
   description: contentData.value?.description || "GamaEdtech",
 }));
 
+const previewImages = ref([]);
+const galleryHelpData = ref({
+  state: "",
+  section: "",
+  base: "",
+  course: "",
+  lesson: "",
+});
+
 useHead({
   title: contentData.value?.title,
   script: [
@@ -175,18 +193,15 @@ useHead({
       type: "application/ld+json",
     },
   ],
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+    },
+  ],
   __dangerouslyDisableSanitizersByTagID: {
     "json-ld-schema": ["innerHTML"],
   },
-});
-
-const previewImages = ref([]);
-const galleryHelpData = ref({
-  state: "",
-  section: "",
-  base: "",
-  course: "",
-  lesson: "",
 });
 
 if (contentData.value) {
@@ -245,6 +260,28 @@ const openCrashReportDialog = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
+const grabRandomTestCode = () => {
+  if (contentData.value && contentData.value.lesson) {
+    $fetch(`/api/v1/examTests/random?lesson=${contentData.value.lesson}`)
+      .then((response) => {
+        if (response.data.code) {
+          retriveRandomTest(response.data.code);
+        }
+      })
+      .catch((err) => {});
+  }
+};
+const retriveRandomTest = (code) => {
+  $fetch(`/api/v1/examTests/${code}`)
+    .then((response) => {
+      randomTestContent.value = response.data;
+    })
+    .catch((err) => {});
+};
+
+onMounted(() => {
+  grabRandomTestCode();
+});
 </script>
 
 <style></style>

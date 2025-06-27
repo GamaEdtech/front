@@ -44,6 +44,12 @@ const menuItems = [
     icon: "mdi-information",
     icon_color: "",
   },
+  {
+    title: "$GET Token",
+    link: "/get-token",
+    icon: "mdi-currency-usd",
+    icon_color: "",
+  },
   // {
   //   title: "Offers",
   //   link: "/offers",
@@ -78,6 +84,11 @@ const menuLink = [
   {
     title: "FAQ",
     link: "/faq",
+    icon: "",
+  },
+  {
+    title: "$GET Token",
+    link: "/get-token",
     icon: "",
   },
   // {
@@ -300,12 +311,13 @@ const search = () => {
 
   timer.value = setTimeout(() => {
     if (searchKey.value && allDataLoaded.value == false)
-      useApiService.get("/api/v1/search/text", {
-        params: {
-          query: searchKey.value,
-          page: pageNum.value,
-        },
-      })
+      useApiService
+        .get("/api/v1/search/text", {
+          params: {
+            query: searchKey.value,
+            page: pageNum.value,
+          },
+        })
         .then((response) => {
           searchCount.value = response.data.num;
           searchResults.value.push(...response.data.list);
@@ -553,6 +565,16 @@ watch(
                   </v-list>
                 </v-menu>
 
+                <div class="wallet-div">
+                  <v-btn
+                    to="/user/wallet"
+                    icon
+                    class="wallet-icon"
+                    :color="menuSetting.linkColor"
+                    ><v-icon>mdi-wallet-outline</v-icon></v-btn
+                  >
+                </div>
+
                 <!--Desktop version-->
                 <common-notification-component
                   :menuSetting="menuSetting"
@@ -560,8 +582,10 @@ watch(
                   class="d-none d-lg-block"
                 />
               </div>
-              <div v-else>
+              <div v-else></div>
+              <div>
                 <v-btn
+                  v-if="!auth.isAuthenticated.value"
                   rounded
                   class="primary text-transform-none black--text"
                   large
@@ -965,6 +989,11 @@ watch(
           ref="notificationComponent"
           class="d-block d-lg-none"
         />
+        <div class="wallet-div wallet-mobile">
+          <v-icon class="wallet-icon" :color="menuSetting.linkColor"
+            >mdi-wallet-outline</v-icon
+          >
+        </div>
         <v-menu
           v-if="auth.isAuthenticated.value"
           transition="slide-x-transition"
@@ -1623,6 +1652,13 @@ watch(
     }
   }
 }
+.wallet-div {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 @media (min-width: 1264px) {
   #main-logo {
@@ -1631,6 +1667,9 @@ watch(
     margin-top: 0.6rem;
     margin-right: 6.4rem;
     margin-left: 0 !important;
+  }
+  .wallet-div {
+    margin: 0 0 0 20px;
   }
 }
 </style>

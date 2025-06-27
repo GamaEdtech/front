@@ -8,38 +8,24 @@
           </v-col>
           <v-col cols="6" class="text-right">
             <div class="d-none d-md-inline">
-              <v-btn rounded outlined large to="/blog" class="gama-btn"
-                >Go to blog</v-btn
-              >
+              <v-btn variant="outlined" rounded outlined size="large" to="/blog" class="gama-btn">Go to blog</v-btn>
             </div>
-            <v-btn rounded to="/blog" text class="d-inline d-md-none seeAllBtn">
-              See all
+            <router-link to="/blog" class="d-inline d-md-none seeAllBtn">
+              <span class="content"> See all</span>
               <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
+            </router-link>
           </v-col>
           <v-col cols="12" class="px-md-0">
             <v-slide-group class="slider py-sm-4" :show-arrows="lgAndUp">
               <div class="d-flex" v-if="isLoading">
                 <v-slide-group-item v-for="i in 10" :key="i">
-                  <v-skeleton-loader
-                    class="mx-auto slide-loading"
-                    type="card"
-                  ></v-skeleton-loader>
+                  <v-skeleton-loader class="mx-auto slide-loading" type="card"></v-skeleton-loader>
                 </v-slide-group-item>
               </div>
 
-              <v-slide-group-item
-                v-else
-                v-for="(item, n) in slideItems"
-                :key="n"
-              >
-                <v-card flat :to="`/blog/${item.id}`">
-                  <v-card
-                    flat
-                    @mouseover="toggleHover('enter', n)"
-                    @mouseleave="toggleHover('leave', n)"
-                    class="ma-1"
-                  >
+              <v-slide-group-item v-else v-for="(item, n) in slideItems" :key="n">
+                <v-card flat :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">
+                  <v-card flat>
                     <v-img :src="item.pic" />
                     <v-card-title>
                       <span class="gama-text-button" v-if="!isHovered[n]">
@@ -54,7 +40,7 @@
                   </v-card>
                   <div class="gama-text-subtitle2">
                     <span v-html="truncateBody(item.body)"></span>
-                    <nuxt-link :to="`/blog/${item.id}`">Read more</nuxt-link>
+                    <nuxt-link :to="`/blog/${item.id}/${$slugGenerator(item.title)}`">Read more</nuxt-link>
                   </div>
                 </v-card>
               </v-slide-group-item>
@@ -71,6 +57,7 @@ import { useDisplay } from "vuetify";
 
 // Using Vuetify's breakpoint system
 const { lgAndUp, sm, xs } = useDisplay();
+const { $slugGenerator } = useNuxtApp();
 
 // Reactive properties
 const model = ref(null);
@@ -109,10 +96,42 @@ const truncateBody = (text) => {
 loadBlog();
 </script>
 
-<style>
+<style scoped>
 #blog-list-container {
   margin: 2.4rem auto 2.4rem auto;
   height: 33rem;
+
+  :deep(.v-card-title){
+    -webkit-backdrop-filter: blur(7.5px);
+    backdrop-filter: blur(7.5px);
+    background: rgba(36, 41, 47, .7);
+    border-radius: 0 0 6px 6px;
+    bottom: 0;
+    color: #fff;
+    font-family: "Inter";
+    height: 4.9rem;
+    left: 0;
+    margin: 0 auto;
+    max-height: 4.9rem;
+    padding-bottom: 5rem !important;
+    padding-top: .6rem !important;
+    position: absolute;
+    right: 0;
+  }
+
+  :deep(.gama-text-button){
+    text-wrap: wrap;
+    color: #fff;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  :deep(.v-img__img--contain){
+    object-fit: cover;
+  }
 
   #main-title {
     color: #354053;
@@ -128,9 +147,21 @@ loadBlog();
     padding-right: 0;
     float: right;
 
-    .v-btn__content {
+    :hover{
+      background-color: transparent;
+    }
+
+    :active{
+      background-color: transparent;
+    }
+
+    :focus{
+      background-color: transparent;
+    }
+
+    .content {
       text-transform: none;
-      color: #6e7781;
+      color: #888a8b;
       font-family: Inter;
       font-size: 1.4rem;
       font-style: normal;

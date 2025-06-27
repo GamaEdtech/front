@@ -86,6 +86,15 @@
         >
           {{ contentData.lesson_title }}
         </v-chip>
+        <v-chip
+          :small="display.mdAndDown.value"
+          link
+          v-show="contentData.paperID"
+          :to="`/paper/${contentData.paperID}`"
+          class="ma-1 primary"
+        >
+          Past Paper
+        </v-chip>
       </div>
     </div>
   </div>
@@ -111,7 +120,7 @@
 
 <script setup>
 import { computed } from "vue";
-
+import { useDisplay } from "vuetify";
 const props = defineProps({
   contentData: {
     type: Object,
@@ -129,7 +138,7 @@ const props = defineProps({
 
 // Create a shortcut computed property for better readability
 const contentData = computed(() => props.contentData);
-
+const display = useDisplay();
 const emit = defineEmits(["login", "register"]);
 
 // Computed properties

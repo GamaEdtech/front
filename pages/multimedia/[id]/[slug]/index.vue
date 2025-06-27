@@ -237,7 +237,7 @@ const editMode = reactive({
   title: false,
   title_loading: false,
 });
-
+const requestURL = ref(useRequestURL().host);
 const breads = ref([
   {
     text: "Multimedia",
@@ -268,6 +268,12 @@ const isLoggedIn = computed(() => {
 
 useHead(() => ({
   title: contentData.value?.title || "Multimedia Details",
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/multimedia/${contentData.value.id}/${contentData.value.title_url}`,
+    },
+  ],
 }));
 
 async function fetchContentData() {

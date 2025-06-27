@@ -2486,6 +2486,9 @@ body {
 }
 
 @media only screen and (min-width: 960px) {
+  .font-weight-lg-regular {
+    font-weight: 400 !important;
+  }
   // md size
   .gama-text-h1 {
     color: #354053;
@@ -4560,7 +4563,8 @@ body {
     position: relative;
     font-size: 1.8rem !important;
 
-    span {
+    span,
+    div {
       p {
         display: inline;
         font-size: 1.8rem !important;
@@ -4600,4 +4604,7 @@ body {
 }
 .break-word {
   word-break: break-word;
+}
+.v-skeleton-loader {
+  overflow: hidden;
 }
