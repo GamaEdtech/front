@@ -491,8 +491,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.transaction-history-section {
-}
 
 .transaction-tabs-wrapper {
   border-bottom: 1px solid #f0f0f0;
