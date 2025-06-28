@@ -3,14 +3,21 @@
     <div class="box-filter-option">
       <div class="container-filter">
         <div class="search-input-contaier">
-          <searchInput
+          <v-text-field
+            rounded
+            :variant="textFieldVariant"
+            bg-color="white"
+            prepend-inner-icon="mdi-magnify"
+            hide-details
             v-model="filterForm.keyword"
-            @input="changeSearchValue"
-            placeholder="Search anything..."
-            icon="mdi-magnify"
+            color="#ffb300"
             active-color="#ffb600"
-            :disable="isExpandMap"
-          />
+            label="Search anything..."
+            glow
+            icon-color="#ffb600"
+            :disabled="isExpandMap"
+            @update:modelValue="changeSearchValue"
+          ></v-text-field>
         </div>
         <div class="d-flex d-lg-none justify-end w-33">
           <v-btn size="small" icon @click="openFilterMobile" color="#f2f4f7">
@@ -449,10 +456,10 @@
 
 <script setup>
 import { ref } from "vue";
+import { useDisplay } from "vuetify";
 import { useRouter, useRoute } from "vue-router";
 import { useClickOutside } from "~/composables/useClickOutside";
 
-import searchInput from "~/components/common/search-input.vue";
 import checkboxInput from "~/components/common/checkbox-input.vue";
 import gomboBox from "~/components/common/gombo-box.vue";
 
@@ -701,6 +708,12 @@ const cityChange = () => {
 // End Section Filter Location
 
 // Start Section Filter Search
+const { width } = useDisplay();
+
+const textFieldVariant = computed(() => {
+  return width.value > 1280 ? "solo" : "outlined";
+});
+
 const changeSearchValue = () => {
   updateQueryParams();
 };

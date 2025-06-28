@@ -26,6 +26,9 @@
             @include style.responsive-size(flex-wrap, unset, wrap, wrap, wrap);
 
             .search-input-contaier {
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 height: 100%;
                 @include style.responsive-size(width, 300px, 67%, 67%, 67%);
             }
