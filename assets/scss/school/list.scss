@@ -66,25 +66,6 @@
                         align-items: flex-start;
                         justify-content: flex-start;
                         row-gap: 20px;
-
-                        .chips-address {
-                            display: flex;
-                            align-items: center;
-                            justify-content: flex-start;
-                            flex-wrap: wrap;
-                            column-gap: 6px;
-                            row-gap: 10px;
-
-                            .chip-address {
-                                font-size: 12px;
-                                font-weight: 400;
-                                color: white;
-                                background-color: #546e7a;
-                                padding: 6px 20px;
-                                border-radius: 20px;
-                                white-space: nowrap;
-                            }
-                        }
                     }
                     .img-div {
                         min-width: 180px;
@@ -96,113 +77,6 @@
                     height: 2px;
                     background-color: #e4e6e9;
                     margin-top: 10px;
-                }
-            }
-            .skeleton-loader {
-                position: relative;
-                overflow: hidden;
-                background-color: #d1d1d1;
-
-                &::after {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-                    animation: shimmer 1.5s infinite;
-                }
-
-                @keyframes shimmer {
-                    0% {
-                        transform: translateX(-100%);
-                    }
-                    100% {
-                        transform: translateX(100%);
-                    }
-                }
-            }
-
-            .skeleton-card-school {
-                width: 100%;
-                min-height: 232px;
-                background-color: white;
-                border-radius: 4px;
-                box-shadow:
-                    0 3px 1px -2px rgba(0, 0, 0, 0.2),
-                    0 2px 2px 0 rgba(0, 0, 0, 0.14),
-                    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: space-between;
-                padding: 16px;
-                .name-address-image {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    .name-div {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-start;
-                        justify-content: flex-start;
-                        row-gap: 20px;
-                        .name {
-                            border-radius: 20px;
-                            @include style.responsive-size(width, 300px, 300px, 300px, 120px);
-                            @include style.responsive-size(height, 30px, 30px, 30px, 20px);
-                        }
-                        .chips-address {
-                            display: flex;
-                            align-items: center;
-                            justify-content: flex-start;
-                            flex-wrap: wrap;
-                            column-gap: 6px;
-                            row-gap: 10px;
-
-                            .chip-address {
-                                border-radius: 30px;
-                                @include style.responsive-size(width, 80px, 80px, 80px, 40px);
-                                @include style.responsive-size(height, 30px, 30px, 30px, 10px);
-                            }
-                        }
-                    }
-                    .img-div {
-                        border-radius: 6px;
-                        @include style.responsive-size(min-width, 180px, 180px, 180px, 100px);
-                        @include style.responsive-size(height, 130px, 130px, 130px, 80px);
-                    }
-                }
-                .line-seperator {
-                    width: 100%;
-                    height: 2px;
-                    background-color: #e4e6e9;
-                    margin-top: 10px;
-                }
-                .links-rate {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    row-gap: 10px;
-                    .link-icons {
-                        display: flex;
-                        align-items: center;
-                        column-gap: 16px;
-                        .link {
-                            border-radius: 50%;
-                            @include style.responsive-size(width, 40px, 40px, 40px, 20px);
-                            @include style.responsive-size(height, 40px, 40px, 40px, 20px);
-                        }
-                    }
-                    .rate-update {
-                        border-radius: 20px;
-                        @include style.responsive-size(width, 220px, 220px, 220px, 120px);
-                        @include style.responsive-size(height, 30px, 30px, 30px, 20px);
-                    }
                 }
             }
 
@@ -231,7 +105,7 @@
     }
 }
 .closed-list {
-    width: 450px;
+    width: 550px;
     position: absolute;
     right: 0;
     top: 100px;
@@ -244,24 +118,6 @@
 
             .card-school {
                 padding: 10px;
-            }
-            .skeleton-card-school {
-                .name {
-                    width: 120px !important;
-                    height: 20px !important;
-                }
-                .chip-address {
-                    width: 40px !important;
-                    height: 20px !important;
-                }
-                .link {
-                    width: 20px !important;
-                    height: 20px !important;
-                }
-                .rate-update {
-                    width: 120px !important;
-                    height: 20px !important;
-                }
             }
         }
     }

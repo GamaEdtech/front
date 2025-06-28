@@ -22,55 +22,10 @@
       ref="scrollDivRef"
     >
       <div class="container-scroll">
-        <div
-          v-if="isInitialLoading"
-          class="skeleton-card-school"
-          v-for="item in 4"
-        >
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
+        <CardSchoolSkeleton v-if="isInitialLoading" v-for="item in 4" />
 
-        <div v-if="isPaginationPreviousLoading" class="skeleton-card-school">
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
+        <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
+
         <NuxtLink
           v-if="!isInitialLoading"
           class="card-school"
@@ -82,21 +37,28 @@
               <span class="name gtext-t4 font-weight-semibold">{{
                 school.name
               }}</span>
-              <div class="chips-address">
-                <span
-                  class="chip-address"
+              <div class="d-flex align-center justify-start flex-wrap ga-3">
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.countryTitle && school.countryTitle.length > 0"
-                  >{{ school.countryTitle }}</span
                 >
-                <span
-                  class="chip-address"
+                  {{ school.countryTitle }}
+                </v-chip>
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.stateTitle && school.stateTitle.length > 0"
-                  >{{ school.stateTitle }}</span
+                  >{{ school.stateTitle }}</v-chip
                 >
-                <span
-                  class="chip-address"
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.cityTitle && school.cityTitle.length > 0"
-                  >United {{ school.cityTitle }}</span
+                  >United {{ school.cityTitle }}</v-chip
                 >
               </div>
             </div>
@@ -150,29 +112,7 @@
           ref="lineSpecifierLoadMoreRef"
         ></div>
 
-        <div v-if="isPaginationLoading" class="skeleton-card-school">
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
-
+        <CardSchoolSkeleton v-if="isPaginationLoading" />
         <div
           class="not-found-div"
           v-if="!isInitialLoading && schoolList.length == 0"
@@ -186,6 +126,8 @@
 
 <script setup>
 import { onMounted, onUnmounted } from "vue";
+
+import CardSchoolSkeleton from "./CardSchoolSkeleton.vue";
 
 const props = defineProps({
   schoolList: {

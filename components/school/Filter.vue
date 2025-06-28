@@ -173,63 +173,60 @@
         <div class="contaier-region-country-filter">
           <div class="box-chips-query-mobile">
             <div class="container-chips">
-              <div class="chip-div" v-if="filterForm.keyword.length > 0">
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
+                v-if="filterForm.keyword.length > 0"
+                closable
+                @click:close="clearFilter(`keyword`)"
+              >
                 {{ filterForm.keyword }}
-                <v-icon
-                  @click="clearFilter(`keyword`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
-
-              <div
-                class="chip-div"
+              </v-chip>
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
                   filterForm.country.length > 0 &&
                   findTitle(`countryList`, filterForm.country)
                 "
+                closable
+                @click:close="clearFilter(`country`)"
               >
                 {{ findTitle("countryList", filterForm.country) }}
-                <v-icon
-                  @click="clearFilter(`country`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
-
-              <div
-                class="chip-div"
+              </v-chip>
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
                   filterForm.state.length > 0 &&
                   findTitle(`stateList`, filterForm.state)
                 "
+                closable
+                @click:close="clearFilter(`state`)"
               >
                 {{ findTitle("stateList", filterForm.state) }}
-                <v-icon
-                  @click="clearFilter(`state`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
+              </v-chip>
 
-              <div
-                class="chip-div"
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
                   filterForm.city.length > 0 &&
                   findTitle(`cityList`, filterForm.city)
                 "
+                closable
+                @click:close="clearFilter(`city`)"
               >
                 {{ findTitle("cityList", filterForm.city) }}
-                <v-icon
-                  @click="clearFilter(`city`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
+              </v-chip>
             </div>
           </div>
           <div class="cotainer-dropdown">
@@ -361,50 +358,59 @@
 
     <div class="box-chips-query-desktop" v-if="!isExpandMap">
       <div class="container-chips">
-        <div class="chip-div" v-if="filterForm.keyword.length > 0">
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
+          v-if="filterForm.keyword.length > 0"
+          closable
+          @click:close="clearFilter(`keyword`)"
+        >
           {{ filterForm.keyword }}
-          <v-icon @click="clearFilter(`keyword`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
-
-        <div
-          class="chip-div"
+        </v-chip>
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
             filterForm.country.length > 0 &&
             findTitle(`countryList`, filterForm.country)
           "
+          closable
+          @click:close="clearFilter(`country`)"
         >
           {{ findTitle("countryList", filterForm.country) }}
-          <v-icon @click="clearFilter(`country`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
-
-        <div
-          class="chip-div"
+        </v-chip>
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
             filterForm.state.length > 0 &&
             findTitle(`stateList`, filterForm.state)
           "
+          closable
+          @click:close="clearFilter(`state`)"
         >
           {{ findTitle("stateList", filterForm.state) }}
-          <v-icon @click="clearFilter(`state`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
+        </v-chip>
 
-        <div
-          class="chip-div"
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
             filterForm.city.length > 0 && findTitle(`cityList`, filterForm.city)
           "
+          closable
+          @click:close="clearFilter(`city`)"
         >
           {{ findTitle("cityList", filterForm.city) }}
-          <v-icon @click="clearFilter(`city`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
+        </v-chip>
       </div>
     </div>
   </div>
