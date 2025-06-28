@@ -100,7 +100,7 @@
           <div class="each-item-filter result-div">
             Results
             <span class="count-result" v-if="totalSchoolFind != 0">{{
-              totalSchoolFind
+              $numberFormat(totalSchoolFind)
             }}</span>
           </div>
         </div>
@@ -110,7 +110,7 @@
           <span
             class="count-result gama-text-button"
             v-if="totalSchoolFind != 0"
-            >{{ totalSchoolFind }}</span
+            >{{ $numberFormat(totalSchoolFind) }}</span
           >
         </div>
       </div>
@@ -121,35 +121,59 @@
       ref="boxRegionRef"
     >
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.country"
           :items="filter.countryList"
-          placeholder="Country"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="Country"
+          :loading="loadingCountry"
           @update:modelValue="countryChange"
-          :is-loading-data="loadingCountry"
         />
       </div>
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.state"
           :items="filter.stateList"
-          placeholder="State"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="State"
+          :loading="loadingState"
           :disabled="!filterForm.country"
           @update:modelValue="stateChange"
-          :is-loading-data="loadingState"
         />
       </div>
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.city"
           :items="filter.cityList"
-          placeholder="City"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="City"
+          :loading="loadingCity"
           :disabled="!filterForm.state"
           @update:modelValue="cityChange"
-          :is-loading-data="loadingCity"
         />
       </div>
     </div>
@@ -190,7 +214,8 @@
                 variant="outlined"
                 color="#252626"
                 v-if="
-                  filterForm.country.length > 0 &&
+                  filterForm.country &&
+                  filterForm.country.toString().length > 0 &&
                   findTitle(`countryList`, filterForm.country)
                 "
                 closable
@@ -204,7 +229,8 @@
                 variant="outlined"
                 color="#252626"
                 v-if="
-                  filterForm.state.length > 0 &&
+                  filterForm.state &&
+                  filterForm.state.toString().length > 0 &&
                   findTitle(`stateList`, filterForm.state)
                 "
                 closable
@@ -219,7 +245,8 @@
                 variant="outlined"
                 color="#252626"
                 v-if="
-                  filterForm.city.length > 0 &&
+                  filterForm.city &&
+                  filterForm.city.toString().length > 0 &&
                   findTitle(`cityList`, filterForm.city)
                 "
                 closable
@@ -375,7 +402,8 @@
           variant="outlined"
           color="#252626"
           v-if="
-            filterForm.country.length > 0 &&
+            filterForm.country &&
+            filterForm.country.toString().length > 0 &&
             findTitle(`countryList`, filterForm.country)
           "
           closable
@@ -389,7 +417,8 @@
           variant="outlined"
           color="#252626"
           v-if="
-            filterForm.state.length > 0 &&
+            filterForm.state &&
+            filterForm.state.toString().length > 0 &&
             findTitle(`stateList`, filterForm.state)
           "
           closable
@@ -404,7 +433,9 @@
           variant="outlined"
           color="#252626"
           v-if="
-            filterForm.city.length > 0 && findTitle(`cityList`, filterForm.city)
+            filterForm.city &&
+            filterForm.city.toString().length > 0 &&
+            findTitle(`cityList`, filterForm.city)
           "
           closable
           @click:close="clearFilter(`city`)"
@@ -422,7 +453,6 @@ import { useRouter, useRoute } from "vue-router";
 import { useClickOutside } from "~/composables/useClickOutside";
 
 import searchInput from "~/components/common/search-input.vue";
-import dropDownInput from "~/components/common/drop-down-input.vue";
 import checkboxInput from "~/components/common/checkbox-input.vue";
 import gomboBox from "~/components/common/gombo-box.vue";
 
@@ -487,9 +517,9 @@ const optionFilter = ref([
 ]);
 const filterForm = reactive({
   keyword: route.query.keyword || "",
-  country: route.query.country || "",
-  state: route.query.state || "",
-  city: route.query.city || "",
+  country: Number(route.query.country) || "",
+  state: Number(route.query.state) || "",
+  city: Number(route.query.city) || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
   sort: route.query.sort || "",
@@ -627,7 +657,7 @@ const clearFilter = (key) => {
 };
 
 const findTitle = (list, id) => {
-  const itemFounded = filter[list].filter((item) => item.id == id);
+  const itemFounded = filter[list].filter((item) => item.id == Number(id));
   if (itemFounded.length > 0) {
     return itemFounded[0].title;
   }
@@ -641,7 +671,7 @@ const loadingState = ref(false);
 const loadingCity = ref(false);
 
 useClickOutside(boxRegionRef, () => {
-  optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;
+  // optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;
 });
 
 const countryChange = () => {
