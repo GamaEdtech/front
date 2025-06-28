@@ -53,13 +53,16 @@ export const useApiService = (
 
 export const authHeader = (req = null) => {
   const auth = useAuth();
-  if (auth.isAuthenticated.value) {
-    if (req.includes("v2")) {
+  if (!auth.isAuthenticated.value) return;
+
+  if (process.client) {
+    if (req?.includes("v2")) {
       return { Authorization: `Bearer ${localStorage.getItem("v2_token")}` };
     } else {
       return { Authorization: `Bearer ${auth.getUserToken()}` };
     }
   }
+
 };
 
 export const get = (

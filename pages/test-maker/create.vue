@@ -1534,7 +1534,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
     }
 
-    const res = await useApiService.get("/api/v1/types/list",params);
+    const res = await useApiService.get("/api/v1/types/list", params);
 
     if (res && res.data) {
       if (type === "section") {
@@ -2607,10 +2607,10 @@ const validateHeaderForm = () => {
     return false;
   }
 
-  if (!form.topics || form.topics.length === 0) {
-    nuxtApp.$toast.error("Please select at least one topic");
-    return false;
-  }
+  // if (!form.topics || form.topics.length === 0) {
+  //   nuxtApp.$toast.error("Please select at least one topic");
+  //   return false;
+  // }
 
   if (!form.title) {
     nuxtApp.$toast.error("Title is required");
