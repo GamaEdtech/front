@@ -5,7 +5,7 @@
     :style="{ height: `${CardHeight}`, borderRadius: '8px' }"
   >
     <v-img
-      class="white--text align-end"
+      class="text-white align-end"
       :height="CardHeight"
       :src="cardPicture"
     >
@@ -13,13 +13,13 @@
     <div class="circle-container">
       <div class="text-center" v-if="showScoreLabel">
         <p
-          class="text-subtitle-1 font-weight-bold white--text text-no-wrap"
+          class="text-subtitle-1 font-weight-bold text-white text-no-wrap"
           style="line-height: 1.5"
         >
           {{ score }}
         </p>
         <p
-          class="text-subtitle-2 white--text font-weight-regular text-no-wrap"
+          class="text-subtitle-2 text-white font-weight-regular text-no-wrap"
           style="line-height: 1"
         >
           score
@@ -32,7 +32,7 @@
           style="color: #d24625; background-color: white"
           >mdi-microsoft-powerpoint</v-icon
         >
-        <v-icon v-else class="white--text">mdi-play-circle-outline</v-icon>
+        <v-icon v-else class="text-white">mdi-play-circle-outline</v-icon>
       </div>
     </div>
 
@@ -100,7 +100,6 @@ const CardHeight = computed(() => {
   z-index: 10;
   position: relative;
   bottom: 70px;
-  display: none;
 }
 .two-line-ellipsis {
   font-size: 10px !important;
@@ -112,5 +111,8 @@ const CardHeight = computed(() => {
   text-overflow: ellipsis;
   color: white;
   text-align: center;
+}
+.v-img__img--contain{
+  object-fit: fill !important;
 }
 </style>
