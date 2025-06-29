@@ -4,11 +4,13 @@
       <!-- Balance Card and Chart Section -->
       <v-row>
         <v-col cols="12" sm="6" md="6">
-          <balance-card></balance-card>
+          <user-wallet-balance-card></user-wallet-balance-card>
         </v-col>
 
         <v-col cols="12" sm="6" md="6" class="d-none d-sm-block">
-          <transaction-chart class="transaction-chart"></transaction-chart>
+          <user-wallet-transaction-chart
+            class="transaction-chart"
+          ></user-wallet-transaction-chart>
         </v-col>
       </v-row>
     </div>
@@ -20,27 +22,24 @@
           class="d-block d-sm-none mt-6 mobile-chart-container"
         >
           <div class="pa-4 rounded-lg bg-primary-gray-100">
-            <transaction-chart
+            <user-wallet-transaction-chart
               class="transaction-chart h-full"
-            ></transaction-chart>
+            ></user-wallet-transaction-chart>
           </div>
         </div>
       </v-expand-transition>
 
       <!-- Transaction History Section -->
-      <transaction-history
+      <user-wallet-transaction-history
         @toggle-chart="toggleMobileChart"
         :is-chart-visible="showMobileChart"
-      ></transaction-history>
+      ></user-wallet-transaction-history>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import TransactionChart from "~/components/user/wallet/TransactionChart.vue";
-import BalanceCard from "~/components/user/wallet/BalanceCard.vue";
-import TransactionHistory from "~/components/user/wallet/TransactionHistory.vue";
 
 // Page metadata
 definePageMeta({
