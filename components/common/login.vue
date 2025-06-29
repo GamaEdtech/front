@@ -57,7 +57,8 @@ async function handleCredentialResponse(value) {
       auth.setUserToken(response.data.jwtToken);
       submitLoginV2(response.data.jwtToken);
       closeDialog();
-      navigateTo("/user");
+
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (err) {
     const status = err?.response?.status;
@@ -164,7 +165,7 @@ const submit = handleSubmit(async () => {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -193,7 +194,7 @@ const onFinish = async () => {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -250,6 +251,10 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
+  const pass = password.value.value ? password.value.value : generatePassword();
+  const identityVal = identity.value.value
+    ? identity.value.value
+    : useAuth().user?.email || "";
   const result = await useApiService.post("/api/v2/identities/tokens/old", {
     token: old_token,
   });
@@ -260,10 +265,6 @@ async function submitLoginV2(old_token) {
     (result.errors[0].message === "UserNotFound" ||
       result.errors[0].message === "Invalid Token")
   ) {
-    let pass = password.value.value ? password.value.value : generatePassword();
-    let identityVal = identity.value.value
-      ? identity.value.value
-      : useAuth().user?.email || "";
     await registerV2(identityVal, pass);
   }
 }
