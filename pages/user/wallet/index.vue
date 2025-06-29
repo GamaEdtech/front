@@ -40,10 +40,17 @@
 
 <script setup>
 import { ref } from "vue";
-
 // Page metadata
 definePageMeta({
   layout: "dashboard-layout",
+});
+
+// Set page title
+useHead({
+  title: "Wallet - Gama",
+  meta: [
+    { name: 'description', content: 'Manage your GET tokens and view transaction history' }
+  ]
 });
 
 // Define reactive state
