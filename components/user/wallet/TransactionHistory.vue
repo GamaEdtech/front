@@ -23,7 +23,6 @@
             grow
             background-color="transparent"
             slider-color="amber"
-            @update:model-value="handleTabChange"
           >
             <v-tab class="text-subtitle-2">All</v-tab>
             <v-tab class="text-subtitle-2">Earned</v-tab>
@@ -33,8 +32,8 @@
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading && !hasMoreItems" class="py-4">
+      <!-- Loading State for Mobile -->
+      <div v-if="loadingMobile && mobileTransactions.length === 0" class="py-4">
         <v-skeleton-loader
           v-for="i in 3"
           :key="i"
@@ -51,7 +50,7 @@
           @scroll="handleScroll"
         >
           <v-list-item
-            v-for="(transaction, i) in filteredMobileTransactions"
+            v-for="(transaction, i) in mobileTransactions"
             :key="i"
             class="transaction-item py-3"
           >
@@ -103,8 +102,8 @@
             </template>
           </v-list-item>
 
-          <!-- Loading More Indicator -->
-          <div v-if="loading && hasMoreItems" class="pa-4 text-center">
+          <!-- Loading More Indicator for Mobile -->
+          <div v-if="loadingMobile" class="pa-4 text-center">
             <v-progress-circular
               indeterminate
               color="primary"
@@ -114,7 +113,7 @@
 
           <!-- End of List Message -->
           <div
-            v-if="!hasMoreItems && filteredMobileTransactions.length > 0"
+            v-if="!hasMoreItems && mobileTransactions.length > 0"
             class="pa-4 text-center"
           >
             <span class="caption grey--text">No more transactions</span>
@@ -122,33 +121,22 @@
 
           <!-- Empty States for Different Tabs -->
           <div
-            v-if="filteredMobileTransactions.length === 0 && !loading"
+            v-if="mobileTransactions.length === 0 && !loadingMobile"
             class="text-center py-8"
           >
-            <!-- All Transactions Empty State -->
             <template v-if="activeTab === 0">
               <v-icon size="64" color="grey lighten-2"
                 >mdi-wallet-outline</v-icon
               >
               <p class="mt-4 grey--text">No transactions found</p>
             </template>
-
-            <!-- Earned Transactions Empty State -->
             <template v-if="activeTab === 1">
-              <v-icon size="64" color="green lighten-4">mdi-cash-plus</v-icon>
-              <p class="mt-4 grey--text">No earned transactions yet</p>
-              <p class="caption grey--text text--darken-1">
-                Complete tasks to earn $GET
-              </p>
+               <v-icon size="64" color="green lighten-4">mdi-cash-plus</v-icon>
+               <p class="mt-4 grey--text">No earned transactions yet</p>
             </template>
-
-            <!-- Spent Transactions Empty State -->
             <template v-if="activeTab === 2">
               <v-icon size="64" color="red lighten-4">mdi-cash-minus</v-icon>
               <p class="mt-4 grey--text">No spent transactions yet</p>
-              <p class="caption grey--text text--darken-1">
-                Your spending history will appear here
-              </p>
             </template>
           </div>
         </div>
@@ -166,7 +154,6 @@
           v-model="activeTab"
           background-color="transparent"
           color="primary"
-          @update:model-value="handleTabChange"
         >
           <v-tab class="font-weight-regular">All</v-tab>
           <v-tab class="font-weight-regular">Earned</v-tab>
@@ -174,72 +161,67 @@
         </v-tabs>
       </div>
 
-      <v-data-table
-        :headers="headers"
-        :items="filteredTransactions"
-        :items-per-page="pageSize"
-        :page="currentPage"
-        @update:page="handlePageChange"
-        @update:items-per-page="handlePageSizeChange"
-        :server-items-length="totalRecords"
-        :loading="loading"
-        :footer-props="{
-          'items-per-page-options': [10, 25, 50],
-          'items-per-page-text': 'Rows per page:',
-          showFirstLastPage: true,
-          class: 'custom-table-footer',
-        }"
-        loading-text="Loading transactions..."
-        no-data-text="No transactions found"
-        class="elevation-0 transaction-table"
-      >
-        <template #[`item.description`]="{ item }">
-          {{ item.description }}
-        </template>
+      <div class="data-table-wrapper">
+        <!--  Using v-data-table-server with proper event handling -->
+        <v-data-table-server
+          v-model:items-per-page="pageSize"
+          :headers="headers"
+          :items="transactions"
+          :items-length="totalRecords"
+          :loading="loadingDesktop"
+          @update:options="loadDesktopTransactions"
+          :key="activeTab"
+        >
+          <template #item.description="{ item }">
+            {{ item.description }}
+          </template>
 
-        <template #[`item.points`]="{ item }">
-          <div class="d-flex align-center">
-            <span class="font-weight-bold">{{ item.points }}</span>
-            <span class="ml-1 caption grey--text">$GET</span>
-          </div>
-        </template>
+          <template #item.points="{ item }">
+            <div class="d-flex align-center">
+              <span class="font-weight-bold">{{ item.points }}</span>
+              <span class="ml-1 caption grey--text">$GET</span>
+            </div>
+          </template>
 
-        <template #[`item.isDebit`]="{ item }">
-          <div class="d-flex align-center">
-            <div v-if="item.isDebit">
-              <div class="state-icon-wrapper spent">
-                <span class="state-icon spent align-center">
-                  <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
-                </span>
-                <span class="state-text spent ml-2">Spent</span>
+          <template #item.isDebit="{ item }">
+            <div class="d-flex align-center">
+              <div v-if="item.isDebit">
+                <div class="state-icon-wrapper spent">
+                  <span class="state-icon spent align-center">
+                    <v-icon color="red" size="18">mdi-tray-arrow-up</v-icon>
+                  </span>
+                  <span class="state-text spent ml-2">Spent</span>
+                </div>
+              </div>
+              <div v-else>
+                <div class="state-icon-wrapper earned">
+                  <span class="state-icon earned align-center">
+                    <v-icon color="green" size="18"
+                      >mdi-tray-arrow-down</v-icon
+                    >
+                  </span>
+                  <span class="state-text earned ml-2">Earned</span>
+                </div>
               </div>
             </div>
-            <div v-else>
-              <div class="state-icon-wrapper earned">
-                <span class="state-icon earned align-center">
-                  <v-icon color="green" size="18">mdi-tray-arrow-down</v-icon>
-                </span>
-                <span class="state-text earned ml-2">Earned</span>
-              </div>
-            </div>
-          </div>
-        </template>
+          </template>
 
-        <template #[`item.creationDate`]="{ item }">
-          <div class="d-flex align-center">
-            <v-icon small class="mr-1 primary-gray-300"
-              >mdi-clock-outline</v-icon
-            >
-            <span class="primary-gray-500">{{ item.creationDate }}</span>
-          </div>
-        </template>
-      </v-data-table>
+          <template #item.creationDate="{ item }">
+            <div class="d-flex align-center">
+              <v-icon small class="mr-1 primary-gray-300"
+                >mdi-clock-outline</v-icon
+              >
+              <span class="primary-gray-500">{{ item.creationDate }}</span>
+            </div>
+          </template>
+        </v-data-table-server>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAuth } from "~/composables/useAuth";
 import { useApiService } from "~/composables/useApiService";
 
@@ -258,213 +240,122 @@ const emit = defineEmits(["toggle-chart"]);
 const auth = useAuth();
 const { $toast } = useNuxtApp();
 
-// Refs
-const infiniteContainer = ref(null);
-
-// Reactive state
+// --- Reactive State ---
 const activeTab = ref(0);
-const loading = ref(false);
-const transactions = ref([]);
-const mobileTransactions = ref([]); // Separate array for mobile view
 const token = ref("");
-const currentPage = ref(1);
-const pageSize = ref(10);
-const totalRecords = ref(0);
-const hasMoreItems = ref(true);
-const loadingMore = ref(false);
+const transactionType = ref(null);
 
-// Data table headers
+// Mobile-specific state
+const mobileTransactions = ref([]);
+const infiniteContainer = ref(null);
+const loadingMobile = ref(false);
+const hasMoreItems = ref(true);
+const MOBILE_PAGE_SIZE = 15;
+
+// Desktop-specific state
+const transactions = ref([]);
+const loadingDesktop = ref(false);
+const totalRecords = ref(0);
+const pageSize = ref(10);
+
+// --- Data table headers ---
 const headers = [
-  {
-    title: "Description",
-    key: "description",
-    sortable: true,
-    align: "start",
-    class: "font-weight-medium",
-  },
-  {
-    title: "Amount",
-    key: "points",
-    sortable: true,
-    align: "start",
-    class: "font-weight-medium",
-  },
-  {
-    title: "State",
-    key: "isDebit",
-    sortable: true,
-    align: "start",
-    class: "font-weight-medium",
-  },
-  {
-    title: "Date",
-    key: "creationDate",
-    sortable: true,
-    align: "start",
-    class: "font-weight-medium",
-  },
+  { title: "Description", key: "description", sortable: true, align: "start", class: "font-weight-medium" },
+  { title: "Amount", key: "points", sortable: true, align: "start", class: "font-weight-medium" },
+  { title: "State", key: "isDebit", sortable: true, align: "start", class: "font-weight-medium" },
+  { title: "Date", key: "creationDate", sortable: true, align: "start", class: "font-weight-medium" },
 ];
 
-// Computed properties
-const filteredTransactions = computed(() => {
-  if (activeTab.value === 0) {
-    // All transactions
-    return transactions.value;
-  } else if (activeTab.value === 1) {
-    // Earned transactions (isDebit = false)
-    return transactions.value.filter((transaction) => !transaction.isDebit);
-  } else if (activeTab.value === 2) {
-    // Spent transactions (isDebit = true)
-    return transactions.value.filter((transaction) => transaction.isDebit);
-  }
-  return transactions.value;
-});
+// --- Methods ---
 
-const filteredMobileTransactions = computed(() => {
-  if (activeTab.value === 0) {
-    // All transactions
-    return mobileTransactions.value;
-  } else if (activeTab.value === 1) {
-    // Earned transactions (isDebit = false)
-    return mobileTransactions.value.filter(
-      (transaction) => !transaction.isDebit
-    );
-  } else if (activeTab.value === 2) {
-    // Spent transactions (isDebit = true)
-    return mobileTransactions.value.filter(
-      (transaction) => transaction.isDebit
-    );
-  }
-  return mobileTransactions.value;
-});
-
-const startIndex = computed(() => {
-  return (currentPage.value - 1) * pageSize.value + 1;
-});
-
-const endIndex = computed(() => {
-  const end = currentPage.value * pageSize.value;
-  return end > totalRecords.value ? totalRecords.value : end;
-});
-
-// Methods
 const getToken = () => {
   if (process.client) {
     token.value = localStorage.getItem("v2_token") || "";
   }
 };
 
-const fetchTransactions = async (loadMore = false) => {
-  if (loading.value || (loadMore && !hasMoreItems.value)) return;
+/**
+ Fetches transactions for the mobile view's infinite scroll.
+ */
+const fetchMobileTransactions = async () => {
+  if (loadingMobile.value || !hasMoreItems.value) return;
 
-  loading.value = true;
-  const skip = loadMore
-    ? mobileTransactions.value.length
-    : (currentPage.value - 1) * pageSize.value;
+  loadingMobile.value = true;
+  const skip = mobileTransactions.value.length;
 
   try {
+    const params = {
+      "PagingDto.PageFilter.Size": MOBILE_PAGE_SIZE,
+      "PagingDto.PageFilter.Skip": skip,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+    };
+    if (transactionType.value !== null) {
+      params["IsDebit"] = transactionType.value;
+    }
+
     const response = await useApiService("/api/v2/transactions", {
       method: "GET",
-      params: {
-        "PagingDto.PageFilter.Size": pageSize.value,
-        "PagingDto.PageFilter.Skip": skip,
-        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      },
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
+      params: params,
+      headers: { Authorization: `Bearer ${token.value}` },
     });
 
     if (response.succeeded && response.data) {
-      if (loadMore) {
-        mobileTransactions.value = [
-          ...mobileTransactions.value,
-          ...response.data.list,
-        ];
-      } else {
-        mobileTransactions.value = response.data.list;
-        transactions.value = response.data.list; // Keep desktop view updated
-      }
-      totalRecords.value = response.data.totalRecordsCount;
-      hasMoreItems.value = mobileTransactions.value.length < totalRecords.value;
+      mobileTransactions.value.push(...response.data.list);
+      hasMoreItems.value = mobileTransactions.value.length < response.data.totalRecordsCount;
     }
   } catch (err) {
-    if (err.response && err.response.status === 403) {
-      auth.logout();
-    }
-    console.error("Error fetching transactions:", err);
+    if (err.response && err.response.status === 403) auth.logout();
+    console.error("Error fetching mobile transactions:", err);
   } finally {
-    loading.value = false;
+    loadingMobile.value = false;
   }
 };
+
+/**
+   Fetches transactions for the v-data-table-server component.
+ * This is called by the table itself on page, sort, or items-per-page change.
+ */
+const loadDesktopTransactions = async ({ page, itemsPerPage, sortBy }) => {
+  loadingDesktop.value = true;
+  const skip = (page - 1) * itemsPerPage;
+
+  try {
+    const params = {
+      "PagingDto.PageFilter.Size": itemsPerPage,
+      "PagingDto.PageFilter.Skip": skip,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+    };
+    if (transactionType.value !== null) {
+      params["IsDebit"] = transactionType.value;
+    }
+
+    const response = await useApiService("/api/v2/transactions", {
+      method: "GET",
+      params: params,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+
+    if (response.succeeded && response.data) {
+      transactions.value = response.data.list;
+      totalRecords.value = response.data.totalRecordsCount;
+    }
+  } catch (err) {
+    if (err.response && err.response.status === 403) auth.logout();
+    console.error("Error fetching desktop transactions:", err);
+  } finally {
+    loadingDesktop.value = false;
+  }
+};
+
+// --- Event Handlers ---
 
 const handleScroll = (event) => {
   const container = event.target;
   const scrollPosition = container.scrollTop + container.clientHeight;
-  const scrollThreshold = container.scrollHeight - 100; // Load more when within 100px of bottom
+  const scrollThreshold = container.scrollHeight - 100;
 
-  if (
-    scrollPosition >= scrollThreshold &&
-    !loading.value &&
-    hasMoreItems.value
-  ) {
-    fetchTransactions(true);
-  }
-};
-
-const handleTabChange = () => {
-  // No need to reset or fetch, just let the computed property handle filtering
-};
-
-const getStateColor = (state) => {
-  switch (state) {
-    case "Pending":
-      return "amber";
-    case "Spent":
-      return "red";
-    case "Earned":
-      return "green";
-    default:
-      return "grey";
-  }
-};
-
-const getStateColorClass = (state) => {
-  switch (state) {
-    case "Pending":
-      return "pending-bg";
-    case "Spent":
-      return "spent-bg";
-    case "Earned":
-      return "earned-bg";
-    default:
-      return "grey-bg";
-  }
-};
-
-const getStateTextColorClass = (state) => {
-  switch (state) {
-    case "Pending":
-      return "amber--text";
-    case "Spent":
-      return "red--text";
-    case "Earned":
-      return "green--text";
-    default:
-      return "grey--text";
-  }
-};
-
-const getStateIcon = (state) => {
-  switch (state) {
-    case "Pending":
-      return "mdi-dots-horizontal";
-    case "Spent":
-      return "mdi-arrow-down";
-    case "Earned":
-      return "mdi-arrow-up";
-    default:
-      return "mdi-help-circle-outline";
+  if (scrollPosition >= scrollThreshold && !loadingMobile.value && hasMoreItems.value) {
+    fetchMobileTransactions();
   }
 };
 
@@ -472,24 +363,39 @@ const toggleChart = () => {
   emit("toggle-chart");
 };
 
-const handlePageChange = (page) => {
-  currentPage.value = page;
-  fetchTransactions();
-};
+// --- Watchers ---
 
-const handlePageSizeChange = (size) => {
-  pageSize.value = size;
-  currentPage.value = 1; // Reset to first page when changing page size
-  fetchTransactions();
-};
+/**
+ * Watches for tab changes to update filters and reset data.
+ */
+watch(activeTab, (newTab) => {
+  // 1. Update the transaction type filter
+  if (newTab === 0) transactionType.value = null; // All
+  else if (newTab === 1) transactionType.value = false; // Earned
+  else if (newTab === 2) transactionType.value = true; // Spent
 
-// Lifecycle hooks
+  // 2. Reset and refetch for the mobile view
+  mobileTransactions.value = [];
+  hasMoreItems.value = true;
+  if (infiniteContainer.value) {
+    infiniteContainer.value.scrollTop = 0;
+  }
+  fetchMobileTransactions();
+
+  // 3. For the desktop view, changing the :key on v-data-table-server
+  // will automatically cause it to remount and call loadDesktopTransactions
+  // with the new filters. No extra code is needed here.
+});
+
+// --- Lifecycle Hooks ---
+
 onMounted(() => {
   getToken();
-  fetchTransactions();
+  // Fetch initial data for the mobile view.
+  // The desktop v-data-table-server will fetch its own data automatically on mount.
+  fetchMobileTransactions();
 });
 </script>
-
 <style scoped>
 .transaction-tabs-wrapper {
   border-bottom: 1px solid #f0f0f0;
@@ -534,6 +440,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.data-table-wrapper {
+  position: relative;
+  margin-bottom: 60px; /* Add space for pagination */
 }
 
 /* Desktop Transaction History Styles */
@@ -793,5 +704,70 @@ onMounted(() => {
 .empty-state-subtext {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.38);
+}
+
+/* Fix for pagination buttons */
+:deep(.v-data-table__wrapper) {
+  min-height: 300px;
+}
+
+:deep(.v-data-footer .v-btn) {
+  min-width: 36px;
+  padding: 0 8px;
+}
+
+:deep(.v-data-footer .v-btn:not(.v-btn--icon)) {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+:deep(.v-data-footer .v-data-footer__icons-before .v-btn),
+:deep(.v-data-footer .v-data-footer__icons-after .v-btn) {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+
+/* Additional specific fixes for pagination buttons */
+:deep(.v-data-footer__pagination .v-btn) {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+:deep(.v-data-footer__pagination) {
+  pointer-events: auto !important;
+}
+
+:deep(.v-data-table-footer__pagination) {
+  pointer-events: auto !important;
+}
+
+:deep(.v-data-table-footer__pagination button),
+:deep(.v-data-footer__pagination button) {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+/* Fix for v-data-table-footer__pagination specifically */
+:deep(.v-data-table-footer) :deep(.v-data-footer) :deep(.v-data-footer__pagination) {
+  pointer-events: auto !important;
+}
+
+:deep(.v-data-table-footer) :deep(.v-data-footer) :deep(.v-data-footer__pagination) button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+:deep(.v-data-table-footer) {
+  z-index: 1;
+  position: relative;
+}
+
+:deep(.v-data-table-footer__pagination) {
+  z-index: 2;
+  position: relative;
 }
 </style>
