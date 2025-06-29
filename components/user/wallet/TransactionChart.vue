@@ -22,9 +22,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { useAuth } from '~/composables/useAuth';
-import { useApiService } from '~/composables/useApiService';
+import { ref, reactive, onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
+import { useApiService } from "~/composables/useApiService";
 import {
   Chart as ChartJS,
   Title,
@@ -34,8 +34,8 @@ import {
   LinearScale,
   CategoryScale,
   PointElement,
-} from 'chart.js';
-import { Line as LineChart } from 'vue-chartjs';
+} from "chart.js";
+import { Line as LineChart } from "vue-chartjs";
 
 // Register Chart.js components
 ChartJS.register(
@@ -54,32 +54,32 @@ const { $toast } = useNuxtApp();
 
 // Reactive state
 const loading = ref(false);
-const selectedPeriod = ref('MonthOfYear');
-const token = ref('');
+const selectedPeriod = ref("MonthOfYear");
+const token = ref("");
 
 const periodOptions = [
-  { text: 'Monthly', value: 'MonthOfYear' },
-  { text: 'Weekly', value: 'DayOfWeek' },
+  { text: "Monthly", value: "MonthOfYear" },
+  { text: "Weekly", value: "DayOfWeek" },
 ];
 
 const chartData = reactive({
   labels: [],
   datasets: [
     {
-      label: 'Spent',
+      label: "Spent",
       data: [],
-      borderColor: 'rgb(235, 77, 75)',
-      backgroundColor: 'rgb(235, 77, 75)',
+      borderColor: "rgb(235, 77, 75)",
+      backgroundColor: "rgb(235, 77, 75)",
       tension: 0.4,
       pointRadius: 0,
       borderWidth: 2,
       fill: false,
     },
     {
-      label: 'Earned',
+      label: "Earned",
       data: [],
-      borderColor: 'rgb(46, 213, 115)',
-      backgroundColor: 'rgb(46, 213, 115)',
+      borderColor: "rgb(46, 213, 115)",
+      backgroundColor: "rgb(46, 213, 115)",
       tension: 0.4,
       pointRadius: 0,
       borderWidth: 2,
@@ -94,35 +94,35 @@ const chartOptions = reactive({
   plugins: {
     legend: {
       display: true,
-      position: 'top',
-      align: 'end',
+      position: "top",
+      align: "end",
       labels: {
         usePointStyle: true,
-        pointStyle: 'circle',
+        pointStyle: "circle",
         padding: 25,
         boxWidth: 10,
         boxHeight: 10,
-        color: '#666',
+        color: "#666",
         font: {
           size: 12,
         },
       },
     },
     tooltip: {
-      backgroundColor: 'white',
-      titleColor: '#333',
-      bodyColor: '#666',
-      borderColor: '#eee',
+      backgroundColor: "white",
+      titleColor: "#333",
+      bodyColor: "#666",
+      borderColor: "#eee",
       borderWidth: 1,
       padding: 10,
       displayColors: true,
       callbacks: {
         label: function (context) {
-          let label = context.dataset.label || '';
+          let label = context.dataset.label || "";
           if (label) {
-            label += ': ';
+            label += ": ";
           }
-          label += context.parsed.y + ' $GET';
+          label += context.parsed.y + " $GET";
           return label;
         },
       },
@@ -134,7 +134,7 @@ const chartOptions = reactive({
         display: false,
       },
       ticks: {
-        color: '#999',
+        color: "#999",
         font: {
           size: 12,
         },
@@ -148,14 +148,14 @@ const chartOptions = reactive({
         callback: function (value) {
           return value;
         },
-        color: '#999',
+        color: "#999",
         font: {
           size: 12,
         },
         padding: 10,
       },
       grid: {
-        color: 'rgba(0, 0, 0, 0.05)',
+        color: "rgba(0, 0, 0, 0.05)",
         borderDash: [3],
         drawBorder: false,
       },
@@ -166,7 +166,7 @@ const chartOptions = reactive({
 // Methods
 const getToken = () => {
   if (process.client) {
-    token.value = localStorage.getItem('v2_token') || '';
+    token.value = localStorage.getItem("v2_token") || "";
   }
 };
 
@@ -174,8 +174,8 @@ const fetchChartData = async () => {
   loading.value = true;
 
   try {
-    const response = await useApiService('/api/v2/transactions/statistics', {
-      method: 'GET',
+    const response = await useApiService("/api/v2/transactions/statistics", {
+      method: "GET",
       params: {
         Period: selectedPeriod.value,
       },
@@ -191,7 +191,7 @@ const fetchChartData = async () => {
     if (err.response && err.response.status === 403) {
       auth.logout();
     }
-    console.error('Error fetching chart data:', err);
+    console.error("Error fetching chart data:", err);
   } finally {
     loading.value = false;
   }
@@ -199,7 +199,7 @@ const fetchChartData = async () => {
 
 const updateChartWithData = (data) => {
   // Filter out the empty record
-  const filteredData = data.filter((item) => item.name !== '');
+  const filteredData = data.filter((item) => item.name !== "");
 
   // Extract labels and values
   const labels = filteredData.map((item) => item.name);

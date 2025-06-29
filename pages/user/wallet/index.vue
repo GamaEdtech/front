@@ -37,14 +37,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import TransactionChart from '~/components/user/wallet/TransactionChart.vue';
-import BalanceCard from '~/components/user/wallet/BalanceCard.vue';
-import TransactionHistory from '~/components/user/wallet/TransactionHistory.vue';
+import { ref } from "vue";
+import TransactionChart from "~/components/user/wallet/TransactionChart.vue";
+import BalanceCard from "~/components/user/wallet/BalanceCard.vue";
+import TransactionHistory from "~/components/user/wallet/TransactionHistory.vue";
 
 // Page metadata
 definePageMeta({
-  layout: 'dashboard-layout'
+  layout: "dashboard-layout",
 });
 
 // Define reactive state
@@ -54,7 +54,6 @@ const showMobileChart = ref(false);
 const toggleMobileChart = () => {
   showMobileChart.value = !showMobileChart.value;
 };
-
 </script>
 
 <style scoped>

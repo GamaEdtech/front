@@ -55,9 +55,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useAuth } from '~/composables/useAuth';
-import { useApiService } from '~/composables/useApiService';
+import { ref, onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
+import { useApiService } from "~/composables/useApiService";
 
 // Composables
 const auth = useAuth();
@@ -67,25 +67,25 @@ const { $toast } = useNuxtApp();
 const balance = ref(0);
 const loading = ref(true);
 const showBalance = ref(true);
-const token = ref('');
+const token = ref("");
 
 // Methods
 const getToken = () => {
   if (process.client) {
-    token.value = localStorage.getItem('v2_token') || '';
+    token.value = localStorage.getItem("v2_token") || "";
   }
 };
 
 const fetchBalance = async () => {
   loading.value = true;
   try {
-    const response = await useApiService('/api/v2/transactions/balance', {
-      method: 'GET',
+    const response = await useApiService("/api/v2/transactions/balance", {
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${token.value}`
-      }
+        Authorization: `Bearer ${token.value}`,
+      },
     });
-    
+
     if (response.succeeded) {
       balance.value = response.data;
     }
@@ -93,7 +93,7 @@ const fetchBalance = async () => {
     if (err.response && err.response.status === 403) {
       auth.logout();
     }
-    console.error('Error fetching balance:', err);
+    console.error("Error fetching balance:", err);
   } finally {
     loading.value = false;
   }
@@ -102,7 +102,7 @@ const fetchBalance = async () => {
 const getDecimal = (num) => {
   return Math.floor((num % 1) * 100)
     .toString()
-    .padStart(2, '0');
+    .padStart(2, "0");
 };
 
 const toggleBalanceVisibility = () => {

@@ -239,9 +239,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useAuth } from '~/composables/useAuth';
-import { useApiService } from '~/composables/useApiService';
+import { ref, computed, onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
+import { useApiService } from "~/composables/useApiService";
 
 // Props
 const props = defineProps({
@@ -252,7 +252,7 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(['toggle-chart']);
+const emit = defineEmits(["toggle-chart"]);
 
 // Composables
 const auth = useAuth();
@@ -266,7 +266,7 @@ const activeTab = ref(0);
 const loading = ref(false);
 const transactions = ref([]);
 const mobileTransactions = ref([]); // Separate array for mobile view
-const token = ref('');
+const token = ref("");
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalRecords = ref(0);
@@ -276,32 +276,32 @@ const loadingMore = ref(false);
 // Data table headers
 const headers = [
   {
-    title: 'Description',
-    key: 'description',
+    title: "Description",
+    key: "description",
     sortable: true,
-    align: 'start',
-    class: 'font-weight-medium',
+    align: "start",
+    class: "font-weight-medium",
   },
   {
-    title: 'Amount',
-    key: 'points',
+    title: "Amount",
+    key: "points",
     sortable: true,
-    align: 'start',
-    class: 'font-weight-medium',
+    align: "start",
+    class: "font-weight-medium",
   },
   {
-    title: 'State',
-    key: 'isDebit',
+    title: "State",
+    key: "isDebit",
     sortable: true,
-    align: 'start',
-    class: 'font-weight-medium',
+    align: "start",
+    class: "font-weight-medium",
   },
   {
-    title: 'Date',
-    key: 'creationDate',
+    title: "Date",
+    key: "creationDate",
     sortable: true,
-    align: 'start',
-    class: 'font-weight-medium',
+    align: "start",
+    class: "font-weight-medium",
   },
 ];
 
@@ -350,7 +350,7 @@ const endIndex = computed(() => {
 // Methods
 const getToken = () => {
   if (process.client) {
-    token.value = localStorage.getItem('v2_token') || '';
+    token.value = localStorage.getItem("v2_token") || "";
   }
 };
 
@@ -363,12 +363,12 @@ const fetchTransactions = async (loadMore = false) => {
     : (currentPage.value - 1) * pageSize.value;
 
   try {
-    const response = await useApiService('/api/v2/transactions', {
-      method: 'GET',
+    const response = await useApiService("/api/v2/transactions", {
+      method: "GET",
       params: {
-        'PagingDto.PageFilter.Size': pageSize.value,
-        'PagingDto.PageFilter.Skip': skip,
-        'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
+        "PagingDto.PageFilter.Size": pageSize.value,
+        "PagingDto.PageFilter.Skip": skip,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
       },
       headers: {
         Authorization: `Bearer ${token.value}`,
@@ -392,7 +392,7 @@ const fetchTransactions = async (loadMore = false) => {
     if (err.response && err.response.status === 403) {
       auth.logout();
     }
-    console.error('Error fetching transactions:', err);
+    console.error("Error fetching transactions:", err);
   } finally {
     loading.value = false;
   }
@@ -418,58 +418,58 @@ const handleTabChange = () => {
 
 const getStateColor = (state) => {
   switch (state) {
-    case 'Pending':
-      return 'amber';
-    case 'Spent':
-      return 'red';
-    case 'Earned':
-      return 'green';
+    case "Pending":
+      return "amber";
+    case "Spent":
+      return "red";
+    case "Earned":
+      return "green";
     default:
-      return 'grey';
+      return "grey";
   }
 };
 
 const getStateColorClass = (state) => {
   switch (state) {
-    case 'Pending':
-      return 'pending-bg';
-    case 'Spent':
-      return 'spent-bg';
-    case 'Earned':
-      return 'earned-bg';
+    case "Pending":
+      return "pending-bg";
+    case "Spent":
+      return "spent-bg";
+    case "Earned":
+      return "earned-bg";
     default:
-      return 'grey-bg';
+      return "grey-bg";
   }
 };
 
 const getStateTextColorClass = (state) => {
   switch (state) {
-    case 'Pending':
-      return 'amber--text';
-    case 'Spent':
-      return 'red--text';
-    case 'Earned':
-      return 'green--text';
+    case "Pending":
+      return "amber--text";
+    case "Spent":
+      return "red--text";
+    case "Earned":
+      return "green--text";
     default:
-      return 'grey--text';
+      return "grey--text";
   }
 };
 
 const getStateIcon = (state) => {
   switch (state) {
-    case 'Pending':
-      return 'mdi-dots-horizontal';
-    case 'Spent':
-      return 'mdi-arrow-down';
-    case 'Earned':
-      return 'mdi-arrow-up';
+    case "Pending":
+      return "mdi-dots-horizontal";
+    case "Spent":
+      return "mdi-arrow-down";
+    case "Earned":
+      return "mdi-arrow-up";
     default:
-      return 'mdi-help-circle-outline';
+      return "mdi-help-circle-outline";
   }
 };
 
 const toggleChart = () => {
-  emit('toggle-chart');
+  emit("toggle-chart");
 };
 
 const handlePageChange = (page) => {
@@ -491,7 +491,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .transaction-tabs-wrapper {
   border-bottom: 1px solid #f0f0f0;
   width: 100%;
