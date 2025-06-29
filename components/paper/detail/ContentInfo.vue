@@ -121,6 +121,21 @@
             }}
           </v-btn>
         </div>
+        <div
+          v-if="contentData?.files.extra && contentData.files.extra.length > 0"
+        >
+          <v-btn
+            v-for="(extra, index) in contentData.files.extra"
+            :key="index"
+            @click="startDownload('extra', extra.id)"
+            block
+            color="blue"
+            class="mb-2 font-weight-bold"
+          >
+            {{ extra.type_title ? extra.type_title : "Extra" }}
+            {{ extra.price > 0 ? "| $" + extra.price : "" }}
+          </v-btn>
+        </div>
         <v-btn
           v-if="contentData?.exams && contentData?.exams[0]?.status != 7"
           :to="`/exam/${contentData?.exams[0].id}`"
@@ -186,7 +201,7 @@ const openCrashReport = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
-const startDownload = async (type) => {
+const startDownload = async (type, extraId) => {
   download_loading.value = true;
   let apiUrl = "";
   if (type === "q_word")
@@ -195,6 +210,8 @@ const startDownload = async (type) => {
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/pdf`;
   if (type === "a_file")
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/answer`;
+  if (type === "extra")
+    apiUrl = `/api/v1/tests/download/${props.contentData?.id}/extra/${extraId}`;
   try {
     const response = await useApiService.get(apiUrl);
     const FileSaver = await import("file-saver");

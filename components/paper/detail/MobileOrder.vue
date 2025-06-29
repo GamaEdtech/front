@@ -67,6 +67,24 @@
               }}
             </v-btn>
           </div>
+          <div
+            v-if="
+              contentData?.files.extra && contentData.files.extra.length > 0
+            "
+          >
+            <v-btn
+              v-for="(extra, index) in contentData.files.extra"
+              :key="index"
+              @click="$emit('download', 'extra', extra.id)"
+              block
+              color="blue"
+              class="mb-2 font-weight-bold"
+              :loading="loading"
+            >
+              {{ extra.type_title ? extra.type_title : "Extra" }}
+              {{ extra.price > 0 ? "| $" + extra.price : "" }}
+            </v-btn>
+          </div>
         </v-col>
 
         <v-col cols="12">
