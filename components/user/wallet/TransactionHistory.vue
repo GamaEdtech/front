@@ -33,7 +33,7 @@
       </div>
 
       <!-- Loading State for Mobile -->
-      <div v-if="loadingMobile && mobileTransactions.length === 0" class="py-4">
+      <div v-if="loading && mobileTransactions.length === 0" class="py-4">
         <v-skeleton-loader
           v-for="i in 3"
           :key="i"
@@ -103,7 +103,7 @@
           </v-list-item>
 
           <!-- Loading More Indicator for Mobile -->
-          <div v-if="loadingMobile" class="pa-4 text-center">
+          <div v-if="loadingMore" class="pa-4 text-center">
             <v-progress-circular
               indeterminate
               color="primary"
@@ -121,7 +121,7 @@
 
           <!-- Empty States for Different Tabs -->
           <div
-            v-if="mobileTransactions.length === 0 && !loadingMobile"
+            v-if="mobileTransactions.length === 0 && !loading"
             class="text-center py-8"
           >
             <template v-if="activeTab === 0">
@@ -131,8 +131,8 @@
               <p class="mt-4 grey--text">No transactions found</p>
             </template>
             <template v-if="activeTab === 1">
-               <v-icon size="64" color="green lighten-4">mdi-cash-plus</v-icon>
-               <p class="mt-4 grey--text">No earned transactions yet</p>
+              <v-icon size="64" color="green lighten-4">mdi-cash-plus</v-icon>
+              <p class="mt-4 grey--text">No earned transactions yet</p>
             </template>
             <template v-if="activeTab === 2">
               <v-icon size="64" color="red lighten-4">mdi-cash-minus</v-icon>
@@ -162,15 +162,13 @@
       </div>
 
       <div class="data-table-wrapper">
-        <!--  Using v-data-table-server with proper event handling -->
         <v-data-table-server
           v-model:items-per-page="pageSize"
           :headers="headers"
           :items="transactions"
           :items-length="totalRecords"
-          :loading="loadingDesktop"
+          :loading="loading"
           @update:options="loadDesktopTransactions"
-          :key="activeTab"
         >
           <template #item.description="{ item }">
             {{ item.description }}
@@ -196,9 +194,7 @@
               <div v-else>
                 <div class="state-icon-wrapper earned">
                   <span class="state-icon earned align-center">
-                    <v-icon color="green" size="18"
-                      >mdi-tray-arrow-down</v-icon
-                    >
+                    <v-icon color="green" size="18">mdi-tray-arrow-down</v-icon>
                   </span>
                   <span class="state-text earned ml-2">Earned</span>
                 </div>
@@ -226,11 +222,8 @@ import { useAuth } from "~/composables/useAuth";
 import { useApiService } from "~/composables/useApiService";
 
 // Props
-const props = defineProps({
-  isChartVisible: {
-    type: Boolean,
-    default: false,
-  },
+defineProps({
+  isChartVisible: { type: Boolean, default: false },
 });
 
 // Emits
@@ -238,32 +231,57 @@ const emit = defineEmits(["toggle-chart"]);
 
 // Composables
 const auth = useAuth();
-const { $toast } = useNuxtApp();
 
-// --- Reactive State ---
+// --- Unified Reactive State ---
 const activeTab = ref(0);
 const token = ref("");
 const transactionType = ref(null);
+const loading = ref(false); // Unified loading state for initial load
+const loadingMore = ref(false); // Specific loading state for mobile infinite scroll
 
-// Mobile-specific state
-const mobileTransactions = ref([]);
-const infiniteContainer = ref(null);
-const loadingMobile = ref(false);
-const hasMoreItems = ref(true);
+// Data states
+const transactions = ref([]); // For Desktop Table
+const mobileTransactions = ref([]); // For Mobile List
+
+// Pagination & Infinite Scroll states
+const totalRecords = ref(0);
+const pageSize = ref(10); // For Desktop
+const hasMoreItems = ref(true); // For Mobile
 const MOBILE_PAGE_SIZE = 15;
 
-// Desktop-specific state
-const transactions = ref([]);
-const loadingDesktop = ref(false);
-const totalRecords = ref(0);
-const pageSize = ref(10);
+// Template Refs
+const infiniteContainer = ref(null);
 
 // --- Data table headers ---
 const headers = [
-  { title: "Description", key: "description", sortable: true, align: "start", class: "font-weight-medium" },
-  { title: "Amount", key: "points", sortable: true, align: "start", class: "font-weight-medium" },
-  { title: "State", key: "isDebit", sortable: true, align: "start", class: "font-weight-medium" },
-  { title: "Date", key: "creationDate", sortable: true, align: "start", class: "font-weight-medium" },
+  {
+    title: "Description",
+    key: "description",
+    sortable: true,
+    align: "start",
+    class: "font-weight-medium",
+  },
+  {
+    title: "Amount",
+    key: "points",
+    sortable: true,
+    align: "start",
+    class: "font-weight-medium",
+  },
+  {
+    title: "State",
+    key: "isDebit",
+    sortable: true,
+    align: "start",
+    class: "font-weight-medium",
+  },
+  {
+    title: "Date",
+    key: "creationDate",
+    sortable: true,
+    align: "start",
+    class: "font-weight-medium",
+  },
 ];
 
 // --- Methods ---
@@ -275,18 +293,26 @@ const getToken = () => {
 };
 
 /**
- Fetches transactions for the mobile view's infinite scroll.
+ * REFACTORED: Main function to fetch initial data when tab changes.
+ * Sends ONE request and populates both desktop and mobile lists.
  */
-const fetchMobileTransactions = async () => {
-  if (loadingMobile.value || !hasMoreItems.value) return;
+const resetAndFetchInitialData = async () => {
+  if (loading.value) return;
+  loading.value = true;
 
-  loadingMobile.value = true;
-  const skip = mobileTransactions.value.length;
+  // Reset states
+  transactions.value = [];
+  mobileTransactions.value = [];
+  totalRecords.value = 0;
+  hasMoreItems.value = true;
+  if (infiniteContainer.value) {
+    infiniteContainer.value.scrollTop = 0;
+  }
 
   try {
     const params = {
-      "PagingDto.PageFilter.Size": MOBILE_PAGE_SIZE,
-      "PagingDto.PageFilter.Skip": skip,
+      "PagingDto.PageFilter.Size": pageSize.value, // Fetch first page based on desktop size
+      "PagingDto.PageFilter.Skip": 0,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
     };
     if (transactionType.value !== null) {
@@ -295,28 +321,30 @@ const fetchMobileTransactions = async () => {
 
     const response = await useApiService("/api/v2/transactions", {
       method: "GET",
-      params: params,
+      params,
       headers: { Authorization: `Bearer ${token.value}` },
     });
 
     if (response.succeeded && response.data) {
-      mobileTransactions.value.push(...response.data.list);
-      hasMoreItems.value = mobileTransactions.value.length < response.data.totalRecordsCount;
+      // Populate both lists with the same initial data
+      transactions.value = response.data.list;
+      mobileTransactions.value = response.data.list;
+      totalRecords.value = response.data.totalRecordsCount;
+      hasMoreItems.value = mobileTransactions.value.length < totalRecords.value;
     }
   } catch (err) {
     if (err.response && err.response.status === 403) auth.logout();
-    console.error("Error fetching mobile transactions:", err);
+    console.error("Error fetching initial transactions:", err);
   } finally {
-    loadingMobile.value = false;
+    loading.value = false;
   }
 };
 
 /**
-   Fetches transactions for the v-data-table-server component.
- * This is called by the table itself on page, sort, or items-per-page change.
+ * Fetches subsequent pages for the DESKTOP table.
  */
 const loadDesktopTransactions = async ({ page, itemsPerPage, sortBy }) => {
-  loadingDesktop.value = true;
+  loading.value = true;
   const skip = (page - 1) * itemsPerPage;
 
   try {
@@ -331,7 +359,7 @@ const loadDesktopTransactions = async ({ page, itemsPerPage, sortBy }) => {
 
     const response = await useApiService("/api/v2/transactions", {
       method: "GET",
-      params: params,
+      params,
       headers: { Authorization: `Bearer ${token.value}` },
     });
 
@@ -341,21 +369,57 @@ const loadDesktopTransactions = async ({ page, itemsPerPage, sortBy }) => {
     }
   } catch (err) {
     if (err.response && err.response.status === 403) auth.logout();
-    console.error("Error fetching desktop transactions:", err);
+    console.error("Error fetching desktop page:", err);
   } finally {
-    loadingDesktop.value = false;
+    loading.value = false;
+  }
+};
+
+/**
+ * Fetches more items for MOBILE infinite scroll.
+ */
+const fetchMoreMobileTransactions = async () => {
+  if (loadingMore.value || !hasMoreItems.value) return;
+  loadingMore.value = true;
+
+  const skip = mobileTransactions.value.length;
+
+  try {
+    const params = {
+      "PagingDto.PageFilter.Size": MOBILE_PAGE_SIZE,
+      "PagingDto.PageFilter.Skip": skip,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": false, // No need for total count here
+    };
+    if (transactionType.value !== null) {
+      params["IsDebit"] = transactionType.value;
+    }
+
+    const response = await useApiService("/api/v2/transactions", {
+      method: "GET",
+      params,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+
+    if (response.succeeded && response.data) {
+      mobileTransactions.value.push(...response.data.list);
+      hasMoreItems.value = mobileTransactions.value.length < totalRecords.value;
+    }
+  } catch (err) {
+    if (err.response && err.response.status === 403) auth.logout();
+    console.error("Error fetching more mobile transactions:", err);
+  } finally {
+    loadingMore.value = false;
   }
 };
 
 // --- Event Handlers ---
-
 const handleScroll = (event) => {
   const container = event.target;
   const scrollPosition = container.scrollTop + container.clientHeight;
   const scrollThreshold = container.scrollHeight - 100;
 
-  if (scrollPosition >= scrollThreshold && !loadingMobile.value && hasMoreItems.value) {
-    fetchMobileTransactions();
+  if (scrollPosition >= scrollThreshold) {
+    fetchMoreMobileTransactions();
   }
 };
 
@@ -364,36 +428,19 @@ const toggleChart = () => {
 };
 
 // --- Watchers ---
-
-/**
- * Watches for tab changes to update filters and reset data.
- */
 watch(activeTab, (newTab) => {
-  // 1. Update the transaction type filter
-  if (newTab === 0) transactionType.value = null; // All
-  else if (newTab === 1) transactionType.value = false; // Earned
-  else if (newTab === 2) transactionType.value = true; // Spent
+  if (newTab === 0) transactionType.value = null;
+  else if (newTab === 1) transactionType.value = false;
+  else if (newTab === 2) transactionType.value = true;
 
-  // 2. Reset and refetch for the mobile view
-  mobileTransactions.value = [];
-  hasMoreItems.value = true;
-  if (infiniteContainer.value) {
-    infiniteContainer.value.scrollTop = 0;
-  }
-  fetchMobileTransactions();
-
-  // 3. For the desktop view, changing the :key on v-data-table-server
-  // will automatically cause it to remount and call loadDesktopTransactions
-  // with the new filters. No extra code is needed here.
+  // This will now be the single point of entry for fetching data on tab change
+  resetAndFetchInitialData();
 });
 
 // --- Lifecycle Hooks ---
-
 onMounted(() => {
   getToken();
-  // Fetch initial data for the mobile view.
-  // The desktop v-data-table-server will fetch its own data automatically on mount.
-  fetchMobileTransactions();
+  resetAndFetchInitialData(); // Initial data load on component mount
 });
 </script>
 <style scoped>
@@ -751,11 +798,16 @@ onMounted(() => {
 }
 
 /* Fix for v-data-table-footer__pagination specifically */
-:deep(.v-data-table-footer) :deep(.v-data-footer) :deep(.v-data-footer__pagination) {
+:deep(.v-data-table-footer)
+  :deep(.v-data-footer)
+  :deep(.v-data-footer__pagination) {
   pointer-events: auto !important;
 }
 
-:deep(.v-data-table-footer) :deep(.v-data-footer) :deep(.v-data-footer__pagination) button {
+:deep(.v-data-table-footer)
+  :deep(.v-data-footer)
+  :deep(.v-data-footer__pagination)
+  button {
   pointer-events: auto !important;
   cursor: pointer !important;
   opacity: 1 !important;
