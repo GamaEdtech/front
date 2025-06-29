@@ -37,10 +37,6 @@ import category from "../components/common/category";
 import main_footer from "../components/common/footer";
 import DashboardDesktopMenu from "@/components/dashboard/desktop-menu";
 import DashboardMobileMenu from "@/components/dashboard/mobile-menu";
-
-definePageMeta({
-  name: "dashboard-layout",
-});
 </script>
 
 <style scoped></style>

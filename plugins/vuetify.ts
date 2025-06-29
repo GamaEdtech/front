@@ -1,5 +1,7 @@
 import '@mdi/font/css/materialdesignicons.css'
 import { VStepperVertical } from 'vuetify/labs/VStepperVertical'
+// Import from Vuetify components
+import { VSlideGroup } from 'vuetify/components'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
@@ -32,6 +34,7 @@ export default defineNuxtPlugin((app: any) => {
     },
     components: {
       VStepperVertical,
+      VSlideGroup,
     },
   })
   app.vueApp.use(vuetify)

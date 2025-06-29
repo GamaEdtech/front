@@ -114,6 +114,11 @@ const items = reactive([
     icon: "mdi-credit-card-outline",
     subMenuList: [
       {
+        title: "Wallet",
+        link: "/user/wallet",
+        icon: "mdi-wallet",
+      },
+      {
         title: "Top Up Wallet",
         icon: "mdi-credit-card-plus-outline",
         link: "/user/charge-wallet",
