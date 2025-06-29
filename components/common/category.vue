@@ -5,8 +5,8 @@
       <v-row>
         <v-col cols="12">
           <v-sheet class="category-sheet mx-auto">
-            <div class="d-flex overflow-x-auto">
-              <div v-for="(item, category) in items" :key="category" class="mx-2">
+            <v-slide-group multiple show-arrows>
+              <v-slide-item v-for="(item, category) in items" :key="category">
                 <div class="category-itm-content">
                   <v-btn
                     class="category-btn"
@@ -20,8 +20,8 @@
                     {{ item.text }}
                   </div>
                 </div>
-              </div>
-            </div>
+              </v-slide-item>
+            </v-slide-group>
           </v-sheet>
         </v-col>
       </v-row>
@@ -92,39 +92,39 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 #main-category-container {
   margin-top: 6rem;
   width: 40rem;
   margin-left: auto;
   margin-right: auto;
-}
 
-#main-category-container .category-sheet {
-  max-width: 100%;
-}
+  .category-sheet {
+    max-width: 100%;
+  }
 
-#main-category-container .category-itm-content {
-  margin-left: 1rem;
-  margin-right: 1rem;
-  text-align: center;
-}
+  .category-itm-content {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    text-align: center;
+  }
 
-#main-category-container .category-btn {
-  border-radius: 15%;
-  height: 4rem;
-  min-width: 4rem !important;
-  width: 4rem !important;
-}
+  .category-btn {
+    border-radius: 15%;
+    height: 4rem;
+    min-width: 4rem !important;
+    width: 4rem !important;
+  }
 
-#main-category-container .category-text {
-  font-size: 1.2rem;
-  font-weight: 400;
-  margin-top: 0.5rem;
-}
+  .category-text {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-top: 0.5rem;
+  }
 
-#main-category-container .icon {
-  font-size: 2.5rem !important;
+  .icon {
+    font-size: 2.5rem !important;
+  }
 }
 
 #main-category .icon {
@@ -134,28 +134,28 @@ export default {
 @media (min-width: 600px) {
   #main-category-container {
     width: 55rem;
-  }
-  
-  #main-category-container .category-itm-content {
-    margin-left: 1.5rem;
-    margin-right: 1.5rem;
-    text-align: center;
-  }
-  
-  #main-category-container .category-btn {
-    border-radius: 15%;
-    height: 5rem !important;
-    width: 5rem !important;
-  }
-  
-  #main-category-container .category-text {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 1rem;
-  }
-  
-  #main-category-container .icon {
-    font-size: 3.5rem !important;
+
+    .category-itm-content {
+      margin-left: 1.5rem;
+      margin-right: 1.5rem;
+      text-align: center;
+    }
+
+    .category-btn {
+      border-radius: 15%;
+      height: 5rem !important;
+      width: 5rem !important;
+    }
+
+    .category-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+
+    .icon {
+      font-size: 3.5rem !important;
+    }
   }
 }
 
@@ -163,62 +163,61 @@ export default {
   #main-category-container {
     margin-top: 8rem;
     width: 80rem;
-  }
-  
-  #main-category-container .category-sheet {
-    max-width: 90%;
-  }
-  
-  #main-category-container .category-itm-content {
-    margin-left: 2rem;
-    margin-right: 2rem;
-    text-align: center;
-  }
-  
-  #main-category-container .category-btn {
-    border-radius: 15%;
-    height: 6rem !important;
-    width: 6rem !important;
-  }
-  
-  #main-category-container .category-text {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 1rem;
-  }
-  
-  #main-category-container .icon {
-    font-size: 3.5rem !important;
+
+    .category-sheet {
+      max-width: 90%;
+    }
+
+    .category-itm-content {
+      margin-left: 2rem;
+      margin-right: 2rem;
+      text-align: center;
+    }
+
+    .category-btn {
+      border-radius: 15%;
+      height: 6rem !important;
+      width: 6rem !important;
+    }
+
+    .category-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+
+    .icon {
+      font-size: 3.5rem !important;
+    }
   }
 }
-
 @media (min-width: 1264px) {
   #main-category-container {
     margin-top: 2rem;
     max-width: 80rem;
     width: 80rem;
-  }
-  
-  #main-category-container .category-itm-content {
-    margin-left: 2rem;
-    margin-right: 2rem;
-    text-align: center;
-  }
-  
-  #main-category-container .category-btn {
-    border-radius: 15%;
-    height: 6rem;
-    width: 6rem;
-  }
-  
-  #main-category-container .category-text {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 1rem;
-  }
-  
-  #main-category-container .icon {
-    font-size: 3.5rem !important;
+
+    .category-itm-content {
+      margin-left: 2rem;
+      margin-right: 2rem;
+      text-align: center;
+    }
+
+    .category-btn {
+      border-radius: 15%;
+      height: 6rem;
+      width: 6rem;
+    }
+
+    .category-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+
+    .icon {
+      font-size: 3.5rem !important;
+    }
   }
 }
 </style>
