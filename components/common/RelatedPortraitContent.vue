@@ -101,6 +101,7 @@ const CardHeight = computed(() => {
 .related-content:hover > .v-slide-group__next {
   opacity: 1;
   visibility: visible;
+  position: absolute;
 }
 
 .related-content > .v-slide-group__wrapper {
@@ -151,13 +152,13 @@ const CardHeight = computed(() => {
 .related-content > .v-slide-group__prev {
   position: absolute;
   margin-top: 90px;
-  left: 15px;
+  left: 10%;
   z-index: 10;
 }
 .related-content > .v-slide-group__next {
   position: absolute;
   margin-top: 90px;
-  right: 15px;
+  right: 10%;
   z-index: 10;
 }
 </style>
