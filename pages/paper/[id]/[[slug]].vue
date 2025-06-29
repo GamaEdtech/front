@@ -108,6 +108,13 @@
               </v-col>
             </v-row>
           </div>
+          <common-related-portrait-content
+            pageType="paper"
+            pageName="Past Papers"
+            source="test"
+            request="test"
+          />
+
         </v-container>
       </section>
       <!--  End: detail  -->
