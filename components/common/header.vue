@@ -567,7 +567,7 @@ watch(
 
                 <div class="wallet-div">
                   <v-btn
-                    to="/user/wallet"
+                    to="/user/charge-wallet"
                     icon
                     class="wallet-icon"
                     :color="menuSetting.linkColor"
