@@ -66,6 +66,7 @@
             block
             color="primary"
             class="mb-2"
+            :loading="qWordFileDownloadLoading"
           >
             Download Question Doc
             {{
@@ -81,7 +82,7 @@
             class="mb-2 white--text font-weight-bold"
             block
             color="#E60012"
-            :loading="download_loading"
+            :loading="qPdfFileDownloadLoading"
           >
             {{ contentData?.test_type_title }}
             {{
@@ -98,6 +99,7 @@
             @click="startDownload('a_file')"
             block
             color="teal accent-3"
+            :loading="answerFileDownloadLoading"
           >
             Mark Scheme
             {{
@@ -112,6 +114,7 @@
             block
             color="primary"
             class="mb-2"
+            :loading="answerFileDownloadLoading"
           >
             Download Answer Doc
             {{
@@ -131,6 +134,7 @@
             block
             color="blue"
             class="mb-2 font-weight-bold"
+            :loading="extraFileDownloadLoading"
           >
             {{ extra.type_title ? extra.type_title : "Extra" }}
             {{ extra.price > 0 ? "| $" + extra.price : "" }}
@@ -165,7 +169,10 @@
     :is-logged-in="auth.isAuthenticated.value"
     :user-credit="user?.user.value && user?.user.value?.credit"
     :is-free="isFree"
-    :loading="download_loading"
+    :qWordFileDownloadLoading="qWordFileDownloadLoading"
+    :qPdfFileDownloadLoading="qPdfFileDownloadLoading"
+    :answerFileDownloadLoading="answerFileDownloadLoading"
+    :extraFileDownloadLoading="extraFileDownloadLoading"
     @download="startDownload"
   />
   <!--End mobile order section-->
@@ -184,7 +191,11 @@ const user = useUser();
 const rating = ref(4.5);
 const crash_report = ref(null);
 const emits = defineEmits(["crash-report"]);
-const download_loading = ref(false);
+
+const qPdfFileDownloadLoading = ref(false);
+const qWordFileDownloadLoading = ref(false);
+const answerFileDownloadLoading = ref(false);
+const extraFileDownloadLoading = ref(false);
 
 const isFree = computed(() => {
   if (!props.contentData) return true;
@@ -202,21 +213,27 @@ const openCrashReport = () => {
   crash_report.value.form.type = "test";
 };
 const startDownload = async (type, extraId) => {
-  download_loading.value = true;
   let apiUrl = "";
-  if (type === "q_word")
+  if (type === "q_word") {
+    qWordFileDownloadLoading.value = true;
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/word`;
-  if (type === "q_pdf")
+  }
+  if (type === "q_pdf") {
+    qPdfFileDownloadLoading.value = true;
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/pdf`;
-  if (type === "a_file")
+  }
+  if (type === "a_file") {
+    answerFileDownloadLoading.value = true;
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/answer`;
-  if (type === "extra")
+  }
+  if (type === "extra") {
+    extraFileDownloadLoading.value = true;
     apiUrl = `/api/v1/tests/download/${props.contentData?.id}/extra/${extraId}`;
+  }
   try {
     const response = await useApiService.get(apiUrl);
     const FileSaver = await import("file-saver");
     await FileSaver.saveAs(response.data.url, response.data.name);
-    download_loading.value = false;
   } catch (err) {
     if (err.response?.status == 400) {
       if (
@@ -227,6 +244,10 @@ const startDownload = async (type, extraId) => {
       }
     }
   } finally {
+    qWordFileDownloadLoading.value = false;
+    qPdfFileDownloadLoading.value = false;
+    answerFileDownloadLoading.value = false;
+    extraFileDownloadLoading.value = false;
   }
 };
 defineExpose({

@@ -9,7 +9,7 @@
               block
               color="primary"
               class="mb-2"
-              :loading="loading"
+              :loading="qWordFileDownloadLoading"
             >
               Download Question Doc
               {{
@@ -25,7 +25,7 @@
               class="mb-2 white--text font-weight-bold"
               block
               color="#E60012"
-              :loading="loading"
+              :loading="qPdfFileDownloadLoading"
             >
               Question Paper
               {{
@@ -42,7 +42,7 @@
               @click="$emit('download', 'a_file')"
               block
               color="teal accent-3"
-              :loading="loading"
+              :loading="answerFileDownloadLoading"
             >
               Mark Scheme
               {{
@@ -57,7 +57,7 @@
               block
               color="primary"
               class="mb-2"
-              :loading="loading"
+              :loading="answerFileDownloadLoading"
             >
               Download Answer Doc
               {{
@@ -79,7 +79,7 @@
               block
               color="blue"
               class="mb-2 font-weight-bold"
-              :loading="loading"
+              :loading="extraFileDownloadLoading"
             >
               {{ extra.type_title ? extra.type_title : "Extra" }}
               {{ extra.price > 0 ? "| $" + extra.price : "" }}
@@ -138,7 +138,19 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  loading: {
+  qWordFileDownloadLoading: {
+    type: Boolean,
+    default: false,
+  },
+  qPdfFileDownloadLoading: {
+    type: Boolean,
+    default: false,
+  },
+  answerFileDownloadLoading: {
+    type: Boolean,
+    default: false,
+  },
+  extraFileDownloadLoading: {
     type: Boolean,
     default: false,
   },
