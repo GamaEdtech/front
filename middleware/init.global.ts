@@ -37,7 +37,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      console.log('fetched')
 
       if (response && response.data) {
         const { setUser } = useUser();

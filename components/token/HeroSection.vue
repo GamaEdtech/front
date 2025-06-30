@@ -94,7 +94,7 @@ const finalPrice = ref(0);
 
 const fetchTokenPrice = async () => {
   const data = await $fetch(
-    "https://api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
+    "https://lite-api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
   );
   finalPrice.value = Object.values(data.data)[0]["price"];
 };
