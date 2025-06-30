@@ -1,4 +1,4 @@
-import { defineNuxtRouteMiddleware, navigateTo, useCookie } from "nuxt/app";
+import { defineNuxtRouteMiddleware, navigateTo, useState } from "nuxt/app";
 import { useUser } from "@/composables/useUser";
 import { useAuth } from "@/composables/useAuth";
 
@@ -27,23 +27,31 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return;
   }
 
-  try {
-    const response = await $fetch<UserResponse>(`/api/v1/users/info`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
+  const hasFetchedUserInfo = useState<boolean>("hasFetchedUserInfo", () => false);
 
-    if (response && response.data) {
-      const { setUser } = useUser();
-      setUser(response.data);
-    } else if (to.path.startsWith("/user")) {
-    }
-  } catch (error) {
-    const status = (error as ErrorResponse)?.response?.status;
-    if ((status === 401 || status === 403) && to.path.startsWith("/user")) {
-      return navigateTo("/");
+  if (!hasFetchedUserInfo.value) {
+    try {
+      const response = await $fetch<UserResponse>(`/api/v1/users/info`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      console.log('fetched')
+
+      if (response && response.data) {
+        const { setUser } = useUser();
+        setUser(response.data);
+        hasFetchedUserInfo.value = true; // Mark as fetched
+
+      } else if (to.path.startsWith("/user")) {
+         return navigateTo("/");
+      }
+    } catch (error) {
+      const status = (error as ErrorResponse)?.response?.status;
+      if ((status === 401 || status === 403) && to.path.startsWith("/user")) {
+        return navigateTo("/");
+      }
     }
   }
 });
