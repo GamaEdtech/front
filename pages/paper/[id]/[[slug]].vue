@@ -114,7 +114,6 @@
             source="test"
             request="test"
           />
-
         </v-container>
       </section>
       <!--  End: detail  -->
@@ -197,7 +196,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+      href: `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {
