@@ -271,7 +271,7 @@ useHead(() => ({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/multimedia/${contentData.value.id}/${contentData.value.title_url}`,
+      href: `https://${requestURL.value}/multimedia/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
 }));

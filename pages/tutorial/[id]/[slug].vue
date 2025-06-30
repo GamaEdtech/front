@@ -364,7 +364,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/tutorial/${tutorialInfo.value.id}/${tutorialInfo.value.title_url}`,
+      href: `https://${requestURL.value}/tutorial/${tutorialInfo.value.id}/${tutorialInfo.value.title_url}`,
     },
   ],
 });

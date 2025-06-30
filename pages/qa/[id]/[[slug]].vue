@@ -994,7 +994,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
+      href: `https://${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
 });
