@@ -6,7 +6,10 @@
         <v-col cols="12">
           <v-sheet class="category-sheet mx-auto">
             <v-slide-group multiple show-arrows>
-              <v-slide-item v-for="(item, category) in items" :key="category">
+              <v-slide-group-item
+                v-for="(item, category) in items"
+                :key="category"
+              >
                 <div class="category-itm-content">
                   <v-btn
                     class="category-btn"
@@ -20,7 +23,7 @@
                     {{ item.text }}
                   </div>
                 </div>
-              </v-slide-item>
+              </v-slide-group-item>
             </v-slide-group>
           </v-sheet>
         </v-col>

@@ -105,6 +105,7 @@ const items = ref([
     title: "Financial",
     icon: "mdi-credit-card-outline",
     subMenuList: [
+      { title: "Wallet", link: "/user/wallet" },
       { title: "Top Up Wallet", link: "/user/charge-wallet" },
       { title: "Payments", link: "/user/payments" },
       { title: "Sell Report", link: "/user/sell-report" },
