@@ -1,6 +1,8 @@
 <template>
-    <v-snackbar class="snackbar" :timeout="4000" v-model="snankebar.isShow" :color="snankebar.status === 'error' ? 'red' : 'green'" location="top left">
-        <span class="snakebar-icon mdi" :class="snankebar.status === 'error' ? 'mdi-close-circle' : 'mdi-check-circle'"></span> 
+    <v-snackbar class="snackbar" :timeout="4000" v-model="snankebar.isShow"
+        :color="snankebar.status === 'error' ? 'red' : 'green'" location="top left">
+        <span class="snakebar-icon mdi"
+            :class="snankebar.status === 'error' ? 'mdi-close-circle' : 'mdi-check-circle'"></span>
         <span class="snackbar-text">
             {{ snankebar.text }}
         </span>
@@ -24,7 +26,8 @@
                             <label class="lable">Email*</label>
 
                             <v-text-field rounded variant="outlined" placeholder="Enter your email address" outlined
-                                height="48" :rules="[rules.required, rules.email]" v-model="formsData.email"></v-text-field>
+                                height="48" :rules="[rules.required, rules.email]"
+                                v-model="formsData.email"></v-text-field>
                         </div>
 
                         <!--Subject Input-->
@@ -43,7 +46,8 @@
 
                             <v-textarea rounded variant="outlined" outlined name="input-7-4"
                                 hint="Enter at least 25 characters." placeholder="Write something..." no-resize
-                                height="155" :rules="[rules.required, rules.min25]" v-model="formsData.message"></v-textarea>
+                                height="155" :rules="[rules.required, rules.min25]"
+                                v-model="formsData.message"></v-textarea>
                         </div>
 
 
@@ -58,7 +62,6 @@
             <v-col class="map-container" cols="12" sm="6" md="8">
                 <div class="address">
                     <v-icon size="x-large" color="#97A2B2" class="icon" icon="mdi-map-marker"></v-icon>
-
                     <span>
                         2419 West 53rd Street, Apt 5B, New York, NY 10019
                     </span>
@@ -68,7 +71,11 @@
                     <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                         layer-type="base" name="OpenStreetMap" />
-                    <LMarker :lat-lng="[41.050652, 28.894283]" :icon="customIcon">
+                    <!-- Custom SVG marker -->
+                    <LMarker :lat-lng="[41.050652, 28.894283]">
+                        <LIcon :icon-size="[50, 50]" :icon-anchor="[50, 50]" class-name="custom-svg-marker">
+                            <img src="/images/foundation--marker.svg" alt="Location marker" class="marker-image" />
+                        </LIcon>
                     </LMarker>
                 </LMap>
             </v-col>
@@ -79,12 +86,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import axios from 'axios'
-import { useNuxtApp } from 'nuxt/app'
 import { useRecaptcha } from '~/composables/useRecapcha'
+import useApiService from '~/composables/useApiService'
 
-const customIcon = ref<L.Icon<L.IconOptions>>()
 const zoom = ref(20)
 const rules = {
     required: (v: string) => !!v || 'This field is required.',
@@ -125,19 +131,26 @@ const submitForm = async () => {
             const token = await recaptcha.getToken('submit')
             console.log("2");
 
-            const res = await axios.post('/api/v2/contacts', {
+            // const res = await axios.post('/api/v2/contacts', {
+                // captcha: token,
+                // fullName: formsData.name,
+                // email: formsData.email,
+                // subject: formsData.subject,
+                // body: formsData.message,
+            // });
+            // console.log("3");
+            const res: any = await useApiService.post("/api/v2/contacts", {
                 captcha: token,
                 fullName: formsData.name,
                 email: formsData.email,
                 subject: formsData.subject,
                 body: formsData.message,
-            });
-            console.log("3");
+            })
 
-            if (res.data.succeeded) {
+            if (res.succeeded) {
                 showSnackebar("success", 'Your message has been sent successfully.')
             } else {
-                res.data.errors.forEach((error: any )=> {
+                res.errors.forEach((error: any )=> {
                     showSnackebar("error", error.message)
                 });
             }
@@ -160,16 +173,6 @@ const submitForm = async () => {
         formLoading.value = false
     }
 }
-
-onMounted(async () => {
-    const L = await import('leaflet')
-    customIcon.value = L.icon({
-        iconUrl: '../images/foundation--marker.svg',
-        iconSize: [50, 50],
-        iconAnchor: [50, 50],
-    })
-    
-})
 </script>
 
 <style scoped>
@@ -233,9 +236,16 @@ onMounted(async () => {
     box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
 }
 
+.marker-image {
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
 @media (max-width: 599px) {
     .map{
         height: 40rem !important;
     }
 }
+
 </style>
