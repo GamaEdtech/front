@@ -71,8 +71,7 @@
                       item-value="id"
                       item-title="title"
                       v-model="formData.topics"
-                      @update:model-value="changeOption('topic', $event)"
-                      label="Topics"
+                      label="Topic"
                       color="#FFB300"
                     />
                   </v-col>
@@ -110,6 +109,7 @@
                       hint="You must enter at least 70 characters."
                       persistent-hint
                       placeholder="Enter your question"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -207,7 +207,7 @@ const formData = reactive({
   section: "",
   base: "",
   lesson: "",
-  topics: [],
+  topics: "",
   title: "",
   question: "",
   file: "",
@@ -277,27 +277,14 @@ const getTypeList = async (type, parent = "") => {
   }
 };
 
-const selectTopic = (event) => {
-  formData.topics = event;
-};
-
 const submitQuestion = async () => {
   loading.form = true;
 
   // Prepare form data
   let formSubmitData = new FormData();
   for (let key in formData) {
-    if (!(key == "topics" || key == "file_extra"))
-      formSubmitData.append(key, formData[key]);
+    if (!(key == "file_extra")) formSubmitData.append(key, formData[key]);
   }
-
-  if (
-    formData.topics &&
-    Array.isArray(formData.topics) &&
-    formData.topics.length
-  )
-    for (let key in formData.topics)
-      formSubmitData.append("topics[]", formData.topics[key]);
 
   try {
     const response = await useApiService.post(
@@ -368,7 +355,7 @@ watch(
     userState.value.lastSelectedCurriculum = val;
     formData.base = "";
     formData.lesson = "";
-    formData.topics = [];
+    formData.topics = "";
     grade_list.value = [];
     lesson_list.value = [];
     topic_list.value = [];
@@ -402,7 +389,7 @@ watch(
         topicSelectorRef.value.lesson_selected = true;
       }
     } else {
-      formData.topics = [];
+      formData.topics = "";
       topic_list.value = [];
       if (topicSelectorRef.value) {
         topicSelectorRef.value.lesson_selected = false;

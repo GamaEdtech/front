@@ -29,6 +29,7 @@
                       item-title="title"
                       item-value="id"
                       label="Board"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -43,6 +44,7 @@
                       item-title="title"
                       @update:model-value="changeOption('base', $event)"
                       label="Grade"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -57,6 +59,7 @@
                       v-model="formData.lesson"
                       @update:model-value="changeOption('lesson', $event)"
                       label="Subject"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
@@ -75,7 +78,8 @@
                       item-title="title"
                       v-model="formData.topics"
                       @update:model-value="changeOption('topic', $event)"
-                      label="Topics"
+                      label="Topic"
+                      color="#FFB300"
                     />
                   </v-col>
 
@@ -92,6 +96,7 @@
                           'This field must be at least 20 characters',
                       ]"
                       label="Summary of the question"
+                      color="#FFB300"
                     />
                   </v-col>
 
@@ -111,6 +116,7 @@
                       hint="You must enter at least 70 characters."
                       persistent-hint
                       placeholder="Enter your question"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="3">
