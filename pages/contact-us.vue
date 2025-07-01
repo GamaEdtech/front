@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRecaptcha } from '~/composables/useRecapcha'
 import useApiService from '~/composables/useApiService'
 
@@ -115,18 +115,18 @@ const showSnackebar = (status: "success" | "error", message: string) => {
     snankebar.text = message
 }
 const form = ref<HTMLFormElement | null>(null)
+const { getToken, initCaptcha, isLoaded } = useRecaptcha()
 
 const submitForm = async () => {
     formLoading.value = true
 
     if (isFormValid.value) {
         try {
-            const recaptcha = useRecaptcha()
-            if (!recaptcha.isLoaded()) {
+            if (!isLoaded()) {
                 throw new Error('reCAPTCHA not loaded yet. Please try again.')
             }
 
-            const token = await recaptcha.getToken('submit')
+            const token = await getToken('submit')
 
             const res: any = await useApiService.post("/api/v2/contacts", {
                 captcha: token,
@@ -162,6 +162,10 @@ const submitForm = async () => {
         formLoading.value = false
     }
 }
+
+onMounted(() => {
+    initCaptcha()
+})
 </script>
 
 <style scoped>
