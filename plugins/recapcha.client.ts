@@ -22,7 +22,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (process.server) return
 
     // Get site key from runtime config or environment
-    const siteKey: string = process.env.RECAPTCHA_SITE_KEY as string
+    const siteKey: string = useRuntimeConfig().public.recapchaSiteKey as string
 
     // Function to dynamically load the reCAPTCHA script
     function loadRecaptchaScript(): Promise<any> {

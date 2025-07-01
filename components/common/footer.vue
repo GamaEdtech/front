@@ -98,6 +98,10 @@ export default {
               link: "/about-us",
             },
             {
+              title: "Contact us",
+              link: "/contact-us",
+            },
+            {
               title: "Terms",
               link: "/terms",
             },

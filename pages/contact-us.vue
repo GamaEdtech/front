@@ -87,7 +87,6 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import axios from 'axios'
 import { useRecaptcha } from '~/composables/useRecapcha'
 import useApiService from '~/composables/useApiService'
 
@@ -120,7 +119,6 @@ const form = ref<HTMLFormElement | null>(null)
 const submitForm = async () => {
     formLoading.value = true
 
-    console.log("1");
     if (isFormValid.value) {
         try {
             const recaptcha = useRecaptcha()
@@ -129,16 +127,7 @@ const submitForm = async () => {
             }
 
             const token = await recaptcha.getToken('submit')
-            console.log("2");
 
-            // const res = await axios.post('/api/v2/contacts', {
-                // captcha: token,
-                // fullName: formsData.name,
-                // email: formsData.email,
-                // subject: formsData.subject,
-                // body: formsData.message,
-            // });
-            // console.log("3");
             const res: any = await useApiService.post("/api/v2/contacts", {
                 captcha: token,
                 fullName: formsData.name,
@@ -164,7 +153,7 @@ const submitForm = async () => {
 
         } catch (error: any) {
             console.log(error);
-
+            formLoading.value = false
             showSnackebar("error", 'An error occurred. Please try again.')
         } finally {
             formLoading.value = false
