@@ -14,7 +14,7 @@
                     <v-form class="form" v-model="isFormValid" ref="form">
                         <!--Name Input-->
                         <div>
-                            <label class="lable">Name*</label>
+                            <label class="label">Name*</label>
 
                             <v-text-field rounded placeholder="Enter your full name" variant="outlined" height="48"
                                 :rules="[rules.required]" v-model="formsData.name">
@@ -23,7 +23,7 @@
 
                         <!--Email Input-->
                         <div>
-                            <label class="lable">Email*</label>
+                            <label class="label">Email*</label>
 
                             <v-text-field rounded variant="outlined" placeholder="Enter your email address" outlined
                                 height="48" :rules="[rules.required, rules.email]"
@@ -32,7 +32,7 @@
 
                         <!--Subject Input-->
                         <div>
-                            <label class="lable">Subject*</label>
+                            <label class="label">Subject*</label>
 
                             <v-text-field rounded variant="outlined" placeholder="Enter your Subject" outlined
                                 class="rounded-pill mb-5" height="48" :rules="[rules.required]"
@@ -42,7 +42,7 @@
 
                         <!--Message textarea-->
                         <div>
-                            <label class="lable">Discription*</label>
+                            <label class="label">Discription*</label>
 
                             <v-textarea rounded variant="outlined" outlined name="input-7-4"
                                 hint="Enter at least 25 characters." placeholder="Write something..." no-resize
@@ -149,8 +149,6 @@ const submitForm = async () => {
                 form.value.reset()
             }
 
-            console.log(res);
-
         } catch (error: any) {
             console.log(error);
             formLoading.value = false
@@ -192,7 +190,7 @@ onMounted(() => {
     gap: 1.5rem;
 }
 
-.lable {
+.label {
     display: block;
     margin-bottom: 1rem;
     font-weight: 600;

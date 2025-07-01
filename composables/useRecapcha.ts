@@ -1,6 +1,10 @@
 import { useNuxtApp, useRuntimeConfig } from "nuxt/app"
-import type { RecaptchaContext } from '~/plugins/recapcha.client'
 import { ref } from "vue"
+
+interface RecaptchaContext {
+    render: (elementId: string, callback: (response: string) => void) => void
+    execute: (action: string, callback: (token: string) => void) => void
+}
 
 export const useRecaptcha = () => {
     // Get site key from runtime config or environment
@@ -60,7 +64,12 @@ export const useRecaptcha = () => {
     const initCaptcha = () => {
         loadRecaptchaScript()
             .then((grecaptcha: any) => {
-                console.log('reCAPTCHA script loaded successfully.')
+                setTimeout(() => {
+                    const badge = document.querySelector('.grecaptcha-badge') as HTMLElement;
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                }, 1000);
 
                 const recaptchaRes: RecaptchaContext = {
                     render: (elementId: string, callback: (response: string) => void): void => {
