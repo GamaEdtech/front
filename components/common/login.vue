@@ -1,7 +1,9 @@
 <script setup>
 import { navigateTo } from "nuxt/app";
+const route = useRoute();
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
+import { useUser } from "@/composables/useUser";
 
 const { $toast } = useNuxtApp();
 
@@ -44,6 +46,7 @@ watch(countDown, (val) => {
 
 async function handleCredentialResponse(value) {
   const auth = useAuth();
+  const { setUser } = useUser();
   try {
     const response = await useApiService.post(
       "/api/v1/users/googleAuth",
@@ -56,6 +59,7 @@ async function handleCredentialResponse(value) {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       submitLoginV2(response.data.jwtToken);
+      setUser(response.data.info);
       closeDialog();
 
       if (route.path === "/") navigateTo("/user");
@@ -144,6 +148,8 @@ const sendOtpCodeAgain = async () => {
 
 const submit = handleSubmit(async () => {
   const auth = useAuth();
+  const { setUser } = useUser();
+
   login_loading.value = true;
   try {
     const response = await auth.login({
@@ -163,7 +169,11 @@ const submit = handleSubmit(async () => {
     } else {
       submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
+
       auth.setUserToken(response.data.jwtToken);
+
+      setUser(response.data.info);
+
       closeDialog();
       if (route.path === "/") navigateTo("/user");
     }
@@ -179,6 +189,7 @@ const submit = handleSubmit(async () => {
 
 const onFinish = async () => {
   const auth = useAuth();
+  const { setUser } = useUser();
   try {
     const response = await useApiService.post(
       "/api/v1/users/login",
@@ -193,6 +204,7 @@ const onFinish = async () => {
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       closeDialog();
       if (route.path === "/") navigateTo("/user");
     }
