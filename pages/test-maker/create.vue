@@ -2049,6 +2049,12 @@ const onScroll = () => {
 
 // Apply test to the exam (add or remove)
 const applyTest = async (item, type = null) => {
+  // Check if we need to create an exam first
+  if (type === 'add' && !exam_id.value) {
+    // Create a draft exam with minimal required fields
+    await createDraftExam();
+  }
+
   if (tests.value.find((x) => x == item.id) && type === "remove") {
     tests.value.splice(tests.value.indexOf(item.id), 1);
 
@@ -2063,6 +2069,126 @@ const applyTest = async (item, type = null) => {
     //Add to preview list
     // this.$store.commit('user/addPreviewTestList', item)
     submitTest();
+  }
+};
+
+// Add this new function to create a draft exam
+const createDraftExam = async () => {
+  submit_loading.value = true;
+  
+  try {
+    // First, ensure we have valid selections for required fields by loading dependencies
+    // If section is not selected, choose first available
+    let sectionId = form.section;
+    if (!sectionId && level_list.value.length === 0) {
+      await getTypeList("section");
+    }
+    if (!sectionId && level_list.value.length > 0) {
+      sectionId = level_list.value[0].id;
+    } else if (!sectionId) {
+      sectionId = "1"; // Fallback
+    }
+    
+    // Now load valid base options for this section
+    if (grade_list.value.length === 0) {
+      await getTypeList("base", sectionId);
+    }
+    
+    // Select the first base if none is selected
+    let baseId = form.base;
+    if (!baseId && grade_list.value.length > 0) {
+      baseId = grade_list.value[0].id;
+    } else if (!baseId) {
+      baseId = "1"; // Fallback
+    }
+    
+    // Now load valid lesson options for this base
+    if (lesson_list.value.length === 0) {
+      await getTypeList("lesson", baseId);
+    }
+    
+    // Select the first lesson if none is selected
+    let lessonId = form.lesson;
+    if (!lessonId && lesson_list.value.length > 0) {
+      lessonId = lesson_list.value[0].id;
+    } else if (!lessonId) {
+      lessonId = "1"; // Fallback
+    }
+    
+    // Load exam types if needed
+    if (test_type_list.value.length === 0) {
+      await loadExamTypes();
+    }
+    
+    // Select first exam type if none is selected
+    let examTypeId = form.exam_type;
+    if (!examTypeId && test_type_list.value.length > 0) {
+      examTypeId = test_type_list.value[0].id;
+    } else if (!examTypeId) {
+      examTypeId = "1"; // Fallback
+    }
+
+    // Create minimal form data for a draft exam
+    let formData = new FormData();
+    
+    // Add required fields with valid values
+    formData.append('title', 'Draft Exam');
+    formData.append('duration', '3');
+    formData.append('level', '2');
+    formData.append('section', sectionId);
+    formData.append('base', baseId);
+    formData.append('lesson', lessonId);
+    formData.append('exam_type', examTypeId);
+    
+    // Add optional fields if available
+    if (form.edu_year) formData.append('edu_year', form.edu_year);
+    if (form.edu_month) formData.append('edu_month', form.edu_month);
+    
+    // Add topics if available
+    if (form.topics && form.topics.length) {
+      for (let key in form.topics) {
+        formData.append("topics[]", form.topics[key]);
+      }
+    }
+
+    const response = await useApiService.post(
+      "/api/v1/exams",
+      urlencodeFormData(formData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    // Set the exam ID values
+    exam_id.value = response.data.id;
+    exam_code.value = response.data.code;
+
+    // Update the store
+    const userState = useState("user");
+    userState.value = {
+      ...userState.value,
+      currentExamId: exam_id.value,
+      currentExamCode: exam_code.value,
+    };
+
+    // Update create form component with new exam info if it exists
+    if (
+      createForm.value &&
+      typeof createForm.value.getCurrentExamInfo === "function"
+    ) {
+      createForm.value.getCurrentExamInfo();
+    }
+
+    nuxtApp.$toast.success("Draft exam created");
+  } catch (error) {
+    nuxtApp.$toast.error(
+      error.response?.data?.message || "Error creating draft exam"
+    );
+    throw error; // Re-throw to handle in calling function
+  } finally {
+    submit_loading.value = false;
   }
 };
 
