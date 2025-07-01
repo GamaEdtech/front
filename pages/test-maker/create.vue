@@ -1480,63 +1480,24 @@ const calcLevel = (level) => {
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
   try {
-    // If parent is empty and this is not the section type, return early
-    // This prevents API calls with empty parent IDs which could return incorrect data
+    console.log(`Loading ${type} with parent: ${parent}`);
+
     if (!parent && type !== "section" && type !== "exam_type") {
-      // Clear the appropriate list based on type and trigger
-      if (type === "base") {
-        if (trigger === "filter") filter_grade_list.value = [];
-        else grade_list.value = [];
-      } else if (type === "lesson") {
-        if (trigger === "filter") filter_lesson_list.value = [];
-        else lesson_list.value = [];
-      } else if (type === "topic") {
-        topic_list.value = [];
-      }
+      console.log(`Skipping ${type} load - no parent provided`);
       return;
     }
 
-    const params = {
-      type: type,
-    };
+    const params = { type };
 
-    // Set up parameters based on type
     if (type === "base") params.section_id = parent;
     if (type === "lesson") params.base_id = parent;
     if (type === "topic") params.lesson_id = parent;
-    if (type === "area") params.state_id = parent;
-
-    if (type === "school") {
-      params.section_id = form.section;
-      params.area_id = form.area;
-    }
-
-    // Add loading state if needed
-    const loadingTarget =
-      type === "section"
-        ? trigger === "filter"
-          ? filter_level_list
-          : level_list
-        : type === "base"
-        ? trigger === "filter"
-          ? filter_grade_list
-          : grade_list
-        : type === "lesson"
-        ? trigger === "filter"
-          ? filter_lesson_list
-          : lesson_list
-        : type === "topic"
-        ? topic_list
-        : null;
-
-    if (loadingTarget) {
-      // Set a temporary loading item
-      loadingTarget.value = [{ id: "", title: "Loading...", disabled: true }];
-    }
 
     const res = await useApiService.get("/api/v1/types/list", params);
 
-    if (res && res.data) {
+    if (res && res.data && Array.isArray(res.data)) {
+      console.log(`Loaded ${res.data.length} items for ${type}`);
+
       if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
@@ -1561,22 +1522,18 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       } else if (type === "topic") {
         topic_list.value = res.data;
       } else if (type === "exam_type") {
-        // Make sure we're properly assigning the exam_type data
         test_type_list.value = res.data;
-      } else if (type === "state") {
-        state_list.value = res.data;
-      } else if (type === "area") {
-        area_list.value = res.data;
-      } else if (type === "school") {
-        school_list.value = res.data;
       }
 
       generateTitle();
+    } else {
+      console.warn(`No data received for ${type}`);
+      throw new Error(`No data available for ${type}`);
     }
   } catch (err) {
     console.error(`Error loading ${type} data:`, err);
 
-    // Reset the target list to empty on error
+    // در صورت خطا، لیست‌ها را خالی کن
     if (type === "section") {
       if (trigger === "filter") filter_level_list.value = [];
       else level_list.value = [];
@@ -1592,9 +1549,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       test_type_list.value = [];
     }
 
-    nuxtApp.$toast.error(
-      `Failed to load ${type} data: ${err.message || "Unknown error"}`
-    );
+    throw err;
   }
 };
 
@@ -1684,14 +1639,17 @@ const submitQuestion = async () => {
 
 // Convert form data from multipart to urlencode
 const urlencodeFormData = (fd) => {
-  let s = "";
+  const params = new URLSearchParams();
 
-  for (const pair of fd.entries()) {
-    if (typeof pair[1] == "string") {
-      s += (s ? "&" : "") + encode(pair[0]) + "=" + encode(pair[1]);
+  for (const [key, value] of fd.entries()) {
+    if (typeof value === "string") {
+      params.append(key, value);
     }
   }
-  return s;
+
+  const result = params.toString();
+  console.log("URL encoded data:", result);
+  return result;
 };
 
 const encode = (s) => {
@@ -2049,107 +2007,72 @@ const onScroll = () => {
 
 // Apply test to the exam (add or remove)
 const applyTest = async (item, type = null) => {
-  // Check if we need to create an exam first
-  if (type === 'add' && !exam_id.value) {
-    // Create a draft exam with minimal required fields
-    await createDraftExam();
-  }
+  try {
+    // بررسی وجود exam_id قبل از اضافه کردن تست
+    if (type === "add" && !exam_id.value) {
+      console.log("No exam ID found, creating draft exam...");
+      await createDraftExam();
 
-  if (tests.value.find((x) => x == item.id) && type === "remove") {
-    tests.value.splice(tests.value.indexOf(item.id), 1);
+      // بررسی مجدد exam_id بعد از ساخت draft
+      if (!exam_id.value) {
+        throw new Error("Failed to create draft exam");
+      }
+    }
 
-    //Remove from preview
-    // this.$store.commit('user/removePreviewTestList', item.id);
+    const testId = String(item.id);
+    const testExists = tests.value.some((id) => String(id) === testId);
 
-    submitTest();
-  }
-  if (!tests.value.find((x) => x == item.id) && type === "add") {
-    tests.value.push(item.id);
+    if (testExists && type === "remove") {
+      const index = tests.value.findIndex((id) => String(id) === testId);
+      if (index !== -1) {
+        tests.value.splice(index, 1);
+        await submitTest();
+        nuxtApp.$toast.success("Test removed from exam");
+      }
+    }
 
-    //Add to preview list
-    // this.$store.commit('user/addPreviewTestList', item)
-    submitTest();
+    if (!testExists && type === "add") {
+      tests.value.push(testId);
+      await submitTest();
+      nuxtApp.$toast.success("Test added to exam");
+    }
+  } catch (error) {
+    console.error("Error in applyTest:", error);
+    nuxtApp.$toast.error(error.message || "Error managing test");
   }
 };
 
 // Add this new function to create a draft exam
 const createDraftExam = async () => {
   submit_loading.value = true;
-  
+
   try {
-    // First, ensure we have valid selections for required fields by loading dependencies
-    // If section is not selected, choose first available
-    let sectionId = form.section;
-    if (!sectionId && level_list.value.length === 0) {
-      await getTypeList("section");
-    }
-    if (!sectionId && level_list.value.length > 0) {
-      sectionId = level_list.value[0].id;
-    } else if (!sectionId) {
-      sectionId = "1"; // Fallback
-    }
-    
-    // Now load valid base options for this section
-    if (grade_list.value.length === 0) {
-      await getTypeList("base", sectionId);
-    }
-    
-    // Select the first base if none is selected
-    let baseId = form.base;
-    if (!baseId && grade_list.value.length > 0) {
-      baseId = grade_list.value[0].id;
-    } else if (!baseId) {
-      baseId = "1"; // Fallback
-    }
-    
-    // Now load valid lesson options for this base
-    if (lesson_list.value.length === 0) {
-      await getTypeList("lesson", baseId);
-    }
-    
-    // Select the first lesson if none is selected
-    let lessonId = form.lesson;
-    if (!lessonId && lesson_list.value.length > 0) {
-      lessonId = lesson_list.value[0].id;
-    } else if (!lessonId) {
-      lessonId = "1"; // Fallback
-    }
-    
-    // Load exam types if needed
-    if (test_type_list.value.length === 0) {
-      await loadExamTypes();
-    }
-    
-    // Select first exam type if none is selected
-    let examTypeId = form.exam_type;
-    if (!examTypeId && test_type_list.value.length > 0) {
-      examTypeId = test_type_list.value[0].id;
-    } else if (!examTypeId) {
-      examTypeId = "1"; // Fallback
+    // اطمینان از بارگذاری داده‌های اساسی
+    await ensureBasicDataLoaded();
+
+    // بررسی و تنظیم مقادیر اجباری
+    const requiredData = await getRequiredFormData();
+
+    console.log("Required data prepared:", requiredData);
+
+    // ساخت FormData
+    const formData = new FormData();
+
+    // اضافه کردن فیلدهای اجباری
+    Object.keys(requiredData).forEach((key) => {
+      if (requiredData[key] !== null && requiredData[key] !== undefined) {
+        formData.append(key, String(requiredData[key]));
+      }
+    });
+
+    // اضافه کردن topics اگر موجود باشد
+    if (form.topics && form.topics.length) {
+      form.topics.forEach((topic) => {
+        formData.append("topics[]", String(topic));
+      });
     }
 
-    // Create minimal form data for a draft exam
-    let formData = new FormData();
-    
-    // Add required fields with valid values
-    formData.append('title', 'Draft Exam');
-    formData.append('duration', '3');
-    formData.append('level', '2');
-    formData.append('section', sectionId);
-    formData.append('base', baseId);
-    formData.append('lesson', lessonId);
-    formData.append('exam_type', examTypeId);
-    
-    // Add optional fields if available
-    if (form.edu_year) formData.append('edu_year', form.edu_year);
-    if (form.edu_month) formData.append('edu_month', form.edu_month);
-    
-    // Add topics if available
-    if (form.topics && form.topics.length) {
-      for (let key in form.topics) {
-        formData.append("topics[]", form.topics[key]);
-      }
-    }
+    console.log("FormData entries:", Object.fromEntries(formData));
 
     const response = await useApiService.post(
       "/api/v1/exams",
@@ -2161,34 +2084,149 @@ const createDraftExam = async () => {
       }
     );
 
-    // Set the exam ID values
-    exam_id.value = response.data.id;
-    exam_code.value = response.data.code;
+    if (response && response.data && response.data.id) {
+      exam_id.value = response.data.id;
+      exam_code.value = response.data.code;
 
-    // Update the store
-    const userState = useState("user");
-    userState.value = {
-      ...userState.value,
-      currentExamId: exam_id.value,
-      currentExamCode: exam_code.value,
-    };
+      // به‌روزرسانی store
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: exam_id.value,
+        currentExamCode: exam_code.value,
+      };
 
-    // Update create form component with new exam info if it exists
-    if (
-      createForm.value &&
-      typeof createForm.value.getCurrentExamInfo === "function"
-    ) {
-      createForm.value.getCurrentExamInfo();
+      // به‌روزرسانی createForm component
+      if (
+        createForm.value &&
+        typeof createForm.value.getCurrentExamInfo === "function"
+      ) {
+        createForm.value.getCurrentExamInfo();
+      }
+
+      nuxtApp.$toast.success("Draft exam created successfully");
+      console.log("Draft exam created:", response.data);
+    } else {
+      throw new Error("Invalid response from server");
+    }
+  } catch (error) {
+    console.error("Error creating draft exam:", error);
+
+    let errorMessage = "Error creating draft exam";
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+
+      // اگر فیلدهای مورد نیاز مشخص شده باشد
+      if (error.response.data.data && Array.isArray(error.response.data.data)) {
+        errorMessage += ` Missing fields: ${error.response.data.data.join(
+          ", "
+        )}`;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
     }
 
-    nuxtApp.$toast.success("Draft exam created");
-  } catch (error) {
-    nuxtApp.$toast.error(
-      error.response?.data?.message || "Error creating draft exam"
-    );
-    throw error; // Re-throw to handle in calling function
+    nuxtApp.$toast.error(errorMessage);
+    throw error;
   } finally {
     submit_loading.value = false;
+  }
+};
+
+const getRequiredFormData = async () => {
+  // اطمینان از وجود section
+  let sectionId = form.section;
+  if (!sectionId) {
+    if (level_list.value.length === 0) {
+      await getTypeList("section");
+    }
+    sectionId = level_list.value.length > 0 ? level_list.value[0].id : null;
+  }
+
+  if (!sectionId) {
+    throw new Error("No valid section available");
+  }
+
+  // اطمینان از وجود base (grade)
+  let baseId = form.base;
+  if (!baseId) {
+    if (grade_list.value.length === 0) {
+      await getTypeList("base", sectionId);
+    }
+    baseId = grade_list.value.length > 0 ? grade_list.value[0].id : null;
+  }
+
+  if (!baseId) {
+    throw new Error("No valid grade available");
+  }
+
+  // اطمینان از وجود lesson
+  let lessonId = form.lesson;
+  if (!lessonId) {
+    if (lesson_list.value.length === 0) {
+      await getTypeList("lesson", baseId);
+    }
+    lessonId = lesson_list.value.length > 0 ? lesson_list.value[0].id : null;
+  }
+
+  if (!lessonId) {
+    throw new Error("No valid lesson available");
+  }
+
+  // اطمینان از وجود exam_type
+  let examTypeId = form.exam_type;
+  if (!examTypeId) {
+    if (test_type_list.value.length === 0) {
+      await loadExamTypes();
+    }
+    examTypeId =
+      test_type_list.value.length > 0 ? test_type_list.value[0].id : null;
+  }
+
+  if (!examTypeId) {
+    throw new Error("No valid exam type available");
+  }
+
+  // تولید title بر اساس داده‌های انتخاب شده
+  const lessonTitle =
+    lesson_list.value.find((l) => l.id == lessonId)?.title || "Test";
+  const baseTitle =
+    grade_list.value.find((b) => b.id == baseId)?.title || "Grade";
+
+  return {
+    title: form.title || `${lessonTitle} Test ${baseTitle}`,
+    duration: form.duration || 3,
+    level: form.level || "2",
+    section: sectionId,
+    base: baseId,
+    lesson: lessonId,
+    exam_type: examTypeId,
+    edu_year: form.edu_year || new Date().getFullYear().toString(),
+    edu_month: form.edu_month || "1",
+  };
+};
+
+const ensureBasicDataLoaded = async () => {
+  try {
+    // بارگذاری sections
+    if (!level_list.value.length) {
+      console.log("Loading sections...");
+      await getTypeList("section");
+    }
+
+    // بارگذاری exam types
+    if (!test_type_list.value.length) {
+      console.log("Loading exam types...");
+      await loadExamTypes();
+    }
+
+    console.log("Basic data loaded:", {
+      sections: level_list.value.length,
+      examTypes: test_type_list.value.length,
+    });
+  } catch (error) {
+    console.error("Error loading basic data:", error);
+    throw error;
   }
 };
 
