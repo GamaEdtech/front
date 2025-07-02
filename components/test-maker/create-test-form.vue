@@ -1676,58 +1676,65 @@ const answerTypeChanged = (type) => {
  * Fetch current exam information
  */
 const getCurrentExamInfo = async () => {
-  // Get current exam ID from state or route
-  const userState = useState("user").value;
-  const currentExamId = userState?.currentExamId || route.params.id;
+  try {
+    // Get current exam ID from state or route
+    const userState = useState("user").value;
+    const currentExamId = userState?.currentExamId || route.params.id;
 
-  if (currentExamId) {
-    try {
-      const response = await useApiService.get(
-        `/api/v1/exams/info/${currentExamId}`
-      );
+    if (currentExamId) {
+      try {
+        const response = await useApiService.get(
+          `/api/v1/exams/info/${currentExamId}`
+        );
 
-      // Set form data from response - important to set in sequence
-      if (response.data.section) {
-        form.section = response.data.section;
-        // Fetch grade list based on section
-        await getTypeList("base", response.data.section);
+        // Set form data from response - important to set in sequence
+        if (response.data.section) {
+          form.section = response.data.section;
+          // Fetch grade list based on section
+          await getTypeList("base", response.data.section);
 
-        if (response.data.base) {
-          form.base = response.data.base;
-          // Fetch lesson list based on base
-          await getTypeList("lesson", response.data.base);
+          if (response.data.base) {
+            form.base = response.data.base;
+            // Fetch lesson list based on base
+            await getTypeList("lesson", response.data.base);
 
-          if (response.data.lesson) {
-            form.lesson = response.data.lesson;
-            // Fetch topic list based on lesson
-            await getTypeList("topic", response.data.lesson);
+            if (response.data.lesson) {
+              form.lesson = response.data.lesson;
+              // Fetch topic list based on lesson
+              await getTypeList("topic", response.data.lesson);
 
-            // If in edit mode, we need to populate topics as well
-            if (
-              props.examEditMode &&
-              response.data.topics &&
-              response.data.topics.length
-            ) {
-              form.topic = response.data.topics[0];
+              // If in edit mode, we need to populate topics as well
+              if (
+                props.examEditMode &&
+                response.data.topics &&
+                response.data.topics.length
+              ) {
+                form.topic = response.data.topics[0];
+              }
             }
           }
         }
-      }
 
-      // Set file path if available
-      if (response.data.file_original) {
-        file_original_path.value = response.data.file_original;
-      }
+        // Set file path if available
+        if (response.data.file_original) {
+          file_original_path.value = response.data.file_original;
+        }
 
-      // Set exam test list length
-      if (response.data.tests && Array.isArray(response.data.tests)) {
-        examTestListLength.value = response.data.tests.length;
+        // Set exam test list length
+        if (response.data.tests && Array.isArray(response.data.tests)) {
+          examTestListLength.value = response.data.tests.length;
+        }
+      } catch (err) {
+        console.error("Error fetching exam info:", err);
+        const { $toast } = useNuxtApp();
+        if ($toast) $toast.error("Failed to load exam information");
+        throw err; // Rethrow to allow parent component to handle it
       }
-    } catch (err) {
-      console.error("Error fetching exam info:", err);
-      const { $toast } = useNuxtApp();
-      if ($toast) $toast.error("Failed to load exam information");
     }
+  } catch (error) {
+    console.error("Error in getCurrentExamInfo:", error);
+    const { $toast } = useNuxtApp();
+    if ($toast) $toast.error("Failed to initialize test form. Please try refreshing the page.");
   }
 };
 
