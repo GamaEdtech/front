@@ -1,16 +1,6 @@
 <script setup>
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
-import {
-  ClassicEditor,
-  Alignment,
-  Bold,
-  Essentials,
-  Italic,
-  Paragraph,
-  Underline,
-  Undo,
-} from "ckeditor5";
-import "ckeditor5/ckeditor5.css";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 // Define props to customize the editor features
 const props = defineProps({
@@ -21,11 +11,7 @@ const props = defineProps({
    */
   features: {
     type: Array,
-    default: () => ['bold', 'underline', 'alignment'],
-    validator: (value) => {
-      const allowedFeatures = ['bold', 'italic', 'underline', 'alignment'];
-      return value.every(feature => allowedFeatures.includes(feature));
-    }
+    default: () => ['bold', 'italic', 'underline', 'alignment'],
   },
   
   /**
@@ -47,75 +33,12 @@ const props = defineProps({
   },
   
   /**
-   * Editor height
-   * @type {String}
-   */
-  height: {
-    type: String,
-    default: "auto"
-  },
-  
-  /**
-   * Editor width
-   * @type {String}
-   */
-  width: {
-    type: String,
-    default: "100%"
-  },
-  
-  /**
    * Editor min-height
    * @type {String}
    */
   minHeight: {
     type: String,
     default: "250px"
-  },
-  
-  /**
-   * Editor max-height
-   * @type {String}
-   */
-  maxHeight: {
-    type: String,
-    default: "500px"
-  },
-  
-  /**
-   * Border radius
-   * @type {String}
-   */
-  borderRadius: {
-    type: String,
-    default: "4px"
-  },
-  
-  /**
-   * Border color
-   * @type {String}
-   */
-  borderColor: {
-    type: String,
-    default: "#ccc"
-  },
-  
-  /**
-   * Background color
-   * @type {String}
-   */
-  backgroundColor: {
-    type: String,
-    default: "#ffffff"
-  },
-  
-  /**
-   * Custom class names
-   * @type {String}
-   */
-  customClass: {
-    type: String,
-    default: ""
   },
   
   /**
@@ -138,74 +61,26 @@ const featureToToolbarItem = {
   alignment: "alignment"
 };
 
-// Define the mapping between feature names and required plugins
-const featureToPlugin = {
-  bold: Bold,
-  italic: Italic,
-  underline: Underline,
-  alignment: Alignment
-};
-
-// Generate toolbar items based on enabled features
-const generateToolbarItems = () => {
-  const items = [];
-  
-  // Always include undo/redo for better UX
-  items.push("undo", "redo", "|");
-  
-  // Add enabled features to toolbar
-  props.features.forEach(feature => {
-    if (featureToToolbarItem[feature]) {
-      items.push(featureToToolbarItem[feature]);
-    }
-  });
-  
-  return items;
-};
-
-// Generate plugins list based on enabled features
-const generatePlugins = () => {
-  // Always include essential plugins
-  const plugins = [Essentials, Paragraph, Undo];
-  
-  // Add plugins for enabled features
-  props.features.forEach(feature => {
-    if (featureToPlugin[feature]) {
-      plugins.push(featureToPlugin[feature]);
-    }
-  });
-  
-  return plugins;
+// Create editor configuration with basic toolbar
+const editorConfig = {
+  toolbar: {
+    items: ['undo', 'redo', '|', 'bold', 'italic'],
+  },
+  placeholder: props.placeholder,
+  initialData: props.initialData,
 };
 
 // Computed property to generate styles
 const editorStyles = {
-  width: props.width,
-  height: props.height,
+  width: '100%',
   minHeight: props.minHeight,
-  maxHeight: props.maxHeight,
   ...props.additionalStyles
-};
-
-// Create editor configuration
-const editorConfig = {
-  toolbar: {
-    items: generateToolbarItems(),
-    shouldNotGroupWhenFull: false,
-  },
-  plugins: generatePlugins(),
-  placeholder: props.placeholder,
-  initialData: props.initialData,
 };
 </script>
 <template>
   <div 
-    class="rich-editor-container" 
-    :class="customClass"
+    class="rich-editor-container"
     :style="{
-      borderRadius: borderRadius,
-      borderColor: borderColor,
-      backgroundColor: backgroundColor,
       '--editor-min-height': minHeight
     }"
   >
@@ -223,27 +98,22 @@ const editorConfig = {
 
 <style>
 .rich-editor-container {
-  border: 1px solid;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
+  background-color: #ffffff;
 }
 
 /* Customize the editor's toolbar */
 .rich-editor-container .ck-toolbar {
   border-bottom-color: inherit;
+  background-color: #FAFAFA !important;
 }
 
 /* Customize the editor's content area */
 .rich-editor-container .ck-editor__editable {
   padding: 0 10px;
-}
-
-/* Ensure editor takes full height of container */
-.rich-editor-container .ck-editor__main {
-  height: 100%;
-}
-
-.rich-editor-container .ck-editor__main > * {
   min-height: var(--editor-min-height);
 }
 
@@ -257,11 +127,9 @@ const editorConfig = {
   align-items: center;
   gap: 8px;
 }
+
 .editor-custom-tools .v-card img{
   height: 7rem !important;
   width: 7rem !important;
-}
-.ck-toolbar_grouping {
-  background-color: #FAFAFA !important;
 }
 </style>
