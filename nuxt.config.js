@@ -63,6 +63,7 @@ export default defineNuxtConfig({
       googleClientId:
         process.env.GOOGLE_CLIENT_ID ||
         "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
+      recapchaSiteKey: process.env.NUXT_RECAPTCHA_SITE_KEY || '6LcGF3ErAAAAAAneMnvDNOvdBg4Z7IDoL86tJr9T'
     },
   },
 
