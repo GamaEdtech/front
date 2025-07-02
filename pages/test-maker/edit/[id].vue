@@ -1378,8 +1378,8 @@ const router = useRouter();
 const userToken = ref("");
 
 // Core data
-const test_step = ref(2); // Start at the Tests step
-const exam_id = ref("");
+const test_step = ref(1); // Start at the Tests step
+const exam_id = ref(route.params.id);
 const exam_code = ref("");
 const submit_loading = ref(false);
 const publish_loading = ref(false);
@@ -1397,9 +1397,9 @@ const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
-  section: route.query.board ? route.query.board : "",
-  base: route.query.grade ? route.query.grade : "",
-  lesson: route.query.subject ? route.query.subject : "",
+  section: "",
+  base: "",
+  lesson: "",
   topics: [],
   exam_type: "",
   level: "2",
@@ -1409,7 +1409,7 @@ const form = reactive({
   school: "",
   duration: 3,
   title: "",
-  paperID: route.query.paperId ? route.query.paperId : "",
+  paperID: "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
@@ -1563,6 +1563,9 @@ const calcLevel = (level) => {
   }
   return "";
 };
+
+
+
 
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
@@ -2409,50 +2412,52 @@ watch(
 
 // Initialize component on mount
 onMounted(async () => {
-  // Get user token for API calls
-  userToken.value = auth.getUserToken();
-
   // Ensure filter.testsHasVideo is set to 0 at initialization
   if (filter.testsHasVideo === null || filter.testsHasVideo === undefined) {
     filter.testsHasVideo = 0;
   }
 
-  await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
+  try {
+    await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
 
-  await getTypeList("section");
-  if (form.section) {
-    await getTypeList("base", form.section);
-    if (form.base) {
-      await getTypeList("lesson", form.base);
-      if (form.lesson) {
-        await getTypeList("topic", form.lesson);
+    await getTypeList("section");
+    if (form.section) {
+      await getTypeList("base", form.section);
+      if (form.base) {
+        await getTypeList("lesson", form.base);
+        if (form.lesson) {
+          await getTypeList("topic", form.lesson);
+        }
       }
     }
-  }
-  await loadExamTypes();
-  await getTypeList("state");
-  await getExamTests(); // For the general list of tests to choose from
+    await loadExamTypes();
+    await getTypeList("state");
+    await getExamTests(); // For the general list of tests to choose from
 
-  if (exam_id.value) {
-    await handleRefreshPreviewList(); // MODIFIED HERE - Populates previewTestList based on tests.value
-  }
+    if (exam_id.value) {
+      await handleRefreshPreviewList(); // MODIFIED HERE - Populates previewTestList based on tests.value
+    }
 
-  if (route.query?.active === "test_list") {
-    test_step.value = 2;
-    testListSwitch.value = true;
-  } else if (route.query?.active === "add_test") {
-    test_step.value = 2;
-    testListSwitch.value = false;
-  } else {
-    // Default to step 1 if no specific active query or if it's an existing exam being edited
-    // For edit, we might want to default to step 2 if exam_id is present
-    test_step.value = exam_id.value ? 2 : 1;
-  }
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    if (route.query?.active === "test_list") {
+      test_step.value = 2;
+      testListSwitch.value = true;
+    } else if (route.query?.active === "add_test") {
+      test_step.value = 2;
+      testListSwitch.value = false;
+    } else {
+      // Default to step 1 if no specific active query or if it's an existing exam being edited
+      // For edit, we might want to default to step 2 if exam_id is present
+      test_step.value = exam_id.value ? 2 : 1;
+    }
+    if (test_step.value === 2 && testListSwitch.value) {
+      await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+    }
+    if (test_step.value === 3) {
+      await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    }
+  } catch (error) {
+    console.error("Error during component initialization:", error);
+    nuxtApp.$toast.error("Failed to initialize the exam editor. Please try refreshing the page.");
   }
 });
 
@@ -3093,18 +3098,27 @@ const getCurrentExamInfo = async () => {
       }
       exam_code.value = examData.code || "";
 
+      // Update the user state with the current exam ID
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: exam_id.value,
+        currentExamCode: exam_code.value,
+      };
+
       // If createForm component is used, ensure its state is updated
       if (createForm.value) {
         createForm.value.examEditMode = true; // Let child know it's in edit context
-        // Pass relevant exam data to createForm if it needs it directly
-        // e.g., createForm.value.setInitialExamData(examData);
-        // Or rely on its own getCurrentExamInfo if that's robust
-        if (typeof createForm.value.getCurrentExamInfo === "function") {
-          // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
-        }
-        if ("examTestListLength" in createForm.value) {
-          createForm.value.examTestListLength = tests.value.length;
-        }
+        
+        // Make sure to call getCurrentExamInfo on the next tick to ensure component is mounted
+        nextTick(() => {
+          if (typeof createForm.value.getCurrentExamInfo === "function") {
+            createForm.value.getCurrentExamInfo();
+          }
+          if ("examTestListLength" in createForm.value) {
+            createForm.value.examTestListLength = tests.value.length;
+          }
+        });
       }
     } else {
       nuxtApp.$toast.error("Failed to load exam data. No data in response.");
@@ -3112,9 +3126,18 @@ const getCurrentExamInfo = async () => {
     }
   } catch (err) {
     console.error("Error fetching exam info:", err);
+    
+    // More detailed error logging
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+    }
+    
     nuxtApp.$toast.error("Failed to load exam information. Please try again.");
-    // Consider redirecting or providing a retry mechanism
-    // router.push('/user/exam');
+    // Consider redirecting after a brief delay
+    setTimeout(() => {
+      router.push('/user/exam');
+    }, 2000);
   }
 };
 
