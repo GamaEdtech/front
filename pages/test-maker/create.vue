@@ -1464,7 +1464,6 @@ const test_share_link = computed(() => {
 
 
 const resetTestList = () => {
-  console.log('Resetting test list...');
   filter.page = 1;
   test_list.value = [];
   all_tests_loaded.value = false;
@@ -1472,19 +1471,8 @@ const resetTestList = () => {
 
 
 const loadFilteredTests = async () => { 
-  if (filter.lesson) {
-    console.log('Loading filtered tests with filters:', {
-      section: filter.section,
-      base: filter.base,
-      lesson: filter.lesson,
-      topic: filter.topic,
-      testsHasVideo: filter.testsHasVideo,
-      myTests: filter.myTests
-    });
-    
+  if (filter.lesson) { 
     await getExamTests();
-  } else {
-    console.log('No lesson selected, skipping test load');
   }
 };
 
@@ -1517,13 +1505,9 @@ const calcLevel = (level) => {
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
   try {
-    console.log(`Loading ${type} with parent: ${parent}, trigger: ${trigger}`);
-    
     // If parent is empty and this is not the section type, return early
     // This prevents API calls with empty parent IDs which could return incorrect data
     if (!parent && type !== "section" && type !== "exam_type") {
-      console.log(`Skipping ${type} load - no parent provided`);
-      
       // Clear the appropriate list based on type and trigger
       if (type === "base") {
         if (trigger === "filter") filter_grade_list.value = [];
@@ -1577,8 +1561,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     const res = await useApiService.get("/api/v1/types/list", params);
 
     if (res && res.data && Array.isArray(res.data)) {
-      console.log(`Successfully loaded ${res.data.length} items for ${type}`);
-      
       if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
@@ -1615,7 +1597,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
 
       generateTitle();
     } else {
-      console.warn(`No data received for ${type}`);
       if (type === "base") {
         if (trigger === "filter") filter_grade_list.value = [];
         else grade_list.value = [];
@@ -1628,7 +1609,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     }
 
   } catch (err) {
-    console.error(`Error loading ${type} data:`, err);
     // Reset the target list to empty on error
     if (type === "section") {
       if (trigger === "filter") filter_level_list.value = [];
@@ -1745,7 +1725,6 @@ const urlencodeFormData = (fd) => {
   }
   
   const result = params.toString();
-  console.log('URL encoded data:', result);
   return result;
 };
 
@@ -2093,7 +2072,6 @@ const onScroll = () => {
   }
 
   if (isNearBottom && filter.lesson) {
-    console.log('Loading more tests - page:', filter.page + 1);
     timer.value = setTimeout(() => {
       test_loading.value = true;
       filter.page++;
@@ -2170,19 +2148,12 @@ const getRequiredFormData = async () => {
 const ensureBasicDataLoaded = async () => {
   try {
     if (!level_list.value.length) {
-      console.log('Loading sections...');
       await getTypeList("section");
     }
     
     if (!test_type_list.value.length) {
-      console.log('Loading exam types...');
       await loadExamTypes();
     }
-    
-    console.log('Basic data loaded:', {
-      sections: level_list.value.length,
-      examTypes: test_type_list.value.length
-    });
     
   } catch (error) {
     console.error('Error loading basic data:', error);
@@ -2198,8 +2169,6 @@ const createDraftExam = async () => {
     
     const requiredData = await getRequiredFormData();
     
-    console.log('Required data prepared:', requiredData);
-    
     const formData = new FormData();
     
     Object.keys(requiredData).forEach(key => {
@@ -2213,8 +2182,6 @@ const createDraftExam = async () => {
         formData.append("topics[]", String(topic));
       });
     }
-
-    console.log('FormData entries:', Object.fromEntries(formData));
 
     const response = await useApiService.post(
       "/api/v1/exams",
@@ -2242,7 +2209,6 @@ const createDraftExam = async () => {
       }
 
       nuxtApp.$toast.success("Draft exam created successfully");
-      console.log('Draft exam created:', response.data);
     } else {
       throw new Error('Invalid response from server');
     }
@@ -2271,7 +2237,6 @@ const createDraftExam = async () => {
 const applyTest = async (item, type = null) => {
   try {
     if (type === 'add' && !exam_id.value) {
-      console.log('No exam ID found, creating draft exam...');
       await createDraftExam();
       
       if (!exam_id.value) {
@@ -2306,24 +2271,15 @@ const applyTest = async (item, type = null) => {
 // Get exam tests
 const getExamTests = async () => {
   if (all_tests_loaded.value || test_loading.value) {
-    console.log('Skipping getExamTests - already loading or all loaded');
     return;
   }
 
   if (!filter.lesson) {
-    console.log('No lesson selected, cannot load tests');
     return;
   }
 
   test_loading.value = true;
-  console.log('Getting exam tests with params:', {
-    lesson: filter.lesson,
-    topic: filter.topic,
-    myTests: filter.myTests,
-    testsHasVideo: filter.testsHasVideo,
-    page: filter.page,
-    perpage: filter.perpage,
-  });
+
 
   try {
     const params = {
@@ -2347,12 +2303,10 @@ const getExamTests = async () => {
     const response = await useApiService.get("/api/v1/examTests", params);
 
     const newTests = response?.data?.list || [];
-    console.log(`Received ${newTests.length} tests for page ${filter.page}`);
 
     if (newTests.length === 0) {
       all_tests_loaded.value = true;
       if (filter.page === 1) {
-        console.log('No tests found for current filters');
       }
     } else {
       if (filter.page === 1) {
@@ -2659,7 +2613,6 @@ const handlePublish = () => {
 
 
 const handleClearSection = () => {
-  console.log('Clearing section filter');
   filter.section = "";
   filter.base = "";
   filter.lesson = "";
@@ -2671,7 +2624,6 @@ const handleClearSection = () => {
 };
 
 const handleClearBase = () => {
-  console.log('Clearing base filter');
   filter.base = "";
   filter.lesson = "";
   filter.topic = "";
@@ -2681,7 +2633,6 @@ const handleClearBase = () => {
 };
 
 const handleClearLesson = () => {
-  console.log('Clearing lesson filter');
   filter.lesson = "";
   filter.topic = "";
   topic_list.value = [];
@@ -2689,7 +2640,6 @@ const handleClearLesson = () => {
 };
 
 const handleClearTopic = () => {
-  console.log('Clearing topic filter');
   filter.topic = "";
   resetTestList();
   loadFilteredTests();
@@ -2942,8 +2892,6 @@ watch(
 watch(
   () => filter.section,
   async (newVal, oldVal) => {
-    console.log('Filter section changed:', { from: oldVal, to: newVal });
-    
     if (newVal && newVal !== oldVal) {
       // Reset dependent filters
       filter.base = "";
@@ -2976,8 +2924,6 @@ watch(
 watch(
   () => filter.base,
   async (newVal, oldVal) => {
-    console.log('Filter base changed:', { from: oldVal, to: newVal });
-    
     if (newVal && newVal !== oldVal) {
       // Reset dependent filters
       filter.lesson = "";
@@ -3008,8 +2954,6 @@ watch(
 watch(
   () => filter.lesson,
   async (newVal, oldVal) => {
-    console.log('Filter lesson changed:', { from: oldVal, to: newVal });
-    
     if (newVal && newVal !== oldVal) {
       // Reset topic filter
       filter.topic = "";
@@ -3039,8 +2983,6 @@ watch(
 watch(
   () => filter.topic,
   async (newVal, oldVal) => {
-    console.log('Filter topic changed:', { from: oldVal, to: newVal });
-    
     if (newVal !== oldVal) {
       resetTestList();
       await loadFilteredTests();
@@ -3051,8 +2993,6 @@ watch(
 watch(
   () => filter.testsHasVideo,
   async (newVal, oldVal) => {
-    console.log('Filter testsHasVideo changed:', { from: oldVal, to: newVal });
-    
     if (newVal !== oldVal) {
       resetTestList();
       await loadFilteredTests();
@@ -3063,8 +3003,6 @@ watch(
 watch(
   () => filter.myTests,
   async (newVal, oldVal) => {
-    console.log('Filter myTests changed:', { from: oldVal, to: newVal });
-    
     if (newVal !== oldVal) {
       resetTestList();
       await loadFilteredTests();
