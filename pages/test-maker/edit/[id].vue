@@ -266,6 +266,7 @@
           <v-row>
             <v-col cols="12">
               <v-switch
+                v-if="exam_id"
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
@@ -1438,7 +1439,7 @@ const filter = ref({
   lesson: "",
   topic: "",
   page: 1,
-  perpage: 40,
+  perpage: 10,
   myTests: false,
   testsHasVideo: 0, // Use 0 instead of "All" string
 });
@@ -2094,7 +2095,7 @@ const onScroll = () => {
   if (isNearBottom) {
     timer.value = setTimeout(() => {
       test_loading.value = true;
-      filter.page++;
+      filter.page = filter.page + 1;
       getExamTests();
     }, 800);
   }
@@ -2520,97 +2521,30 @@ const deleteExamTest = async () => {
 
 // Get exam tests with improved error handling
 const getExamTests = async () => {
-  // If already loading or all tests loaded, don't make another request
-  if (test_loading.value || all_tests_loaded.value) return;
-
   test_loading.value = true;
 
-  // Build query params, ensuring testsHasVideo is always a number
-  const params = {
-    lesson: filter.lesson,
-    topic: filter.topic,
-    myTests: filter.myTests,
-    // Ensure testsHasVideo is always a number (0 if null/undefined/cleared)
-    testsHasVideo:
-      filter.testsHasVideo === null || filter.testsHasVideo === undefined
-        ? 0
-        : filter.testsHasVideo,
-    page: filter.page,
-    perpage: filter.perpage,
-  };
-
-  // Remove undefined or null values (except testsHasVideo which we've already handled)
-  Object.keys(params).forEach((key) => {
-    if (
-      key !== "testsHasVideo" &&
-      (params[key] === undefined || params[key] === null)
-    ) {
-      delete params[key];
-    }
-  });
-
   try {
-    // First attempt with all parameters
+    const params = {
+      lesson: filter.lesson,
+      topic: filter.topic,
+      myTests: filter.myTests,
+      testsHasVideo: filter.testsHasVideo,
+      page: filter.page,
+      perpage: filter.perpage,
+    };
+
+
     const response = await useApiService.get("/api/v1/examTests", params);
+    test_list.value.push(...response?.data?.list);
 
-    test_list.value.push(...response.data.list);
-
-    // Update exam test list length
-    if (createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-
-    // Check if we've loaded all tests
-    all_tests_loaded.value = response.data.list.length === 0;
-
-    return response;
-  } catch (error) {
-    console.error("Error getting exam tests:", error);
-
-    // Try a fallback with simpler params if the first request failed
-    try {
-      // Show a toast notification about the fallback
-      nuxtApp.$toast.info(
-        "Some filters were ignored due to an error. Trying with simplified parameters."
-      );
-
-      // Simplified params - just keep the essential ones
-      const fallbackParams = {
-        lesson: filter.lesson,
-        page: filter.page,
-        perpage: filter.perpage,
-      };
-
-      console.log("Retrying with simplified params:", fallbackParams);
-
-      const fallbackResponse = await useApiService.get(
-        "/api/v1/examTests",
-        fallbackParams
-      );
-
-      test_list.value.push(...fallbackResponse.data.list);
-      // Update exam test list length
-      if (createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
-      }
-
-      // Check if we've loaded all tests
-      all_tests_loaded.value = fallbackResponse.data.list.length === 0;
-
-      return fallbackResponse;
-    } catch (fallbackError) {
-      console.error("Error in fallback test fetch:", fallbackError);
-
-      // Final fallback - try with minimal params or handle the error gracefully
-      nuxtApp.$toast.error(
-        "Could not load tests. Please try again later or contact support."
-      );
-
-      // Mark as loaded to prevent further requests
+    createForm.value.examTestListLength = response?.data?.list?.length;
+    if (response.data.list.length === 0) {
       all_tests_loaded.value = true;
-
-      return { data: { list: [] } };
+    } else {
+      all_tests_loaded.value = false;
     }
+  } catch (err) {
+    console.log(err)
   } finally {
     test_loading.value = false;
   }

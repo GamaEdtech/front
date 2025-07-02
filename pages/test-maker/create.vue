@@ -257,6 +257,7 @@
           <v-row>
             <v-col cols="12">
               <v-switch
+                v-if="exam_id"
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
@@ -1354,7 +1355,7 @@ const filter = reactive({
   lesson: "",
   topic: "",
   page: 1,
-  perpage: 40,
+  perpage: 10,
   testsHasVideo: "All",
   myTests: false,
 });
@@ -2074,7 +2075,7 @@ const onScroll = () => {
   if (isNearBottom && filter.lesson) {
     timer.value = setTimeout(() => {
       test_loading.value = true;
-      filter.page++;
+       filter.page = filter.page + 1;
       getExamTests();
     }, 800);
   }
@@ -2270,65 +2271,31 @@ const applyTest = async (item, type = null) => {
 
 // Get exam tests
 const getExamTests = async () => {
-  if (all_tests_loaded.value || test_loading.value) {
-    return;
-  }
-
-  if (!filter.lesson) {
-    return;
-  }
-
   test_loading.value = true;
-
 
   try {
     const params = {
       lesson: filter.lesson,
+      topic: filter.topic,
+      myTests: filter.myTests,
+      testsHasVideo: filter.testsHasVideo,
       page: filter.page,
       perpage: filter.perpage,
     };
 
-    if (filter.topic) {
-      params.topic = filter.topic;
-    }
-    
-    if (filter.myTests) {
-      params.myTests = filter.myTests;
-    }
-    
-    if (filter.testsHasVideo && filter.testsHasVideo !== 'All' && filter.testsHasVideo !== 0) {
-      params.testsHasVideo = filter.testsHasVideo;
-    }
 
     const response = await useApiService.get("/api/v1/examTests", params);
+    test_list.value.push(...response?.data?.list);
 
-    const newTests = response?.data?.list || [];
+    createForm.value.examTestListLength = response?.data?.list?.length;
 
-    if (newTests.length === 0) {
+    if (response.data.list.length === 0) {
       all_tests_loaded.value = true;
-      if (filter.page === 1) {
-      }
     } else {
-      if (filter.page === 1) {
-        test_list.value = newTests;
-      } else {
-        test_list.value.push(...newTests);
-      }
-
-      if (newTests.length < filter.perpage) {
-        all_tests_loaded.value = true;
-      }
+      all_tests_loaded.value = false;
     }
-
-
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-
   } catch (err) {
-    console.error("Error getting exam tests:", err);
-    nuxtApp.$toast.error("Error loading tests");
-    all_tests_loaded.value = true;
+    console.log(err)
   } finally {
     test_loading.value = false;
   }
@@ -2369,6 +2336,7 @@ const deleteOnlineExam = async () => {
   } finally {
     deleteLoading.value = false;
     confirmDeleteDialog.value = false;
+ 
   }
 };
 
