@@ -257,8 +257,6 @@ const openRegisterDialog = () => {
 };
 
 const handleScroll = () => {
-  console.log("handleScroll");
-
   if (
     route.name == "index" ||
     route.name == "smart-learning" ||
@@ -325,9 +323,7 @@ const search = () => {
 
           if (response.data.list.length === 0) allDataLoaded.value = true;
         })
-        .catch((err) => {
-          console.log(err);
-        })
+        .catch((err) => {})
         .finally(() => {
           searchLoading.value = false;
         });
