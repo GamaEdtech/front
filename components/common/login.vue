@@ -58,8 +58,8 @@ async function handleCredentialResponse(value) {
     if (response.status === 1) {
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
-      submitLoginV2(response.data.jwtToken);
       setUser(response.data.info);
+      submitLoginV2(response.data.jwtToken);
       closeDialog();
 
       if (route.path === "/") navigateTo("/user");
@@ -167,12 +167,10 @@ const submit = handleSubmit(async () => {
     } else if (data.data.type == "register") {
       goToRegister();
     } else {
+      auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
-
-      auth.setUserToken(response.data.jwtToken);
-
-      setUser(response.data.info);
 
       closeDialog();
       if (route.path === "/") navigateTo("/user");
@@ -201,10 +199,10 @@ const onFinish = async () => {
       })
     );
     if (response.status === 1) {
+      setUser(response.data.info);
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
-      setUser(response.data.info);
       closeDialog();
       if (route.path === "/") navigateTo("/user");
     }
@@ -263,20 +261,18 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
+  const { user } = useUser();
   const pass = password.value.value ? password.value.value : generatePassword();
   const identityVal = identity.value.value
     ? identity.value.value
-    : useAuth().user?.email || "";
+    : user.value.email || "";
+
   const result = await useApiService.post("/api/v2/identities/tokens/old", {
     token: old_token,
   });
   if (result.succeeded) {
     localStorage.setItem("v2_token", result.data.token);
-  } else if (
-    result.errors.length &&
-    (result.errors[0].message === "UserNotFound" ||
-      result.errors[0].message === "Invalid Token")
-  ) {
+  } else if (result.errors.length) {
     await registerV2(identityVal, pass);
   }
 }
