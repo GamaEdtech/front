@@ -270,15 +270,9 @@ async function submitLoginV2(old_token) {
   const result = await useApiService.post("/api/v2/identities/tokens/old", {
     token: old_token,
   });
-  alert("step1");
-  console.log(result);
   if (result.succeeded) {
-    alert("step2");
     localStorage.setItem("v2_token", result.data.token);
   } else if (result.errors.length) {
-    alert("step 3");
-    console.log(identityVal);
-    console.log(pass);
     await registerV2(identityVal, pass);
   }
 }
