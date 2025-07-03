@@ -74,7 +74,7 @@ const editorConfig = {
 const editorStyles = {
   width: '100%',
   minHeight: props.minHeight,
-  ...props.additionalStyles
+  ...props.additionalStyles,
 };
 </script>
 <template>
@@ -131,5 +131,8 @@ const editorStyles = {
 .editor-custom-tools .v-card img{
   height: 7rem !important;
   width: 7rem !important;
+}
+.ck-content > p{
+  font-size: 20px !important;
 }
 </style>
