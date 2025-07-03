@@ -57,12 +57,14 @@ async function handleCredentialResponse(value) {
 
     if (response.status === 1) {
       $toast.success("Logged in successfully");
+
+      console.log(`new token: ${response.data.jwtToken}`);
       auth.setUserToken(response.data.jwtToken);
       setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
       closeDialog();
 
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (err) {
     const status = err?.response?.status;
@@ -173,7 +175,7 @@ const submit = handleSubmit(async () => {
       $toast.success("Logged in successfully");
 
       closeDialog();
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -199,12 +201,12 @@ const onFinish = async () => {
       })
     );
     if (response.status === 1) {
+      auth.setUserToken(response.data.jwtToken);
       setUser(response.data.info);
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
-      auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -272,7 +274,11 @@ async function submitLoginV2(old_token) {
   });
   if (result.succeeded) {
     localStorage.setItem("v2_token", result.data.token);
-  } else if (result.errors.length) {
+  } else if (
+    result.errors.length &&
+    (result.errors[0].message === "UserNotFound" ||
+      result.errors[0].message === "Invalid Token")
+  ) {
     await registerV2(identityVal, pass);
   }
 }
