@@ -58,7 +58,6 @@ async function handleCredentialResponse(value) {
     if (response.status === 1) {
       $toast.success("Logged in successfully");
 
-      console.log(`new token: ${response.data.jwtToken}`);
       auth.setUserToken(response.data.jwtToken);
       setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
