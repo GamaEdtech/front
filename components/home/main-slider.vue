@@ -26,13 +26,13 @@
                       :to="slide.link"
                       class="d-none d-md-inline-flex"
                       id="read-about-btn"
-                      x-large
+                      size="x-large"
                       >Learn more</v-btn
                     >
 
                     <v-btn
+                      variant="text"
                       :to="slide.link"
-                      text
                       id="slide-register-btn"
                       class="d-md-none"
                     >
@@ -47,15 +47,16 @@
           <v-sheet class="section2"> </v-sheet>
         </v-carousel-item>
         <v-card id="main-search" class="d-none d-md-block">
-          <v-card-text>
+          <v-card-text class="mt-1">
             <v-row class="text-center">
               <v-col cols="7" id="main-search-keyword">
                 <v-text-field
+                  class="h-100"
                   ref="keywordInput"
                   v-model="searchKey"
                   rounded="s-pill"
                   label="Ex: Paper Summer Session"
-                  dense
+                  density="compact"
                   :append-inner-icon="searchKey ? 'mdi-close-circle' : ''"
                   @click:append-inner="closeSearch()"
                   hide-details
@@ -65,7 +66,7 @@
               <v-col cols="4" class="pl-0" id="keysearch-cate">
                 <v-autocomplete
                   hide-details
-                  dense
+                  density="compact"
                   v-model="searchCate"
                   label="Select category"
                   :items="['Paper', 'Multimedia', 'Q&A', 'Exam', 'Tutorial']"
@@ -206,130 +207,133 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "main-slider",
-  data() {
-    return {
-      carousel_model: 0,
-      colors: ["#24292F", "#0092A9"],
+<script setup>
+import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
-      slides: [
-        {
-          title:
-            '<span class="gama-text-h1">AI</span> <span class="gama-text-h4 text-white">&nbspSystem <span class="d-sm-none"><br>&nbsp&nbsp</span>in Education</span>',
-          img: "ai-robot.png",
-          text: "Discover the future of education with our AI-powered learning platform,<br> revolutionizing the way you acquire knowledge and skills.",
-          id: "ai-slide",
-          link: "/smart-learning",
-        },
-        {
-          title: '<span class="gama-text-h1">School finder</span>',
-          img: "school-finder.png",
-          text: "Discover the future of education with our AI-powered learning platform,<br> revolutionizing the way you acquire knowledge and skills.",
-          id: "school-finder-slide",
-          link: "/school",
-        },
-        {
-          title:
-            '<span class="gama-text-h1 font-weight-bold">Question<span class="d-sm-none"><br>&nbsp&nbsp</span> & Answer</span>',
-          text: "Q&A made easy. Connect with classmates and<br> teachers for quick answers to your questions.",
-          img: "a-q.png",
-          id: "aq-slide",
-          link: "/search?type=question",
-        },
-      ],
+const carousel_model = ref(0);
+const colors = ["#24292F", "#0092A9"];
 
-      //Search section
-      searchResults: [],
-      searchCount: "...",
-      searchKey: "",
-      searchCate: "",
-      searchLoading: true,
-      pageNum: 1,
-      timer: 0,
-      searchResultsSection: false,
-      allDataLoaded: false,
-      //End search section
-    };
+const slides = [
+  {
+    title:
+      '<span class="gama-text-h1">AI</span> <span class="gama-text-h4 text-white">&nbspSystem <span class="d-sm-none"><br>&nbsp&nbsp</span>in Education</span>',
+    img: "ai-robot.png",
+    text: "Discover the future of education with our AI-powered learning platform,<br> revolutionizing the way you acquire knowledge and skills.",
+    id: "ai-slide",
+    link: "/smart-learning",
   },
-  watch: {
-    searchKey(val) {
-      if (val.trim() === "") {
-        this.searchResultsSection = false;
-      } else {
-        this.searchResultsSection = true;
-      }
-      this.pageNum = 1;
-      this.searchCount = "...";
-      this.allDataLoaded = false;
-      this.searchResults = [];
-      this.search();
-    },
+  {
+    title: '<span class="gama-text-h1">School finder</span>',
+    img: "school-finder.png",
+    text: "Discover the future of education with our AI-powered learning platform,<br> revolutionizing the way you acquire knowledge and skills.",
+    id: "school-finder-slide",
+    link: "/school",
   },
-  methods: {
-    openAuthDialog(val) {
-      this.$router.push({ query: { auth_form: val } });
-    },
-    checkSearchScroll() {
-      const scrollableDiv = this.$refs.searchResult;
-      if (this.isScrollAtBottom(scrollableDiv) && this.allDataLoaded == false) {
-        this.pageNum++;
-        this.search();
-      }
-    },
-    isScrollAtBottom(element) {
-      return element.scrollHeight - element.scrollTop == element.clientHeight;
-    },
-    search() {
-      this.searchLoading = true;
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = null;
-      }
-
-      this.timer = setTimeout(() => {
-        if (this.searchKey && this.allDataLoaded == false)
-          $fetch("/api/v1/search/text", {
-            method: "GET",
-            params: {
-              query: this.searchKey,
-              page: this.pageNum,
-            },
-          })
-            .then((response) => {
-              this.searchCount = response.data.num;
-              this.searchResults.push(...response.data.list);
-
-              if (response.data.list.length < 20)
-                //20 is lenght of item per page
-                this.allDataLoaded = true;
-            })
-            .catch((err) => {
-              console.log(err);
-            })
-            .finally(() => {
-              this.searchLoading = false;
-            });
-      }, 800);
-    },
-    closeSearch() {
-      this.searchResultsSection = false;
-      this.searchKey = "";
-      this.$refs.keywordInput.blur();
-    },
-    calcPath(type) {
-      if (type == "gama_tests") return "paper";
-      else if (type == "gama_learnfiles") return "multimedia";
-      else if (type == "gama_azmoons") return "exams";
-      else if (type == "gama_questions") return "qa";
-      else if (type == "gama_dars") return "tutorial";
-      else if (type == "gama_teachers") return "teacher";
-      else if (type == "gama_schools") return "school";
-      else if (type == "gama_live") return "live";
-      else if (type == "gama_students") return "student";
-    },
+  {
+    title:
+      '<span class="gama-text-h1 font-weight-bold">Question<span class="d-sm-none"><br>&nbsp&nbsp</span> & Answer</span>',
+    text: "Q&A made easy. Connect with classmates and<br> teachers for quick answers to your questions.",
+    img: "a-q.png",
+    id: "aq-slide",
+    link: "/search?type=question",
   },
+];
+
+//Search section
+const searchResults = ref([]);
+const searchCount = ref("...");
+const searchKey = ref("");
+const searchCate = ref(null);
+const searchLoading = ref(true);
+const pageNum = ref(1);
+const timer = ref(0);
+const searchResultsSection = ref(false);
+const allDataLoaded = ref(false);
+//End search section
+
+const router = useRouter();
+const keywordInput = ref(null);
+const searchResult = ref(null);
+
+watch(searchKey, (val) => {
+  if (val.trim() === "") {
+    searchResultsSection.value = false;
+  } else {
+    searchResultsSection.value = true;
+  }
+  pageNum.value = 1;
+  searchCount.value = "...";
+  allDataLoaded.value = false;
+  searchResults.value = [];
+  search();
+});
+
+const openAuthDialog = (val) => {
+  router.push({ query: { auth_form: val } });
+};
+
+const checkSearchScroll = () => {
+  const scrollableDiv = searchResult.value;
+  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
+    pageNum.value++;
+    search();
+  }
+};
+
+const isScrollAtBottom = (element) => {
+  return element.scrollHeight - element.scrollTop == element.clientHeight;
+};
+
+const search = () => {
+  searchLoading.value = true;
+  if (timer.value) {
+    clearTimeout(timer.value);
+    timer.value = null;
+  }
+
+  timer.value = setTimeout(() => {
+    if (searchKey.value && allDataLoaded.value == false)
+      useFetch("/api/v1/search/text", {
+        method: "GET",
+        params: {
+          query: searchKey.value,
+          page: pageNum.value,
+        },
+      })
+        .then((response) => {
+          searchCount.value = response.data.num;
+          searchResults.value.push(...response.data.list);
+
+          if (response.data.list.length < 20)
+            //20 is length of item per page
+            allDataLoaded.value = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          searchLoading.value = false;
+        });
+  }, 800);
+};
+
+const closeSearch = () => {
+  searchResultsSection.value = false;
+  searchKey.value = "";
+  keywordInput.value?.blur();
+};
+
+const calcPath = (type) => {
+  if (type == "gama_tests") return "paper";
+  else if (type == "gama_learnfiles") return "multimedia";
+  else if (type == "gama_azmoons") return "exams";
+  else if (type == "gama_questions") return "qa";
+  else if (type == "gama_dars") return "tutorial";
+  else if (type == "gama_teachers") return "teacher";
+  else if (type == "gama_schools") return "school";
+  else if (type == "gama_live") return "live";
+  else if (type == "gama_students") return "student";
 };
 </script>
 
@@ -345,7 +349,7 @@ export default {
 #main-slider .section1 {
   height: 35%;
 
-  .container {
+  .v-container {
     width: 100%;
 
     .slide-title {
