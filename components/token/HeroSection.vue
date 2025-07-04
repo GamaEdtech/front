@@ -131,15 +131,16 @@ onMounted(() => {
 .title-row {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 4rem;
   margin-bottom: 2rem;
+  margin-top: 4rem;
 }
 
 .live-trading-badge {
   background: rgba(5, 182, 231, 0.3);
   border: 1px solid rgba(110, 119, 129, 1);
   border-radius: 999px;
-  padding: 8px 32px;
+  padding: 18px 32px;
   font-size: 1.25rem;
   display: flex;
   align-items: center;
@@ -168,18 +169,22 @@ onMounted(() => {
 }
 
 .main-title {
-  font-size: 8rem;
-  font-weight: 900;
-  margin: 0;
-  color: white;
+  font-family: 'Inter', 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-size: 6rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.05;
 }
 
 .description {
-  font-size: 1.2rem;
+  font-family: 'Inter', 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-size: 2rem;
   line-height: 1.6;
   color: #b0b0b0;
   margin-bottom: 2rem;
-  max-width: 500px;
+  max-width: 700px;
 }
 
 .price-section {
@@ -414,7 +419,6 @@ onMounted(() => {
     font-size: 1.1rem !important;
   }
 
- 
   .main-title {
     font-size: 2.2rem;
   }
@@ -517,6 +521,7 @@ onMounted(() => {
   
   .main-title {
     font-size: 156px;
+    margin-top: 4rem;
   }
   
   .description {
@@ -574,5 +579,13 @@ onMounted(() => {
     transform: translateY(-2px);
   }
 }
-</style>
 
+@media (max-width: 599px) {
+  .title-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+}
+
+</style>

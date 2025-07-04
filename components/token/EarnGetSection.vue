@@ -101,14 +101,14 @@ const cards = ref([
 }
 .earn-get-card-title {
   color: #222;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
   margin-bottom: 8px;
 }
 .earn-get-card-desc {
   color: #6e7781;
-  font-size: 14px;
-  height: 40px;
+  font-size: 18px;
+  height: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

@@ -2,7 +2,7 @@
   <section class="trust-community-section">
     <v-container class="trust-community-container">
       <h2 class="trust-community-title">Built On Trust, Driven By Community</h2>
-      <p class="trust-community-subtitle text-h5">
+      <p class="trust-community-subtitle text-h4">
         At Gamatrain, our mission is to empower the community through a
         foundation of:
       </p>
@@ -44,7 +44,7 @@
           />
         </v-col>
       </v-row>
-      <p class="trust-community-description text-h5">
+      <p class="trust-community-description text-h4">
         Every decision, reward, and improvement is made with our contributors in
         mind – because GamaTrain is built with you, not just for you.
       </p>
@@ -122,7 +122,7 @@ const items = ref([
 }
 .trust-community-list-text {
   color: #4a5568;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   font-family: "Inter", "Roboto", "Arial", sans-serif;
 }
@@ -165,6 +165,18 @@ const items = ref([
   .trust-community-illustration {
     margin-top: 32px;
     margin-bottom: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .trust-community-title {
+    font-size: 18px;
+  }
+  .trust-community-list-text {
+    font-size: 14px;
+  }
+  .trust-community-description,
+  .trust-community-subtitle {
+    font-size: 14px;
   }
 }
 </style>

@@ -24,7 +24,7 @@
           <v-col cols="12" sm="3" md="2" class="about-get-img-col">
             <img
               class="about-get-img"
-              src="/images/token/about.png"
+              src="/images/token/get-thinker.svg"
               alt="$GET token about illustration"
             />
           </v-col>
