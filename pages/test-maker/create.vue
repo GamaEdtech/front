@@ -287,14 +287,12 @@
                     {{ tests.length === 1 ? "test" : "tests" }} added to this
                     exam</span
                   >
-                  <span v-if="tests.length < 5" class="ml-2"
+                  <span v-if="!hasEnoughTests" class="ml-2"
                     >Need {{ 5 - tests.length }} more
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span
-                    v-if="tests.length > 5 && exam_id"
-                    class="ml-2 text-success"
+                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
                   >
                   <span v-else class="ml-2 text-success"
@@ -446,13 +444,16 @@
                     {{ tests.length === 1 ? "test" : "tests" }} added to this
                     exam</span
                   >
-                  <span v-if="tests.length < 5" class="ml-2"
+                  <span v-if="!hasEnoughTests" class="ml-2"
                     >Need {{ 5 - tests.length }} more
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-if="tests.length > 5" class="ml-2 text-success"
+                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Please First Create an Exam</span
                   >
                 </div>
               </v-alert>
@@ -704,7 +705,7 @@
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     @click="test_step = 3"
-                    :disabled="tests.length < 5"
+                    :disabled="!hasEnoughTests"
                     :loading="publish_loading"
                     block
                     color="teal"
@@ -716,10 +717,10 @@
                       font-weight: 500;
                     "
                   >
-                    <span v-show="tests.length < 5"
+                    <span v-show="!hasEnoughTests"
                       >Add at least {{ 5 - tests.length }} more tests</span
                     >
-                    <span v-show="tests.length >= 5">Next step</span>
+                    <span v-show="hasEnoughTests">Next step</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -907,7 +908,7 @@
                   <v-col cols="12" md="6" class="pb-0">
                     <v-btn
                       @click="publishTest"
-                      :disabled="tests.length < 5"
+                      :disabled="!hasEnoughTests"
                       :loading="publish_loading"
                       size="large"
                       density="compact"
@@ -916,10 +917,10 @@
                       block
                       style="text-transform: none; font-size: 13px !important"
                     >
-                      <span v-show="tests.length < 5"
+                      <span v-show="!hasEnoughTests"
                         >Add at least {{ 5 - tests.length }} more tests</span
                       >
-                      <span v-show="tests.length >= 5">Publish</span>
+                      <span v-show="hasEnoughTests">Publish</span>
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -1453,6 +1454,16 @@ const testProgress = computed(() => {
   return percentage;
 });
 
+// Computed property to check if we have exactly 5 tests
+const hasExactlyFiveTests = computed(() => {
+  return tests.value.length === 5;
+});
+
+// Computed property to check if we have enough tests
+const hasEnoughTests = computed(() => {
+  return tests.value.length >= 5;
+});
+
 // Change from ref to computed
 const test_share_link = computed(() => {
   if (process.server) {
@@ -1838,10 +1849,17 @@ const submitTest = async (skipListRefresh = false) => {
       return;
     }
 
+    // Ensure all test IDs are strings for consistent comparison
+    tests.value = tests.value.map(id => String(id));
+
     const formData = new URLSearchParams();
     tests.value.forEach((id) => {
       formData.append("tests[]", String(id));
     });
+
+    // Log the tests being submitted
+    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
+    console.log("Tests:", tests.value);
 
     await useApiService.put(
       `/api/v1/exams/tests/${exam_id.value}`,
@@ -1853,12 +1871,24 @@ const submitTest = async (skipListRefresh = false) => {
       }
     );
 
+    // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    await handleRefreshPreviewList();
-
+    // Force UI to update with the current test count
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
+    }
+
+    // Refresh the preview list if needed
+    if (!skipListRefresh) {
+      await handleRefreshPreviewList();
+    }
+
+    // Force a UI update if we've just reached or fallen below the threshold
+    if (tests.value.length === 5) {
+      nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
+      // Force a nextTick to ensure the UI updates
+      await nextTick();
     }
   } catch (err) {
     console.error("Failed to update tests:", err);
@@ -2235,6 +2265,29 @@ const createDraftExam = async () => {
   }
 };
 
+// Force UI update when tests count changes
+const forceUIUpdate = async () => {
+  // Ensure consistent string IDs
+  tests.value = tests.value.map(id => String(id));
+  
+  // Update the test count in the create form component
+  if (createForm.value && "examTestListLength" in createForm.value) {
+    createForm.value.examTestListLength = tests.value.length;
+  }
+  
+  // Force a small delay to ensure reactive updates have time to propagate
+  await nextTick();
+  
+  // Explicitly trigger UI updates for components that might not be updating
+  if (hasEnoughTests.value) {
+    // If we have enough tests, make sure the UI shows "Next step" instead of "Add more tests"
+    nuxtApp.$toast.info(`You have ${tests.value.length} tests - ready to proceed!`);
+  } else {
+    // If we don't have enough tests, show how many more are needed
+    nuxtApp.$toast.info(`Need ${5 - tests.value.length} more tests to proceed`);
+  }
+};
+
 const applyTest = async (item, type = null) => {
   try {
     if (type === 'add' && !exam_id.value) {
@@ -2249,10 +2302,14 @@ const applyTest = async (item, type = null) => {
     // Always use string comparison
     const testExists = tests.value.some(id => String(id) === testId);
 
+    // Store the old length to check if we hit exactly 5 tests
+    const oldLength = tests.value.length;
+
     if (testExists && type === "remove") {
       const index = tests.value.findIndex(id => String(id) === testId);
       if (index !== -1) {
         tests.value.splice(index, 1);
+        await forceUIUpdate(); // Force UI update immediately
         await submitTest();
         nuxtApp.$toast.success("Test removed from exam");
       }
@@ -2260,8 +2317,16 @@ const applyTest = async (item, type = null) => {
 
     if (!testExists && type === "add") {
       tests.value.push(testId);
+      await forceUIUpdate(); // Force UI update immediately
       await submitTest();
       nuxtApp.$toast.success("Test added to exam");
+      
+      // Special handling when we reach exactly 5 tests
+      if (oldLength === 4 && tests.value.length === 5) {
+        console.log("Exactly 5 tests reached - forcing UI update");
+        await nextTick();
+        nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
+      }
     }
     
     // Force refresh the preview list to ensure UI consistency
@@ -2291,7 +2356,10 @@ const getExamTests = async () => {
     const response = await useApiService.get("/api/v1/examTests", params);
     test_list.value.push(...response?.data?.list);
 
-    createForm.value.examTestListLength = response?.data?.list?.length;
+    // Update the examTestListLength with the actual tests array length, not the response length
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
 
     if (response.data.list.length === 0) {
       all_tests_loaded.value = true;
@@ -2660,19 +2728,14 @@ const previewDragEnd = async () => {
 // Handle test refresh events from CreateTestForm component
 const handleTestRefresh = async () => {
   try {
-    // Ensure consistent string IDs
-    tests.value = tests.value.map(id => String(id));
+    // Force UI update immediately
+    await forceUIUpdate();
     
     // Wait for API operations to complete
     await new Promise(resolve => setTimeout(resolve, 300));
     
     // Refresh the preview list
     await handleRefreshPreviewList();
-
-    // Update the test count in the create form component
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
 
     // If in test list mode, refresh the test list as well
     if (testListSwitch.value) {
@@ -2749,6 +2812,9 @@ watch(
 
       // Add the new test to the tests array - association already done in child component
       tests.value.push(newTestId);
+      
+      // Force UI update immediately
+      await forceUIUpdate();
 
       // Always update the preview list when a new test is created
       // This ensures the Review section is always up to date
@@ -3018,9 +3084,14 @@ watch(
 watch(
   () => tests.value,
   async (newTests, oldTests) => {
+    // Log test count changes for debugging
+    console.log(`Tests count changed: ${oldTests?.length || 0} -> ${newTests.length}`);
+    console.log(`hasEnoughTests: ${hasEnoughTests.value}`);
+    
     // Update the test count in the create form component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
+      console.log(`Updated examTestListLength to ${newTests.length}`);
     }
 
     // Check if the tests array has changed and we have an exam ID
@@ -3035,6 +3106,13 @@ watch(
       
       // Refresh the preview list
       await handleRefreshPreviewList();
+      
+      // Force UI update if we've just reached 5 tests
+      if (newTests.length === 5 && oldTests?.length !== 5) {
+        console.log("Exactly 5 tests reached - forcing UI update");
+        await nextTick();
+        nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
+      }
     }
   },
   { deep: true }
