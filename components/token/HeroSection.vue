@@ -4,7 +4,7 @@
       <v-row align="center" justify="center" class="min-h-screen">
         <v-col cols="12" md="6" class="hero-content">
           <div class="title-row">
-            <div class="live-trading-badge">
+            <div class="live-trading-badge ml-16">
               <span class="live-dot"></span>
               Live Trading
             </div>

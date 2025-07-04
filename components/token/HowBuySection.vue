@@ -173,6 +173,7 @@
 }
 .how-buy-section {
   background: #fff;
+  margin-left: 2rem;
 }
 .how-buy-title {
   font-size: 24px;

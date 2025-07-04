@@ -10,7 +10,7 @@
           Empower education. Power the Gama ecosystem.
         </p>
         <div class="d-flex justify-center align-center flex-column mt-8">
-          <div class="token-purchase__title mb-1">Buy now on</div>
+          <div class="token-purchase__title">Buy now on</div>
           <a
             target="_blank"
             href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
@@ -26,21 +26,21 @@
           </a>
         </div>
       </div>
-      <figure>
+      <figure class="token-purchase-figure">
         <img
-          src="/images/token/tokens.png"
+          src="/images/token/GET_CTA_Desktop.svg"
           alt="People holding Gama tokens illustration"
-          class="token-purchase__illustration d-none d-md-block"
+          class="illustration-desktop"
         />
         <img
-          src="/images/token/tokens_tablet.png"
-          alt="People holding Gama tokens illustration for tablet"
-          class="token-purchase__illustration d-none d-sm-block d-md-none"
+          src="/images/token/GET_CTA_IPAD_Mini_8.3.svg"
+          alt="People holding Gama tokens illustration for iPad Mini"
+          class="illustration-ipadmini"
         />
         <img
-          src="/images/token/tokens_mobile.png"
-          alt="People holding Gama tokens illustration for mobile"
-          class="token-purchase__illustration d-sm-none"
+          src="/images/token/GET_CTA_Android_Small.svg"
+          alt="People holding Gama tokens illustration for Android Small"
+          class="illustration-androidsmall"
         />
       </figure>
     </div>
@@ -52,49 +52,69 @@
 <style scoped>
 .token-purchase-bg {
   background: linear-gradient(to bottom, #999999, #f2f2f2);
+  width: 100%;
   position: relative;
   overflow: hidden;
-  padding-bottom: 20rem;
-}
-.token-purchase-content {
-  position: relative;
-  z-index: 3;
-}
-.token-purchase__illustration {
-  position: absolute;
-  left: 10px;
-  width: 90%;
-  max-width: 100%;
-  bottom: 20px;
-  z-index: 1;
+  max-height: 100vh;
 }
 .token-purchase-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem 0 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding-top: 7rem;
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+.token-purchase-content {
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+}
+
+
+.token-purchase-figure {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding: 0;
+}
+.illustration-desktop,
+.illustration-ipadmini,
+.illustration-androidsmall {
+  display: none;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
 }
 .main-heading {
   font-size: 32px;
   font-weight: 700;
   color: #fff;
   text-align: center;
+  padding-top: 10rem;
 }
 .sub-heading {
   font-size: 40px;
   font-weight: 700;
-  color: #4e545b;
+  color: #000000;
   text-align: center;
 }
 .sub-heading .head-yellow {
   color: #fecd1c;
 }
 .token-purchase__description {
-  color: #6e7781;
+  color: #000000;
   font-size: 14px;
   font-weight: 500;
   text-align: center;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
 }
 .token-purchase__btn {
   background: #000000;
@@ -114,29 +134,21 @@
 }
 .token-purchase__title {
   color: #000000;
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 700;
+  padding-bottom: 1rem;
 }
 @media (min-width: 600px) {
   .token-purchase-bg {
     padding-bottom: 30rem;
   }
-  .token-purchase__illustration {
-    position: absolute;
-    right: 10px;
-    width: 90%;
-    max-width: 100%;
-    bottom: 30px;
-    z-index: 1;
-    left: auto;
-  }
   .token-purchase__title {
     color: #313231;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 500;
   }
   .token-purchase__description {
-    font-size: 20px;
+    font-size: 24px;
   }
   .main-heading {
     font-size: 56px;
@@ -153,8 +165,9 @@
   }
   .token-purchase__title {
     color: #313231;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
+    padding-bottom: 1rem;
   }
   .main-heading {
     font-size: 84px;
@@ -163,6 +176,7 @@
   .sub-heading {
     font-size: 96px;
     font-weight: 700;
+    padding-bottom: 4rem;
   }
   .token-purchase__description {
     color: #24292f;
@@ -179,6 +193,37 @@
   .token-purchase__btn img {
     width: 40px;
     height: 40px;
+  }
+}
+@media (min-width: 961px) {
+  .illustration-desktop { display: block; max-width: 1000px; }
+}
+@media (min-width: 601px) and (max-width: 960px) {
+  .illustration-ipadmini { display: block; max-width: 700px; }
+}
+@media (max-width: 600px) {
+  .token-purchase-bg {
+    min-height: 32vh;
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+  }
+  .main-heading {
+    padding-top: 2rem;
+  }
+  .token-purchase-figure {
+    margin-top: 1rem;
+  }
+  .illustration-androidsmall {
+    max-height: 120px;
+  }
+  .token-purchase-container {
+    padding: 4rem 0.5rem 0 0.5rem;
+  }
+  .token-purchase__description {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
   }
 }
 </style>

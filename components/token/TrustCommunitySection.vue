@@ -72,7 +72,10 @@ const items = ref([
 <style scoped>
 .trust-community-section {
   background: #fff;
-  padding: 56px 0 40px 0;
+  padding: 56px 4rem 40px 4rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .trust-community-container {
 }
@@ -177,6 +180,29 @@ const items = ref([
   .trust-community-description,
   .trust-community-subtitle {
     font-size: 14px;
+  }
+  .trust-community-section {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+.profit-buyback-section {
+  max-width: 900px;
+  margin: 2rem auto 0 auto;
+  font-size: 1.15rem;
+  color: #555;
+  text-align: center;
+  line-height: 1.6;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (max-width: 600px) {
+  .profit-buyback-section {
+    font-size: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 }
 </style>

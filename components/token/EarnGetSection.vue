@@ -49,6 +49,11 @@ const cards = ref([
   background: rgba(36, 41, 47, 0.05);
   padding: 48px 0;
   margin-top: 4rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 .earn-get-container {
   max-width: 1100px;
@@ -130,6 +135,10 @@ const cards = ref([
   }
   .earn-get-img-section {
     height: 125px;
+  }
+  .earn-get-section {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 }
 </style>

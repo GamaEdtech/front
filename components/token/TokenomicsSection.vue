@@ -1,12 +1,12 @@
 <template>
   <section class="tokenomics-section">
     <v-container class="tokenomics-container">
-      <h2 class="tokenomics-title">Tokenomics</h2>
+      <h4 class="tokenomics-title">Tokenomics</h4>
       <v-row justify="center">
         <v-col cols="12" class="d-flex justify-center">
           <figure class="d-none d-sm-block text-center">
             <img
-              src="/images/token/tokenomicsdesktop.png"
+              src="/images/token/Tokenomics_Desktop.png"
               alt="Tokenomics chart desktop"
               class="tokenomics-img"
               contain
@@ -112,18 +112,22 @@
 
 <style scoped>
 .tokenomics-section {
-  background-color: rgba(36, 41, 47, 0.05);
-  padding: 24px 0;
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
 }
 .tokenomics-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 14px;
 }
 .tokenomics-title {
   text-align: center;
   color: #000000;
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 800;
   margin-bottom: 12px;
 }
@@ -165,9 +169,17 @@
   .tokenomics-title {
     text-align: center;
     color: #24292f;
-    font-size: 48px;
+    font-size: 36px;
     font-weight: 700;
     margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tokenomics-section {
+    margin-left: 2rem;
+    margin-right: 2rem;
+    padding: 3rem 1rem;
   }
 }
 </style>
