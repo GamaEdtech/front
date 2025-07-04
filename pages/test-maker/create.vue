@@ -2246,6 +2246,7 @@ const applyTest = async (item, type = null) => {
     }
 
     const testId = String(item.id);
+    // Always use string comparison
     const testExists = tests.value.some(id => String(id) === testId);
 
     if (testExists && type === "remove") {
@@ -2262,6 +2263,9 @@ const applyTest = async (item, type = null) => {
       await submitTest();
       nuxtApp.$toast.success("Test added to exam");
     }
+    
+    // Force refresh the preview list to ensure UI consistency
+    await handleRefreshPreviewList();
 
   } catch (error) {
     console.error('Error in applyTest:', error);
@@ -2656,14 +2660,21 @@ const previewDragEnd = async () => {
 // Handle test refresh events from CreateTestForm component
 const handleTestRefresh = async () => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    tests.value = tests.value.map((id) => String(id));
+    // Ensure consistent string IDs
+    tests.value = tests.value.map(id => String(id));
+    
+    // Wait for API operations to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Refresh the preview list
     await handleRefreshPreviewList();
 
+    // Update the test count in the create form component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
 
+    // If in test list mode, refresh the test list as well
     if (testListSwitch.value) {
       filter.page = 1;
       test_list.value = [];
@@ -2671,9 +2682,7 @@ const handleTestRefresh = async () => {
       await getExamTests();
     }
 
-    nuxtApp.$toast.success(
-      `Tests updated: ${tests.value.length} tests in exam`
-    );
+    nuxtApp.$toast.success(`Tests updated: ${tests.value.length} tests in exam`);
   } catch (err) {
     console.error("Error in handleTestRefresh:", err);
     nuxtApp.$toast.error("Error refreshing test list");
@@ -3008,19 +3017,24 @@ watch(
 // Watch for changes in tests array to update the button number
 watch(
   () => tests.value,
-  (newTests, oldTests) => {
+  async (newTests, oldTests) => {
+    // Update the test count in the create form component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
     }
 
+    // Check if the tests array has changed and we have an exam ID
     if (
       exam_id.value &&
       (newTests.length !== oldTests?.length ||
-        JSON.stringify(newTests) !== JSON.stringify(oldTests))
+        JSON.stringify(newTests.map(id => String(id))) !== 
+        JSON.stringify(oldTests?.map(id => String(id))))
     ) {
-      setTimeout(() => {
-        handleRefreshPreviewList();
-      }, 300);
+      // Ensure consistent string IDs
+      tests.value = newTests.map(id => String(id));
+      
+      // Refresh the preview list
+      await handleRefreshPreviewList();
     }
   },
   { deep: true }
