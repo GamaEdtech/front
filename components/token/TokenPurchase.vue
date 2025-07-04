@@ -33,7 +33,7 @@
           class="illustration-desktop"
         />
         <img
-          src="/images/token/GET_CTA_IPAD_Mini_8.3.svg"
+          src="/images/token/GET_CTA_Ipad_Mini_8.3.svg"
           alt="People holding Gama tokens illustration for iPad Mini"
           class="illustration-ipadmini"
         />
