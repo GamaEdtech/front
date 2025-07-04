@@ -36,7 +36,7 @@
                     <div class="flex-shrink-0 pl-5">
                       <img
                         class="tokenomics-static__img"
-                        src="/images/token/governance.png"
+                        src="/images/token/governance.svg"
                         alt=""
                       />
                     </div>
@@ -60,7 +60,7 @@
                     <div class="flex-shrink-0 pl-5">
                       <img
                         class="tokenomics-static__img"
-                        src="/images/token/team.png"
+                        src="/images/token/team.svg"
                         alt=""
                       />
                     </div>

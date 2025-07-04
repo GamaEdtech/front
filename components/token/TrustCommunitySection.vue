@@ -35,7 +35,7 @@
         </v-col>
         <v-col cols="12" md="4" class="trust-community-illustration-col">
           <v-img
-            src="/images/token/built.png"
+            src="/images/token/community.svg"
             alt="Community trust and collaboration illustration"
             class="trust-community-illustration d-none d-lg-block"
             contain
@@ -55,7 +55,7 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/trust.png",
+    img: "/images/token/trust.svg",
     text: "Trust",
   },
   {
@@ -63,7 +63,7 @@ const items = ref([
     text: "Transparency",
   },
   {
-    img: "/images/token/shared.png",
+    img: "/images/token/team.svg",
     text: "Shared Accountability",
   },
 ]);
