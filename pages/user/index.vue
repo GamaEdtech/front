@@ -63,7 +63,7 @@ const authToken = auth.getUserToken();
 
 definePageMeta({
   layout: "dashboard-layout",
-  middleware: ["auth"],
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

@@ -1279,6 +1279,7 @@ defineRule("required", required);
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

@@ -276,6 +276,7 @@ import FormTopicSelector from "~/components/form/topic-selector.vue";
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

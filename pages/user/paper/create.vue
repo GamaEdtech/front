@@ -332,6 +332,7 @@
 <script setup>
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

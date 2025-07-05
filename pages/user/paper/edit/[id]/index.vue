@@ -393,6 +393,7 @@ const { $toast } = useNuxtApp();
 // Define layout
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 // Page title
