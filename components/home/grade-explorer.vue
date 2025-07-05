@@ -114,10 +114,6 @@ import GamaIcon from "~/assets/images/boards/Gama.svg";
 import ScientificIcon from "~/assets/images/boards/Scientific Competition.svg";
 import { ref, watch, onMounted } from "vue";
 
-const props = defineProps({
-  stats: {},
-});
-
 const categories = ref([
   {
     type: "learnfiles",

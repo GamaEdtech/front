@@ -63,7 +63,7 @@ async function handleCredentialResponse(value) {
       submitLoginV2(response.data.jwtToken);
       closeDialog();
 
-      // if (route.path === "/") navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (err) {
     const status = err?.response?.status;
@@ -174,7 +174,7 @@ const submit = handleSubmit(async () => {
       $toast.success("Logged in successfully");
 
       closeDialog();
-      // if (route.path === "/") navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -205,7 +205,7 @@ const onFinish = async () => {
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
       closeDialog();
-      // if (route.path === "/") navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
