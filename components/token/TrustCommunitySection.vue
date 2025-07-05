@@ -20,13 +20,10 @@
               :key="item.text"
             >
               <span class="trust-community-icon">
-                <v-img
+                <img
                   :src="item.img"
                   :alt="item.text + ' icon'"
                   class="trust-community-img-icon"
-                  contain
-                  width="21"
-                  height="18"
                 />
               </span>
               <span class="trust-community-list-text">{{ item.text }}</span>
@@ -34,13 +31,10 @@
           </ul>
         </v-col>
         <v-col cols="12" md="4" class="trust-community-illustration-col">
-          <v-img
+          <img
             src="/images/token/community.svg"
             alt="Community trust and collaboration illustration"
-            class="trust-community-illustration d-none d-lg-block"
-            contain
-            width="245"
-            height="245"
+            class="trust-community-illustration"
           />
         </v-col>
       </v-row>
@@ -55,16 +49,16 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/trust.svg",
+    img: "/images/token/Trust.svg",
     text: "Trust",
   },
   {
-    img: "/images/token/transparency.png",
-    text: "Transparency",
+    img: "/images/token/shared.svg",
+    text: "Shared Accountability",
   },
   {
-    img: "/images/token/team.svg",
-    text: "Shared Accountability",
+    img: "/images/token/transparency.svg",
+    text: "Transparency",
   },
 ]);
 </script>
@@ -88,7 +82,7 @@ const items = ref([
 }
 .trust-community-subtitle {
   text-align: center;
-  color: #24292f;
+  color: #6c757d;
   margin-bottom: 32px;
 }
 .trust-community-content {
@@ -102,26 +96,34 @@ const items = ref([
   display: flex;
   flex-direction: column;
   gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .trust-community-list-item {
   display: flex;
   align-items: center;
-  gap: 11px;
+  margin-bottom: 24px;
 }
 .trust-community-icon {
-  background: #23272f;
+  background: #f0f2f5;
   border-radius: 50%;
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #23272f;
+  margin-right: 16px;
+  transition: background-color 0.2s ease;
 }
 .trust-community-img-icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
+  filter: brightness(0.3);
+}
+.trust-community-list-item:hover .trust-community-icon {
+  background: #e4e7eb;
 }
 .trust-community-list-text {
   color: #4a5568;
@@ -142,7 +144,7 @@ const items = ref([
 .trust-community-description {
   margin-top: 40px;
   text-align: center;
-  color: #4a5568;
+  color: #6c757d;
   margin-left: auto;
   margin-right: auto;
 }
@@ -153,6 +155,10 @@ const items = ref([
     font-weight: 800;
     margin-bottom: 32px;
     font-size: 30px;
+  }
+  .trust-community-illustration {
+    width: 245px;
+    height: 245px;
   }
 }
 @media (max-width: 960px) {
@@ -168,6 +174,8 @@ const items = ref([
   .trust-community-illustration {
     margin-top: 32px;
     margin-bottom: 16px;
+    width: 180px;
+    height: 180px;
   }
 }
 @media (max-width: 600px) {
@@ -186,6 +194,10 @@ const items = ref([
     padding-right: 0.5rem;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+  }
+  .trust-community-illustration {
+    width: 160px;
+    height: 160px;
   }
 }
 .profit-buyback-section {

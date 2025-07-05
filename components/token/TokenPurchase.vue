@@ -28,17 +28,17 @@
       </div>
       <figure class="token-purchase-figure">
         <img
-          src="/images/token/GET_CTA_Desktop.svg"
+          src="/assets/images/token/GET_CTA_Desktop.svg"
           alt="People holding Gama tokens illustration"
           class="illustration-desktop"
         />
         <img
-          src="/images/token/GET_CTA_Ipad_Mini_8.3.svg"
+          src="/assets/images/token/GET_CTA_Ipad_Mini_8.3.svg"
           alt="People holding Gama tokens illustration for iPad Mini"
           class="illustration-ipadmini"
         />
         <img
-          src="/images/token/GET_CTA_Android_Small.svg"
+          src="/assets/images/token/GET_CTA_Android_Small.svg"
           alt="People holding Gama tokens illustration for Android Small"
           class="illustration-androidsmall"
         />

@@ -44,7 +44,7 @@
         
         <v-col cols="12" md="6" class="hero-image-desktop">
           <div class="token-wrapper">
-            <img src="/images/token/GET-coin.svg" alt="GET Token" />
+            <img src="/assets/images/token/GET-coin.svg" alt="GET Token" />
           </div>
         </v-col>
       </v-row>
@@ -134,6 +134,9 @@ onMounted(() => {
   gap: 4rem;
   margin-bottom: 2rem;
   margin-top: 4rem;
+  padding-left: 1rem;
+  position: relative;
+  width: 100%;
 }
 
 .live-trading-badge {
@@ -153,6 +156,9 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(36, 170, 148, 0.08);
   white-space: nowrap;
   justify-content: center;
+  margin-left: 1rem;
+  position: relative;
+  left: 0;
 }
 
 .live-dot {
@@ -372,11 +378,18 @@ onMounted(() => {
 
 @media (max-width: 960px) {
   .title-row {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+    padding-left: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
   }
-  
+
+  .live-trading-badge {
+    margin-left: 0;
+    font-size: 1.1rem;
+    padding: 16px 28px;
+  }
+
   .main-title {
     font-size: 5rem;
   }

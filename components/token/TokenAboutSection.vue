@@ -8,6 +8,13 @@
           </div>
         </div>
         <v-row class="justify-content-center">
+          <v-col cols="12" sm="3" md="2" class="about-get-img-col">
+            <img
+              class="about-get-img"
+              src="/images/token/think.svg"
+              alt="$GET token about illustration"
+            />
+          </v-col>
           <v-col cols="12" sm="7" md="7">
             <div class="d-flex justify-end">
               <p class="about-get-desc px-10 px-md-0">
@@ -21,19 +28,22 @@
               </p>
             </div>
           </v-col>
-          <v-col cols="12" sm="3" md="2" class="about-get-img-col">
-            <img
-              class="about-get-img"
-              src="/images/token/get-thinker.svg"
-              alt="$GET token about illustration"
-            />
-          </v-col>
         </v-row>
       </v-container>
     </section>
   </div>
 </template>
-<script setup></script>
+<script setup>
+import { ref } from 'vue';
+
+const items = ref([
+  {
+    img: "/images/token/Trust.svg",
+    text: "Trust",
+  },
+  // ...
+]);
+</script>
 
 <style scoped>
 .about-get-section {
@@ -45,6 +55,7 @@
   font-weight: 800;
   color: #24292f;
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 .about-get-desc {
   font-size: 16px;
@@ -54,12 +65,13 @@
 .about-get-img-col {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  order: -1;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 .about-get-img {
-  width: 140px;
+  width: 180px;
   max-width: 100%;
+  height: auto;
 }
 
 @media (min-width: 600px) {
@@ -69,15 +81,25 @@
     color: #24292f;
     margin-bottom: 1.5rem;
   }
+  
   .about-get-img-col {
-    order: 2;
+    margin-bottom: 0;
+    align-items: flex-start;
   }
-  .about-get-desc {
-    font-size: 20px;
-  }
+  
   .about-get-img {
-    width: 180px;
-    max-width: 100%;
+    width: 140px;
+  }
+}
+
+@media (max-width: 599px) {
+  .about-get-section {
+    padding: 3rem 0 2rem 0;
+  }
+  
+  .about-get-desc {
+    text-align: center;
+    padding: 0 1.5rem !important;
   }
 }
 </style>

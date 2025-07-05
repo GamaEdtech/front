@@ -3,247 +3,317 @@
     <v-container>
       <v-row justify="center">
         <v-col cols="12" md="10" lg="10">
-          <h2 class="how-buy-title text-center mb-8">How To Buy $GET</h2>
-          <v-row class="mb-8" no-gutters>
-            <v-col
-              cols="12"
-              md="3"
-              class="d-flex justify-center align-self-start"
-            >
-              <img
-                src="/images/token/wallet.png"
-                alt="Wallet Icon"
-                class="how-buy-icon"
-                contain
-              />
-            </v-col>
-            <v-col cols="12" md="9">
-              <div class="how-buy-step-title">1. Set Up a Wallet</div>
-              <ul class="how-buy-list">
-                <li>
-                  Go to
-                  <a
-                    href="https://phantom.com"
-                    target="_blank"
-                    rel="noopener"
-                    class="how-buy-link"
-                    >https://phantom.com</a
-                  >
-                </li>
-                <li>
-                  Create a wallet and receive
-                  <span class="font-weight-bold font-weight-lg-regular"
-                    >your secret recovery phrase</span
-                  >
-                </li>
-                <li>Write your phrase down somewhere safe</li>
-                <li class="font-weight-bold font-weight-lg-regular">
-                  Never share this phrase with anyone
-                </li>
-              </ul>
-            </v-col>
-          </v-row>
-
-          <v-row class="mb-8" no-gutters>
-            <v-col
-              cols="12"
-              md="3"
-              class="d-flex justify-center align-self-start"
-            >
-              <img
-                src="/images/token/account.png"
-                alt="DEX Icon"
-                class="how-buy-icon"
-                contain
-              />
-            </v-col>
-            <v-col cols="12" md="9">
-              <div class="how-buy-step-title">
-                2. Connect to a Decentralized Exchange (DEX)
+          <div class="text-center mb-12">
+            <img
+              src="/images/token/BuyImage.svg"
+              alt="Buy Illustration"
+              class="how-buy-illustration"
+              contain
+            />
+          </div>
+          <h2 class="how-buy-title text-center">How To Buy $GET</h2>
+          
+          <div class="steps-container">
+            <div class="step-item" v-for="(step, index) in steps" :key="index">
+              <div class="step-icon-wrapper">
+                <img
+                  :src="step.icon"
+                  :alt="step.title + ' Icon'"
+                  class="how-buy-icon"
+                  contain
+                />
               </div>
-              <ul class="how-buy-list">
-                <li>
-                  Go to
-                  <a
-                    href="https://jup.ag"
-                    target="_blank"
-                    rel="noopener"
-                    class="how-buy-link"
-                    >https://jup.ag</a
-                  >
-                  and create an account
-                </li>
-                <li>
-                  Click
-                  <span class="font-weight-bold font-weight-lg-regular"
-                    >Connect Wallet</span
-                  >
-                  and choose
-                  <span class="font-weight-bold font-weight-lg-regular"
-                    >Phantom</span
-                  >
-                </li>
-              </ul>
-            </v-col>
-          </v-row>
-
-          <v-row class="mb-8" no-gutters>
-            <v-col
-              cols="12"
-              md="3"
-              class="d-flex justify-center align-self-start"
-            >
-              <img
-                src="/images/token/search.png"
-                alt="Search Icon"
-                class="how-buy-icon"
-                contain
-              />
-            </v-col>
-            <v-col cols="12" md="9">
-              <div class="how-buy-step-title">3. Find the $GET Token</div>
-              <ul class="how-buy-list">
-                <li>Search for $GET and select it</li>
-              </ul>
-            </v-col>
-          </v-row>
-
-          <v-row class="mt-10" align="center" justify="center">
-            <v-col
-              cols="4"
-              md="4"
-              class="d-flex flex-column align-start align-md-center"
-            >
-              <div class="d-flex flex-column align-center mb-4">
-                <div class="d-flex align-center mb-4 mb-md-8">
-                  <img
-                    src="/images/token/token-get.png"
-                    alt="GET"
-                    class="token-icon mr-5"
-                  />
-                  <span class="how-buy-token-label">GET</span>
-                </div>
-                <div class="d-flex align-center mb-4 mb-md-8">
-                  <img
-                    src="/images/token/token-usdc.png"
-                    alt="USDC"
-                    class="token-icon mr-5"
-                  />
-                  <span class="how-buy-token-label">USDC</span>
-                </div>
-                <div class="d-flex align-center mb-4 mb-md-8">
-                  <img
-                    src="/images/token/token-usdt.png"
-                    alt="USDT"
-                    class="token-icon mr-5"
-                  />
-                  <span class="how-buy-token-label">USDT</span>
-                </div>
-                <div class="d-flex align-center">
-                  <img
-                    src="/images/token/token-wbtc.png"
-                    alt="WBTC"
-                    class="token-icon mr-5"
-                  />
-                  <span class="how-buy-token-label">WBTC</span>
-                </div>
+              <div class="step-content">
+                <div class="step-title">{{ index + 1 }}. {{ step.title }}</div>
+                <ul class="step-list">
+                  <li v-for="(item, i) in step.items" :key="i" 
+                      :class="{ 'warning-text': item.isWarning }">
+                    <template v-if="item.link">
+                      Go to
+                      <a :href="item.link" target="_blank" rel="noopener" class="how-buy-link">
+                        {{ item.link }}
+                      </a>
+                      <template v-if="item.extraText">{{ item.extraText }}</template>
+                    </template>
+                    <template v-else>
+                      <span :class="{ 'font-weight-bold': item.isBold }">{{ item.text }}</span>
+                    </template>
+                  </li>
+                </ul>
               </div>
-            </v-col>
-            <v-col cols="4" md="4" class="d-flex justify-start align-start">
-              <img
-                src="/images/token/guide.png"
-                alt="Buy Illustration"
-                class="how-buy-illustration"
-                contain
-              />
-            </v-col>
-          </v-row>
+            </div>
+          </div>
         </v-col>
       </v-row>
     </v-container>
   </section>
 </template>
 
-<script setup></script>
+<script setup>
+const steps = [
+  {
+    title: 'Set Up a Wallet',
+    icon: '/images/token/wallet-6.svg',
+    items: [
+      { link: 'https://phantom.com' },
+      { text: 'Create a wallet and receive your secret recovery phrase', isBold: true },
+      { text: 'Write your phrase down somewhere safe' },
+      { text: 'Never share this phrase with anyone ❗', isWarning: true }
+    ]
+  },
+  {
+    title: 'Connect to a Decentralized Exchange (DEX)',
+    icon: '/images/token/money-exchange.svg',
+    items: [
+      { link: 'https://jup.ag', extraText: ' and create an account' },
+      { text: 'Click Connect Wallet and choose Phantom', isBold: true }
+    ]
+  },
+  {
+    title: 'Find the $GET Token',
+    icon: '/images/token/search1.svg',
+    items: [
+      { text: 'Search for $GET and select it' }
+    ]
+  },
+  {
+    title: 'Choose the Amount & Currency',
+    icon: '/images/token/calculator2.svg',
+    items: [
+      { text: 'Select how much $GET you want to buy' },
+      { text: 'Choose which currency to pay with (USDC, USDT, etc.)' },
+      { text: 'Review the exchange rate and fees' }
+    ]
+  },
+  {
+    title: 'Confirm Transaction',
+    icon: '/images/token/checked.svg',
+    items: [
+      { text: 'Double-check all transaction details' },
+      { text: 'Ensure you have enough funds to cover the purchase and fees' },
+      { text: 'Approve the transaction in your wallet' }
+    ]
+  },
+  {
+    title: 'Verify & Store',
+    icon: '/images/token/verify.svg',
+    items: [
+      { text: 'Wait for transaction confirmation' },
+      { text: 'Check your wallet balance for the $GET tokens' },
+      { text: 'Store your tokens securely' }
+    ]
+  }
+];
+</script>
 
 <style scoped>
-.token-icon {
-  width: 30px;
-  height: 30px;
-}
 .how-buy-section {
   background: #fff;
-  margin-left: 2rem;
+  padding: 4rem 0;
 }
+
+.how-buy-illustration {
+  max-width: 100%;
+  height: auto;
+  width: 400px;
+  margin: 0 auto;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+}
+
 .how-buy-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #000000;
+  font-size: 36px;
+  font-weight: 800;
+  color: #24292f;
+  margin-bottom: 4rem;
+  letter-spacing: -0.02em;
 }
-.how-buy-step-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #000000;
-  margin-bottom: 0.5rem;
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
-.how-buy-list {
+
+.step-item {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+}
+
+.step-icon-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  min-width: 90px;
+  height: 90px;
+}
+
+.how-buy-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: brightness(0.2);
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #24292f;
+  margin-bottom: 1rem;
+}
+
+.step-list {
   margin: 0;
-  padding-left: 2.2rem;
-  font-size: 12px;
-  color: #000000;
+  padding-left: 1.5rem;
+  list-style-type: none;
 }
+
+.step-list li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.step-list li::before {
+  content: "•";
+  position: absolute;
+  left: -1rem;
+  color: #24aa94;
+}
+
 .how-buy-link {
   color: #0a7cff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.how-buy-link:hover {
+  color: #0056b3;
   text-decoration: underline;
 }
-.how-buy-token-label {
-  font-size: 20px;
-  font-weight: 500;
-  color: #000000;
-  width: 100px;
+
+.warning-text {
+  color: #e53e3e !important;
+  font-weight: 600;
 }
-.how-buy-icon {
-  border-radius: 12px;
-  padding: 0 12px;
-  width: 1px;
-  width: 90px;
-  height: 90px;
-  object-fit: contain;
+
+.font-weight-bold {
+  font-weight: 600;
+  color: #24292f;
 }
-.how-buy-illustration {
-  height: 160px;
-}
-@media (min-width: 600px) {
+
+@media (max-width: 960px) {
+  .how-buy-section {
+    padding: 3rem 1rem;
+  }
+
   .how-buy-illustration {
-    margin-top: 2rem;
-    height: 400px;
+    width: 300px;
+    margin-bottom: 2rem;
   }
-  .token-icon {
-    width: 62px;
-    height: 62px;
+
+  .how-buy-title {
+    font-size: 28px;
+    margin-bottom: 3rem;
   }
-  .how-buy-list {
-    margin: 0;
-    padding-left: 2.2rem;
+
+  .steps-container {
+    gap: 2rem;
+  }
+
+  .step-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .step-icon-wrapper {
+    min-width: 70px;
+    height: 70px;
+    padding: 0.75rem;
+  }
+
+  .how-buy-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .step-title {
+    font-size: 18px;
+  }
+
+  .step-list {
+    text-align: left;
+    padding-left: 1rem;
+  }
+
+  .step-list li {
+    font-size: 15px;
+    padding-left: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .how-buy-section {
+    padding: 2rem 1rem;
+  }
+
+  .how-buy-illustration {
+    width: 250px;
+  }
+
+  .how-buy-title {
     font-size: 24px;
-    color: #000000;
+    margin-bottom: 2rem;
   }
-  .how-buy-step-title {
-    font-size: 24px;
-    font-weight: 400;
-    color: #000000;
+
+  .step-item {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .step-icon-wrapper {
+    min-width: 60px;
+    height: 60px;
+  }
+
+  .how-buy-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .step-title {
+    font-size: 16px;
+  }
+
+  .step-list li {
+    font-size: 14px;
+    line-height: 1.5;
     margin-bottom: 0.5rem;
   }
-  .how-buy-icon {
-    width: 165px;
-    height: 165px;
-  }
-  .how-buy-title {
-    font-size: 36px;
-    font-weight: 800;
-    color: #354053;
-  }
-}
-@media (min-width: 960px) {
 }
 </style>
