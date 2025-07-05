@@ -106,8 +106,8 @@ const items = ref([
   margin-bottom: 24px;
 }
 .trust-community-icon {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #333333 !important;
+  border: 1px solid #2a2a2a;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -116,18 +116,23 @@ const items = ref([
   justify-content: center;
   margin-right: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .trust-community-img-icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
   filter: none;
+  opacity: 1;
 }
 .trust-community-list-item:hover .trust-community-icon {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #cbd5e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #2a2a2a !important;
+  border-color: #222222;
+}
+.trust-community-list-item:hover .trust-community-img-icon {
+  opacity: 1;
 }
 .trust-community-list-text {
   color: #2d3748;
@@ -211,6 +216,9 @@ const items = ref([
   .trust-community-illustration {
     width: 160px;
     height: 160px;
+  }
+  .trust-community-list-item .trust-community-icon {
+    background: #333333 !important;
   }
 }
 .profit-buyback-section {

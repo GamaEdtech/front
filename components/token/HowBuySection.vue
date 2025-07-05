@@ -156,7 +156,7 @@ const steps = [
   align-items: flex-start;
   justify-content: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: #333333;
   border-radius: 12px;
   min-width: 90px;
   height: 90px;

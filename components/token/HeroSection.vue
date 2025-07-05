@@ -143,14 +143,14 @@ onMounted(() => {
   background: rgba(5, 182, 231, 0.3);
   border: 1px solid rgba(110, 119, 129, 1);
   border-radius: 999px;
-  padding: 18px 32px;
+  padding: 12px 24px;
   font-size: 1.25rem;
   display: flex;
   align-items: center;
   gap: 12px;
   color: white;
   font-weight: 600;
-  height: 48px;
+  height: auto;
   min-width: 180px;
   width: auto;
   box-shadow: 0 2px 8px rgba(36, 170, 148, 0.08);
@@ -158,15 +158,17 @@ onMounted(() => {
   justify-content: center;
   margin-left: 1rem;
   position: relative;
-  left: 0;
 }
 
 .live-dot {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
   background: #24aa94;
   border-radius: 50%;
   animation: pulse 2s infinite;
+  display: inline-block;
+  margin-right: 4px;
 }
 
 @keyframes pulse {
@@ -387,7 +389,8 @@ onMounted(() => {
   .live-trading-badge {
     margin-left: 0;
     font-size: 1.1rem;
-    padding: 16px 28px;
+    padding: 12px 20px;
+    min-width: 160px;
   }
 
   .main-title {
@@ -451,6 +454,16 @@ onMounted(() => {
   .token-wrapper img {
     max-width: 160px;
     margin-top: 2.5rem;
+  }
+  .live-trading-badge {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    min-width: 140px;
+  }
+  .live-dot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
   }
 }
 
@@ -523,13 +536,14 @@ onMounted(() => {
 /* Responsive adjustments for larger screens */
 @media (min-width: 600px) {
   .live-trading-badge {
-    font-size: 24px;
-    padding: 12px 24px;
+    padding: 18px 32px;
+    font-size: 1.25rem;
   }
   
   .live-dot {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
   }
   
   .main-title {
