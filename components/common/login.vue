@@ -57,12 +57,13 @@ async function handleCredentialResponse(value) {
 
     if (response.status === 1) {
       $toast.success("Logged in successfully");
+
       auth.setUserToken(response.data.jwtToken);
-      submitLoginV2(response.data.jwtToken);
       setUser(response.data.info);
+      submitLoginV2(response.data.jwtToken);
       closeDialog();
 
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (err) {
     const status = err?.response?.status;
@@ -167,15 +168,13 @@ const submit = handleSubmit(async () => {
     } else if (data.data.type == "register") {
       goToRegister();
     } else {
+      auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
 
-      auth.setUserToken(response.data.jwtToken);
-
-      setUser(response.data.info);
-
       closeDialog();
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -201,12 +200,12 @@ const onFinish = async () => {
       })
     );
     if (response.status === 1) {
-      await submitLoginV2(response.data.jwtToken);
-      $toast.success("Logged in successfully");
       auth.setUserToken(response.data.jwtToken);
       setUser(response.data.info);
+      await submitLoginV2(response.data.jwtToken);
+      $toast.success("Logged in successfully");
       closeDialog();
-      if (route.path === "/") navigateTo("/user");
+      // if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -263,10 +262,12 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
+  const { user } = useUser();
   const pass = password.value.value ? password.value.value : generatePassword();
   const identityVal = identity.value.value
     ? identity.value.value
-    : useAuth().user?.email || "";
+    : user.value.email || "";
+
   const result = await useApiService.post("/api/v2/identities/tokens/old", {
     token: old_token,
   });

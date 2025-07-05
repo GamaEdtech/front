@@ -509,7 +509,7 @@ body {
       opacity: 1 !important;
     }
 
-    .v-btn--active .v-icon {
+    .v-btn--active .v-icon:not(.mdi-wallet-outline) {
       color: transparent;
       display: block;
       width: 21px;
@@ -4611,4 +4611,33 @@ body {
 }
 .v-skeleton-loader {
   overflow: hidden;
+}
+.overflow-unset {
+  overflow: unset !important;
+}
+.v-btn {
+  text-transform: capitalize !important;
+}
+#test-details {
+  .v-selection-control__wrapper {
+    display: none;
+  }
+
+  .option-icon {
+    border: 1px solid #e0e0e0;
+  }
+
+  .next-test.v-btn {
+    height: 3.6rem;
+    padding: 0rem 1.6rem;
+    border-radius: 3rem;
+    background: #ffb600;
+
+    .v-btn__content {
+      color: #24292f;
+      font-size: 1.4rem;
+      font-style: normal;
+      font-weight: 600;
+    }
+  }
 }

@@ -629,34 +629,7 @@ function loadNextTest() {
 }
 </script>
 
-<style>
-#test-details {
-  .v-input--selection-controls__input {
-    display: none;
-  }
-  .v-selection-control__wrapper {
-    display: none;
-  }
-
-  .option-icon {
-    border: 1px solid #e0e0e0;
-  }
-
-  .next-test.v-btn {
-    height: 3.6rem;
-    padding: 0rem 1.6rem;
-    border-radius: 3rem;
-    background: #ffb600;
-
-    .v-btn__content {
-      color: #24292f;
-      font-size: 1.4rem;
-      font-style: normal;
-      font-weight: 600;
-    }
-  }
-}
-
+<style scoped>
 .content_main_info {
   padding: 27px;
   background: #f5f5f5 !important;
