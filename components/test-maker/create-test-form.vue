@@ -883,12 +883,12 @@ const current_crop_file = ref("");
  * Form data and hidden fields
  */
 const form = reactive({
-  section: "",
-  base: "",
-  level: "",
-  grade: "",
-  lesson: "",
-  topic: "",
+  section: null,
+  base: null,
+  level: null,
+  grade: null,
+  lesson: null,
+  topic: null,
   type: "fourchoice",
   direction: "ltr",
   true_answer: "",
@@ -2470,5 +2470,8 @@ defineExpose({
 .img-clear-btn {
   position: relative;
   bottom: -20px;
+}
+.v-label {
+  font-size: 1.4rem !important;
 }
 </style>

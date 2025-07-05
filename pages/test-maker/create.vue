@@ -705,7 +705,7 @@
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     @click="test_step = 3"
-                    :disabled="!hasEnoughTests"
+                    :disabled="tests?.length < 5"
                     :loading="publish_loading"
                     block
                     color="teal"
@@ -717,10 +717,10 @@
                       font-weight: 500;
                     "
                   >
-                    <span v-show="!hasEnoughTests"
-                      >Add at least {{ 5 - tests.length }} more tests</span
+                    <span v-show="tests?.length < 5"
+                      >Add at least {{ 5 - tests?.length }} more tests</span
                     >
-                    <span v-show="hasEnoughTests">Next step</span>
+                    <span v-show="tests?.length >= 5">Next step</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -908,7 +908,7 @@
                   <v-col cols="12" md="6" class="pb-0">
                     <v-btn
                       @click="publishTest"
-                      :disabled="!hasEnoughTests"
+                      :disabled="tests?.length < 5"
                       :loading="publish_loading"
                       size="large"
                       density="compact"
@@ -917,10 +917,10 @@
                       block
                       style="text-transform: none; font-size: 13px !important"
                     >
-                      <span v-show="!hasEnoughTests"
-                        >Add at least {{ 5 - tests.length }} more tests</span
+                      <span v-show="tests?.length < 5"
+                        >Add at least {{ 5 - tests?.length }} more tests</span
                       >
-                      <span v-show="hasEnoughTests">Publish</span>
+                      <span v-show="tests?.length >= 5">Publish</span>
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -1315,36 +1315,26 @@ const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
-  section: route.query.board ? route.query.board : "",
-  base: route.query.grade ? route.query.grade : "",
-  lesson: route.query.subject ? route.query.subject : "",
+  section: route.query.board ? route.query.board : null,
+  base: route.query.grade ? route.query.grade : null,
+  lesson: route.query.subject ? route.query.subject : null,
   topics: [],
-  exam_type: "",
+  exam_type: null,
   level: "2",
   holding_time: false,
-  state: "",
-  area: "",
-  school: "",
+  state: null,
+  area: null,
+  school: null,
   duration: 3,
   title: "",
   paperID: route.query.paperId ? route.query.paperId : "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
-  edu_year: "",
-  edu_month: "",
+  edu_year: null,
+  edu_month: null,
 });
 
-// Form errors for validation
-const formErrors = reactive({
-  section: "",
-  base: "",
-  lesson: "",
-  topic: "",
-  test_type: "",
-  test_duration: "",
-  title: "",
-});
 
 const file_original = ref(null);
 const file_original_path = ref("");
@@ -1637,9 +1627,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       test_type_list.value = [];
     }
 
-    nuxtApp.$toast.error(
-      `Failed to load ${type} data: ${err.message || "Unknown error"}`
-    );
   }
 };
 
@@ -1695,7 +1682,7 @@ const submitQuestion = async () => {
       }
     );
 
-    nuxtApp.$toast.success("Exam created successfully");
+    
     exam_id.value = response.data.id;
     exam_code.value = response.data.code;
 
@@ -1718,9 +1705,7 @@ const submitQuestion = async () => {
     // Move to the next step
     test_step.value = 2;
   } catch (error) {
-    nuxtApp.$toast.error(
-      error.response?.data?.message || "Error creating exam"
-    );
+    
   } finally {
     submit_loading.value = false;
   }
@@ -1760,12 +1745,12 @@ const uploadFile = async (file_name) => {
     const response = await useApiService.post("/api/v1/upload", formData);
     if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
-      nuxtApp.$toast.success("File uploaded successfully");
+      
     } else {
-      nuxtApp.$toast.error("Invalid response from server");
+      
     }
   } catch (err) {
-    nuxtApp.$toast.error("Failed to upload file");
+    
     console.error(err);
   }
 };
@@ -1810,10 +1795,10 @@ const publishTest = async () => {
       // Navigate to publish step
       test_step.value = 4;
 
-      nuxtApp.$toast.success("Exam published successfully");
+      
     }
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error publishing exam");
+    
   } finally {
     publish_loading.value = false;
   }
@@ -1845,7 +1830,7 @@ const submitTest = async (skipListRefresh = false) => {
     // Ensure we have a valid exam ID
     if (!exam_id.value) {
       console.error("No exam ID available, cannot submit tests");
-      nuxtApp.$toast.error("No exam ID available");
+      
       return;
     }
 
@@ -1869,7 +1854,14 @@ const submitTest = async (skipListRefresh = false) => {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         },
       }
-    );
+    ).then(async (res) => {
+      if (res.status === 1) {
+        await nextTick();
+        await forceUIUpdate();
+        await handleRefreshPreviewList();
+        createForm.value.examTestListLength = tests.value.length;
+      }
+    });
 
     // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -1886,13 +1878,13 @@ const submitTest = async (skipListRefresh = false) => {
 
     // Force a UI update if we've just reached or fallen below the threshold
     if (tests.value.length === 5) {
-      nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
+      
       // Force a nextTick to ensure the UI updates
       await nextTick();
     }
   } catch (err) {
     console.error("Failed to update tests:", err);
-    nuxtApp.$toast.error("Failed to update tests");
+    
   }
 };
 
@@ -1993,7 +1985,6 @@ const handleRefreshPreviewList = async () => {
       .filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
   } catch (err) {
     console.error("Error in handleRefreshPreviewList during API call:", err);
-    nuxtApp.$toast.error("Error refreshing preview list.");
     // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
     if (tests.value.length > 0 && previewTestList.value.length === 0) {
       const fallbackPromises = tests.value.map(async (id) => {
@@ -2077,7 +2068,7 @@ const getCurrentExamInfo = async () => {
 
       // ... any other fields that should be populated from exam info
     } catch (err) {
-      nuxtApp.$toast.error("Failed to load exam information");
+      
       console.error("Error fetching exam info:", err);
     }
   }
@@ -2239,7 +2230,7 @@ const createDraftExam = async () => {
         createForm.value.getCurrentExamInfo();
       }
 
-      nuxtApp.$toast.success("Draft exam created successfully");
+      
     } else {
       throw new Error('Invalid response from server');
     }
@@ -2258,7 +2249,7 @@ const createDraftExam = async () => {
       errorMessage = error.message;
     }
     
-    nuxtApp.$toast.error(errorMessage);
+    
     throw error;
   } finally {
     submit_loading.value = false;
@@ -2275,17 +2266,8 @@ const forceUIUpdate = async () => {
     createForm.value.examTestListLength = tests.value.length;
   }
   
-  // Force a small delay to ensure reactive updates have time to propagate
-  await nextTick();
+ 
   
-  // Explicitly trigger UI updates for components that might not be updating
-  if (hasEnoughTests.value) {
-    // If we have enough tests, make sure the UI shows "Next step" instead of "Add more tests"
-    nuxtApp.$toast.info(`You have ${tests.value.length} tests - ready to proceed!`);
-  } else {
-    // If we don't have enough tests, show how many more are needed
-    nuxtApp.$toast.info(`Need ${5 - tests.value.length} more tests to proceed`);
-  }
 };
 
 const applyTest = async (item, type = null) => {
@@ -2311,7 +2293,7 @@ const applyTest = async (item, type = null) => {
         tests.value.splice(index, 1);
         await forceUIUpdate(); // Force UI update immediately
         await submitTest();
-        nuxtApp.$toast.success("Test removed from exam");
+       
       }
     }
 
@@ -2319,14 +2301,6 @@ const applyTest = async (item, type = null) => {
       tests.value.push(testId);
       await forceUIUpdate(); // Force UI update immediately
       await submitTest();
-      nuxtApp.$toast.success("Test added to exam");
-      
-      // Special handling when we reach exactly 5 tests
-      if (oldLength === 4 && tests.value.length === 5) {
-        console.log("Exactly 5 tests reached - forcing UI update");
-        await nextTick();
-        nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
-      }
     }
     
     // Force refresh the preview list to ensure UI consistency
@@ -2334,7 +2308,7 @@ const applyTest = async (item, type = null) => {
 
   } catch (error) {
     console.error('Error in applyTest:', error);
-    nuxtApp.$toast.error(error.message || "Error managing test");
+   
   }
 };
 
@@ -2382,7 +2356,7 @@ const deleteOnlineExam = async () => {
     );
 
     if (response.data.message === "done") {
-      nuxtApp.$toast.success("Deleted successfully");
+
       // Reset all values
       exam_id.value = "";
       exam_code.value = "";
@@ -2403,7 +2377,7 @@ const deleteOnlineExam = async () => {
       test_step.value = 1;
     }
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error deleting exam");
+   
     console.error("Error deleting exam:", err);
   } finally {
     deleteLoading.value = false;
@@ -2427,8 +2401,6 @@ const deleteExamTest = async () => {
       `/api/v1/examTests/${delete_exam_test_id.value}`
     );
 
-    nuxtApp.$toast.success("Deleted successfully");
-
     // Remove from tests array
     const index = tests.value.findIndex(
       (id) => id === delete_exam_test_id.value
@@ -2442,7 +2414,7 @@ const deleteExamTest = async () => {
     test_list.value = [];
     getExamTests();
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error deleting test");
+   
     console.error("Error deleting exam test:", err);
   } finally {
     delete_exam_test_loading.value = false;
@@ -2455,27 +2427,23 @@ const deleteExamTest = async () => {
 const validateHeaderForm = () => {
   // Check required fields
   if (!form.section) {
-    nuxtApp.$toast.error("Board is required");
+    
     return false;
   }
   if (!form.base) {
-    nuxtApp.$toast.error("Grade is required");
+    
     return false;
   }
   if (!form.lesson) {
-    nuxtApp.$toast.error("Subject is required");
+    
     return false;
   }
-  // if (!form.topics || form.topics.length === 0) {
-  //   nuxtApp.$toast.error("Please select at least one topic");
-  //   return false;
-  // }
+
   if (!form.title) {
-    nuxtApp.$toast.error("Title is required");
+    
     return false;
   }
   if (!form.duration) {
-    nuxtApp.$toast.error("Test duration is required");
     return false;
   }
   return true;
@@ -2485,9 +2453,7 @@ const validateHeaderForm = () => {
 const handleStepChange = (newStep) => {
   // Don't allow changing to step 4 (Publish) if we don't have enough tests
   if (newStep === 4 && tests.value.length < 5) {
-    nuxtApp.$toast.error(
-      `You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`
-    );
+   
     // Revert to step 3 (Review)
     test_step.value = 3;
     return;
@@ -2495,7 +2461,7 @@ const handleStepChange = (newStep) => {
 
   // Prevent access to step 4 if exam hasn't been published yet
   if (newStep === 4 && !isExamPublished.value) {
-    nuxtApp.$toast.error("Please publish the exam from the Review step first");
+   
     // Revert to step 3 (Review)
     test_step.value = 3;
     return;
@@ -2503,7 +2469,7 @@ const handleStepChange = (newStep) => {
 
   // Prevent access to step 4 directly from step 1 or 2
   if (newStep === 4 && test_step.value < 3) {
-    nuxtApp.$toast.error("Please review your exam before publishing");
+   
     // Go to step 3 (Review) instead
     test_step.value = 3;
     return;
@@ -2512,29 +2478,25 @@ const handleStepChange = (newStep) => {
   // If moving to Review step (3), make sure we load the test data
   if (newStep === 3 && exam_id.value) {
     test_step.value = newStep;
-    nuxtApp.$toast.info("Loading test data...");
+   
     handleRefreshPreviewList()
       .then(() => {
         if (previewTestList.value.length === 0 && tests.value.length > 0) {
-          nuxtApp.$toast.warning("Retrying test data load...");
+         
           setTimeout(() => {
             handleRefreshPreviewList().then(() => {
               if (previewTestList.value.length > 0) {
-                nuxtApp.$toast.success(
-                  `Loaded ${previewTestList.value.length} tests`
-                );
+               
               }
             });
           }, 1000);
-        } else if (previewTestList.value.length > 0) {
-          nuxtApp.$toast.success(
-            `Loaded ${previewTestList.value.length} tests`
-          );
-        }
+          } else if (previewTestList.value.length > 0) {
+             
+          }
       })
       .catch((err) => {
         console.error("Error loading test data:", err);
-        nuxtApp.$toast.error("Error loading test data");
+
       });
     return;
   }
@@ -2550,7 +2512,7 @@ const handleStepChange = (newStep) => {
       3: "Review",
       4: "Publish",
     };
-    nuxtApp.$toast.info(`Navigated to ${stepNames[newStep]} step`);
+
   }
 };
 
@@ -2617,39 +2579,13 @@ const resetAllData = () => {
 // Add a new function to help users understand how many tests are needed
 const goToNextStep = () => {
   if (tests.value.length < 5) {
-    nuxtApp.$toast.warning(
-      `You need at least 5 tests to proceed. Currently have ${
-        tests.value.length
-      }. Add ${5 - tests.value.length} more.`
-    );
     return;
   }
 
   test_step.value = 3;
-  nuxtApp.$toast.success("Moving to Review step");
+
 };
 
-/**
- * Check if exam is ready to be published
- */
-const checkPublishReadiness = () => {
-  if (tests.value.length < 5) {
-    nuxtApp.$toast.error(
-      `You need at least 5 tests to publish. Currently have ${tests.value.length}`
-    );
-    return false;
-  }
-  return true;
-};
-
-/**
- * Wrapper for publish function with validation
- */
-const handlePublish = () => {
-  if (checkPublishReadiness()) {
-    publishTest();
-  }
-};
 
 
 const handleClearSection = () => {
@@ -2744,11 +2680,9 @@ const handleTestRefresh = async () => {
       all_tests_loaded.value = false;
       await getExamTests();
     }
-
-    nuxtApp.$toast.success(`Tests updated: ${tests.value.length} tests in exam`);
+   
   } catch (err) {
-    console.error("Error in handleTestRefresh:", err);
-    nuxtApp.$toast.error("Error refreshing test list");
+    console.error("Error in handleTestRefresh:", err); 
   }
 };
 
@@ -2820,9 +2754,7 @@ watch(
       // This ensures the Review section is always up to date
       await submitTest();
 
-      // Show success message
-      nuxtApp.$toast.success("Test added to exam");
-
+      
       // Reset the lastCreatedTest after processing
       lastCreatedTest.value = null;
     }
@@ -3107,15 +3039,22 @@ watch(
       // Refresh the preview list
       await handleRefreshPreviewList();
       
-      // Force UI update if we've just reached 5 tests
-      if (newTests.length === 5 && oldTests?.length !== 5) {
-        console.log("Exactly 5 tests reached - forcing UI update");
-        await nextTick();
-        nuxtApp.$toast.success("You now have 5 tests - ready to proceed!");
-      }
+
     }
   },
   { deep: true }
+);
+
+watch(
+  () => hasEnoughTests.value,
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      await nextTick();
+      await forceUIUpdate();
+      await loadFilteredTests();
+      await handleRefreshPreviewList();
+    }
+  }
 );
 
 watch(
@@ -3162,6 +3101,9 @@ watch(testListSwitch, async (isSwitchedOn) => {
     await nextTick();
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   }
+  await nextTick();
+  await forceUIUpdate();
+  await handleRefreshPreviewList();
 });
 
 // Initialize component on mount
@@ -3231,14 +3173,23 @@ onMounted(async () => {
 onUpdated(async () => {
   if (test_step.value === 2 && testListSwitch.value) {
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
   }
 
   if (test_step.value === 3) {
     await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
   }
 
   if (printPreviewDialog.value) {
     await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
   }
 });
 </script>
@@ -3384,5 +3335,8 @@ onUpdated(async () => {
 }
 .v-btn {
   display: inline-grid !important;
+}
+.v-label {
+  font-size: 1.4rem !important;
 }
 </style>
