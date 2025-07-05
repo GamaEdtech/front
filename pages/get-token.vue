@@ -24,11 +24,11 @@
     <section>
       <token-purchase />
     </section>
-    <section>
-      <token-how-buy-section />
+     <section>
+      <token-stats-section />
     </section>
     <section>
-      <token-stats-section />
+      <token-how-buy-section />
     </section>
     <section>
       <token-faq />

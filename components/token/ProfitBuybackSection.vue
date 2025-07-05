@@ -22,17 +22,19 @@
         </v-col>
       </v-row>
       <v-row>
-        <div class="profit-buyback-description px-7 px-sm-15 px-lg-0">
-          <p>
-            After covering platform costs (servers, development, maintenance,
-            content team, and taxes), all remaining profits go toward buying
-            back $GET tokens.
-          </p>
-          <p class="pt-4">
-            These bought-back tokens are redistributed to governance members
-            based on their activity, contributions, and commitment to the
-            ecosystem.
-          </p>
+        <div class="profit-buyback-text px-7 px-sm-15 px-lg-0">
+          <div class="profit-buyback-section">
+            <p>
+              After covering platform costs (servers, development, maintenance,
+              content team, and taxes), all remaining profits go toward buying
+              back $GET tokens.
+            </p>
+            <p class="pt-4">
+              These bought-back tokens are redistributed to governance members
+              based on their activity, contributions, and commitment to the
+              ecosystem.
+            </p>
+          </div>
         </div>
       </v-row>
     </v-container>
@@ -42,11 +44,19 @@
 <script setup></script>
 
 <style scoped>
-.profit-buyback-section {
-  background: #fff;
-  padding: 24px 0;
+  .profit-buyback-section {
+  max-width: 1800px;         
+  margin: 2rem auto 0 auto; 
+  font-size: 1.15rem;       
+  color: #000000;              
+  text-align: center;       
+  line-height: 1.6;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .profit-buyback-container {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 .profit-buyback-title {
   text-align: center;
@@ -58,8 +68,10 @@
 .video-card {
   position: relative;
   width: 100%;
-  height: 200px;
-  max-width: 100%;
+  height: auto;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
   max-height: 550px;
   border-radius: 8px;
   overflow: hidden;
@@ -82,11 +94,16 @@
   pointer-events: auto;
   transition: background 0.2s;
 }
-.profit-buyback-description {
-  color: #242a2f;
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 32px;
+.profit-buyback-text {
+  max-width: 1000px;         
+  margin: 2.5rem auto 2.5rem auto; 
+  font-size: 1.35rem;       
+  font-weight: 500;         
+  color: #000000;
+  text-align: center;
+  line-height: 1.8;          
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 @media (min-width: 600px) {
   .profit-buyback-title {
@@ -96,17 +113,31 @@
   .video-card {
     height: 340px;
   }
-  .profit-buyback-description {
-    color: #6e7781;
-    font-size: 18px;
+  .profit-buyback-text {
+    color: #000000;
+    font-size: 24px;
     font-weight: 400;
-    margin-top: 32px;
+    margin-top: 12px;
   }
 }
 @media (min-width: 960px) {
   .video-card {
     min-height: 400px;
     height: 540px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profit-buyback-section {
+    font-size: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .profit-buyback-text {
+    font-size: 1.1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin: 1.5rem 0;
   }
 }
 </style>
