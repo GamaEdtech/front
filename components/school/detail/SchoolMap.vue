@@ -74,11 +74,21 @@ function handleSelectLocationUpdate(payload) {
   handleUpdate();
 }
 function handleUpdate() {
-  let formData = {};
-  formData = {
+  let formData = {
     latitude: mapMarkerData.value.lat,
     longitude: mapMarkerData.value.lng,
   };
+
+  if (mapMarkerData.value?.countryId) {
+    formData.countryId = mapMarkerData.value.countryId;
+  }
+  if (mapMarkerData.value?.stateId) {
+    formData.stateId = mapMarkerData.value.stateId;
+  }
+  if (mapMarkerData.value?.cityId) {
+    formData.cityId = mapMarkerData.value.cityId;
+  }
+
   mapSubmitLoader.value = true;
   useApiService
     .post(`/api/v2/schools/${route.params.id}/contributions`, formData)
