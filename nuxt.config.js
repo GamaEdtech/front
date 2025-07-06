@@ -106,7 +106,6 @@ export default defineNuxtConfig({
   // Plugins
   plugins: [
     { src: "plugins/helper.js" },
-    { src: "plugins/vue-emoji-picker.js", mode: "client" },
     { src: "plugins/img-cropper", mode: "client" },
     { src: "plugins/vuedraggable", mode: "client" },
   ],

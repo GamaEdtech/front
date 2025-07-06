@@ -13,11 +13,16 @@
               <div class="stats-section-stats__card darken-card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-poll</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-poll</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-poll</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent">+5.2%</div>
                 </div>
@@ -29,11 +34,16 @@
               <div class="stats-section-stats__card darken-card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-finance</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-finance</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-finance</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent">+10%</div>
                 </div>
@@ -45,11 +55,16 @@
               <div class="stats-section-stats__card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-cached</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-cached</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-cached</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent text-white">
                     75%
@@ -65,11 +80,16 @@
               <div class="stats-section-stats__card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-account-arrow-up</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-account-arrow-up</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-account-arrow-up</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div
                     class="stats-section-stats__card--percent text-deep-orange-lighten-1"

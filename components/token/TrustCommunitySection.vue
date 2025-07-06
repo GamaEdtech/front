@@ -49,15 +49,15 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/Trust.svg",
+    img: "/images/token/lock.svg",
     text: "Trust",
   },
   {
-    img: "/images/token/shared.svg",
+    img: "/images/token/us.svg",
     text: "Shared Accountability",
   },
   {
-    img: "/images/token/transparency.svg",
+    img: "/images/token/search2.svg",
     text: "Transparency",
   },
 ]);

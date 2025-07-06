@@ -5,7 +5,7 @@
         <v-col cols="12" md="10" lg="10">
           <div class="text-center mb-12">
             <img
-              src="/images/token/BuyImage.svg"
+              src="/images/token/GetBuyIllustration.svg"
               alt="Buy Illustration"
               class="how-buy-illustration"
               contain
@@ -15,6 +15,7 @@
           
           <div class="steps-container">
             <div class="step-item" v-for="(step, index) in steps" :key="index">
+              <div class="step-badge">{{ index + 1 }}</div>
               <div class="step-icon-wrapper">
                 <img
                   :src="step.icon"
@@ -24,7 +25,7 @@
                 />
               </div>
               <div class="step-content">
-                <div class="step-title">{{ index + 1 }}. {{ step.title }}</div>
+                <div class="step-title">{{ step.title }}</div>
                 <ul class="step-list">
                   <li v-for="(item, i) in step.items" :key="i" 
                       :class="{ 'warning-text': item.isWarning }">
@@ -138,35 +139,54 @@ const steps = [
 
 .step-item {
   display: flex;
+  align-items: center;
   gap: 2rem;
-  padding: 2rem;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem 2rem;
+  background: #eeeff0;
+  border-radius: 20px;
+  box-shadow: 0 6px 32px rgba(44, 62, 80, 0.10);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .step-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 36px rgba(44, 62, 80, 0.13);
+}
+
+.step-badge {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  color: #0d0d0d;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-right: 0.5rem;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+  flex-shrink: 0;
 }
 
 .step-icon-wrapper {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: #333333;
-  border-radius: 12px;
-  min-width: 90px;
-  height: 90px;
+  background: #fff;
+  border-radius: 16px;
+  min-width: 80px;
+  height: 80px;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.06);
 }
 
 .how-buy-icon {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  filter: brightness(0.2);
+  display: block;
 }
 
 .step-content {
@@ -174,7 +194,7 @@ const steps = [
 }
 
 .step-title {
-  font-size: 20px;
+  font-size: 2.25rem;
   font-weight: 700;
   color: #24292f;
   margin-bottom: 1rem;
@@ -182,138 +202,146 @@ const steps = [
 
 .step-list {
   margin: 0;
-  padding-left: 1.5rem;
+  padding-left: 0;
   list-style-type: none;
 }
 
 .step-list li {
-  position: relative;
-  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
   margin-bottom: 0.75rem;
   font-size: 16px;
   line-height: 1.6;
-  color: #4a5568;
+  color: #000206;
+  padding-left: 0;
 }
 
 .step-list li::before {
   content: "•";
-  position: absolute;
-  left: -1rem;
-  color: #24aa94;
-}
-
-.how-buy-link {
-  color: #0a7cff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.how-buy-link:hover {
-  color: #0056b3;
-  text-decoration: underline;
+  color: #0e0e0f;
+  font-size: 1.2em;
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  flex-shrink: 0;
+  position: static;
 }
 
 .warning-text {
-  color: #e53e3e !important;
-  font-weight: 600;
+  color: #e53935 !important;
+  font-weight: 700;
 }
 
 .font-weight-bold {
-  font-weight: 600;
-  color: #24292f;
+  font-weight: 700;
 }
 
-@media (max-width: 960px) {
-  .how-buy-section {
-    padding: 3rem 1rem;
-  }
+.how-buy-link {
+  color: #3578e5;
+  text-decoration: underline;
+  font-weight: 500;
+}
 
-  .how-buy-illustration {
-    width: 300px;
-    margin-bottom: 2rem;
-  }
-
-  .how-buy-title {
-    font-size: 28px;
-    margin-bottom: 3rem;
-  }
-
+@media (max-width: 900px) {
   .steps-container {
     gap: 2rem;
   }
-
   .step-item {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem;
-    gap: 1.5rem;
+    align-items: flex-start;
+    padding: 2rem 1.25rem;
   }
-
+  .step-badge {
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+  }
   .step-icon-wrapper {
-    min-width: 70px;
-    height: 70px;
-    padding: 0.75rem;
+    width: 80px !important;
+    height: 80px !important;
+    padding: 0.5rem !important;
+    margin: 0 auto 1rem auto !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-
   .how-buy-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px !important;
+    height: 48px !important;
+    display: block;
+    margin: 0 auto;
   }
-
   .step-title {
-    font-size: 18px;
+    font-size: 1.05rem;
   }
-
-  .step-list {
-    text-align: left;
-    padding-left: 1rem;
-  }
-
   .step-list li {
-    font-size: 15px;
-    padding-left: 0.75rem;
+    font-size: 14px;
+  }
+  .how-buy-card-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem auto;
+  }
+  .how-buy-card-icon img {
+    width: 64px;
+    height: 64px;
   }
 }
 
 @media (max-width: 600px) {
-  .how-buy-section {
-    padding: 2rem 1rem;
-  }
-
-  .how-buy-illustration {
-    width: 250px;
-  }
-
   .how-buy-title {
     font-size: 24px;
     margin-bottom: 2rem;
   }
-
-  .step-item {
-    padding: 1.25rem;
-    gap: 1.25rem;
+  .steps-container {
+    gap: 1.5rem;
   }
-
+  .step-item {
+    padding: 1.25rem 0.75rem;
+    border-radius: 14px;
+  }
+  .step-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
   .step-icon-wrapper {
     min-width: 60px;
     height: 60px;
+    border-radius: 12px;
+    padding: 0.5rem;
   }
-
   .how-buy-icon {
     width: 32px;
     height: 32px;
   }
-
   .step-title {
-    font-size: 16px;
+    font-size: 1.05rem;
   }
-
   .step-list li {
     font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 0.5rem;
+  }
+  .how-buy-card-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem auto;
+  }
+  .how-buy-card-icon img {
+    width: 64px;
+    height: 64px;
+  }
+  @media (max-width: 600px) {
+  .step-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem auto;
+    padding: 0.5rem;
+  }
+  .how-buy-icon {
+    width: 48px;
+    height: 48px;
   }
 }
+}
+
 </style>
