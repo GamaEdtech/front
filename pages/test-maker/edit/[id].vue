@@ -319,6 +319,7 @@
                 ref="createForm"
                 :goToPreviewStep="test_step"
                 :updateTestList="lastCreatedTest"
+                v-model:testList="tests"
                 :examEditMode="true"
                 @update:updateTestList="(val) => (lastCreatedTest = val)"
                 @update:refreshTests="handleTestRefresh"
