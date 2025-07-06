@@ -312,7 +312,8 @@
               <CreateTestForm
                 ref="createForm"
                 :goToPreviewStep="test_step"
-                :updateTestList="lastCreatedTest"
+                :updateTestList=lastCreatedTest
+                v-model:testList="tests"
                 :examEditMode="true"
                 @update:updateTestList="(val) => (lastCreatedTest = val)"
                 @update:refreshTests="handleTestRefresh"
@@ -2732,34 +2733,15 @@ const typesetMathInSpecificContainer = async (containerRef) => {
 // Watch for newly created tests and add them to the current exam
 watch(
   () => lastCreatedTest.value,
-  async (newTest) => {
-    if (newTest && exam_id.value) {
-      // Convert to string for consistent comparison - IDs might be numbers or strings
-      const newTestId = String(newTest);
+ (newTest) => {
+    if (newTest && !tests.value.find((x)=> x== newTest)) {
+      {
+            tests.value.push(newTest)
+            submitTest()
 
-      // First check if this test is already in our list to avoid duplicates
-      // Make sure we're comparing strings to strings for consistency
-      if (tests.value.some((id) => String(id) === newTestId)) {
-        lastCreatedTest.value = null;
-        return;
       }
-
-      // Add the new test to the tests array - association already done in child component
-      tests.value.push(newTestId);
-      
-      // Force UI update immediately
-      await forceUIUpdate();
-
-      // Always update the preview list when a new test is created
-      // This ensures the Review section is always up to date
-      await submitTest();
-
-      
-      // Reset the lastCreatedTest after processing
-      lastCreatedTest.value = null;
     }
   },
-  { immediate: true }
 );
 
 // Watch for changes in form.section (Board)

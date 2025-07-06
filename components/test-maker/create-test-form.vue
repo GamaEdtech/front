@@ -9,7 +9,7 @@
     <v-card flat class="mt-3">
       <!--Question section-->
       <v-card-text id="test-question">
-        <VeeForm ref="veeForm" @submit.prevent>
+        <VeeForm ref="veeForm" @submit="submitQuestion">
           <v-row>
             <v-col cols="12" md="2" class="mt-2" v-show="path_panel_expand">
               <v-autocomplete
@@ -545,6 +545,7 @@
               "
             >
               <p>Solution:</p>
+       
               <ClientOnly fallback-tag="span" fallback="Loading...">
                 <RickEditor
                   v-model:modelValue="form.answer_full"
@@ -592,7 +593,7 @@
               <v-row>
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
-                    type="button"
+                    type="submit"
                     :disabled="buttonDisabled"
                     :loading="create_loading"
                     size="large"
@@ -601,7 +602,6 @@
                     density="compact"
                     block
                     :color="buttonDisabled == false ? '#009688' : 'gray'"
-                    @click.prevent="manualSubmit"
                     style="
                       font-weight: 600;
                       text-transform: none;
@@ -773,12 +773,14 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { Form as VeeForm, Field, useForm } from "vee-validate";
 import { required } from "@vee-validate/rules";
 import { defineRule } from "vee-validate";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import * as yup from "yup";
+import { useState } from "#app";
 import { useAuth } from "~/composables/useAuth";
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css"; // Import cropper styles
@@ -809,7 +811,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  testList:{
+    type: Array,
+    default: () => [],
+  }
 });
+
 
 /**
  * Component emits
@@ -867,7 +874,6 @@ const photo_answer_rules = ref((value) => {
   return true;
 });
 const answerType = ref("text"); // Default to text answers
-const examTestListLength = ref(0);
 const file_original_path = ref("");
 
 /**
@@ -937,6 +943,12 @@ const topic_list = ref([]);
  * Selected topics state
  */
 const selected_topics = ref([]);
+
+
+// for holding test
+const examTestListLength = computed(() => {
+  return props.testList.length;
+});
 
 /**
  * Handle topic selection from topic selector
@@ -1339,7 +1351,8 @@ const validateForm = () => {
 /**
  * Handle form submission
  */
-const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
+const submitQuestion = async ( ) => {
+  console.log('submitQuestion Called')
   create_loading.value = true;
 
   // Force clear error messages again
@@ -1388,139 +1401,28 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
     if (form.c_file) formData.append("c_file", form.c_file);
     if (form.d_file) formData.append("d_file", form.d_file);
 
-    // Add a simulated delay for easier debugging in console
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const response = await useApiService
       .post("/api/v1/examTests", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      })
-      .catch((error) => {
-        console.error("Network error details:", {
-          message: error.message,
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-        });
-        throw error;
-      });
+      }).then((response)=> {
+        if(response.status === 1)
+        {
+          path_panel_expand.value = false;
+          const userState = useState("user");
 
-    if (response.status == 1) {
-      $toast.success("Created successfully");
-      path_panel_expand.value = false;
-
-      // Get the created test ID
-      const createdTestId = response.data.id;
-
-      // Edit mode or create exam progress
-      if (props.examEditMode === true) {
-        // Get current exam ID from state
-        const userState = useState("user").value;
-        const currentExamId = userState?.currentExamId || route.params.id;
-
-        if (currentExamId) {
-          try {
-            // Add the newly created test to the current exam
-            const examTestsFormData = new URLSearchParams();
-            examTestsFormData.append("tests[]", createdTestId);
-
-            // Make API call to associate test with exam
-            const associationResponse = await useApiService.put(
-              `/api/v1/exams/tests/${currentExamId}`,
-              examTestsFormData,
-              {
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-              }
-            );
-
-            if (associationResponse && associationResponse.status === 1) {
-              emit("update:updateTestList", createdTestId);
-
-              // Increment the exam test list length
-              examTestListLength.value++;
-
-              // Force parent to refresh tests list
-              emit("update:refreshTests");
-
-              // Notify user of success
-              $toast.success("Test created and added to exam successfully");
-            } else {
-              console.warn(
-                "API returned error for test association:",
-                associationResponse
-              );
-
-              // Try a second time with a different approach if the first attempt failed
-              try {
-                // Wait a moment before retrying
-                await new Promise((resolve) => setTimeout(resolve, 500));
-
-                // Try again with a different content type
-                const retryResponse = await useApiService.put(
-                  `/api/v1/exams/tests/${currentExamId}`,
-                  JSON.stringify({ tests: [createdTestId] }),
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
-                if (retryResponse && retryResponse.status === 1) {
-                  // Notify parent component about the new test
-                  emit("update:updateTestList", createdTestId);
-                  examTestListLength.value++;
-
-                  // Force parent to refresh tests list
-                  emit("update:refreshTests");
-
-                  $toast.success("Test created and added to exam successfully");
-                } else {
-                  // If retry also failed, still emit the event to let parent component try
-                  emit("update:updateTestList", createdTestId);
-                  $toast.warning(
-                    "Test created but couldn't be added to exam automatically. Please try adding it manually."
-                  );
-                }
-              } catch (retryErr) {
-                console.error(
-                  "Error in retry attempt for test association:",
-                  retryErr
-                );
-                // Still emit the event to let parent component try
-                emit("update:updateTestList", createdTestId);
-                $toast.warning(
-                  "Test created but couldn't be added to exam automatically"
-                );
-              }
+          //Edit mode or create exam progress
+          if(userState.value.currentExamCode || props.examEditMode === true)
+            {
+              emit("update:updateTestList", response.data.id); 
+              emit("update:refreshTests");      
+              resetFormFields();
             }
-          } catch (err) {
-            console.error("Error adding test to exam:", err);
-
-            // Enhanced error logging
-            if (err.response) {
-              console.error("Error response status:", err.response.status);
-              console.error("Error response data:", err.response.data);
-            }
-
-            // Still emit the event to let parent component try
-            emit("update:updateTestList", createdTestId);
-            $toast.error("Test created but couldn't be added to exam");
-          }
-        } else {
-          console.warn("No current exam ID found for test association");
         }
-      }
+      })
 
-      // Reset form fields using our improved function
-      resetFormFields();
-    } else {
-      console.error("API returned error status:", response);
-      $toast.error(response.message || "An error occurred, try again");
-    }
   } catch (err) {
     console.error("Error submitting form:", err);
     if (err.response?.status == 400) {
@@ -1537,8 +1439,9 @@ const submitQuestion = veeHandleSubmit(async (values, { setErrors }) => {
     }
   } finally {
     create_loading.value = false;
+    
   }
-});
+};
 
 /**
  * Select file for upload
@@ -1968,6 +1871,7 @@ watch(
  * Initialize on mount
  */
 onMounted(async () => {
+  
   // Initialize user token
   userToken.value = auth.getUserToken();
 
@@ -1977,6 +1881,9 @@ onMounted(async () => {
   form.testImgAnswers = false;
   text_answer.value = true;
   photo_answer.value = false;
+
+  console.log(props.testList.length)
+
 
   // Load initial data - start with sections
   await getTypeList("section");
@@ -2018,6 +1925,9 @@ onMounted(async () => {
     }, 500);
   }
 });
+
+
+
 
 /**
  * Submit cropped image for upload
@@ -2092,13 +2002,6 @@ const submitCrop = async () => {
   }
 };
 
-/**
- * Create test handler (for backward compatibility)
- * This is a wrapper for submitQuestion
- */
-const createTest = () => {
-  manualSubmit();
-};
 
 /**
  * Trigger form validation manually after user interacts with RichEditor
@@ -2266,8 +2169,6 @@ const manualSubmit = async () => {
   if (form.d_file) formData.append("d_file", form.d_file);
 
   try {
-    const { $toast } = useNuxtApp();
-
     const response = await useApiService.post("/api/v1/examTests", formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -2275,7 +2176,6 @@ const manualSubmit = async () => {
     });
 
     if (response.status == 1) {
-      if ($toast) $toast.success("Created successfully");
       path_panel_expand.value = false;
 
       // Get the created test ID
@@ -2342,6 +2242,13 @@ defineExpose({
   getCurrentExamInfo,
   resetFormFields,
 });
+
+
+// watchEffect(() => {
+//   // `foo` transformed to `props.foo` by the compiler
+//   console.log(props.testList.length)
+// })
+
 </script>
 
 <style>
