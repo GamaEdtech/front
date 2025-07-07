@@ -2,7 +2,7 @@
   <v-container fluid class="px-0 py-0 mt-md-0">
     <home-main-slider />
 
-    <lazy-home-grade-explorer v-if="stats?.length" :stats="stats" />
+    <lazy-home-grade-explorer />
 
     <home-level-guid-banner :slide-arr="slideArr" />
 
@@ -191,19 +191,6 @@ const slideColor = computed(() => {
   }
   return "#24292F"; // Default color if colors or carousel_model are not available
 });
-
-// Async Data (similar to asyncData)
-const stats = ref(null);
-
-const fetchStats = async () => {
-  try {
-    const response = await useApiService.get("/api/v1/home/stats");
-    stats.value = response?.data;
-  } catch (error) {
-    console.error("Failed to fetch stats:", error);
-  }
-};
-await fetchStats();
 
 // Lifecycle Hook (onMounted)
 

@@ -227,6 +227,7 @@ import { useAuth } from "#imports";
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 // Use services
