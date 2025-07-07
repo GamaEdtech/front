@@ -1,18 +1,13 @@
 <script setup>
 
-// Disable Nuxt Auth middleware
 definePageMeta({
   name: 'admin-auth',
   layout: 'default',
   auth: false,
 })
-const router = useRoute()
 
-const rememberMe = ref(false)
-const loading = ref(false)
-const loginError = ref('')
-const emailError = ref('')
-const passwordError = ref('')
+const router = useRouter()
+
 const isFormValid = ref(false)
 const passwordShow = ref(false)
 
@@ -27,31 +22,27 @@ const form = reactive({
   password: '',
 })
 
+//No API to sign in via token yet
+const rememberMe = ref(false)
+
+const Btnloading = ref(false)
+const loginError = ref(null)
 
 const submit = async () => {
   const auth = useAuth();
-  const { setUser } = useUser();
-  loginError.value = ''
-
   try {
-    loading.value = true
+    Btnloading.value = true
 
-    const formData = {
-      username: form.email,
-      password: form.password,
-    }
+    const result = await useApiService.post(
+      '/api/v2/identities/tokens',{
+        username: form.email,
+        password: form.password,
+      })
 
-    const result = await useApiService.post('/api/v2/identities/tokens', formData)
-
-    if (result.succeeded) {
-      if (rememberMe.value) {
-        localStorage.setItem('v2_token', result.data.token)
-      } else {
-        sessionStorage.setItem('v2_token', result.data.token)
-      }
-      auth.setUserToken(result.data.jwtToken);
-      setUser(result.data.info);
-      router.push('/admin')
+    if (result.succeeded == true) {
+      localStorage.setItem("v2_token", result.data.token);
+      auth.setUserToken(result.data.token);
+      router.push('/admin/contact-us')
     } else {
       const errorMessage = result?.errors?.[0]?.message
       switch (errorMessage) {
@@ -59,8 +50,7 @@ const submit = async () => {
           loginError.value = 'Invalid username or password. Please try again.'
           break
         case 'UserLockedOut':
-          loginError.value =
-            'Your account has been locked due to multiple failed login attempts. Please contact an administrator.'
+          loginError.value ='Your account has been locked due to multiple failed login attempts. Please contact an administrator.'
           break
         default:
           loginError.value = errorMessage || 'Login failed. Please try again.'
@@ -70,26 +60,21 @@ const submit = async () => {
     console.error('Login error:', err)
     loginError.value = 'An error occurred during login. Please try again.'
   } finally {
-    loading.value = false
+    Btnloading.value = false
   }
 }
 </script>
 <template>
-  <v-container class="fill-height my-14 my-lg-5" fluid>
+  <v-container class="fill-height my-9" fluid>
     <v-row align="center" justify="center">
-      <v-col cols="12" sm="8" md="6" lg="4">
+      <v-col cols="12" sm="8" md="6" lg="5">
         <v-card class="pa-8" elevation="0" color="#F2F4F7" rounded="lg">
           <div class="text-center mb-6">
-            <div
-              class="rounded-circle mx-auto d-flex align-center justify-center"
-              style="width: 100px; height: 100px"
-            >
               <img
                 src="/public/images/adminAuth.png"
-                alt=""
-                class="w-100 h-100"
+                alt="Gama"
+                class="wh-100"
               />
-            </div>
             <h1 class="font-size-18 primary-gray-900 font-weight-bold mt-4">
               Admin Login
             </h1>
@@ -112,65 +97,56 @@ const submit = async () => {
             class="soft-form__inputs-border"
             v-model="isFormValid"
           >
-            <div class="mb-1">
-              <label class="primary-gray-700 font-size-xs font-weight-medium"
-                >User Name / Email</label
-              >
-            </div>
+            <label class="primary-gray-700 gtext-t6 font-weight-medium">
+              User Name / Email
+            </label>
             <v-text-field
               v-model="form.email"
               placeholder="Enter User Name or Email"
-              variant="outlined"
+              variant="solo"
               density="comfortable"
               :rules="emailRules"
-              rounded
-              @focus="emailError = ''"
-              class="mb-9"
-            ></v-text-field>
+              class="mb-9 mt-1"
+            />
 
-            <div class="mb-1">
-              <label class="primary-gray-700 font-size-xs font-weight-medium"
-                >Password</label
-              >
-            </div>
+            <label class="primary-gray-700 gtext-t6 font-weight-medium">
+              Password
+            </label>
             <v-text-field
               v-model="form.password"
-              :append-icon="passwordShow ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append="passwordShow = !passwordShow"
+              :append-inner-icon="passwordShow ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="passwordShow = !passwordShow"
               placeholder="Enter Password"
-              variant="outlined"
+              variant="solo"
               density="comfortable"
               :rules="passwordRules"
-              rounded
               :type="passwordShow ? 'text' : 'password'"
-              background-color="white"
-              class="mb-4"
-              @focus="passwordError = ''"
-            ></v-text-field>
+              class="mb-4 mt-1"
+            />
 
-            <div class="d-flex align-center justify-space-between mb-6">
+            <div class="d-flex align-center justify-space-between mb-4">
               <v-checkbox
                 v-model="rememberMe"
                 label="Remember me"
                 hide-details
-                class="mt-0 pt-0 primary-gray-800 gtext-t5 font-weight-medium"
+                class="gtext-t5"
                 color="primary"
               ></v-checkbox>
               <v-btn
                 variant="plain"
                 color="#FFB600"
-                class="gtext-t5 pa-0 text-capitalize"
-                >Forgot password?</v-btn
+                class="gtext-t5 pa-0 font-weight-semibold"
+                >Forgot Password?</v-btn
               >
             </div>
 
             <v-btn
-              block
               rounded
-              height="40px"
+              block
+              height="42"
               color="#FFB600"
-              class="primary-gray-800 gtext-t5 mb-5"
-              :loading="loading"
+              class="primary-gray-800 gtext-t4 font-weight-semibold mb-9"
+              :loading="Btnloading"
               :disabled="!isFormValid"
               @click="submit"
             >
@@ -184,24 +160,42 @@ const submit = async () => {
 </template>
 
 <style scoped>
-:deep(.v-label){
-    font-size: 14px !important;
-    font-weight: 400;
-    color: #1D2939;
-}
-:deep(.v-field__field){
-    background-color: white;
-    border-radius: 25px;
+.wh-100{
+  width: 100px;
+  height: 100px;
 }
 
-:deep(.v-text-field  .v-input__slot) {
-  min-height: 48px !important;
+:deep(.v-field__input){
+  padding: 16px 20px;
+  font-family: Inter, sans-serif;
+  font-size: 1.4rem;
+  line-height: 1.8rem;
+  font-weight: 400;
+}
+:deep(.v-field){
+  border-radius: 30px;
+  border: 1px solid #E4E7EC;
+  box-shadow: none;
 }
 
-:deep(.v-input__append){
-  font-size: 16px !important;
+:deep(.v-label--clickable){
+  font-family: Inter, sans-serif !important;
+  font-size: 1.4rem !important;
+  line-height: 2.4rem !important;
+  font-weight: 400;
+  color: #1D2939;
 }
 
+:deep(.v-btn--variant-plain){
+  opacity: 0.7 !important;
+  &:hover{
+    opacity: 1 !important;
+  }
+}
+
+:deep(.v-btn--disabled){
+  opacity: 0.7 !important;
+}
 
 .login-error-alert {
   border-radius: 8px;

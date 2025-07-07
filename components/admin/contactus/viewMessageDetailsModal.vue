@@ -22,7 +22,7 @@ const messageReply = ref(null)
       <v-card class="bg-primary-gray-100">
           <v-card-title class="gtext-t4 bg-white flex-column d-flex align-center pt-12">
             <div class="avatarBg">
-              <img width="64" height="64" src="" alt="avatar">
+              <img width="64" height="64" src="/public/images/adminAuth.png" alt="avatar">
             </div>
             <p class="primary-gray-700 gtext-t3 font-weight-semibold mb-2">{{ name }}</p>
             <p class="primary-gray-500 gtext-t3 mb-6">{{ email }}</p>
@@ -166,12 +166,13 @@ const messageReply = ref(null)
   width: 100%;
 }
 .avatarBg{
+  display: flex;
   width: 100px;
   height: 100px;
   border-radius: 50%;
   background-color: #F2F4F7;
-  text-align: center;
   align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
 }
 .messageContainer{

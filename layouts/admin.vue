@@ -1,6 +1,5 @@
 <script setup>
 import { useDisplay } from 'vuetify'
-import { useRouter } from 'vue-router'
 
 const { mobile } = useDisplay()
 const drawer = ref(true)
@@ -14,6 +13,7 @@ const isPermanent = computed(() => !mobile.value)
 const isTemporary = computed(() => mobile.value)
 
 const router = useRouter()
+const route = useRoute()
 
 const menuItems = [
         { title: "Type", link: "/admin/type", icon: "mdi-basket" },
@@ -26,6 +26,10 @@ const menuItems = [
 const navigate = (link) => {
   router.push(link)
   if (mobile.value) drawer.value = false // auto-close drawer on mobile after navigation
+}
+
+function isActive(link) {
+  return route.path === link
 }
 </script>
 
@@ -51,9 +55,9 @@ const navigate = (link) => {
           :key="item.link"
           link
           @click="navigate(item.link)"
-          class="px-6"
+          class="px-3"
         >
-        <div class="d-flex align-center ga-3">
+        <div class="d-flex align-center ga-3 py-3 px-5" :class="{ 'active-tab': isActive(item.link) }">
             <v-list-item-icon>
                 <v-icon class="primary-gray-400">{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -62,6 +66,13 @@ const navigate = (link) => {
           
         </v-list-item>
       </v-list>
+      <div class="d-flex align-center ga-2" style="position: absolute;bottom: 20px; left: 20px;">
+        <img class="rounded-pill" style="width: 36px; height: 36px;border: 1px solid white;" src="/public/images/adminAuth.png" alt="">
+        <div>
+          <p class="gtext-t5 font-weight-medium">shelina Shay</p>
+          <p class="gtext-t6 primary-gray-400">Admin@Gama</p>
+        </div>
+      </div>
     </v-navigation-drawer>
 
     <v-app-bar app color="#1d2939" dark>
@@ -95,6 +106,28 @@ const navigate = (link) => {
   overflow-y: auto;
 }
 :deep(.v-navigation-drawer--left){
-    border-width: 0px !important;
+  border-width: 0px !important;
+}
+
+.active-tab > .v-list-item-title, .active-tab > v-list-item-icon > i{
+  color:#2E90FA ;
+}
+:deep(.v-list-item:hover > .v-list-item__overlay){
+  opacity: 0;
+}
+:deep(.v-list-item:hover > .v-list-item__content > div){
+  background-color: #EFF8FF;
+  border-radius: 30px;
+  opacity: 0.6;
+}
+:deep(.v-list-item:hover > .v-list-item__content > div > div),
+:deep(.v-list-item:hover > .v-list-item__content > div > v-list-item-icon > i){
+  color: #2E90FA;
+}
+:deep(.v-list-item:hover > .v-list-item__content > .active-tab), .active-tab{
+  background-color: #EFF8FF !important;
+  border-radius: 30px;
+  opacity: 1 !important;
+  color: #2E90FA !important;
 }
 </style>

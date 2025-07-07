@@ -5,7 +5,7 @@ import viewMessageDetailsModal from '@/components/admin/contactus/viewMessageDet
 // Nuxt 3 page meta
 definePageMeta({
   layout: 'admin',
-  auth: false,
+  auth: true,
 });
 
 const list = ref([]);
@@ -18,7 +18,7 @@ const headers = [
 ];
 
 const tableLoading = ref(true);
-const dialogVisible = ref(true);
+const dialogVisible = ref(false);
 const isDeleteModalOpen = ref(false);
 const selectedMessage = ref('');
 const selectedEmail = ref('');
@@ -50,17 +50,13 @@ const allPageSize = [
 
 const fetchContactUs = async () => {
   tableLoading.value = true;
+  const token = useCookie('authToken').value
   try {
-    const response = await $fetch('/api/v2/admin/contacts', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
-      },
-      params: {
+    const response = await useApiService.get('/api/v2/admin/contacts', {
+        headers : {Authorization: `Bearer ${token}`},
         'PagingDto.PageFilter.Size': selectedPageSize.value,
         'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
         'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
-      },
     });
     list.value = response.data.list;
     filteredList.value = list.value;
@@ -153,7 +149,7 @@ const isReadClass = (item) => {
 
 onMounted(() => {
   selectedAction.value = allActions[0].label;
-  selectedPageSize.value = allPageSize[0].label;
+  selectedPageSize.value = allPageSize[0].value;
   fetchContactUs();
 });
 
@@ -255,7 +251,7 @@ watch(filter, (val) => {
             <v-avatar size="40" class="mr-2" v-if="item.avatar">
               <img :src="item.avatar" alt="Avatar" />
             </v-avatar>
-            <span>{{ item.title }}</span>
+            <span>{{ item.fullName }}</span>
           </div>
         </template>
 
@@ -280,9 +276,9 @@ watch(filter, (val) => {
 
       <viewMessageDetailsModal
         v-model="dialogVisible"
-        message="selectedMessage"
-        email="selectedEmail"
-        name="selectedName"
+        :message="selectedMessage"
+        :email="selectedEmail"
+        :name="selectedName"
         @next="goToNextMessage(selectedId)"
         :disableNext="disableNextBtn"
         @back="goToPreviousMessage(selectedId)"
@@ -429,6 +425,10 @@ watch(filter, (val) => {
 
 .inactive-filter {
   color: #667085 !important;
+}
+
+:deep(.v-btn--variant-plain){
+  opacity: 1 !important;
 }
 
 </style>
