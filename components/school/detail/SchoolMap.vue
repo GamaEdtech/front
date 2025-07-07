@@ -42,6 +42,7 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(["location-updated"]);
 const schoolMap = ref(null);
 const nuxtApp = useNuxtApp();
 const route = useRoute();
@@ -98,6 +99,12 @@ function handleUpdate() {
         nuxtApp.$toast?.success(
           "Your contribution has been successfully submitted"
         );
+        // Emit the updated location data
+        emit("location-updated", {
+          countryId: mapMarkerData.value?.countryId,
+          stateId: mapMarkerData.value?.stateId,
+          cityId: mapMarkerData.value?.cityId,
+        });
       } else {
         nuxtApp.$toast?.error(response?.errors[0]?.message);
       }
@@ -116,6 +123,18 @@ watch(
   (val) => {
     mapClass.value = val;
   }
+);
+
+watch(
+  () => props.content,
+  (newContent) => {
+    contentData.value = newContent;
+    if (newContent?.latitude && newContent?.longitude) {
+      map.center = [newContent.latitude, newContent.longitude];
+      map.latLng = [newContent.latitude, newContent.longitude];
+    }
+  },
+  { deep: true }
 );
 
 onMounted(() => {
