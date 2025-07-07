@@ -1,7 +1,26 @@
 <template>
   <v-container class="flex-column margin-top-handle">
     <v-row>
-      <v-col cols="12" class="d-flex justify-center">
+      <v-col cols="4" md="12" class="d-flex d-md-none justify-start">
+        <v-badge
+          class="mt-1"
+          offset-x="-10"
+          :color="countFilterSelect == 0 ? `#ffffff` : `#F04438`"
+          :content="countFilterSelect == 0 ? `` : countFilterSelect"
+        >
+          <v-btn
+            rounded="xl"
+            prepend-icon="mdi-tune-vertical"
+            variant="outlined"
+            class="primary-gray-700"
+            density="comfortable"
+            @click="openFilterMobileModal = !openFilterMobileModal"
+          >
+            Filter
+          </v-btn>
+        </v-badge>
+      </v-col>
+      <v-col cols="8" md="12" class="d-flex justify-end justify-md-center">
         <v-text-field
           label="Search anything...."
           variant="outlined"
@@ -9,6 +28,8 @@
           max-width="330"
           density="compact"
           class="custom-search-text-field"
+          v-model="textSearch"
+          @update:modelValue="changeTextSearch"
         >
           <template v-slot:append>
             <v-btn
@@ -25,13 +46,53 @@
         </v-text-field>
       </v-col>
       <v-col cols="12">
-        <search-filter-option />
+        <search-filter-option
+          v-model:showDialogFilterMobile="openFilterMobileModal"
+          @changeFilterQuery="changeFilterQuery"
+        />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter, useRoute } from "vue-router";
+
+const router = useRouter();
+const route = useRoute();
+
+const openFilterMobileModal = ref(false);
+const countFilterSelect = ref(0);
+const querySearch = ref();
+const textSearch = ref(route.query.keyword ? route.query.keyword : "");
+const timer = ref(null);
+
+const changeFilterQuery = (query) => {
+  console.log(query);
+  countFilterSelect.value = Object.keys(query).length;
+  querySearch.value = {
+    ...query,
+    keyword: textSearch.value,
+  };
+};
+
+const changeTextSearch = () => {
+  const query = querySearch.value;
+  query.keyword = textSearch.value;
+  router.replace({ query });
+  // debouncedSearchText();
+};
+
+// const debouncedSearchText = () => {
+//   if (timer.value) {
+//     clearTimeout(timer.value);
+//     timer.value = null;
+//   }
+//   timer.value = setTimeout(() => {
+//     // get data
+//   }, 800);
+// };
+</script>
 
 <style scoped>
 .margin-top-handle {

@@ -1,9 +1,11 @@
 <template>
-  <div class="w-100 d-flex justify-center align-center flex-wrap ga-4">
+  <div
+    class="w-100 d-none d-md-flex justify-center align-center flex-wrap ga-4"
+  >
     <template v-for="(filter, index) in filters">
       <v-btn
         append-icon="mdi-chevron-down"
-        :class="`text-h5 ${
+        :class="`text-h5 primary-gray-700 ${
           filter.isOpenModal || filter.selectedItem ? `open-style-btn` : ``
         }`"
         variant="outlined"
@@ -24,11 +26,128 @@
       />
     </template>
   </div>
+
+  <v-dialog
+    v-model="dialogModel"
+    transition="dialog-bottom-transition"
+    fullscreen
+    scrim="#ffffff"
+  >
+    <div
+      class="w-100 h-100 d-flex flex-column justify-space-between overflow-y-auto bg-white position-relative"
+    >
+      <v-container class="flex-column">
+        <v-col cols="12" class="d-flex justify-space-between align-center">
+          <span class="text-h3">Filter</span>
+
+          <v-icon
+            @click="closeModalFilterMobile"
+            size="x-large"
+            color="#D0D5DD"
+          >
+            mdi-close-circle</v-icon
+          >
+        </v-col>
+        <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
+          <template v-for="(filter, index) in filters">
+            <v-chip
+              variant="flat"
+              class="text-h5 pl-5 pr-5"
+              color="#F2F4F7"
+              closable
+              @click:close="clearFilter(filter, index)"
+              :key="filter.title"
+              v-if="filter.selectedItem"
+            >
+              {{ filter.selectedItem?.title }}
+            </v-chip>
+          </template>
+        </v-col>
+        <v-col
+          cols="12"
+          class="d-flex flex-column justify-start align-center mt-4"
+        >
+          <div
+            v-for="(filter, index) in filters"
+            :key="index"
+            :class="`w-100 d-flex justify-space-between align-center flex-wrap pt-2 pb-2 ${
+              filter.disabled ? `opacity-20 cursor-not-allowed` : ``
+            }`"
+            @click="openModalSelectedFilter(filter)"
+          >
+            <v-badge
+              :color="filter.selectedItem ? `#F04438` : `#ffffff`"
+              dot
+              floating
+            >
+              <span class="text-h4">{{ filter.title }} </span>
+            </v-badge>
+            <div class="d-flex align-center ga-1">
+              <v-chip
+                variant="flat"
+                class="text-h5 font-weight-bold pl-5 pr-5"
+                color="#F2F4F7"
+                v-if="filter.selectedItem"
+              >
+                {{ filter.selectedItem.title }}
+              </v-chip>
+
+              <v-icon color="#667085"> mdi-chevron-down </v-icon>
+            </div>
+
+            <v-divider
+              :thickness="2"
+              class="border-opacity-100 mt-4 mb-4"
+              color="#F2F4F7"
+            ></v-divider>
+          </div>
+        </v-col>
+      </v-container>
+      <div class="w-100 d-flex align-center justify-center ga-3 box-button">
+        <v-btn @click="clearAllFilter" variant="text" class="text-h5">
+          Clear All
+        </v-btn>
+        <v-btn
+          color="#ffb600"
+          rounded="xl"
+          height="40"
+          width="200"
+          class="text-h5"
+          @click="closeModalFilterMobile"
+        >
+          Show 14 Results
+        </v-btn>
+      </div>
+    </div>
+  </v-dialog>
 </template>
 
 <script setup>
-import { onMounted, reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
+
+const props = defineProps({
+  showDialogFilterMobile: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits([
+  "update:showDialogFilterMobile",
+  "changeFilterQuery",
+]);
+
+// Start Section Handle Status Modal
+const dialogModel = computed({
+  get: () => props.showDialogFilterMobile,
+  set: (value) => emit("update:showDialogFilterMobile", value),
+});
+
+const closeModalFilterMobile = () => {
+  emit("update:showDialogFilterMobile", false);
+};
+// End Section Handle Status Modal
 
 const router = useRouter();
 const route = useRoute();
@@ -222,6 +341,53 @@ const filters = reactive([
   },
 ]);
 
+const openModalSelectedFilter = (filter) => {
+  if (!filter.disabled) {
+    filter.isOpenModal = !filter.isOpenModal;
+  }
+};
+
+const clearAllFilter = () => {
+  filters.forEach((filter) => {
+    filter.selectedItem = null;
+    filter.disabled = true;
+  });
+  filters[FILTER_INDEX.Board].disabled = false;
+  filters[FILTER_INDEX.Type].disabled = false;
+  updateQueryParam();
+};
+
+const clearFilter = (filter, index) => {
+  if (index < FILTER_INDEX.Type) {
+    for (let i = index; i < FILTER_INDEX.Type; i++) {
+      filters[i].selectedItem = null;
+      if (i != index) {
+        filters[i].disabled = true;
+      }
+    }
+    if (index == FILTER_INDEX.Board) {
+      filters[FILTER_INDEX.Classification].selectedItem = null;
+      filters[FILTER_INDEX.Classification].disabled = true;
+    }
+  }
+  if (index == FILTER_INDEX.Type) {
+    filters[index].selectedItem = null;
+    filters[FILTER_INDEX.Classification].selectedItem = null;
+    filters[FILTER_INDEX.Classification].disabled = true;
+
+    filters[FILTER_INDEX.Month].selectedItem = null;
+    filters[FILTER_INDEX.Month].disabled = true;
+
+    filters[FILTER_INDEX.Year].selectedItem = null;
+    filters[FILTER_INDEX.Year].disabled = true;
+  }
+  if ((index) => FILTER_INDEX.Classification) {
+    filters[index].selectedItem = null;
+    filters[index].disabled = false;
+  }
+  updateQueryParam();
+};
+
 const updateClassificationFilter = async () => {
   resetFilters(FILTER_INDEX.Classification, 6);
   if (filters[FILTER_INDEX.Type].selectedItem.hasClassification) {
@@ -255,9 +421,10 @@ const updateStatusMonthYearFilter = () => {
 
 const onFilterUpdate = async (item, filterName) => {
   const index = FILTER_INDEX[filterName];
+  filters[index].isOpenModal = false;
+
   if (item.id && item.id != filters[index]?.selectedItem?.id) {
     filters[index].selectedItem = item;
-    filters[index].isOpenModal = false;
 
     if (index == FILTER_INDEX.Board || index == FILTER_INDEX.Type) {
       if (
@@ -336,7 +503,7 @@ const updateQueryParam = () => {
       }
     }
   });
-
+  emit("changeFilterQuery", query);
   router.replace({ query });
 };
 
@@ -402,6 +569,7 @@ const updateFiltersExistInRoute = async () => {
       );
     }
   }
+  emit("changeFilterQuery", route.query);
 };
 
 const getBoardData = async () => {
@@ -418,11 +586,22 @@ const getBoardData = async () => {
 onMounted(async () => {
   await updateFiltersExistInRoute();
 });
+
+// const countFilterSelect = computed(() => {
+//   const count = filters.filter((item) => item.selectedItem).length;
+//   emit("changeCountFilter", count);
+//   return count;
+// });
 </script>
 
 <style scoped>
 .open-style-btn {
   background-color: #fff8e8;
   border: 1px solid #ffebb9;
+}
+
+.box-button {
+  min-height: 74px;
+  box-shadow: 0px -24px 50px 0px #1018280a;
 }
 </style>

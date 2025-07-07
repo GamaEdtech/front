@@ -1,6 +1,8 @@
 <template>
-  <v-dialog v-model="dialogModel" max-width="400">
-    <div class="w-100 d-flex flex-wrap flex-column bg-white pa-6 rounded-xl">
+  <v-dialog v-model="dialogModel" max-width="400" :fullscreen="!mdAndUp">
+    <div
+      class="w-100 d-flex flex-wrap flex-column bg-white pa-6 rounded-xl mobile-style"
+    >
       <v-row>
         <v-col cols="6">
           <span class="text-h3">{{ titleModal }}</span>
@@ -10,6 +12,14 @@
           <span class="text-h4 text-green font-weight-bold">{{
             filteredItems.length
           }}</span>
+          <v-icon
+            class="ml-4"
+            @click="closeModal"
+            size="x-large"
+            color="#D0D5DD"
+          >
+            mdi-close-circle</v-icon
+          >
         </v-col>
       </v-row>
       <v-row class="pl-2 pr-2 mt-6">
@@ -43,6 +53,8 @@
           :key="item.title"
           :value="item.title"
           @click="changeSelectedItem(item)"
+          :active="item.id == selectedItem?.id"
+          color="#FFB600"
         >
           <v-list-item-title
             class="text-h5"
@@ -77,6 +89,10 @@
 </template>
 
 <script setup>
+import { useDisplay } from "vuetify";
+
+const { mdAndUp } = useDisplay();
+
 const props = defineProps({
   titleModal: {
     type: String,
@@ -117,6 +133,10 @@ const dialogModel = computed({
   get: () => props.showDialog,
   set: (value) => emit("update:showDialog", value),
 });
+
+const closeModal = () => {
+  emit("update:showDialog", false);
+};
 // End Section Handle Status Modal
 
 const changeSelectedItem = (item) => {
@@ -124,4 +144,12 @@ const changeSelectedItem = (item) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@media only screen and (max-width: 960px) {
+  .mobile-style {
+    position: absolute;
+    bottom: 0;
+    border-radius: 24px 24px 0 0 !important;
+  }
+}
+</style>
