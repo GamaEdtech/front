@@ -400,11 +400,10 @@ async function initializeLocationData() {
         selectedState.value = props.contentData.stateId;
 
         await fetchCities(props.contentData.stateId);
-        setTimeout(() => {
-          if (props.contentData?.cityId) {
-            selectedCity.value = props.contentData.cityId;
-          }
-        }, 2000);
+
+        if (props.contentData?.cityId) {
+          selectedCity.value = props.contentData.cityId;
+        }
       }
     }
   } catch (error) {
