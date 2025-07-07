@@ -225,7 +225,7 @@
 
 <script setup>
 import locationSearch from "@/components/form/LocationSearch.vue";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 
 const props = defineProps({
   modelValue: {
@@ -290,7 +290,11 @@ const loadingCities = ref(false);
 async function fetchCountries() {
   loadingCountries.value = true;
   try {
-    const response = await useApiService.get("/api/v2/locations/countries");
+    const response = await useApiService.get("/api/v2/locations/countries", {
+      "PagingDto.PageFilter.Skip": 0,
+      "PagingDto.PageFilter.Size": 1000,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+    });
     if (response.succeeded) {
       countries.value = response.data.list;
     }
@@ -307,7 +311,12 @@ async function fetchStates(countryId) {
   loadingStates.value = true;
   try {
     const response = await useApiService.get(
-      `/api/v2/locations/states/${countryId}`
+      `/api/v2/locations/states/${countryId}`,
+      {
+        "PagingDto.PageFilter.Skip": 0,
+        "PagingDto.PageFilter.Size": 1000,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+      }
     );
     if (response.succeeded) {
       states.value = response.data.list;
@@ -325,7 +334,12 @@ async function fetchCities(stateId) {
   loadingCities.value = true;
   try {
     const response = await useApiService.get(
-      `/api/v2/locations/cities/${stateId}`
+      `/api/v2/locations/cities/${stateId}`,
+      {
+        "PagingDto.PageFilter.Skip": 0,
+        "PagingDto.PageFilter.Size": 1000,
+        "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+      }
     );
     if (response.succeeded) {
       cities.value = response.data.list;
@@ -368,13 +382,38 @@ function emitUpdate() {
   emit("update", locationData);
 }
 
+// Initialize location data from contentData
+async function initializeLocationData() {
+  try {
+    if (props.contentData?.countryId) {
+      selectedCountry.value = props.contentData.countryId;
+
+      await fetchStates(props.contentData.countryId);
+
+      if (props.contentData?.stateId) {
+        selectedState.value = props.contentData.stateId;
+
+        await fetchCities(props.contentData.stateId);
+        setTimeout(() => {
+          if (props.contentData?.cityId) {
+            selectedCity.value = props.contentData.cityId;
+          }
+        }, 2000);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to initialize location data:", error);
+  }
+}
+
 // Fetch countries when dialog becomes visible
 watch(
   () => dialogVisible.value,
   (newVal) => {
-    if (newVal) {
+    if (newVal && !countries.value.length) {
       fetchCountries();
     }
+    initializeLocationData();
   }
 );
 
@@ -383,6 +422,8 @@ const showLocationDialog = ref(false);
 function handleLocationSubmit() {
   showLocationDialog.value = false;
 }
+
+onMounted(() => {});
 </script>
 
 <style>
