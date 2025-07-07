@@ -104,6 +104,9 @@ function handleUpdate() {
           countryId: mapMarkerData.value?.countryId,
           stateId: mapMarkerData.value?.stateId,
           cityId: mapMarkerData.value?.cityId,
+          countryTitle: mapMarkerData.value?.countryTitle,
+          stateTitle: mapMarkerData.value?.stateTitle,
+          cityTitle: mapMarkerData.value?.cityTitle,
         });
       } else {
         nuxtApp.$toast?.error(response?.errors[0]?.message);

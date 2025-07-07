@@ -330,11 +330,16 @@ function loadGalleryImages() {
 
 function handleLocationUpdate(locationData) {
   if (contentData.value) {
+    console.log("handleLocationUpdate", locationData);
+
     contentData.value = {
       ...contentData.value,
       countryId: locationData.countryId,
       stateId: locationData.stateId,
       cityId: locationData.cityId,
+      countryTitle: locationData.countryTitle,
+      stateTitle: locationData.stateTitle,
+      cityTitle: locationData.cityTitle,
     };
   }
 }

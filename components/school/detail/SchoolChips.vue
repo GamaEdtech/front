@@ -2,49 +2,49 @@
   <div class="d-flex">
     <v-sheet class="chips-container">
       <v-chip
-        v-show="contentData.countryTitle"
+        v-show="localContentData.countryTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.countryTitle }}
+        {{ localContentData.countryTitle }}
       </v-chip>
       <v-chip
-        v-show="contentData.stateTitle"
+        v-show="localContentData.stateTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.stateTitle }}
+        {{ localContentData.stateTitle }}
       </v-chip>
       <v-chip
-        v-show="contentData.cityTitle"
+        v-show="localContentData.cityTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.cityTitle }}
+        {{ localContentData.cityTitle }}
       </v-chip>
       <v-chip
-        v-if="contentData.schoolType && contentData.schoolType.name"
+        v-if="localContentData.schoolType && localContentData.schoolType.name"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData?.schoolType?.name }}
+        {{ localContentData?.schoolType?.name }}
       </v-chip>
       <v-chip
-        :to="`/school?school_type=${contentData.school_type}`"
-        v-if="contentData.school_type_title"
+        :to="`/school?school_type=${localContentData.school_type}`"
+        v-if="localContentData.school_type_title"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.school_type_title }}
+        {{ localContentData.school_type_title }}
       </v-chip>
       <v-chip
-        :to="`/school?section=${contentData.section}`"
-        v-if="contentData.section_title"
+        :to="`/school?section=${localContentData.section}`"
+        v-if="localContentData.section_title"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.section_title }}
+        {{ localContentData.section_title }}
       </v-chip>
       <v-chip
-        :to="`/school?coed_status=${contentData.sex}`"
-        v-if="contentData.sex_title"
+        :to="`/school?coed_status=${localContentData.sex}`"
+        v-if="localContentData.sex_title"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.sex_title }}
+        {{ localContentData.sex_title }}
       </v-chip>
     </v-sheet>
     <v-spacer />
@@ -53,12 +53,24 @@
 </template>
 
 <script setup>
+import { ref, watch } from "vue";
+
 const props = defineProps({
   contentData: {
     type: Object,
     required: true,
   },
 });
+
+const localContentData = ref(props.contentData);
+
+watch(
+  () => props.contentData,
+  (newContent) => {
+    localContentData.value = newContent;
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>

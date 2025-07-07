@@ -378,6 +378,12 @@ function emitUpdate() {
     countryId: selectedCountry.value,
     stateId: selectedState.value,
     cityId: selectedCity.value,
+    countryTitle:
+      countries.value.find((c) => c.id === selectedCountry.value)?.title || "",
+    stateTitle:
+      states.value.find((s) => s.id === selectedState.value)?.title || "",
+    cityTitle:
+      cities.value.find((c) => c.id === selectedCity.value)?.title || "",
   };
   emit("update", locationData);
 }
