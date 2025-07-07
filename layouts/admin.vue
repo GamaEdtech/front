@@ -85,6 +85,7 @@ function isActive(link) {
     <v-main>
       <NuxtPage class="pa-5" />
     </v-main>
+    <AppGlobalSnackbar />
   </v-app>
 </template>
 

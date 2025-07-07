@@ -1,12 +1,14 @@
 <script setup>
 import DeleteItemModal from '@/components/admin/contactus/deleteItemModal.vue'
 import viewMessageDetailsModal from '@/components/admin/contactus/viewMessageDetailsModal.vue'
+import useApiService from '~/composables/useApiService';
 
-// Nuxt 3 page meta
 definePageMeta({
   layout: 'admin',
   auth: true,
 });
+
+const { $toast } = useNuxtApp();
 
 const list = ref([]);
 const headers = [
@@ -33,7 +35,7 @@ const selectedPageSize = ref(10);
 const page = ref(1);
 const pageCount = ref(0);
 const totalCount = ref(0);
-const selected = ref([]);
+let selected = ref([]);
 const disableNextBtn = ref(false);
 const disableBackBtn = ref(false);
 
@@ -64,7 +66,7 @@ const fetchContactUs = async () => {
     pageCount.value = Math.ceil(totalCount.value / selectedPageSize.value);
   } catch (err) {
     if (err.response?.status === 400) {
-      useNuxtApp().$toast.error(err.response.data.message);
+      $toast.error(err.response.data.message);
     }
   } finally {
     tableLoading.value = false;
@@ -73,8 +75,7 @@ const fetchContactUs = async () => {
 
 const viewMessageDetails = async (id) => {
   try {
-    const response = await $fetch(`/api/v2/admin/contacts/${id}`, {
-      method: 'GET',
+    const response = await useApiService.get(`/api/v2/admin/contacts/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
       },
@@ -97,7 +98,7 @@ const viewMessageDetails = async (id) => {
     disableBackBtn.value = index <= 0;
   } catch (err) {
     if (err.response?.status === 400) {
-      useNuxtApp().$toast.error(err.response.data.message);
+      $toast.error(err.response.data.message);
     }
   }
 };
@@ -118,8 +119,7 @@ const goToPreviousMessage = (id) => {
 
 const deleteMessage = async () => {
   try {
-    await $fetch(`/api/v2/admin/contacts/${selectedDeleteId.value}`, {
-      method: 'DELETE',
+    await useApiService.delete(`/api/v2/admin/contacts/${selectedDeleteId.value}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
       },
@@ -127,10 +127,10 @@ const deleteMessage = async () => {
 
     list.value = list.value.filter((i) => i.id !== selectedDeleteId.value);
     filteredList.value = list.value;
-    useNuxtApp().$toast.success('Message deleted successfully!');
+    $toast.success('Message deleted successfully!');
   } catch (err) {
     if (err.response?.status === 400) {
-      useNuxtApp().$toast.error(err.response.data.message);
+      $toast.error(err.response.data.message);
     }
   } finally {
     isDeleteModalOpen.value = false;
@@ -143,8 +143,34 @@ const handleDelete = (id) => {
   selectedDeleteId.value = id;
 };
 
-const isReadClass = (item) => {
-  return item.isRead === false ? 'font-weight-heavy' : '';
+const doAll = async () => {
+  if (selectedAction.value === 'Delete All') {
+    for (const item of selected.value) {
+      selectedDeleteId.value = item;
+      await deleteMessage();
+    }
+
+    selected.value = [];
+    $toast.success('All selected messages deleted!');
+  } else {
+    for (const id of selected.value) {
+      const index = list.value.findIndex((msg) => msg.id === id);
+        try {
+          await $fetch(`/api/v2/admin/contacts/${id}/toggle`, {
+            method:'PATCH',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
+            },
+          });
+
+          list.value[index] = { ...list.value[index], isRead: true };
+          selected.value = [];
+          $toast.success('All selected messages marked as read!');
+        } catch (err) {
+          console.error(`Failed to mark message ${id} as read`, err);
+        }
+    }
+  }
 };
 
 onMounted(() => {
@@ -231,27 +257,26 @@ watch(filter, (val) => {
       <v-data-table
         :headers="headers"
         :items="filteredList"
-        :item-class="isReadClass"
         :items-per-page="selectedPageSize"
-        :page="page"
-        @update:page="page = $event"
         class="elevation-1"
         :loading="tableLoading"
-        v-model:selected="selected"
+        v-model="selected"
         hide-default-footer
         show-select
       >
 
-        <template #item.index="{ index }">
-          {{ index + 1 }}
-        </template>
 
         <template #item.fullName="{ item }">
           <div class="d-flex align-center">
             <v-avatar size="40" class="mr-2" v-if="item.avatar">
               <img :src="item.avatar" alt="Avatar" />
             </v-avatar>
-            <span>{{ item.fullName }}</span>
+            <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.fullName }}</span>
+          </div>
+        </template>
+        <template #item.subject="{ item }">
+          <div class="d-flex align-center">
+            <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.subject }}</span>
           </div>
         </template>
 
@@ -297,18 +322,18 @@ watch(filter, (val) => {
           <v-select
             v-model="selectedAction"
             :items="allActions"
-            item-text="label"
+            item-title="label"
             item-value="value"
             variant="outlined"
             density="compact"
             rounded
             hide-details
             class="rounded-pill footerBtns"
-            :disabled="!selected.length"
+            :disabled="selected.length === 0"
           />
           <v-btn
             class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
-            :disabled="!selected.length"
+            :disabled="selected.length === 0" @click="doAll"
           >
             <span>Do</span>
           </v-btn>
@@ -386,8 +411,6 @@ watch(filter, (val) => {
   background-color: #F2F4F7 !important;
 }
 
-
-
 .filterBtns{
     display: flex;
     padding: 4px;
@@ -409,8 +432,16 @@ watch(filter, (val) => {
   width: 100% !important;
   justify-content: center !important;
 }
-
-:deep(.custom-pagination li button.primary) {
+:deep(.custom-pagination li),:deep(.custom-pagination li button){
+  min-width: 36px !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+:deep(.custom-pagination li button:hover){
+  background-color: #ffb300;
+  opacity: 0.7;
+}
+:deep(.custom-pagination .v-pagination__item--is-active button) {
   background: #ffb300 !important;
 }
 
