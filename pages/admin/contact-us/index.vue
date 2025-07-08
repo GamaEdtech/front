@@ -52,10 +52,8 @@ const allPageSize = [
 
 const fetchContactUs = async () => {
   tableLoading.value = true;
-  const token = useCookie('authToken').value
   try {
     const response = await useApiService.get('/api/v2/admin/contacts', {
-        headers : {Authorization: `Bearer ${token}`},
         'PagingDto.PageFilter.Size': selectedPageSize.value,
         'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
         'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
@@ -119,7 +117,7 @@ const goToPreviousMessage = (id) => {
 
 const deleteMessage = async () => {
   try {
-    await useApiService.delete(`/api/v2/admin/contacts/${selectedDeleteId.value}`, {
+    await useApiService.remove(`/api/v2/admin/contacts/${selectedDeleteId.value}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
       },
