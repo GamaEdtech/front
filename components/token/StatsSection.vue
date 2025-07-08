@@ -116,7 +116,7 @@
               <div class="stats-section-chart__coins flex-grow-1">
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-get.png"
+                    src="/images/token/Stats/token-get.png"
                     alt="GET"
                     class="token-icon mr-2"
                   />
@@ -124,7 +124,7 @@
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-usdc.png"
+                    src="/images/token/Stats/token-usdc.png"
                     alt="USDC"
                     class="token-icon mr-2"
                   />
@@ -132,7 +132,7 @@
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-usdt.png"
+                    src="/images/token/Stats/token-usdt.png"
                     alt="USDT"
                     class="token-icon mr-2"
                   />
@@ -140,7 +140,7 @@
                 </div>
                 <div class="d-flex align-center">
                   <img
-                    src="/images/token/token-wbtc.png"
+                    src="/images/token/Stats/token-wbtc.png"
                     alt="WBTC"
                     class="token-icon mr-2"
                   />
@@ -262,7 +262,7 @@ const display = useDisplay();
   padding: 3rem 0;
 }
 .stats-section__content {
-} 
+}
 .stats-section__title {
   font-size: 28px;
   color: #fff;
@@ -331,19 +331,6 @@ const display = useDisplay();
 @media (min-width: 960px) {
   .stats-section-stats__card {
     padding: 1.7rem;
-  }
-}
-.live-statistics-section {
-  max-width: 1200px;         
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 2rem;       
-  padding-right: 2rem;
-}
-@media (max-width: 600px) {
-  .live-statistics-section {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
   }
 }
 </style>

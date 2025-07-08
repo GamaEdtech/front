@@ -11,7 +11,7 @@
           <v-col cols="12" sm="3" md="2" class="about-get-img-col">
             <img
               class="about-get-img"
-              src="/images/token/think.svg"
+              src="/images/token/About/think.svg"
               alt="$GET token about illustration"
             />
           </v-col>
@@ -33,17 +33,7 @@
     </section>
   </div>
 </template>
-<script setup>
-import { ref } from 'vue';
 
-const items = ref([
-  {
-    img: "/images/token/Trust.svg",
-    text: "Trust",
-  },
-  // ...
-]);
-</script>
 
 <style scoped>
 .about-get-section {

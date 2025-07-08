@@ -23,7 +23,7 @@
           <v-col cols="12" sm="4" md="3" class="can-get-img-col">
             <img
               class="can-get-img"
-              src="/images/token/can.png"
+              src="/images/token/About/Think2.svg"
               alt="What can you do with $GET token illustration"
             />
           </v-col>

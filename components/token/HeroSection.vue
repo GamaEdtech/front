@@ -44,7 +44,7 @@
         
         <v-col cols="12" md="6" class="hero-image-desktop">
           <div class="token-wrapper">
-            <img src="/assets/images/token/GET-coin.svg" alt="GET Token" />
+            <img src="/images/token/Hero/GET-coin.svg" alt="GET Token" />
           </div>
         </v-col>
       </v-row>

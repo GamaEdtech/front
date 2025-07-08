@@ -24,22 +24,22 @@ const cards = ref([
   {
     title: "Teachers",
     desc: "Create content and upload learning materials",
-    img: "/images/token/teachers.png",
+    img: "/images/token/Earn/teachers.png",
   },
   {
     title: "Students",
     desc: "Use the system and submit assignments",
-    img: "/images/token/students.png",
+    img: "/images/token/Earn/students.png",
   },
   {
     title: "Developers",
     desc: "Contribute to the development process",
-    img: "/images/token/developers.png",
+    img: "/images/token/Earn/developers.png",
   },
   {
     title: "Community",
     desc: "Use social media to help others learn about Gamatrain",
-    img: "/images/token/community.png",
+    img: "/images/token/Earn/community.png",
   },
 ]);
 </script>

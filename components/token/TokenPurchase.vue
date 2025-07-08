@@ -18,7 +18,7 @@
             class="token-purchase__btn"
           >
             <img
-              src="/images/token/jupiter.png"
+              src="/images/token/CTA/jupiter.png"
               alt="Jupiter exchange logo"
               class="jupiter-logo"
             />
@@ -28,17 +28,17 @@
       </div>
       <figure class="token-purchase-figure">
         <img
-          src="/assets/images/token/GET_CTA_Desktop.svg"
+          src="/images/token/CTA/CTA_People_Desktop.svg"
           alt="People holding Gama tokens illustration"
           class="illustration-desktop"
         />
         <img
-          src="/assets/images/token/GET_CTA_Ipad_Mini_8.3.svg"
+          src="/images/token/CTA/CTA_People_Tablet.svg"
           alt="People holding Gama tokens illustration for iPad Mini"
           class="illustration-ipadmini"
         />
         <img
-          src="/assets/images/token/GET_CTA_Android_Small.svg"
+          src="/images/token/CTA/CTA_People_Mobile.svg"
           alt="People holding Gama tokens illustration for Android Small"
           class="illustration-androidsmall"
         />
@@ -55,25 +55,32 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  max-height: 100vh;
+  min-height: 100vh;
+  padding: 2rem 0;
 }
+
 .token-purchase-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem 0 2rem;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   width: 100%;
   overflow-x: hidden;
+  min-height: calc(100vh - 4rem);
 }
+
 .token-purchase-content {
   z-index: 2;
   width: 100%;
   text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
-
 
 .token-purchase-figure {
   width: 100%;
@@ -82,7 +89,9 @@
   margin-top: 2rem;
   margin-bottom: 0;
   padding: 0;
+  flex-shrink: 0;
 }
+
 .illustration-desktop,
 .illustration-ipadmini,
 .illustration-androidsmall {
@@ -91,31 +100,44 @@
   height: auto;
   object-fit: contain;
   margin: 0 auto;
+  max-width: 100%;
 }
+
 .main-heading {
-  font-size: 32px;
+  font-size: 3rem;
   font-weight: 700;
   color: #fff;
   text-align: center;
-  padding-top: 10rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.2;
 }
+
 .sub-heading {
-  font-size: 40px;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #000000;
   text-align: center;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+  line-height: 1.2;
 }
+
 .sub-heading .head-yellow {
   color: #fecd1c;
 }
+
 .token-purchase__description {
   color: #000000;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 500;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
   line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
+
 .token-purchase__btn {
   background: #000000;
   display: flex;
@@ -124,106 +146,207 @@
   height: 48px;
   width: 160px;
   border-radius: 6px;
-  font-size: 24px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
 }
+
+.token-purchase__btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
 .token-purchase__btn img {
   width: 27px;
   height: 27px;
 }
+
 .token-purchase__title {
   color: #000000;
-  font-size: 24px;
+  font-size: 2.25rem;
   font-weight: 700;
   padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
-@media (min-width: 600px) {
+
+/* Mobile First - Base styles for small screens */
+@media (max-width: 599px) {
   .token-purchase-bg {
-    padding-bottom: 30rem;
+    min-height: auto;
+    padding: 1rem 0;
   }
-  .token-purchase__title {
-    color: #313231;
-    font-size: 24px;
-    font-weight: 500;
+  
+  .token-purchase-container {
+    padding: 1rem 0.5rem;
+    min-height: auto;
   }
-  .token-purchase__description {
-    font-size: 24px;
-  }
+  
   .main-heading {
-    font-size: 56px;
-    font-weight: 700;
+    font-size: 2.75rem;
+    padding-top: 1rem;
   }
+  
   .sub-heading {
-    font-size: 56px;
-    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .token-purchase__description {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .token-purchase__btn {
+    height: 44px;
+    width: 140px;
+    font-size: 1.1rem;
+  }
+  
+  .token-purchase__btn img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .token-purchase__title {
+    font-size: 2.1rem;
+  }
+  
+  .token-purchase-figure {
+    margin-top: 1rem;
+  }
+  
+  .illustration-androidsmall {
+    display: block;
+    max-height: 150px;
+    max-width: 300px;
   }
 }
+
+/* Tablet styles */
+@media (min-width: 600px) and (max-width: 959px) {
+  .token-purchase-bg {
+    min-height: 100vh;
+    padding: 3rem 0;
+  }
+  
+  .token-purchase-container {
+    padding: 3rem 2rem;
+  }
+  
+  .main-heading {
+    font-size: 7.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .sub-heading {
+    font-size: 6.5rem;
+    margin-bottom: 3.5rem;
+  }
+  
+  .token-purchase__description {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .token-purchase__btn {
+    height: 56px;
+    width: 180px;
+    font-size: 1.5rem;
+  }
+  
+  .token-purchase__btn img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .token-purchase__title {
+    font-size: 2.5rem;
+  }
+  
+  .illustration-ipadmini {
+    display: block;
+    max-width: 500px;
+  }
+}
+
+/* Desktop styles */
 @media (min-width: 960px) {
   .token-purchase-bg {
-    padding-bottom: 40rem;
+    min-height: 100vh;
+    padding: 4rem 0;
   }
-  .token-purchase__title {
-    color: #313231;
-    font-size: 28px;
-    font-weight: 700;
-    padding-bottom: 1rem;
+  
+  .token-purchase-container {
+    padding: 4rem 2rem;
   }
+  
   .main-heading {
-    font-size: 84px;
-    font-weight: 700;
+    font-size: 9.25rem;
+    margin-bottom: 2rem;
   }
+  
   .sub-heading {
-    font-size: 96px;
-    font-weight: 700;
-    padding-bottom: 4rem;
+    font-size: 8rem;
+    margin-bottom: 2rem;
   }
+  
   .token-purchase__description {
-    color: #24292f;
-    font-size: 32px;
-    font-weight: 400;
-    text-align: center;
+    font-size: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
   }
+  
   .token-purchase__btn {
     height: 68px;
     width: 215px;
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 2rem;
   }
+  
   .token-purchase__btn img {
     width: 40px;
     height: 40px;
   }
-}
-@media (min-width: 961px) {
-  .illustration-desktop { display: block; max-width: 1000px; }
-}
-@media (min-width: 601px) and (max-width: 960px) {
-  .illustration-ipadmini { display: block; max-width: 700px; }
-}
-@media (max-width: 600px) {
-  .token-purchase-bg {
-    min-height: 32vh;
-    padding-top: 2rem;
-    padding-bottom: 1.5rem;
+  
+  .token-purchase__title {
+    font-size: 2.75rem;
   }
+  
+  .illustration-desktop {
+    display: block;
+    max-width: 800px;
+  }
+}
+
+/* Large desktop styles */
+@media (min-width: 1200px) {
   .main-heading {
-    padding-top: 2rem;
+    font-size: 9rem;
   }
-  .token-purchase-figure {
-    margin-top: 1rem;
+  
+  .sub-heading {
+    font-size: 8rem;
+    margin-bottom: 4rem;
   }
-  .illustration-androidsmall {
-    max-height: 120px;
-  }
-  .token-purchase-container {
-    padding: 4rem 0.5rem 0 0.5rem;
-  }
+  
   .token-purchase__description {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    padding: 0 0.5rem;
+    font-size: 2.25rem;
+  }
+  
+  .illustration-desktop {
+    max-width: 1000px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-heading {
+    font-size: 2.2rem;
+  }
+  .sub-heading {
+    font-size: 1.5rem;
   }
 }
 </style>

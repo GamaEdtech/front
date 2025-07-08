@@ -3,19 +3,44 @@
     <v-container>
       <v-row justify="center">
         <v-col cols="12" md="10" lg="10">
-          <div class="text-center mb-12">
-            <img
-              src="/images/token/GetBuyIllustration.svg"
-              alt="Buy Illustration"
-              class="how-buy-illustration"
-              contain
-            />
+          <!-- New illustration layout: tokens + man -->
+          <div class="how-buy-hero mb-12">
+            <!-- Token icons and names -->
+            <div class="how-buy-tokens">
+              <div class="token-row">
+                <div class="token-icon-col">
+                  <img src="/images/token/Buy/token-get2.png" alt="GET" class="token-icon" />
+                </div>
+                <span class="how-buy-token-label">GET</span>
+              </div>
+              <div class="token-row">
+                <div class="token-icon-col">
+                  <img src="/images/token/Buy/token-usdc.png" alt="USDC" class="token-icon" />
+                </div>
+                <span class="how-buy-token-label">USDC</span>
+              </div>
+              <div class="token-row">
+                <div class="token-icon-col">
+                  <img src="/images/token/Buy/token-usdt.png" alt="USDT" class="token-icon" />
+                </div>
+                <span class="how-buy-token-label">USDT</span>
+              </div>
+              <div class="token-row">
+                <div class="token-icon-col">
+                  <img src="/images/token/Buy/token-wbtc.png" alt="WBTC" class="token-icon" />
+                </div>
+                <span class="how-buy-token-label">WBTC</span>
+              </div>
+            </div>
+            <!-- Man illustration -->
+            <div class="how-buy-man d-flex justify-center align-center">
+              <img src="/images/token/Buy/guide.svg" alt="Buy Illustration" class="how-buy-illustration" />
+            </div>
           </div>
+          <!-- End hero -->
           <h2 class="how-buy-title text-center">How To Buy $GET</h2>
-          
           <div class="steps-container">
             <div class="step-item" v-for="(step, index) in steps" :key="index">
-              <div class="step-badge">{{ index + 1 }}</div>
               <div class="step-icon-wrapper">
                 <img
                   :src="step.icon"
@@ -54,32 +79,32 @@
 const steps = [
   {
     title: 'Set Up a Wallet',
-    icon: '/images/token/wallet-6.svg',
+    icon: '/images/token/Buy/wallet-6.svg',
     items: [
       { link: 'https://phantom.com' },
-      { text: 'Create a wallet and receive your secret recovery phrase', isBold: true },
+      { text: 'Create a wallet and receive your secret recovery phrase' },
       { text: 'Write your phrase down somewhere safe' },
-      { text: 'Never share this phrase with anyone ❗', isWarning: true }
+      { text: 'Never share this phrase with anyone ❗'}
     ]
   },
   {
     title: 'Connect to a Decentralized Exchange (DEX)',
-    icon: '/images/token/money-exchange.svg',
+    icon: '/images/token/Buy/money-exchange.svg',
     items: [
       { link: 'https://jup.ag', extraText: ' and create an account' },
-      { text: 'Click Connect Wallet and choose Phantom', isBold: true }
+      { text: 'Click Connect Wallet and choose Phantom' }
     ]
   },
   {
     title: 'Find the $GET Token',
-    icon: '/images/token/search1.svg',
+    icon: '/images/token/Buy/search1.svg',
     items: [
       { text: 'Search for $GET and select it' }
     ]
   },
   {
     title: 'Choose the Amount & Currency',
-    icon: '/images/token/calculator2.svg',
+    icon: '/images/token/Buy/calculator2.svg',
     items: [
       { text: 'Select how much $GET you want to buy' },
       { text: 'Choose which currency to pay with (USDC, USDT, etc.)' },
@@ -88,7 +113,7 @@ const steps = [
   },
   {
     title: 'Confirm Transaction',
-    icon: '/images/token/checked.svg',
+    icon: '/images/token/Buy/checked.svg',
     items: [
       { text: 'Double-check all transaction details' },
       { text: 'Ensure you have enough funds to cover the purchase and fees' },
@@ -97,7 +122,7 @@ const steps = [
   },
   {
     title: 'Verify & Store',
-    icon: '/images/token/verify.svg',
+    icon: '/images/token/Buy/verify.svg',
     items: [
       { text: 'Wait for transaction confirmation' },
       { text: 'Check your wallet balance for the $GET tokens' },
@@ -113,12 +138,61 @@ const steps = [
   padding: 4rem 0;
 }
 
+.how-buy-hero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+}
+
+.how-buy-tokens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.token-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.token-icon-col {
+  width: 64px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.token-icon {
+  width: 56px;
+  height: 56px;
+  display: block;
+}
+
+.how-buy-token-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  line-height: 1;
+  min-width: 60px;
+}
+
+
 .how-buy-illustration {
-  max-width: 100%;
+  max-width: 400px;
+  min-width: 250px;
+  width: 100%;
   height: auto;
-  width: 400px;
-  margin: 0 auto;
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+}
+
+.how-buy-man {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .how-buy-title {
@@ -152,22 +226,6 @@ const steps = [
 .step-item:hover {
   transform: translateY(-2px) scale(1.01);
   box-shadow: 0 12px 36px rgba(44, 62, 80, 0.13);
-}
-
-.step-badge {
-  width: 40px;
-  height: 40px;
-  background: #fff;
-  color: #0d0d0d;
-  font-weight: bold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  margin-right: 0.5rem;
-  box-shadow: 0 2px 8px rgba(44,62,80,0.08);
-  flex-shrink: 0;
 }
 
 .step-icon-wrapper {
@@ -244,6 +302,29 @@ const steps = [
 }
 
 @media (max-width: 900px) {
+  .how-buy-hero {
+    flex-direction: row;
+    gap: 32px;
+  }
+  .how-buy-tokens {
+    margin-right: 0 !important;
+    margin-bottom: 2rem !important;
+    align-items: center !important;
+  }
+  .how-buy-man {
+    min-width: 160px;
+  }
+  .how-buy-illustration {
+    max-width: 140px;
+    min-width: 100px;
+  }
+  .token-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .how-buy-token-label {
+    font-size: 1.1rem;
+  }
   .steps-container {
     gap: 2rem;
   }
@@ -251,10 +332,6 @@ const steps = [
     flex-direction: column;
     align-items: flex-start;
     padding: 2rem 1.25rem;
-  }
-  .step-badge {
-    margin-bottom: 0.5rem;
-    margin-right: 0;
   }
   .step-icon-wrapper {
     width: 80px !important;
@@ -289,59 +366,50 @@ const steps = [
 }
 
 @media (max-width: 600px) {
-  .how-buy-title {
-    font-size: 24px;
-    margin-bottom: 2rem;
+  .how-buy-hero {
+    gap: 16px;
   }
-  .steps-container {
-    gap: 1.5rem;
+  .how-buy-man {
+    flex: 1 1 60%;
+    /* Optionally center the image */
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  .step-item {
-    padding: 1.25rem 0.75rem;
-    border-radius: 14px;
+  .how-buy-illustration {
+    max-width: 80vw;   /* Use most of the viewport width */
+    min-width: 0;
+    width: 100%;
   }
-  .step-badge {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-  }
-  .step-icon-wrapper {
-    min-width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    padding: 0.5rem;
-  }
-  .how-buy-icon {
-    width: 32px;
-    height: 32px;
-  }
-  .step-title {
-    font-size: 1.05rem;
-  }
-  .step-list li {
-    font-size: 14px;
-  }
-  .how-buy-card-icon {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 1.5rem auto;
-  }
-  .how-buy-card-icon img {
-    width: 64px;
-    height: 64px;
-  }
-  @media (max-width: 600px) {
-  .step-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1rem auto;
-    padding: 0.5rem;
-  }
-  .how-buy-icon {
-    width: 48px;
-    height: 48px;
+  .how-buy-tokens {
+    flex: 1 1 40%;
   }
 }
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .step-title {
+    font-size: 2rem;
+    color: #24292f;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    display: block;
+  }
+  .step-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .step-badge,
+  .step-icon-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 </style>

@@ -32,7 +32,7 @@
         </v-col>
         <v-col cols="12" md="4" class="trust-community-illustration-col">
           <img
-            src="/images/token/community.svg"
+            src="/images/token/Mission/community.svg"
             alt="Community trust and collaboration illustration"
             class="trust-community-illustration"
           />
@@ -49,15 +49,15 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/lock.svg",
+    img: "/images/token/Mission/lock.svg",
     text: "Trust",
   },
   {
-    img: "/images/token/us.svg",
+    img: "/images/token/Mission/us.svg",
     text: "Shared Accountability",
   },
   {
-    img: "/images/token/search2.svg",
+    img: "/images/token/Mission/search2.svg",
     text: "Transparency",
   },
 ]);
