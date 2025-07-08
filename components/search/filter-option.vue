@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-100 d-none d-md-flex justify-center align-center flex-wrap ga-4"
+    class="w-100 d-none d-md-flex justify-center align-center flex-wrap ga-4 mt-2"
   >
     <template v-for="(filter, index) in filters">
       <v-btn

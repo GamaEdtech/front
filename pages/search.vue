@@ -27,6 +27,7 @@
           color="#FFB600"
           max-width="330"
           density="compact"
+          hide-details
           class="custom-search-text-field"
           v-model="textSearch"
           @update:modelValue="changeTextSearch"
@@ -45,12 +46,21 @@
           </template>
         </v-text-field>
       </v-col>
-      <v-col cols="12">
-        <search-filter-option
-          v-model:showDialogFilterMobile="openFilterMobileModal"
-          @changeFilterQuery="changeFilterQuery"
-        />
+      <search-filter-option
+        v-model:showDialogFilterMobile="openFilterMobileModal"
+        @changeFilterQuery="changeFilterQuery"
+      />
+      <v-col cols="12" class="d-flex align-end justify-end ga-2">
+        <span class="text-h5 primary-gray-400">Result</span>
+        <span class="text-h4 primary-gray-700 font-weight-bold">24</span>
       </v-col>
+      <search-list
+        :data-list="data"
+        :is-initial-loading="isInitialDataLoading"
+        :is-pagination-loading="isPaginationDataLoading"
+        :is-all-data-loaded="isAllDataLoaded"
+        @load-next-page="loadNextPageData"
+      />
     </v-row>
   </v-container>
 </template>
@@ -66,6 +76,14 @@ const countFilterSelect = ref(0);
 const querySearch = ref();
 const textSearch = ref(route.query.keyword ? route.query.keyword : "");
 const timer = ref(null);
+
+const isInitialDataLoading = ref(false);
+const isPaginationDataLoading = ref(false);
+const data = ref([]);
+const isAllDataLoaded = ref(false);
+const pageNumber = ref(1);
+
+const loadNextPageData = () => {};
 
 const changeFilterQuery = (query) => {
   console.log(query);
