@@ -42,6 +42,7 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(["location-updated"]);
 const schoolMap = ref(null);
 const nuxtApp = useNuxtApp();
 const route = useRoute();
@@ -74,11 +75,21 @@ function handleSelectLocationUpdate(payload) {
   handleUpdate();
 }
 function handleUpdate() {
-  let formData = {};
-  formData = {
+  let formData = {
     latitude: mapMarkerData.value.lat,
     longitude: mapMarkerData.value.lng,
   };
+
+  if (mapMarkerData.value?.countryId) {
+    formData.countryId = mapMarkerData.value.countryId;
+  }
+  if (mapMarkerData.value?.stateId) {
+    formData.stateId = mapMarkerData.value.stateId;
+  }
+  if (mapMarkerData.value?.cityId) {
+    formData.cityId = mapMarkerData.value.cityId;
+  }
+
   mapSubmitLoader.value = true;
   useApiService
     .post(`/api/v2/schools/${route.params.id}/contributions`, formData)
@@ -88,6 +99,15 @@ function handleUpdate() {
         nuxtApp.$toast?.success(
           "Your contribution has been successfully submitted"
         );
+        // Emit the updated location data
+        emit("location-updated", {
+          countryId: mapMarkerData.value?.countryId,
+          stateId: mapMarkerData.value?.stateId,
+          cityId: mapMarkerData.value?.cityId,
+          countryTitle: mapMarkerData.value?.countryTitle,
+          stateTitle: mapMarkerData.value?.stateTitle,
+          cityTitle: mapMarkerData.value?.cityTitle,
+        });
       } else {
         nuxtApp.$toast?.error(response?.errors[0]?.message);
       }
@@ -106,6 +126,18 @@ watch(
   (val) => {
     mapClass.value = val;
   }
+);
+
+watch(
+  () => props.content,
+  (newContent) => {
+    contentData.value = newContent;
+    if (newContent?.latitude && newContent?.longitude) {
+      map.center = [newContent.latitude, newContent.longitude];
+      map.latLng = [newContent.latitude, newContent.longitude];
+    }
+  },
+  { deep: true }
 );
 
 onMounted(() => {

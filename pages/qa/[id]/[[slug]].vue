@@ -950,6 +950,7 @@ import breadcrumb from "~/components/widgets/breadcrumb.vue";
 import EmojiPicker from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
+const { $toast } = useNuxtApp();
 
 const { isAuthenticated } = useAuth();
 import {
@@ -994,7 +995,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
+      href: `https://${requestURL.value}/qa/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
 });
@@ -1146,24 +1147,17 @@ function selectEmoji(emoji) {
 async function submitReply(values, { resetForm }) {
   loading.reply_form = true;
   const payload = {
-    ...values,
     id: route.params.id,
+    answer: values.answer,
   };
 
   try {
-    await useApiService.post(
-      "/api/v1/questionReplies",
-      querystring.stringify(payload),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    await useApiService.post("/api/v1/questionReplies", payload);
+
     await reInit();
 
     resetForm();
-    // $toast.success("Reply submit successfully");
+    $toast.success("Reply submit successfully");
   } catch (err) {
     $toast.error(err.response.data.message);
   } finally {

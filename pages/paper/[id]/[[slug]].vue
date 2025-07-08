@@ -76,6 +76,13 @@
                     >
                       {{ contentData?.edu_year }}
                     </v-chip>
+                    <v-chip
+                      :small="display.mdAndDown"
+                      :to="`/subject-directory?board=${contentData?.section}&grade=${contentData?.base}&subject=${contentData?.lesson}`"
+                      class="ma-1 bg-primary white--text"
+                    >
+                      {{ contentData?.lesson_title }} directory
+                    </v-chip>
                   </template>
                 </paper-detail-description>
               </v-col>
@@ -101,6 +108,12 @@
               </v-col>
             </v-row>
           </div>
+          <common-related-portrait-content
+            pageType="paper"
+            pageName="Past Papers"
+            source="test"
+            request="test"
+          />
         </v-container>
       </section>
       <!--  End: detail  -->
@@ -120,10 +133,6 @@ const route = useRoute();
 const router = useRouter();
 const requestURL = ref(useRequestURL().host);
 const randomTestContent = ref(null);
-const paperId = computed(() => {
-  if (!route.params.slug || !route.params.slug.length) return null;
-  return route.params.slug[0];
-});
 
 // Track loading state
 
@@ -132,13 +141,10 @@ const {
   error,
   pending: dataFetching,
 } = await useAsyncData(
-  `paper-${paperId.value}`,
+  `paper-${route.params.id}`,
   async () => {
     try {
-      const response = await $fetch(
-        `/api/v1/tests/${route.params.slug[0]}`,
-        {}
-      );
+      const response = await $fetch(`/api/v1/tests/${route.params.id}`, {});
 
       return response.data;
     } catch (e) {
@@ -153,7 +159,7 @@ const {
     server: true,
     lazy: false,
     immediate: true,
-    watch: [() => paperId.value],
+    watch: [() => route.params.id],
   }
 );
 
@@ -190,7 +196,7 @@ useHead({
   link: [
     {
       rel: "canonical",
-      href: `${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+      href: `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {

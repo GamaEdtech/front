@@ -206,6 +206,7 @@
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
+  middleware: ["auth", "user-type"],
 });
 
 const { $toast, $store } = useNuxtApp();
@@ -314,23 +315,19 @@ const deleteExam = async () => {
   delete_loading.value = true;
   try {
     await useApiService.remove(`/api/v1/exams/${delete_exam_id.value}`);
-
-    delete_exam_id.value = null;
-    deleteConfirmDialog.value = false;
-
-    $store.commit("user/setCurrentExamId", "");
-    $store.commit("user/setCurrentExamCode", "");
-    $store.commit("user/setPreviewTestList", []);
-
-    $toast.success("Deleted successfully");
-
+    
+    // Reset pagination and reload exams
+    page.value = 1;
+    all_files_loaded.value = false;
     exam_list.value = [];
-    getExams();
+    getExams()
   } catch (e) {
-    delete_exam_id.value = null;
-    deleteConfirmDialog.value = false;
+    console.log(e);
   } finally {
     delete_loading.value = false;
+    delete_exam_id.value = null;
+    deleteConfirmDialog.value = false;
+   
   }
 };
 
@@ -377,6 +374,7 @@ watch(
     getExams();
   }
 );
+
 </script>
 
 <style scoped>

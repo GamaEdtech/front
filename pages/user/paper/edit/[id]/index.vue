@@ -34,6 +34,7 @@
                   item-title="title"
                   item-value="id"
                   label="Board"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -47,6 +48,7 @@
                   item-value="id"
                   item-title="title"
                   label="Grade"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -60,6 +62,7 @@
                   item-title="title"
                   v-model="formData.lesson"
                   label="Subject"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="12">
@@ -79,7 +82,8 @@
                   item-value="id"
                   item-title="title"
                   v-model="formData.test_type"
-                  label="Test type"
+                  label="Classification"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -97,7 +101,8 @@
                   item-value="id"
                   item-title="title"
                   v-model="formData.answer_type"
-                  label="Answer status"
+                  label="Solution Availability"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -108,7 +113,8 @@
                   item-value="id"
                   item-title="title"
                   v-model="formData.level"
-                  label="Level"
+                  label="Difficulty Level"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -120,6 +126,7 @@
                   :rules="[(v) => !!v || 'Year is required']"
                   v-model="formData.edu_year"
                   label="Year"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -133,6 +140,7 @@
                   item-title="title"
                   item-value="id"
                   label="Month"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -143,7 +151,8 @@
                   v-model="formData.holding_level"
                   item-title="title"
                   item-value="id"
-                  label="Holding level"
+                  label="Testing Scope"
+                  color="#FFB300"
                 />
               </v-col>
 
@@ -156,6 +165,7 @@
                   item-title="title"
                   item-value="id"
                   label="State"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4" v-if="formData.holding_level < 3">
@@ -167,6 +177,7 @@
                   item-title="title"
                   item-value="id"
                   label="Area"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4" v-if="formData.holding_level < 2">
@@ -178,6 +189,7 @@
                   item-title="title"
                   item-value="id"
                   label="School"
+                  color="#FFB300"
                 />
               </v-col>
 
@@ -189,6 +201,7 @@
                   v-model="formData.title"
                   :rules="[(v) => !!v || 'Title is required']"
                   label="Title"
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="12">
@@ -203,10 +216,11 @@
                       (v && v.length >= 70) ||
                       'Description must be at least 70 characters',
                   ]"
-                  label="Describe"
+                  label="Content outline"
                   hint="You must enter at least 70 characters."
                   persistent-hint
-                  placeholder="Write a brief description about the files to help the user make an informed choice"
+                  placeholder="A brief overview of the content, outlining sections, topics, and question formats."
+                  color="#FFB300"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -216,7 +230,7 @@
                   v-model="file_pdf"
                   :prepend-icon="null"
                   accept="application/pdf"
-                  label="Pdf question & answer file"
+                  label="Pdf Question"
                   color="red"
                   :loading="file_pdf_loading"
                   @change="uploadFile('file_pdf', $event)"
@@ -239,8 +253,36 @@
                 <v-file-input
                   density="compact"
                   variant="outlined"
+                  v-model="file_answer"
+                  label="PDF Solution"
+                  :prepend-icon="null"
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  :loading="file_answer_loading"
+                  color="default"
+                  @change="uploadFile('file_answer', $event)"
+                  prepend-inner-icon="mdi-file"
+                  append-inner-icon="mdi-folder-open"
+                >
+                  <template #append>
+                    <v-icon
+                      color="blue"
+                      @click="startDownload('a_file')"
+                      v-show="
+                        paperData?.files?.answer?.exist || formData.file_answer
+                      "
+                      size="x-large"
+                    >
+                      mdi-download
+                    </v-icon>
+                  </template>
+                </v-file-input>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-file-input
+                  density="compact"
+                  variant="outlined"
                   v-model="file_word"
-                  label="Word question & answer file"
+                  label="Word Q & S"
                   :prepend-icon="null"
                   accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   :loading="file_word_loading"
@@ -264,35 +306,6 @@
                 </v-file-input>
               </v-col>
 
-              <v-col cols="12" md="4">
-                <v-file-input
-                  density="compact"
-                  variant="outlined"
-                  v-model="file_answer"
-                  label="Answer file"
-                  :prepend-icon="null"
-                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  :loading="file_answer_loading"
-                  color="default"
-                  @change="uploadFile('file_answer', $event)"
-                  prepend-inner-icon="mdi-file"
-                  append-inner-icon="mdi-folder-open"
-                >
-                  <template #append>
-                    <v-icon
-                      color="blue"
-                      @click="startDownload('a_file')"
-                      v-show="
-                        paperData?.files?.answer?.exist || formData.file_answer
-                      "
-                      size="x-large"
-                    >
-                      mdi-download
-                    </v-icon>
-                  </template>
-                </v-file-input>
-              </v-col>
-
               <v-col cols="12" v-if="extraAttr.length">
                 <v-row v-for="(item, index) in extraAttr" :key="index">
                   <v-col cols="12" md="4">
@@ -304,6 +317,7 @@
                       item-title="title"
                       item-value="id"
                       label="Select file type"
+                      color="#FFB300"
                     />
                   </v-col>
                   <v-col cols="12" md="4">
@@ -340,17 +354,17 @@
                   Add Solution video
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="12">
+              <!-- <v-col cols="12" md="12">
                 <v-checkbox
                   density="compact"
                   v-model="formData.free_agreement"
                   label="I would like the file to be freely available to others."
                 />
-              </v-col>
+              </v-col> -->
 
               <v-col cols="12" md="6" class="pb-0">
                 <v-btn
-                  color="primary"
+                  color="success"
                   type="submit"
                   block
                   :loading="loading.form"
@@ -379,6 +393,7 @@ const { $toast } = useNuxtApp();
 // Define layout
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 // Page title
@@ -413,7 +428,7 @@ const formData = reactive({
   state: "",
   area: "",
   school: "",
-  free_agreement: false,
+  // free_agreement: false,
   file_pdf: "",
   file_word: "",
   file_answer: "",
@@ -438,15 +453,15 @@ const topic_list = ref([]);
 const test_type_list = ref([]);
 
 const answer_status_list = [
-  { id: 0, title: "No answer" },
-  { id: 1, title: "Has key answer" },
-  { id: 2, title: "Has descriptive answer" },
+  { id: 0, title: "No Solution" },
+  { id: 1, title: "Answer Key" },
+  { id: 2, title: "Complete Solution" },
 ];
 
 const test_level_list = [
-  { id: "1", title: "Simple" },
-  { id: "2", title: "Medium" },
-  { id: "3", title: "Hard" },
+  { id: 1, title: "Easy" },
+  { id: 2, title: "Moderate" },
+  { id: 3, title: "Hard" },
 ];
 
 const year_list = [
@@ -469,10 +484,12 @@ const month_list = [
 ];
 
 const holding_level_list = [
-  { id: 1, title: "School" },
-  { id: 2, title: "District" },
-  { id: 3, title: "State" },
-  { id: 4, title: "Country" },
+  // { id: 1, title: "School" },
+  // { id: 2, title: "District" },
+  // { id: 3, title: "State" },
+  // { id: 4, title: "Country" },
+  { id: 4, title: "National" },
+  { id: 5, title: "International" },
 ];
 
 const state_list = ref([]);
@@ -840,7 +857,7 @@ const initData = async () => {
 
   formData.test_type = paperData.value.test_type;
   formData.answer_type = parseInt(paperData.value.answer_type || 0);
-  formData.level = paperData.value.level;
+  formData.level = parseInt(paperData.value.level || 2);
   formData.edu_year = parseInt(paperData.value.edu_year);
   formData.edu_month = parseInt(paperData.value.edu_month);
   formData.holding_level = parseInt(paperData.value.holding_level || 4);
@@ -848,7 +865,7 @@ const initData = async () => {
   formData.description = paperData.value.description;
 
   // Set free agreement
-  formData.free_agreement = paperData.value.free_agreement == 1;
+  // formData.free_agreement = paperData.value.free_agreement == 1;
 
   if (paperData.value.files?.extra) {
     for (let index in paperData.value.files.extra) {

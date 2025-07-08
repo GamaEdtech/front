@@ -1,7 +1,9 @@
 <script setup>
 import { navigateTo } from "nuxt/app";
+const route = useRoute();
 import { useField, useForm } from "vee-validate";
 import * as yup from "yup";
+import { useUser } from "@/composables/useUser";
 
 const { $toast } = useNuxtApp();
 
@@ -44,6 +46,7 @@ watch(countDown, (val) => {
 
 async function handleCredentialResponse(value) {
   const auth = useAuth();
+  const { setUser } = useUser();
   try {
     const response = await useApiService.post(
       "/api/v1/users/googleAuth",
@@ -54,10 +57,13 @@ async function handleCredentialResponse(value) {
 
     if (response.status === 1) {
       $toast.success("Logged in successfully");
+
       auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
       closeDialog();
-      navigateTo("/user");
+
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (err) {
     const status = err?.response?.status;
@@ -143,6 +149,8 @@ const sendOtpCodeAgain = async () => {
 
 const submit = handleSubmit(async () => {
   const auth = useAuth();
+  const { setUser } = useUser();
+
   login_loading.value = true;
   try {
     const response = await auth.login({
@@ -160,11 +168,13 @@ const submit = handleSubmit(async () => {
     } else if (data.data.type == "register") {
       goToRegister();
     } else {
+      auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
-      auth.setUserToken(response.data.jwtToken);
+
       closeDialog();
-      navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -178,6 +188,7 @@ const submit = handleSubmit(async () => {
 
 const onFinish = async () => {
   const auth = useAuth();
+  const { setUser } = useUser();
   try {
     const response = await useApiService.post(
       "/api/v1/users/login",
@@ -189,11 +200,12 @@ const onFinish = async () => {
       })
     );
     if (response.status === 1) {
+      auth.setUserToken(response.data.jwtToken);
+      setUser(response.data.info);
       await submitLoginV2(response.data.jwtToken);
       $toast.success("Logged in successfully");
-      auth.setUserToken(response.data.jwtToken);
       closeDialog();
-      navigateTo("/user");
+      if (route.path === "/") navigateTo("/user");
     }
   } catch (error) {
     const errorData = error?.response?._data;
@@ -250,6 +262,12 @@ const recheckEnteredIdentity = () => {
 };
 
 async function submitLoginV2(old_token) {
+  const { user } = useUser();
+  const pass = password.value.value ? password.value.value : generatePassword();
+  const identityVal = identity.value.value
+    ? identity.value.value
+    : user.value.email || "";
+
   const result = await useApiService.post("/api/v2/identities/tokens/old", {
     token: old_token,
   });
@@ -260,10 +278,6 @@ async function submitLoginV2(old_token) {
     (result.errors[0].message === "UserNotFound" ||
       result.errors[0].message === "Invalid Token")
   ) {
-    let pass = password.value.value ? password.value.value : generatePassword();
-    let identityVal = identity.value.value
-      ? identity.value.value
-      : useAuth().user?.email || "";
     await registerV2(identityVal, pass);
   }
 }

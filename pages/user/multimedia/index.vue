@@ -156,9 +156,8 @@
                             color="green"
                             :to="`/multimedia/${item.id}/${item.title}`"
                             target="_blank"
-                            variant="icon"
-                            class="mx-2"
-                            density
+                            density="compact"
+                            variant="text"
                             v-bind="props"
                           >
                             <v-icon>mdi-eye</v-icon>
@@ -172,9 +171,8 @@
                             icon
                             v-bind="props"
                             :to="`/user/multimedia/edit/${item.id}`"
-                            variant="icon"
-                            class="mx-2"
-                            density
+                            density="compact"
+                            variant="text"
                           >
                             <v-icon>mdi-note-edit-outline</v-icon>
                           </v-btn>
@@ -188,9 +186,8 @@
                             color="error"
                             @click="confirmDelete(item.id, index)"
                             v-bind="props"
-                            variant="icon"
-                            class="mx-2"
-                            density
+                            density="compact"
+                            variant="text"
                           >
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
@@ -281,6 +278,7 @@ const auth = useAuth();
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

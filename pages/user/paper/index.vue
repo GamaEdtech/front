@@ -119,8 +119,8 @@
                               :to="`/paper/${item.id}`"
                               target="_blank"
                               v-bind="props"
-                              class="mx-1"
-                              variant="plain"
+                              variant="text"
+                              density="compact"
                             >
                               <v-icon> mdi-eye </v-icon>
                             </v-btn>
@@ -133,8 +133,8 @@
                               icon
                               v-bind="props"
                               :to="`/user/paper/edit/${item.id}`"
-                              class="mx-1"
-                              variant="plain"
+                              variant="text"
+                              density="compact"
                             >
                               <v-icon> mdi-note-edit-outline </v-icon>
                             </v-btn>
@@ -148,8 +148,8 @@
                               color="error"
                               @click="openDeleteConfirmDialog(item.id, index)"
                               v-bind="props"
-                              class="mx-1"
-                              variant="plain"
+                              variant="text"
+                              density="compact"
                             >
                               <v-icon> mdi-delete </v-icon>
                             </v-btn>
@@ -227,6 +227,7 @@ import { useAuth } from "#imports";
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 // Use services

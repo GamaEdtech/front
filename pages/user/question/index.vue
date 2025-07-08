@@ -143,9 +143,8 @@
                               :to="`/qa/${item.id}`"
                               target="_blank"
                               v-bind="props"
-                              variant="icon"
-                              class="mx-2"
-                              density
+                              density="compact"
+                              variant="text"
                             >
                               <v-icon> mdi-eye </v-icon>
                             </v-btn>
@@ -158,9 +157,8 @@
                               icon
                               v-bind="props"
                               :to="`/user/question/edit/${item.id}`"
-                              variant="icon"
-                              class="mx-2"
-                              density
+                              density="compact"
+                              variant="text"
                             >
                               <v-icon> mdi-note-edit-outline </v-icon>
                             </v-btn>
@@ -174,9 +172,8 @@
                               color="error"
                               @click="openDeleteConfirmDialog(item.id, index)"
                               v-bind="props"
-                              variant="icon"
-                              class="mx-2"
-                              density
+                              density="compact"
+                              variant="text"
                             >
                               <v-icon> mdi-delete </v-icon>
                             </v-btn>
@@ -269,6 +266,7 @@ const auth = useAuth();
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 // Use services

@@ -7,6 +7,7 @@
           <school-detail-school-map
             :content="contentData"
             :class="topSlideClass.map"
+            @location-updated="handleLocationUpdate"
           ></school-detail-school-map>
         </client-only>
         <school-detail-school-tour
@@ -32,6 +33,7 @@
       <v-col cols="12" md="4">
         <school-detail-school-map
           :content="contentData"
+          @location-updated="handleLocationUpdate"
         ></school-detail-school-map>
       </v-col>
       <v-col cols="12" md="4">
@@ -252,16 +254,16 @@ watch(
   { immediate: true }
 );
 
-useHead(() => ({
-  link: [
-    {
-      rel: "canonical",
-      href: `${requestURL.value}/school/${
-        contentData.value?.id
-      }/${$slugGenerator(contentData.value?.name)}`,
-    },
-  ],
-}));
+// useHead(() => ({
+//   link: [
+//     {
+//       rel: "canonical",
+//       href: `${requestURL.value}/school/${
+//         contentData.value?.id
+//       }/${$slugGenerator(contentData.value?.name)}`,
+//     },
+//   ],
+// }));
 
 watch(
   () => ratingDataRaw.value,
@@ -324,6 +326,20 @@ function loadGalleryImages() {
       galleryImages.value = [...response.data].reverse();
     })
     .catch(() => {});
+}
+
+function handleLocationUpdate(locationData) {
+  if (contentData.value) {
+    contentData.value = {
+      ...contentData.value,
+      countryId: locationData.countryId,
+      stateId: locationData.stateId,
+      cityId: locationData.cityId,
+      countryTitle: locationData.countryTitle,
+      stateTitle: locationData.stateTitle,
+      cityTitle: locationData.cityTitle,
+    };
+  }
 }
 
 onMounted(() => {

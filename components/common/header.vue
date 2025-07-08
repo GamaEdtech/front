@@ -134,8 +134,8 @@ const searchFilterItems = [
     key: "student",
   },
 ];
-let mobileSearchFilter = "exam";
-let keyword = "";
+const mobileSearchFilter = ref("exam");
+const keyword = ref("");
 
 const user_profile_items = [
   {
@@ -212,40 +212,39 @@ onMounted(async () => {
   // if (window.innerWidth <= 960 && this.$auth.loggedIn) {
   //   this.$refs["notification-section"].getNotifications();
   // }
-  if (!user.value && cookieToken.value)
-    if (
-      route.name == "index" ||
-      route.name == "smart-learning" ||
-      route.name == "services" ||
-      route.name == "school-service" ||
-      route.name == "faq" ||
-      route.name == "terms" ||
-      route.name == "about-us" ||
-      route.name == "earn-money"
-    ) {
-      if (window.scrollY > 60) {
-        menuSetting.value = {
-          logo: "gamatrain-logo-black.svg",
-          bgColor: "#fff",
-          fixedStatus: true,
-          linkColor: "#424A53",
-          class: "",
-        };
-      } else {
-        menuSetting.value = {
-          logo: "gamatrain-logo.svg",
-          bgColor: "#000",
-          fixedStatus: true,
-          linkColor: "#fff",
-          class: "transparentMenu",
-        };
-      }
+  if (
+    route.name == "index" ||
+    route.name == "smart-learning" ||
+    route.name == "services" ||
+    route.name == "school-service" ||
+    route.name == "faq" ||
+    route.name == "terms" ||
+    route.name == "about-us" ||
+    route.name == "earn-money"
+  ) {
+    if (window.scrollY > 60) {
+      menuSetting.value = {
+        logo: "gamatrain-logo-black.svg",
+        bgColor: "#fff",
+        fixedStatus: true,
+        linkColor: "#424A53",
+        class: "",
+      };
+    } else {
+      menuSetting.value = {
+        logo: "gamatrain-logo.svg",
+        bgColor: "#000",
+        fixedStatus: true,
+        linkColor: "#fff",
+        class: "transparentMenu",
+      };
     }
-  window.addEventListener("scroll", handleScroll.value);
+  }
+  window.addEventListener("scroll", handleScroll);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll.value);
+  window.removeEventListener("scroll", handleScroll);
 });
 const login_modal = ref(null);
 const openLoginDialog = (componentName = "login") => {
@@ -269,7 +268,7 @@ const handleScroll = () => {
     route.name == "earn-money"
   )
     if (window.scrollY > 60) {
-      menuSetting = {
+      menuSetting.value = {
         logo: "gamatrain-logo-black.svg",
         bgColor: "#fff",
         fixedStatus: true,
@@ -277,7 +276,7 @@ const handleScroll = () => {
         class: "",
       };
     } else {
-      menuSetting = {
+      menuSetting.value = {
         logo: "gamatrain-logo.svg",
         bgColor: "#000",
         fixedStatus: true,
@@ -287,7 +286,7 @@ const handleScroll = () => {
     }
 };
 const setActiveFilter = (val) => {
-  mobileSearchFilter = val;
+  mobileSearchFilter.value = val;
 };
 
 //Search section
@@ -324,9 +323,7 @@ const search = () => {
 
           if (response.data.list.length === 0) allDataLoaded.value = true;
         })
-        .catch((err) => {
-          console.log(err);
-        })
+        .catch((err) => {})
         .finally(() => {
           searchLoading.value = false;
         });
@@ -514,7 +511,10 @@ watch(
               </div>
             </v-col>
             <v-col cols="4" md="3" lg="3" xl="3" class="text-right mt-md-1">
-              <div class="d-flex text-right" v-if="auth.isAuthenticated.value">
+              <div
+                class="d-flex text-right align-md-center"
+                v-if="auth.isAuthenticated.value"
+              >
                 <v-spacer />
                 <v-menu
                   transition="slide-x-transition"
@@ -569,8 +569,10 @@ watch(
                   <v-btn
                     to="/user/wallet"
                     icon
-                    class="wallet-icon"
+                    variant="text"
+                    class="wallet-icon pt-1"
                     :color="menuSetting.linkColor"
+                    size="small"
                     ><v-icon>mdi-wallet-outline</v-icon></v-btn
                   >
                 </div>
@@ -629,8 +631,11 @@ watch(
 
       <v-navigation-drawer
         v-model="sidebar"
-        app
+        :modelValue="sidebar"
+        temporary
+        location="left"
         class="hidden-lg-and-up main-sidebar"
+        :mobile="true"
       >
         <v-list density="compact">
           <!-- Profile Info -->
@@ -732,7 +737,7 @@ watch(
         <v-icon
           @click="sidebar = !sidebar"
           class="px-2"
-          :class="menuSetting.bgColor == '#fff' ? '' : 'white--text '"
+          :class="menuSetting.bgColor == '#fff' ? '' : 'text-white'"
         >
           mdi-menu
         </v-icon>
@@ -771,17 +776,19 @@ watch(
               </div>
               <v-slide-group
                 id="search-cate-slide"
-                center-active
+                v-model="mobileSearchFilter"
+                selected-class="active-item"
+                show-arrows="hover"
                 class="pt-4"
-                show-arrows
               >
                 <v-slide-group-item
                   v-for="(item, n) in searchFilterItems"
-                  class="slide-item"
-                  :class="mobileSearchFilter == item.key ? 'active-item' : ''"
                   :key="n"
+                  :value="item.key"
+                  :class="{ 'slide-item': true }"
+                  v-slot="{ isSelected, toggle }"
                 >
-                  <div @click="setActiveFilter(item.key)">
+                  <div @click="toggle">
                     <div :class="`active-avatar active-${item.key}-avatar`">
                       <div :class="`avatar ${item.key}-avatar`">
                         <span :class="`icon icon-${item.key}`"></span>
@@ -989,11 +996,11 @@ watch(
           ref="notificationComponent"
           class="d-block d-lg-none"
         />
-        <div class="wallet-div wallet-mobile">
+        <nuxt-link to="/user/wallet" class="wallet-div wallet-mobile">
           <v-icon class="wallet-icon" :color="menuSetting.linkColor"
             >mdi-wallet-outline</v-icon
           >
-        </div>
+        </nuxt-link>
         <v-menu
           v-if="auth.isAuthenticated.value"
           transition="slide-x-transition"
@@ -1577,8 +1584,12 @@ watch(
         line-height: normal;
         padding-bottom: 0.1rem !important;
       }
-
       .v-btn--active {
+        .v-btn__overlay {
+          opacity: 0;
+        }
+      }
+      .v-btn--active:not(.wallet-icon) {
         border-bottom: 0.2rem solid #ffb300 !important;
 
         .v-btn__overlay {
