@@ -266,6 +266,7 @@
           <v-row>
             <v-col cols="12">
               <v-switch
+                v-if="exam_id"
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
@@ -318,6 +319,7 @@
                 ref="createForm"
                 :goToPreviewStep="test_step"
                 :updateTestList="lastCreatedTest"
+                v-model:testList="tests"
                 :examEditMode="true"
                 @update:updateTestList="(val) => (lastCreatedTest = val)"
                 @update:refreshTests="handleTestRefresh"
@@ -1379,8 +1381,8 @@ const router = useRouter();
 const userToken = ref("");
 
 // Core data
-const test_step = ref(2); // Start at the Tests step
-const exam_id = ref("");
+const test_step = ref(1); // Start at the Tests step
+const exam_id = ref(route.params.id);
 const exam_code = ref("");
 const submit_loading = ref(false);
 const publish_loading = ref(false);
@@ -1398,9 +1400,9 @@ const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
-  section: route.query.board ? route.query.board : "",
-  base: route.query.grade ? route.query.grade : "",
-  lesson: route.query.subject ? route.query.subject : "",
+  section: "",
+  base: "",
+  lesson: "",
   topics: [],
   exam_type: "",
   level: "2",
@@ -1410,7 +1412,7 @@ const form = reactive({
   school: "",
   duration: 3,
   title: "",
-  paperID: route.query.paperId ? route.query.paperId : "",
+  paperID: "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
@@ -1439,7 +1441,7 @@ const filter = ref({
   lesson: "",
   topic: "",
   page: 1,
-  perpage: 40,
+  perpage: 10,
   myTests: false,
   testsHasVideo: 0, // Use 0 instead of "All" string
 });
@@ -1564,6 +1566,9 @@ const calcLevel = (level) => {
   }
   return "";
 };
+
+
+
 
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
@@ -1879,7 +1884,6 @@ const checkActiveParam = () => {
 const submitTest = async () => {
   try {
     if (!tests.value.length) {
-      // console.log('No tests to submit'); // Keep for debugging if needed
       return;
     }
 
@@ -1888,23 +1892,57 @@ const submitTest = async () => {
       return;
     }
 
+    // FIXED: Ensure all test IDs are strings before submission
+    tests.value = tests.value.map(id => String(id));
+
     const formData = new URLSearchParams();
     tests.value.forEach((id) => {
-      formData.append("tests[]", String(id));
+      formData.append("tests[]", id);
     });
 
-    await useApiService.put(
-      `/api/v1/exams/tests/${exam_id.value}`,
-      formData.toString(),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        },
-      }
-    );
+    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await handleRefreshPreviewList(); // MODIFIED HERE
+    // Add retry logic for the API call
+    let success = false;
+    let attempts = 0;
+    let error;
+
+    while (!success && attempts < 3) {
+      try {
+        attempts++;
+        
+        const response = await useApiService.put(
+          `/api/v1/exams/tests/${exam_id.value}`,
+          formData.toString(),
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            },
+          }
+        );
+        
+        success = true;
+        console.log(`Tests submitted successfully on attempt ${attempts}`);
+      } catch (err) {
+        error = err;
+        console.warn(`Attempt ${attempts} failed:`, err);
+        
+        // If we're going to retry, wait a bit longer each time
+        if (attempts < 3) {
+          await new Promise(resolve => setTimeout(resolve, attempts * 500));
+        }
+      }
+    }
+
+    if (!success) {
+      throw error || new Error("Failed to update tests after multiple attempts");
+    }
+
+    // Add a delay to ensure backend has processed the changes
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Refresh the test list
+    await handleRefreshPreviewList();
 
     nuxtApp.$toast.success("Tests updated successfully");
   } catch (err) {
@@ -1933,25 +1971,25 @@ const fetchTestDetails = async (testId) => {
 const handleRefreshPreviewList = async () => {
   if (!exam_id.value) {
     previewTestList.value = [];
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = 0;
-    }
     return;
   }
 
   test_loading.value = true;
-  try {
-    const currentTestIds = tests.value.map((id) => String(id));
 
+  try {
+    console.log(`Refreshing preview list for ${tests.value.length} tests`);
+    
+    // FIXED: Always ensure tests array contains string IDs
+    tests.value = tests.value.map(id => String(id));
+    const currentTestIds = tests.value;
+    
     if (currentTestIds.length === 0) {
       previewTestList.value = [];
-      if (createForm.value && "examTestListLength" in createForm.value) {
-        createForm.value.examTestListLength = 0;
-      }
       test_loading.value = false;
       return;
     }
-
+    
+    // First try to get all tests in one API call
     const response = await useApiService.get(`/api/v1/examTests`, {
       exam_id: exam_id.value,
     });
@@ -1961,78 +1999,85 @@ const handleRefreshPreviewList = async () => {
       fetchedApiTests = Array.isArray(response.data)
         ? response.data
         : response.data?.list || [];
+      
+      console.log(`API returned ${fetchedApiTests.length} tests`);
     }
 
+    // Create a map for quick lookup - ensure all keys are strings
     const fetchedDetailsMap = new Map(
       fetchedApiTests.map((test) => [String(test.id), test])
     );
 
-    const newPreviewListConstructionPromises = currentTestIds.map(
-      async (testId) => {
-        if (fetchedDetailsMap.has(testId)) {
-          return fetchedDetailsMap.get(testId);
-        } else {
-          console.warn(
-            `Test ${testId} was in local tests.value but not in bulk API response. Fetching individually.`
-          );
-          const individualDetails = await fetchTestDetails(testId);
-          if (individualDetails) {
-            return individualDetails;
-          } else {
-            console.error(
-              `Failed to fetch details for ${testId} even individually. Creating placeholder.`
-            );
-            // Mark these placeholders clearly so we can handle them in the UI
-            return {
-              id: testId,
-              question: `Test ${testId} could not be loaded. It may have been deleted or you may not have permission to view it.`,
-              type: "error",
-              isPlaceholder: true,
-              owner: false, // Don't show edit buttons for placeholders
-              error: true, // Add an error flag to clearly identify this as an error state
-            };
+    // For any tests not found in the bulk response, fetch individually
+    const missingTests = currentTestIds.filter(id => !fetchedDetailsMap.has(id));
+    
+    if (missingTests.length > 0) {
+      console.log(`Fetching ${missingTests.length} missing tests individually:`, missingTests);
+      
+      // Fetch missing tests individually with retry logic
+      const individualFetches = await Promise.all(
+        missingTests.map(async (id) => {
+          try {
+            // Try up to 3 times with increasing delays
+            for (let attempt = 0; attempt < 3; attempt++) {
+              if (attempt > 0) {
+                await new Promise(resolve => setTimeout(resolve, attempt * 300));
+              }
+              
+              const response = await useApiService.get(`/api/v1/examTests/${id}`);
+              if (response?.data) {
+                return response.data;
+              }
+            }
+            
+            console.error(`Failed to fetch test ${id} after multiple attempts`);
+            return null;
+          } catch (err) {
+            console.error(`Failed to fetch test ${id}:`, err);
+            return null;
           }
-        }
-      }
-    );
-
-    const constructedList = (
-      await Promise.all(newPreviewListConstructionPromises)
-    ).filter(Boolean);
-
-    // Ensure the order of previewTestList matches tests.value
-    previewTestList.value = currentTestIds
-      .map((id) => {
-        return constructedList.find((test) => String(test.id) === id);
-      })
-      .filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
-  } catch (err) {
-    console.error("Error in handleRefreshPreviewList during API call:", err);
-    nuxtApp.$toast.error("Error refreshing preview list.");
-    // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
-    if (tests.value.length > 0 && previewTestList.value.length === 0) {
-      const fallbackPromises = tests.value.map(async (id) => {
-        const details = await fetchTestDetails(String(id));
-        return (
-          details || {
-            id: String(id),
-            question: `Test ${id} could not be loaded. It may have been deleted.`,
-            type: "error",
-            isPlaceholder: true,
-            owner: false,
-            error: true,
-          }
-        );
-      });
-      previewTestList.value = (await Promise.all(fallbackPromises)).filter(
-        Boolean
+        })
       );
+      
+      // Add successfully fetched tests to the map
+      individualFetches.filter(Boolean).forEach(test => {
+        fetchedDetailsMap.set(String(test.id), test);
+      });
+    }
+
+    // Build the preview list in the same order as tests.value
+    previewTestList.value = currentTestIds
+      .map(id => {
+        const test = fetchedDetailsMap.get(id);
+        if (!test) {
+          // Create placeholder for tests that couldn't be fetched
+          return {
+            id: id,
+            question: `Loading test ${id}...`,
+            type: "placeholder",
+            isPlaceholder: true
+          };
+        }
+        return test;
+      });
+    
+    console.log(`Preview list updated with ${previewTestList.value.length} tests`);
+
+  } catch (err) {
+    console.error("Error refreshing preview list:", err);
+    nuxtApp.$toast.error("Error refreshing test list");
+    
+    // Fallback: Create placeholders for all tests if the API call fails
+    if (tests.value.length > 0) {
+      previewTestList.value = tests.value.map(id => ({
+        id: String(id),
+        question: `Loading test ${id}...`,
+        type: "placeholder",
+        isPlaceholder: true
+      }));
     }
   } finally {
     test_loading.value = false;
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
   }
 };
 
@@ -2092,7 +2137,7 @@ const onScroll = () => {
   if (isNearBottom) {
     timer.value = setTimeout(() => {
       test_loading.value = true;
-      filter.page++;
+      filter.page = filter.page + 1;
       getExamTests();
     }, 800);
   }
@@ -2110,8 +2155,11 @@ const applyTest = async (item, type = null) => {
     // Convert item.id to string for consistent comparison
     const testId = String(item.id);
 
+    // FIXED: Ensure tests array contains only string IDs
+    tests.value = tests.value.map(id => String(id));
+    
     // Check if the test ID exists in the array (using string comparison)
-    const testExists = tests.value.some((id) => String(id) === testId);
+    const testExists = tests.value.some((id) => id === testId);
 
     // Check if we need to add or remove the test
     const shouldAdd = type === "add" || (!type && !testExists);
@@ -2120,10 +2168,12 @@ const applyTest = async (item, type = null) => {
     if (shouldAdd) {
       // Add the test to the tests array
       tests.value.push(testId);
+      console.log(`Added test ${testId} to exam ${exam_id.value}`);
       nuxtApp.$toast.success("Test added to exam");
     } else if (shouldRemove) {
       // Remove the test from the tests array (using string comparison)
-      tests.value = tests.value.filter((id) => String(id) !== testId);
+      tests.value = tests.value.filter((id) => id !== testId);
+      console.log(`Removed test ${testId} from exam ${exam_id.value}`);
       nuxtApp.$toast.success("Test removed from exam");
     }
 
@@ -2142,16 +2192,23 @@ watch(
     if (newTest && exam_id.value) {
       // Convert to string for consistent comparison - IDs might be numbers or strings
       const newTestId = String(newTest);
+      
+      // FIXED: Ensure tests array contains only string IDs
+      tests.value = tests.value.map(id => String(id));
 
       // First check if this test is already in our list to avoid duplicates
-      // Make sure we're comparing strings to strings for consistency
-      if (tests.value.some((id) => String(id) === newTestId)) {
+      if (tests.value.some((id) => id === newTestId)) {
+        console.log(`Test ${newTestId} already in exam, skipping`);
         lastCreatedTest.value = null;
         return;
       }
 
-      // Add the new test to the tests array - association already done in child component
+      // Add the new test to the tests array
       tests.value.push(newTestId);
+      console.log(`Added newly created test ${newTestId} to exam ${exam_id.value}`);
+      
+      // Submit the updated tests array to the backend
+      await submitTest();
 
       // Reset the lastCreatedTest after processing
       lastCreatedTest.value = null;
@@ -2410,50 +2467,28 @@ watch(
 
 // Initialize component on mount
 onMounted(async () => {
-  // Get user token for API calls
+  // Get user token
+  const auth = useAuth();
   userToken.value = auth.getUserToken();
 
-  // Ensure filter.testsHasVideo is set to 0 at initialization
-  if (filter.testsHasVideo === null || filter.testsHasVideo === undefined) {
-    filter.testsHasVideo = 0;
-  }
+  // Ensure exam published state is reset
+  isExamPublished.value = false;
 
-  await getCurrentExamInfo(); // Fetches basic exam data and populates tests.value
-
-  await getTypeList("section");
-  if (form.section) {
-    await getTypeList("base", form.section);
-    if (form.base) {
-      await getTypeList("lesson", form.base);
-      if (form.lesson) {
-        await getTypeList("topic", form.lesson);
-      }
-    }
+  // Load initial data - start with sections
+    await getTypeList("section");
+    await loadExamTypes();
+  
+  // Initialize exam data from the route parameter
+  await getCurrentExamInfo();
+  
+  // Check if we need to refresh the preview list
+  if (tests.value.length > 0 && previewTestList.value.length === 0) {
+    await handleRefreshPreviewList();
   }
-  await loadExamTypes();
-  await getTypeList("state");
-  await getExamTests(); // For the general list of tests to choose from
-
-  if (exam_id.value) {
-    await handleRefreshPreviewList(); // MODIFIED HERE - Populates previewTestList based on tests.value
-  }
-
-  if (route.query?.active === "test_list") {
-    test_step.value = 2;
-    testListSwitch.value = true;
-  } else if (route.query?.active === "add_test") {
-    test_step.value = 2;
-    testListSwitch.value = false;
-  } else {
-    // Default to step 1 if no specific active query or if it's an existing exam being edited
-    // For edit, we might want to default to step 2 if exam_id is present
-    test_step.value = exam_id.value ? 2 : 1;
-  }
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  
+  // Make sure the examTestListLength is properly initialized
+  if (createForm.value && "examTestListLength" in createForm.value) {
+    createForm.value.examTestListLength = tests.value.length;
   }
 });
 
@@ -2516,97 +2551,30 @@ const deleteExamTest = async () => {
 
 // Get exam tests with improved error handling
 const getExamTests = async () => {
-  // If already loading or all tests loaded, don't make another request
-  if (test_loading.value || all_tests_loaded.value) return;
-
   test_loading.value = true;
 
-  // Build query params, ensuring testsHasVideo is always a number
-  const params = {
-    lesson: filter.lesson,
-    topic: filter.topic,
-    myTests: filter.myTests,
-    // Ensure testsHasVideo is always a number (0 if null/undefined/cleared)
-    testsHasVideo:
-      filter.testsHasVideo === null || filter.testsHasVideo === undefined
-        ? 0
-        : filter.testsHasVideo,
-    page: filter.page,
-    perpage: filter.perpage,
-  };
-
-  // Remove undefined or null values (except testsHasVideo which we've already handled)
-  Object.keys(params).forEach((key) => {
-    if (
-      key !== "testsHasVideo" &&
-      (params[key] === undefined || params[key] === null)
-    ) {
-      delete params[key];
-    }
-  });
-
   try {
-    // First attempt with all parameters
+    const params = {
+      lesson: filter.lesson,
+      topic: filter.topic,
+      myTests: filter.myTests,
+      testsHasVideo: filter.testsHasVideo,
+      page: filter.page,
+      perpage: filter.perpage,
+    };
+
+
     const response = await useApiService.get("/api/v1/examTests", params);
+    test_list.value.push(...response?.data?.list);
 
-    test_list.value.push(...response.data.list);
-
-    // Update exam test list length
-    if (createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-
-    // Check if we've loaded all tests
-    all_tests_loaded.value = response.data.list.length === 0;
-
-    return response;
-  } catch (error) {
-    console.error("Error getting exam tests:", error);
-
-    // Try a fallback with simpler params if the first request failed
-    try {
-      // Show a toast notification about the fallback
-      nuxtApp.$toast.info(
-        "Some filters were ignored due to an error. Trying with simplified parameters."
-      );
-
-      // Simplified params - just keep the essential ones
-      const fallbackParams = {
-        lesson: filter.lesson,
-        page: filter.page,
-        perpage: filter.perpage,
-      };
-
-      console.log("Retrying with simplified params:", fallbackParams);
-
-      const fallbackResponse = await useApiService.get(
-        "/api/v1/examTests",
-        fallbackParams
-      );
-
-      test_list.value.push(...fallbackResponse.data.list);
-      // Update exam test list length
-      if (createForm.value) {
-        createForm.value.examTestListLength = tests.value.length;
-      }
-
-      // Check if we've loaded all tests
-      all_tests_loaded.value = fallbackResponse.data.list.length === 0;
-
-      return fallbackResponse;
-    } catch (fallbackError) {
-      console.error("Error in fallback test fetch:", fallbackError);
-
-      // Final fallback - try with minimal params or handle the error gracefully
-      nuxtApp.$toast.error(
-        "Could not load tests. Please try again later or contact support."
-      );
-
-      // Mark as loaded to prevent further requests
+    createForm.value.examTestListLength = response?.data?.list?.length;
+    if (response.data.list.length === 0) {
       all_tests_loaded.value = true;
-
-      return { data: { list: [] } };
+    } else {
+      all_tests_loaded.value = false;
     }
+  } catch (err) {
+    console.log(err)
   } finally {
     test_loading.value = false;
   }
@@ -3037,85 +3005,90 @@ const previewDragEnd = async () => {
  * Get current exam information
  */
 const getCurrentExamInfo = async () => {
-  exam_id.value = route.params.id;
-  if (!exam_id.value) {
-    nuxtApp.$toast.error("Exam ID is missing from route.");
-    router.push("/user/exam"); // Redirect if no ID
-    return;
-  }
-
   try {
-    const response = await useApiService.get(
-      `/api/v1/exams/info/${exam_id.value}`
-    );
-
-    if (response.data) {
-      const examData = response.data;
-      tests.value = examData.tests?.map((id) => String(id)) || [];
-
-      // Set form data in sequence to trigger proper cascading updates
-      form.section = examData.section || "";
-      if (form.section) await getTypeList("base", form.section);
-
-      form.base = examData.base || "";
-      if (form.base) await getTypeList("lesson", form.base);
-
-      form.lesson = examData.lesson || "";
-      if (form.lesson) await getTypeList("topic", form.lesson);
-
-      // Ensure topics are correctly mapped to string IDs for selected_topics
-      // and for the form.topics array.
-      // The API might return topics as an array of objects or just an array of IDs.
-      if (examData.topics && Array.isArray(examData.topics)) {
-        form.topics = examData.topics.map((topic) => String(topic.id || topic));
-        selected_topics.value = form.topics; // Sync with topic selector
-      } else {
-        form.topics = [];
-        selected_topics.value = [];
-      }
-      if (form.topics.length) await getTopicTitleList();
-
-      form.exam_type = examData.exam_type || examData.azmoon_type || "";
-      form.paperID = examData.paperID || "";
-      form.duration = examData.duration || examData.azmoon_time || 3;
-      form.title = examData.title || "";
-      form.level = examData.level || "2"; // Default to '2' if not provided
-      form.edu_year = examData.edu_year ? parseInt(examData.edu_year) : "";
-      form.edu_month = examData.edu_month ? parseInt(examData.edu_month) : "";
-      form.state = examData.state || "";
-      form.area = examData.area || "";
-      form.school = examData.school || "";
-      form.holding_time = examData.holding_time || false;
-      form.negative_point = examData.negative_point || false;
-      form.holding_level = examData.holding_level || 4;
-
-      if (examData.file_original) {
-        file_original_path.value = examData.file_original;
-      }
-      exam_code.value = examData.code || "";
-
-      // If createForm component is used, ensure its state is updated
-      if (createForm.value) {
-        createForm.value.examEditMode = true; // Let child know it's in edit context
-        // Pass relevant exam data to createForm if it needs it directly
-        // e.g., createForm.value.setInitialExamData(examData);
-        // Or rely on its own getCurrentExamInfo if that's robust
-        if (typeof createForm.value.getCurrentExamInfo === "function") {
-          // createForm.value.getCurrentExamInfo(); // This might be redundant if exam_id is the primary driver
-        }
-        if ("examTestListLength" in createForm.value) {
-          createForm.value.examTestListLength = tests.value.length;
-        }
-      }
-    } else {
-      nuxtApp.$toast.error("Failed to load exam data. No data in response.");
-      router.push("/user/exam");
+    // Get the exam ID from the route
+    const examId = route.params.id;
+    
+    if (!examId) {
+      console.error("No exam ID available");
+      nuxtApp.$toast.error("No exam ID available");
+      return;
     }
+
+    exam_id.value = examId;
+    
+    // Show loading indicator
+    submit_loading.value = true;
+    
+    // Fetch exam information
+    const response = await useApiService.get(`/api/v1/exams/info/${examId}`);
+    
+    if (!response || !response.data) {
+      throw new Error("Failed to load exam information");
+    }
+    
+    // Set exam code if available
+    if (response.data.code) {
+      exam_code.value = response.data.code;
+    }
+    
+    // FIXED: Ensure tests array is properly populated and all IDs are strings
+    if (response.data.tests && Array.isArray(response.data.tests)) {
+      // Make sure all test IDs are strings for consistent comparison
+      tests.value = response.data.tests.map(id => String(id));
+      console.log(`Loaded ${tests.value.length} tests for exam ${examId}:`, tests.value);
+    } else {
+      console.warn("No tests found in exam data");
+      tests.value = [];
+    }
+    
+    // Set form data in sequence to trigger proper cascading updates
+    if (response.data.section) {
+      form.section = response.data.section;
+      await getTypeList("base", response.data.section);
+      
+      if (response.data.base) {
+        form.base = response.data.base;
+        await getTypeList("lesson", response.data.base);
+        
+        if (response.data.lesson) {
+          form.lesson = response.data.lesson;
+          await getTypeList("topic", response.data.lesson);
+          
+          if (response.data.topics && response.data.topics.length) {
+            form.topics = response.data.topics;
+            selected_topics.value = response.data.topics.map(String);
+            await getTopicTitleList();
+          }
+        }
+      }
+    }
+    
+    // Other form fields from response.data
+    form.exam_type = response.data.exam_type || "";
+    form.level = response.data.level || "2";
+    form.duration = response.data.duration || 3;
+    form.title = response.data.title || "";
+    form.paperID = response.data.paperID || "";
+    form.edu_year = response.data.edu_year || "";
+    form.edu_month = response.data.edu_month || "";
+    
+    // FIXED: Add a delay before refreshing the preview list to ensure API consistency
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // After loading all data, refresh the preview list
+    await handleRefreshPreviewList();
+    
+    // Move to step 2 for tests if we have tests
+    if (tests.value.length > 0) {
+      test_step.value = 2;
+    }
+    
   } catch (err) {
     console.error("Error fetching exam info:", err);
-    nuxtApp.$toast.error("Failed to load exam information. Please try again.");
-    // Consider redirecting or providing a retry mechanism
-    // router.push('/user/exam');
+    nuxtApp.$toast.error("Failed to load exam information: " + (err.message || "Unknown error"));
+  } finally {
+    submit_loading.value = false;
   }
 };
 
