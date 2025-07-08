@@ -62,13 +62,17 @@
                 >
               </div>
             </div>
-            <div class="img-div" v-if="school.defaultImageUri">
+            <div
+              class="img-div d-none d-md-block"
+              v-if="school.defaultImageUri && isExpanded"
+            >
               <NuxtImg
                 alt="school.name"
                 v-if="school.defaultImageUri"
                 width="180px"
                 :src="school.defaultImageUri"
                 placeholder
+                class="h-100"
               />
             </div>
           </div>
