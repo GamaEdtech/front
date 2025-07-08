@@ -311,42 +311,67 @@ const breakdowns = [
 }
 @media (max-width: 600px) {
   .tokenomics-section-dark {
-    padding: 3rem 1rem;
-    margin: 0;
+    padding: 2rem 0.5rem;
   }
   .tokenomics-title-dark {
-    font-size: 24px;
-    margin-bottom: 24px;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .tokenomics-subtitle-dark {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .tokenomics-main-dark {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .tokenomics-chart-card-dark {
+    margin-bottom: 1.5rem;
+    flex: 0 0 auto;
+  }
+  .tokenomics-svg-dark {
+    width: 180px;
+    max-width: 90vw;
+    margin: 0 auto;
+    display: block;
+  }
+  .tokenomics-breakdowns-dark {
+    min-width: unset;
+    width: 100%;
+    gap: 1rem;
   }
   .tokenomics-breakdown-card-dark {
-    padding: 1.25rem;
+    padding: 0.75rem 0.5rem;
+    min-height: unset;
+    font-size: 0.95rem;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    border: 1px solid #333;
   }
   .tokenomics-dot-dark {
-    width: 24px;
-    height: 24px;
-    margin-right: 1rem;
+    margin-right: 0.5rem;
   }
   .tokenomics-icon-dark {
-    width: 40px;
-    height: 40px;
-    margin-right: 1rem;
+    margin-right: 0.5rem;
+  }
+  .tokenomics-info-dark {
+    flex: 1;
   }
   .tokenomics-info-dark .tokenomics-title-dark {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
   }
   .tokenomics-amount-dark,
   .tokenomics-detail-dark {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   .tokenomics-percent-dark {
-    font-size: 2rem;
-    margin-left: 1rem;
-  }
-  .v-btn__content {
-    color: #101010;
-  }
-  .tokenomics-svg-dark {
-    width: 200px;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
   }
 }
 </style>
