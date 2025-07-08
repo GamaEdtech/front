@@ -1367,7 +1367,6 @@ defineRule("required", required);
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
-  middleware: ["auth", "user-type"],
 });
 
 useHead({
@@ -1400,50 +1399,39 @@ const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
-  section: "",
-  base: "",
-  lesson: "",
+  section: route.query.board ? route.query.board : null,
+  base: route.query.grade ? route.query.grade : null,
+  lesson: route.query.subject ? route.query.subject : null,
   topics: [],
-  exam_type: "",
+  exam_type: null,
   level: "2",
   holding_time: false,
-  state: "",
-  area: "",
-  school: "",
+  state: null,
+  area: null,
+  school: null,
   duration: 3,
   title: "",
-  paperID: "",
+  paperID: route.query.paperId ? route.query.paperId : "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
-  edu_year: "",
-  edu_month: "",
-});
-
-// Form errors for validation
-const formErrors = reactive({
-  section: "",
-  base: "",
-  lesson: "",
-  topic: "",
-  test_type: "",
-  test_duration: "",
-  title: "",
+  edu_year: null,
+  edu_month: null,
 });
 
 const file_original = ref(null);
 const file_original_path = ref("");
 
 // Filter data
-const filter = ref({
+const filter = reactive({
   section: "",
   base: "",
   lesson: "",
   topic: "",
   page: 1,
   perpage: 10,
+  testsHasVideo: "All",
   myTests: false,
-  testsHasVideo: 0, // Use 0 instead of "All" string
 });
 
 // UI State
@@ -1567,9 +1555,6 @@ const calcLevel = (level) => {
   return "";
 };
 
-
-
-
 // API methods
 const getTypeList = async (type, parent = "", trigger = "") => {
   try {
@@ -1598,7 +1583,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     if (type === "lesson") params.base_id = parent;
     if (type === "topic") params.lesson_id = parent;
     if (type === "area") params.state_id = parent;
-
     if (type === "school") {
       params.section_id = form.section;
       params.area_id = form.area;
@@ -1629,7 +1613,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
 
     const res = await useApiService.get("/api/v1/types/list", params);
 
-    if (res && res.data) {
+    if (res && res.data && Array.isArray(res.data)) {
       if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
@@ -1665,10 +1649,18 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       }
 
       generateTitle();
+    } else {
+      if (type === "base") {
+        if (trigger === "filter") filter_grade_list.value = [];
+        else grade_list.value = [];
+      } else if (type === "lesson") {
+        if (trigger === "filter") filter_lesson_list.value = [];
+        else lesson_list.value = [];
+      } else if (type === "topic") {
+        topic_list.value = [];
+      }
     }
   } catch (err) {
-    console.error(`Error loading ${type} data:`, err);
-
     // Reset the target list to empty on error
     if (type === "section") {
       if (trigger === "filter") filter_level_list.value = [];
@@ -1684,13 +1676,8 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     } else if (type === "exam_type") {
       test_type_list.value = [];
     }
-
-    nuxtApp.$toast.error(
-      `Failed to load ${type} data: ${err.message || "Unknown error"}`
-    );
   }
 };
-
 const selectTopic = (event) => {
   selected_topics.value = event;
   const numbers = [];
@@ -1893,14 +1880,16 @@ const submitTest = async () => {
     }
 
     // FIXED: Ensure all test IDs are strings before submission
-    tests.value = tests.value.map(id => String(id));
+    tests.value = tests.value.map((id) => String(id));
 
     const formData = new URLSearchParams();
     tests.value.forEach((id) => {
       formData.append("tests[]", id);
     });
 
-    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
+    console.log(
+      `Submitting ${tests.value.length} tests to exam ${exam_id.value}`
+    );
 
     // Add retry logic for the API call
     let success = false;
@@ -1910,37 +1899,40 @@ const submitTest = async () => {
     while (!success && attempts < 3) {
       try {
         attempts++;
-        
+
         const response = await useApiService.put(
           `/api/v1/exams/tests/${exam_id.value}`,
           formData.toString(),
           {
             headers: {
-              "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+              "Content-Type":
+                "application/x-www-form-urlencoded; charset=UTF-8",
             },
           }
         );
-        
+
         success = true;
         console.log(`Tests submitted successfully on attempt ${attempts}`);
       } catch (err) {
         error = err;
         console.warn(`Attempt ${attempts} failed:`, err);
-        
+
         // If we're going to retry, wait a bit longer each time
         if (attempts < 3) {
-          await new Promise(resolve => setTimeout(resolve, attempts * 500));
+          await new Promise((resolve) => setTimeout(resolve, attempts * 500));
         }
       }
     }
 
     if (!success) {
-      throw error || new Error("Failed to update tests after multiple attempts");
+      throw (
+        error || new Error("Failed to update tests after multiple attempts")
+      );
     }
 
     // Add a delay to ensure backend has processed the changes
     await new Promise((resolve) => setTimeout(resolve, 500));
-    
+
     // Refresh the test list
     await handleRefreshPreviewList();
 
@@ -1978,17 +1970,17 @@ const handleRefreshPreviewList = async () => {
 
   try {
     console.log(`Refreshing preview list for ${tests.value.length} tests`);
-    
+
     // FIXED: Always ensure tests array contains string IDs
-    tests.value = tests.value.map(id => String(id));
+    tests.value = tests.value.map((id) => String(id));
     const currentTestIds = tests.value;
-    
+
     if (currentTestIds.length === 0) {
       previewTestList.value = [];
       test_loading.value = false;
       return;
     }
-    
+
     // First try to get all tests in one API call
     const response = await useApiService.get(`/api/v1/examTests`, {
       exam_id: exam_id.value,
@@ -1999,7 +1991,7 @@ const handleRefreshPreviewList = async () => {
       fetchedApiTests = Array.isArray(response.data)
         ? response.data
         : response.data?.list || [];
-      
+
       console.log(`API returned ${fetchedApiTests.length} tests`);
     }
 
@@ -2009,11 +2001,16 @@ const handleRefreshPreviewList = async () => {
     );
 
     // For any tests not found in the bulk response, fetch individually
-    const missingTests = currentTestIds.filter(id => !fetchedDetailsMap.has(id));
-    
+    const missingTests = currentTestIds.filter(
+      (id) => !fetchedDetailsMap.has(id)
+    );
+
     if (missingTests.length > 0) {
-      console.log(`Fetching ${missingTests.length} missing tests individually:`, missingTests);
-      
+      console.log(
+        `Fetching ${missingTests.length} missing tests individually:`,
+        missingTests
+      );
+
       // Fetch missing tests individually with retry logic
       const individualFetches = await Promise.all(
         missingTests.map(async (id) => {
@@ -2021,15 +2018,19 @@ const handleRefreshPreviewList = async () => {
             // Try up to 3 times with increasing delays
             for (let attempt = 0; attempt < 3; attempt++) {
               if (attempt > 0) {
-                await new Promise(resolve => setTimeout(resolve, attempt * 300));
+                await new Promise((resolve) =>
+                  setTimeout(resolve, attempt * 300)
+                );
               }
-              
-              const response = await useApiService.get(`/api/v1/examTests/${id}`);
+
+              const response = await useApiService.get(
+                `/api/v1/examTests/${id}`
+              );
               if (response?.data) {
                 return response.data;
               }
             }
-            
+
             console.error(`Failed to fetch test ${id} after multiple attempts`);
             return null;
           } catch (err) {
@@ -2038,42 +2039,42 @@ const handleRefreshPreviewList = async () => {
           }
         })
       );
-      
+
       // Add successfully fetched tests to the map
-      individualFetches.filter(Boolean).forEach(test => {
+      individualFetches.filter(Boolean).forEach((test) => {
         fetchedDetailsMap.set(String(test.id), test);
       });
     }
 
     // Build the preview list in the same order as tests.value
-    previewTestList.value = currentTestIds
-      .map(id => {
-        const test = fetchedDetailsMap.get(id);
-        if (!test) {
-          // Create placeholder for tests that couldn't be fetched
-          return {
-            id: id,
-            question: `Loading test ${id}...`,
-            type: "placeholder",
-            isPlaceholder: true
-          };
-        }
-        return test;
-      });
-    
-    console.log(`Preview list updated with ${previewTestList.value.length} tests`);
+    previewTestList.value = currentTestIds.map((id) => {
+      const test = fetchedDetailsMap.get(id);
+      if (!test) {
+        // Create placeholder for tests that couldn't be fetched
+        return {
+          id: id,
+          question: `Loading test ${id}...`,
+          type: "placeholder",
+          isPlaceholder: true,
+        };
+      }
+      return test;
+    });
 
+    console.log(
+      `Preview list updated with ${previewTestList.value.length} tests`
+    );
   } catch (err) {
     console.error("Error refreshing preview list:", err);
     nuxtApp.$toast.error("Error refreshing test list");
-    
+
     // Fallback: Create placeholders for all tests if the API call fails
     if (tests.value.length > 0) {
-      previewTestList.value = tests.value.map(id => ({
+      previewTestList.value = tests.value.map((id) => ({
         id: String(id),
         question: `Loading test ${id}...`,
         type: "placeholder",
-        isPlaceholder: true
+        isPlaceholder: true,
       }));
     }
   } finally {
@@ -2156,8 +2157,8 @@ const applyTest = async (item, type = null) => {
     const testId = String(item.id);
 
     // FIXED: Ensure tests array contains only string IDs
-    tests.value = tests.value.map(id => String(id));
-    
+    tests.value = tests.value.map((id) => String(id));
+
     // Check if the test ID exists in the array (using string comparison)
     const testExists = tests.value.some((id) => id === testId);
 
@@ -2192,9 +2193,9 @@ watch(
     if (newTest && exam_id.value) {
       // Convert to string for consistent comparison - IDs might be numbers or strings
       const newTestId = String(newTest);
-      
+
       // FIXED: Ensure tests array contains only string IDs
-      tests.value = tests.value.map(id => String(id));
+      tests.value = tests.value.map((id) => String(id));
 
       // First check if this test is already in our list to avoid duplicates
       if (tests.value.some((id) => id === newTestId)) {
@@ -2205,8 +2206,10 @@ watch(
 
       // Add the new test to the tests array
       tests.value.push(newTestId);
-      console.log(`Added newly created test ${newTestId} to exam ${exam_id.value}`);
-      
+      console.log(
+        `Added newly created test ${newTestId} to exam ${exam_id.value}`
+      );
+
       // Submit the updated tests array to the backend
       await submitTest();
 
@@ -2475,20 +2478,57 @@ onMounted(async () => {
   isExamPublished.value = false;
 
   // Load initial data - start with sections
-    await getTypeList("section");
-    await loadExamTypes();
-  
   // Initialize exam data from the route parameter
   await getCurrentExamInfo();
-  
-  // Check if we need to refresh the preview list
-  if (tests.value.length > 0 && previewTestList.value.length === 0) {
-    await handleRefreshPreviewList();
+
+  // Load initial data - start with sections
+  await getTypeList("section");
+  // Conditionally load data based on URL parameters or existing form values
+  if (form.section) {
+    await getTypeList("base", form.section);
+    if (form.base) {
+      await getTypeList("lesson", form.base);
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
+      }
+    }
   }
-  
-  // Make sure the examTestListLength is properly initialized
-  if (createForm.value && "examTestListLength" in createForm.value) {
-    createForm.value.examTestListLength = tests.value.length;
+
+  // Get additional type lists
+  await loadExamTypes(); // Use our specialized function for exam types
+  await getTypeList("state");
+
+  // Load tests if needed
+  await getExamTests();
+
+  // If we have an exam ID, get its tests
+  if (exam_id.value) {
+    await handleRefreshPreviewList();
+
+    // Make sure the examTestListLength is properly initialized
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+  }
+
+  // Check active tab from route and enable it
+  if (route.query?.active === "test_list") {
+    test_step.value = 2;
+    testListSwitch.value = true;
+  } else if (route.query?.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
+  }
+
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
   }
 });
 
@@ -2563,7 +2603,6 @@ const getExamTests = async () => {
       perpage: filter.perpage,
     };
 
-
     const response = await useApiService.get("/api/v1/examTests", params);
     test_list.value.push(...response?.data?.list);
 
@@ -2574,7 +2613,7 @@ const getExamTests = async () => {
       all_tests_loaded.value = false;
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
     test_loading.value = false;
   }
@@ -2891,21 +2930,6 @@ watch(printPreviewDialog, async (isDialogVisible) => {
   }
 });
 
-watch(test_step, async (newStep, oldStep) => {
-  await nextTick();
-  if (newStep === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  } else if (newStep === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
-  }
-});
-
-watch(testListSwitch, async (isSwitchedOn) => {
-  if (test_step.value === 2 && isSwitchedOn) {
-    await nextTick();
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-});
 // Handle clear icon click for Board filter
 const handleClearSection = () => {
   filter.section = "";
@@ -3008,7 +3032,7 @@ const getCurrentExamInfo = async () => {
   try {
     // Get the exam ID from the route
     const examId = route.params.id;
-    
+
     if (!examId) {
       console.error("No exam ID available");
       nuxtApp.$toast.error("No exam ID available");
@@ -3016,45 +3040,48 @@ const getCurrentExamInfo = async () => {
     }
 
     exam_id.value = examId;
-    
+
     // Show loading indicator
     submit_loading.value = true;
-    
+
     // Fetch exam information
     const response = await useApiService.get(`/api/v1/exams/info/${examId}`);
-    
+
     if (!response || !response.data) {
       throw new Error("Failed to load exam information");
     }
-    
+
     // Set exam code if available
     if (response.data.code) {
       exam_code.value = response.data.code;
     }
-    
+
     // FIXED: Ensure tests array is properly populated and all IDs are strings
     if (response.data.tests && Array.isArray(response.data.tests)) {
       // Make sure all test IDs are strings for consistent comparison
-      tests.value = response.data.tests.map(id => String(id));
-      console.log(`Loaded ${tests.value.length} tests for exam ${examId}:`, tests.value);
+      tests.value = response.data.tests.map((id) => String(id));
+      console.log(
+        `Loaded ${tests.value.length} tests for exam ${examId}:`,
+        tests.value
+      );
     } else {
       console.warn("No tests found in exam data");
       tests.value = [];
     }
-    
+
     // Set form data in sequence to trigger proper cascading updates
     if (response.data.section) {
       form.section = response.data.section;
       await getTypeList("base", response.data.section);
-      
+
       if (response.data.base) {
         form.base = response.data.base;
         await getTypeList("lesson", response.data.base);
-        
+
         if (response.data.lesson) {
           form.lesson = response.data.lesson;
           await getTypeList("topic", response.data.lesson);
-          
+
           if (response.data.topics && response.data.topics.length) {
             form.topics = response.data.topics;
             selected_topics.value = response.data.topics.map(String);
@@ -3063,7 +3090,7 @@ const getCurrentExamInfo = async () => {
         }
       }
     }
-    
+
     // Other form fields from response.data
     form.exam_type = response.data.exam_type || "";
     form.level = response.data.level || "2";
@@ -3072,21 +3099,22 @@ const getCurrentExamInfo = async () => {
     form.paperID = response.data.paperID || "";
     form.edu_year = response.data.edu_year || "";
     form.edu_month = response.data.edu_month || "";
-    
+
     // FIXED: Add a delay before refreshing the preview list to ensure API consistency
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // After loading all data, refresh the preview list
     await handleRefreshPreviewList();
-    
+
     // Move to step 2 for tests if we have tests
     if (tests.value.length > 0) {
       test_step.value = 2;
     }
-    
   } catch (err) {
     console.error("Error fetching exam info:", err);
-    nuxtApp.$toast.error("Failed to load exam information: " + (err.message || "Unknown error"));
+    nuxtApp.$toast.error(
+      "Failed to load exam information: " + (err.message || "Unknown error")
+    );
   } finally {
     submit_loading.value = false;
   }
