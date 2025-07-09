@@ -185,6 +185,7 @@ const {
       if (data) {
         contentData.value = data;
         initBreadCrumb();
+        updateGalleryData();
       }
       return data;
     } catch (err) {

@@ -206,7 +206,10 @@ useHead({
 
 if (contentData.value) {
   previewImages.value.push(contentData.value.thumb_pic);
-  previewImages.value.push(contentData.value.lesson_pic);
+  if (contentData.value.lesson_pic) {
+    previewImages.value.push(contentData.value.lesson_pic);
+  }
+
   previewImages.value.carouselVal = 0;
 
   galleryHelpData.value = {
