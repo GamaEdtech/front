@@ -13,6 +13,7 @@
         value="board"
         :disabled="filter.disabled"
         @click="filter.isOpenModal = !filter.isOpenModal"
+        :loading="filter.loading"
       >
         {{ filter.selectedItem ? filter.selectedItem.title : filter.title }}
       </v-btn>
@@ -54,7 +55,7 @@
               variant="flat"
               class="text-h5 pl-5 pr-5"
               color="#F2F4F7"
-              closable
+              :closable="index != FILTER_INDEX.Type"
               @click:close="clearFilter(filter, index)"
               :key="filter.title"
               v-if="filter.selectedItem"
@@ -115,7 +116,7 @@
           class="text-h5"
           @click="closeModalFilterMobile"
         >
-          Show 14 Results
+          Show {{ $numberFormat(countDataFound) }} Results
         </v-btn>
       </div>
     </div>
@@ -130,6 +131,10 @@ const props = defineProps({
   showDialogFilterMobile: {
     type: Boolean,
     default: false,
+  },
+  countDataFound: {
+    type: String,
+    default: 0,
   },
 });
 
@@ -348,9 +353,11 @@ const openModalSelectedFilter = (filter) => {
 };
 
 const clearAllFilter = () => {
-  filters.forEach((filter) => {
-    filter.selectedItem = null;
-    filter.disabled = true;
+  filters.forEach((filter, index) => {
+    if (index != FILTER_INDEX.Type) {
+      filter.selectedItem = null;
+      filter.disabled = true;
+    }
   });
   filters[FILTER_INDEX.Board].disabled = false;
   filters[FILTER_INDEX.Type].disabled = false;
@@ -391,10 +398,13 @@ const clearFilter = (filter, index) => {
 const updateClassificationFilter = async () => {
   resetFilters(FILTER_INDEX.Classification, 6);
   if (filters[FILTER_INDEX.Type].selectedItem.hasClassification) {
+    filters[FILTER_INDEX.Classification].loading = true;
     const response = await getInformationNextFilter(
       "Board",
       filters[FILTER_INDEX.Type].selectedItem.typeForGetClassification
     );
+    filters[FILTER_INDEX.Classification].loading = false;
+    filters[FILTER_INDEX.Classification].disabled = false;
     if (response.data) {
       filters[FILTER_INDEX.Classification].items = response.data;
       filters[FILTER_INDEX.Classification].disabled = false;
@@ -441,10 +451,12 @@ const onFilterUpdate = async (item, filterName) => {
     }
     if (index < FILTER_INDEX.Topic) {
       const typeNextFilter = FILTER_TYPE[filters[index + 1].title];
+      filters[index + 1].loading = true;
       const response = await getInformationNextFilter(
         filterName,
         typeNextFilter
       );
+      filters[index + 1].loading = false;
       if (response.data) {
         filters[index + 1].items = response.data;
         filters[index + 1].disabled = false;
@@ -469,7 +481,6 @@ const getInformationNextFilter = async (filterName, typeFilter) => {
 
     const keyParams = FILTER_TYPE[filterName] + "_id";
     const indexFilter = FILTER_INDEX[filterName];
-
     params[keyParams] = filters[indexFilter].selectedItem.id;
     const response = await $fetch(`/api/v1/types/list`, { params });
     return response;
@@ -520,6 +531,17 @@ const applyRouteToFilter = (index, queryKey, customId = null) => {
 };
 
 const updateFiltersExistInRoute = async () => {
+  const typeFilter = filters[FILTER_INDEX.Type];
+  applyRouteToFilter(FILTER_INDEX.Type, FILTER_TYPE.Type);
+  if (!filters[FILTER_INDEX.Type].selectedItem) {
+    filters[FILTER_INDEX.Type].selectedItem =
+      filters[FILTER_INDEX.Type].items[0];
+  }
+  if (typeFilter.selectedItem?.title === "Past Papers") {
+    filters[FILTER_INDEX.Year].disabled = false;
+    filters[FILTER_INDEX.Month].disabled = false;
+  }
+
   const boardResponse = await getBoardData();
   if (boardResponse.data) {
     filters[FILTER_INDEX.Board].items = boardResponse.data;
@@ -530,10 +552,12 @@ const updateFiltersExistInRoute = async () => {
   for (let index = FILTER_INDEX.Grade; index <= FILTER_INDEX.Topic; index++) {
     if (filters[index - 1].selectedItem) {
       const typeNextFilter = FILTER_TYPE[filters[index].title];
+      filters[index].loading = true;
       const response = await getInformationNextFilter(
         filters[index - 1].title,
         typeNextFilter
       );
+      filters[index].loading = false;
       if (response.data) {
         filters[index].items = response.data;
         filters[index].disabled = false;
@@ -542,23 +566,18 @@ const updateFiltersExistInRoute = async () => {
     }
   }
 
-  const typeFilter = filters[FILTER_INDEX.Type];
-  applyRouteToFilter(FILTER_INDEX.Type, FILTER_TYPE.Type);
-  if (typeFilter.selectedItem?.title === "Past Papers") {
-    filters[FILTER_INDEX.Year].disabled = false;
-    filters[FILTER_INDEX.Month].disabled = false;
-  }
-
   [FILTER_INDEX.Year, FILTER_INDEX.Month].forEach((index) => {
     applyRouteToFilter(index, FILTER_TYPE[filters[index].title]);
   });
 
   if (filters[FILTER_INDEX.Board].selectedItem && typeFilter.selectedItem) {
     filters[FILTER_INDEX.Classification].disabled = false;
+    filters[FILTER_INDEX.Classification].loading = true;
     const classResponse = await getInformationNextFilter(
       "Board",
       typeFilter.selectedItem.typeForGetClassification
     );
+    filters[FILTER_INDEX.Classification].loading = false;
     if (classResponse.data) {
       filters[FILTER_INDEX.Classification].items = classResponse.data;
       const id = route.query["test_type"] || route.query["content_type"];
@@ -569,15 +588,37 @@ const updateFiltersExistInRoute = async () => {
       );
     }
   }
-  emit("changeFilterQuery", route.query);
+  const skipFetch = true;
+
+  if (!route.query.type) {
+    emit(
+      "changeFilterQuery",
+      {
+        ...route.query,
+        type: filters[FILTER_INDEX.Type].selectedItem.typeForGetContent,
+      },
+      skipFetch
+    );
+    router.replace({
+      query: {
+        ...route.query,
+        type: filters[FILTER_INDEX.Type].selectedItem.typeForGetContent,
+      },
+    });
+  } else {
+    emit("changeFilterQuery", route.query, skipFetch);
+  }
 };
 
 const getBoardData = async () => {
   try {
     let params = { type: "section" };
+    filters[FILTER_INDEX.Board].loading = true;
     const response = await $fetch(`/api/v1/types/list`, { params });
+    filters[FILTER_INDEX.Board].loading = false;
     return response;
   } catch (error) {
+    filters[FILTER_INDEX.Board].loading = false;
     console.log("error", error);
     return error;
   }
@@ -586,12 +627,6 @@ const getBoardData = async () => {
 onMounted(async () => {
   await updateFiltersExistInRoute();
 });
-
-// const countFilterSelect = computed(() => {
-//   const count = filters.filter((item) => item.selectedItem).length;
-//   emit("changeCountFilter", count);
-//   return count;
-// });
 </script>
 
 <style scoped>

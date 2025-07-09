@@ -4,12 +4,9 @@
       <search-card-skeleton v-for="item in 4" />
     </template>
 
-    <search-card />
-    <search-card />
-    <search-card />
-    <search-card />
-    <search-card />
-    <search-card />
+    <template v-for="(item, index) in dataList">
+      <search-card :information="item" />
+    </template>
 
     <div class="line-specifier-load-more" ref="lineSpecifierLoadMoreRef"></div>
     <template v-if="isPaginationLoading">
@@ -72,8 +69,7 @@ const handleScrollListener = () => {
     !props.isAllDataLoaded
   ) {
     console.log("inja");
-
-    // emit("loadNextPage");
+    emit("loadNextPage");
   }
 };
 </script>
@@ -82,6 +78,5 @@ const handleScrollListener = () => {
 .line-specifier-load-more {
   width: 100%;
   height: 6px;
-  background-color: red;
 }
 </style>

@@ -48,11 +48,14 @@
       </v-col>
       <search-filter-option
         v-model:showDialogFilterMobile="openFilterMobileModal"
+        :count-data-found="totalDataFind"
         @changeFilterQuery="changeFilterQuery"
       />
       <v-col cols="12" class="d-flex align-end justify-end ga-2">
         <span class="text-h5 primary-gray-400">Result</span>
-        <span class="text-h4 primary-gray-700 font-weight-bold">24</span>
+        <span class="text-h4 primary-gray-700 font-weight-bold">{{
+          $numberFormat(totalDataFind)
+        }}</span>
       </v-col>
       <search-list
         :data-list="data"
@@ -81,35 +84,113 @@ const isInitialDataLoading = ref(false);
 const isPaginationDataLoading = ref(false);
 const data = ref([]);
 const isAllDataLoaded = ref(false);
+const totalDataFind = ref(0);
 const pageNumber = ref(1);
+const perPage = 10;
 
-const loadNextPageData = () => {};
+const loadNextPageData = async () => {
+  pageNumber.value += 1;
+  isPaginationDataLoading.value = true;
+  await getDataList(true);
+};
 
-const changeFilterQuery = (query) => {
-  console.log(query);
+const changeFilterQuery = async (query, skipFetch = false) => {
   countFilterSelect.value = Object.keys(query).length;
   querySearch.value = {
     ...query,
-    keyword: textSearch.value,
   };
+  if (textSearch.value.length > 0) {
+    querySearch.value.keyword = textSearch.value;
+  }
+  if (!skipFetch) {
+    isAllDataLoaded.value = false;
+    isInitialDataLoading.value = true;
+    pageNumber.value = 1;
+    await getDataList();
+  }
 };
 
 const changeTextSearch = () => {
+  isInitialDataLoading.value = true;
+
   const query = querySearch.value;
-  query.keyword = textSearch.value;
+  if (textSearch.value.length == 0) {
+    delete query.keyword;
+  } else {
+    query.keyword = textSearch.value;
+  }
   router.replace({ query });
-  // debouncedSearchText();
+  debouncedSearchText();
 };
 
-// const debouncedSearchText = () => {
-//   if (timer.value) {
-//     clearTimeout(timer.value);
-//     timer.value = null;
-//   }
-//   timer.value = setTimeout(() => {
-//     // get data
-//   }, 800);
-// };
+const debouncedSearchText = () => {
+  if (timer.value) {
+    clearTimeout(timer.value);
+    timer.value = null;
+  }
+  timer.value = setTimeout(() => {
+    isAllDataLoaded.value = false;
+    pageNumber.value = 1;
+    getDataList();
+  }, 800);
+};
+
+const { data: initialData, pending: loadingDataServer } = await useAsyncData(
+  "dataSearchSSR",
+  () => {
+    const params = {
+      page: pageNumber.value,
+      keyword: route.query.keyword,
+      section: route.query.section,
+      base: route.query.base,
+      lesson: route.query.lesson,
+      topic: route.query.topic,
+      type: route.query.type ? route.query.type : "test",
+      edu_year: route.query.edu_year,
+      edu_month: route.query.edu_month,
+    };
+
+    if (route.query.type && route.query.type == "learnfiles") {
+      params.content_type = route.query.content_type;
+    }
+    if (route.query.type && route.query.type == "test") {
+      params.test_type = route.query.test_type;
+    }
+
+    return $fetch("/api/v1/search", { params });
+  }
+);
+
+if (initialData.value) {
+  data.value = initialData.value.data.list;
+  totalDataFind.value = initialData.value.data.num || 0;
+  isInitialDataLoading.value = false;
+  isPaginationDataLoading.value = false;
+}
+
+const getDataList = async (isLoadNextPage = false) => {
+  if (isAllDataLoaded.value) return;
+  try {
+    const params = { ...querySearch.value };
+    params.page = pageNumber.value;
+    const response = await $fetch("/api/v1/search", { params });
+
+    if (response.data.list.length < perPage) {
+      isAllDataLoaded.value = true;
+    }
+    totalDataFind.value = response.data.num ? response.data.num : 0;
+    if (isLoadNextPage) {
+      data.value = [...data.value, ...response.data.list];
+    } else {
+      data.value = response.data.list;
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    isPaginationDataLoading.value = false;
+    isInitialDataLoading.value = false;
+  }
+};
 </script>
 
 <style scoped>
