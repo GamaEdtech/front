@@ -143,6 +143,93 @@ const emit = defineEmits([
   "changeFilterQuery",
 ]);
 
+const pageTitle = ref("");
+const pageDescribe = ref("");
+
+const setMetaData = (type) => {
+  const boardTitle = filters[FILTER_INDEX.Board]?.selectedItem?.title
+    ? filters[FILTER_INDEX.Board]?.selectedItem?.title
+    : "";
+  const gradeTitle = filters[FILTER_INDEX.Grade]?.selectedItem?.title
+    ? filters[FILTER_INDEX.Grade]?.selectedItem?.title
+    : "";
+  const subjectTitle = filters[FILTER_INDEX.Subject]?.selectedItem?.title
+    ? filters[FILTER_INDEX.Subject]?.selectedItem?.title
+    : "";
+  if (type === "learnfiles") {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} multimedia`
+      : "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
+    pageDescribe.value =
+      "Elevate your learning experience with GamaTrain's captivating multimedia content, including PowerPoint presentations, informative videos, and diverse educational materials.";
+  } else if (type === "test") {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} Past Papers`
+      : "Educational Resources | K12 Education Papers and Materials";
+    pageDescribe.value =
+      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+  } else if (type === "question") {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} Forum`
+      : "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum";
+    pageDescribe.value =
+      "Engage in active learning and gain deeper insights through GamaTrain's interactive Q&A platform, where you can pose questions and seek support from fellow learners and experts.";
+  } else if (type === "azmoon") {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} Online test`
+      : "Online Exams , Free Exams for Improving Education";
+    pageDescribe.value =
+      "Hone your skills and assess your knowledge with GamaTrain's online exams, designed to enhance your exam preparation and boost your confidence.";
+  } else if (type === "dars") {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} Textbook`
+      : "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials";
+    pageDescribe.value =
+      "Complement your studies with GamaTrain's comprehensive online tutorials, providing step-by-step guidance and practice opportunities to refine your understanding.";
+  } else if (type === "tutor") {
+    pageTitle.value = "Teacher";
+    pageDescribe.value = "Teacher";
+  } else {
+    pageTitle.value = boardTitle
+      ? `${boardTitle} ${gradeTitle} ${subjectTitle} Past Papers`
+      : "Educational Resources | K12 Education Papers and Materials";
+    pageDescribe.value =
+      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+  }
+
+  // Set page metadata
+  useHead(() => ({
+    title: pageTitle.value,
+    meta: [
+      {
+        hid: "apple-mobile-web-app-title",
+        name: "apple-mobile-web-app-title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:title",
+        name: "og:title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:site_name",
+        name: "og:site_name",
+        content: "GamaTrain",
+      },
+      {
+        hid: "description",
+        name: "description",
+        content: pageDescribe.value,
+      },
+      {
+        hid: "og:description",
+        name: "og:description",
+        content: pageDescribe.value,
+      },
+    ],
+  }));
+};
+
 // Start Section Handle Status Modal
 const dialogModel = computed({
   get: () => props.showDialogFilterMobile,
@@ -514,6 +601,7 @@ const updateQueryParam = () => {
       }
     }
   });
+  setMetaData(query.type);
   emit("changeFilterQuery", query);
   router.replace({ query });
 };
@@ -570,7 +658,11 @@ const updateFiltersExistInRoute = async () => {
     applyRouteToFilter(index, FILTER_TYPE[filters[index].title]);
   });
 
-  if (filters[FILTER_INDEX.Board].selectedItem && typeFilter.selectedItem) {
+  if (
+    filters[FILTER_INDEX.Board].selectedItem &&
+    typeFilter.selectedItem &&
+    filters[FILTER_INDEX.Classification].typeForGetClassification
+  ) {
     filters[FILTER_INDEX.Classification].disabled = false;
     filters[FILTER_INDEX.Classification].loading = true;
     const classResponse = await getInformationNextFilter(

@@ -3,8 +3,9 @@
     <v-row>
       <v-col cols="4" md="12" class="d-flex d-md-none justify-start">
         <v-badge
-          class="mt-1"
-          offset-x="-10"
+          class="mt-1 height-badge"
+          offset-x="5"
+          offset-y="-5"
           :color="countFilterSelect == 0 ? `#ffffff` : `#F04438`"
           :content="countFilterSelect == 0 ? `` : countFilterSelect"
         >
@@ -87,6 +88,110 @@ const isAllDataLoaded = ref(false);
 const totalDataFind = ref(0);
 const pageNumber = ref(1);
 const perPage = 10;
+
+const pageTitle = ref("");
+const pageDescribe = ref("");
+
+const setMetaData = (type) => {
+  if (type === "learnfiles") {
+    pageTitle.value =
+      "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
+    pageDescribe.value =
+      "Elevate your learning experience with GamaTrain's captivating multimedia content, including PowerPoint presentations, informative videos, and diverse educational materials.";
+  } else if (type === "test") {
+    pageTitle.value =
+      "Educational Resources | K12 Education Papers and Materials";
+    pageDescribe.value =
+      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+  } else if (type === "question") {
+    pageTitle.value =
+      "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum";
+    pageDescribe.value =
+      "Engage in active learning and gain deeper insights through GamaTrain's interactive Q&A platform, where you can pose questions and seek support from fellow learners and experts.";
+  } else if (type === "azmoon") {
+    pageTitle.value = "Online Exams , Free Exams for Improving Education";
+    pageDescribe.value =
+      "Hone your skills and assess your knowledge with GamaTrain's online exams, designed to enhance your exam preparation and boost your confidence.";
+  } else if (type === "dars") {
+    pageTitle.value =
+      "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials";
+    pageDescribe.value =
+      "Complement your studies with GamaTrain's comprehensive online tutorials, providing step-by-step guidance and practice opportunities to refine your understanding.";
+  } else if (type === "tutor") {
+    pageTitle.value = "Teacher";
+    pageDescribe.value = "Teacher";
+  } else {
+    pageTitle.value =
+      "Educational Resources | K12 Education Papers and Materials";
+    pageDescribe.value =
+      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+  }
+
+  // Set page metadata
+  useHead(() => ({
+    title: pageTitle.value,
+    meta: [
+      {
+        hid: "apple-mobile-web-app-title",
+        name: "apple-mobile-web-app-title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:title",
+        name: "og:title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:site_name",
+        name: "og:site_name",
+        content: "GamaTrain",
+      },
+      {
+        hid: "description",
+        name: "description",
+        content: pageDescribe.value,
+      },
+      {
+        hid: "og:description",
+        name: "og:description",
+        content: pageDescribe.value,
+      },
+    ],
+  }));
+};
+setMetaData(route.query.type);
+
+// Set page metadata
+useHead(() => ({
+  title: pageTitle.value,
+  meta: [
+    {
+      hid: "apple-mobile-web-app-title",
+      name: "apple-mobile-web-app-title",
+      content: pageTitle.value,
+    },
+    {
+      hid: "og:title",
+      name: "og:title",
+      content: pageTitle.value,
+    },
+    {
+      hid: "og:site_name",
+      name: "og:site_name",
+      content: "GamaTrain",
+    },
+    {
+      hid: "description",
+      name: "description",
+      content: pageDescribe.value,
+    },
+    {
+      hid: "og:description",
+      name: "og:description",
+      content: pageDescribe.value,
+    },
+  ],
+}));
 
 const loadNextPageData = async () => {
   pageNumber.value += 1;
@@ -205,6 +310,10 @@ const getDataList = async (isLoadNextPage = false) => {
 }
 :deep(.custom-search-text-field .v-field__outline__end) {
   border-radius: 0 4px 4px 0 !important;
+}
+
+:deep(.height-badge .v-badge__wrapper .v-badge__badge) {
+  height: 20px !important;
 }
 
 @media (min-width: 960px) {
