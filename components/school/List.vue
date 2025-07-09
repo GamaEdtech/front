@@ -68,9 +68,9 @@
             >
               <NuxtImg
                 alt="school.name"
-                v-if="school.defaultImageUri"
+                v-show="school.defaultImageUri"
                 width="180px"
-                :src="school.defaultImageUri"
+                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')"
                 placeholder
                 class="h-100"
               />

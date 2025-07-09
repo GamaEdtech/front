@@ -19,7 +19,7 @@
         <v-carousel-item
           v-for="(image, index) in galleryImages"
           :key="index"
-          :src="image?.fileUri"
+          :src="image?.fileUri?.replace(/^http:\/\//, 'https://')"
           eager
           cover
           class="pointer"
