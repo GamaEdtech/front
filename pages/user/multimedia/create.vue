@@ -226,6 +226,7 @@ const auth = useAuth();
 // Define layout and page metadata
 definePageMeta({
   layout: "dashboard-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({

@@ -2,7 +2,7 @@
   <v-container fluid class="px-0 py-0 mt-md-0">
     <home-main-slider />
 
-    <lazy-home-grade-explorer v-if="stats?.length" :stats="stats" />
+    <lazy-home-grade-explorer />
 
     <home-level-guid-banner :slide-arr="slideArr" />
 
@@ -11,7 +11,7 @@
       <v-row>
         <v-col cols="12" id="ai-learn-banner">
           <img id="img-top" alt="AI Learn" src="/images/ai-learn-bg1.png" />
-          <v-card flat>
+          <v-card flat class="overflow-unset">
             <h2 class="gama-text-h2">AI Learn</h2>
             <p class="gama-text-subtitle1">
               Discover Your Full Potential with AI-based Education
@@ -41,12 +41,12 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h2 class="gama-text-h4">Are you a student?</h2>
+            <h2 class="gama-text-h4">Study Smarter, Not Harder</h2>
           </v-col>
           <v-col cols="12" sm="6">
             <v-card class="fill-height float-sm-right" to="/search?type=test">
-              <v-card-title class="gama-text-h6">
-                <v-icon size="large" class="text-primary icon mr-2"
+              <v-card-title class="gama-text-h6 pt-4 pb-3">
+                <v-icon size="48" class="text-primary icon mr-2"
                   >mdi-cloud-download</v-icon
                 >
                 <span class="text-white">Educational Content</span>
@@ -61,11 +61,8 @@
           </v-col>
           <v-col cols="12" sm="6">
             <v-card class="fill-height float-sm-left" to="/search?type=azmoon">
-              <v-card-title class="gama-text-h6">
-                <v-icon
-                  size="large"
-                  class="text-primary icon icon-exam"
-                ></v-icon>
+              <v-card-title class="gama-text-h6 pt-4 pb-3">
+                <v-icon size="48" class="text-primary icon icon-exam"></v-icon>
                 <span class="text-white">&nbsp; Exam</span>
               </v-card-title>
               <v-card-text class="gama-text-body2 text-white">
@@ -90,23 +87,17 @@
           />
         </v-col>
         <v-col cols="12" sm="8">
-          <h2 class="gama-text-h4">Find school service</h2>
+          <h2 class="gama-text-h4">
+            Search Nearby Schools by Location, Ratings & Reviews
+          </h2>
           <p class="gama-text-body1 describe">
-            You don't have to try the hardest ways anymore. GamaTrain has
-            provided you with access to school information. Just filter and
-            GamaTrain will find it for you.
+            Stop searching blindly. With GamaTrain, discovering the best schools
+            near you is just a few clicks away. Filter by location, ratings,
+            reviews, and facilities – and let us do the rest.
           </p>
+
           <v-btn
-            :large="display.mdAndUp"
-            :small="display.xs"
-            rounded
-            class="primary gama-btn"
-            to="/school-service"
-            >Learn more</v-btn
-          >
-          <v-btn
-            :large="display.mdAndUp"
-            :small="display.xs"
+            :size="display.mdAndUp ? 'large' : 'small'"
             rounded
             class="primary gama-btn"
             to="/school"
@@ -117,15 +108,14 @@
     </v-container>
     <!--End school service banner-->
 
-    
     <!-- Car Race container -->
     <home-car-race-banner />
     <!-- End Car Race container -->
-    
+
     <!-- Stats container -->
     <home-stats-banner />
     <!-- End stats container -->
-    
+
     <!-- Blog container -->
     <home-blog-container />
     <!-- End blog container -->
@@ -136,14 +126,13 @@
         <v-row>
           <v-col cols="12" sm="12" md="12" class="text-md-right">
             <h2 class="gama-text-h6 text-center">
-              Why wait? Earn money with us in minutes with just a few clicks!
+              Monetize Your Teaching Skills
             </h2>
           </v-col>
           <v-col cols="12" sm="12" md="12" class="text-center">
             <v-btn
               rounded
-              :large="display.mdAndUp"
-              :small="display.xs"
+              :size="display.mdAndUp ? 'large' : 'small'"
               to="/earn-money"
               class="primary gama-btn"
               >Earn money</v-btn
@@ -202,19 +191,6 @@ const slideColor = computed(() => {
   }
   return "#24292F"; // Default color if colors or carousel_model are not available
 });
-
-// Async Data (similar to asyncData)
-const stats = ref(null);
-
-const fetchStats = async () => {
-  try {
-    const response = await useApiService.get("/api/v1/home/stats");
-    stats.value = response?.data;
-  } catch (error) {
-    console.error("Failed to fetch stats:", error);
-  }
-};
-await fetchStats();
 
 // Lifecycle Hook (onMounted)
 

@@ -4,9 +4,16 @@
       class="container-button-load-previous-data"
       v-if="pageNumberForLoadPreviousData != 1 && !isInitialLoading"
     >
-      <button @click="loadPreviousPage" class="load-previous-button">
+      <v-btn
+        @click="loadPreviousPage"
+        class="text-h5 text-md-h4"
+        height="50"
+        variant="outlined"
+        color="#ffb300"
+        rounded="xl"
+      >
         Load Previous Data
-      </button>
+      </v-btn>
     </div>
     <div
       :class="`container-list-div ${
@@ -15,55 +22,10 @@
       ref="scrollDivRef"
     >
       <div class="container-scroll">
-        <div
-          v-if="isInitialLoading"
-          class="skeleton-card-school"
-          v-for="item in 4"
-        >
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
+        <CardSchoolSkeleton v-if="isInitialLoading" v-for="item in 4" />
 
-        <div v-if="isPaginationPreviousLoading" class="skeleton-card-school">
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
+        <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
+
         <NuxtLink
           v-if="!isInitialLoading"
           class="card-school"
@@ -75,56 +37,71 @@
               <span class="name gtext-t4 font-weight-semibold">{{
                 school.name
               }}</span>
-              <div class="chips-address">
-                <span
-                  class="chip-address"
+              <div class="d-flex align-center justify-start flex-wrap ga-3">
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.countryTitle && school.countryTitle.length > 0"
-                  >{{ school.countryTitle }}</span
                 >
-                <span
-                  class="chip-address"
+                  {{ school.countryTitle }}
+                </v-chip>
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.stateTitle && school.stateTitle.length > 0"
-                  >{{ school.stateTitle }}</span
+                  >{{ school.stateTitle }}</v-chip
                 >
-                <span
-                  class="chip-address"
+                <v-chip
+                  class="text-subtitle-1"
+                  variant="elevated"
+                  color="#546e7a"
                   v-if="school.cityTitle && school.cityTitle.length > 0"
-                  >United {{ school.cityTitle }}</span
+                  >United {{ school.cityTitle }}</v-chip
                 >
               </div>
             </div>
-            <div class="img-div" v-if="school.defaultImageUri">
+            <div
+              class="img-div d-none d-md-block"
+              v-if="school.defaultImageUri && isExpanded"
+            >
               <NuxtImg
                 alt="school.name"
-                v-if="school.defaultImageUri"
+                v-show="school.defaultImageUri"
                 width="180px"
-                :src="school.defaultImageUri"
+                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')"
                 placeholder
+                class="h-100"
               />
             </div>
           </div>
           <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <button class="button-link" :disabled="!school.hasLocation">
+          <div
+            class="w-100 d-flex align-center justify-space-between mt-3 flex-wrap ga-5"
+          >
+            <div class="d-flex align-center">
+              <v-btn variant="text" icon :disabled="!school.hasLocation">
                 <v-icon size="x-large"> mdi-map-marker </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasPhon">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasPhon">
                 <v-icon size="x-large"> mdi-phone </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasEmail">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasEmail">
                 <v-icon size="x-large"> mdi-email </v-icon>
-              </button>
-              <button class="button-link" :disabled="!school.hasWebsite">
+              </v-btn>
+              <v-btn variant="text" icon :disabled="!school.hasWebsite">
                 <v-icon size="x-large"> mdi-web </v-icon>
-              </button>
+              </v-btn>
             </div>
-            <div class="rate-update">
-              <div class="rate-section gtext-t6 font-weight-semibold">
+            <div class="d-flex align-center ga-2">
+              <div
+                class="d-flex align-center ga-2 gtext-t6 font-weight-semibold"
+              >
                 <v-icon size="x-large" color="primary"> mdi-star </v-icon>
                 {{ school.score ? school.score.toFixed(1) : "New" }}
               </div>
-              <div class="rate-section gtext-t6 primary-gray-300">
+              <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
                 <v-icon size="x-large">mdi-update</v-icon>
                 <span class="primary-gray-600">
                   {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
@@ -139,29 +116,7 @@
           ref="lineSpecifierLoadMoreRef"
         ></div>
 
-        <div v-if="isPaginationLoading" class="skeleton-card-school">
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name skeleton-loader"></span>
-              <div class="chips-address">
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-                <span class="chip-address skeleton-loader"></span>
-              </div>
-            </div>
-            <div class="img-div skeleton-loader"></div>
-          </div>
-          <div class="line-seperator"></div>
-          <div class="links-rate">
-            <div class="link-icons">
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-              <div class="link skeleton-loader"></div>
-            </div>
-            <div class="rate-update skeleton-loader"></div>
-          </div>
-        </div>
-
+        <CardSchoolSkeleton v-if="isPaginationLoading" />
         <div
           class="not-found-div"
           v-if="!isInitialLoading && schoolList.length == 0"
@@ -175,6 +130,8 @@
 
 <script setup>
 import { onMounted, onUnmounted } from "vue";
+
+import CardSchoolSkeleton from "./CardSchoolSkeleton.vue";
 
 const props = defineProps({
   schoolList: {

@@ -3,23 +3,36 @@
     <div class="box-filter-option">
       <div class="container-filter">
         <div class="search-input-contaier">
-          <searchInput
+          <v-text-field
+            rounded
+            :variant="textFieldVariant"
+            bg-color="white"
+            prepend-inner-icon="mdi-magnify"
+            hide-details
             v-model="filterForm.keyword"
-            @input="changeSearchValue"
-            placeholder="Search anything..."
-            icon="mdi-magnify"
+            color="#ffb300"
             active-color="#ffb600"
-            :disable="isExpandMap"
-          />
+            label="Search anything..."
+            glow
+            icon-color="#ffb600"
+            :disabled="isExpandMap"
+            @update:modelValue="changeSearchValue"
+          ></v-text-field>
         </div>
-        <div class="button-sort-filter-mobile">
-          <button class="btn-filter" @click="openFilterMobile">
-            <v-icon x-large color="#000000">mdi-filter</v-icon>
-          </button>
-
-          <button disabled class="btn-filter" @click="openSortNav($event)">
-            <v-icon x-large color="#000000">mdi-filter-variant</v-icon>
-          </button>
+        <div class="d-flex d-lg-none justify-end w-33">
+          <v-btn size="small" icon @click="openFilterMobile" color="#f2f4f7">
+            <v-icon size="x-large" color="#000000">mdi-filter</v-icon>
+          </v-btn>
+          <v-btn
+            size="small"
+            variant="text"
+            disabled
+            icon
+            @click="openSortNav($event)"
+            color="#f2f4f7"
+          >
+            <v-icon size="x-large" color="#000000">mdi-filter-variant</v-icon>
+          </v-btn>
         </div>
         <div class="filter-options-div">
           <div
@@ -94,7 +107,7 @@
           <div class="each-item-filter result-div">
             Results
             <span class="count-result" v-if="totalSchoolFind != 0">{{
-              totalSchoolFind
+              $numberFormat(totalSchoolFind)
             }}</span>
           </div>
         </div>
@@ -104,7 +117,7 @@
           <span
             class="count-result gama-text-button"
             v-if="totalSchoolFind != 0"
-            >{{ totalSchoolFind }}</span
+            >{{ $numberFormat(totalSchoolFind) }}</span
           >
         </div>
       </div>
@@ -115,35 +128,59 @@
       ref="boxRegionRef"
     >
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.country"
           :items="filter.countryList"
-          placeholder="Country"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="Country"
+          :loading="loadingCountry"
           @update:modelValue="countryChange"
-          :is-loading-data="loadingCountry"
         />
       </div>
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.state"
           :items="filter.stateList"
-          placeholder="State"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="State"
+          :loading="loadingState"
           :disabled="!filterForm.country"
           @update:modelValue="stateChange"
-          :is-loading-data="loadingState"
         />
       </div>
       <div class="cotainer-dropdown">
-        <dropDownInput
+        <v-autocomplete
+          rounded
+          variant="outlined"
+          menu-icon="mdi-chevron-down"
+          item-title="title"
+          item-value="id"
+          hide-details
           v-model="filterForm.city"
           :items="filter.cityList"
-          placeholder="City"
+          clearable
+          color="#ffb300"
           active-color="#ffb600"
+          label="City"
+          :loading="loadingCity"
           :disabled="!filterForm.state"
           @update:modelValue="cityChange"
-          :is-loading-data="loadingCity"
         />
       </div>
     </div>
@@ -167,63 +204,63 @@
         <div class="contaier-region-country-filter">
           <div class="box-chips-query-mobile">
             <div class="container-chips">
-              <div class="chip-div" v-if="filterForm.keyword.length > 0">
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
+                v-if="filterForm.keyword.length > 0"
+                closable
+                @click:close="clearFilter(`keyword`)"
+              >
                 {{ filterForm.keyword }}
-                <v-icon
-                  @click="clearFilter(`keyword`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
-
-              <div
-                class="chip-div"
+              </v-chip>
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
-                  filterForm.country.length > 0 &&
+                  filterForm.country &&
+                  filterForm.country.toString().length > 0 &&
                   findTitle(`countryList`, filterForm.country)
                 "
+                closable
+                @click:close="clearFilter(`country`)"
               >
                 {{ findTitle("countryList", filterForm.country) }}
-                <v-icon
-                  @click="clearFilter(`country`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
-
-              <div
-                class="chip-div"
+              </v-chip>
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
-                  filterForm.state.length > 0 &&
+                  filterForm.state &&
+                  filterForm.state.toString().length > 0 &&
                   findTitle(`stateList`, filterForm.state)
                 "
+                closable
+                @click:close="clearFilter(`state`)"
               >
                 {{ findTitle("stateList", filterForm.state) }}
-                <v-icon
-                  @click="clearFilter(`state`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
+              </v-chip>
 
-              <div
-                class="chip-div"
+              <v-chip
+                class="text-h4 pa-3"
+                size="large"
+                variant="outlined"
+                color="#252626"
                 v-if="
-                  filterForm.city.length > 0 &&
+                  filterForm.city &&
+                  filterForm.city.toString().length > 0 &&
                   findTitle(`cityList`, filterForm.city)
                 "
+                closable
+                @click:close="clearFilter(`city`)"
               >
                 {{ findTitle("cityList", filterForm.city) }}
-                <v-icon
-                  @click="clearFilter(`city`)"
-                  size="small"
-                  color="#252626"
-                  >mdi-close-circle</v-icon
-                >
-              </div>
+              </v-chip>
             </div>
           </div>
           <div class="cotainer-dropdown">
@@ -335,61 +372,83 @@
             />
           </div>
         </div>
-        <div class="button-apply-cancel">
-          <button class="btn-cancel" @click="closeFilterMobile">Cancel</button>
-          <button class="btn-apply" @click="applyFilterMobie">
+        <div class="w-100 mt-8 d-flex align-center justify-center ga-3">
+          <v-btn @click="closeFilterMobile" variant="text" class="text-h4">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="#ffb600"
+            rounded="xl"
+            height="50"
+            width="160"
+            @click="applyFilterMobie"
+            class="text-h4"
+          >
             Apply filter
-          </button>
+          </v-btn>
         </div>
       </div>
     </div>
 
     <div class="box-chips-query-desktop" v-if="!isExpandMap">
       <div class="container-chips">
-        <div class="chip-div" v-if="filterForm.keyword.length > 0">
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
+          v-if="filterForm.keyword.length > 0"
+          closable
+          @click:close="clearFilter(`keyword`)"
+        >
           {{ filterForm.keyword }}
-          <v-icon @click="clearFilter(`keyword`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
-
-        <div
-          class="chip-div"
+        </v-chip>
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
-            filterForm.country.length > 0 &&
+            filterForm.country &&
+            filterForm.country.toString().length > 0 &&
             findTitle(`countryList`, filterForm.country)
           "
+          closable
+          @click:close="clearFilter(`country`)"
         >
           {{ findTitle("countryList", filterForm.country) }}
-          <v-icon @click="clearFilter(`country`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
-
-        <div
-          class="chip-div"
+        </v-chip>
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
-            filterForm.state.length > 0 &&
+            filterForm.state &&
+            filterForm.state.toString().length > 0 &&
             findTitle(`stateList`, filterForm.state)
           "
+          closable
+          @click:close="clearFilter(`state`)"
         >
           {{ findTitle("stateList", filterForm.state) }}
-          <v-icon @click="clearFilter(`state`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
+        </v-chip>
 
-        <div
-          class="chip-div"
+        <v-chip
+          class="text-h4 pa-3"
+          size="large"
+          variant="outlined"
+          color="#252626"
           v-if="
-            filterForm.city.length > 0 && findTitle(`cityList`, filterForm.city)
+            filterForm.city &&
+            filterForm.city.toString().length > 0 &&
+            findTitle(`cityList`, filterForm.city)
           "
+          closable
+          @click:close="clearFilter(`city`)"
         >
           {{ findTitle("cityList", filterForm.city) }}
-          <v-icon @click="clearFilter(`city`)" size="small" color="#252626"
-            >mdi-close-circle</v-icon
-          >
-        </div>
+        </v-chip>
       </div>
     </div>
   </div>
@@ -397,11 +456,10 @@
 
 <script setup>
 import { ref } from "vue";
+import { useDisplay } from "vuetify";
 import { useRouter, useRoute } from "vue-router";
 import { useClickOutside } from "~/composables/useClickOutside";
 
-import searchInput from "~/components/common/search-input.vue";
-import dropDownInput from "~/components/common/drop-down-input.vue";
 import checkboxInput from "~/components/common/checkbox-input.vue";
 import gomboBox from "~/components/common/gombo-box.vue";
 
@@ -466,9 +524,9 @@ const optionFilter = ref([
 ]);
 const filterForm = reactive({
   keyword: route.query.keyword || "",
-  country: route.query.country || "",
-  state: route.query.state || "",
-  city: route.query.city || "",
+  country: Number(route.query.country) || "",
+  state: Number(route.query.state) || "",
+  city: Number(route.query.city) || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
   sort: route.query.sort || "",
@@ -606,7 +664,7 @@ const clearFilter = (key) => {
 };
 
 const findTitle = (list, id) => {
-  const itemFounded = filter[list].filter((item) => item.id == id);
+  const itemFounded = filter[list].filter((item) => item.id == Number(id));
   if (itemFounded.length > 0) {
     return itemFounded[0].title;
   }
@@ -620,7 +678,7 @@ const loadingState = ref(false);
 const loadingCity = ref(false);
 
 useClickOutside(boxRegionRef, () => {
-  optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;
+  // optionFilter.value.filter((item) => item.name == "Region")[0].isShow = false;
 });
 
 const countryChange = () => {
@@ -650,6 +708,12 @@ const cityChange = () => {
 // End Section Filter Location
 
 // Start Section Filter Search
+const { width } = useDisplay();
+
+const textFieldVariant = computed(() => {
+  return width.value > 1280 ? "solo" : "outlined";
+});
+
 const changeSearchValue = () => {
   updateQueryParams();
 };

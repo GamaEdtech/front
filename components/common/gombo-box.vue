@@ -98,7 +98,7 @@ const props = defineProps({
     default: () => [],
   },
   modelValue: {
-    type: String,
+    type: [String, Number],
   },
   itemTitle: {
     type: String,

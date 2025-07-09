@@ -257,6 +257,7 @@
           <v-row>
             <v-col cols="12">
               <v-switch
+                v-if="exam_id"
                 color="teal"
                 v-model="testListSwitch"
                 label="I want to select from list"
@@ -286,14 +287,12 @@
                     {{ tests.length === 1 ? "test" : "tests" }} added to this
                     exam</span
                   >
-                  <span v-if="tests.length < 5" class="ml-2"
+                  <span v-if="!hasEnoughTests" class="ml-2"
                     >Need {{ 5 - tests.length }} more
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span
-                    v-if="tests.length > 5 && exam_id"
-                    class="ml-2 text-success"
+                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
                   >
                   <span v-else class="ml-2 text-success"
@@ -313,7 +312,8 @@
               <CreateTestForm
                 ref="createForm"
                 :goToPreviewStep="test_step"
-                :updateTestList="lastCreatedTest"
+                :updateTestList=lastCreatedTest
+                v-model:testList="tests"
                 :examEditMode="true"
                 @update:updateTestList="(val) => (lastCreatedTest = val)"
                 @update:refreshTests="handleTestRefresh"
@@ -445,13 +445,16 @@
                     {{ tests.length === 1 ? "test" : "tests" }} added to this
                     exam</span
                   >
-                  <span v-if="tests.length < 5" class="ml-2"
+                  <span v-if="!hasEnoughTests" class="ml-2"
                     >Need {{ 5 - tests.length }} more
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-if="tests.length > 5" class="ml-2 text-success"
+                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
                     >Ready to publish!</span
+                  >
+                  <span v-else class="ml-2 text-success"
+                    >Please First Create an Exam</span
                   >
                 </div>
               </v-alert>
@@ -703,7 +706,7 @@
                 <v-col cols="12" md="6" class="pb-0">
                   <v-btn
                     @click="test_step = 3"
-                    :disabled="tests.length < 5"
+                    :disabled="tests?.length < 5"
                     :loading="publish_loading"
                     block
                     color="teal"
@@ -715,10 +718,10 @@
                       font-weight: 500;
                     "
                   >
-                    <span v-show="tests.length < 5"
-                      >Add at least {{ 5 - tests.length }} more tests</span
+                    <span v-show="tests?.length < 5"
+                      >Add at least {{ 5 - tests?.length }} more tests</span
                     >
-                    <span v-show="tests.length >= 5">Next step</span>
+                    <span v-show="tests?.length >= 5">Next step</span>
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -906,7 +909,7 @@
                   <v-col cols="12" md="6" class="pb-0">
                     <v-btn
                       @click="publishTest"
-                      :disabled="tests.length < 5"
+                      :disabled="tests?.length < 5"
                       :loading="publish_loading"
                       size="large"
                       density="compact"
@@ -915,10 +918,10 @@
                       block
                       style="text-transform: none; font-size: 13px !important"
                     >
-                      <span v-show="tests.length < 5"
-                        >Add at least {{ 5 - tests.length }} more tests</span
+                      <span v-show="tests?.length < 5"
+                        >Add at least {{ 5 - tests?.length }} more tests</span
                       >
-                      <span v-show="tests.length >= 5">Publish</span>
+                      <span v-show="tests?.length >= 5">Publish</span>
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="6">
@@ -1255,8 +1258,9 @@
   </v-container>
 </template>
 
+
 <script setup>
-import { ref, reactive, watch, nextTick, onMounted, computed } from "vue";
+import { ref, reactive, watch, nextTick, onMounted, onUpdated, computed } from "vue";
 import { useRuntimeConfig } from "nuxt/app";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
@@ -1267,6 +1271,7 @@ import { required } from "@vee-validate/rules";
 import draggable from "vuedraggable";
 import FormTopicSelector from "~/components/form/topic-selector.vue";
 import CreateTestForm from "~/components/test-maker/create-test-form.vue";
+import { definePageMeta, useHead } from "#imports";
 
 // Get Nuxt app instance for accessing plugins like toast
 const config = useRuntimeConfig();
@@ -1279,6 +1284,7 @@ defineRule("required", required);
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({
@@ -1311,36 +1317,26 @@ const isExamPublished = ref(false); // Track if the exam has been published
 
 // Form data
 const form = reactive({
-  section: route.query.board ? route.query.board : "",
-  base: route.query.grade ? route.query.grade : "",
-  lesson: route.query.subject ? route.query.subject : "",
+  section: route.query.board ? route.query.board : null,
+  base: route.query.grade ? route.query.grade : null,
+  lesson: route.query.subject ? route.query.subject : null,
   topics: [],
-  exam_type: "",
+  exam_type: null,
   level: "2",
   holding_time: false,
-  state: "",
-  area: "",
-  school: "",
+  state: null,
+  area: null,
+  school: null,
   duration: 3,
   title: "",
   paperID: route.query.paperId ? route.query.paperId : "",
   negative_point: false,
   file_original: "",
   holding_level: 4,
-  edu_year: "",
-  edu_month: "",
+  edu_year: null,
+  edu_month: null,
 });
 
-// Form errors for validation
-const formErrors = reactive({
-  section: "",
-  base: "",
-  lesson: "",
-  topic: "",
-  test_type: "",
-  test_duration: "",
-  title: "",
-});
 
 const file_original = ref(null);
 const file_original_path = ref("");
@@ -1352,7 +1348,7 @@ const filter = reactive({
   lesson: "",
   topic: "",
   page: 1,
-  perpage: 40,
+  perpage: 10,
   testsHasVideo: "All",
   myTests: false,
 });
@@ -1388,6 +1384,7 @@ const selected_topics = ref([]);
 const mathJaxStep2ListContainerRef = ref();
 const mathJaxStep3ReviewContainerRef = ref();
 const mathJaxPrintDialogContainerRef = ref();
+
 // Static data
 const year_list = ref([
   2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013,
@@ -1444,12 +1441,44 @@ const holding_level_list = [
 const testProgress = computed(() => {
   const minRequired = 5;
   const currentCount = tests.value.length;
-
   // Calculate percentage, capped at 100%
   const percentage = Math.min((currentCount / minRequired) * 100, 100);
-
   return percentage;
 });
+
+// Computed property to check if we have exactly 5 tests
+const hasExactlyFiveTests = computed(() => {
+  return tests.value.length === 5;
+});
+
+// Computed property to check if we have enough tests
+const hasEnoughTests = computed(() => {
+  return tests.value.length >= 5;
+});
+
+// Change from ref to computed
+const test_share_link = computed(() => {
+  if (process.server) {
+    // Return a consistent value during SSR to avoid hydration mismatch
+    return `https://gamatrain.com/exam/${exam_id.value || ""}`;
+  }
+  // Only use window.location on client side
+  return `${window.location.origin}/exam/${exam_id.value || ""}`;
+});
+
+
+const resetTestList = () => {
+  filter.page = 1;
+  test_list.value = [];
+  all_tests_loaded.value = false;
+};
+
+
+const loadFilteredTests = async () => { 
+  if (filter.lesson) { 
+    await getExamTests();
+  }
+};
 
 // Generate title function
 const generateTitle = () => {
@@ -1505,7 +1534,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     if (type === "lesson") params.base_id = parent;
     if (type === "topic") params.lesson_id = parent;
     if (type === "area") params.state_id = parent;
-
     if (type === "school") {
       params.section_id = form.section;
       params.area_id = form.area;
@@ -1536,7 +1564,7 @@ const getTypeList = async (type, parent = "", trigger = "") => {
 
     const res = await useApiService.get("/api/v1/types/list", params);
 
-    if (res && res.data) {
+    if (res && res.data && Array.isArray(res.data)) {
       if (type === "section") {
         if (trigger === "filter") {
           filter_level_list.value = res.data;
@@ -1572,10 +1600,19 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       }
 
       generateTitle();
+    } else {
+      if (type === "base") {
+        if (trigger === "filter") filter_grade_list.value = [];
+        else grade_list.value = [];
+      } else if (type === "lesson") {
+        if (trigger === "filter") filter_lesson_list.value = [];
+        else lesson_list.value = [];
+      } else if (type === "topic") {
+        topic_list.value = [];
+      }
     }
-  } catch (err) {
-    console.error(`Error loading ${type} data:`, err);
 
+  } catch (err) {
     // Reset the target list to empty on error
     if (type === "section") {
       if (trigger === "filter") filter_level_list.value = [];
@@ -1592,9 +1629,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
       test_type_list.value = [];
     }
 
-    nuxtApp.$toast.error(
-      `Failed to load ${type} data: ${err.message || "Unknown error"}`
-    );
   }
 };
 
@@ -1650,8 +1684,7 @@ const submitQuestion = async () => {
       }
     );
 
-    nuxtApp.$toast.success("Exam created successfully");
-
+    
     exam_id.value = response.data.id;
     exam_code.value = response.data.code;
 
@@ -1674,9 +1707,7 @@ const submitQuestion = async () => {
     // Move to the next step
     test_step.value = 2;
   } catch (error) {
-    nuxtApp.$toast.error(
-      error.response?.data?.message || "Error creating exam"
-    );
+    
   } finally {
     submit_loading.value = false;
   }
@@ -1684,14 +1715,16 @@ const submitQuestion = async () => {
 
 // Convert form data from multipart to urlencode
 const urlencodeFormData = (fd) => {
-  let s = "";
-
-  for (const pair of fd.entries()) {
-    if (typeof pair[1] == "string") {
-      s += (s ? "&" : "") + encode(pair[0]) + "=" + encode(pair[1]);
+  const params = new URLSearchParams();
+  
+  for (const [key, value] of fd.entries()) {
+    if (typeof value === 'string') {
+      params.append(key, value);
     }
   }
-  return s;
+  
+  const result = params.toString();
+  return result;
 };
 
 const encode = (s) => {
@@ -1712,15 +1745,14 @@ const uploadFile = async (file_name) => {
 
   try {
     const response = await useApiService.post("/api/v1/upload", formData);
-
     if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
-      nuxtApp.$toast.success("File uploaded successfully");
+      
     } else {
-      nuxtApp.$toast.error("Invalid response from server");
+      
     }
   } catch (err) {
-    nuxtApp.$toast.error("Failed to upload file");
+    
     console.error(err);
   }
 };
@@ -1765,10 +1797,10 @@ const publishTest = async () => {
       // Navigate to publish step
       test_step.value = 4;
 
-      nuxtApp.$toast.success("Exam published successfully");
+      
     }
   } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error publishing exam");
+    
   } finally {
     publish_loading.value = false;
   }
@@ -1800,14 +1832,21 @@ const submitTest = async (skipListRefresh = false) => {
     // Ensure we have a valid exam ID
     if (!exam_id.value) {
       console.error("No exam ID available, cannot submit tests");
-      nuxtApp.$toast.error("No exam ID available");
+      
       return;
     }
+
+    // Ensure all test IDs are strings for consistent comparison
+    tests.value = tests.value.map(id => String(id));
 
     const formData = new URLSearchParams();
     tests.value.forEach((id) => {
       formData.append("tests[]", String(id));
     });
+
+    // Log the tests being submitted
+    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
+    console.log("Tests:", tests.value);
 
     await useApiService.put(
       `/api/v1/exams/tests/${exam_id.value}`,
@@ -1817,16 +1856,37 @@ const submitTest = async (skipListRefresh = false) => {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         },
       }
-    );
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await handleRefreshPreviewList();
+    ).then(async (res) => {
+      if (res.status === 1) {
+        await nextTick();
+        await forceUIUpdate();
+        await handleRefreshPreviewList();
+        createForm.value.examTestListLength = tests.value.length;
+      }
+    });
 
+    // Add a small delay to ensure the backend has processed the update
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Force UI to update with the current test count
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
+
+    // Refresh the preview list if needed
+    if (!skipListRefresh) {
+      await handleRefreshPreviewList();
+    }
+
+    // Force a UI update if we've just reached or fallen below the threshold
+    if (tests.value.length === 5) {
+      
+      // Force a nextTick to ensure the UI updates
+      await nextTick();
+    }
   } catch (err) {
     console.error("Failed to update tests:", err);
-    nuxtApp.$toast.error("Failed to update tests");
+    
   }
 };
 
@@ -1834,7 +1894,6 @@ const submitTest = async (skipListRefresh = false) => {
 const fetchTestDetails = async (testId) => {
   try {
     const response = await useApiService.get(`/api/v1/examTests/${testId}`);
-
     if (response && response.status === 1 && response.data) {
       return response.data;
     }
@@ -1857,6 +1916,7 @@ const handleRefreshPreviewList = async () => {
   }
 
   test_loading.value = true;
+
   try {
     const currentTestIds = tests.value.map((id) => String(id));
 
@@ -1927,7 +1987,6 @@ const handleRefreshPreviewList = async () => {
       .filter(Boolean); // Clean out any nulls if a test somehow failed all fetches
   } catch (err) {
     console.error("Error in handleRefreshPreviewList during API call:", err);
-    nuxtApp.$toast.error("Error refreshing preview list.");
     // Fallback: If the main API call itself fails, try to build from tests.value with placeholders
     if (tests.value.length > 0 && previewTestList.value.length === 0) {
       const fallbackPromises = tests.value.map(async (id) => {
@@ -1942,6 +2001,7 @@ const handleRefreshPreviewList = async () => {
           }
         );
       });
+
       previewTestList.value = (await Promise.all(fallbackPromises)).filter(
         Boolean
       );
@@ -1958,7 +2018,6 @@ const handleRefreshPreviewList = async () => {
 const getCurrentExamInfo = async () => {
   // Check if we have an exam ID in the user state
   const userState = useState("user");
-
   if (userState.value?.currentExamId) {
     exam_id.value = userState.value.currentExamId;
     exam_code.value = userState.value.currentExamCode;
@@ -1982,15 +2041,12 @@ const getCurrentExamInfo = async () => {
       if (response.data.section) {
         form.section = response.data.section;
         await getTypeList("base", response.data.section);
-
         if (response.data.base) {
           form.base = response.data.base;
           await getTypeList("lesson", response.data.base);
-
           if (response.data.lesson) {
             form.lesson = response.data.lesson;
             await getTypeList("topic", response.data.lesson);
-
             if (response.data.topics && response.data.topics.length) {
               form.topics = response.data.topics;
               await getTopicTitleList();
@@ -2011,9 +2067,10 @@ const getCurrentExamInfo = async () => {
       form.paperID = response.data.paperID || "";
       form.edu_year = response.data.edu_year || "";
       form.edu_month = response.data.edu_month || "";
+
       // ... any other fields that should be populated from exam info
     } catch (err) {
-      nuxtApp.$toast.error("Failed to load exam information");
+      
       console.error("Error fetching exam info:", err);
     }
   }
@@ -2038,64 +2095,654 @@ const onScroll = () => {
     timer.value = null;
   }
 
-  if (isNearBottom) {
+  if (isNearBottom && filter.lesson) {
     timer.value = setTimeout(() => {
       test_loading.value = true;
-      filter.page++;
+       filter.page = filter.page + 1;
       getExamTests();
     }, 800);
   }
 };
 
-// Apply test to the exam (add or remove)
-const applyTest = async (item, type = null) => {
-  if (tests.value.find((x) => x == item.id) && type === "remove") {
-    tests.value.splice(tests.value.indexOf(item.id), 1);
-
-    //Remove from preview
-    // this.$store.commit('user/removePreviewTestList', item.id);
-
-    submitTest();
+const getRequiredFormData = async () => {
+  let sectionId = form.section;
+  if (!sectionId) {
+    if (level_list.value.length === 0) {
+      await getTypeList("section");
+    }
+    sectionId = level_list.value.length > 0 ? level_list.value[0].id : null;
   }
-  if (!tests.value.find((x) => x == item.id) && type === "add") {
-    tests.value.push(item.id);
 
-    //Add to preview list
-    // this.$store.commit('user/addPreviewTestList', item)
-    submitTest();
+  if (!sectionId) {
+    throw new Error('No valid section available');
+  }
+
+  let baseId = form.base;
+  if (!baseId) {
+    if (grade_list.value.length === 0) {
+      await getTypeList("base", sectionId);
+    }
+    baseId = grade_list.value.length > 0 ? grade_list.value[0].id : null;
+  }
+
+  if (!baseId) {
+    throw new Error('No valid grade available');
+  }
+
+  let lessonId = form.lesson;
+  if (!lessonId) {
+    if (lesson_list.value.length === 0) {
+      await getTypeList("lesson", baseId);
+    }
+    lessonId = lesson_list.value.length > 0 ? lesson_list.value[0].id : null;
+  }
+
+  if (!lessonId) {
+    throw new Error('No valid lesson available');
+  }
+
+  let examTypeId = form.exam_type;
+  if (!examTypeId) {
+    if (test_type_list.value.length === 0) {
+      await loadExamTypes();
+    }
+    examTypeId = test_type_list.value.length > 0 ? test_type_list.value[0].id : null;
+  }
+
+  if (!examTypeId) {
+    throw new Error('No valid exam type available');
+  }
+
+  const lessonTitle = lesson_list.value.find(l => l.id == lessonId)?.title || 'Test';
+  const baseTitle = grade_list.value.find(b => b.id == baseId)?.title || 'Grade';
+  
+  return {
+    title: form.title || `${lessonTitle} Test ${baseTitle}`,
+    duration: form.duration || 3,
+    level: form.level || '2',
+    section: sectionId,
+    base: baseId,
+    lesson: lessonId,
+    exam_type: examTypeId,
+    edu_year: form.edu_year || new Date().getFullYear().toString(),
+    edu_month: form.edu_month || '1'
+  };
+};
+
+const ensureBasicDataLoaded = async () => {
+  try {
+    if (!level_list.value.length) {
+      await getTypeList("section");
+    }
+    
+    if (!test_type_list.value.length) {
+      await loadExamTypes();
+    }
+    
+  } catch (error) {
+    console.error('Error loading basic data:', error);
+    throw error;
+  }
+};
+
+const createDraftExam = async () => {
+  submit_loading.value = true;
+  
+  try {
+    await ensureBasicDataLoaded();
+    
+    const requiredData = await getRequiredFormData();
+    
+    const formData = new FormData();
+    
+    Object.keys(requiredData).forEach(key => {
+      if (requiredData[key] !== null && requiredData[key] !== undefined) {
+        formData.append(key, String(requiredData[key]));
+      }
+    });
+
+    if (form.topics && form.topics.length) {
+      form.topics.forEach(topic => {
+        formData.append("topics[]", String(topic));
+      });
+    }
+
+    const response = await useApiService.post(
+      "/api/v1/exams",
+      urlencodeFormData(formData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    if (response && response.data && response.data.id) {
+      exam_id.value = response.data.id;
+      exam_code.value = response.data.code;
+
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: exam_id.value,
+        currentExamCode: exam_code.value,
+      };
+
+      if (createForm.value && typeof createForm.value.getCurrentExamInfo === "function") {
+        createForm.value.getCurrentExamInfo();
+      }
+
+      
+    } else {
+      throw new Error('Invalid response from server');
+    }
+
+  } catch (error) {
+    console.error('Error creating draft exam:', error);
+    
+    let errorMessage = "Error creating draft exam";
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+      
+      if (error.response.data.data && Array.isArray(error.response.data.data)) {
+        errorMessage += ` Missing fields: ${error.response.data.data.join(', ')}`;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    
+    throw error;
+  } finally {
+    submit_loading.value = false;
+  }
+};
+
+// Force UI update when tests count changes
+const forceUIUpdate = async () => {
+  // Ensure consistent string IDs
+  tests.value = tests.value.map(id => String(id));
+  
+  // Update the test count in the create form component
+  if (createForm.value && "examTestListLength" in createForm.value) {
+    createForm.value.examTestListLength = tests.value.length;
+  }
+  
+ 
+  
+};
+
+const applyTest = async (item, type = null) => {
+  try {
+    if (type === 'add' && !exam_id.value) {
+      await createDraftExam();
+      
+      if (!exam_id.value) {
+        throw new Error('Failed to create draft exam');
+      }
+    }
+
+    const testId = String(item.id);
+    // Always use string comparison
+    const testExists = tests.value.some(id => String(id) === testId);
+
+    // Store the old length to check if we hit exactly 5 tests
+    const oldLength = tests.value.length;
+
+    if (testExists && type === "remove") {
+      const index = tests.value.findIndex(id => String(id) === testId);
+      if (index !== -1) {
+        tests.value.splice(index, 1);
+        await forceUIUpdate(); // Force UI update immediately
+        await submitTest();
+       
+      }
+    }
+
+    if (!testExists && type === "add") {
+      tests.value.push(testId);
+      await forceUIUpdate(); // Force UI update immediately
+      await submitTest();
+    }
+    
+    // Force refresh the preview list to ensure UI consistency
+    await handleRefreshPreviewList();
+
+  } catch (error) {
+    console.error('Error in applyTest:', error);
+   
+  }
+};
+
+// Get exam tests
+const getExamTests = async () => {
+  test_loading.value = true;
+
+  try {
+    const params = {
+      lesson: filter.lesson,
+      topic: filter.topic,
+      myTests: filter.myTests,
+      testsHasVideo: filter.testsHasVideo,
+      page: filter.page,
+      perpage: filter.perpage,
+    };
+
+
+    const response = await useApiService.get("/api/v1/examTests", params);
+    test_list.value.push(...response?.data?.list);
+
+    // Update the examTestListLength with the actual tests array length, not the response length
+    if (createForm.value && "examTestListLength" in createForm.value) {
+      createForm.value.examTestListLength = tests.value.length;
+    }
+
+    if (response.data.list.length === 0) {
+      all_tests_loaded.value = true;
+    } else {
+      all_tests_loaded.value = false;
+    }
+  } catch (err) {
+    console.log(err)
+  } finally {
+    test_loading.value = false;
+  }
+};
+
+const deleteOnlineExam = async () => {
+  deleteLoading.value = true;
+
+  try {
+    const response = await useApiService.remove(
+      `/api/v1/exams/${exam_id.value}`
+    );
+
+    if (response.data.message === "done") {
+
+      // Reset all values
+      exam_id.value = "";
+      exam_code.value = "";
+      isExamPublished.value = false;
+      // Reset tests
+      tests.value = [];
+      previewTestList.value = [];
+      // Reset state in user store
+      const userState = useState("user");
+      userState.value = {
+        ...userState.value,
+        currentExamId: "",
+        currentExamCode: "",
+      };
+      // Reset form and data
+      resetForm();
+      // Reset to first step
+      test_step.value = 1;
+    }
+  } catch (err) {
+   
+    console.error("Error deleting exam:", err);
+  } finally {
+    deleteLoading.value = false;
+    confirmDeleteDialog.value = false;
+ 
+  }
+};
+
+// Open delete confirmation dialog
+const openTestDeleteConfirmDialog = (item_id) => {
+  delete_exam_test_id.value = item_id;
+  deleteTestConfirmDialog.value = true;
+};
+
+// Delete exam test
+const deleteExamTest = async () => {
+  delete_exam_test_loading.value = true;
+
+  try {
+    await useApiService.remove(
+      `/api/v1/examTests/${delete_exam_test_id.value}`
+    );
+
+    // Remove from tests array
+    const index = tests.value.findIndex(
+      (id) => id === delete_exam_test_id.value
+    );
+    if (index !== -1) {
+      tests.value.splice(index, 1);
+    }
+
+    // Refresh test lists
+    filter.page = 1;
+    test_list.value = [];
+    getExamTests();
+  } catch (err) {
+   
+    console.error("Error deleting exam test:", err);
+  } finally {
+    delete_exam_test_loading.value = false;
+    delete_exam_test_id.value = null;
+    deleteTestConfirmDialog.value = false;
+  }
+};
+
+// Form validation helper
+const validateHeaderForm = () => {
+  // Check required fields
+  if (!form.section) {
+    
+    return false;
+  }
+  if (!form.base) {
+    
+    return false;
+  }
+  if (!form.lesson) {
+    
+    return false;
+  }
+
+  if (!form.title) {
+    
+    return false;
+  }
+  if (!form.duration) {
+    return false;
+  }
+  return true;
+};
+
+// Handle stepper navigation to validate steps
+const handleStepChange = (newStep) => {
+  // Don't allow changing to step 4 (Publish) if we don't have enough tests
+  if (newStep === 4 && tests.value.length < 5) {
+   
+    // Revert to step 3 (Review)
+    test_step.value = 3;
+    return;
+  }
+
+  // Prevent access to step 4 if exam hasn't been published yet
+  if (newStep === 4 && !isExamPublished.value) {
+   
+    // Revert to step 3 (Review)
+    test_step.value = 3;
+    return;
+  }
+
+  // Prevent access to step 4 directly from step 1 or 2
+  if (newStep === 4 && test_step.value < 3) {
+   
+    // Go to step 3 (Review) instead
+    test_step.value = 3;
+    return;
+  }
+
+  // If moving to Review step (3), make sure we load the test data
+  if (newStep === 3 && exam_id.value) {
+    test_step.value = newStep;
+   
+    handleRefreshPreviewList()
+      .then(() => {
+        if (previewTestList.value.length === 0 && tests.value.length > 0) {
+         
+          setTimeout(() => {
+            handleRefreshPreviewList().then(() => {
+              if (previewTestList.value.length > 0) {
+               
+              }
+            });
+          }, 1000);
+          } else if (previewTestList.value.length > 0) {
+             
+          }
+      })
+      .catch((err) => {
+        console.error("Error loading test data:", err);
+
+      });
+    return;
+  }
+
+  // If all validations pass, update the step
+  test_step.value = newStep;
+
+  // Show step change notification
+  if (newStep !== test_step.value) {
+    const stepNames = {
+      1: "Header",
+      2: "Tests",
+      3: "Review",
+      4: "Publish",
+    };
+
+  }
+};
+
+/**
+ * Reset form fields to initial state
+ */
+const resetForm = () => {
+  // Reset all form fields
+  form.section = "";
+  form.base = "";
+  form.lesson = "";
+  form.topics = [];
+  form.exam_type = "";
+  form.level = "2";
+  form.holding_time = false;
+  form.state = "";
+  form.area = "";
+  form.school = "";
+  form.duration = 3;
+  form.title = "";
+  form.negative_point = false;
+  form.file_original = "";
+  form.paperID = "";
+  form.edu_year = "";
+  form.edu_month = "";
+
+  // Reset data lists that are dependent on form fields
+  grade_list.value = [];
+  lesson_list.value = [];
+  topic_list.value = [];
+  form.topics = [];
+  selected_topics.value = [];
+
+  // Reset file inputs
+  file_original.value = null;
+  file_original_path.value = "";
+};
+
+/**
+ * Reset all data (used after deletion)
+ */
+const resetAllData = () => {
+  // Reset form
+  resetForm();
+
+  // Reset exam data
+  exam_id.value = "";
+  exam_code.value = "";
+  isExamPublished.value = false;
+
+  // Reset tests
+  tests.value = [];
+  previewTestList.value = [];
+
+  // Reset state in user store
+  const userState = useState("user");
+  userState.value = {
+    ...userState.value,
+    currentExamId: "",
+    currentExamCode: "",
+  };
+};
+
+// Add a new function to help users understand how many tests are needed
+const goToNextStep = () => {
+  if (tests.value.length < 5) {
+    return;
+  }
+
+  test_step.value = 3;
+
+};
+
+
+
+const handleClearSection = () => {
+  filter.section = "";
+  filter.base = "";
+  filter.lesson = "";
+  filter.topic = "";
+  filter_grade_list.value = [];
+  filter_lesson_list.value = [];
+  topic_list.value = [];
+  resetTestList();
+};
+
+const handleClearBase = () => {
+  filter.base = "";
+  filter.lesson = "";
+  filter.topic = "";
+  filter_lesson_list.value = [];
+  topic_list.value = [];
+  resetTestList();
+};
+
+const handleClearLesson = () => {
+  filter.lesson = "";
+  filter.topic = "";
+  topic_list.value = [];
+  resetTestList();
+};
+
+const handleClearTopic = () => {
+  filter.topic = "";
+  resetTestList();
+  loadFilteredTests();
+};
+
+/**
+ * Specifically load exam types with better error handling
+ */
+const loadExamTypes = async () => {
+  try {
+    // First try to get exam types from the API
+    const res = await useApiService.get("/api/v1/types/list", {
+      type: "exam_type",
+    });
+
+    if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+      test_type_list.value = res.data;
+    } else {
+      // If API returned no data, use fallback
+      test_type_list.value = defaultExamTypes;
+    }
+  } catch (err) {
+    // Use fallback in case of error
+    test_type_list.value = defaultExamTypes;
+  }
+};
+
+/**
+ * Handle drag end event for reordering preview items
+ * This is called when the user finishes dragging/reordering tests in the preview dialog
+ */
+const previewDragEnd = async () => {
+  // Extract IDs from the reordered preview list
+  const new_list = [];
+  for (const index in previewTestList.value) {
+    new_list.push(previewTestList.value[index].id);
+  }
+
+  // Update the tests array with the new order
+  tests.value = new_list;
+
+  // Submit the reordered tests to the backend and refresh the preview list
+  await submitTest();
+};
+
+// Handle test refresh events from CreateTestForm component
+const handleTestRefresh = async () => {
+  try {
+    // Force UI update immediately
+    await forceUIUpdate();
+    
+    // Wait for API operations to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Refresh the preview list
+    await handleRefreshPreviewList();
+
+    // If in test list mode, refresh the test list as well
+    if (testListSwitch.value) {
+      filter.page = 1;
+      test_list.value = [];
+      all_tests_loaded.value = false;
+      await getExamTests();
+    }
+   
+  } catch (err) {
+    console.error("Error in handleTestRefresh:", err); 
+  }
+};
+
+const typesetMathInSpecificContainer = async (containerRef) => {
+  if (process.client && containerRef.value && window.MathJax) {
+    let elementToProcess = null;
+
+    if (
+      containerRef.value.$el &&
+      containerRef.value.$el instanceof HTMLElement
+    ) {
+      elementToProcess = containerRef.value.$el;
+    } else if (containerRef.value instanceof HTMLElement) {
+      elementToProcess = containerRef.value;
+    }
+
+    if (!elementToProcess) {
+      return;
+    }
+
+    try {
+      await $ensureMathJaxReady();
+      await nextTick();
+
+      if (containerRef.value) {
+        let currentElementForProcessing = null;
+
+        if (
+          containerRef.value.$el &&
+          containerRef.value.$el instanceof HTMLElement
+        ) {
+          currentElementForProcessing = containerRef.value.$el;
+        } else if (containerRef.value instanceof HTMLElement) {
+          currentElementForProcessing = containerRef.value;
+        }
+
+        if (currentElementForProcessing) {
+          $renderMathInElement(currentElementForProcessing);
+        }
+      }
+    } catch (error) {
+      console.error("MathJax Error:", error);
+    }
   }
 };
 
 // Watch for newly created tests and add them to the current exam
 watch(
   () => lastCreatedTest.value,
-  async (newTest) => {
-    if (newTest && exam_id.value) {
-      // Convert to string for consistent comparison - IDs might be numbers or strings
-      const newTestId = String(newTest);
+ (newTest) => {
+    if (newTest && !tests.value.find((x)=> x== newTest)) {
+      {
+            tests.value.push(newTest)
+            submitTest()
 
-      // First check if this test is already in our list to avoid duplicates
-      // Make sure we're comparing strings to strings for consistency
-      if (tests.value.some((id) => String(id) === newTestId)) {
-        lastCreatedTest.value = null;
-        return;
       }
-
-      // Add the new test to the tests array - association already done in child component
-      tests.value.push(newTestId);
-
-      // Always update the preview list when a new test is created
-      // This ensures the Review section is always up to date
-      await submitTest();
-
-      // Show success message
-      nuxtApp.$toast.success("Test added to exam");
-
-      // Reset the lastCreatedTest after processing
-      lastCreatedTest.value = null;
     }
   },
-  { immediate: true }
 );
 
 // Watch for changes in form.section (Board)
@@ -2183,7 +2830,6 @@ watch(
       // Reset topics when lesson is cleared
       form.topics = [];
       topic_list.value = [];
-
       // Update topic selector if available
       if (topicSelector.value) {
         topicSelector.value.lesson_selected = false;
@@ -2201,116 +2847,124 @@ watch(
   }
 );
 
-// Watch for changes in filter.section
 watch(
   () => filter.section,
-  async (val, oldVal) => {
-    if (val) {
-      test_loading.value = true;
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
       // Reset dependent filters
       filter.base = "";
       filter.lesson = "";
+      filter.topic = "";
+      
+      // Clear dependent lists
       filter_grade_list.value = [];
       filter_lesson_list.value = [];
-
-      // Fetch new grade list for filter
-      await getTypeList("base", val, "filter");
-      test_loading.value = false;
-    } else {
-      // Clear grade and lesson lists when section is cleared
-      filter_grade_list.value = [];
-      filter_lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Reset test list and pagination
+      resetTestList();
+      
+      try {
+        test_loading.value = true;
+        await getTypeList("base", newVal, "filter");
+      } catch (error) {
+        console.error('Error loading grades for section:', error);
+      } finally {
+        test_loading.value = false;
+      }
+    } else if (!newVal && oldVal) {
+      // Section was cleared
+      handleClearSection();
     }
-
-    // Reset pagination and test list
-    all_tests_loaded.value = true;
-    filter.page = 1;
-    test_list.value = [];
   }
 );
 
-// Watch for changes in filter.base
 watch(
   () => filter.base,
-  async (val, oldVal) => {
-    if (val) {
-      test_loading.value = true;
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
       // Reset dependent filters
       filter.lesson = "";
+      filter.topic = "";
+      
+      // Clear dependent lists
       filter_lesson_list.value = [];
-
-      // Fetch new lesson list for filter
-      await getTypeList("lesson", val, "filter");
-      test_loading.value = false;
-    } else {
-      // Clear lesson list when base is cleared
-      filter_lesson_list.value = [];
+      topic_list.value = [];
+      
+      // Reset test list and pagination
+      resetTestList();
+      
+      try {
+        test_loading.value = true;
+        await getTypeList("lesson", newVal, "filter");
+      } catch (error) {
+        console.error('Error loading lessons for base:', error);
+      } finally {
+        test_loading.value = false;
+      }
+    } else if (!newVal && oldVal) {
+      // Base was cleared
+      handleClearBase();
     }
-
-    // Reset pagination and test list
-    all_tests_loaded.value = true;
-    filter.page = 1;
-    test_list.value = [];
   }
 );
 
-// Watch for changes in filter.lesson (Subject)
 watch(
   () => filter.lesson,
-  async (val) => {
-    // Reset topic filter when lesson changes
-    filter.topic = "";
-
-    if (val) {
-      test_loading.value = true;
-      // Fetch topic list based on selected lesson
-      await getTypeList("topic", val, "filter");
-      test_loading.value = false;
-    } else {
-      // Clear topic list when lesson is cleared
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
+      // Reset topic filter
+      filter.topic = "";
       topic_list.value = [];
+      
+      // Reset test list and pagination
+      resetTestList();
+      
+      try {
+        test_loading.value = true;
+        await getTypeList("topic", newVal, "filter");
+        
+        // Load tests after topics are loaded
+        await loadFilteredTests();
+      } catch (error) {
+        console.error('Error loading topics for lesson:', error);
+      } finally {
+        test_loading.value = false;
+      }
+    } else if (!newVal && oldVal) {
+      // Lesson was cleared
+      handleClearLesson();
     }
-
-    // Reset pagination and test list
-    filter.page = 1;
-    test_list.value = [];
-    all_tests_loaded.value = false;
-
-    // Load tests with new filter
-    getExamTests();
   }
 );
 
 watch(
   () => filter.topic,
-  () => {
-    // Reset pagination and test list before loading new data
-    filter.page = 1;
-    test_list.value = [];
-    all_tests_loaded.value = false;
-    getExamTests();
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      resetTestList();
+      await loadFilteredTests();
+    }
   }
 );
 
 watch(
   () => filter.testsHasVideo,
-  () => {
-    // Reset pagination and test list before loading new data
-    filter.page = 1;
-    test_list.value = [];
-    all_tests_loaded.value = false;
-    getExamTests();
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      resetTestList();
+      await loadFilteredTests();
+    }
   }
 );
 
 watch(
   () => filter.myTests,
-  () => {
-    // Reset pagination and test list before loading new data
-    filter.page = 1;
-    test_list.value = [];
-    all_tests_loaded.value = false;
-    getExamTests();
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      resetTestList();
+      await loadFilteredTests();
+    }
   }
 );
 
@@ -2341,82 +2995,50 @@ watch(
   { deep: true }
 );
 
-// Initialize component on mount
-onMounted(async () => {
-  // Get user token
-  const auth = useAuth();
-  userToken.value = auth.getUserToken();
-
-  // Ensure exam published state is reset
-  isExamPublished.value = false;
-
-  // Initialize data in the correct sequence
-  await getCurrentExamInfo();
-
-  // Load initial data - start with sections
-  await getTypeList("section");
-
-  // Conditionally load data based on URL parameters or existing form values
-  if (form.section) {
-    await getTypeList("base", form.section);
-
-    if (form.base) {
-      await getTypeList("lesson", form.base);
-
-      if (form.lesson) {
-        await getTypeList("topic", form.lesson);
-      }
-    }
-  }
-
-  // Get additional type lists
-  await loadExamTypes(); // Use our specialized function for exam types
-  await getTypeList("state");
-
-  // Load tests if needed
-  await getExamTests();
-
-  // If we have an exam ID, get its tests
-  if (exam_id.value) {
-    await handleRefreshPreviewList();
-
-    // Make sure the examTestListLength is properly initialized
+// Watch for changes in tests array to update the button number
+watch(
+  () => tests.value,
+  async (newTests, oldTests) => {
+    // Log test count changes for debugging
+    console.log(`Tests count changed: ${oldTests?.length || 0} -> ${newTests.length}`);
+    console.log(`hasEnoughTests: ${hasEnoughTests.value}`);
+    
+    // Update the test count in the create form component
     if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
+      createForm.value.examTestListLength = newTests.length;
+      console.log(`Updated examTestListLength to ${newTests.length}`);
+    }
+
+    // Check if the tests array has changed and we have an exam ID
+    if (
+      exam_id.value &&
+      (newTests.length !== oldTests?.length ||
+        JSON.stringify(newTests.map(id => String(id))) !== 
+        JSON.stringify(oldTests?.map(id => String(id))))
+    ) {
+      // Ensure consistent string IDs
+      tests.value = newTests.map(id => String(id));
+      
+      // Refresh the preview list
+      await handleRefreshPreviewList();
+      
+
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  () => hasEnoughTests.value,
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      await nextTick();
+      await forceUIUpdate();
+      await loadFilteredTests();
+      await handleRefreshPreviewList();
     }
   }
-
-  // Check active tab from route and enable it
-  if (route.query?.active === "test_list") {
-    test_step.value = 2;
-    testListSwitch.value = true;
-  } else if (route.query?.active === "add_test") {
-    test_step.value = 2;
-    testListSwitch.value = false;
-  } else {
-    test_step.value = 1;
-    testListSwitch.value = false;
-  }
-
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
-  }
-});
-
-onUpdated(async () => {
-  if (test_step.value === 2 && testListSwitch.value) {
-    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
-  }
-  if (test_step.value === 3) {
-    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
-  }
-  if (printPreviewDialog.value) {
-    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
-  }
-});
+);
 
 watch(
   test_list,
@@ -2462,574 +3084,100 @@ watch(testListSwitch, async (isSwitchedOn) => {
     await nextTick();
     await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
   }
+  await nextTick();
+  await forceUIUpdate();
+  await handleRefreshPreviewList();
 });
-// Open delete confirmation dialog
-const openTestDeleteConfirmDialog = (item_id) => {
-  delete_exam_test_id.value = item_id;
-  deleteTestConfirmDialog.value = true;
-};
 
-// Delete exam test
-const deleteExamTest = async () => {
-  delete_exam_test_loading.value = true;
+// Initialize component on mount
+onMounted(async () => {
+  // Get user token
+  const auth = useAuth();
+  userToken.value = auth.getUserToken();
 
-  try {
-    await useApiService.remove(
-      `/api/v1/examTests/${delete_exam_test_id.value}`
-    );
-
-    nuxtApp.$toast.success("Deleted successfully");
-
-    // Remove from tests array
-    const index = tests.value.findIndex(
-      (id) => id === delete_exam_test_id.value
-    );
-    if (index !== -1) {
-      tests.value.splice(index, 1);
-    }
-
-    // Refresh test lists
-    filter.page = 1;
-    test_list.value = [];
-    getExamTests();
-  } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error deleting test");
-    console.error("Error deleting exam test:", err);
-  } finally {
-    delete_exam_test_loading.value = false;
-    delete_exam_test_id.value = null;
-    deleteTestConfirmDialog.value = false;
-  }
-};
-
-// Get exam tests
-const getExamTests = async () => {
-  if (all_tests_loaded.value || test_loading.value) return;
-
-  test_loading.value = true;
-
-  try {
-    const response = await useApiService.get("/api/v1/examTests", {
-      lesson: filter.lesson,
-      topic: filter.topic,
-      myTests: filter.myTests,
-      testsHasVideo: filter.testsHasVideo,
-      page: filter.page,
-      perpage: filter.perpage,
-    });
-
-    const newTests = response?.data?.list || [];
-
-    // Check if we received any tests
-    if (newTests.length === 0) {
-      // No more tests, mark as loaded
-      all_tests_loaded.value = true;
-    } else {
-      // Add new tests to the list
-      test_list.value.push(...newTests);
-
-      // If we received fewer tests than requested per page,
-      // we've likely reached the end
-      if (newTests.length < filter.perpage) {
-        all_tests_loaded.value = true;
-      }
-    }
-
-    // Update createForm if it exists and has examTestListLength property
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = tests.value.length;
-    }
-  } catch (err) {
-    console.error("Error getting exam tests:", err);
-    all_tests_loaded.value = true; // Prevent further requests on error
-  } finally {
-    test_loading.value = false;
-  }
-};
-
-const deleteOnlineExam = async () => {
-  deleteLoading.value = true;
-
-  try {
-    const response = await useApiService.remove(
-      `/api/v1/exams/${exam_id.value}`
-    );
-    if (response.data.message === "done") {
-      nuxtApp.$toast.success("Deleted successfully");
-
-      // Reset all values
-      exam_id.value = "";
-      exam_code.value = "";
-      isExamPublished.value = false;
-
-      // Reset tests
-      tests.value = [];
-      previewTestList.value = [];
-
-      // Reset state in user store
-      const userState = useState("user");
-      userState.value = {
-        ...userState.value,
-        currentExamId: "",
-        currentExamCode: "",
-      };
-
-      // Reset form and data
-      resetForm();
-
-      // Reset to first step
-      test_step.value = 1;
-    }
-  } catch (err) {
-    nuxtApp.$toast.error(err.message || "Error deleting exam");
-    console.error("Error deleting exam:", err);
-  } finally {
-    deleteLoading.value = false;
-    confirmDeleteDialog.value = false;
-  }
-};
-
-// Form validation helper
-const validateHeaderForm = () => {
-  // Check required fields
-  if (!form.section) {
-    nuxtApp.$toast.error("Board is required");
-    return false;
-  }
-
-  if (!form.base) {
-    nuxtApp.$toast.error("Grade is required");
-    return false;
-  }
-
-  if (!form.lesson) {
-    nuxtApp.$toast.error("Subject is required");
-    return false;
-  }
-
-  // if (!form.topics || form.topics.length === 0) {
-  //   nuxtApp.$toast.error("Please select at least one topic");
-  //   return false;
-  // }
-
-  if (!form.title) {
-    nuxtApp.$toast.error("Title is required");
-    return false;
-  }
-
-  if (!form.duration) {
-    nuxtApp.$toast.error("Test duration is required");
-    return false;
-  }
-
-  return true;
-};
-
-// Handle stepper navigation to validate steps
-const handleStepChange = (newStep) => {
-  // Don't allow changing to step 4 (Publish) if we don't have enough tests
-  if (newStep === 4 && tests.value.length < 5) {
-    nuxtApp.$toast.error(
-      `You need at least 5 tests to publish the exam. Currently have ${tests.value.length}.`
-    );
-
-    // Revert to step 3 (Review)
-    test_step.value = 3;
-    return;
-  }
-
-  // Prevent access to step 4 if exam hasn't been published yet
-  if (newStep === 4 && !isExamPublished.value) {
-    nuxtApp.$toast.error("Please publish the exam from the Review step first");
-
-    // Revert to step 3 (Review)
-    test_step.value = 3;
-    return;
-  }
-
-  // Prevent access to step 4 directly from step 1 or 2
-  if (newStep === 4 && test_step.value < 3) {
-    nuxtApp.$toast.error("Please review your exam before publishing");
-
-    // Go to step 3 (Review) instead
-    test_step.value = 3;
-    return;
-  }
-
-  // If moving to Review step (3), make sure we load the test data
-  if (newStep === 3 && exam_id.value) {
-    test_step.value = newStep;
-    nuxtApp.$toast.info("Loading test data...");
-    handleRefreshPreviewList()
-      .then(() => {
-        if (previewTestList.value.length === 0 && tests.value.length > 0) {
-          nuxtApp.$toast.warning("Retrying test data load...");
-          setTimeout(() => {
-            handleRefreshPreviewList().then(() => {
-              if (previewTestList.value.length > 0) {
-                nuxtApp.$toast.success(
-                  `Loaded ${previewTestList.value.length} tests`
-                );
-              }
-            });
-          }, 1000);
-        } else if (previewTestList.value.length > 0) {
-          nuxtApp.$toast.success(
-            `Loaded ${previewTestList.value.length} tests`
-          );
-        }
-      })
-      .catch((err) => {
-        console.error("Error loading test data:", err);
-        nuxtApp.$toast.error("Error loading test data");
-      });
-    return;
-  }
-
-  // If all validations pass, update the step
-  test_step.value = newStep;
-
-  // Show step change notification
-  if (newStep !== test_step.value) {
-    const stepNames = {
-      1: "Header",
-      2: "Tests",
-      3: "Review",
-      4: "Publish",
-    };
-    nuxtApp.$toast.info(`Navigated to ${stepNames[newStep]} step`);
-  }
-};
-
-/**
- * Reset form fields to initial state
- */
-const resetForm = () => {
-  // Reset all form fields
-  form.section = "";
-  form.base = "";
-  form.lesson = "";
-  form.topics = [];
-  form.exam_type = "";
-  form.level = "2";
-  form.holding_time = false;
-  form.state = "";
-  form.area = "";
-  form.school = "";
-  form.duration = 3;
-  form.title = "";
-  form.negative_point = false;
-  form.file_original = "";
-  form.paperID = "";
-  form.edu_year = "";
-  form.edu_month = "";
-
-  // Reset data lists that are dependent on form fields
-  grade_list.value = [];
-  lesson_list.value = [];
-  topic_list.value = [];
-  form.topics = [];
-  selected_topics.value = [];
-
-  // Reset file inputs
-  file_original.value = null;
-  file_original_path.value = "";
-};
-
-/**
- * Reset all data (used after deletion)
- */
-const resetAllData = () => {
-  // Reset form
-  resetForm();
-
-  // Reset exam data
-  exam_id.value = "";
-  exam_code.value = "";
+  // Ensure exam published state is reset
   isExamPublished.value = false;
 
-  // Reset tests
-  tests.value = [];
-  previewTestList.value = [];
+  // Initialize data in the correct sequence
+  await getCurrentExamInfo();
 
-  // Reset state in user store
-  const userState = useState("user");
-  userState.value = {
-    ...userState.value,
-    currentExamId: "",
-    currentExamCode: "",
-  };
-};
+  // Load initial data - start with sections
+  await getTypeList("section");
 
-// Add a new function to help users understand how many tests are needed
-const goToNextStep = () => {
-  if (tests.value.length < 5) {
-    nuxtApp.$toast.warning(
-      `You need at least 5 tests to proceed. Currently have ${
-        tests.value.length
-      }. Add ${5 - tests.value.length} more.`
-    );
-    return;
-  }
-
-  test_step.value = 3;
-  nuxtApp.$toast.success("Moving to Review step");
-};
-
-/**
- * Check if exam is ready to be published
- */
-const checkPublishReadiness = () => {
-  if (tests.value.length < 5) {
-    nuxtApp.$toast.error(
-      `You need at least 5 tests to publish. Currently have ${tests.value.length}`
-    );
-    return false;
-  }
-  return true;
-};
-
-/**
- * Wrapper for publish function with validation
- */
-const handlePublish = () => {
-  if (checkPublishReadiness()) {
-    publishTest();
-  }
-};
-
-// Change from ref to computed
-const test_share_link = computed(() => {
-  if (process.server) {
-    // Return a consistent value during SSR to avoid hydration mismatch
-    return `https://gamatrain.com/exam/${exam_id.value || ""}`;
-  }
-  // Only use window.location on client side
-  return `${window.location.origin}/exam/${exam_id.value || ""}`;
-});
-
-// Add a watcher for the clear icon (X) clicks on filter.section (Board)
-watch(
-  () => filter.section,
-  (val, oldVal) => {
-    // If the value was cleared (X icon clicked)
-    if (oldVal && !val) {
-      // Clear dependent filters and their lists
-      filter.base = "";
-      filter.lesson = "";
-      filter.topic = "";
-      filter_grade_list.value = [];
-      filter_lesson_list.value = [];
-      topic_list.value = [];
-
-      // Reset pagination and test list
-      filter.page = 1;
-      test_list.value = [];
-      all_tests_loaded.value = true;
+  // Conditionally load data based on URL parameters or existing form values
+  if (form.section) {
+    await getTypeList("base", form.section);
+    if (form.base) {
+      await getTypeList("lesson", form.base);
+      if (form.lesson) {
+        await getTypeList("topic", form.lesson);
+      }
     }
   }
-);
 
-// Add a watcher for the clear icon (X) clicks on filter.base (Grade)
-watch(
-  () => filter.base,
-  (val, oldVal) => {
-    // If the value was cleared (X icon clicked)
-    if (oldVal && !val) {
-      // Clear dependent filters and their lists
-      filter.lesson = "";
-      filter.topic = "";
-      filter_lesson_list.value = [];
-      topic_list.value = [];
+  // Get additional type lists
+  await loadExamTypes(); // Use our specialized function for exam types
+  await getTypeList("state");
 
-      // Reset pagination and test list
-      filter.page = 1;
-      test_list.value = [];
-      all_tests_loaded.value = true;
-    }
-  }
-);
+  // Load tests if needed
+  await getExamTests();
 
-// Handle clear icon click for Board filter
-const handleClearSection = () => {
-  filter.section = "";
-  filter.base = "";
-  filter.lesson = "";
-  filter.topic = "";
-  filter_grade_list.value = [];
-  filter_lesson_list.value = [];
-  topic_list.value = [];
-
-  // Reset pagination and test list
-  filter.page = 1;
-  test_list.value = [];
-  all_tests_loaded.value = true;
-};
-
-// Handle clear icon click for Grade filter
-const handleClearBase = () => {
-  filter.base = "";
-  filter.lesson = "";
-  filter.topic = "";
-  filter_lesson_list.value = [];
-  topic_list.value = [];
-
-  // Reset pagination and test list
-  filter.page = 1;
-  test_list.value = [];
-  all_tests_loaded.value = true;
-};
-
-// Handle clear icon click for Subject filter
-const handleClearLesson = () => {
-  filter.lesson = "";
-  filter.topic = "";
-  topic_list.value = [];
-
-  // Reset pagination and test list
-  filter.page = 1;
-  test_list.value = [];
-  all_tests_loaded.value = true;
-};
-
-// Handle clear icon click for Topic filter
-const handleClearTopic = () => {
-  filter.topic = "";
-
-  // Reset pagination and test list
-  filter.page = 1;
-  test_list.value = [];
-  all_tests_loaded.value = false;
-
-  // Load tests with new filter
-  getExamTests();
-};
-
-/**
- * Specifically load exam types with better error handling
- */
-const loadExamTypes = async () => {
-  try {
-    // First try to get exam types from the API
-    const res = await useApiService.get("/api/v1/types/list", {
-      type: "exam_type",
-    });
-
-    if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-      test_type_list.value = res.data;
-    } else {
-      // If API returned no data, use fallback
-      test_type_list.value = defaultExamTypes;
-    }
-  } catch (err) {
-    // Use fallback in case of error
-    test_type_list.value = defaultExamTypes;
-  }
-};
-
-/**
- * Handle drag end event for reordering preview items
- * This is called when the user finishes dragging/reordering tests in the preview dialog
- */
-const previewDragEnd = async () => {
-  // Extract IDs from the reordered preview list
-  const new_list = [];
-  for (const index in previewTestList.value) {
-    new_list.push(previewTestList.value[index].id);
-  }
-
-  // Update the tests array with the new order
-  tests.value = new_list;
-
-  // Submit the reordered tests to the backend and refresh the preview list
-  await submitTest();
-};
-
-// Handle test refresh events from CreateTestForm component
-const handleTestRefresh = async () => {
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    tests.value = tests.value.map((id) => String(id));
+  // If we have an exam ID, get its tests
+  if (exam_id.value) {
     await handleRefreshPreviewList();
 
+    // Make sure the examTestListLength is properly initialized
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = tests.value.length;
     }
-
-    if (testListSwitch.value) {
-      filter.page = 1;
-      test_list.value = [];
-      all_tests_loaded.value = false;
-      await getExamTests();
-    }
-    nuxtApp.$toast.success(
-      `Tests updated: ${tests.value.length} tests in exam`
-    );
-  } catch (err) {
-    console.error("Error in handleTestRefresh:", err);
-    nuxtApp.$toast.error("Error refreshing test list");
   }
-};
-const typesetMathInSpecificContainer = async (containerRef) => {
-  if (process.client && containerRef.value && window.MathJax) {
-    let elementToProcess = null;
 
-    if (
-      containerRef.value.$el &&
-      containerRef.value.$el instanceof HTMLElement
-    ) {
-      elementToProcess = containerRef.value.$el;
-    } else if (containerRef.value instanceof HTMLElement) {
-      elementToProcess = containerRef.value;
-    }
-
-    if (!elementToProcess) {
-      return;
-    }
-    try {
-      await $ensureMathJaxReady();
-      await nextTick();
-      if (containerRef.value) {
-        let currentElementForProcessing = null;
-        if (
-          containerRef.value.$el &&
-          containerRef.value.$el instanceof HTMLElement
-        ) {
-          currentElementForProcessing = containerRef.value.$el;
-        } else if (containerRef.value instanceof HTMLElement) {
-          currentElementForProcessing = containerRef.value;
-        }
-
-        if (currentElementForProcessing) {
-          $renderMathInElement(currentElementForProcessing);
-        }
-      }
-    } catch (error) {
-      console.error("MathJax Error:", error);
-    }
+  // Check active tab from route and enable it
+  if (route.query?.active === "test_list") {
+    test_step.value = 2;
+    testListSwitch.value = true;
+  } else if (route.query?.active === "add_test") {
+    test_step.value = 2;
+    testListSwitch.value = false;
+  } else {
+    test_step.value = 1;
+    testListSwitch.value = false;
   }
-};
 
-// Watch for changes in tests array to update the button number
-watch(
-  () => tests.value,
-  (newTests, oldTests) => {
-    if (createForm.value && "examTestListLength" in createForm.value) {
-      createForm.value.examTestListLength = newTests.length;
-    }
-    if (
-      exam_id.value &&
-      (newTests.length !== oldTests?.length ||
-        JSON.stringify(newTests) !== JSON.stringify(oldTests))
-    ) {
-      setTimeout(() => {
-        handleRefreshPreviewList();
-      }, 300);
-    }
-  },
-  { deep: true }
-);
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+  }
+
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+  }
+});
+
+onUpdated(async () => {
+  if (test_step.value === 2 && testListSwitch.value) {
+    await typesetMathInSpecificContainer(mathJaxStep2ListContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
+  }
+
+  if (test_step.value === 3) {
+    await typesetMathInSpecificContainer(mathJaxStep3ReviewContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
+  }
+
+  if (printPreviewDialog.value) {
+    await typesetMathInSpecificContainer(mathJaxPrintDialogContainerRef);
+    await nextTick();
+    await forceUIUpdate();
+    await handleRefreshPreviewList();
+  }
+});
 </script>
+
+
 
 <style lang="scss">
 .create-test-container {
@@ -3170,5 +3318,8 @@ watch(
 }
 .v-btn {
   display: inline-grid !important;
+}
+.v-label {
+  font-size: 1.4rem !important;
 }
 </style>
