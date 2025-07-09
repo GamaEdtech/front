@@ -82,7 +82,7 @@
                 >
                   <div class="position-relative">
                     <v-img
-                      :src="item.fileUri"
+                      :src="item.fileUri?.replace(/^http:\/\//, 'https://')"
                       aspect-ratio="1"
                       class="position-relative rounded"
                       :class="mainImage === item ? 'primary--border' : ''"
