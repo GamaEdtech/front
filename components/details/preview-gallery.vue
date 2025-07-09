@@ -72,13 +72,14 @@
                 class="product-carousel"
                 cycle
                 :show-arrows-on="images.length > 1 ? 'hover' : 'never'"
+                height="100%"
               >
                 <v-carousel-item
                   v-for="(image, index) in images"
                   :key="index"
                   cover
                 >
-                  <img :src="image" class="carousel-img" />
+                  <v-img :src="image" class="carousel-img fill-height" />
                 </v-carousel-item>
               </v-carousel>
 
@@ -200,7 +201,7 @@ watch(
   () => props.initialSlide,
   (newVal) => {
     if (newVal !== undefined) {
-      carouselVal.value = newVal;
+      // carouselVal.value = newVal;
     }
   },
   { immediate: true }
@@ -212,19 +213,42 @@ watch(
   #product-carousel {
     width: 100%;
     max-width: 100%;
-    height: auto !important;
+    height: 30rem !important;
     margin: auto;
     border-radius: 1.2rem;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
+    .v-window {
+      height: 100%;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
+    .v-window__container {
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .v-carousel__item {
+      height: 100%;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
     .carousel-img {
+      height: 100%;
       width: 100%;
-      height: auto;
-      object-fit: cover;
-      display: block;
-      // max-height: 500px;
-      margin: 0 auto;
+      border-radius: inherit;
+    }
+
+    :deep(.v-window__container) {
+      border-radius: inherit;
+    }
+
+    :deep(.v-carousel__item) {
+      border-radius: inherit;
+      overflow: hidden;
     }
   }
 }
@@ -282,13 +306,7 @@ watch(
 
 @media screen and (max-width: 600px) {
   #details-gallery-portrate #product-carousel {
-    width: 100%;
-    max-width: 100%;
-    height: auto !important;
-
-    .carousel-img {
-      // max-height: 300px;
-    }
+    height: 30rem !important;
   }
 
   .thumbnail-box {
@@ -319,14 +337,7 @@ watch(
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
       height: 30rem !important;
-      min-height: 30rem !important;
-      max-height: 30rem !important;
-      .carousel-img {
-        // max-height: 350px;
-      }
     }
   }
 }
@@ -334,13 +345,7 @@ watch(
 @media (min-width: 960px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
-      height: auto !important;
-
-      .carousel-img {
-        // max-height: 400px;
-      }
+      height: 30rem !important;
     }
 
     .thumbnail-box {
@@ -353,13 +358,7 @@ watch(
 @media (min-width: 1264px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
-      height: auto !important;
-
-      .carousel-img {
-        // max-height: 450px;
-      }
+      height: 30rem !important;
     }
 
     .thumbnail-box {
