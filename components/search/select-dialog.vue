@@ -1,6 +1,12 @@
 <template>
-  <v-dialog v-model="dialogModel" max-width="400" :fullscreen="!mdAndUp">
+  <v-dialog
+    v-model="dialogModel"
+    max-width="400"
+    :fullscreen="!mdAndUp"
+    @click="clickOnOverlay"
+  >
     <div
+      @click="clickOnModal"
       class="w-100 d-flex flex-wrap flex-column bg-white pa-6 rounded-xl mobile-style"
     >
       <v-row>
@@ -141,6 +147,16 @@ const closeModal = () => {
 
 const changeSelectedItem = (item) => {
   emit("changeSelectedItem", item);
+};
+
+const clickOnOverlay = () => {
+  if (!mdAndUp.value) {
+    emit("update:showDialog", false);
+  }
+};
+
+const clickOnModal = (event) => {
+  event.stopPropagation();
 };
 </script>
 
