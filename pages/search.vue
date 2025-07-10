@@ -6,7 +6,7 @@
           class="mt-1 height-badge"
           offset-x="5"
           offset-y="-5"
-          :color="countFilterSelect == 0 ? `#ffffff` : `#F04438`"
+          :color="countFilterSelect == 0 ? `transparent` : `#F04438`"
           :content="countFilterSelect == 0 ? `` : countFilterSelect"
         >
           <v-btn
