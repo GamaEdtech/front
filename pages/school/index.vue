@@ -282,14 +282,16 @@ const debouncedGetSchoolList = () => {
 
 const { data: initialSchools, pending: loadingSchoolsServer } =
   await useAsyncData("schoolListSSR", () => {
+    console.log(1);
+    console.time("req");
     const params = {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      "PagingDto.SortFilter[0].sortType": "Desc",
-      "PagingDto.SortFilter[0].column": "defaultImageUri",
-      "PagingDto.SortFilter[1].sortType": "Desc",
-      "PagingDto.SortFilter[1].column": "score",
+      // "PagingDto.SortFilter[0].sortType": "Desc",
+      // "PagingDto.SortFilter[0].column": "defaultImageUri",
+      // "PagingDto.SortFilter[1].sortType": "Desc",
+      // "PagingDto.SortFilter[1].column": "score",
       Name: filterForm.value.keyword,
       section: filterForm.value.stage,
       tuition_fee: filterForm.value.tuition_fee,
@@ -307,11 +309,13 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
   });
 
 if (initialSchools.value) {
+  console.log("2");
   schools.value = initialSchools.value.data.list;
   totalSchoolFind.value = initialSchools.value.data.totalRecordsCount || 0;
   isInitialSchoolLoading.value = false;
   isPaginationSchoolLoading.value = false;
   isPaginationPreviousSchoolLoading.value = false;
+  console.timeEnd("req");
 }
 
 const getSchoolList = async () => {
@@ -321,10 +325,10 @@ const getSchoolList = async () => {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      "PagingDto.SortFilter[0].sortType": "Desc",
-      "PagingDto.SortFilter[0].column": "defaultImageUri",
-      "PagingDto.SortFilter[1].sortType": "Desc",
-      "PagingDto.SortFilter[1].column": "score",
+      // "PagingDto.SortFilter[0].sortType": "Desc",
+      // "PagingDto.SortFilter[0].column": "defaultImageUri",
+      // "PagingDto.SortFilter[1].sortType": "Desc",
+      // "PagingDto.SortFilter[1].column": "score",
     };
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
       params["Location.Radius"] = filterForm.value.distance;
