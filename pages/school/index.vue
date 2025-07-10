@@ -282,8 +282,6 @@ const debouncedGetSchoolList = () => {
 
 const { data: initialSchools, pending: loadingSchoolsServer } =
   await useAsyncData("schoolListSSR", () => {
-    console.log(1);
-    console.time("req");
     const params = {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
@@ -309,13 +307,11 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
   });
 
 if (initialSchools.value) {
-  console.log("2");
   schools.value = initialSchools.value.data.list;
   totalSchoolFind.value = initialSchools.value.data.totalRecordsCount || 0;
   isInitialSchoolLoading.value = false;
   isPaginationSchoolLoading.value = false;
   isPaginationPreviousSchoolLoading.value = false;
-  console.timeEnd("req");
 }
 
 const getSchoolList = async () => {
