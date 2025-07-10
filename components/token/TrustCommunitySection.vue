@@ -2,7 +2,15 @@
   <section class="trust-community-section">
     <v-container class="trust-community-container">
       <h2 class="trust-community-title">Built On Trust, Driven By Community</h2>
-      <p class="trust-community-subtitle text-h4">
+      <v-img
+        src="/images/token/Mission/community.svg"
+        alt="Community trust and collaboration illustration"
+        class="trust-community-illustration"
+        contain
+        width="245"
+        height="245"
+      />
+      <p class="trust-community-subtitle text-h5">
         At Gamatrain, our mission is to empower the community through a
         foundation of:
       </p>
@@ -20,25 +28,21 @@
               :key="item.text"
             >
               <span class="trust-community-icon">
-                <img
+                <v-img
                   :src="item.img"
                   :alt="item.text + ' icon'"
                   class="trust-community-img-icon"
+                  contain
+                  width="21"
+                  height="18"
                 />
               </span>
               <span class="trust-community-list-text">{{ item.text }}</span>
             </li>
           </ul>
         </v-col>
-        <v-col cols="12" md="4" class="trust-community-illustration-col">
-          <img
-            src="/images/token/Mission/community.svg"
-            alt="Community trust and collaboration illustration"
-            class="trust-community-illustration"
-          />
-        </v-col>
       </v-row>
-      <p class="trust-community-description text-h4">
+      <p class="trust-community-description text-h5">
         Every decision, reward, and improvement is made with our contributors in
         mind – because GamaTrain is built with you, not just for you.
       </p>
@@ -49,16 +53,16 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/Mission/lock.svg",
+    img: "/images/token/Mission/trust.svg",
     text: "Trust",
   },
   {
-    img: "/images/token/Mission/us.svg",
-    text: "Shared Accountability",
+    img: "/images/token/Mission/transparency.svg",
+    text: "Transparency",
   },
   {
-    img: "/images/token/Mission/search2.svg",
-    text: "Transparency",
+    img: "/images/token/Mission/shared.svg",
+    text: "Shared Accountability",
   },
 ]);
 </script>
@@ -66,10 +70,7 @@ const items = ref([
 <style scoped>
 .trust-community-section {
   background: #fff;
-  padding: 56px 4rem 40px 4rem;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 56px 0 40px 0;
 }
 .trust-community-container {
 }
@@ -82,8 +83,11 @@ const items = ref([
 }
 .trust-community-subtitle {
   text-align: center;
-  color: #6c757d;
+  color: #24292f;
   margin-bottom: 32px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .trust-community-content {
   margin-bottom: 32px;
@@ -96,49 +100,34 @@ const items = ref([
   display: flex;
   flex-direction: column;
   gap: 16px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 .trust-community-list-item {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 11px;
 }
 .trust-community-icon {
-  background: #333333 !important;
-  border: 1px solid #2a2a2a;
+  background: #262729;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 20px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #23272f;
+  flex-shrink: 0;
 }
 .trust-community-img-icon {
-  width: 24px;
-  height: 24px;
+  width: 21px;
+  height: 18px;
   object-fit: contain;
-  filter: none;
-  opacity: 1;
-}
-.trust-community-list-item:hover .trust-community-icon {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: #2a2a2a !important;
-  border-color: #222222;
-}
-.trust-community-list-item:hover .trust-community-img-icon {
-  opacity: 1;
 }
 .trust-community-list-text {
-  color: #2d3748;
-  font-size: 20px;
-  font-weight: 600;
+  color: #4a5568;
+  font-size: 16px;
+  font-weight: 700;
   font-family: "Inter", "Roboto", "Arial", sans-serif;
+  margin-left: 4px;
 }
 .trust-community-illustration-col {
   display: flex;
@@ -153,89 +142,167 @@ const items = ref([
 .trust-community-description {
   margin-top: 40px;
   text-align: center;
-  color: #6c757d;
+  color: #4a5568;
   margin-left: auto;
   margin-right: auto;
+  max-width: 600px;
 }
-@media (min-width: 600px) {
+/* ===== MOBILE STYLES (max-width: 599px) ===== */
+@media (max-width: 599px) {
+  .trust-community-section {
+    padding: 40px 0 32px 0;
+  }
   .trust-community-title {
-    text-align: center;
-    color: #354053;
-    font-weight: 800;
-    margin-bottom: 32px;
-    font-size: 30px;
+    font-size: 24px;
+    margin-bottom: 24px;
   }
-  .trust-community-illustration {
-    width: 245px;
-    height: 245px;
-  }
-}
-@media (max-width: 960px) {
-  .trust-community-list-col,
-  .trust-community-illustration-col {
-    justify-content: center !important;
-    text-align: center;
-  }
-  .trust-community-list {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .trust-community-illustration {
-    margin-top: 32px;
-    margin-bottom: 16px;
-    width: 180px;
-    height: 180px;
-  }
-}
-@media (max-width: 600px) {
-  .trust-community-title {
-    font-size: 18px;
-  }
-  .trust-community-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 16px;
-  }
-  .trust-community-img-icon {
-    width: 20px;
-    height: 20px;
+  .trust-community-subtitle {
+    font-size: 16px !important;
+    margin-bottom: 24px;
+    padding: 0 16px;
   }
   .trust-community-list-text {
-    font-size: 16px;
-  }
-  .trust-community-description,
-  .trust-community-subtitle {
     font-size: 14px;
   }
-  .trust-community-section {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+  .trust-community-description {
+    font-size: 16px !important;
+    padding: 0 16px;
+    margin-top: 32px;
+  }
+  .trust-community-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .trust-community-img-icon {
+    width: 18px;
+    height: 15px;
+  }
+  .trust-community-mobile-illustration {
+    display: block !important;
+    margin: 0 auto 24px;
   }
   .trust-community-illustration {
-    width: 160px;
-    height: 160px;
-  }
-  .trust-community-list-item .trust-community-icon {
-    background: #333333 !important;
+    display: none !important;
   }
 }
-.profit-buyback-section {
-  max-width: 900px;
-  margin: 2rem auto 0 auto;
-  font-size: 1.15rem;
-  color: #555;
-  text-align: center;
-  line-height: 1.6;
-  padding-left: 1rem;
-  padding-right: 1rem;
+
+/* ===== TABLET STYLES (min-width: 600px) and (max-width: 1199px) ===== */
+@media (min-width: 600px) and (max-width: 1199px) {
+  .trust-community-title {
+    font-size: 4rem !important;
+    font-weight: 750;
+    margin-bottom: 2rem;
+  }
+  .trust-community-illustration {
+    display: block !important;
+    margin: 0 auto 2.5rem auto !important;
+    width: 300px;
+    height: 300px;
+  }
+  .trust-community-subtitle {
+    font-size: 2.3rem !important;
+    margin-bottom: 4rem;
+  }
+  .trust-community-list {
+    margin-bottom: 2.5rem;
+  }
+  .trust-community-list-text {
+    font-size: 2rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .trust-community-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .trust-community-img-icon {
+    width: 28px;
+    height: 24px;
+  }
+  .trust-community-description {
+    font-size: 2.3rem !important;
+    margin-bottom: 4rem;
+    margin-top: 2.5rem;
+  }
+  .trust-community-content {
+    flex-direction: column !important;
+  }
 }
-@media (max-width: 600px) {
-  .profit-buyback-section {
-    font-size: 1rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+
+/* ===== DESKTOP STYLES (min-width: 1200px) ===== */
+@media (min-width: 1200px) {
+  .trust-community-section {
+    padding: 80px 0 60px 0;
+  }
+  .trust-community-container {
+    max-width: 1400px;
+  }
+  .trust-community-title {
+    font-size: 4rem;
+    margin-bottom: 48px;
+  }
+  .trust-community-subtitle {
+    font-size: 24px !important;
+    margin-bottom: 48px;
+    max-width: 800px;
+  }
+  .trust-community-content {
+    margin-bottom: 48px;
+  }
+  .trust-community-list {
+    gap: 32px;
+  }
+  .trust-community-icon {
+    width: 80px;
+    height: 80px;
+  }
+  .trust-community-img-icon {
+    width: 42px !important;
+    height: 36px !important;
+  }
+  .trust-community-list-text {
+    font-size: 24px;
+  }
+  .trust-community-illustration {
+    display: block !important;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+  }
+  .trust-community-mobile-illustration {
+    display: none !important;
+  }
+  .trust-community-description {
+    font-size: 24px !important;
+    margin-top: 60px;
+    max-width: 800px;
+  }
+}
+
+/* ===== ULTRA-WIDE DESKTOP STYLES (min-width: 1600px) ===== */
+@media (min-width: 1600px) {
+  .trust-community-container {
+    max-width: 1600px;
+  }
+  .trust-community-title {
+    font-size: 4rem;
+  }
+  .trust-community-subtitle,
+  .trust-community-description {
+    max-width: 1000px;
+    font-size: 28px !important;
+  }
+  .trust-community-illustration {
+    width: 500px;
+    height: 500px;
+  }
+  .trust-community-icon {
+    width: 86px;
+    height: 86px;
+  }
+  .trust-community-img-icon {
+    width: 40px !important;
+    height: 34px !important;
   }
 }
 </style>

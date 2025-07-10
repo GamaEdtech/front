@@ -7,35 +7,33 @@
         </v-col>
       </v-row>
       <v-row justify="center">
-        <v-col cols="12" class="d-flex justify-center px-0">
-          <div class="video-card px-4 px-sm-15 px-lg-0">
-            <iframe
-              class="rounded youtube-container"
-              src="https://www.youtube.com/embed/qJcZwPcXyXU?si=Y4PcVrImzRAanotw"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            />
+        <v-col cols="12" md="10" lg="9" class="profit-buyback-content">
+          <div class="video-and-text-wrapper">
+            <div class="video-card">
+              <iframe
+                class="rounded youtube-container"
+                src="https://www.youtube.com/embed/qJcZwPcXyXU?si=Y4PcVrImzRAanotw"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              />
+            </div>
+            <div class="profit-buyback-text">
+              <p>
+                After covering platform costs (servers, development, maintenance,
+                content team, and taxes), all remaining profits go toward buying
+                back $GET tokens.
+              </p>
+              <p>
+                These bought-back tokens are redistributed to governance members
+                based on their activity, contributions, and commitment to the
+                ecosystem.
+              </p>
+            </div>
           </div>
         </v-col>
-      </v-row>
-      <v-row>
-        <div class="profit-buyback-text px-7 px-sm-15 px-lg-0">
-          <div class="profit-buyback-section">
-            <p>
-              After covering platform costs (servers, development, maintenance,
-              content team, and taxes), all remaining profits go toward buying
-              back $GET tokens.
-            </p>
-            <p class="pt-4">
-              These bought-back tokens are redistributed to governance members
-              based on their activity, contributions, and commitment to the
-              ecosystem.
-            </p>
-          </div>
-        </div>
       </v-row>
     </v-container>
   </section>
@@ -44,100 +42,113 @@
 <script setup></script>
 
 <style scoped>
-  .profit-buyback-section {
-  max-width: 1800px;         
-  margin: 2rem auto 0 auto; 
-  font-size: 1.15rem;       
-  color: #000000;              
-  text-align: center;       
-  line-height: 1.6;
-  padding-left: 1rem;
-  padding-right: 1rem;
+.profit-buyback-section {
+  max-width: 1800px;
+  margin: 2rem auto 0 auto;
+  padding: 4rem 1rem;
+  color: #24292f;
 }
+
 .profit-buyback-container {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
+
 .profit-buyback-title {
-  text-align: center;
-  color: #354053;
-  margin-bottom: 7px;
+  color: #24292f;
   font-size: 24px;
   font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
 }
+
+.profit-buyback-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-and-text-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .video-card {
   position: relative;
   width: 100%;
-  height: auto;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  max-height: 550px;
+  aspect-ratio: 16 / 9;
   border-radius: 8px;
   overflow: hidden;
+  margin-bottom: 2.5rem;
+  background: #000;
 }
+
 .youtube-container {
   width: 100%;
   height: 100%;
+  min-height: 240px;
+  border: none;
+  display: block;
 }
 
-.youtube-btn {
-  display: inline-block;
-  background: #222;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 6px;
-  padding: 6px 18px;
-  text-decoration: none;
-  margin-top: 2px;
-  pointer-events: auto;
-  transition: background 0.2s;
-}
 .profit-buyback-text {
-  max-width: 1000px;         
-  margin: 2.5rem auto 2.5rem auto; 
-  font-size: 1.35rem;       
-  font-weight: 500;         
-  color: #000000;
-  text-align: center;
-  line-height: 1.8;          
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: 400;
+  color: #24292f;
+  text-align: left;
+  line-height: 1.6;
 }
+
+.profit-buyback-text p {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 18px;
+  font-weight: 400;
+  color: #24292f;
+  line-height: 1.6;
+}
+
+.profit-buyback-text p:last-child {
+  margin-bottom: 0;
+}
+
 @media (min-width: 600px) {
   .profit-buyback-title {
-    font-size: 30px;
-    margin-bottom: 22px;
-  }
-  .video-card {
-    height: 340px;
-  }
-  .profit-buyback-text {
-    color: #000000;
-    font-size: 24px;
-    font-weight: 400;
-    margin-top: 12px;
-  }
-}
-@media (min-width: 960px) {
-  .video-card {
-    min-height: 400px;
-    height: 540px;
+    font-size: 32px;
+    margin-bottom: 2.5rem;
   }
 }
 
 @media (max-width: 600px) {
   .profit-buyback-section {
-    font-size: 1rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding: 2rem 0.5rem;
   }
-  .profit-buyback-text {
-    font-size: 1.1rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    margin: 1.5rem 0;
+
+  .video-card {
+    min-height: 180px;
+    margin-bottom: 1.2rem;
+  }
+
+  .profit-buyback-text,
+  .profit-buyback-text p {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+}
+@media (min-width: 1200px) {
+  .profit-buyback-title {
+    font-size: 4rem;
+  }
+  .profit-buyback-text,
+  .profit-buyback-text p {
+    font-size: 2rem;
   }
 }
 </style>

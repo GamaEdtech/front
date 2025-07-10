@@ -1,43 +1,85 @@
 <template>
-  <section class="tokenomics-section-dark">
-    <div class="tokenomics-container-dark">
-      <h2 class="tokenomics-title-dark">Tokenomics</h2>
-      <h4 class="tokenomics-subtitle-dark">
-        Transparent allocation for sustainable growth
+  <section class="tokenomics-section">
+    <div class="tokenomics-container">
+      <h2 class="tokenomics-title">Tokenomics</h2>
+      <h4 class="tokenomics-subtitle">
+        See exactly how $GET tokens are allocated
       </h4>
-      <div class="tokenomics-main-dark">
-        <div class="tokenomics-chart-card-dark">
+      
+      <!-- Desktop View -->
+      <div class="tokenomics-main">
+        <div class="tokenomics-chart-card">
           <img
-            src="/images/token/Tokenomics/TokenomicsPieChart.png"
+            src="/images/token/Tokenomics/Tokenomics_Pie_Green.png"
             alt="Tokenomics Section"
-            class="tokenomics-svg-dark"
+            class="tokenomics-svg"
           />
         </div>
-        <div class="tokenomics-breakdowns-dark">
+        <div class="tokenomics-breakdowns">
           <div
             v-for="item in breakdowns"
             :key="item.key"
-            class="tokenomics-breakdown-card-dark"
+            class="tokenomics-breakdown-card"
             @click="openBreakdown(item)"
             style="cursor: pointer"
           >
-            <div :class="['tokenomics-dot-dark', item.dotClass]"></div>
             <img
               :src="item.icon"
               :alt="item.title"
-              class="tokenomics-icon-dark"
+              class="tokenomics-icon"
             />
-            <div class="tokenomics-info-dark">
-              <div class="tokenomics-title-dark">{{ item.title }}</div>
-              <div class="tokenomics-amount-dark">{{ item.amount }}</div>
-              <div class="tokenomics-detail-dark">{{ item.detail }}</div>
-            </div>
-            <div :class="['tokenomics-percent-dark', item.percentClass]">
-              {{ item.percent }}
+            <div class="tokenomics-info">
+              <div class="tokenomics-detail-row">
+                <div class="tokenomics-percent" :style="{ color: item.color }">{{ item.percent }}</div>
+                <div class="tokenomics-title-detail">
+                  <div class="tokenomics-title" :style="{ color: item.color }">{{ item.title }}</div>
+                  <div class="tokenomics-detail">{{ item.detail }}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- iPad Mini View -->
+      <div class="tokenomics-ipad-mini">
+        <img
+          src="/images/token/Tokenomics/TokenomicsSec.png"
+          alt="Tokenomics for iPad Mini"
+          class="tokenomics-ipad-svg"
+        />
+      </div>
+
+      <!-- Mobile View -->
+      <div class="mobile-view">
+        <img
+          src="/images/token/Tokenomics/Tokenomics_Pie_Green.png"
+          alt="Tokenomics Mobile"
+          class="tokenomics-mobile-svg"
+        />
+        <div class="mobile-breakdowns">
+          <div
+            v-for="item in breakdowns"
+            :key="item.key"
+            class="mobile-breakdown-card"
+            @click="openBreakdown(item)"
+          >
+            <img
+              :src="item.icon"
+              :alt="item.title"
+              class="mobile-icon"
+            />
+            <div class="mobile-info">
+              <div class="mobile-title-row">
+                <div class="mobile-title" :style="{ color: item.color }">{{ item.title }}</div>
+                <div class="mobile-percent" :style="{ color: item.color }">{{ item.percent }}</div>
+              </div>
+              <div class="mobile-detail">{{ item.detail }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal popup for breakdown details -->
       <v-dialog
         v-model="dialog"
@@ -45,7 +87,7 @@
         persistent
         class="tokenomics-modal-dialog"
       >
-        <v-card class="tokenomics-modal-card-dark">
+        <v-card class="tokenomics-modal-card">
           <v-card-title class="headline modal-title">{{
             selectedBreakdown?.title
           }}</v-card-title>
@@ -79,299 +121,140 @@ function openBreakdown(item) {
 const breakdowns = [
   {
     key: "governance",
-    dotClass: "governance-dot-dark",
     icon: "/images/token/Tokenomics/Governance.svg",
     title: "Governance",
-    detail: "70B $GET - Locked for 10 years.",
+    detail: "7B $GET - Locked for 10 years.",
     popupText:
       'These tokens are reserved for community governance. "Locked" means that these tokens are not available for a certain amount of time. After unlocking, these tokens will help guide decisions like new features, tokenomics, and more.',
     percent: "70%",
-    percentClass: "governance-percent-dark",
+    color: "#188896"
   },
   {
     key: "team",
-    dotClass: "team-dot-dark",
     icon: "/images/token/Tokenomics/Team.svg",
     title: "Team",
-    detail: "20B $GET - Development fund",
+    detail: "2B $GET - Development fund",
     popupText:
       "These tokens are reserved for core contributors. This includes the team, developers, and anyone else contributing to the development and maintenance of the GamaTrain platform.",
     percent: "20%",
-    percentClass: "team-percent-dark",
+    color: "#df2121"
   },
   {
     key: "liquidity",
-    dotClass: "liquidity-dot-dark",
     icon: "/images/token/Tokenomics/Liquidity.svg",
     title: "Liquidity",
-    detail: "10B $GET - Market liquidity",
+    detail: "1B $GET - Market liquidity",
     popupText:
       "These tokens are used to make it easier to buy and sell $GET on exchanges. They help provide price stability of the token and avoid big price swings.",
     percent: "10%",
-    percentClass: "liquidity-percent-dark",
+    color: "#95c9d7"
   },
 ];
 </script>
 
 <style scoped>
-.tokenomics-section-dark {
-  background: #252626;
-  padding: 6rem 0;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-}
-.tokenomics-container-dark {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px;
-}
-.tokenomics-title-dark {
-  text-align: center;
-  color: #fff;
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 32px;
-}
-.tokenomics-subtitle-dark {
-  text-align: center;
-  color: #9c9898;
-  font-size: 24px;
-  font-weight: 400;
-  margin-bottom: 42px;
-}
-.tokenomics-main-dark {
-  display: flex;
-  gap: 3rem;
-  align-items: flex-start;
-  justify-content: center;
-}
-.tokenomics-chart-card-dark {
-  flex: 0 0 500px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.tokenomics-svg-dark {
-  width: 620px;
-  border-radius: 12px;
-  max-width: 100%;
+/* === MOBILE (default) === */
+.tokenomics-section { background: #24292f0d; padding: 2rem 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; }
+.tokenomics-container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+.tokenomics-title { text-align: center; color: #121111; font-size: 24px; font-weight: 700; margin-bottom: 1rem; }
+.tokenomics-subtitle { text-align: center; color: #797676; font-size: 16px; font-weight: 400; }
+.tokenomics-main { display: none; }
+.tokenomics-ipad-mini { display: none; }
+.mobile-view { display: block; width: 100%; padding: 0 1rem; }
+.tokenomics-mobile-svg {
+  width: 100%;
   height: auto;
+  max-width: 320px;
   display: block;
-  margin: 0 auto;
-}
-.tokenomics-breakdowns-dark {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-width: 400px;
-}
-.tokenomics-breakdown-card-dark {
-  display: flex;
-  align-items: center;
-  background: #363637;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  padding: 3.8rem 4rem;
-  min-height: 120px;
-  position: relative;
-  transition:
-    box-shadow 0.2s,
-    background 0.2s;
-}
-.tokenomics-breakdown-card-dark:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
-  background: #444446;
-}
-.tokenomics-dot-dark {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  margin-right: 1.5rem;
-  flex-shrink: 0;
-}
-.governance-dot-dark {
-  background: #188896;
-}
-.team-dot-dark {
-  background: #df2121;
-}
-.liquidity-dot-dark {
-  background: #95c9d7;
-}
-.tokenomics-icon-dark {
-  width: 54px;
-  height: 54px;
-  margin-right: 1.5rem;
-  flex-shrink: 0;
-}
-.tokenomics-info-dark {
-  flex: 1;
-}
-.tokenomics-info-dark .tokenomics-title-dark {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-align: left;
-  color: #fff;
-}
-.tokenomics-amount-dark {
-  font-size: 1.25rem;
-  color: #b0bec5;
-  margin-bottom: 0.25rem;
-}
-.tokenomics-detail-dark {
-  font-size: 1.1rem;
-  color: #b0bec5;
-}
-.tokenomics-percent-dark {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-left: 1.5rem;
-  align-self: center;
-}
-.governance-percent-dark {
-  color: #188896;
-}
-.team-percent-dark {
-  color: #df2121;
-}
-.liquidity-percent-dark {
-  color: #95c9d7;
-}
-.tokenomics-modal-card-dark {
-  background: #dfe0e3;
-  color: #171616;
-  padding: 2.5rem 2rem;
-  border-radius: 24px;
+  margin: 0 auto 2rem auto;
+  justify-content: center;
 }
 
-.modal-title {
-  font-size: 2.5rem;
-  color: #0a0a0a;
-  font-weight: 800;
-  margin-bottom: 1rem;
+@media (max-width: 480px) {
+  .tokenomics-mobile-svg {
+    max-width: 340px;
+    margin: 0 auto 2.5rem auto;
+  }
+}
+.mobile-breakdowns { display: flex; flex-direction: column; gap: 1.5rem; }
+.mobile-breakdown-card { display: flex; align-items: center; background: #f5f5f6; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18); padding: 1.5rem; min-height: 90px; position: relative; transition: box-shadow 0.2s, background 0.2s; }
+.mobile-breakdown-card:hover { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28); background: #444446; }
+.mobile-icon { width: 32px; height: 32px; margin-right: 1rem; flex-shrink: 0; }
+.mobile-info { flex: 1; }
+.mobile-title-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.mobile-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+.mobile-percent { font-size: 2rem; font-weight: 800; margin-left: 1rem; }
+.mobile-detail { font-size: 1.1rem; color: #414242; }
+.tokenomics-modal-card { background: #dfe0e3; color: #171616; padding: 2.5rem 2rem; border-radius: 24px; }
+.modal-title { font-size: 2.5rem; color: #0a0a0a; font-weight: 800; margin-bottom: 1rem; }
+.modal-percent { font-size: 2.8rem; font-weight: 700; color: #0f871f; margin-bottom: 1rem; }
+.modal-amount { font-size: 1.5rem; color: #b0bec5; margin-bottom: 1rem; }
+.modal-popup-text { font-size: 2.25rem; color: #322e2e; line-height: 1.7; }
+.modal-close-btn { color: #2121df !important; font-weight: 700; font-size: 1.6rem; text-transform: none; letter-spacing: 0; }
+:deep(.tokenomics-modal-dialog .v-overlay__content) { align-items: flex-start !important; margin-top: 50px; }
+
+/* === TABLET (min-width: 481px and max-width: 1199px) === */
+@media (min-width: 481px) and (max-width: 1199px) {
+  .tokenomics-section { padding: 4rem 0; background: #f2f2f5; }
+  .tokenomics-title { font-size: 36px; margin-bottom: 1.5rem; color: #070808; }
+  .tokenomics-subtitle { font-size: 20px; margin-bottom: 0.5rem; color: #58595a; }
+  .mobile-view { display: none; }
+  .tokenomics-main { display: none; }
+  .tokenomics-ipad-mini { display: block; width: 100%; padding: 0 1rem; }
+  .tokenomics-ipad-svg { width: 100%; height: auto; max-width: 100%; }
+  .tokenomics-container { padding: 0; }
 }
 
-.modal-percent {
-  font-size: 2.8rem;
-  font-weight: 700;
-  color: #0f871f;
-  margin-bottom: 1rem;
-}
-
-.modal-amount {
-  font-size: 1.5rem;
-  color: #b0bec5;
-  margin-bottom: 1rem;
-}
-
-.modal-popup-text {
-  font-size: 2.25rem;
-  color: #322e2e;
-  line-height: 1.7;
-}
-
-.tokenomics-modal-dialog .v-overlay__content {
-  align-items: flex-start !important;
-  margin-top: 0px;
-}
-
-.modal-close-btn {
-  color: #2121df !important;
-  font-weight: 700;
-  font-size: 1.6rem;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-:deep(.tokenomics-modal-dialog .v-overlay__content) {
-  align-items: flex-start !important;
-  margin-top: 50px;
-}
-
-@media (max-width: 960px) {
-  .tokenomics-main-dark {
+/* === DESKTOP (min-width: 1200px) === */
+@media (min-width: 1200px) {
+  .tokenomics-section { padding: 6rem 0; background: #edebeb; }
+  .tokenomics-title { font-size: 4rem; color: #161515; margin-bottom: 3rem; }
+  .tokenomics-subtitle { font-size: 24px; color: #3e3d3d; margin-bottom: 4rem; }
+  .mobile-view { display: none; }
+  .tokenomics-ipad-mini { display: none; }
+  .tokenomics-main { display: flex; gap: 3rem; align-items: flex-start; justify-content: center; }
+  .tokenomics-chart-card { flex: 0 0 600px; border-radius: 25px; display: flex; align-items: center; justify-content: center; background: rgba(40, 39, 39, 0.8); }
+  .tokenomics-svg { width: 750px; border-radius: 25px; max-width: 100%; height: auto; display: block; margin: 0 auto; padding: 3rem; }
+  .tokenomics-breakdowns { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; min-width: 400px; }
+  .tokenomics-breakdown-card { display: flex; align-items: center; background: rgba(40, 39, 39, 0.8); border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18); padding: 3.8rem 4rem; min-height: 120px; position: relative; transition: box-shadow 0.2s, background 0.2s; backdrop-filter: blur(10px); cursor: pointer; }
+  .tokenomics-breakdown-card:hover { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28); background: rgba(68, 68, 70, 0.9); }
+  .tokenomics-icon { width: 54px; height: 54px; margin-right: 1.5rem; flex-shrink: 0; }
+  .tokenomics-info { flex: 1; }
+  .tokenomics-info .tokenomics-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; text-align: left; color: #fff; }
+  .tokenomics-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 0.25rem;
+  }
+  .tokenomics-percent {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    min-width: 70px;
+    text-align: left;
+  }
+  .tokenomics-title-detail {
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
-  .tokenomics-chart-card-dark {
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    flex: 0 0 auto;
+  .tokenomics-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 3.25rem;
+    text-align: center;
+    color: #100f0f;
   }
-  .tokenomics-breakdowns-dark {
-    width: 100%;
-  }
-}
-@media (max-width: 600px) {
-  .tokenomics-section-dark {
-    padding: 2rem 0.5rem;
-  }
-  .tokenomics-title-dark {
-    font-size: 1.5rem;
+  .tokenomics-detail {
+    font-size: 2rem;
+    color: #b0bec5;
     margin-bottom: 1rem;
+    text-align: left;
   }
-  .tokenomics-subtitle-dark {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .tokenomics-main-dark {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .tokenomics-chart-card-dark {
-    margin-bottom: 1.5rem;
-    flex: 0 0 auto;
-  }
-  .tokenomics-svg-dark {
-    width: 180px;
-    max-width: 90vw;
-    margin: 0 auto;
-    display: block;
-  }
-  .tokenomics-breakdowns-dark {
-    min-width: unset;
-    width: 100%;
-    gap: 1rem;
-  }
-  .tokenomics-breakdown-card-dark {
-    padding: 0.75rem 0.5rem;
-    min-height: unset;
-    font-size: 0.95rem;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    border: 1px solid #333;
-  }
-  .tokenomics-dot-dark {
-    margin-right: 0.5rem;
-  }
-  .tokenomics-icon-dark {
-    margin-right: 0.5rem;
-  }
-  .tokenomics-info-dark {
-    flex: 1;
-  }
-  .tokenomics-info-dark .tokenomics-title-dark {
-    font-size: 1rem;
-    margin-bottom: 0.2rem;
-  }
-  .tokenomics-amount-dark,
-  .tokenomics-detail-dark {
-    font-size: 0.85rem;
-  }
-  .tokenomics-percent-dark {
-    font-size: 1.2rem;
-    margin-left: 0.5rem;
-  }
+  .governance-percent { color: #188896; }
+  .team-percent { color: #df2121; }
+  .liquidity-percent { color: #95c9d7; }
 }
 </style>
