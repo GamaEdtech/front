@@ -18,7 +18,7 @@
             class="token-purchase__btn"
           >
             <img
-              src="/images/token/cTA/jupiter.png"
+              src="/images/token/CTA/jupiter.png"
               alt="Jupiter exchange logo"
               class="jupiter-logo"
             />
