@@ -38,7 +38,6 @@
           hide-details
           single-line
           class="search-input mr-4"
-          height="20px"
           style="max-width: 300px; width: 300px"
         ></v-text-field>
         <span class="item-count grey--text">{{ totalRecords }} Item</span>
@@ -298,17 +297,20 @@ onMounted(() => {
   border-radius: 100px;
   padding: 4px;
   gap: 4px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .toggle-btn {
   height: 40px !important;
-  min-width: 100px;
+  flex: 1;
   border-radius: 100px !important;
   text-transform: none;
   font-weight: 500;
   font-size: 14px;
   color: #667085 !important;
   background: transparent !important;
+  padding: 0 !important;
 }
 
 .active-tab {
@@ -319,6 +321,64 @@ onMounted(() => {
 .new-blog-btn {
   text-transform: none;
   font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .d-flex.align-center.justify-space-between.mb-4 {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 16px;
+  }
+
+  .d-flex.align-center {
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .toggle-container {
+    width: 100%;
+    max-width: none;
+  }
+
+  .new-blog-btn {
+    width: 100%;
+    margin-right: 0 !important;
+  }
+
+  .search-input {
+    width: 100% !important;
+    max-width: none !important;
+    margin-right: 0 !important;
+  }
+
+  .item-count {
+    align-self: flex-end;
+  }
+
+  .d-flex.justify-space-between.align-center.mt-4 {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bulk-action-select {
+    max-width: none;
+    width: 100%;
+  }
+
+  .do-btn {
+    width: 100%;
+  }
+
+  .row-select {
+    max-width: none;
+    width: 100%;
+  }
+
+  .custom-pagination {
+    order: -1;
+    margin-bottom: 16px;
+  }
 }
 
 .blog-table {
