@@ -113,7 +113,7 @@ const items = ref([
     ],
   },
   { title: "Messages", icon: "mdi-email-outline", link: "/user/ticket" },
-  { title: "Blogs", icon: "mdi-email-outline", link: "/user/blogs" },
+  { title: "Blogs", icon: "mdi-newspaper", link: "/user/blogs" },
   {
     title: "Profile",
     icon: "mdi-account-outline",

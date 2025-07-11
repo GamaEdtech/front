@@ -293,29 +293,35 @@ onMounted(() => {
 <style scoped>
 .toggle-container {
   display: flex;
-  background: #f9fafb;
-  border-radius: 100px;
+  background: #f2f4f7;
+  border-radius: 32px;
   padding: 4px;
-  gap: 4px;
   width: 100%;
   max-width: 400px;
+  height: 44px;
 }
 
 .toggle-btn {
-  height: 40px !important;
+  height: 38px !important;
   flex: 1;
-  border-radius: 100px !important;
+  border-radius: 32px !important;
   text-transform: none;
   font-weight: 500;
   font-size: 14px;
+  line-height: 20px;
   color: #667085 !important;
   background: transparent !important;
-  padding: 0 !important;
+  letter-spacing: 0;
+  min-width: 0 !important;
+  margin: 0 !important;
 }
 
 .active-tab {
-  background: #ffc107 !important;
-  color: #000000 !important;
+  background: #ffb600 !important;
+  color: #1d2939 !important;
+  font-weight: 600;
+  box-shadow: 0px 1px 3px rgba(16, 24, 40, 0.1),
+    0px 1px 2px rgba(16, 24, 40, 0.06);
 }
 
 .new-blog-btn {
