@@ -977,18 +977,24 @@ const requestURL = ref(useRequestURL().host);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
-const { data: contentData, error } = await useAsyncData(async () => {
-  try {
-    const content = await $fetch(`/api/v1/questions/${route.params.id}`);
-    // Check if data exists
-    return content.status === 1 ? content.data : {};
-  } catch (e) {
-    if (e?.status === 404) {
-      // router.push("/search?type=question");
+const { data: contentData, error, refresh: refreshContent } = await useAsyncData(
+  () => `question-${route.params.id}`,
+  async () => {
+    try {
+      const content = await $fetch(`/api/v1/questions/${route.params.id}`);
+      return content.status === 1 ? content.data : {};
+    } catch (e) {
+      if (e?.status === 404) {
+        // router.push("/search?type=question");
+      }
+      throw e;
     }
-    throw e;
+  },
+  {
+    server: false,
+    watch: [() => route.params.id]
   }
-});
+);
 
 useHead({
   title: contentData.value?.title || "Gama Train",
