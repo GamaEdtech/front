@@ -1,5 +1,5 @@
 <template>
-  <div class="blog-create-page">
+  <div class="blog-edit-page">
     <v-form ref="form" @submit.prevent="validate">
       <div class="d-flex flex-wrap flex-mobile">
         <v-row>
@@ -50,11 +50,11 @@
                 </div>
               </div>
 
-              <!-- Bottom publish button -->
+              <!-- Bottom update button -->
               <div class="d-flex justify-start mt-6">
                 <v-btn
                   color="#FFC107"
-                  class="publish-btn mobile-full"
+                  class="update-btn mobile-full"
                   height="50"
                   width="320"
                   rounded
@@ -62,7 +62,7 @@
                   :disabled="!isFormValid"
                   @click="validate"
                 >
-                  Publish
+                  Update
                 </v-btn>
               </div>
             </div>
@@ -87,17 +87,17 @@
                     :disabled="!isFormValid"
                     @click="validate"
                   >
-                    Publish
+                    Update
                   </v-btn>
 
                   <v-btn
                     icon
                     color="#344054"
-                    small
+                    size="small"
                     variant="text"
                     class="mobile-mb-2"
                   >
-                    <v-icon size="large">mdi-delete</v-icon>
+                    <v-icon>mdi-delete</v-icon>
                   </v-btn>
                 </div>
                 <div
@@ -232,7 +232,6 @@
                         hide-details
                         class="category-checkbox"
                         dense
-                        :rules="categoryRules"
                       ></v-checkbox>
                     </template>
                   </div>
@@ -327,11 +326,9 @@
                       @click="deleteImage"
                       :disabled="!imagePreview"
                       class="mobile-mb-2"
-                      size="large"
+                      size="small"
                     >
-                      <v-icon size="large" class="primary-gray-500">
-                        mdi-delete
-                      </v-icon>
+                      <v-icon class="primary-gray-500"> mdi-delete </v-icon>
                     </v-btn>
                     <input
                       type="file"
@@ -340,14 +337,6 @@
                       style="display: none"
                       @change="onImageSelected"
                     />
-                  </div>
-                  <v-text-field
-                    v-model="imageValidation"
-                    :rules="imageRules"
-                    style="display: none"
-                  ></v-text-field>
-                  <div v-if="!blog.image" class="error-message">
-                    Featured image is required
                   </div>
                 </v-card-text>
               </v-card>
@@ -367,13 +356,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import BlogSlugDialog from "@/components/admin/blogs/BlogSlugDialog.vue";
 import RichEditorContent from "@/components/common/RichEditor.vue";
 
 const { $slugGenerator, $toast } = useNuxtApp();
 const router = useRouter();
-const { $axios } = useNuxtApp();
+const route = useRoute();
 
 definePageMeta({
   layout: "dashboard-layout",
@@ -422,11 +411,60 @@ const contentRules = [
   (v) => (v && v.trim() !== "" && v !== "<p></p>") || "Content cannot be empty",
 ];
 
-const categoryRules = [
-  (v) => (v && v.length > 0) || "Select at least one category",
-];
+// Remove category rules since they're not required
+// const categoryRules = [
+//   (v) => (v && v.length > 0) || "Select at least one category",
+// ];
 
-const imageRules = [(v) => !!v || "Featured image is required"];
+// Fetch existing blog data
+const fetchBlogData = async () => {
+  try {
+    loading.value = true;
+    const response = await useApiService.get(
+      `/api/v2/blogs/posts/${route.params.id}`
+    );
+    if (response && response.succeeded) {
+      const blogData = response.data;
+      blog.value = {
+        title: blogData.title,
+        content: blogData.body,
+        summary: blogData.summary,
+        status: blogData.status,
+        visibility: blogData.visibilityType,
+        publishTime: blogData.scheduledDate ? "Schedule" : "Immediately",
+        categories: blogData.tags?.map((k) => k.id) || [],
+        scheduledDate: blogData.scheduledDate,
+      };
+      slug.value = blogData.slug;
+
+      if (blogData.imageUri) {
+        imagePreview.value = blogData.imageUri;
+        imageValidation.value = "valid";
+      }
+      // Split the keywords string into array
+      keywords.value = blogData.keywords
+        ? blogData.keywords.split(",").map((k) => k.trim())
+        : [];
+
+      // Trigger initial validation after loading data
+      nextTick(async () => {
+        if (form.value) {
+          const { valid } = await form.value.validate();
+          isFormValid.value = valid;
+        }
+      });
+    } else {
+      $toast.error("Failed to fetch blog data");
+      router.push("/user/blogs");
+    }
+  } catch (error) {
+    console.error("Error fetching blog:", error);
+    $toast.error("Failed to fetch blog data");
+    router.push("/user/blogs");
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Form methods
 async function validate() {
@@ -447,20 +485,6 @@ function resetValidation() {
   form.value.resetValidation();
   isFormValid.value = false;
 }
-
-const createKeyword = async () => {
-  if (!keywordSearch.value) return;
-  const newKeywords = keywordSearch.value
-    .split(",")
-    .map((k) => k.trim())
-    .filter((k) => k.length > 0);
-  keywords.value.push(...newKeywords);
-  keywordSearch.value = "";
-};
-
-const deleteKeyword = async (row, index) => {
-  keywords.value.splice(index, 1);
-};
 
 const onSubmit = async () => {
   try {
@@ -502,22 +526,22 @@ const onSubmit = async () => {
       formData.append("image", blog.value.image);
     }
 
-    const response = await useApiService.post(
-      "/api/v2/blogs/contributions",
+    const response = await useApiService.put(
+      `/api/v2/blogs/contributions/${route.params.id}`,
       formData
     );
 
     if (response && response.succeeded) {
-      $toast.success("Blog post created successfully!");
+      $toast.success("Blog post updated successfully!");
       router.push("/user/blogs");
     } else {
       $toast.error(
-        response?.errors?.[0]?.message || "Failed to create blog post."
+        response?.errors?.[0]?.message || "Failed to update blog post."
       );
     }
   } catch (error) {
-    console.error("Error creating blog post:", error);
-    $toast.error("Failed to create blog post. Please try again.");
+    console.error("Error updating blog post:", error);
+    $toast.error("Failed to update blog post. Please try again.");
   } finally {
     loading.value = false;
   }
@@ -533,7 +557,7 @@ const onImageSelected = (event) => {
   if (file) {
     blog.value.image = file;
     imagePreview.value = URL.createObjectURL(file);
-    imageValidation.value = "valid"; // Set validation when image is selected
+    imageValidation.value = "valid";
   }
 };
 
@@ -541,7 +565,7 @@ const deleteImage = () => {
   blog.value.image = null;
   imagePreview.value = null;
   imageInput.value.value = "";
-  imageValidation.value = ""; // Clear validation when image is deleted
+  imageValidation.value = "";
 };
 
 // Category handling
@@ -586,6 +610,21 @@ const fetchCategories = async () => {
   } finally {
     categoriesLoading.value = false;
   }
+};
+
+// Keyword handling
+const createKeyword = async () => {
+  if (!keywordSearch.value) return;
+  const newKeywords = keywordSearch.value
+    .split(",")
+    .map((k) => k.trim())
+    .filter((k) => k.length > 0);
+  keywords.value.push(...newKeywords);
+  keywordSearch.value = "";
+};
+
+const deleteKeyword = async (row, index) => {
+  keywords.value.splice(index, 1);
 };
 
 // Slug handling
@@ -645,12 +684,7 @@ watch(
 
 // Watch for changes in required fields to validate form
 watch(
-  [
-    () => blog.value.title,
-    () => blog.value.content,
-    () => blog.value.categories,
-    () => blog.value.image,
-  ],
+  [() => blog.value.title, () => blog.value.content],
   async () => {
     if (form.value) {
       const { valid } = await form.value.validate();
@@ -663,6 +697,7 @@ watch(
 // Lifecycle
 onMounted(() => {
   fetchCategories();
+  fetchBlogData();
 });
 </script>
 
@@ -691,15 +726,6 @@ onMounted(() => {
 .input-enter-button {
   width: 30px;
   height: 30px;
-  /* width: 30px;
-  height: 30px;
-  border-radius: 30px;
-  background: #ffb600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 9px; */
-  /* margin-right: -15px; */
 }
 .form-label-title {
   color: #344054;
@@ -710,7 +736,7 @@ onMounted(() => {
   border-radius: 16px !important;
 }
 @media (max-width: 900px) {
-  .blog-create-page {
+  .blog-edit-page {
     padding: 8px;
   }
   .d-flex.flex-wrap.flex-mobile {
@@ -743,7 +769,7 @@ onMounted(() => {
 .card-select-item {
   width: 150px;
 }
-.blog-create-page {
+.blog-edit-page {
   padding: 20px;
 }
 
@@ -804,7 +830,7 @@ onMounted(() => {
   color: #9e9e9e;
 }
 
-.publish-btn {
+.update-btn {
   text-transform: none;
   font-weight: 500;
   font-size: 16px;

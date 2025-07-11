@@ -4,8 +4,11 @@
       <Ckeditor
         v-if="CustomEditor"
         :editor="CustomEditor"
+        :value="modelValue"
         v-model="internalValue"
         :config="editorConfig"
+        @ready="onEditorReady"
+        @input="(event) => $emit('update:modelValue', event)"
       />
     </div>
   </client-only>
@@ -14,7 +17,7 @@
 <script setup>
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 const props = defineProps({
-  value: {
+  modelValue: {
     type: String,
     default: "",
   },
@@ -29,8 +32,8 @@ useHead({
   ],
 });
 
-const emit = defineEmits(["update:value"]);
-
+const emit = defineEmits(["update:modelValue"]);
+const editorInstance = ref(null);
 const internalValue = ref(props.value);
 const CustomEditor = ref(null);
 const editorConfig = {
@@ -39,12 +42,21 @@ const editorConfig = {
   removePlugins: ["ImageCaption"],
 };
 
+function onEditorReady(editor) {
+  editorInstance.value = editor;
+  if (props.modelValue) {
+    editor.setData(props.modelValue);
+  }
+}
 watch(
-  () => props.value,
-  (newVal) => {
-    if (newVal !== internalValue.value) {
-      internalValue.value = newVal;
+  () => props.modelValue,
+  (newValue) => {
+    if (editorInstance.value && newValue !== editorInstance.value.getData()) {
+      editorInstance.value.setData(newValue);
     }
+  },
+  {
+    immediate: true,
   }
 );
 

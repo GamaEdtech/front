@@ -23,8 +23,8 @@
 
         <v-card-actions class="action-buttons">
           <v-btn
-            depressed
-            color="bg-Error"
+            variant="flat"
+            color="error"
             class="w-50 rounded-pill white--text"
             @click="emit('confirm')"
           >
@@ -32,7 +32,7 @@
           </v-btn>
 
           <v-btn
-            depressed
+            variant="flat"
             color="bg-white"
             class="w-50 rounded-pill black--text"
             @click="closeModal"
