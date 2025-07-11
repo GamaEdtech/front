@@ -4,11 +4,7 @@
     width="160"
     :style="{ height: `${CardHeight}`, borderRadius: '8px' }"
   >
-    <v-img
-      class="text-white align-end"
-      :height="CardHeight"
-      :src="cardPicture"
-    >
+    <v-img class="text-white align-end" :height="CardHeight" :src="cardPicture">
     </v-img>
     <div class="circle-container">
       <div class="text-center" v-if="showScoreLabel">
@@ -44,19 +40,18 @@
   </v-card>
 </template>
 <script setup>
-
 const props = defineProps({
   cardPicture: String,
   cardTitle: String,
   score: [String, Number],
   showScoreLabel: Boolean,
-})
+});
 
 const CardHeight = computed(() => {
-  return props.showScoreLabel ? '230px' : '107px'
-})
+  return props.showScoreLabel ? "230px" : "107px";
+});
 </script>
-<style>
+<style scoped>
 .inner-curve {
   --r: 8px; /* control the rounded part */
   --s: 30px; /* control the size of the cut */
@@ -112,7 +107,7 @@ const CardHeight = computed(() => {
   color: white;
   text-align: center;
 }
-.v-img__img--contain{
+.v-img__img--contain {
   object-fit: fill !important;
 }
 </style>
