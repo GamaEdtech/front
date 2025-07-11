@@ -991,7 +991,6 @@ const { data: contentData, error, refresh: refreshContent } = await useAsyncData
     }
   },
   {
-    server: false,
     watch: [() => route.params.id]
   }
 );
