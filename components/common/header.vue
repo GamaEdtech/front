@@ -45,11 +45,18 @@ const menuItems = [
     icon_color: "",
   },
   {
+    title: "Blogs",
+    link: "/user/blogs",
+    icon: "mdi-newspaper",
+    icon_color: "",
+  },
+  {
     title: "$GET Token",
     link: "/get-token",
     icon: "mdi-currency-usd",
     icon_color: "",
   },
+
   // {
   //   title: "Offers",
   //   link: "/offers",
