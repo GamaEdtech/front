@@ -292,29 +292,30 @@ const search = () => {
     timer.value = null;
   }
 
-  timer.value = setTimeout(() => {
-    if (searchKey.value && allDataLoaded.value == false)
-      useFetch("/api/v1/search/text", {
-        method: "GET",
-        params: {
+  timer.value = setTimeout(async () => {
+    if (searchKey.value && allDataLoaded.value == false) {
+      try {
+        const params = {
           query: searchKey.value,
           page: pageNum.value,
-        },
-      })
-        .then((response) => {
+        };
+        const response = await $fetch("/api/v1/search/text", {
+          params,
+        });
+        if (response.data) {
           searchCount.value = response.data.num;
           searchResults.value.push(...response.data.list);
 
-          if (response.data.list.length < 20)
-            //20 is length of item per page
+          if (response.data.list.length < 20) {
             allDataLoaded.value = true;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          searchLoading.value = false;
-        });
+          }
+        }
+      } catch (error) {
+        console.log(err);
+      } finally {
+        searchLoading.value = false;
+      }
+    }
   }, 800);
 };
 
