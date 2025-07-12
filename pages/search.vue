@@ -1,6 +1,6 @@
 <template>
   <v-container class="flex-column margin-top-handle">
-    <v-row>
+    <v-row class="justify-center">
       <v-col cols="4" md="12" class="d-flex d-md-none justify-start">
         <v-badge
           class="mt-1 height-badge"
@@ -52,7 +52,10 @@
         :count-data-found="totalDataFind"
         @changeFilterQuery="changeFilterQuery"
       />
-      <v-col cols="12" class="d-flex align-end justify-end ga-2">
+      <v-col
+        cols="12"
+        class="d-flex align-end justify-end ga-2 max-width-container"
+      >
         <span class="text-h5 primary-gray-400">Result</span>
         <span class="text-h4 primary-gray-700 font-weight-bold">{{
           $numberFormat(totalDataFind)
@@ -323,7 +326,9 @@ setMetaData(route.query.type);
 :deep(.height-badge .v-badge__wrapper .v-badge__badge) {
   height: 20px !important;
 }
-
+.max-width-container {
+  max-width: 1200px;
+}
 @media (min-width: 960px) {
   .margin-top-handle {
     margin-top: 6.4rem;

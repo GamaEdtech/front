@@ -70,6 +70,13 @@
           class="d-none d-sm-flex align-center justify-space-between container-extra-info"
         >
           <span
+            v-if="information.ext && route.query.type == `learnfiles`"
+            class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+          >
+            <v-icon color="#667085">mdi-sticker-outline</v-icon>
+            {{ information.ext }}
+          </span>
+          <span
             v-if="information.test_type_title"
             class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
           >
@@ -78,11 +85,28 @@
           </span>
           <span
             class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+            v-if="information.tests_num && route.query.type == `azmoon`"
+          >
+            <v-icon color="#667085">mdi-format-list-bulleted</v-icon>
+            {{ information.tests_num }}
+          </span>
+
+          <span
+            class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
             v-if="information.views"
           >
             <v-icon color="#667085">mdi-eye</v-icon>
             {{ information.views }}
           </span>
+
+          <span
+            class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+            v-if="information.reply_num && route.query.type == `question`"
+          >
+            <v-icon color="#667085">mdi-reply-outline</v-icon>
+            {{ information.reply_num }}
+          </span>
+
           <span
             class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
           >
@@ -109,11 +133,26 @@
     </div>
     <div class="d-flex d-sm-none align-center justify-space-between w-100">
       <span
+        v-if="information.ext && route.query.type == `learnfiles`"
+        class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+      >
+        <v-icon color="#667085">mdi-sticker-outline</v-icon>
+        {{ information.ext }}
+      </span>
+      <span
         class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
         v-if="information.test_type_title"
       >
         <v-icon color="#667085">mdi-folder-outline</v-icon>
         {{ information.test_type_title }}
+      </span>
+
+      <span
+        class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+        v-if="information.tests_num && route.query.type == `azmoon`"
+      >
+        <v-icon color="#667085">mdi-format-list-bulleted</v-icon>
+        {{ information.tests_num }}
       </span>
       <span
         class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
@@ -121,6 +160,13 @@
       >
         <v-icon color="#667085">mdi-eye</v-icon>
         {{ information.views }}
+      </span>
+      <span
+        class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1"
+        v-if="information.reply_num && route.query.type == `question`"
+      >
+        <v-icon color="#667085">mdi-reply-outline</v-icon>
+        {{ information.reply_num }}
       </span>
       <span class="primary-gray-400 text-subtitle-1 d-flex align-start ga-1">
         <v-icon color="#667085">mdi-calendar-range</v-icon>
