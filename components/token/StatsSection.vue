@@ -13,11 +13,16 @@
               <div class="stats-section-stats__card darken-card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-poll</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-poll</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-poll</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent">+5.2%</div>
                 </div>
@@ -29,11 +34,16 @@
               <div class="stats-section-stats__card darken-card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-finance</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-finance</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-finance</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent">+10%</div>
                 </div>
@@ -45,11 +55,16 @@
               <div class="stats-section-stats__card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-cached</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-cached</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-cached</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div class="stats-section-stats__card--percent text-white">
                     75%
@@ -65,11 +80,16 @@
               <div class="stats-section-stats__card">
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
-                    <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
-                      color="white"
-                      >mdi-account-arrow-up</v-icon
-                    >
+                    <ClientOnly>
+                      <v-icon
+                        :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                        color="white"
+                        >mdi-account-arrow-up</v-icon
+                      >
+                      <template #fallback>
+                        <v-icon size="x-large" color="white">mdi-account-arrow-up</v-icon>
+                      </template>
+                    </ClientOnly>
                   </div>
                   <div
                     class="stats-section-stats__card--percent text-deep-orange-lighten-1"
@@ -96,7 +116,7 @@
               <div class="stats-section-chart__coins flex-grow-1">
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-get.png"
+                    src="/images/token/Stats/token-get.png"
                     alt="GET"
                     class="token-icon mr-2"
                   />
@@ -104,7 +124,7 @@
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-usdc.png"
+                    src="/images/token/Stats/token-usdc.png"
                     alt="USDC"
                     class="token-icon mr-2"
                   />
@@ -112,7 +132,7 @@
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
                   <img
-                    src="/images/token/token-usdt.png"
+                    src="/images/token/Stats/token-usdt.png"
                     alt="USDT"
                     class="token-icon mr-2"
                   />
@@ -120,7 +140,7 @@
                 </div>
                 <div class="d-flex align-center">
                   <img
-                    src="/images/token/token-wbtc.png"
+                    src="/images/token/Stats/token-wbtc.png"
                     alt="WBTC"
                     class="token-icon mr-2"
                   />

@@ -5,8 +5,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     // Dynamically import only on client side
     import('vue3-emoji-picker')
       .then((module) => {
-        const VEmojiPicker = module.default;
-        nuxtApp.vueApp.use(VEmojiPicker);
+        const EmojiPicker = module.default;
+        // Register as a global component
+        nuxtApp.vueApp.component('EmojiPicker', EmojiPicker);
       })
       .catch(error => {
         console.error('Failed to load emoji picker:', error);
