@@ -61,13 +61,13 @@ const easeOutQuad = (t) => {
 onMounted(() => {
   setFavicon();
   const nuxtApp = useNuxtApp();
-  nuxtApp.hook("page:loading:start", () => {
+  nuxtApp.hook("page:start", () => {
     isLoading.value = true;
     progress.value = 0;
     startTime = null;
     animationFrame = requestAnimationFrame(animateProgress);
   });
-  nuxtApp.hook("page:loading:end", () => {
+  nuxtApp.hook("page:finish", () => {
     if (animationFrame) cancelAnimationFrame(animationFrame);
     progress.value = 100;
     setTimeout(() => {
