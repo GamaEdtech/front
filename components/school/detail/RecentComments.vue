@@ -97,4 +97,15 @@ const props = defineProps({
 .comment-card-header {
   height: 8rem;
 }
+.profile-avatar{
+ width: 100%;
+ height: 100%;
+ background-position: center;
+ object-fit: cover;
+ user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  background-size: cover
+}
 </style>
