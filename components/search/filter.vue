@@ -107,7 +107,9 @@
 
         <!-- Month chip -->
         <v-chip
-          v-if="applied_filter.select_month_title && $route.query.type !== 'azmoon'"
+          v-if="
+            applied_filter.select_month_title && $route.query.type !== 'azmoon'
+          "
           class="mt-1"
           closable
           variant="outlined"
@@ -291,14 +293,11 @@
                   ? '#000000'
                   : 'rgba(0, 0, 0, 0.38)',
               pointerEvents:
-                !board_val || !filter.file_type_list.length
-                  ? 'none'
-                  : 'auto',
+                !board_val || !filter.file_type_list.length ? 'none' : 'auto',
             }"
-            class="filter-title "
+            class="filter-title"
             :class="{
-              'filter-inactive':
-                !board_val || !filter.file_type_list.length,
+              'filter-inactive': !board_val || !filter.file_type_list.length,
             }"
           >
             {{
@@ -351,7 +350,7 @@
         </v-expansion-panel>
 
         <!-- Month panel -->
-        <!-- <v-expansion-panel v-show="$route.query.type !== 'azmoon' && $route.query.type !== 'test'">
+        <v-expansion-panel v-show="$route.query.type === 'test'">
           <v-expansion-panel-title class="filter-title font-weight-bold">
             Month
           </v-expansion-panel-title>
@@ -372,7 +371,7 @@
               ></v-radio>
             </v-radio-group>
           </v-expansion-panel-text>
-        </v-expansion-panel> -->
+        </v-expansion-panel>
       </v-expansion-panels>
     </div>
   </div>
@@ -420,7 +419,9 @@ export default {
       test_level_val: this.$route.query.test_level_val
         ? this.$route.query.test_level_val
         : 0,
-      year_val: this.$route.query.edu_year ? String(this.$route.query.edu_year) : 0,
+      year_val: this.$route.query.edu_year
+        ? String(this.$route.query.edu_year)
+        : 0,
       month_val: this.$route.query.edu_month
         ? Number(this.$route.query.edu_month)
         : 0,
@@ -601,10 +602,9 @@ export default {
     };
   },
   created() {
-    
     // Convert year list values to strings to ensure consistent types
-    this.filter.year_list = this.filter.year_list.map(year => String(year));
-    
+    this.filter.year_list = this.filter.year_list.map((year) => String(year));
+
     // In Nuxt 3, we use $fetch for API calls
     // Load the section list for the Board filter
     $fetch("/api/v1/types/list", {
@@ -856,7 +856,6 @@ export default {
         if (type === "section") {
           this.filter.section_list = res.data;
 
-
           if (this.board_val) {
             // Use string comparison for reliable ID matching
             const sectionItem = this.filter.section_list.find(
@@ -1074,7 +1073,7 @@ export default {
       } else {
         this.applied_filter.select_year_title = "";
       }
-      
+
       this.updateQueryParams();
       this.setBreadcrumbInfo();
     },
@@ -1170,7 +1169,8 @@ export default {
       };
 
       if (active_tab === "test") breadcrumb_item.title = "Past Papers";
-      else if (active_tab === "learnfiles") breadcrumb_item.title = "Multimedia";
+      else if (active_tab === "learnfiles")
+        breadcrumb_item.title = "Multimedia";
       else if (active_tab === "question") breadcrumb_item.title = "Forum";
       else if (active_tab === "azmoon") breadcrumb_item.title = "QuizHub";
       else if (active_tab === "dars") breadcrumb_item.title = "Tutorial";
@@ -1268,7 +1268,7 @@ export default {
         //Emit to parent
         this.$emit("setPageTitle", page_title);
       }
-      //Emit to parent breadcrumbs    
+      //Emit to parent breadcrumbs
       this.$emit("update:modelValue", [...this.breadcrumbs]);
     },
     setFilter(type, list) {
