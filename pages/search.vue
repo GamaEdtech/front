@@ -89,110 +89,6 @@ const totalDataFind = ref(0);
 const pageNumber = ref(1);
 const perPage = 10;
 
-const pageTitle = ref("");
-const pageDescribe = ref("");
-
-const setMetaData = (type) => {
-  if (type === "learnfiles") {
-    pageTitle.value =
-      "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain";
-    pageDescribe.value =
-      "Elevate your learning experience with GamaTrain's captivating multimedia content, including PowerPoint presentations, informative videos, and diverse educational materials.";
-  } else if (type === "test") {
-    pageTitle.value =
-      "Educational Resources | K12 Education Papers and Materials";
-    pageDescribe.value =
-      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
-  } else if (type === "question") {
-    pageTitle.value =
-      "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum";
-    pageDescribe.value =
-      "Engage in active learning and gain deeper insights through GamaTrain's interactive Q&A platform, where you can pose questions and seek support from fellow learners and experts.";
-  } else if (type === "azmoon") {
-    pageTitle.value = "Online Exams , Free Exams for Improving Education";
-    pageDescribe.value =
-      "Hone your skills and assess your knowledge with GamaTrain's online exams, designed to enhance your exam preparation and boost your confidence.";
-  } else if (type === "dars") {
-    pageTitle.value =
-      "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials";
-    pageDescribe.value =
-      "Complement your studies with GamaTrain's comprehensive online tutorials, providing step-by-step guidance and practice opportunities to refine your understanding.";
-  } else if (type === "tutor") {
-    pageTitle.value = "Teacher";
-    pageDescribe.value = "Teacher";
-  } else {
-    pageTitle.value =
-      "Educational Resources | K12 Education Papers and Materials";
-    pageDescribe.value =
-      "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
-  }
-
-  // Set page metadata
-  useHead(() => ({
-    title: pageTitle.value,
-    meta: [
-      {
-        hid: "apple-mobile-web-app-title",
-        name: "apple-mobile-web-app-title",
-        content: pageTitle.value,
-      },
-      {
-        hid: "og:title",
-        name: "og:title",
-        content: pageTitle.value,
-      },
-      {
-        hid: "og:site_name",
-        name: "og:site_name",
-        content: "GamaTrain",
-      },
-      {
-        hid: "description",
-        name: "description",
-        content: pageDescribe.value,
-      },
-      {
-        hid: "og:description",
-        name: "og:description",
-        content: pageDescribe.value,
-      },
-    ],
-  }));
-};
-setMetaData(route.query.type);
-
-// Set page metadata
-useHead(() => ({
-  title: pageTitle.value,
-  meta: [
-    {
-      hid: "apple-mobile-web-app-title",
-      name: "apple-mobile-web-app-title",
-      content: pageTitle.value,
-    },
-    {
-      hid: "og:title",
-      name: "og:title",
-      content: pageTitle.value,
-    },
-    {
-      hid: "og:site_name",
-      name: "og:site_name",
-      content: "GamaTrain",
-    },
-    {
-      hid: "description",
-      name: "description",
-      content: pageDescribe.value,
-    },
-    {
-      hid: "og:description",
-      name: "og:description",
-      content: pageDescribe.value,
-    },
-  ],
-}));
-
 const loadNextPageData = async () => {
   pageNumber.value += 1;
   isPaginationDataLoading.value = true;
@@ -296,6 +192,118 @@ const getDataList = async (isLoadNextPage = false) => {
     isInitialDataLoading.value = false;
   }
 };
+
+const pageTitle = ref("");
+const pageDescribe = ref("");
+
+const setMetaData = (type) => {
+  setPageDescribe(type);
+  setPageTitle(type);
+
+  useHead(() => ({
+    title: pageTitle.value,
+    meta: [
+      {
+        hid: "apple-mobile-web-app-title",
+        name: "apple-mobile-web-app-title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:title",
+        name: "og:title",
+        content: pageTitle.value,
+      },
+      {
+        hid: "og:site_name",
+        name: "og:site_name",
+        content: "GamaTrain",
+      },
+      {
+        hid: "description",
+        name: "description",
+        content: pageDescribe.value,
+      },
+      {
+        hid: "og:description",
+        name: "og:description",
+        content: pageDescribe.value,
+      },
+    ],
+  }));
+};
+
+const setPageTitle = (type) => {
+  const { section, base, lesson } = route.query;
+  const firstElement = initialData.value?.data?.list[0];
+
+  const titles = {
+    boardTitle:
+      section && firstElement ? firstElement.section_title : undefined,
+    gradeTitle: section && base && firstElement ? firstElement.base_title : "",
+    subjectTitle:
+      section && base && lesson && firstElement
+        ? firstElement.lesson_title
+        : "",
+  };
+
+  const titleTemplates = {
+    learnfiles: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} multimedia`,
+      fallback:
+        "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain",
+    },
+    test: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      fallback: "Educational Resources | K12 Education Papers and Materials",
+    },
+    question: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Forum`,
+      fallback:
+        "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum",
+    },
+    azmoon: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Online test`,
+      fallback: "Online Exams, Free Exams for Improving Education",
+    },
+    dars: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Textbook`,
+      fallback:
+        "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials",
+    },
+    tutor: {
+      dynamic: "Teacher",
+      fallback: "Teacher",
+    },
+    default: {
+      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      fallback: "Educational Resources | K12 Education Papers and Materials",
+    },
+  };
+
+  const template = titleTemplates[type] || titleTemplates.default;
+
+  pageTitle.value = titles.boardTitle ? template.dynamic : template.fallback;
+};
+
+const pageDescriptions = {
+  learnfiles:
+    "Elevate your learning experience with GamaTrain's captivating multimedia content, including PowerPoint presentations, informative videos, and diverse educational materials.",
+  test: "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.",
+  question:
+    "Engage in active learning and gain deeper insights through GamaTrain's interactive Q&A platform, where you can pose questions and seek support from fellow learners and experts.",
+  azmoon:
+    "Hone your skills and assess your knowledge with GamaTrain's online exams, designed to enhance your exam preparation and boost your confidence.",
+  dars: "Complement your studies with GamaTrain's comprehensive online tutorials, providing step-by-step guidance and practice opportunities to refine your understanding.",
+  tutor: "Teacher",
+};
+
+const setPageDescribe = (type) => {
+  pageDescribe.value =
+    pageDescriptions[type] ||
+    "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+};
+
+setMetaData(route.query.type);
 </script>
 
 <style scoped>
