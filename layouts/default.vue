@@ -1,9 +1,8 @@
 <template>
   <v-app>
-    <v-overlay
-      v-model="isLoading"
-      class="align-center justify-center"
-      persistent
+    <div
+      class="w-100 h-100 position-fixed left-0 top-0 d-flex justify-center align-center custom-ovarlay"
+      v-if="isLoading"
     >
       <v-progress-circular
         :model-value="progress"
@@ -13,8 +12,7 @@
         class="text-h4 font-weight-black"
         >{{ progress }}%</v-progress-circular
       >
-    </v-overlay>
-
+    </div>
     <common-header />
     <div>
       <slot />
@@ -30,6 +28,33 @@ const progress = ref(0);
 let animationFrame = null;
 let startTime = null;
 const duration = 10000;
+
+onMounted(() => {
+  setFavicon();
+  const nuxtApp = useNuxtApp();
+  nuxtApp.hook("page:start", () => {
+    isLoading.value = true;
+    progress.value = 0;
+    startTime = null;
+    animationFrame = requestAnimationFrame(animateProgress);
+  });
+  nuxtApp.hook("page:finish", () => {
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    progress.value = 100;
+    setTimeout(() => {
+      isLoading.value = false;
+    }, 500);
+
+    setTimeout(() => {
+      progress.value = 0;
+    }, 1000);
+  });
+  nuxtApp.hook("page:error", () => {
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    isLoading.value = false;
+    progress.value = 0;
+  });
+});
 
 const setFavicon = () => {
   const prefersDarkMode =
@@ -58,30 +83,11 @@ const animateProgress = (timestamp) => {
 const easeOutQuad = (t) => {
   return t * (2 - t);
 };
-onMounted(() => {
-  setFavicon();
-  const nuxtApp = useNuxtApp();
-  nuxtApp.hook("page:start", () => {
-    isLoading.value = true;
-    progress.value = 0;
-    startTime = null;
-    animationFrame = requestAnimationFrame(animateProgress);
-  });
-  nuxtApp.hook("page:finish", () => {
-    if (animationFrame) cancelAnimationFrame(animationFrame);
-    progress.value = 100;
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 500);
-
-    setTimeout(() => {
-      progress.value = 0;
-    }, 1000);
-  });
-  nuxtApp.hook("page:error", () => {
-    if (animationFrame) cancelAnimationFrame(animationFrame);
-    isLoading.value = false;
-    progress.value = 0;
-  });
-});
 </script>
+
+<style scoped>
+.custom-ovarlay {
+  background-color: #00000069;
+  z-index: 1010;
+}
+</style>
