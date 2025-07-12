@@ -22,91 +22,155 @@
       ref="scrollDivRef"
     >
       <div class="container-scroll">
-        <CardSchoolSkeleton v-if="isInitialLoading" v-for="item in 4" />
+        <CardSchoolSkeleton
+          v-if="isInitialLoading"
+          v-for="item in 4"
+          :key="item"
+        />
 
         <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
 
         <NuxtLink
-          v-if="!isInitialLoading"
+          v-else-if="!isInitialLoading"
           class="card-school"
           v-for="(school, index) in schoolList"
+          :key="index"
           :to="`school/${school.id}/${$slugGenerator(school.name)}`"
         >
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name gtext-t4 font-weight-semibold">{{
-                school.name
-              }}</span>
-              <div class="d-flex align-center justify-start flex-wrap ga-3">
-                <v-chip
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                  v-if="school.countryTitle && school.countryTitle.length > 0"
+          <div
+            v-if="school.defaultImageUri"
+            class="school-card-bg"
+            :style="{ backgroundImage: `url(${school.defaultImageUri})` }"
+            style="border-top: 0px !important"
+          >
+            <div class="school-card-overlay">
+              <div class="school-card-header">
+                <div class="school-name">{{ school.name }}</div>
+                <!-- <div class="grade-badge">A+</div> -->
+                <!-- <v-icon class="bookmark">mdi-bookmark-outline</v-icon> -->
+              </div>
+              <div class="d-flex-col">
+                <div
+                  class="d-flex  align-center ga-2 flex-wrap my-2  justify-space-start"
                 >
-                  {{ school.countryTitle }}
-                </v-chip>
-                <v-chip
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                  v-if="school.stateTitle && school.stateTitle.length > 0"
-                  >{{ school.stateTitle }}</v-chip
-                >
-                <v-chip
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                  v-if="school.cityTitle && school.cityTitle.length > 0"
-                  >United {{ school.cityTitle }}</v-chip
-                >
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.countryTitle && school.countryTitle.length > 0"
+                  >
+                    {{ school.countryTitle }}
+                  </v-chip>
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.stateTitle && school.stateTitle.length > 0"
+                    >{{ school.stateTitle }}</v-chip
+                  >
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.cityTitle && school.cityTitle.length > 0"
+                    >United {{ school.cityTitle }}</v-chip
+                  >
+                </div>
+                <div class="d-flex justify-space-between pt-2">
+                  <div
+                    class="d-flex align-center ga-1 gtext-t6 font-weight-semibold"
+                  >
+                    <v-icon size="large" color="primary"> mdi-star </v-icon>
+                    {{ school.score ? school.score.toFixed(1) : "New" }}
+                  </div>
+                  <div
+                    class="d-flex align-center ga-2 gtext-t6 primary-gray-300"
+                  >
+                    <v-icon size="large" color="rgba(52, 64, 84, 1)">mdi-update</v-icon>
+                    <span class=" primary-gray-600">
+                      {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div
-              class="img-div d-none d-md-block"
-              v-if="school.defaultImageUri && isExpanded"
-            >
-              <NuxtImg
-                alt="school.name"
-                v-show="school.defaultImageUri"
-                width="180px"
-                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')"
-                placeholder
-                class="h-100"
-              />
+
+            <!-- <div class="img-div " v-if="school.defaultImageUri && isExpanded">
+              <NuxtImg alt="school.name" v-show="school.defaultImageUri" width="180px"
+                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')" placeholder class="h-100" />
+            </div> -->
+          </div>
+          <div v-else>
+            <div class="name-address-image">
+              <div class="name-div">
+                <span class="name gtext-t4 font-weight-semibold">{{
+                  school.name
+                }}</span>
+                <div class="d-flex align-center justify-start flex-wrap ga-3">
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.countryTitle && school.countryTitle.length > 0"
+                  >
+                    {{ school.countryTitle }}
+                  </v-chip>
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.stateTitle && school.stateTitle.length > 0"
+                    >{{ school.stateTitle }}</v-chip
+                  >
+                  <v-chip
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                    v-if="school.cityTitle && school.cityTitle.length > 0"
+                    >United {{ school.cityTitle }}</v-chip
+                  >
+                </div>
+              </div>
             </div>
           </div>
           <div class="line-seperator"></div>
           <div
-            class="w-100 d-flex align-center justify-space-between mt-3 flex-wrap ga-5"
+            class="w-100 d-flex justify-space-between align-center pa-2"
+            style="background: rgba(249, 250, 251, 1)"
           >
             <div class="d-flex align-center">
               <v-btn variant="text" icon :disabled="!school.hasLocation">
-                <v-icon size="x-large"> mdi-map-marker </v-icon>
+                <v-icon size="large" color="rgba(52, 64, 84, 1)">
+                  mdi-map-marker
+                </v-icon>
               </v-btn>
-              <v-btn variant="text" icon :disabled="!school.hasPhon">
-                <v-icon size="x-large"> mdi-phone </v-icon>
+              <v-btn variant="text" icon :disabled="!school.hasPhone">
+                <v-icon size="large" color="rgba(52, 64, 84, 1)">
+                  mdi-phone
+                </v-icon>
               </v-btn>
               <v-btn variant="text" icon :disabled="!school.hasEmail">
-                <v-icon size="x-large"> mdi-email </v-icon>
+                <v-icon size="large" color="rgba(52, 64, 84, 1)">
+                  mdi-email
+                </v-icon>
               </v-btn>
               <v-btn variant="text" icon :disabled="!school.hasWebsite">
-                <v-icon size="x-large"> mdi-web </v-icon>
+                <v-icon size="large" color="rgba(52, 64, 84, 1)">
+                  mdi-web
+                </v-icon>
               </v-btn>
             </div>
-            <div class="d-flex align-center ga-2">
-              <div
-                class="d-flex align-center ga-2 gtext-t6 font-weight-semibold"
+            <div
+              class="d-flex align-center px-1 h-100"
+              style="color: rgba(52, 64, 84, 1)"
+            >
+              <div>Details</div>
+              <v-icon
+                color="rgba(52, 64, 84, 1)"
+                style="line-height: unset; margin-inline-start: 4px"
               >
-                <v-icon size="x-large" color="primary"> mdi-star </v-icon>
-                {{ school.score ? school.score.toFixed(1) : "New" }}
-              </div>
-              <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
-                <v-icon size="x-large">mdi-update</v-icon>
-                <span class="primary-gray-600">
-                  {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
-                </span>
-              </div>
+                mdi-chevron-right
+              </v-icon>
             </div>
           </div>
         </NuxtLink>
