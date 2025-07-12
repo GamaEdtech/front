@@ -1,6 +1,7 @@
 <script setup>
 import DeleteItemModal from '@/components/admin/contactus/deleteItemModal.vue'
-import viewMessageDetailsModal from '@/components/admin/contactus/viewMessageDetailsModal.vue'
+import UserDetailModal from '~/components/admin/usermanagment/userDetailModal.vue';
+import AddUserDialog from '~/components/admin/usermanagment/adduserDialog.vue';
 import useApiService from '~/composables/useApiService';
 
 definePageMeta({
@@ -12,22 +13,20 @@ const { $toast } = useNuxtApp();
 
 const list = ref([]);
 const headers = [
-  { title: 'Name', key: 'fullName', sortable: false, width: '15vw' },
-  { title: 'Subject', key: 'subject', sortable: false, width: '15vw' },
-  { key: 'attachedFile', sortable: false, width: '17vw' },
-  { title: 'Date', key: 'date', width: '10vw' },
+  { title: 'Username', key: 'username', sortable: false, width: '15vw' },
+  { title: 'Email', key: 'email', sortable: false, width: '15vw' },
   { title: 'Actions', key: 'actions', sortable: false, width: '5vw' },
 ];
 
 const tableLoading = ref(true);
 const dialogVisible = ref(false);
 const isDeleteModalOpen = ref(false);
-const selectedMessage = ref('');
+const showAddUserDialog = ref(false);
 const selectedEmail = ref('');
 const selectedName = ref('');
 const selectedId = ref(null);
+const selectedPhoneNumber = ref('')
 const selectedDeleteId = ref(null);
-const search = ref(null);
 const filter = ref('all');
 const filteredList = ref([]);
 const selectedAction = ref(null);
@@ -36,12 +35,9 @@ const page = ref(1);
 const pageCount = ref(0);
 const totalCount = ref(0);
 let selected = ref([]);
-const disableNextBtn = ref(false);
-const disableBackBtn = ref(false);
 
 const allActions = [
   { label: 'Delete All', value: 'deleteAll' },
-  { label: 'Read All', value: 'readAll' },
 ];
 
 const allPageSize = [
@@ -50,10 +46,10 @@ const allPageSize = [
   { label: '50 Rows', value: 50 },
 ];
 
-const fetchContactUs = async () => {
+const fetchUsers = async () => {
   tableLoading.value = true;
   try {
-    const response = await useApiService.get('/api/v2/admin/contacts', {
+    const response = await useApiService.get('/api/v2/admin/identities', {
         'PagingDto.PageFilter.Size': selectedPageSize.value,
         'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
         'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
@@ -73,23 +69,16 @@ const fetchContactUs = async () => {
 
 const viewMessageDetails = async (id) => {
   try {
-    const response = await useApiService.get(`/api/v2/admin/contacts/${id}`);
+    const response = await useApiService.get(`/api/v2/admin/identities/${id}`);
 
-    selectedMessage.value = response.data.body;
     selectedEmail.value = response.data.email;
-    selectedName.value = response.data.fullName;
+    selectedName.value = response.data.username;
     selectedId.value = response.data.id;
+    selectedPhoneNumber.value = response.data.phoneNumber;
     dialogVisible.value = true;
 
     const index = list.value.findIndex((item) => item.id === id);
-    setTimeout(() => {
-      if (index !== -1) {
-        list.value[index] = { ...list.value[index], isRead: true };
-      }
-    }, 1500);
 
-    disableNextBtn.value = index >= list.value.length - 1;
-    disableBackBtn.value = index <= 0;
   } catch (err) {
     if (err.response?.status === 400) {
       $toast.error(err.response.data.message);
@@ -97,34 +86,24 @@ const viewMessageDetails = async (id) => {
   }
 };
 
-const goToNextMessage = (id) => {
-  const index = list.value.findIndex((item) => item.id === id);
-  if (index < list.value.length - 1) {
-    viewMessageDetails(list.value[index + 1].id);
-  }
-};
 
-const goToPreviousMessage = (id) => {
-  const index = list.value.findIndex((item) => item.id === id);
-  if (index > 0) {
-    viewMessageDetails(list.value[index - 1].id);
-  }
-};
-
-const deleteMessage = async () => {
+const deleteUser = async () => {
   try {
-    await useApiService.remove(`/api/v2/admin/contacts/${selectedDeleteId.value}`);
+    const res = await useApiService.remove(`/api/v2/admin/identities/${selectedDeleteId.value}`);
 
     list.value = list.value.filter((i) => i.id !== selectedDeleteId.value);
     filteredList.value = list.value;
-    $toast.success('Message deleted successfully!');
+    if(res.succeeded === true)
+        $toast.success('User deleted successfully!');
+    else $toast.error(res.errors[0].message)
   } catch (err) {
     if (err.response?.status === 400) {
       $toast.error(err.response.data.message);
     }
   } finally {
     isDeleteModalOpen.value = false;
-    fetchContactUs();
+    dialogVisible.value = false
+    fetchUsers();
   }
 };
 
@@ -137,107 +116,41 @@ const doAll = async () => {
   if (selectedAction.value === 'Delete All') {
     for (const item of selected.value) {
       selectedDeleteId.value = item;
-      await deleteMessage();
+      await deleteUser();
     }
 
     selected.value = [];
-    $toast.success('All selected messages deleted!');
-  } else {
-    for (const id of selected.value) {
-      const index = list.value.findIndex((msg) => msg.id === id);
-        try {
-          await $fetch(`/api/v2/admin/contacts/${id}/toggle`, {
-            method:'PATCH',
-          });
-
-          list.value[index] = { ...list.value[index], isRead: true };
-          selected.value = [];
-          $toast.success('All selected messages marked as read!');
-        } catch (err) {
-          console.error(`Failed to mark message ${id} as read`, err);
-        }
-    }
+    $toast.success('All selected Users deleted!');
   }
 };
 
 onMounted(() => {
   selectedAction.value = allActions[0].label;
   selectedPageSize.value = allPageSize[0].value;
-  fetchContactUs();
+  fetchUsers();
 });
 
 watch(page, () => {
   filter.value = 'all';
-  fetchContactUs();
+  fetchUsers();
 });
 
 watch(selectedPageSize, () => {
   page.value = 1;
-  fetchContactUs();
+  fetchUsers();
 });
 
-watch(filter, (val) => {
-  if (val === 'read') {
-    filteredList.value = list.value.filter((item) => item.isRead);
-  } else if (val === 'unread') {
-    filteredList.value = list.value.filter((item) => !item.isRead);
-  } else {
-    filteredList.value = list.value;
-  }
-}, { immediate: true });
 </script>
 
 <template>
   <div>
     <div class="d-flex flex-column justify-space-between align-center mb-4 flex-sm-row">
-      <div class="filterBtns mb-4 mb-sm-0">
-        <v-btn
-          :class="{ 'active-filter': filter === 'all', 'inactive-filter': filter !== 'all' }"
-          depressed
-          @click="filter = 'all'"
-          rounded
-          variant="plain"
-          class="gtext-t4 font-weight-regular"
-        >
-          All
-        </v-btn>
-        <v-btn
-          :class="{ 'active-filter': filter === 'unread', 'inactive-filter': filter !== 'unread' }"
-          depressed
-          @click="filter = 'unread'"
-          rounded
-          variant="plain"
-          class="gtext-t4 font-weight-regular"
-        >
-          Unread
-        </v-btn>
-
-        <v-btn
-          :class="{ 'active-filter': filter === 'read', 'inactive-filter': filter !== 'read' }"
-          depressed
-          class="ml-2 gtext-t4 font-weight-regular"
-          @click="filter = 'read'"
-          rounded
-          variant="plain"
-        >
-          Read
-        </v-btn>
-      </div>
-
-      <v-text-field
-            v-model="search"
-            label="Search anything..."
-            variant="outlined"
-            density="compact"
-            rounded
-            hide-details
-            class="searchInput"
-          >
-            <template #prepend-inner>
-                <span class="primary-gray-300"><v-icon>mdi-magnify </v-icon></span>
-                <span class="primary-gray-300 ">|</span>
-            </template>
-         </v-text-field>
+      <v-btn
+        class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
+        @click="showAddUserDialog= true"
+      >
+        <span>New User</span>
+      </v-btn>
     </div>
 
     <div class="scrollable-table">
@@ -253,29 +166,26 @@ watch(filter, (val) => {
       >
 
 
-        <template #item.fullName="{ item }">
+        <template #item.username="{ item }">
           <div class="d-flex align-center">
-            <v-avatar size="40" class="mr-2" v-if="item.avatar">
-              <img :src="item.avatar" alt="Avatar" />
-            </v-avatar>
-            <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.fullName }}</span>
-          </div>
-        </template>
-        <template #item.subject="{ item }">
-          <div class="d-flex align-center">
-            <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.subject }}</span>
+            <span class="truncate-email">{{ item.username }}</span>
           </div>
         </template>
 
-        <template #header.attachedFile>
+        <template #item.email="{ item }">
           <div class="d-flex align-center">
-            <v-icon small class="mr-1">mdi-paperclip</v-icon>
-            Attachment File
+            <span class="truncate-email">{{ item.email }}</span>
+          </div>
+        </template>
+
+        <template #header.actions>
+          <div class="d-flex justify-end pr-3">
+            Actions
           </div>
     </template>
 
         <template #item.actions="{ item }">
-          <div class="d-flex">
+          <div class="d-flex justify-end pr-2">
             <v-icon small class="mr-2 gtext-t1" @click="viewMessageDetails(item.id)">
               mdi-file-find
             </v-icon>
@@ -286,20 +196,22 @@ watch(filter, (val) => {
         </template>
       </v-data-table>
 
-      <viewMessageDetailsModal
+      <UserDetailModal
         v-model="dialogVisible"
-        :message="selectedMessage"
+        :username="selectedName"
         :email="selectedEmail"
-        :name="selectedName"
-        @next="goToNextMessage(selectedId)"
-        :disableNext="disableNextBtn"
-        @back="goToPreviousMessage(selectedId)"
-        :disableBack="disableBackBtn"
+        :phoneNumber="selectedPhoneNumber"
+        :id="selectedId"
+        @delete="handleDelete"
       />
 
       <DeleteItemModal
         v-model="isDeleteModalOpen"
-        @confirm="deleteMessage"
+        @confirm="deleteUser"
+      />
+      <AddUserDialog
+        v-model="showAddUserDialog"
+        @confirm="deleteUser"
       />
     </div>
 
@@ -370,14 +282,10 @@ watch(filter, (val) => {
 
 <style scoped>
 .scrollable-table {
-  max-height: 70vh;  
+  max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.searchInput{
-  width: 360px !important;
-  max-width: 360px;
+  position: relative;
 }
 
 :deep(.v-field__outline){
@@ -449,4 +357,23 @@ watch(filter, (val) => {
   opacity: 1 !important;
 }
 
+.truncate-email {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Vuetify 3 uses a wrapper div inside the table */
+:deep(.v-data-table thead) {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #F2F4F7 !important; /* Your desired header color */
+}
+
+/* Optional: give each header cell a background too */
+:deep(.v-data-table thead th) {
+  background-color: #F2F4F7 !important;
+}
 </style>
