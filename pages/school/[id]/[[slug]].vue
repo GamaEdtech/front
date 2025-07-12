@@ -157,19 +157,21 @@
 
         <!-- End general data section -->
 
-        <school-detail-users-score
-          :ratingData="ratingData"
-          @leave-comment="showLeaveCommentDialog = true"
-        />
-        <school-detail-recent-comments :commentList="commentList" />
-        <school-detail-similar-schools :similarSchools="similarSchools" />
+
+            <school-detail-users-score
+              :ratingData="ratingData"   
+              @leave-comment="showLeaveCommentDialog = true"
+            />
+            <school-detail-recent-comments :commentList="commentList" />
+            <school-detail-similar-schools :similarSchools="similarSchools" />
       </v-col>
     </v-row>
     <!-- End data container -->
-
+    
     <school-detail-leave-comment-dialog
       v-model="showLeaveCommentDialog"
       :contentData="contentData"
+      @submitted="handleCommentSubmitted"
     />
 
     <school-detail-report-dialog
@@ -293,16 +295,7 @@ function changeSlide() {
 function openAuthDialog(val) {
   router.push({ query: { auth_form: val } });
 }
-function loadComments() {
-  useApiService
-    .get(`/api/v2/schools/${route.params.id}/comments`, {
-      "PagingDto.PageFilter.Size": 20,
-    })
-    .then((response) => {
-      commentList.value = response.data.list;
-    })
-    .catch(() => {});
-}
+
 function loadTourPanorama() {
   useApiService
     .get(`/api/v2/schools/${route.params.id}/images/Tour360`)
@@ -342,8 +335,43 @@ function handleLocationUpdate(locationData) {
   }
 }
 
+function handleCommentSubmitted() {
+  // Refresh comments when a new comment is submitted
+  refreshComments();
+}
+
+
+const {
+  data: commentsData,
+  refresh: refreshComments,
+  pending: commentsPending
+} = await useAsyncData(
+  `comments-${route.params.id}`,
+  () => useApiService.get(
+    `/api/v2/schools/${route.params.id}/comments`,
+    {
+      "PagingDto.PageFilter.Size": 20,
+    }
+  ),
+  {
+    server: true,
+    lazy: false,
+    immediate: true,
+  }
+);
+
+// Watch for changes in comments data
+watch(
+  () => commentsData.value,
+  (newData) => {
+    if (newData?.data) {
+      commentList.value = newData.data.list;
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
-  loadComments();
   loadTourPanorama();
   loadGalleryImages();
 });

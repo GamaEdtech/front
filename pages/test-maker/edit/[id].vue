@@ -1367,6 +1367,7 @@ defineRule("required", required);
 // Define layout and page metadata
 definePageMeta({
   layout: "test-maker-layout",
+  middleware: ["auth", "user-type"],
 });
 
 useHead({
@@ -1396,6 +1397,9 @@ const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
 const isExamPublished = ref(false); // Track if the exam has been published
+
+
+
 
 // Form data
 const form = reactive({
