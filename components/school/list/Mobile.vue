@@ -230,7 +230,7 @@
 <script setup>
 import { onMounted, onUnmounted } from "vue";
 
-import CardSchoolSkeleton from "./CardSchoolSkeleton.vue";
+import CardSchoolSkeleton from "../CardSchoolSkeleton.vue";
 
 const props = defineProps({
   schoolList: {
@@ -304,6 +304,176 @@ const loadPreviousPage = () => {
 };
 </script>
 
-<style scoped>
-@import "../../assets/scss/school/list.scss";
+<style lang="scss" scoped>
+@use "../../../assets/scss//app.scss" as style;
+
+// comment import css-file &  using particular styles for Mobile-Desktop view
+/* @import "../../../assets/scss/school/list.scss"; */
+
+.main-list-school-div {
+    width: 100%;
+    padding: 40px 5px 0 5px;
+    transition: all 0.5s;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+
+    .container-list-div {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        max-width: 1600px;
+
+        .container-scroll {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            row-gap: 20px;
+            padding: 0 20px 20px 20px;
+            @include style.responsive-size(padding,
+                0 20px 20px 20px,
+                0 20px 20px 20px,
+                0 20px 20px 20px,
+                0 10px 20px 10px);
+
+            .card-school {
+                width: 100%;
+                min-height: fit-content;
+                background-color: rgba(255, 255, 255, 0.95);
+                border-radius: 10px;
+                border: 1px solid rgba(242, 244, 247, 1);
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-between;
+
+                .name-address-image {
+                    padding: 16px;
+                    width: 100%;
+                    display: flex;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                    row-gap: 20px;
+                    min-height: 130px;
+                    position: relative;
+                    @include style.responsive-size(justify-content,
+                        space-between,
+                        space-between,
+                        space-between,
+                        center);
+
+                    .name-div {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        justify-content: flex-start;
+                        row-gap: 20px
+                    }
+
+                    .img-div {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        transform: translate(-50%, -50%);
+                        z-index: 0;
+                    }
+                }
+
+                .line-seperator {
+                    width: 100%;
+                    height: 1px;
+                    background-color: rgba(242, 244, 247, 1);
+                }
+            }
+
+            .line-specifier-load-more {
+                width: 100%;
+                height: 6px;
+                // background-color: red;
+            }
+
+            .not-found-div {
+                width: 100%;
+                text-align: center;
+                font-size: 20px;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .container-button-load-previous-data {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        z-index: 3;
+        @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+    }
+}
+
+.closed-list {
+    width: 550px;
+    position: absolute;
+    right: 0;
+    top: 100px;
+    padding: 40px 10px;
+    height: calc(100% - 100px);
+
+    .container-list-div {
+        height: 100%;
+
+        .container-scroll {
+            padding: 0 10px 20px 10px;
+
+            .card-school {
+                padding: 10px;
+            }
+        }
+    }
+}
+
+.school-card-bg {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    background-size: cover;
+    background-position: center;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+
+.school-card-overlay {
+    width: inherit !important;
+    background: rgba(255, 255, 255, 0.87);
+    padding: 15px 12px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    position: relative;
+}
+
+.school-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.school-name {
+    font-family: Inter;
+    font-weight: 600;
+    font-style: Semi Bold;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 0%;
+}
 </style>
