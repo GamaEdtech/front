@@ -17,6 +17,7 @@
         height: 100%;
         overflow-y: auto;
         max-width: 1600px;
+
         .container-scroll {
             width: 100%;
             display: flex;
@@ -25,23 +26,23 @@
             justify-content: flex-start;
             row-gap: 20px;
             padding: 0 20px 20px 20px;
-            @include style.responsive-size(
-                padding,
+            @include style.responsive-size(padding,
                 0 20px 20px 20px,
                 0 20px 20px 20px,
                 0 20px 20px 20px,
-                0 10px 20px 10px
-            );
+                0 10px 20px 10px);
+
             .card-school {
                 width: 100%;
-                min-height: fit-content ;
+                min-height: fit-content;
                 background-color: rgba(255, 255, 255, 0.95);
                 border-radius: 10px;
-                border: 2px solid rgba(242, 244, 247, 1);
+                border: 1px solid rgba(242, 244, 247, 1);
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: space-between;
+
                 .name-address-image {
                     padding: 16px;
                     width: 100%;
@@ -51,29 +52,29 @@
                     row-gap: 20px;
                     min-height: 130px;
                     position: relative;
-                    @include style.responsive-size(
-                        justify-content,
+                    @include style.responsive-size(justify-content,
                         space-between,
                         space-between,
                         space-between,
-                        center
-                    );
+                        center);
+
                     .name-div {
                         display: flex;
                         flex-direction: column;
                         align-items: flex-start;
                         justify-content: flex-start;
                         row-gap: 20px
-                        
                     }
+
                     .img-div {
-                      position: absolute;
-                      top: 0;
-                      left: 0;
-                      transform: translate(-50%, -50%);
-                      z-index: 0;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        transform: translate(-50%, -50%);
+                        z-index: 0;
                     }
                 }
+
                 .line-seperator {
                     width: 100%;
                     height: 1px;
@@ -95,6 +96,7 @@
             }
         }
     }
+
     .container-button-load-previous-data {
         width: 100%;
         display: flex;
@@ -105,6 +107,7 @@
         @include style.responsive-size(background-color, #f2f4f7, white, white, white);
     }
 }
+
 .closed-list {
     width: 550px;
     position: absolute;
@@ -112,8 +115,10 @@
     top: 100px;
     padding: 40px 10px;
     height: calc(100% - 100px);
+
     .container-list-div {
         height: 100%;
+
         .container-scroll {
             padding: 0 10px 20px 10px;
 
@@ -123,6 +128,7 @@
         }
     }
 }
+
 .school-card-bg {
     position: relative;
     width: 100%;
@@ -134,18 +140,29 @@
     overflow: hidden;
     display: flex;
     align-items: flex-end;
-  }
-  .school-card-overlay {
-    width: 100%;
+}
+
+.school-card-overlay {
+    width: inherit !important;
     background: rgba(255, 255, 255, 0.87);
-    padding:15px;
+    padding: 15px 12px;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
     position: relative;
-  }
-  .school-card-header {
+}
+
+.school-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
+}
 
+
+.school-name {
+    font-family: Inter;
+    font-weight: 600;
+    font-style: Semi Bold;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 0%;
+}
