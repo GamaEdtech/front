@@ -26,6 +26,24 @@
         @changeSelectedItem="onFilterUpdate($event, filter.title)"
       />
     </template>
+    <v-col
+      cols="12"
+      class="d-flex flex-wrap align-center ga-4 max-width-container"
+    >
+      <template v-for="(filter, index) in filters">
+        <v-chip
+          variant="flat"
+          class="text-h5 pl-5 pr-5"
+          color="#F2F4F7"
+          :closable="index != FILTER_INDEX.Type"
+          @click:close="clearFilter(filter, index)"
+          :key="filter.title"
+          v-if="filter.selectedItem"
+        >
+          {{ filter.selectedItem?.title }}
+        </v-chip>
+      </template>
+    </v-col>
   </div>
 
   <v-dialog
@@ -751,5 +769,8 @@ onMounted(async () => {
 .box-button {
   min-height: 74px;
   box-shadow: 0px -24px 50px 0px #1018280a;
+}
+.max-width-container {
+  max-width: 1200px;
 }
 </style>
