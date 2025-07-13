@@ -45,98 +45,133 @@
           >
             <div class="school-card-overlay">
               <div class="school-card-header">
-                <div class="school-name">{{ school.name }}</div>
-                <!-- <div class="grade-badge">A+</div> -->
-                <!-- <v-icon class="bookmark">mdi-bookmark-outline</v-icon> -->
+                <ClientOnly>
+                  <div class="school-name">{{ school.name }}</div>
+                </ClientOnly>
               </div>
+
               <div class="d-flex-col">
                 <div
-                  class="d-flex  align-center ga-2 flex-wrap my-2  justify-space-start"
+                  class="d-flex align-center ga-2 flex-wrap my-4 justify-space-start"
                 >
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.countryTitle && school.countryTitle.length > 0"
                   >
                     {{ school.countryTitle }}
                   </v-chip>
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.stateTitle && school.stateTitle.length > 0"
                     >{{ school.stateTitle }}</v-chip
                   >
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.cityTitle && school.cityTitle.length > 0"
                     >United {{ school.cityTitle }}</v-chip
                   >
                 </div>
-                <div class="d-flex justify-space-between pt-2">
+                <div class="d-flex align-strach justify-space-between pt-2">
                   <div
-                    class="d-flex align-center ga-1 gtext-t6 font-weight-semibold"
+                    class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500"
                   >
-                    <v-icon size="large" color="primary"> mdi-star </v-icon>
-                    {{ school.score ? school.score.toFixed(1) : "New" }}
+                    Score:
+                    <v-icon color="primary"> mdi-star </v-icon>
+                    {{ school.score ? school.score.toFixed(1) : "N/A" }}
                   </div>
+                  <v-divider
+                    :thickness="1"
+                    class="border-opacity-100 primary-gray-300 w-100"
+                    vertical
+                  ></v-divider>
                   <div
-                    class="d-flex align-center ga-2 gtext-t6 primary-gray-300"
+                    class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100"
                   >
-                    <v-icon size="large" color="rgba(52, 64, 84, 1)">mdi-update</v-icon>
-                    <span class=" primary-gray-600">
+                    <v-icon color="rgba(52, 64, 84, 1)">mdi-update</v-icon>
+                    <span class="primary-gray-600">
                       {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- <div class="img-div " v-if="school.defaultImageUri && isExpanded">
-              <NuxtImg alt="school.name" v-show="school.defaultImageUri" width="180px"
-                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')" placeholder class="h-100" />
-            </div> -->
           </div>
-          <div v-else>
-            <div class="name-address-image">
-              <div class="name-div">
-                <span class="name gtext-t4 font-weight-semibold">{{
-                  school.name
-                }}</span>
-                <div class="d-flex align-center justify-start flex-wrap ga-3">
+          <div v-else class="card-school">
+            <div class="school-card-overlay">
+              <div class="school-card-header">
+                <div class="school-name">{{ school.name }}</div>
+              </div>
+
+              <div class="d-flex-col">
+                <div
+                  class="d-flex align-center ga-2 flex-wrap my-6 justify-space-start"
+                >
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.countryTitle && school.countryTitle.length > 0"
                   >
                     {{ school.countryTitle }}
                   </v-chip>
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.stateTitle && school.stateTitle.length > 0"
                     >{{ school.stateTitle }}</v-chip
                   >
                   <v-chip
                     class="text-subtitle-1"
-                    variant="elevated"
-                    color="#546e7a"
+                    variant="flat"
+                    density="comfortable"
+                    color="rgba(52, 64, 84, 1)"
                     v-if="school.cityTitle && school.cityTitle.length > 0"
                     >United {{ school.cityTitle }}</v-chip
                   >
+                </div>
+                <div
+                  class="w-100 d-flex align-strach justify-space-between pt-2"
+                >
+                  <div
+                    class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500"
+                  >
+                    Score:
+                    <v-icon color="primary"> mdi-star </v-icon>
+                    {{ school.score ? school.score.toFixed(1) : "N/A" }}
+                  </div>
+                  <v-divider
+                    :thickness="1"
+                    class="border-opacity-100 primary-gray-300 w-100"
+                    vertical
+                  ></v-divider>
+                  <div
+                    class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100"
+                  >
+                    <v-icon color="rgba(52, 64, 84, 1)">mdi-update</v-icon>
+                    <span class="primary-gray-600">
+                      {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="line-seperator"></div>
           <div
-            class="w-100 d-flex justify-space-between align-center pa-2"
-            style="background: rgba(249, 250, 251, 1)"
+            class="w-100 d-flex justify-space-between align-center px-1"
+            style="background: rgba(249, 250, 251, 0.7)"
           >
             <div class="d-flex align-center">
               <v-btn variant="text" icon :disabled="!school.hasLocation">
@@ -164,7 +199,7 @@
               class="d-flex align-center px-1 h-100"
               style="color: rgba(52, 64, 84, 1)"
             >
-              <div>Details</div>
+              <div class="font-size-12">Details</div>
               <v-icon
                 color="rgba(52, 64, 84, 1)"
                 style="line-height: unset; margin-inline-start: 4px"
