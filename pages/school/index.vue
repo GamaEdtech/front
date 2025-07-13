@@ -85,7 +85,6 @@ import { onUnmounted } from "vue";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/Filter.vue";
-import schoolList from "~/components/school/list/Mobile.vue";
 import Map from "~/components/school/Map.vue";
 
 useHead({
