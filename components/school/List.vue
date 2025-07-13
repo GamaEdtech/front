@@ -176,7 +176,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  scrollDivRef.value.removeEventListener("scroll", handleScrollListener);
+  if (scrollDivRef.value) {
+    scrollDivRef.value.removeEventListener("scroll", handleScrollListener);
+  }
 });
 
 const setupScrollListener = () => {

@@ -61,7 +61,6 @@
         show-arrows="hover"
         height="28.1rem"
         class="rounded-lg gallery-carousel"
-        @click="openGalleryDialog"
         v-model="activeGalleryIndex"
         @change="updateMainGalleryImage"
       >

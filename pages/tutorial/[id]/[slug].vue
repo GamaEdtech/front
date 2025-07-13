@@ -248,7 +248,7 @@ const route = useRoute();
 
 // Fetch tutorial data
 let { data: tutorialInfo, error: tutorialError } = await useAsyncData(
-  "tutorialInfo",
+  `tutorialInfo-${route.params.id}`,
   async () => {
     try {
       const response = await useApiService.get(
@@ -258,6 +258,9 @@ let { data: tutorialInfo, error: tutorialError } = await useAsyncData(
     } catch (e) {
       throw e;
     }
+  },
+  {
+    watch: [() => route.params.id]
   }
 );
 
