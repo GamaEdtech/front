@@ -118,24 +118,12 @@ const route = useRoute();
 
 const sortList = [
   {
-    value: "scoreDesc",
+    value: "score",
     title: "Highest score",
   },
   {
-    value: "viewsDesc",
-    title: "Most active",
-  },
-  {
-    value: "updateDesc",
-    title: "Update date",
-  },
-  {
-    value: "tuitionAsc",
-    title: "Tuition Fee (Highest First)",
-  },
-  {
-    value: "tuitionDesc",
-    title: "Tuition Fee (Lowest First)",
+    value: "defaultImageUri",
+    title: "Has Image",
   },
 ];
 
@@ -161,7 +149,11 @@ const filterForm = ref({
   city: route.query.city || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
-  sort: route.query.sort || "",
+  sort: Array.isArray(route.query.sort)
+    ? route.query.sort
+    : route.query.sort
+    ? route.query.sort.split(",")
+    : [],
   school_type: Array.isArray(route.query.school_type)
     ? route.query.school_type
     : route.query.school_type
@@ -187,6 +179,7 @@ const filterForm = ref({
   lng: Number(route.query.lng) || null,
   page: Number(route.query.page) || 1,
 });
+
 const defaultLatLongDistance = {
   lat: 39.90973623453719,
   lng: -81.12304687500001,
@@ -245,13 +238,16 @@ const changeFilterWithMapMoved = (locationParam) => {
 const updateQueryParams = () => {
   const query = {};
   Object.entries(filterForm.value).forEach(([key, value]) => {
-    if (
-      value &&
-      (typeof value === "string" ||
-        (Array.isArray(value) && value.length) ||
-        (typeof value === "number" && value != 0))
-    ) {
-      query[key] = value;
+    if (value) {
+      if (
+        typeof value === "string" ||
+        (typeof value === "number" && value != 0)
+      ) {
+        query[key] = value;
+      } else if (Array.isArray(value) && value.length) {
+        const joinText = value.join(",");
+        query[key] = joinText;
+      }
     }
   });
   router.replace({ query });
@@ -273,11 +269,9 @@ const debouncedGetSchoolList = () => {
     timer.value = null;
   }
 
-  // if (!isInitialSchoolLoading.value) {
   timer.value = setTimeout(() => {
     getSchoolList();
   }, 800);
-  // }
 };
 
 const { data: initialSchools, pending: loadingSchoolsServer } =
@@ -286,10 +280,6 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      // "PagingDto.SortFilter[0].sortType": "Desc",
-      // "PagingDto.SortFilter[0].column": "defaultImageUri",
-      // "PagingDto.SortFilter[1].sortType": "Desc",
-      // "PagingDto.SortFilter[1].column": "score",
       Name: filterForm.value.keyword,
       section: filterForm.value.stage,
       tuition_fee: filterForm.value.tuition_fee,
@@ -300,8 +290,13 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
       religion: filterForm.value.religion,
       boarding_type: filterForm.value.boarding_type,
       coed_status: filterForm.value.coed_status,
-      sort: filterForm.value.sort,
     };
+    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
+      filterForm.value.sort.forEach((sortOption, index) => {
+        params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
+        params[`PagingDto.SortFilter[${index}].column`] = sortOption;
+      });
+    }
 
     return $fetch("/api/v2/schools", { params });
   });
@@ -321,11 +316,13 @@ const getSchoolList = async () => {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      // "PagingDto.SortFilter[0].sortType": "Desc",
-      // "PagingDto.SortFilter[0].column": "defaultImageUri",
-      // "PagingDto.SortFilter[1].sortType": "Desc",
-      // "PagingDto.SortFilter[1].column": "score",
     };
+    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
+      filterForm.value.sort.forEach((sortOption, index) => {
+        params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
+        params[`PagingDto.SortFilter[${index}].column`] = sortOption;
+      });
+    }
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
       params["Location.Radius"] = filterForm.value.distance;
       params["Location.Latitude"] = filterForm.value.lat;
@@ -343,6 +340,7 @@ const getSchoolList = async () => {
       params["coed_status"] = filterForm.value.coed_status;
       params["sort"] = filterForm.value.sort;
     }
+
     const response = await $fetch("/api/v2/schools", {
       params,
     });
