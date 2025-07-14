@@ -17,6 +17,7 @@
         <school-detail-image-gallery
           :content="contentData"
           :class="topSlideClass.image"
+          :images="galleryImages"
           @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </div>
@@ -27,14 +28,17 @@
         <school-detail-image-gallery
           :content="contentData"
           :images="galleryImages"
+          :class="topSlideClass.image"
           @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </v-col>
       <v-col cols="12" md="4">
-        <school-detail-school-map
-          :content="contentData"
-          @location-updated="handleLocationUpdate"
-        ></school-detail-school-map>
+        <client-only>
+          <school-detail-school-map
+            :content="contentData"
+            @location-updated="handleLocationUpdate"
+          ></school-detail-school-map>
+        </client-only>
       </v-col>
       <v-col cols="12" md="4">
         <school-detail-school-tour
@@ -372,9 +376,6 @@ watch(
 );
 
 onMounted(() => {
-  console.log(`href: ${requestURL.value}/school/${
-        contentData.value?.id
-      }/${$slugGenerator(contentData.value?.name)}`)
   loadTourPanorama();
   loadGalleryImages();
 });
