@@ -35,7 +35,7 @@
           class="card-school"
           v-for="(school, index) in schoolList"
           :key="index"
-          :to="`school/${school.id}/${$slugGenerator(school.name)}`"
+          :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
         >
           <div
             v-if="school.defaultImageUri"

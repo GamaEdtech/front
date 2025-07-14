@@ -256,16 +256,16 @@ watch(
   { immediate: true }
 );
 
-// useHead(() => ({
-//   link: [
-//     {
-//       rel: "canonical",
-//       href: `${requestURL.value}/school/${
-//         contentData.value?.id
-//       }/${$slugGenerator(contentData.value?.name)}`,
-//     },
-//   ],
-// }));
+useHead(() => ({
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/school/${
+        contentData.value?.id
+      }/${$slugGenerator(contentData.value?.name)}`,
+    },
+  ],
+}));
 
 watch(
   () => ratingDataRaw.value,
@@ -372,6 +372,9 @@ watch(
 );
 
 onMounted(() => {
+  console.log(`href: ${requestURL.value}/school/${
+        contentData.value?.id
+      }/${$slugGenerator(contentData.value?.name)}`)
   loadTourPanorama();
   loadGalleryImages();
 });
