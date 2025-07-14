@@ -206,6 +206,7 @@ const galleryImages = ref([]);
 const requestURL = ref(useRequestURL().host);
 const { $slugGenerator } = useNuxtApp();
 
+
 const fetchSchoolData = async () => {
   try {
     const response = await useApiService.get(
@@ -261,6 +262,9 @@ watch(
 );
 
 useHead(() => ({
+  htmlAttrs: {
+    lang: "en",
+  },
   link: [
     {
       rel: "canonical",
@@ -268,8 +272,27 @@ useHead(() => ({
         contentData.value?.id
       }/${$slugGenerator(contentData.value?.name)}`,
     },
+    {
+      rel: "icon",
+      type: "image/x-icon",
+      href: "/favicon-dark.ico",
+    },
   ],
 }));
+
+useSeoMeta({
+  title: `${contentData.value?.name} | GamaTrain Schools`,
+  description: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. Explore ratings, facilities, and more on GamaTrain.`,
+  ogTitle: `${contentData.value?.name} | GamaTrain Schools`,
+  ogDescription: `Learn more about ${contentData.value?.name} located in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. See ratings, facilities, and more.`,
+  ogImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
+  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(contentData.value?.name)}`,
+  twitterTitle: `${contentData.value?.name} | GamaTrain Schools`,
+  twitterDescription: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle} on GamaTrain.`,
+  twitterImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
+  twitterCard: 'summary_large_image',
+});
+
 
 watch(
   () => ratingDataRaw.value,
