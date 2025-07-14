@@ -81,6 +81,12 @@ const items = ref([
         icon: "icong-test",
         icon_type: "custom",
       },
+      {
+        title: "Blogs",
+        link: "/user/blogs",
+        icon: "mdi-newspaper",
+        icon_type: "custom",
+      },
     ],
   },
   {
@@ -113,7 +119,6 @@ const items = ref([
     ],
   },
   { title: "Messages", icon: "mdi-email-outline", link: "/user/ticket" },
-  { title: "Blogs", icon: "mdi-newspaper", link: "/user/blogs" },
   {
     title: "Profile",
     icon: "mdi-account-outline",
