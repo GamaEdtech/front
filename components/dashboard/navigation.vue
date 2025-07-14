@@ -81,6 +81,12 @@ const items = ref([
         icon: "icong-test",
         icon_type: "custom",
       },
+      {
+        title: "Blogs",
+        link: "/user/blogs",
+        icon: "mdi-newspaper",
+        icon_type: "custom",
+      },
     ],
   },
   {
