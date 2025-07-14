@@ -5,7 +5,7 @@
     </v-col>
     <v-col cols="12" md="12">
       <v-card
-        v-for="comment in commentList"
+        v-for="comment in displayedComments"
         :key="comment.id"
         class="comment-card primary-gray-100 pt-4 mb-3"
         elevation="1"
@@ -77,6 +77,8 @@
           class="text-transform-none gtext-t4 font-weight-medium"
           color="white"
           size="x-large"
+          v-if="showLoadMoreButton"
+          @click="loadMoreComments"
           >Load more</v-btn
         >
       </div>
@@ -85,16 +87,52 @@
 </template>
 
 <script setup>
+import { ref, computed, watch } from 'vue'
+
 const props = defineProps({
   commentList: {
     type: Array,
     required: true,
   },
 });
+
+// State for pagination
+const displayedCount = ref(10)
+const commentsPerPage = 10
+
+// Computed properties
+const displayedComments = computed(() => {
+  return props.commentList.slice(0, displayedCount.value)
+})
+
+const showLoadMoreButton = computed(() => {
+  return props.commentList.length > displayedCount.value
+})
+
+// Methods
+const loadMoreComments = () => {
+  displayedCount.value += commentsPerPage
+}
+
+// Reset displayed count when commentList changes
+watch(() => props.commentList, () => {
+  displayedCount.value = 10
+}, { deep: true })
 </script>
 
 <style scoped>
 .comment-card-header {
   height: 8rem;
+}
+.profile-avatar{
+ width: 100%;
+ height: 100%;
+ background-position: center;
+ object-fit: cover;
+ user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  background-size: cover
 }
 </style>
