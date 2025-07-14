@@ -109,22 +109,26 @@
               </v-list>
             </div>
           </div>
-          <div class="each-item-filter result-div">
-            Results
-            <span class="count-result" v-if="totalSchoolFind != 0">{{
-              $numberFormat(totalSchoolFind)
-            }}</span>
-          </div>
+          <ClientOnly>
+            <div class="each-item-filter result-div">
+              Results
+              <span class="count-result" v-if="totalSchoolFind != 0">{{
+                $numberFormat(totalSchoolFind)
+              }}</span>
+            </div>
+          </ClientOnly>
         </div>
 
-        <div class="result-div-mobile gama-text-overline">
-          Results
-          <span
-            class="count-result gama-text-button"
-            v-if="totalSchoolFind != 0"
-            >{{ $numberFormat(totalSchoolFind) }}</span
-          >
-        </div>
+        <ClientOnly>
+          <div class="result-div-mobile gama-text-overline">
+            Results
+            <span
+              class="count-result gama-text-button"
+              v-if="totalSchoolFind != 0"
+              >{{ $numberFormat(totalSchoolFind) }}</span
+            >
+          </div>
+        </ClientOnly>
       </div>
     </div>
     <div
