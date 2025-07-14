@@ -15,7 +15,7 @@ const list = ref([]);
 const headers = [
   { title: 'Username', key: 'username', sortable: false, width: '15vw' },
   { title: 'Email', key: 'email', sortable: false, width: '15vw' },
-  { title: 'Status', key: 'enabled', sortable: false, width: '1vw' },
+  { title: 'Status', key: 'enabled', sortable: false, width: '10vw' },
   { title: 'Actions', key: 'actions', sortable: false, width: '5vw' },
 ];
 
@@ -51,9 +51,9 @@ const fetchUsers = async () => {
   tableLoading.value = true;
   try {
     const response = await useApiService.get('/api/v2/admin/identities', {
-        'PagingDto.PageFilter.Size': selectedPageSize.value,
-        'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
-        'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
+      'PagingDto.PageFilter.Size': selectedPageSize.value,
+      'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
+      'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
     });
     list.value = response.data.list;
     filteredList.value = list.value;
@@ -77,9 +77,6 @@ const viewMessageDetails = async (id) => {
     selectedId.value = response.data.id;
     selectedPhoneNumber.value = response.data.phoneNumber;
     dialogVisible.value = true;
-
-    const index = list.value.findIndex((item) => item.id === id);
-
   } catch (err) {
     if (err.response?.status === 400) {
       $toast.error(err.response.data.message);
@@ -90,15 +87,17 @@ const viewMessageDetails = async (id) => {
 const toggleUserStatus = async (id) => {
   const token = localStorage.getItem('v2_token')
   try{
-    await $fetch(`/api/v2/admin/identities/${id}/toggle`,{
+    const res = await $fetch(`/api/v2/admin/identities/${id}/toggle`,{
       method : 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
-      },
-      }
-    );
-    fetchUsers();
-
+    }});
+    if(res.succeeded){
+      $toast.success('User Status Toggled Successfully')
+      fetchUsers();
+    }
+    else 
+      $toast.error(res.errors[0].message)
   }catch (err) {
     if (err.response?.status === 400) {
       $toast.error(err.response.data.message);
@@ -114,8 +113,9 @@ const deleteUser = async () => {
     list.value = list.value.filter((i) => i.id !== selectedDeleteId.value);
     filteredList.value = list.value;
     if(res.succeeded === true)
-        $toast.success('User deleted successfully!');
-    else $toast.error(res.errors[0].message)
+      $toast.success('User deleted successfully!');
+    else 
+      $toast.error(res.errors[0].message)
   } catch (err) {
     if (err.response?.status === 400) {
       $toast.error(err.response.data.message);
@@ -164,7 +164,7 @@ watch(selectedPageSize, () => {
 
 <template>
   <div>
-    <div class="d-flex flex-column justify-space-between align-center mb-4 flex-sm-row">
+    <div class="d-flex justify-space-between align-center mb-4 flex-row">
       <v-btn
         class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
         @click="showAddUserDialog= true"
@@ -185,16 +185,15 @@ watch(selectedPageSize, () => {
         show-select
       >
 
-
         <template #item.username="{ item }">
           <div class="d-flex align-center">
-            <span class="truncate-email">{{ item.username }}</span>
+            <span class="truncate-text">{{ item.username }}</span>
           </div>
         </template>
 
         <template #item.email="{ item }">
           <div class="d-flex align-center">
-            <span class="truncate-email">{{ item.email }}</span>
+            <span class="truncate-text">{{ item.email }}</span>
           </div>
         </template>
 
@@ -202,46 +201,47 @@ watch(selectedPageSize, () => {
           <div class="d-flex justify-end pr-6">
             Actions
           </div>
-    </template>
+        </template>
 
         <template #item.enabled="{ item }">
           <span v-if="item.enabled == true" class="gtext-t5 green-12b76a">enable</span>
           <span v-else class="gtext-t5 red-F04438">disable</span>
         </template>
+
         <template #item.actions="{ item }">
           <div class="d-flex justify-end pr-2">
             <v-btn variant="plain" class="px-0 min-width-10">
-            <v-icon small class="mr-2 gtext-t1" @click="viewMessageDetails(item.id)">
-              mdi-file-find
-            </v-icon>
-            <v-tooltip
+              <v-icon small class="mr-2 gtext-t1" @click="viewMessageDetails(item.id)">
+                mdi-file-find
+              </v-icon>
+              <v-tooltip
               activator="parent"
               location="top"
-            >
-            Details
-            </v-tooltip>
+              >
+                Details
+              </v-tooltip>
             </v-btn>
             <v-btn variant="plain" class="px-0 min-width-10">
-            <v-icon small class="mr-2 gtext-t1" @click="toggleUserStatus(item.id)">
-              mdi mdi-account-alert
-            </v-icon>
-            <v-tooltip
+              <v-icon small class="mr-2 gtext-t1" @click="toggleUserStatus(item.id)">
+                mdi mdi-account-alert
+              </v-icon>
+              <v-tooltip
               activator="parent"
               location="top"
-            >
-            toggle status
-            </v-tooltip>
+              >
+                Toggle status
+              </v-tooltip>
             </v-btn>
             <v-btn variant="plain" class="px-0 min-width-10">
-            <v-icon small class="gtext-t1" @click="handleDelete(item.id)">
-              mdi-delete
-            </v-icon>
-            <v-tooltip
+              <v-icon small class="gtext-t1" @click="handleDelete(item.id)">
+                mdi-delete
+              </v-icon>
+              <v-tooltip
               activator="parent"
               location="top"
-            >
-            Delete
-            </v-tooltip>
+              >
+                Delete
+              </v-tooltip>
             </v-btn>
           </div>
         </template>
@@ -265,67 +265,69 @@ watch(selectedPageSize, () => {
         @confirm="deleteUser"
         @fetchUser="fetchUsers"
       />
+
     </div>
 
     <v-row class="mt-2" align="center" justify="space-between" no-gutters>
       <v-col cols="12" class="d-flex flex-wrap flex-sm-nowrap align-center justify-space-between">
         <div class="d-flex align-center mb-2 mb-sm-0">
           <v-select
-            v-model="selectedAction"
-            :items="allActions"
-            item-title="label"
-            item-value="value"
-            variant="outlined"
-            density="compact"
-            rounded
-            hide-details
-            class="rounded-pill footerBtns"
-            :disabled="selected.length === 0"
+          v-model="selectedAction"
+          :items="allActions"
+          item-title="label"
+          item-value="value"
+          variant="outlined"
+          density="compact"
+          rounded
+          hide-details
+          class="rounded-pill footerBtns"
+          :disabled="selected.length === 0"
           />
           <v-btn
-            class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
-            :disabled="selected.length === 0" @click="doAll"
+          class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
+          :disabled="selected.length === 0" 
+          @click="doAll"
           >
             <span>Do</span>
           </v-btn>
         </div>
 
-        <!-- Pagination (hidden on mobile here) -->
+        <!-- Pagination (hidden on mobile) -->
         <div class="d-none d-sm-flex">
           <v-pagination
-            v-model="page"
-            :length="pageCount"
-            :total-visible="5"
-            class="custom-pagination"
-            next-icon="mdi-arrow-right"
-            prev-icon="mdi-arrow-left"
-          />
-        </div>
-
-        <div class="mb-2 mb-sm-0">
-          <v-select
-            v-model="selectedPageSize"
-            :items="allPageSize"
-            item-title="label"
-            item-value="value"
-            variant="outlined"
-            density="compact"
-            rounded
-            hide-details
-            class="rounded-pill footerBtns"
-          />
-        </div>
-      </v-col>
-
-      <!-- Pagination (visible only on xs, second row) -->
-      <v-col cols="12" class="d-flex justify-center d-sm-none mt-2">
-        <v-pagination
           v-model="page"
           :length="pageCount"
           :total-visible="5"
           class="custom-pagination"
           next-icon="mdi-arrow-right"
           prev-icon="mdi-arrow-left"
+          />
+        </div>
+
+        <div class="mb-2 mb-sm-0">
+          <v-select
+          v-model="selectedPageSize"
+          :items="allPageSize"
+          item-title="label"
+          item-value="value"
+          variant="outlined"
+          density="compact"
+          rounded
+          hide-details
+          class="rounded-pill footerBtns"
+          />
+        </div>
+      </v-col>
+
+      <!-- Pagination (visible only on xs) -->
+      <v-col cols="12" class="d-flex justify-center d-sm-none mt-2">
+        <v-pagination
+        v-model="page"
+        :length="pageCount"
+        :total-visible="5"
+        class="custom-pagination"
+        next-icon="mdi-arrow-right"
+        prev-icon="mdi-arrow-left"
         />
       </v-col>
     </v-row>
@@ -409,7 +411,7 @@ watch(selectedPageSize, () => {
   opacity: 1 !important;
 }
 
-.truncate-email {
+.truncate-text {
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
