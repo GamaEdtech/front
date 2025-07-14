@@ -272,7 +272,7 @@ useHead(() => ({
       rel: "canonical",
       href: `${requestURL.value}/school/${
         contentData.value?.id
-      }/${$slugGenerator(contentData.value?.name)}`,
+      }/${$slugGenerator(contentData?.value?.name)}`,
     },
     {
       rel: "icon",
@@ -288,7 +288,7 @@ useSeoMeta({
   ogTitle: `${contentData.value?.name} | GamaTrain Schools`,
   ogDescription: `Learn more about ${contentData.value?.name} located in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. See ratings, facilities, and more.`,
   ogImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
-  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(contentData.value?.name)}`,
+  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(contentData?.value?.name)}`,
   twitterTitle: `${contentData.value?.name} | GamaTrain Schools`,
   twitterDescription: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle} on GamaTrain.`,
   twitterImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
