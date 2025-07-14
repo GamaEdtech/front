@@ -3,10 +3,7 @@ import useApiService from '~/composables/useApiService';
 
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true
-  },
+  modelValue: Boolean,
   id: String
 });
 
@@ -19,24 +16,45 @@ const tokenExpireDate = ref(null)
 
 const getUserToken = async () => {
     try {
-        const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/token`);
+      const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/token`);
+      if(res.succeeded)
         userToken.value = res.data.token
-    } catch (error) {
-        
+    } catch (err) {
+        if (err.response?.status === 400) 
+          $toast.error(err.response.data.message);
     }
 }
 
 const generateNewtoken = async (id) => {
-
-  const res = await useApiService.post(`/api/v2/admin/identities/${id}/token`)
-  userToken.value = res.data.token
-  tokenExpireDate.value = redirect.data.expirationTime
+  try{
+    const res = await useApiService.post(`/api/v2/admin/identities/${id}/token`)
+    if(res.succeeded){
+      userToken.value = res.data.token
+      tokenExpireDate.value = res.data.expirationTime 
+      $toast.success('Token Generated Successfully')
+    }
+    else 
+      $toast.error(res.errors[0].message)
+  } catch(err){
+      if (err.response?.status === 400) 
+        $toast.error(err.response.data.message);
+  }
 
 }
 
 const deleteToken = async (id) =>{
-  const res = await useApiService.remove(`/api/v2/admin/identities/${id}/token`)
-  userToken.value = null
+  try{
+    const res = await useApiService.remove(`/api/v2/admin/identities/${id}/token`)
+    if(res.succeeded){
+      userToken.value = null
+      $toast.success('Token Deleted Successfully')
+    }
+    else 
+      $toast.error(res.errors[0].message)
+  } catch(err){
+    if (err.response?.status === 400) 
+        $toast.error(err.response.data.message);
+  }
 }
 
 onMounted(() => {
@@ -46,37 +64,44 @@ onMounted(() => {
 </script>
 <template>
   <v-dialog :model-value="modelValue" @click:outside="$emit('update:modelValue', false)" max-width="400px">
-    <v-card class="bg-primary-gray-200">
+    <v-card class="bg-primary-gray-200 rounded-xl">
       <v-card-title class="d-flex justify-center pa-4 bg-white">
         <span class="gtext-t3">Token</span>
       </v-card-title>
 
-      <v-card-text class="py-2">
+      <v-card-text class="px-4 bg-white ma-6 mb-2 rounded-lg">
         {{ userToken || 'No Token' }}
       </v-card-text>
-      <v-card-text class="py-2">
+      <v-card-text class="px-4 bg-white ma-6 mb-2 rounded-lg">
         {{ tokenExpireDate || 'No Expiration Time' }}
       </v-card-text>
 
       <v-card-actions class="d-flex justify-center ga-10 mb-2">
-        <v-btn class="closeBtn" variant="plain" @click="$emit('update:modelValue', false)">
-                    <span class="mdi mdi-close gtext-t1"></span>
-                </v-btn>
-        <v-btn class="deleteTokenBtn relative" variant="plain" @click="deleteToken(props.id)">
+        <v-btn
+        class="closeBtn" 
+        variant="plain" 
+        @click="$emit('update:modelValue', false)"
+        >
+          <span class="mdi mdi-close gtext-t1"></span>
+        </v-btn>
+        <v-btn 
+        class="deleteTokenBtn relative" 
+        variant="plain" 
+        @click="deleteToken(props.id)">
           <span class="mdi mdi-delete gtext-t1"></span>
           <v-tooltip
-              activator="parent"
-              location="top"
-            >
-            Delete
-            </v-tooltip>
+          activator="parent"
+          location="top"
+          >
+            Delete Token
+          </v-tooltip>
         </v-btn>
         <v-btn
         class="rounded-pill gtext-t5 ml-4 submitBtn"
         @click="generateNewtoken(props.id)"
-      >
-        <span>Generate New Token</span>
-      </v-btn>
+        >
+          <span>Generate New Token</span>
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

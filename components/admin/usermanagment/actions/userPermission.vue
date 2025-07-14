@@ -3,10 +3,7 @@ import useApiService from '~/composables/useApiService';
 
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true
-  },
+  modelValue: Boolean,
   id: String
 });
 
@@ -17,59 +14,71 @@ const emit = defineEmits(['update:modelValue']);
 const userRole = ref([])
 
 const getUserPermission = async () => {
-    try {
-        const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/permissions`);
-        userRole.value = res.data.roles
-    } catch (error) {
-        
-    }
+  try {
+    const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/permissions`);
+    userRole.value = res.data.roles
+  } catch (error) {
+      if (err.response?.status === 400) 
+        $toast.error(err.response.data.message);
+  }
 }
 
 const editUserPermission = async (id) => {
-  const res = await useApiService.put(`/api/v2/admin/identities/${id}/permissions`,{
-    roles: userRole.value
-  })
-  userRole.value = res.data.roles
-
+  try{
+    const res = await useApiService.put(`/api/v2/admin/identities/${id}/permissions`,{
+      roles: userRole.value
+    })
+    if(res.succeeded){
+      userRole.value = res.data.roles
+      $toast.success('Permission Changed successfully')
+    }
+    else 
+      $toast.error(res.errors[0].message)
+  } catch(err){
+      if (err.response?.status === 400) 
+        $toast.error(err.response.data.message);
+  }
 }
 
 onMounted(() => {
   getUserPermission()
 })
 
-
-
 </script>
 <template>
   <v-dialog :model-value="modelValue" @click:outside="$emit('update:modelValue', false)" max-width="400px">
-    <v-card class="bg-primary-gray-200">
+    <v-card class="bg-primary-gray-200 rounded-xl">
       <v-card-title class="d-flex justify-center pa-4 bg-white">
         <span class="gtext-t3">User Permission</span>
       </v-card-title>
 
       <v-card-text class="py-2">
         <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
-                Roles
-            </label>
+          Roles
+        </label>
         <v-select
           :items="['Admin']"
           variant="solo"
           density="compact"
           multiple
           v-model="userRole"
-        ></v-select>
+          />
       </v-card-text>
 
       <v-card-actions class="d-flex justify-center ga-10 mb-2">
-        <v-btn class="closeBtn" variant="plain" @click="$emit('update:modelValue', false)">
-                    <span class="mdi mdi-close gtext-t1"></span>
-                </v-btn>
+        <v-btn 
+        class="closeBtn" 
+        variant="plain" 
+        @click="$emit('update:modelValue', false)"
+        >
+          <span class="mdi mdi-close gtext-t1"></span>
+        </v-btn>
         <v-btn
         class="rounded-pill gtext-t5 ml-4 submitBtn"
         @click="editUserPermission(props.id)"
-      >
-        <span>Submit</span>
-      </v-btn>
+        >
+          <span>Submit</span>
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -100,8 +109,6 @@ onMounted(() => {
   font-weight: 400 !important;
 }
 .submitBtn{
-    width: 7rem;
-    height: 3.4rem;
     padding: 0rem 1.2rem;
     background: #ffb600;
     color: #24292f;
