@@ -2,6 +2,7 @@ import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
 import glsl from "vite-plugin-glsl";
 
+
 export default defineNuxtConfig({
   // Add compatibility date to fix the warning
   compatibilityDate: "2024-04-03",
@@ -40,10 +41,13 @@ export default defineNuxtConfig({
             "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
         },
         { property: "og:site_name", content: "GamaTrain" },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon-dark.ico" },
         { rel: "stylesheet", href: "/assets/css/all.min.css" },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon-light.png' },
       ],
       script: [
         {
@@ -83,17 +87,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  // pwa config
-  pwa: {
-    manifest: {
-      name: "Gamatrain App",
-      short_name: "Gamatrain",
-      description:
-        "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
-      lang: "en",
-      useWebmanifestExtension: false,
-    },
-  },
+
 
   // Global CSS
   css: [
@@ -121,12 +115,79 @@ export default defineNuxtConfig({
     "nuxt-gtag",
     "@nuxt/image",
     "@nuxtjs/leaflet",
+    "@vite-pwa/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
   ],
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: "Gamatrain App",
+      short_name: "Gamatrain",
+      description: "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
+      theme_color: '#00ff40ff',
+      background_color: '#ff0000ff',
+      display: 'standalone',
+      start_url: '/',
+      icons: [
+        {
+          src: "/favicon-16x16-light.png",
+          sizes: "16x16",
+          type: "image/png",
+        },
+        {
+          src: "/favicon-32x32-light.png",
+          sizes: "32x32",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-192x192-light.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-512x512-light.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+      screenshots: [
+        {
+          "src": "/screenshots/home-desktop.png",
+          "sizes": "1280x720",
+          "type": "image/png",
+          "form_factor": "wide"
+        },
+        {
+          "src": "/screenshots/home-mobile.png",
+          "sizes": "540x720",
+          "type": "image/png",
+          "form_factor": "narrow"
+        }
+      ]
+    },
+    meta: {
+      theme_color: '#1900ffff',
+      mobileAppIOS: true,
+      appleStatusBarStyle: 'black-translucent',
+      name: 'Gamatrain'
+    },
+    workbox: {
+      navigateFallback: "/",
+      // globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
+      // cleanupOutdatedCaches: true
+    },
+    devOptions: {
+      enabled: true,
+      type: "module",
+    },
+  },
+
+
   leaflet: {
     markerCluster: true,
   },
@@ -174,7 +235,7 @@ export default defineNuxtConfig({
     },
     define: {
       global: "globalThis",
-    },
+    }
   },
 
   routeRules: {
