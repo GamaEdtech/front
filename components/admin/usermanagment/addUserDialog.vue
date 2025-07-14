@@ -10,7 +10,7 @@ defineProps({
 });
 const { $toast } = useNuxtApp();
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue','fetchUser']);
 
 
 const form = ref(null);
@@ -39,24 +39,27 @@ const confirmPasswordVisible = ref(false)
 
 
 const submitUser = async () => {
+    const payload = {
+    Username: newUser.value.username,
+    Password: newUser.value.password,
+    ConfirmPassword: newUser.value.confirmPassword,
+    Email: newUser.value.email,
+    PhoneNumber: newUser.value.phone,
+    FirstName: newUser.value.firstName,
+    LastName: newUser.value.lastName
+    };
     try{
-        const res = await useApiService.post('/api/v2/admin/identities',{
-            'Username' : newUser.value.username,
-            'FirstName' : newUser.value.firstName,
-            'LastName' : newUser.value.lastName,
-            'Email' : newUser.value.email,
-            'PhoneNumber' : newUser.value.phone,
-            'Password' : newUser.value.password,
-            'ConfirmPassword' : newUser.value.confirmPassword
-        })
+        const res = await useApiService.post('/api/v2/admin/identities', null, {
+          params: payload
+        });
         // Reset all form fields
-            Object.keys(newUser.value).forEach(key => {
-                newUser.value[key] = '';
-            });
-            form.value.reset();
-            $toast.success("User Added Successfully")
-            emit('update:modelValue', false);
-            console.log('salam')
+        Object.keys(newUser.value).forEach(key => {
+            newUser.value[key] = '';
+        });
+        form.value.reset();
+        $toast.success("User Added Successfully")
+        emit('update:modelValue', false);
+        emit('fetchUser');
     }
     catch(err){
         if (err.response?.status === 400) 
@@ -67,8 +70,8 @@ const submitUser = async () => {
 </script>
 <template>
   <v-dialog :model-value="modelValue" @click:outside="$emit('update:modelValue', false)" max-width="500px">
-    <v-card>
-      <v-card-title class="d-flex justify-center pa-4 bg-primary-gray-200">
+    <v-card class="bg-primary-gray-200">
+      <v-card-title class="d-flex justify-center pa-4 bg-white">
         <span class="gtext-t3">Add New User</span>
       </v-card-title>
 
@@ -113,7 +116,7 @@ const submitUser = async () => {
                 Phone Number
             </label>
             <v-text-field
-            v-model="newUser.PhoneNumber"
+            v-model="newUser.phone"
             variant="solo"
             type="email"
             density="compact"
@@ -149,16 +152,13 @@ const submitUser = async () => {
       </v-card-text>
 
       <v-card-actions class="d-flex justify-center ga-10 mb-2">
-        <v-btn
-        class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
-        @click="$emit('update:modelValue', false)"
-      >
-        <span>Cancel</span>
-      </v-btn>
+        <v-btn class="closeBtn" variant="plain" @click="$emit('update:modelValue', false)">
+          <span class="mdi mdi-close gtext-t1"></span>
+        </v-btn>
         <v-btn
         class="rounded-pill gtext-t5 ml-4 submitBtn"
         @click="submitUser" :disabled="!formIsValid"
-      >
+        >
         <span>Submit</span>
       </v-btn>
       </v-card-actions>
@@ -191,15 +191,23 @@ const submitUser = async () => {
   font-weight: 400 !important;
 }
 .submitBtn{
-    width: 7rem;
     height: 3.4rem;
-    padding: 0rem 1.2rem;
+    padding: 0.6rem 1.8rem;
     background: #ffb600;
     color: #24292f;
     border-radius: 3rem;
-    opacity: 0.7;
+}
+.closeBtn {
+    width: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    color: #919191;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 0px !important;
     &:hover{
-        opacity: 1;
+        color: #F04438;
         transition: 300ms;
     }
 }

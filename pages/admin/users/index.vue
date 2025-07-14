@@ -1,7 +1,7 @@
 <script setup>
 import DeleteItemModal from '@/components/admin/contactus/deleteItemModal.vue'
 import UserDetailModal from '~/components/admin/usermanagment/userDetailModal.vue';
-import AddUserDialog from '~/components/admin/usermanagment/adduserDialog.vue';
+import addUserDialog from '~/components/admin/usermanagment/addUserDialog.vue';
 import useApiService from '~/composables/useApiService';
 
 definePageMeta({
@@ -15,6 +15,7 @@ const list = ref([]);
 const headers = [
   { title: 'Username', key: 'username', sortable: false, width: '15vw' },
   { title: 'Email', key: 'email', sortable: false, width: '15vw' },
+  { title: 'Status', key: 'enabled', sortable: false, width: '1vw' },
   { title: 'Actions', key: 'actions', sortable: false, width: '5vw' },
 ];
 
@@ -85,6 +86,25 @@ const viewMessageDetails = async (id) => {
     }
   }
 };
+
+const toggleUserStatus = async (id) => {
+  const token = localStorage.getItem('v2_token')
+  try{
+    await $fetch(`/api/v2/admin/identities/${id}/toggle`,{
+      method : 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      }
+    );
+    fetchUsers();
+
+  }catch (err) {
+    if (err.response?.status === 400) {
+      $toast.error(err.response.data.message);
+    }
+  }
+}
 
 
 const deleteUser = async () => {
@@ -179,19 +199,50 @@ watch(selectedPageSize, () => {
         </template>
 
         <template #header.actions>
-          <div class="d-flex justify-end pr-3">
+          <div class="d-flex justify-end pr-6">
             Actions
           </div>
     </template>
 
+        <template #item.enabled="{ item }">
+          <span v-if="item.enabled == true" class="gtext-t5 green-12b76a">enable</span>
+          <span v-else class="gtext-t5 red-F04438">disable</span>
+        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end pr-2">
+            <v-btn variant="plain" class="px-0 min-width-10">
             <v-icon small class="mr-2 gtext-t1" @click="viewMessageDetails(item.id)">
               mdi-file-find
             </v-icon>
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
+            Details
+            </v-tooltip>
+            </v-btn>
+            <v-btn variant="plain" class="px-0 min-width-10">
+            <v-icon small class="mr-2 gtext-t1" @click="toggleUserStatus(item.id)">
+              mdi mdi-account-alert
+            </v-icon>
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
+            toggle status
+            </v-tooltip>
+            </v-btn>
+            <v-btn variant="plain" class="px-0 min-width-10">
             <v-icon small class="gtext-t1" @click="handleDelete(item.id)">
               mdi-delete
             </v-icon>
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
+            Delete
+            </v-tooltip>
+            </v-btn>
           </div>
         </template>
       </v-data-table>
@@ -202,16 +253,17 @@ watch(selectedPageSize, () => {
         :email="selectedEmail"
         :phoneNumber="selectedPhoneNumber"
         :id="selectedId"
-        @delete="handleDelete"
+        @fetchUser="fetchUsers"
       />
 
       <DeleteItemModal
         v-model="isDeleteModalOpen"
         @confirm="deleteUser"
       />
-      <AddUserDialog
+      <addUserDialog
         v-model="showAddUserDialog"
         @confirm="deleteUser"
+        @fetchUser="fetchUsers"
       />
     </div>
 
@@ -376,4 +428,23 @@ watch(selectedPageSize, () => {
 :deep(.v-data-table thead th) {
   background-color: #F2F4F7 !important;
 }
+
+.red-F04438{
+  color: #F04438;
+  border-radius: 4px;
+  padding: 4px 8px;
+  border: 1px solid #F04438;
+}
+.green-12b76a{
+  color: #12b76a;
+  border-radius: 4px;
+  padding: 4px 8px;
+  border: 1px solid #12b76a;
+}
+
+.min-width-10{
+  min-width: 10px !important;
+  height: 10px !important;
+}
+
 </style>
