@@ -52,7 +52,20 @@
           Map view
         </v-btn>
       </div>
-      <schoolList
+      <schoolListDesktop
+        v-if="!isMobile"
+        :school-list="schools"
+        :is-expanded="!isExpandMapInDesktop"
+        :is-initial-loading="isInitialSchoolLoading"
+        :is-pagination-loading="isPaginationSchoolLoading"
+        :is-pagination-previous-loading="isPaginationPreviousSchoolLoading"
+        :is-all-data-loaded="isAllSchoolLoaded"
+        :page-number-for-load-previous-data="pageNumberForLoadPreviousSchool"
+        @load-next-page="loadNextPageSchool"
+        @load-previous-page="loadPreviousSchool"
+      />
+      <schoolListMobile
+        v-if="isMobile"
         :school-list="schools"
         :is-expanded="!isExpandMapInDesktop"
         :is-initial-loading="isInitialSchoolLoading"
@@ -72,7 +85,6 @@ import { onUnmounted } from "vue";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/Filter.vue";
-import schoolList from "~/components/school/List.vue";
 import Map from "~/components/school/Map.vue";
 
 useHead({
@@ -115,6 +127,10 @@ useHead({
 
 const router = useRouter();
 const route = useRoute();
+
+const display = useGlobalDisplay();
+const isMobile = ref(display.xs);
+
 
 const sortList = [
   {

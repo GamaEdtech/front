@@ -131,7 +131,7 @@
 <script setup>
 import { onMounted, onUnmounted } from "vue";
 
-import CardSchoolSkeleton from "./CardSchoolSkeleton.vue";
+import CardSchoolSkeleton from "../CardSchoolSkeleton.vue";
 
 const props = defineProps({
   schoolList: {
@@ -205,6 +205,132 @@ const loadPreviousPage = () => {
 };
 </script>
 
-<style scoped>
-@import "../../assets/scss/school/list.scss";
+<style lang="scss" scoped>
+@use "../../../assets/scss//app.scss" as style;
+
+
+// comment import css-file &  using particular styles for Mobile-Desktop view
+/* @import "../../../assets/scss/school/list.scss"; */
+.main-list-school-div {
+    width: 100%;
+    padding: 40px 20px 0 20px;
+    transition: all 0.5s;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+
+    .container-list-div {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        max-width: 1600px;
+        .container-scroll {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            row-gap: 20px;
+            padding: 0 20px 20px 20px;
+            @include style.responsive-size(
+                padding,
+                0 20px 20px 20px,
+                0 20px 20px 20px,
+                0 20px 20px 20px,
+                0 10px 20px 10px
+            );
+            .card-school {
+                width: 100%;
+                min-height: 232px;
+                background-color: white;
+                border-radius: 4px;
+                box-shadow:
+                    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-between;
+                padding: 16px;
+                .name-address-image {
+                    width: 100%;
+                    display: flex;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                    row-gap: 20px;
+                    min-height: 130px;
+                    @include style.responsive-size(
+                        justify-content,
+                        space-between,
+                        space-between,
+                        space-between,
+                        center
+                    );
+                    .name-div {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        justify-content: flex-start;
+                        row-gap: 20px;
+                    }
+                    .img-div {
+                        min-width: 180px;
+                        height: 130px;
+                    }
+                }
+                .line-seperator {
+                    width: 100%;
+                    height: 2px;
+                    background-color: #e4e6e9;
+                    margin-top: 10px;
+                }
+            }
+
+            .line-specifier-load-more {
+                width: 100%;
+                height: 6px;
+                // background-color: red;
+            }
+
+            .not-found-div {
+                width: 100%;
+                text-align: center;
+                font-size: 20px;
+                font-weight: 600;
+            }
+        }
+    }
+    .container-button-load-previous-data {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        z-index: 3;
+        @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+    }
+}
+.closed-list {
+    width: 550px;
+    position: absolute;
+    right: 0;
+    top: 100px;
+    padding: 40px 10px;
+    height: calc(100% - 100px);
+    .container-list-div {
+        height: 100%;
+        .container-scroll {
+            padding: 0 10px 20px 10px;
+
+            .card-school {
+                padding: 10px;
+            }
+        }
+    }
+}
 </style>
