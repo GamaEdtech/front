@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex d-md-none">
-    <div class="under-image-right" v-if="contentData.tour && !tourImgPreview">
+    <div :class="tourClass" v-if="contentData.tour && !tourImgPreview">
       <img
         @click="openTourImgInput"
         class="pointer schoolDetailsImg"
@@ -20,7 +20,7 @@
         </v-btn>
       </div>
     </div>
-    <div v-else-if="tourImgPreview" class="" :class="tourClass">
+    <div v-else-if="tourImgPreview" :class="['enter-img-holder', tourClass]">
       <img
         class="pointer schoolDetailsImg"
         :src="tourImgPreview"

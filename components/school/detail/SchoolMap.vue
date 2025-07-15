@@ -1,7 +1,7 @@
 <template>
   <div :class="mapClass">
     <client-only>
-      <l-map
+      <l-map  
         ref="schoolMap"
         :zoom="map.zoom"
         :min-zoom="map.minZoom"
