@@ -50,6 +50,7 @@ const menuItems = [
     icon: "mdi-currency-usd",
     icon_color: "",
   },
+
   // {
   //   title: "Offers",
   //   link: "/offers",

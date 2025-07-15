@@ -336,9 +336,6 @@ const mathJaxEl = ref(null);
 const crash_report = ref(null);
 
 onMounted(async () => {
-  if (testDetail.value && testDetail.value.querySelector("#test-question")) {
-    document.title = testDetail.value.querySelector("#test-question").innerText;
-  }
   setTimeout(() => {
     renderMathJax();
   }, 2000);

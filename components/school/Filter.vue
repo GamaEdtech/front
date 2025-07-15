@@ -19,18 +19,11 @@
             @update:modelValue="changeSearchValue"
           ></v-text-field>
         </div>
-        <div class="d-flex d-lg-none justify-end w-33">
+        <div class="d-flex d-lg-none justify-end w-33 ga-2">
           <v-btn size="small" icon @click="openFilterMobile" color="#f2f4f7">
             <v-icon size="x-large" color="#000000">mdi-filter</v-icon>
           </v-btn>
-          <v-btn
-            size="small"
-            variant="text"
-            disabled
-            icon
-            @click="openSortNav($event)"
-            color="#f2f4f7"
-          >
+          <v-btn size="small" icon @click="openSortNav($event)" color="#f2f4f7">
             <v-icon size="x-large" color="#000000">mdi-filter-variant</v-icon>
           </v-btn>
         </div>
@@ -94,32 +87,48 @@
               ref="boxSortRef"
               v-if="item.name == `Sort` && item.isShow"
             >
-              <div
-                class="item-sort"
-                v-for="item in sortList"
-                :key="item.value"
-                @click="selectSort($event, item)"
-              >
-                {{ item.title }}
-              </div>
+              <v-list class="w-100">
+                <v-list-item v-for="sortItem in sortList" :key="sortItem.value">
+                  <v-checkbox
+                    :model-value="filterForm.sort.includes(sortItem.value)"
+                    color="primary"
+                    class="text-h4"
+                    hide-details
+                    @click.stop
+                    @update:modelValue="
+                      (val) => handleCheckboxChange(val, sortItem)
+                    "
+                  >
+                    <template v-slot:label>
+                      <span class="text-h4 font-weight-medium ml-2">{{
+                        sortItem.title
+                      }}</span>
+                    </template>
+                  </v-checkbox>
+                </v-list-item>
+              </v-list>
             </div>
           </div>
-          <div class="each-item-filter result-div">
-            Results
-            <span class="count-result" v-if="totalSchoolFind != 0">{{
-              $numberFormat(totalSchoolFind)
-            }}</span>
-          </div>
+          <ClientOnly>
+            <div class="each-item-filter result-div">
+              Results
+              <span class="count-result" v-if="totalSchoolFind != 0">{{
+                $numberFormat(totalSchoolFind)
+              }}</span>
+            </div>
+          </ClientOnly>
         </div>
 
-        <div class="result-div-mobile gama-text-overline">
-          Results
-          <span
-            class="count-result gama-text-button"
-            v-if="totalSchoolFind != 0"
-            >{{ $numberFormat(totalSchoolFind) }}</span
-          >
-        </div>
+        <ClientOnly>
+          <div class="result-div-mobile gama-text-overline">
+            Results
+            <span
+              class="count-result gama-text-button"
+              v-if="totalSchoolFind != 0"
+              >{{ $numberFormat(totalSchoolFind) }}</span
+            >
+          </div>
+        </ClientOnly>
       </div>
     </div>
     <div
@@ -188,14 +197,28 @@
     <div class="overlay-bottom-nav" v-if="showSortNavMobile">
       <div class="sort-bottom-nav" ref="sortBottomNavRef">
         <span class="title">Sort by</span>
-        <div
-          class="item-sort"
-          v-for="item in sortList"
-          :key="item.value"
-          @click="selectSort($event, item)"
-        >
-          {{ item.title }}
-        </div>
+        <v-list class="w-100">
+          <v-list-item
+            class="px-0"
+            v-for="sortItem in sortList"
+            :key="sortItem.value"
+          >
+            <v-checkbox
+              :model-value="filterForm.sort.includes(sortItem.value)"
+              color="primary"
+              class="text-h4"
+              hide-details
+              @click.stop
+              @update:modelValue="(val) => handleCheckboxChange(val, sortItem)"
+            >
+              <template v-slot:label>
+                <span class="text-h4 font-weight-medium ml-2">{{
+                  sortItem.title
+                }}</span>
+              </template>
+            </v-checkbox>
+          </v-list-item>
+        </v-list>
       </div>
     </div>
 
@@ -518,10 +541,11 @@ const optionFilter = ref([
   },
   {
     name: "Sort",
-    active: false,
+    active: true,
     isShow: false,
   },
 ]);
+
 const filterForm = reactive({
   keyword: route.query.keyword || "",
   country: Number(route.query.country) || "",
@@ -529,7 +553,11 @@ const filterForm = reactive({
   city: Number(route.query.city) || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
-  sort: route.query.sort || "",
+  sort: Array.isArray(route.query.sort)
+    ? route.query.sort
+    : route.query.sort
+    ? route.query.sort.split(",")
+    : [],
   school_type: Array.isArray(route.query.school_type)
     ? route.query.school_type
     : route.query.school_type
@@ -611,7 +639,9 @@ const updateQueryParams = () => {
   if (filterForm.city) query.city = filterForm.city;
   if (filterForm.stage) query.stage = filterForm.stage;
   if (filterForm.tuition_fee > 0) query.tuition_fee = filterForm.tuition_fee;
-  if (filterForm.sort) query.sort = filterForm.sort;
+  if (filterForm.sort.length > 0 && filterForm.sort != undefined)
+    query.sort = filterForm.sort;
+
   if (filterForm.school_type.length > 0 && filterForm.school_type != undefined)
     query.school_type = filterForm.school_type;
 
@@ -624,7 +654,6 @@ const updateQueryParams = () => {
     query.coed_status = filterForm.coed_status;
   if (filterForm.religion.length > 0 && filterForm.religion != undefined)
     query.religion = filterForm.religion;
-  // router.replace({ query });
   emit("update-filter", query);
 };
 
@@ -757,11 +786,13 @@ const boxSortRef = ref(null);
 const showSortNavMobile = ref(false);
 const sortBottomNavRef = ref(null);
 
-const selectSort = (event, sort) => {
-  event.stopPropagation();
-  filterForm.sort = sort.value;
-  showSortNavMobile.value = false;
-  optionFilter.value.filter((item) => item.name == "Sort")[0].isShow = false;
+const handleCheckboxChange = (checked, item) => {
+  const index = filterForm.sort.indexOf(item.value);
+  if (checked && index === -1) {
+    filterForm.sort.push(item.value);
+  } else if (!checked && index !== -1) {
+    filterForm.sort.splice(index, 1);
+  }
   updateQueryParams();
 };
 
