@@ -73,6 +73,7 @@
 </template>
 
 <script setup>
+import dayjs from "dayjs";
 import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
@@ -200,8 +201,36 @@ const pageTitle = ref("");
 const pageDescribe = ref("");
 
 const setMetaData = (type) => {
-  setPageDescribe(type);
-  setPageTitle(type);
+  const { section, base, lesson, test_type, edu_year, edu_month } = route.query;
+  const firstElement = initialData.value?.data?.list[0];
+
+  const titles = {
+    boardTitle:
+      section && firstElement ? firstElement.section_title : undefined,
+    gradeTitle: section && base && firstElement ? firstElement.base_title : "",
+    subjectTitle:
+      section && base && lesson && firstElement
+        ? firstElement.lesson_title
+        : "",
+    classificationTitle: "",
+    yearTitle: edu_year ? edu_year : "",
+    monthTitle: edu_month
+      ? dayjs()
+          .month(edu_month - 1)
+          .format("MMMM")
+      : "",
+  };
+  if (
+    (route.query.type == "test" || route.query.type == "azmoon") &&
+    test_type
+  ) {
+    titles.classificationTitle =
+      firstElement?.test_type_title || firstElement?.azmoon_type_title;
+  }
+  const joinTextTitles = `${titles.monthTitle} ${titles.yearTitle} ${titles.classificationTitle} ${titles.subjectTitle} ${titles.gradeTitle} ${titles.boardTitle}`;
+
+  setPageDescribe(type, titles, joinTextTitles);
+  setPageTitle(type, titles, joinTextTitles);
 
   useHead(() => ({
     title: pageTitle.value,
@@ -235,50 +264,37 @@ const setMetaData = (type) => {
   }));
 };
 
-const setPageTitle = (type) => {
-  const { section, base, lesson } = route.query;
-  const firstElement = initialData.value?.data?.list[0];
-
-  const titles = {
-    boardTitle:
-      section && firstElement ? firstElement.section_title : undefined,
-    gradeTitle: section && base && firstElement ? firstElement.base_title : "",
-    subjectTitle:
-      section && base && lesson && firstElement
-        ? firstElement.lesson_title
-        : "",
-  };
-
+const setPageTitle = (type, titles, joinTextTitles) => {
   const titleTemplates = {
     learnfiles: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} multimedia`,
+      dynamic: `${joinTextTitles} multimedia`,
       fallback:
         "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain",
     },
     test: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      dynamic: `${joinTextTitles} Past Papers`,
       fallback: "Educational Resources | K12 Education Papers and Materials",
     },
     question: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Forum`,
+      dynamic: `${joinTextTitles} Forum`,
       fallback:
         "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum",
     },
     azmoon: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Online test`,
+      dynamic: `${joinTextTitles} Online test`,
       fallback: "Online Exams, Free Exams for Improving Education",
     },
     dars: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Textbook`,
+      dynamic: `${joinTextTitles} Textbook`,
       fallback:
         "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials",
     },
     tutor: {
-      dynamic: "Teacher",
+      dynamic: `${joinTextTitles} Teacher`,
       fallback: "Teacher",
     },
     default: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      dynamic: `${joinTextTitles} Past Papers`,
       fallback: "Educational Resources | K12 Education Papers and Materials",
     },
   };
@@ -300,10 +316,36 @@ const pageDescriptions = {
   tutor: "Teacher",
 };
 
-const setPageDescribe = (type) => {
-  pageDescribe.value =
-    pageDescriptions[type] ||
-    "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+const setPageDescribe = (type, titles, joinTextTitles) => {
+  const descriptionTemplates = {
+    learnfiles: {
+      dynamic: `Free download list of ${joinTextTitles}  multimedia. Includes mark scheme for exam preparation.`,
+    },
+    test: {
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+    },
+    question: {
+      dynamic: `Free download list of ${joinTextTitles} Forum. Includes mark scheme for exam preparation.`,
+    },
+    azmoon: {
+      dynamic: `Free download list of ${joinTextTitles} Online test. Includes mark scheme for exam preparation.`,
+    },
+    dars: {
+      dynamic: `Free download list of ${joinTextTitles} Textbook. Includes mark scheme for exam preparation.`,
+    },
+    tutor: {
+      dynamic: `Free download list of ${joinTextTitles} Teacher. Includes mark scheme for exam preparation.`,
+    },
+    default: {
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+    },
+  };
+
+  const template = descriptionTemplates[type] || descriptionTemplates.default;
+
+  pageDescribe.value = titles.boardTitle
+    ? template.dynamic
+    : pageDescriptions[type];
 };
 
 setMetaData(route.query.type);

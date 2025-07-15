@@ -165,8 +165,31 @@ const pageTitle = ref("");
 const pageDescribe = ref("");
 
 const setMetaData = (type) => {
-  setPageDescribe(type);
-  setPageTitle(type);
+  const titles = {
+    boardTitle: filters[FILTER_INDEX.Board]?.selectedItem?.title
+      ? filters[FILTER_INDEX.Board]?.selectedItem?.title
+      : undefined,
+    gradeTitle: filters[FILTER_INDEX.Grade]?.selectedItem?.title
+      ? filters[FILTER_INDEX.Grade]?.selectedItem?.title
+      : "",
+    subjectTitle: filters[FILTER_INDEX.Subject]?.selectedItem?.title
+      ? filters[FILTER_INDEX.Subject]?.selectedItem?.title
+      : "",
+    classificationTitle: filters[FILTER_INDEX.Classification]?.selectedItem
+      ?.title
+      ? filters[FILTER_INDEX.Classification]?.selectedItem?.title
+      : "",
+    yearTitle: filters[FILTER_INDEX.Year]?.selectedItem?.title
+      ? filters[FILTER_INDEX.Year]?.selectedItem?.title
+      : "",
+    monthTitle: filters[FILTER_INDEX.Month]?.selectedItem?.title
+      ? filters[FILTER_INDEX.Month]?.selectedItem?.title
+      : "",
+  };
+
+  const joinTextTitles = `${titles.monthTitle} ${titles.yearTitle} ${titles.classificationTitle} ${titles.subjectTitle} ${titles.gradeTitle} ${titles.boardTitle}`;
+  setPageDescribe(type, joinTextTitles, titles);
+  setPageTitle(type, joinTextTitles, titles);
   useHead(() => ({
     title: pageTitle.value,
     meta: [
@@ -199,49 +222,37 @@ const setMetaData = (type) => {
   }));
 };
 
-const setPageTitle = (type) => {
-  const titles = {
-    boardTitle: filters[FILTER_INDEX.Board]?.selectedItem?.title
-      ? filters[FILTER_INDEX.Board]?.selectedItem?.title
-      : undefined,
-    gradeTitle: filters[FILTER_INDEX.Grade]?.selectedItem?.title
-      ? filters[FILTER_INDEX.Grade]?.selectedItem?.title
-      : "",
-    subjectTitle: filters[FILTER_INDEX.Subject]?.selectedItem?.title
-      ? filters[FILTER_INDEX.Subject]?.selectedItem?.title
-      : "",
-  };
-
+const setPageTitle = (type, joinTextTitles, titles) => {
   const titleTemplates = {
     learnfiles: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} multimedia`,
+      dynamic: `${joinTextTitles}  multimedia`,
       fallback:
         "Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain",
     },
     test: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      dynamic: `${joinTextTitles} Past Papers`,
       fallback: "Educational Resources | K12 Education Papers and Materials",
     },
     question: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Forum`,
+      dynamic: `${joinTextTitles} Forum`,
       fallback:
         "Seek Clarification, Expand Your Understanding: GamaTrain's Q&A Forum",
     },
     azmoon: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Online test`,
+      dynamic: `${joinTextTitles} Online test`,
       fallback: "Online Exams, Free Exams for Improving Education",
     },
     dars: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Textbook`,
+      dynamic: `${joinTextTitles} Textbook`,
       fallback:
         "Master Concepts, Enhance Learning: GamaTrain's Online Tutorials",
     },
     tutor: {
-      dynamic: "Teacher",
+      dynamic: `${joinTextTitles} Teacher`,
       fallback: "Teacher",
     },
     default: {
-      dynamic: `${titles.boardTitle} ${titles.gradeTitle} ${titles.subjectTitle} Past Papers`,
+      dynamic: `${joinTextTitles} Past Papers`,
       fallback: "Educational Resources | K12 Education Papers and Materials",
     },
   };
@@ -263,10 +274,36 @@ const pageDescriptions = {
   tutor: "Teacher",
 };
 
-const setPageDescribe = (type) => {
-  pageDescribe.value =
-    pageDescriptions[type] ||
-    "Enhance your learning with GamaTrain's extensive collection of online documents and texts, carefully curated to enrich your academic journey.";
+const setPageDescribe = (type, joinTextTitles, titles) => {
+  const descriptionTemplates = {
+    learnfiles: {
+      dynamic: `Free download list of ${joinTextTitles}  multimedia. Includes mark scheme for exam preparation.`,
+    },
+    test: {
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+    },
+    question: {
+      dynamic: `Free download list of ${joinTextTitles} Forum. Includes mark scheme for exam preparation.`,
+    },
+    azmoon: {
+      dynamic: `Free download list of ${joinTextTitles} Online test. Includes mark scheme for exam preparation.`,
+    },
+    dars: {
+      dynamic: `Free download list of ${joinTextTitles} Textbook. Includes mark scheme for exam preparation.`,
+    },
+    tutor: {
+      dynamic: `Free download list of ${joinTextTitles} Teacher. Includes mark scheme for exam preparation.`,
+    },
+    default: {
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+    },
+  };
+
+  const template = descriptionTemplates[type] || descriptionTemplates.default;
+
+  pageDescribe.value = titles.boardTitle
+    ? template.dynamic
+    : pageDescriptions[type];
 };
 
 // Start Section Handle Status Modal
@@ -700,7 +737,7 @@ const updateFiltersExistInRoute = async () => {
   if (
     filters[FILTER_INDEX.Board].selectedItem &&
     typeFilter.selectedItem &&
-    filters[FILTER_INDEX.Classification].typeForGetClassification
+    filters[FILTER_INDEX.Type].selectedItem.typeForGetClassification
   ) {
     filters[FILTER_INDEX.Classification].disabled = false;
     filters[FILTER_INDEX.Classification].loading = true;
