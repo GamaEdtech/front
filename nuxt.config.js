@@ -6,6 +6,10 @@ export default defineNuxtConfig({
   // Add compatibility date to fix the warning
   compatibilityDate: "2024-04-03",
 
+  imports: {
+    autoImport: true
+  },
+
   // Global page headers
   app: {
     head: {

@@ -5,10 +5,6 @@
 </template>
 
 <script>
-export default {
-  layout:'dashboard_layout',
-  name: "edit-profile"
-}
 </script>
 
 <style scoped>
