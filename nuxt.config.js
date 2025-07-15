@@ -129,8 +129,8 @@ export default defineNuxtConfig({
       name: "Gamatrain App",
       short_name: "Gamatrain",
       description: "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
-      theme_color: '#00ff40ff',
-      background_color: '#ff0000ff',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
       display: 'standalone',
       start_url: '/',
       icons: [
@@ -171,15 +171,13 @@ export default defineNuxtConfig({
       ]
     },
     meta: {
-      theme_color: '#1900ffff',
+      theme_color: '#ffffff',
       mobileAppIOS: true,
       appleStatusBarStyle: 'black-translucent',
       name: 'Gamatrain'
     },
     workbox: {
       navigateFallback: "/",
-      // globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
-      // cleanupOutdatedCaches: true
     },
     devOptions: {
       enabled: true,
