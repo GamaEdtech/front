@@ -131,7 +131,6 @@ const route = useRoute();
 const display = useGlobalDisplay();
 const isMobile = ref(display.xs);
 
-
 const sortList = [
   {
     value: "score",
