@@ -146,7 +146,7 @@
         </v-row>
         <v-row>
           <v-col cols="12" md="8">
-            <school-detail-school-chips :contentData="contentData" @onChipsClick="handleQueryParameters" />
+            <school-detail-school-chips :contentData="contentData" />
             <school-detail-tuition-info :contentData="contentData" />
             <school-detail-facilities
               :facilities="contentData.tags"
@@ -369,17 +369,6 @@ function handleCommentSubmitted() {
   refreshComments();
 }
 
-function handleQueryParameters(data){
-  const query = {};
-  if (data.countryId) query.country = data.countryId;
-  if (data.type === 'state' || data.type === 'city') {
-    if (data.stateId) query.state = data.stateId;
-  }
-  if (data.type === 'city') {
-    if (data.cityId) query.city = data.cityId;
-  }
-  router.push({ path: '/school', query });
-}
 
 
 const {

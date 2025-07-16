@@ -4,21 +4,21 @@
       <v-chip
         v-show="localContentData.countryTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
-        @click="emit('onChipsClick', { type: 'country', ...localContentData })"
+        :to="buildSchoolListUrl('country', localContentData)"
       >
         {{ localContentData.countryTitle }}
       </v-chip>
       <v-chip
         v-show="localContentData.stateTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
-          @click="emit('onChipsClick', { type: 'state', ...localContentData })"
+        :to="buildSchoolListUrl('state', localContentData)"
       >
         {{ localContentData.stateTitle }}
       </v-chip>
       <v-chip
         v-show="localContentData.cityTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
-         @click="emit('onChipsClick', { type: 'city', ...localContentData })"
+        :to="buildSchoolListUrl('city', localContentData)"
       >
         {{ localContentData.cityTitle }}
       </v-chip>
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 const props = defineProps({
   contentData: {
@@ -64,8 +64,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const emit = defineEmits(['onChipsClick'])
 
 const localContentData = ref(props.contentData);
 
@@ -76,6 +74,19 @@ watch(
   },
   { deep: true }
 );
+
+function buildSchoolListUrl(type, data) {
+  const query = {};
+  if (data.countryId) query.country = data.countryId;
+  if (type === 'state' || type === 'city') {
+    if (data.stateId) query.state = data.stateId;
+  }
+  if (type === 'city') {
+    if (data.cityId) query.city = data.cityId;
+  }
+  const params = new URLSearchParams(query).toString();
+  return `/school?${params}`;
+}
 </script>
 
 <style scoped>
