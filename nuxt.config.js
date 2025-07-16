@@ -122,9 +122,12 @@ export default defineNuxtConfig({
       });
     },
   ],
+  experimental: {
+    payloadExtraction: false,
+    appManifest: false,
+  },
 
   pwa: {
-    strategies: 'injectManifest',
     registerType: 'autoUpdate',
     manifest: {
       name: "Gamatrain App",
@@ -177,12 +180,14 @@ export default defineNuxtConfig({
       appleStatusBarStyle: 'black-translucent',
       name: 'Gamatrain'
     },
-    injectManifest: {
-      globPatterns: ['**/*.{html}'],
-      swSrc: 'public/sw.js'
-    },
     workbox: {
       navigateFallback: "/",
+      globPatterns: [],
+      globIgnores: [
+        '**/_payload.json',
+        '_nuxt/builds/**/*.json',
+        '**/node_modules/**/*'
+      ]
     },
     devOptions: {
       enabled: true,
