@@ -3,7 +3,6 @@
     <section id="details-gallery-portrate" class="rounded-lg">
       <div class="card-carousel">
         <v-row justify="center">
-          <!--Mobile side section-->
           <v-col
             cols="12"
             class="pr-0 d-flex d-md-none overflow-x-auto mt-3 mt-md-0"
@@ -17,23 +16,14 @@
               :key="index"
               class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip location="right">
-                <template v-slot:activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="font-size: 26px"
-                    :class="
-                      'white--text text--lighten-1 icon icon-' + item.icon
-                    "
-                  />
-                </template>
-                <span>{{ item.text }}</span>
-              </v-tooltip>
+              <span
+                v-tooltip="item.text"
+                style="font-size: 26px"
+                :class="'white--text text--lighten-1 icon icon-' + item.icon"
+              />
             </v-btn>
           </v-col>
-          <!--End mobile side section-->
 
-          <!--Desktop side section-->
           <v-col
             cols="2"
             xl="2"
@@ -48,19 +38,13 @@
               :key="index"
               class="mb-3 bg-blue-grey-darken-2 flex-shrink-0"
             >
-              <v-tooltip location="right">
-                <template v-slot:activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="font-size: 26px"
-                    :class="`icon icon-${item.icon} white--text text--darken-1`"
-                  />
-                </template>
-                <span>{{ item.text }}</span>
-              </v-tooltip>
+              <span
+                v-tooltip="item.text"
+                style="font-size: 26px"
+                :class="`icon icon-${item.icon} white--text text--darken-1`"
+              />
             </v-btn>
           </v-col>
-          <!--End desktop side section-->
 
           <v-col cols="12" md="9" xl="10" class="pl-2">
             <div class="mx-8 mx-md-0">
