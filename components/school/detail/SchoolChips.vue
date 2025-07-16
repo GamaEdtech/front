@@ -65,6 +65,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['onChipsClick'])
+
 const localContentData = ref(props.contentData);
 
 watch(
