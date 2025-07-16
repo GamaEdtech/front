@@ -1015,18 +1015,27 @@ const fetchTestData = async () => {
 
       if (data.a_file) {
         form.a_file_base64 = data.a_file;
+        form.a_file = data.a_file_name || data.a_file || "";
+      } else {
+        form.a_file = "";
       }
-
       if (data.b_file) {
         form.b_file_base64 = data.b_file;
+        form.b_file = data.b_file_name || data.b_file || "";
+      } else {
+        form.b_file = "";
       }
-
       if (data.c_file) {
         form.c_file_base64 = data.c_file;
+        form.c_file = data.c_file_name || data.c_file || "";
+      } else {
+        form.c_file = "";
       }
-
       if (data.d_file) {
         form.d_file_base64 = data.d_file;
+        form.d_file = data.d_file_name || data.d_file || "";
+      } else {
+        form.d_file = "";
       }
 
       // Update UI state based on answer type
@@ -1107,14 +1116,11 @@ const updateQuestion = async () => {
       }
     }
 
-    // Add file fields if they exist
-    if (form.q_file) formData.append("q_file", form.q_file);
-    if (form.answer_full_file)
-      formData.append("answer_full_file", form.answer_full_file);
-    if (form.a_file) formData.append("a_file", form.a_file);
-    if (form.b_file) formData.append("b_file", form.b_file);
-    if (form.c_file) formData.append("c_file", form.c_file);
-    if (form.d_file) formData.append("d_file", form.d_file);
+    // Add file fields for all options, always
+    formData.append("a_file", form.a_file || "");
+    formData.append("b_file", form.b_file || "");
+    formData.append("c_file", form.c_file || "");
+    formData.append("d_file", form.d_file || "");
 
     // Send update request
     const response = await useApiService.put(
@@ -1129,11 +1135,7 @@ const updateQuestion = async () => {
 
     if (response && response.status === 1) {
       $toast.success("Test updated successfully");
-
-      // Redirect back to test maker
-      setTimeout(() => {
-        router.push("/test-maker/create");
-      }, 1500);
+        router.back()
     } else {
       $toast.error(response?.message || "Failed to update test");
     }
@@ -1155,7 +1157,7 @@ const deleteTest = async () => {
 
     if (response.status === 1) {
       $toast.success("Test deleted successfully");
-      router.push("/test-maker/create");
+      router.back()
     } else {
       $toast.error(response.message || "Error deleting test");
     }
