@@ -35,13 +35,12 @@
           class="card-school"
           v-for="(school, index) in schoolList"
           :key="index"
-          :to="`school/${school.id}/${$slugGenerator(school.name)}`"
+          :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
         >
           <div
             v-if="school.defaultImageUri"
             class="school-card-bg"
             :style="{ backgroundImage: `url(${school.defaultImageUri})` }"
-            style="border-top: 0px !important"
           >
             <div class="school-card-overlay">
               <div class="school-card-header">
@@ -346,8 +345,6 @@ const loadPreviousPage = () => {
                 width: 100%;
                 min-height: fit-content;
                 background-color: rgba(255, 255, 255, 0.95);
-                border-radius: 10px;
-                border: 1px solid rgba(242, 244, 247, 1);
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
@@ -438,11 +435,21 @@ const loadPreviousPage = () => {
         }
     }
 }
+.card-school:not(.school-card-bg) {
+  outline: 1px solid  rgba(252, 241, 241, 0.975);
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+}
+
+:deep(.school-card-overlay)   {
+  outline:1px solid  rgba(252, 241, 241, 0.87);
+  outline-style: auto;
+}
 
 .school-card-bg {
     position: relative;
     width: 100%;
-    height: 340px;
+    height: 220px;
     background-size: cover;
     background-position: center;
     border-top-left-radius: 24px;

@@ -17,6 +17,7 @@
         <school-detail-image-gallery
           :content="contentData"
           :class="topSlideClass.image"
+          :images="galleryImages"
           @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </div>
@@ -27,14 +28,17 @@
         <school-detail-image-gallery
           :content="contentData"
           :images="galleryImages"
+          :class="topSlideClass.image"
           @fetch="loadGalleryImages"
         ></school-detail-image-gallery>
       </v-col>
       <v-col cols="12" md="4">
-        <school-detail-school-map
-          :content="contentData"
-          @location-updated="handleLocationUpdate"
-        ></school-detail-school-map>
+        <client-only>
+          <school-detail-school-map
+            :content="contentData"
+            @location-updated="handleLocationUpdate"
+          ></school-detail-school-map>
+        </client-only>
       </v-col>
       <v-col cols="12" md="4">
         <school-detail-school-tour
@@ -142,7 +146,7 @@
         </v-row>
         <v-row>
           <v-col cols="12" md="8">
-            <school-detail-school-chips :contentData="contentData" />
+            <school-detail-school-chips :contentData="contentData" @onChipsClick="handleQueryParameters" />
             <school-detail-tuition-info :contentData="contentData" />
             <school-detail-facilities
               :facilities="contentData.tags"
@@ -183,6 +187,8 @@
 </template>
 
 <script setup>
+import { useRouter, useRoute } from 'nuxt/app';
+
 const route = useRoute();
 const router = useRouter();
 const tourPanoramas = ref([]);
@@ -201,6 +207,7 @@ const similarSchools = [];
 const galleryImages = ref([]);
 const requestURL = ref(useRequestURL().host);
 const { $slugGenerator } = useNuxtApp();
+
 
 const fetchSchoolData = async () => {
   try {
@@ -256,16 +263,38 @@ watch(
   { immediate: true }
 );
 
-// useHead(() => ({
-//   link: [
-//     {
-//       rel: "canonical",
-//       href: `${requestURL.value}/school/${
-//         contentData.value?.id
-//       }/${$slugGenerator(contentData.value?.name)}`,
-//     },
-//   ],
-// }));
+useHead(() => ({
+  htmlAttrs: {
+    lang: "en",
+  },
+  link: [
+    {
+      rel: "canonical",
+      href: `${requestURL.value}/school/${
+        contentData.value?.id
+      }/${$slugGenerator(contentData?.value?.name)}`,
+    },
+    {
+      rel: "icon",
+      type: "image/x-icon",
+      href: "/favicon-dark.ico",
+    },
+  ],
+}));
+
+useSeoMeta({
+  title: `${contentData.value?.name} | GamaTrain Schools`,
+  description: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. Explore ratings, facilities, and more on GamaTrain.`,
+  ogTitle: `${contentData.value?.name} | GamaTrain Schools`,
+  ogDescription: `Learn more about ${contentData.value?.name} located in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. See ratings, facilities, and more.`,
+  ogImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
+  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(contentData?.value?.name)}`,
+  twitterTitle: `${contentData.value?.name} | GamaTrain Schools`,
+  twitterDescription: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle} on GamaTrain.`,
+  twitterImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
+  twitterCard: 'summary_large_image',
+});
+
 
 watch(
   () => ratingDataRaw.value,
@@ -338,6 +367,18 @@ function handleLocationUpdate(locationData) {
 function handleCommentSubmitted() {
   // Refresh comments when a new comment is submitted
   refreshComments();
+}
+
+function handleQueryParameters(data){
+  const query = {};
+  if (data.countryId) query.country = data.countryId;
+  if (data.type === 'state' || data.type === 'city') {
+    if (data.stateId) query.state = data.stateId;
+  }
+  if (data.type === 'city') {
+    if (data.cityId) query.city = data.cityId;
+  }
+  router.push({ path: '/school', query });
 }
 
 

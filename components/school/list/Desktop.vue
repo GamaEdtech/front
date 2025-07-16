@@ -30,7 +30,7 @@
           v-if="!isInitialLoading"
           class="card-school"
           v-for="(school, index) in schoolList"
-          :to="`school/${school.id}/${$slugGenerator(school.name)}`"
+          :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
         >
           <div class="name-address-image">
             <div class="name-div">

@@ -1132,7 +1132,7 @@ const updateQuestion = async () => {
 
       // Redirect back to test maker
       setTimeout(() => {
-        router.push("/test-maker");
+        router.push("/test-maker/create");
       }, 1500);
     } else {
       $toast.error(response?.message || "Failed to update test");
@@ -1155,7 +1155,7 @@ const deleteTest = async () => {
 
     if (response.status === 1) {
       $toast.success("Test deleted successfully");
-      router.push("/test-maker");
+      router.push("/test-maker/create");
     } else {
       $toast.error(response.message || "Error deleting test");
     }

@@ -4,18 +4,21 @@
       <v-chip
         v-show="localContentData.countryTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+        @click="emit('onChipsClick', { type: 'country', ...localContentData })"
       >
         {{ localContentData.countryTitle }}
       </v-chip>
       <v-chip
         v-show="localContentData.stateTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+          @click="emit('onChipsClick', { type: 'state', ...localContentData })"
       >
         {{ localContentData.stateTitle }}
       </v-chip>
       <v-chip
         v-show="localContentData.cityTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+         @click="emit('onChipsClick', { type: 'city', ...localContentData })"
       >
         {{ localContentData.cityTitle }}
       </v-chip>
@@ -61,6 +64,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(['onChipsClick'])
 
 const localContentData = ref(props.contentData);
 
