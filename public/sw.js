@@ -1,6 +1,6 @@
 const CACHE_NAME = 'gama-cache-v1';
 
-const ASSETS = ["/"];
+const ASSETS = self.__WB_MANIFEST;
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
