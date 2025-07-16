@@ -178,7 +178,7 @@ export default defineNuxtConfig({
       name: 'Gamatrain'
     },
     injectManifest: {
-      globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+      globPatterns: [],
       swSrc: 'public/sw.js'
     },
     workbox: {
