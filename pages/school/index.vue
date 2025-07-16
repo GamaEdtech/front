@@ -133,6 +133,10 @@ const isMobile = ref(display.xs);
 
 const sortList = [
   {
+    value: "lastModifyDate",
+    title: "Recently Updated",
+  },
+  {
     value: "score",
     title: "Highest score",
   },
