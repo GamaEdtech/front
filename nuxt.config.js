@@ -124,6 +124,7 @@ export default defineNuxtConfig({
   ],
 
   pwa: {
+    strategies: 'injectManifest',
     registerType: 'autoUpdate',
     manifest: {
       name: "Gamatrain App",
@@ -175,6 +176,10 @@ export default defineNuxtConfig({
       mobileAppIOS: true,
       appleStatusBarStyle: 'black-translucent',
       name: 'Gamatrain'
+    },
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+      swSrc: 'public/sw.js'
     },
     workbox: {
       navigateFallback: "/",
