@@ -2,7 +2,6 @@
   <ClientOnly>
     <LMap
       ref="map"
-      class="map-container"
       :zoom="zoom"
       :min-zoom="minZoom"
       :center="center"
@@ -186,11 +185,3 @@ const getUserLocation = () => {
   }
 };
 </script>
-
-<style scoped>
-.map-container {
-  width: 100% !important;
-  height: 100dvh !important;
-  min-height: 400px;
-}
-</style>
