@@ -64,9 +64,9 @@
         position: absolute;
         left: 0;
         z-index: 2;
-        @include style.responsive-size(width, calc(100% - 450px), 100%, 100%, 100%);
-        @include style.responsive-size(height, calc(100% - 100px), 100%, 100%, 100%);
-        @include style.responsive-size(top, 100px, 0, 0, 0);
+        @include style.responsive-size(width, 100% , 100%, 100%, 100%);
+        @include style.responsive-size(height, 100%, 100%, 100%, 100%);
+        // @include style.responsive-size(top, 100px, 0, 0, 0);
 
         .list-view-button {
             z-index: 401;
