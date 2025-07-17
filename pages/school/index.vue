@@ -17,9 +17,18 @@
         :items="newSchoolForMarkersOnMap"
         @map-moved="changeFilterWithMapMoved"
         @user-location-found="userLocationFound"
+        @school-marker-clicked="handleSchoolMarkerClick"
       />
     </div>
+
+    <!-- School Details Modal -->
+    <SchoolDetailsModal
+      v-model="showSchoolModal"
+      :school="selectedSchool"
+      @navigate-to-details="navigateToSchoolDetails"
+    />
     <div
+      v-if="!isExpandMapInDesktop"
       :class="`filter-list-div ${
         openBottomNavFilterList ? `open-bottom-nav` : ``
       }`"
@@ -86,6 +95,9 @@ import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/Filter.vue";
 import Map from "~/components/school/Map.vue";
+import SchoolDetailsModal from "~/components/school/SchoolDetailsModal.vue";
+import schoolListDesktop from "~/components/school/list/Desktop.vue";
+import schoolListMobile from "~/components/school/list/Mobile.vue";
 
 useHead({
   titleTemplate: "%s",
@@ -259,7 +271,7 @@ const updateQueryParams = () => {
         (typeof value === "number" && value != 0)
       ) {
         query[key] = value;
-      } else if (Array.isArray(value) && value.length) {
+      } else if (Array.isArray(value) && value?.length) {
         const joinText = value.join(",");
         query[key] = joinText;
       }
@@ -289,32 +301,31 @@ const debouncedGetSchoolList = () => {
   }, 800);
 };
 
-const { data: initialSchools, pending: loadingSchoolsServer } =
-  await useAsyncData("schoolListSSR", () => {
-    const params = {
-      "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
-      "PagingDto.PageFilter.Size": perPage,
-      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-      Name: filterForm.value.keyword,
-      section: filterForm.value.stage,
-      tuition_fee: filterForm.value.tuition_fee,
-      CountryId: filterForm.value.country,
-      StateId: filterForm.value.state,
-      CityId: filterForm.value.city,
-      school_type: filterForm.value.school_type,
-      religion: filterForm.value.religion,
-      boarding_type: filterForm.value.boarding_type,
-      coed_status: filterForm.value.coed_status,
-    };
-    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
-      filterForm.value.sort.forEach((sortOption, index) => {
-        params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
-        params[`PagingDto.SortFilter[${index}].column`] = sortOption;
-      });
-    }
+const { data: initialSchools } = await useAsyncData("schoolListSSR", () => {
+  const params = {
+    "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
+    "PagingDto.PageFilter.Size": perPage,
+    "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+    Name: filterForm.value.keyword,
+    section: filterForm.value.stage,
+    tuition_fee: filterForm.value.tuition_fee,
+    CountryId: filterForm.value.country,
+    StateId: filterForm.value.state,
+    CityId: filterForm.value.city,
+    school_type: filterForm.value.school_type,
+    religion: filterForm.value.religion,
+    boarding_type: filterForm.value.boarding_type,
+    coed_status: filterForm.value.coed_status,
+  };
+  if (filterForm.value.sort && filterForm?.value?.sort?.length > 0) {
+    filterForm.value.sort.forEach((sortOption, index) => {
+      params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
+      params[`PagingDto.SortFilter[${index}].column`] = sortOption;
+    });
+  }
 
-    return $fetch("/api/v2/schools", { params });
-  });
+  return $fetch("/api/v2/schools", { params });
+});
 
 if (initialSchools.value) {
   schools.value = initialSchools.value.data.list;
@@ -326,23 +337,30 @@ if (initialSchools.value) {
 
 const getSchoolList = async () => {
   if (isAllSchoolLoaded.value) return;
+
   try {
     const params = {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
     };
-    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
+
+    // Add sort parameters if available
+    if (filterForm.value.sort && filterForm?.value?.sort?.length > 0) {
       filterForm.value.sort.forEach((sortOption, index) => {
         params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
         params[`PagingDto.SortFilter[${index}].column`] = sortOption;
       });
     }
+
+    // Use different parameters based on view mode
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
+      // Map view mode - use location-based parameters
       params["Location.Radius"] = filterForm.value.distance;
       params["Location.Latitude"] = filterForm.value.lat;
       params["Location.Longitude"] = filterForm.value.lng;
     } else {
+      // List view mode - use filter-based parameters
       params["Name"] = filterForm.value.keyword;
       params["section"] = filterForm.value.stage;
       params["tuition_fee"] = filterForm.value.tuition_fee;
@@ -353,31 +371,36 @@ const getSchoolList = async () => {
       params["religion"] = filterForm.value.religion;
       params["boarding_type"] = filterForm.value.boarding_type;
       params["coed_status"] = filterForm.value.coed_status;
-      params["sort"] = filterForm.value.sort;
     }
 
+    // Fetch data
     const response = await $fetch("/api/v2/schools", {
       params,
     });
 
-    if (response.data.list.length < perPage) {
+    // Check if we've loaded all available data
+    if (response?.data?.list?.length < perPage) {
       isAllSchoolLoaded.value = true;
     }
-    totalSchoolFind.value = response.data.totalRecordsCount
-      ? response.data.totalRecordsCount
-      : 0;
 
+    // Update total count
+    totalSchoolFind.value = response.data.totalRecordsCount || 0;
+
+    // Update school list based on pagination direction
     if (isPaginationPreviousSchoolLoading.value) {
       schools.value = [...response.data.list, ...schools.value];
     } else {
       schools.value = [...schools.value, ...response.data.list];
     }
+
+    // Update map markers if in map view mode
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
       newSchoolForMarkersOnMap.value = response.data.list;
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching school list:", err);
   } finally {
+    // Reset loading states
     isInitialSchoolLoading.value = false;
     isPaginationSchoolLoading.value = false;
     isPaginationPreviousSchoolLoading.value = false;
@@ -411,15 +434,24 @@ const isExpandMapInDesktop = ref(false);
 
 const changeStatusExpandMap = () => {
   isExpandMapInDesktop.value = !isExpandMapInDesktop.value;
+
+  // Update filter parameters based on map view state
   if (isExpandMapInDesktop.value) {
+    // In map view mode, use location-based filtering
     filterForm.value.lat = defaultLatLongDistance.lat;
     filterForm.value.lng = defaultLatLongDistance.lng;
     filterForm.value.distance = defaultLatLongDistance.distance;
+
+    // Clear school list when switching to map view for performance
+    schools.value = [];
   } else {
+    // In list view mode, use standard filtering
     filterForm.value.lat = null;
     filterForm.value.lng = null;
     filterForm.value.distance = null;
   }
+
+  // Reset parameters and update URL
   resetParameter();
   updateQueryParams();
 };
@@ -490,8 +522,97 @@ const endDrag = () => {
   updateQueryParams();
 };
 // End Handle Drag To Open/Close Bottom Nav
+
+// Start School Modal Management
+const showSchoolModal = ref(false);
+const selectedSchool = ref(null);
+
+// Handle school marker click from map
+const handleSchoolMarkerClick = (school) => {
+  try {
+    // Validate school data before showing modal
+    if (!school || !school.id) {
+      console.error("Invalid school data received from map marker click");
+      return;
+    }
+
+    // Set loading state if needed
+    const isDataComplete = validateSchoolData(school);
+
+    // Set the selected school and show modal
+    selectedSchool.value = school;
+    showSchoolModal.value = true;
+
+    // If data is incomplete, we could fetch additional details here
+    if (!isDataComplete) {
+      fetchAdditionalSchoolDetails(school.id);
+    }
+  } catch (error) {
+    console.error("Error displaying school modal:", error);
+    // Fallback to direct navigation if modal fails
+    if (school && school.id) {
+      const schoolSlug = $slugGenerator(school.name);
+      router.push(`/school/${school.id}/${schoolSlug}`);
+    }
+  }
+};
+
+// Validate school data completeness
+const validateSchoolData = (school) => {
+  // Check if all required fields are present
+  const requiredFields = ["id", "name"];
+  const hasAllRequired = requiredFields.every((field) => !!school[field]);
+
+  // Check if we have enough display data
+  const hasDisplayData =
+    school.defaultImageUri ||
+    school.countryTitle ||
+    school.stateTitle ||
+    school.cityTitle;
+
+  return hasAllRequired && hasDisplayData;
+};
+
+// Fetch additional school details if needed
+const fetchAdditionalSchoolDetails = async (schoolId) => {
+  try {
+    // This would be implemented if we need to fetch more details
+    const response = await $fetch(`/api/v2/schools/${schoolId}`);
+    if (response && response?.data) {
+      selectedSchool.value = { ...selectedSchool?.value, ...response?.data };
+    }
+  } catch (error) {
+    console.error("Error fetching additional school details:", error);
+  }
+};
+
+// Handle navigation from modal to school details
+const navigateToSchoolDetails = (schoolId, schoolSlug) => {
+  showSchoolModal.value = false;
+  router.push(`/school/${schoolId}/${schoolSlug}`);
+};
+// End School Modal Management
 </script>
 
 <style scoped>
 @import "../../assets/scss/school/index.scss";
+
+/* Additional styles for map view mode */
+.main-school-list-div {
+  position: relative !important;
+  display: flex;
+}
+
+.map-div {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* When in map view mode (list is hidden) */
+.main-school-list-div:has(.filter-list-div[style*="display: none"]) .map-div,
+.main-school-list-div:not(:has(.filter-list-div)) .map-div {
+  width: 100%;
+}
 </style>
