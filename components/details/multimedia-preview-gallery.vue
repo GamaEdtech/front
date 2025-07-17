@@ -19,15 +19,11 @@
               :key="index"
               class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip :text="item.text" location="top">
-                <template v-slot:activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="font-size: 26px"
-                    :class="`text-white text--lighten-1 icon icon-${item.icon} pt-1 `"
-                  />
-                </template>
-              </v-tooltip>
+              <span
+                v-tooltip="item.text"
+                style="font-size: 26px"
+                :class="`text-white text--lighten-1 icon icon-${item.icon} pt-1 `"
+              />
             </v-btn>
           </v-col>
           <!--End side section-->
