@@ -140,7 +140,7 @@
                                 <v-row>
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pb-sm-0 pb-md-3">
-                                      <NuxtLink to="/user/edit-profile">
+                                      <NuxtLink to="/user/profile">
                                         <img
                                           width="40"
                                           height="40"
@@ -513,7 +513,7 @@
                                 <v-row>
                                   <v-col cols="10" class="pl-0 pl-sm-3">
                                     <div class="d-flex pbs-sm-0">
-                                      <nuxt-link to="/user/edit-profile">
+                                      <nuxt-link to="/user/profile">
                                         <img
                                           width="40"
                                           height="40"
@@ -977,7 +977,11 @@ const requestURL = ref(useRequestURL().host);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
-const { data: contentData, error, refresh: refreshContent } = await useAsyncData(
+const {
+  data: contentData,
+  error,
+  refresh: refreshContent,
+} = await useAsyncData(
   () => `question-${route.params.id}`,
   async () => {
     try {
@@ -991,7 +995,7 @@ const { data: contentData, error, refresh: refreshContent } = await useAsyncData
     }
   },
   {
-    watch: [() => route.params.id]
+    watch: [() => route.params.id],
   }
 );
 
