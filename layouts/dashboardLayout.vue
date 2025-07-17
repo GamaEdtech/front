@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <VitePwaManifest />
     <main_header />
     <div class="mt-16 mt-md-0">
       <v-container class="dashboard">
