@@ -15,7 +15,7 @@
                 <v-btn
                   class="live-trading-btn mr-4 d-flex align-center"
                   rounded
-                  :size="`${display.xs.value ? 'large' : 'x-large'}`"
+                  :size="`${isMobile ? 'large' : 'x-large'}`"
                   elevation="0"
                 >
                   <span class="live-trading-dot mr-2"></span>
@@ -53,7 +53,7 @@
                 <v-btn
                   target="_blank"
                   href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
-                  :size="`${display.xs.value ? 'large' : 'x-large'}`"
+                  :size="`${isMobile ? 'large' : 'x-large'}`"
                   class="buy-btn mr-4"
                   rounded
                   elevation="0"
@@ -63,7 +63,7 @@
                   to="/whitepaper"
                   class="whitepaper-btn"
                   rounded
-                  :size="`${display.xs.value ? 'large' : 'x-large'}`"
+                  :size="`${isMobile ? 'large' : 'x-large'}`"
                   elevation="0"
                   >View Whitepaper</v-btn
                 >
@@ -90,7 +90,18 @@
 <script setup>
 import { useDisplay } from "vuetify";
 const display = useDisplay();
+const isMobile = ref(false);
 const finalPrice = ref(0);
+
+onMounted(() => {
+  isMobile.value = display.xs.value;
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal;
+    }
+  );
+});
 
 const fetchTokenPrice = async () => {
   const data = await $fetch(

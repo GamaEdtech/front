@@ -14,7 +14,7 @@
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
                     <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                      :size="`${isMobile ? 'small' : 'x-large'}`"
                       color="white"
                       >mdi-poll</v-icon
                     >
@@ -30,7 +30,7 @@
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
                     <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                      :size="`${isMobile ? 'small' : 'x-large'}`"
                       color="white"
                       >mdi-finance</v-icon
                     >
@@ -46,7 +46,7 @@
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
                     <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                      :size="`${isMobile ? 'small' : 'x-large'}`"
                       color="white"
                       >mdi-cached</v-icon
                     >
@@ -66,7 +66,7 @@
                 <div class="d-flex justify-space-between">
                   <div class="stats-section-stats__card--icon">
                     <v-icon
-                      :size="`${display.xs.value ? 'small' : 'x-large'}`"
+                      :size="`${isMobile ? 'small' : 'x-large'}`"
                       color="white"
                       >mdi-account-arrow-up</v-icon
                     >
@@ -148,6 +148,17 @@
 <script setup>
 import { useDisplay } from "vuetify";
 const display = useDisplay();
+const isMobile = ref(false);
+
+onMounted(() => {
+  isMobile.value = display.xs.value;
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal;
+    }
+  );
+});
 </script>
 
 <style scoped>
