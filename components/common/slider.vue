@@ -1,7 +1,7 @@
 <template>
   <div ref="slider" class="px-0 pb-0">
     <v-card outlined flat class="py-8" color="rgba(0,0,0,1)">
-      <v-container class="white--text">
+      <v-container class="text-white">
         <p class="text-left text-md-h4 text-h5 font-weight-bold">
           Stats and Achievements (GAMA Experience in Iran’s EdTech Market)
         </p>
@@ -18,7 +18,7 @@
               <span class="stat-icon d-flex align-center justify-center">
                 <i :class="' icon-g icon icong-' + item.icon"> </i>
               </span>
-              <span class="stat-label white--text">{{ item.label }}</span>
+              <span class="stat-label text-white">{{ item.label }}</span>
               <span class="stat-value" :id="'stat' + index + 1"
                 >{{ $numberFormat(item.counter) }} +</span
               >

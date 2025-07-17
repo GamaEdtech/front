@@ -292,7 +292,9 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
+                  <span
+                    v-else-if="hasEnoughTests && exam_id"
+                    class="ml-2 text-success"
                     >Ready to publish!</span
                   >
                   <span v-else class="ml-2 text-success"
@@ -312,7 +314,7 @@
               <CreateTestForm
                 ref="createForm"
                 :goToPreviewStep="test_step"
-                :updateTestList=lastCreatedTest
+                :updateTestList="lastCreatedTest"
                 v-model:testList="tests"
                 :examEditMode="true"
                 @update:updateTestList="(val) => (lastCreatedTest = val)"
@@ -450,7 +452,9 @@
                     {{ 5 - tests.length === 1 ? "test" : "tests" }} to
                     publish</span
                   >
-                  <span v-else-if="hasEnoughTests && exam_id" class="ml-2 text-success"
+                  <span
+                    v-else-if="hasEnoughTests && exam_id"
+                    class="ml-2 text-success"
                     >Ready to publish!</span
                   >
                   <span v-else class="ml-2 text-success"
@@ -914,7 +918,7 @@
                       size="large"
                       density="compact"
                       color="teal"
-                      class="white--text"
+                      class="text-white"
                       block
                       style="text-transform: none; font-size: 13px !important"
                     >
@@ -1258,9 +1262,16 @@
   </v-container>
 </template>
 
-
 <script setup>
-import { ref, reactive, watch, nextTick, onMounted, onUpdated, computed } from "vue";
+import {
+  ref,
+  reactive,
+  watch,
+  nextTick,
+  onMounted,
+  onUpdated,
+  computed,
+} from "vue";
 import { useRuntimeConfig } from "nuxt/app";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
@@ -1336,7 +1347,6 @@ const form = reactive({
   edu_year: null,
   edu_month: null,
 });
-
 
 const file_original = ref(null);
 const file_original_path = ref("");
@@ -1466,16 +1476,14 @@ const test_share_link = computed(() => {
   return `${window.location.origin}/exam/${exam_id.value || ""}`;
 });
 
-
 const resetTestList = () => {
   filter.page = 1;
   test_list.value = [];
   all_tests_loaded.value = false;
 };
 
-
-const loadFilteredTests = async () => { 
-  if (filter.lesson) { 
+const loadFilteredTests = async () => {
+  if (filter.lesson) {
     await getExamTests();
   }
 };
@@ -1611,7 +1619,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
         topic_list.value = [];
       }
     }
-
   } catch (err) {
     // Reset the target list to empty on error
     if (type === "section") {
@@ -1628,7 +1635,6 @@ const getTypeList = async (type, parent = "", trigger = "") => {
     } else if (type === "exam_type") {
       test_type_list.value = [];
     }
-
   }
 };
 
@@ -1684,7 +1690,6 @@ const submitQuestion = async () => {
       }
     );
 
-    
     exam_id.value = response.data.id;
     exam_code.value = response.data.code;
 
@@ -1707,7 +1712,6 @@ const submitQuestion = async () => {
     // Move to the next step
     test_step.value = 2;
   } catch (error) {
-    
   } finally {
     submit_loading.value = false;
   }
@@ -1716,13 +1720,13 @@ const submitQuestion = async () => {
 // Convert form data from multipart to urlencode
 const urlencodeFormData = (fd) => {
   const params = new URLSearchParams();
-  
+
   for (const [key, value] of fd.entries()) {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       params.append(key, value);
     }
   }
-  
+
   const result = params.toString();
   return result;
 };
@@ -1747,12 +1751,9 @@ const uploadFile = async (file_name) => {
     const response = await useApiService.post("/api/v1/upload", formData);
     if (response.data?.[0]?.file?.name) {
       form.file_original = response.data[0].file.name;
-      
     } else {
-      
     }
   } catch (err) {
-    
     console.error(err);
   }
 };
@@ -1796,11 +1797,8 @@ const publishTest = async () => {
 
       // Navigate to publish step
       test_step.value = 4;
-
-      
     }
   } catch (err) {
-    
   } finally {
     publish_loading.value = false;
   }
@@ -1832,12 +1830,12 @@ const submitTest = async (skipListRefresh = false) => {
     // Ensure we have a valid exam ID
     if (!exam_id.value) {
       console.error("No exam ID available, cannot submit tests");
-      
+
       return;
     }
 
     // Ensure all test IDs are strings for consistent comparison
-    tests.value = tests.value.map(id => String(id));
+    tests.value = tests.value.map((id) => String(id));
 
     const formData = new URLSearchParams();
     tests.value.forEach((id) => {
@@ -1845,25 +1843,25 @@ const submitTest = async (skipListRefresh = false) => {
     });
 
     // Log the tests being submitted
-    console.log(`Submitting ${tests.value.length} tests to exam ${exam_id.value}`);
+    console.log(
+      `Submitting ${tests.value.length} tests to exam ${exam_id.value}`
+    );
     console.log("Tests:", tests.value);
 
-    await useApiService.put(
-      `/api/v1/exams/tests/${exam_id.value}`,
-      formData.toString(),
-      {
+    await useApiService
+      .put(`/api/v1/exams/tests/${exam_id.value}`, formData.toString(), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         },
-      }
-    ).then(async (res) => {
-      if (res.status === 1) {
-        await nextTick();
-        await forceUIUpdate();
-        await handleRefreshPreviewList();
-        createForm.value.examTestListLength = tests.value.length;
-      }
-    });
+      })
+      .then(async (res) => {
+        if (res.status === 1) {
+          await nextTick();
+          await forceUIUpdate();
+          await handleRefreshPreviewList();
+          createForm.value.examTestListLength = tests.value.length;
+        }
+      });
 
     // Add a small delay to ensure the backend has processed the update
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -1880,13 +1878,11 @@ const submitTest = async (skipListRefresh = false) => {
 
     // Force a UI update if we've just reached or fallen below the threshold
     if (tests.value.length === 5) {
-      
       // Force a nextTick to ensure the UI updates
       await nextTick();
     }
   } catch (err) {
     console.error("Failed to update tests:", err);
-    
   }
 };
 
@@ -2070,7 +2066,6 @@ const getCurrentExamInfo = async () => {
 
       // ... any other fields that should be populated from exam info
     } catch (err) {
-      
       console.error("Error fetching exam info:", err);
     }
   }
@@ -2098,7 +2093,7 @@ const onScroll = () => {
   if (isNearBottom && filter.lesson) {
     timer.value = setTimeout(() => {
       test_loading.value = true;
-       filter.page = filter.page + 1;
+      filter.page = filter.page + 1;
       getExamTests();
     }, 800);
   }
@@ -2114,7 +2109,7 @@ const getRequiredFormData = async () => {
   }
 
   if (!sectionId) {
-    throw new Error('No valid section available');
+    throw new Error("No valid section available");
   }
 
   let baseId = form.base;
@@ -2126,7 +2121,7 @@ const getRequiredFormData = async () => {
   }
 
   if (!baseId) {
-    throw new Error('No valid grade available');
+    throw new Error("No valid grade available");
   }
 
   let lessonId = form.lesson;
@@ -2138,7 +2133,7 @@ const getRequiredFormData = async () => {
   }
 
   if (!lessonId) {
-    throw new Error('No valid lesson available');
+    throw new Error("No valid lesson available");
   }
 
   let examTypeId = form.exam_type;
@@ -2146,26 +2141,29 @@ const getRequiredFormData = async () => {
     if (test_type_list.value.length === 0) {
       await loadExamTypes();
     }
-    examTypeId = test_type_list.value.length > 0 ? test_type_list.value[0].id : null;
+    examTypeId =
+      test_type_list.value.length > 0 ? test_type_list.value[0].id : null;
   }
 
   if (!examTypeId) {
-    throw new Error('No valid exam type available');
+    throw new Error("No valid exam type available");
   }
 
-  const lessonTitle = lesson_list.value.find(l => l.id == lessonId)?.title || 'Test';
-  const baseTitle = grade_list.value.find(b => b.id == baseId)?.title || 'Grade';
-  
+  const lessonTitle =
+    lesson_list.value.find((l) => l.id == lessonId)?.title || "Test";
+  const baseTitle =
+    grade_list.value.find((b) => b.id == baseId)?.title || "Grade";
+
   return {
     title: form.title || `${lessonTitle} Test ${baseTitle}`,
     duration: form.duration || 3,
-    level: form.level || '2',
+    level: form.level || "2",
     section: sectionId,
     base: baseId,
     lesson: lessonId,
     exam_type: examTypeId,
     edu_year: form.edu_year || new Date().getFullYear().toString(),
-    edu_month: form.edu_month || '1'
+    edu_month: form.edu_month || "1",
   };
 };
 
@@ -2174,35 +2172,34 @@ const ensureBasicDataLoaded = async () => {
     if (!level_list.value.length) {
       await getTypeList("section");
     }
-    
+
     if (!test_type_list.value.length) {
       await loadExamTypes();
     }
-    
   } catch (error) {
-    console.error('Error loading basic data:', error);
+    console.error("Error loading basic data:", error);
     throw error;
   }
 };
 
 const createDraftExam = async () => {
   submit_loading.value = true;
-  
+
   try {
     await ensureBasicDataLoaded();
-    
+
     const requiredData = await getRequiredFormData();
-    
+
     const formData = new FormData();
-    
-    Object.keys(requiredData).forEach(key => {
+
+    Object.keys(requiredData).forEach((key) => {
       if (requiredData[key] !== null && requiredData[key] !== undefined) {
         formData.append(key, String(requiredData[key]));
       }
     });
 
     if (form.topics && form.topics.length) {
-      form.topics.forEach(topic => {
+      form.topics.forEach((topic) => {
         formData.append("topics[]", String(topic));
       });
     }
@@ -2228,30 +2225,31 @@ const createDraftExam = async () => {
         currentExamCode: exam_code.value,
       };
 
-      if (createForm.value && typeof createForm.value.getCurrentExamInfo === "function") {
+      if (
+        createForm.value &&
+        typeof createForm.value.getCurrentExamInfo === "function"
+      ) {
         createForm.value.getCurrentExamInfo();
       }
-
-      
     } else {
-      throw new Error('Invalid response from server');
+      throw new Error("Invalid response from server");
     }
-
   } catch (error) {
-    console.error('Error creating draft exam:', error);
-    
+    console.error("Error creating draft exam:", error);
+
     let errorMessage = "Error creating draft exam";
     if (error.response?.data?.message) {
       errorMessage = error.response.data.message;
-      
+
       if (error.response.data.data && Array.isArray(error.response.data.data)) {
-        errorMessage += ` Missing fields: ${error.response.data.data.join(', ')}`;
+        errorMessage += ` Missing fields: ${error.response.data.data.join(
+          ", "
+        )}`;
       }
     } else if (error.message) {
       errorMessage = error.message;
     }
-    
-    
+
     throw error;
   } finally {
     submit_loading.value = false;
@@ -2261,41 +2259,37 @@ const createDraftExam = async () => {
 // Force UI update when tests count changes
 const forceUIUpdate = async () => {
   // Ensure consistent string IDs
-  tests.value = tests.value.map(id => String(id));
-  
+  tests.value = tests.value.map((id) => String(id));
+
   // Update the test count in the create form component
   if (createForm.value && "examTestListLength" in createForm.value) {
     createForm.value.examTestListLength = tests.value.length;
   }
-  
- 
-  
 };
 
 const applyTest = async (item, type = null) => {
   try {
-    if (type === 'add' && !exam_id.value) {
+    if (type === "add" && !exam_id.value) {
       await createDraftExam();
-      
+
       if (!exam_id.value) {
-        throw new Error('Failed to create draft exam');
+        throw new Error("Failed to create draft exam");
       }
     }
 
     const testId = String(item.id);
     // Always use string comparison
-    const testExists = tests.value.some(id => String(id) === testId);
+    const testExists = tests.value.some((id) => String(id) === testId);
 
     // Store the old length to check if we hit exactly 5 tests
     const oldLength = tests.value.length;
 
     if (testExists && type === "remove") {
-      const index = tests.value.findIndex(id => String(id) === testId);
+      const index = tests.value.findIndex((id) => String(id) === testId);
       if (index !== -1) {
         tests.value.splice(index, 1);
         await forceUIUpdate(); // Force UI update immediately
         await submitTest();
-       
       }
     }
 
@@ -2304,13 +2298,11 @@ const applyTest = async (item, type = null) => {
       await forceUIUpdate(); // Force UI update immediately
       await submitTest();
     }
-    
+
     // Force refresh the preview list to ensure UI consistency
     await handleRefreshPreviewList();
-
   } catch (error) {
-    console.error('Error in applyTest:', error);
-   
+    console.error("Error in applyTest:", error);
   }
 };
 
@@ -2328,7 +2320,6 @@ const getExamTests = async () => {
       perpage: filter.perpage,
     };
 
-
     const response = await useApiService.get("/api/v1/examTests", params);
     test_list.value.push(...response?.data?.list);
 
@@ -2343,7 +2334,7 @@ const getExamTests = async () => {
       all_tests_loaded.value = false;
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
     test_loading.value = false;
   }
@@ -2358,7 +2349,6 @@ const deleteOnlineExam = async () => {
     );
 
     if (response.data.message === "done") {
-
       // Reset all values
       exam_id.value = "";
       exam_code.value = "";
@@ -2379,12 +2369,10 @@ const deleteOnlineExam = async () => {
       test_step.value = 1;
     }
   } catch (err) {
-   
     console.error("Error deleting exam:", err);
   } finally {
     deleteLoading.value = false;
     confirmDeleteDialog.value = false;
- 
   }
 };
 
@@ -2416,7 +2404,6 @@ const deleteExamTest = async () => {
     test_list.value = [];
     getExamTests();
   } catch (err) {
-   
     console.error("Error deleting exam test:", err);
   } finally {
     delete_exam_test_loading.value = false;
@@ -2429,20 +2416,16 @@ const deleteExamTest = async () => {
 const validateHeaderForm = () => {
   // Check required fields
   if (!form.section) {
-    
     return false;
   }
   if (!form.base) {
-    
     return false;
   }
   if (!form.lesson) {
-    
     return false;
   }
 
   if (!form.title) {
-    
     return false;
   }
   if (!form.duration) {
@@ -2455,7 +2438,6 @@ const validateHeaderForm = () => {
 const handleStepChange = (newStep) => {
   // Don't allow changing to step 4 (Publish) if we don't have enough tests
   if (newStep === 4 && tests.value.length < 5) {
-   
     // Revert to step 3 (Review)
     test_step.value = 3;
     return;
@@ -2463,7 +2445,6 @@ const handleStepChange = (newStep) => {
 
   // Prevent access to step 4 if exam hasn't been published yet
   if (newStep === 4 && !isExamPublished.value) {
-   
     // Revert to step 3 (Review)
     test_step.value = 3;
     return;
@@ -2471,7 +2452,6 @@ const handleStepChange = (newStep) => {
 
   // Prevent access to step 4 directly from step 1 or 2
   if (newStep === 4 && test_step.value < 3) {
-   
     // Go to step 3 (Review) instead
     test_step.value = 3;
     return;
@@ -2480,25 +2460,21 @@ const handleStepChange = (newStep) => {
   // If moving to Review step (3), make sure we load the test data
   if (newStep === 3 && exam_id.value) {
     test_step.value = newStep;
-   
+
     handleRefreshPreviewList()
       .then(() => {
         if (previewTestList.value.length === 0 && tests.value.length > 0) {
-         
           setTimeout(() => {
             handleRefreshPreviewList().then(() => {
               if (previewTestList.value.length > 0) {
-               
               }
             });
           }, 1000);
-          } else if (previewTestList.value.length > 0) {
-             
-          }
+        } else if (previewTestList.value.length > 0) {
+        }
       })
       .catch((err) => {
         console.error("Error loading test data:", err);
-
       });
     return;
   }
@@ -2514,7 +2490,6 @@ const handleStepChange = (newStep) => {
       3: "Review",
       4: "Publish",
     };
-
   }
 };
 
@@ -2585,10 +2560,7 @@ const goToNextStep = () => {
   }
 
   test_step.value = 3;
-
 };
-
-
 
 const handleClearSection = () => {
   filter.section = "";
@@ -2668,10 +2640,10 @@ const handleTestRefresh = async () => {
   try {
     // Force UI update immediately
     await forceUIUpdate();
-    
+
     // Wait for API operations to complete
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     // Refresh the preview list
     await handleRefreshPreviewList();
 
@@ -2682,9 +2654,8 @@ const handleTestRefresh = async () => {
       all_tests_loaded.value = false;
       await getExamTests();
     }
-   
   } catch (err) {
-    console.error("Error in handleTestRefresh:", err); 
+    console.error("Error in handleTestRefresh:", err);
   }
 };
 
@@ -2734,15 +2705,14 @@ const typesetMathInSpecificContainer = async (containerRef) => {
 // Watch for newly created tests and add them to the current exam
 watch(
   () => lastCreatedTest.value,
- (newTest) => {
-    if (newTest && !tests.value.find((x)=> x== newTest)) {
+  (newTest) => {
+    if (newTest && !tests.value.find((x) => x == newTest)) {
       {
-            tests.value.push(newTest)
-            submitTest()
-
+        tests.value.push(newTest);
+        submitTest();
       }
     }
-  },
+  }
 );
 
 // Watch for changes in form.section (Board)
@@ -2855,20 +2825,20 @@ watch(
       filter.base = "";
       filter.lesson = "";
       filter.topic = "";
-      
+
       // Clear dependent lists
       filter_grade_list.value = [];
       filter_lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Reset test list and pagination
       resetTestList();
-      
+
       try {
         test_loading.value = true;
         await getTypeList("base", newVal, "filter");
       } catch (error) {
-        console.error('Error loading grades for section:', error);
+        console.error("Error loading grades for section:", error);
       } finally {
         test_loading.value = false;
       }
@@ -2886,19 +2856,19 @@ watch(
       // Reset dependent filters
       filter.lesson = "";
       filter.topic = "";
-      
+
       // Clear dependent lists
       filter_lesson_list.value = [];
       topic_list.value = [];
-      
+
       // Reset test list and pagination
       resetTestList();
-      
+
       try {
         test_loading.value = true;
         await getTypeList("lesson", newVal, "filter");
       } catch (error) {
-        console.error('Error loading lessons for base:', error);
+        console.error("Error loading lessons for base:", error);
       } finally {
         test_loading.value = false;
       }
@@ -2916,18 +2886,18 @@ watch(
       // Reset topic filter
       filter.topic = "";
       topic_list.value = [];
-      
+
       // Reset test list and pagination
       resetTestList();
-      
+
       try {
         test_loading.value = true;
         await getTypeList("topic", newVal, "filter");
-        
+
         // Load tests after topics are loaded
         await loadFilteredTests();
       } catch (error) {
-        console.error('Error loading topics for lesson:', error);
+        console.error("Error loading topics for lesson:", error);
       } finally {
         test_loading.value = false;
       }
@@ -3000,9 +2970,11 @@ watch(
   () => tests.value,
   async (newTests, oldTests) => {
     // Log test count changes for debugging
-    console.log(`Tests count changed: ${oldTests?.length || 0} -> ${newTests.length}`);
+    console.log(
+      `Tests count changed: ${oldTests?.length || 0} -> ${newTests.length}`
+    );
     console.log(`hasEnoughTests: ${hasEnoughTests.value}`);
-    
+
     // Update the test count in the create form component
     if (createForm.value && "examTestListLength" in createForm.value) {
       createForm.value.examTestListLength = newTests.length;
@@ -3013,16 +2985,14 @@ watch(
     if (
       exam_id.value &&
       (newTests.length !== oldTests?.length ||
-        JSON.stringify(newTests.map(id => String(id))) !== 
-        JSON.stringify(oldTests?.map(id => String(id))))
+        JSON.stringify(newTests.map((id) => String(id))) !==
+          JSON.stringify(oldTests?.map((id) => String(id))))
     ) {
       // Ensure consistent string IDs
-      tests.value = newTests.map(id => String(id));
-      
+      tests.value = newTests.map((id) => String(id));
+
       // Refresh the preview list
       await handleRefreshPreviewList();
-      
-
     }
   },
   { deep: true }
@@ -3176,8 +3146,6 @@ onUpdated(async () => {
   }
 });
 </script>
-
-
 
 <style lang="scss">
 .create-test-container {

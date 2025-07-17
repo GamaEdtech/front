@@ -17,12 +17,25 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-center">
-            <div class="w-100 w-sm-auto d-flex gap-4 justify-center align-center">
-              <v-text-field v-model="searchQuery" rounded="s-pill" variant="outlined" color="#ffb600" icon-color=""
-                label="Search">
+            <div
+              class="w-100 w-sm-auto d-flex gap-4 justify-center align-center"
+            >
+              <v-text-field
+                v-model="searchQuery"
+                rounded="s-pill"
+                variant="outlined"
+                color="#ffb600"
+                icon-color=""
+                label="Search"
+              >
               </v-text-field>
               <div class="pt-4 h-100">
-                <v-btn height="100%" dense color="#FFB300" class="white--text search">
+                <v-btn
+                  height="100%"
+                  dense
+                  color="#FFB300"
+                  class="text-white search"
+                >
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
               </div>
@@ -35,9 +48,15 @@
         <v-col cols="12" md="3">
           <v-card id="terms-navigation" class="mx-auto">
             <v-list height="100%">
-              <v-list-item active-class="active-title" :active="isItemActive(item)"
-                v-for="(item, index) in filteredItems" :value="item" :key="index" @click="scrollToSection(item.id)"
-                style="cursor: pointer;">
+              <v-list-item
+                active-class="active-title"
+                :active="isItemActive(item)"
+                v-for="(item, index) in filteredItems"
+                :value="item"
+                :key="index"
+                @click="scrollToSection(item.id)"
+                style="cursor: pointer"
+              >
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
               </v-list-item>
             </v-list>
@@ -106,7 +125,7 @@ export default {
     return {
       searchQuery: "",
       activeSection: null,
-      currentHash: '',
+      currentHash: "",
       isClient: false,
       observer: null,
       isScrolling: false,
@@ -248,8 +267,8 @@ export default {
 
     // Handle initial hash if present
     if (this.$route.hash) {
-      const targetId = this.$route.hash.replace('#', '');
-      if (this.termsSection.find(item => item.id === targetId)) {
+      const targetId = this.$route.hash.replace("#", "");
+      if (this.termsSection.find((item) => item.id === targetId)) {
         this.activeSection = targetId;
         this.$nextTick(() => {
           this.scrollToSection(targetId, false);
@@ -271,8 +290,8 @@ export default {
     initializeObserver() {
       const options = {
         root: null,
-        rootMargin: '-20% 0px -70% 0px', // Only trigger when section is in the top 30% of viewport
-        threshold: 0
+        rootMargin: "-20% 0px -70% 0px", // Only trigger when section is in the top 30% of viewport
+        threshold: 0,
       };
 
       this.observer = new IntersectionObserver((entries) => {
@@ -282,7 +301,7 @@ export default {
         let mostVisibleEntry = null;
         let maxRatio = 0;
 
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
             maxRatio = entry.intersectionRatio;
             mostVisibleEntry = entry;
@@ -300,7 +319,7 @@ export default {
 
       // Observe all sections
       this.$nextTick(() => {
-        this.termsSection.forEach(section => {
+        this.termsSection.forEach((section) => {
           const element = document.getElementById(section.id);
           if (element) {
             this.observer.observe(element);
@@ -327,11 +346,12 @@ export default {
       if (element) {
         const headerOffset = 100; // Adjust based on your fixed header height
         const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,
-          behavior: smooth ? 'smooth' : 'auto'
+          behavior: smooth ? "smooth" : "auto",
         });
 
         this.updateHash(sectionId);
@@ -341,15 +361,18 @@ export default {
       if (this.scrollTimeout) {
         clearTimeout(this.scrollTimeout);
       }
-      this.scrollTimeout = setTimeout(() => {
-        this.isScrolling = false;
-      }, smooth ? 1000 : 100);
+      this.scrollTimeout = setTimeout(
+        () => {
+          this.isScrolling = false;
+        },
+        smooth ? 1000 : 100
+      );
     },
 
     isItemActive(item) {
       if (!this.isClient) return false;
       return this.activeSection === item.id;
-    }
+    },
   },
 
   computed: {
@@ -358,26 +381,30 @@ export default {
         return this.termsSection;
       }
       const query = this.searchQuery.toLowerCase();
-      return this.termsSection.filter((item) =>
-        item.title.toLowerCase().includes(query) ||
-        item.describe.toLowerCase().includes(query)
+      return this.termsSection.filter(
+        (item) =>
+          item.title.toLowerCase().includes(query) ||
+          item.describe.toLowerCase().includes(query)
       );
-    }
+    },
   },
 
   watch: {
-    '$route.hash': {
+    "$route.hash": {
       handler(newHash) {
         if (this.isClient && !this.isScrolling) {
-          const targetId = newHash.replace('#', '');
-          if (targetId && this.termsSection.find(item => item.id === targetId)) {
+          const targetId = newHash.replace("#", "");
+          if (
+            targetId &&
+            this.termsSection.find((item) => item.id === targetId)
+          ) {
             this.activeSection = targetId;
           }
         }
       },
-      immediate: false
-    }
-  }
+      immediate: false,
+    },
+  },
 };
 </script>
 
@@ -464,7 +491,7 @@ export default {
     border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
     margin: 1.6rem auto 1.6rem auto;
 
-    .v-input__control>.v-input__slot {
+    .v-input__control > .v-input__slot {
       min-height: auto;
       height: 4rem !important;
 
@@ -554,7 +581,7 @@ export default {
       height: 4rem !important;
       margin: 1.6rem auto 1.6rem auto;
 
-      .v-input__control>.v-input__slot {
+      .v-input__control > .v-input__slot {
         min-height: auto;
         height: 4rem !important;
 
@@ -655,7 +682,7 @@ export default {
       border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
       margin: 1.6rem auto 1.6rem auto;
 
-      .v-input__control>.v-input__slot {
+      .v-input__control > .v-input__slot {
         min-height: auto;
         height: 4rem !important;
 

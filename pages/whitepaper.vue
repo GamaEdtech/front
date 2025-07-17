@@ -36,7 +36,7 @@
                   height="100%"
                   dense
                   color="#FFB300"
-                  class="white--text search"
+                  class="text-white search"
                 >
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
@@ -1176,4 +1176,4 @@ const smoothScroll = (elementId) => {
     }
   }
 }
-</style> 
+</style>

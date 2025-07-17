@@ -60,7 +60,7 @@
                 <template v-slot:activator="{ props }">
                   <v-btn
                     color="teal"
-                    class="white--text py-5"
+                    class="text-white py-5"
                     v-bind="props"
                     block
                     @click="path_panel_expand = !path_panel_expand"
@@ -1658,7 +1658,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.white--text {
+.text-white {
   color: white !important;
 }
 

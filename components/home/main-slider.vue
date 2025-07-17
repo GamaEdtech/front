@@ -14,7 +14,7 @@
           <v-sheet class="section1" :id="slide.id">
             <v-container class="pt-0 pt-sm-6 pt-md-6 pt-lg-8">
               <v-card flat class="px-4 px-sm-8 px-md-12">
-                <v-row class="white--text">
+                <v-row class="text-white">
                   <v-col col="12">
                     <div class="slide-title" v-html="slide.title" />
                     <div
@@ -74,7 +74,7 @@
                 ></v-autocomplete>
               </v-col>
               <v-col cols="1" class="pl-0">
-                <v-btn color="#FFB300" class="white--text">
+                <v-btn color="#FFB300" class="text-white">
                   <v-icon color="#ffffff" size="20"> mdi-magnify </v-icon>
                 </v-btn>
               </v-col>

@@ -19,7 +19,7 @@
               <span
                 v-tooltip="item.text"
                 style="font-size: 26px"
-                :class="'white--text text--lighten-1 icon icon-' + item.icon"
+                :class="'text-white text--lighten-1 icon icon-' + item.icon"
               />
             </v-btn>
           </v-col>
@@ -41,7 +41,7 @@
               <span
                 v-tooltip="item.text"
                 style="font-size: 26px"
-                :class="`icon icon-${item.icon} white--text text--darken-1`"
+                :class="`icon icon-${item.icon} text-white text--darken-1`"
               />
             </v-btn>
           </v-col>

@@ -25,7 +25,7 @@
                   <template #labels>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -36,7 +36,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -46,7 +46,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -56,7 +56,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       {{ contentData?.edu_month_title }}
@@ -64,14 +64,14 @@
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                     >
                       {{ contentData?.edu_year }}
                     </v-chip>
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/subject-directory?board=${contentData?.section}&grade=${contentData?.base}&subject=${contentData?.lesson}`"
-                      class="ma-1 bg-primary white--text"
+                      class="ma-1 bg-primary text-white"
                     >
                       {{ contentData?.lesson_title }} directory
                     </v-chip>

@@ -41,7 +41,7 @@
           <div class="pb-8">
             <div class="float-left">
               <v-btn
-                class="bg-primary-gray-700 white--text mr-6"
+                class="bg-primary-gray-700 text-white mr-6"
                 variant="fab"
                 size="x-small"
                 icon
@@ -49,7 +49,7 @@
                 <v-icon size="14" color="white"> mdi-thumb-down </v-icon>
               </v-btn>
               <v-btn
-                class="bg-primary-gray-700 white--text mr-6"
+                class="bg-primary-gray-700 text-white mr-6"
                 variant="fab"
                 size="x-small"
                 icon
@@ -57,7 +57,7 @@
                 <v-icon size="14" color="white"> mdi-thumb-up </v-icon>
               </v-btn>
               <v-btn
-                class="bg-primary-blue-500 white--text"
+                class="bg-primary-blue-500 text-white"
                 variant="fab"
                 size="x-small"
                 icon
@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch } from "vue";
 
 const props = defineProps({
   commentList: {
@@ -97,42 +97,46 @@ const props = defineProps({
 });
 
 // State for pagination
-const displayedCount = ref(10)
-const commentsPerPage = 10
+const displayedCount = ref(10);
+const commentsPerPage = 10;
 
 // Computed properties
 const displayedComments = computed(() => {
-  return props.commentList.slice(0, displayedCount.value)
-})
+  return props.commentList.slice(0, displayedCount.value);
+});
 
 const showLoadMoreButton = computed(() => {
-  return props.commentList.length > displayedCount.value
-})
+  return props.commentList.length > displayedCount.value;
+});
 
 // Methods
 const loadMoreComments = () => {
-  displayedCount.value += commentsPerPage
-}
+  displayedCount.value += commentsPerPage;
+};
 
 // Reset displayed count when commentList changes
-watch(() => props.commentList, () => {
-  displayedCount.value = 10
-}, { deep: true })
+watch(
+  () => props.commentList,
+  () => {
+    displayedCount.value = 10;
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
 .comment-card-header {
   height: 8rem;
 }
-.profile-avatar{
- width: 100%;
- height: 100%;
- background-position: center;
- object-fit: cover;
- user-select: none;
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  object-fit: cover;
+  user-select: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
   -webkit-user-select: none;
-  background-size: cover
+  background-size: cover;
 }
 </style>

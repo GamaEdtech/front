@@ -163,7 +163,7 @@
                 width="40"
                 :loading="helpLoading"
                 @click="sendToAI()"
-                class="white--text"
+                class="text-white"
                 color="teal lighten-2"
                 style="position: absolute; right: 10px; bottom: 40px"
               >

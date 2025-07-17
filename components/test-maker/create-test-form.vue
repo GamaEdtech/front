@@ -60,7 +60,7 @@
                 <template v-slot:activator="{ props }">
                   <v-btn
                     color="teal"
-                    class="white--text py-5 my-2"
+                    class="text-white py-5 my-2"
                     v-bind="props"
                     block
                     @click="path_panel_expand = !path_panel_expand"
@@ -545,7 +545,7 @@
               "
             >
               <p>Solution:</p>
-       
+
               <ClientOnly fallback-tag="span" fallback="Loading...">
                 <RickEditor
                   v-model:modelValue="form.answer_full"
@@ -811,12 +811,11 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  testList:{
+  testList: {
     type: Array,
     default: () => [],
-  }
+  },
 });
-
 
 /**
  * Component emits
@@ -943,7 +942,6 @@ const topic_list = ref([]);
  * Selected topics state
  */
 const selected_topics = ref([]);
-
 
 // for holding test
 const examTestListLength = computed(() => {
@@ -1351,8 +1349,8 @@ const validateForm = () => {
 /**
  * Handle form submission
  */
-const submitQuestion = async ( ) => {
-  console.log('submitQuestion Called')
+const submitQuestion = async () => {
+  console.log("submitQuestion Called");
   create_loading.value = true;
 
   // Force clear error messages again
@@ -1401,28 +1399,25 @@ const submitQuestion = async ( ) => {
     if (form.c_file) formData.append("c_file", form.c_file);
     if (form.d_file) formData.append("d_file", form.d_file);
 
-
     const response = await useApiService
       .post("/api/v1/examTests", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      }).then((response)=> {
-        if(response.status === 1)
-        {
+      })
+      .then((response) => {
+        if (response.status === 1) {
           path_panel_expand.value = false;
           const userState = useState("user");
 
           //Edit mode or create exam progress
-          if(userState.value.currentExamCode || props.examEditMode === true)
-            {
-              emit("update:updateTestList", response.data.id); 
-              emit("update:refreshTests");      
-              resetFormFields();
-            }
+          if (userState.value.currentExamCode || props.examEditMode === true) {
+            emit("update:updateTestList", response.data.id);
+            emit("update:refreshTests");
+            resetFormFields();
+          }
         }
-      })
-
+      });
   } catch (err) {
     console.error("Error submitting form:", err);
     if (err.response?.status == 400) {
@@ -1439,7 +1434,6 @@ const submitQuestion = async ( ) => {
     }
   } finally {
     create_loading.value = false;
-    
   }
 };
 
@@ -1637,7 +1631,10 @@ const getCurrentExamInfo = async () => {
   } catch (error) {
     console.error("Error in getCurrentExamInfo:", error);
     const { $toast } = useNuxtApp();
-    if ($toast) $toast.error("Failed to initialize test form. Please try refreshing the page.");
+    if ($toast)
+      $toast.error(
+        "Failed to initialize test form. Please try refreshing the page."
+      );
   }
 };
 
@@ -1871,7 +1868,6 @@ watch(
  * Initialize on mount
  */
 onMounted(async () => {
-  
   // Initialize user token
   userToken.value = auth.getUserToken();
 
@@ -1882,8 +1878,7 @@ onMounted(async () => {
   text_answer.value = true;
   photo_answer.value = false;
 
-  console.log(props.testList.length)
-
+  console.log(props.testList.length);
 
   // Load initial data - start with sections
   await getTypeList("section");
@@ -1925,9 +1920,6 @@ onMounted(async () => {
     }, 500);
   }
 });
-
-
-
 
 /**
  * Submit cropped image for upload
@@ -2001,7 +1993,6 @@ const submitCrop = async () => {
     crop_confirm_loading.value = false;
   }
 };
-
 
 /**
  * Trigger form validation manually after user interacts with RichEditor
@@ -2243,12 +2234,10 @@ defineExpose({
   resetFormFields,
 });
 
-
 // watchEffect(() => {
 //   // `foo` transformed to `props.foo` by the compiler
 //   console.log(props.testList.length)
 // })
-
 </script>
 
 <style>
@@ -2319,7 +2308,7 @@ defineExpose({
   overflow: hidden;
 }
 
-.white--text {
+.text-white {
   color: white !important;
 }
 

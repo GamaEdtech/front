@@ -821,7 +821,7 @@ watch(
                             </v-icon>
                           </template>
                           <template v-slot:append-outer>
-                            <v-btn dense color="#FFB300" class="white--text">
+                            <v-btn dense color="#FFB300" class="text-white">
                               <v-icon>mdi-magnify</v-icon>
                             </v-btn>
                           </template>
