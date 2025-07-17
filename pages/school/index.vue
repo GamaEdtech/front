@@ -28,7 +28,7 @@
       @navigate-to-details="navigateToSchoolDetails"
     />
     <div
-      v-if="!isExpandMapInDesktop"
+      v-if="!isExpandMapInDesktop || isMobile"
       :class="`filter-list-div ${
         openBottomNavFilterList ? `open-bottom-nav` : ``
       }`"
@@ -629,21 +629,4 @@ const navigateToSchoolDetails = (schoolId, schoolSlug) => {
 @import "../../assets/scss/school/index.scss";
 
 /* Additional styles for map view mode */
-.main-school-list-div {
-  position: relative !important;
-  display: flex;
-}
-
-.map-div {
-  position: relative;
-  flex: 1;
-  height: 100%;
-  transition: all 0.3s ease;
-}
-
-/* When in map view mode (list is hidden) */
-.main-school-list-div:has(.filter-list-div[style*="display: none"]) .map-div,
-.main-school-list-div:not(:has(.filter-list-div)) .map-div {
-  width: 100%;
-}
 </style>
