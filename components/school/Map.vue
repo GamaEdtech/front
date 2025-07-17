@@ -46,7 +46,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["mapMoved", "userLocationFound"]);
+const emit = defineEmits(["mapMoved", "userLocationFound", "school-marker-clicked"]);
 
 const router = useRouter();
 
@@ -120,7 +120,14 @@ const setMarkers = async () => {
   markers.forEach((marker) => {
     marker.on("click", (event) => {
       if (event.target.options.alt) {
-        window.open(`/school/${event.target.options.alt}`, "_blank");
+        // Find the school data from props.items
+        const schoolId = event.target.options.alt;
+        const school = props.items.find(item => item.id === schoolId);
+        
+        if (school) {
+          // Emit event with school data instead of direct navigation
+          emit("school-marker-clicked", school);
+        }
       }
     });
   });
@@ -182,8 +189,8 @@ const getUserLocation = () => {
 
 <style scoped>
 .map-container {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100dvh !important;
   min-height: 400px;
 }
 </style>
