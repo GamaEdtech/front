@@ -400,8 +400,6 @@ watch(() => props.school, (newSchool) => {
   height: 220px;
   background-size: cover;
   background-position: center;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -444,7 +442,7 @@ watch(() => props.school, (newSchool) => {
 // Bottom sheet modal styles
 :deep(.bottom-sheet-modal) {
   position: fixed !important;
-  bottom: 30% !important;
+  bottom: 10% !important;
   top: auto !important;
   left: 0 !important;
   right: 0 !important;
@@ -461,10 +459,13 @@ watch(() => props.school, (newSchool) => {
     right: auto !important;
     transform: translateX(-50%) !important;
   }
+  
 }
 
 :deep(.v-overlay__content) {
-  align-items: flex-end !important;
+  align-items: center !important;
   justify-content: center !important;
+  width: auto;
+  height: auto;
 }
 </style>
