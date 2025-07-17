@@ -250,7 +250,7 @@ const pageNumberForLoadPreviousSchool = ref(
 const pageNumberForLoadNextSchool = ref(
   route.query.page ? Number(route.query.page) : 1
 );
-const perPage = 10;
+const perPage = 20;
 const totalSchoolFind = ref(0);
 
 const resetParameter = () => {
@@ -297,14 +297,9 @@ const updateQueryParams = () => {
     }
   });
   router.replace({ query });
-};
 
-watch(
-  () => route.query,
-  () => {
-    applyFiltersFromQuery(route.query);
-  }
-);
+  applyFiltersFromQuery(query);
+};
 
 const applyFiltersFromQuery = (query) => {
   debouncedGetSchoolList();
