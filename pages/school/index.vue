@@ -140,13 +140,38 @@ const sortList = [
     value: "score",
     title: "Highest score",
   },
-  {
-    value: "defaultImageUri",
-    title: "Has Image",
-  },
 ];
+const setDefaultSort = (selectedSorts) => {
+  if (!selectedSorts.includes("lastModifyDate")) {
+    return ["lastModifyDate", ...selectedSorts];
+  }
+  return selectedSorts;
+};
+
+const setDefaultSortToRoute = () => {
+  const currentSort = route.query.sort;
+  const hasLastModify =
+    currentSort &&
+    (Array.isArray(currentSort)
+      ? currentSort.includes("lastModifyDate")
+      : currentSort.split(",").includes("lastModifyDate"));
+
+  if (!hasLastModify) {
+    const newSort = currentSort
+      ? `lastModifyDate,${currentSort}`
+      : "lastModifyDate";
+
+    router.replace({
+      query: {
+        ...route.query,
+        sort: newSort,
+      },
+    });
+  }
+};
 
 onMounted(() => {
+  setDefaultSortToRoute();
   const footer = document.getElementById("footer-container");
   if (footer) {
     footer.style.display = "none";
@@ -168,11 +193,13 @@ const filterForm = ref({
   city: route.query.city || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
-  sort: Array.isArray(route.query.sort)
-    ? route.query.sort
-    : route.query.sort
-    ? route.query.sort.split(",")
-    : [],
+  sort: setDefaultSort(
+    Array.isArray(route.query.sort)
+      ? route.query.sort
+      : route.query.sort
+      ? route.query.sort.split(",")
+      : []
+  ),
   school_type: Array.isArray(route.query.school_type)
     ? route.query.school_type
     : route.query.school_type
@@ -321,8 +348,8 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
   });
 
 if (initialSchools.value) {
-  schools.value = initialSchools.value.data.list;
-  totalSchoolFind.value = initialSchools.value.data.totalRecordsCount || 0;
+  schools.value = initialSchools.value?.data?.list || [];
+  totalSchoolFind.value = initialSchools.value?.data?.totalRecordsCount || 0;
   isInitialSchoolLoading.value = false;
   isPaginationSchoolLoading.value = false;
   isPaginationPreviousSchoolLoading.value = false;
@@ -364,7 +391,7 @@ const getSchoolList = async () => {
       params,
     });
 
-    if (response.data.list.length < perPage) {
+    if (response?.data?.list.length < perPage) {
       isAllSchoolLoaded.value = true;
     }
     totalSchoolFind.value = response.data.totalRecordsCount
