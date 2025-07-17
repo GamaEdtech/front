@@ -181,16 +181,17 @@ export default defineNuxtConfig({
       name: 'Gamatrain'
     },
     workbox: {
+      // globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
       navigateFallback: "/",
-      globPatterns: [],
-      globIgnores: [
-        '**/_payload.json',
-        '_nuxt/builds/**/*.json',
-        '**/node_modules/**/*'
-      ]
+      // globPatterns: ['**/*.{js,css,html,ico,svg}'],
+      // globIgnores: [
+      //   '**/_payload.json',
+      //   '_nuxt/builds/**/*.json',
+      //   '**/node_modules/**/*'
+      // ]
     },
     devOptions: {
-      enabled: true,
+      enabled: false,
       type: "module",
     },
   },
