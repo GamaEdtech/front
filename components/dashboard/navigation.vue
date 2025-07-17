@@ -109,7 +109,7 @@ const items = ref([
       { title: "Top Up Wallet", link: "/user/charge-wallet" },
       { title: "Payments", link: "/user/payments" },
       { title: "Sell Report", link: "/user/sell-report" },
-      { title: "Withdrawal", link: "/user/withdrawal" },
+      // { title: "Withdrawal", link: "/user/withdrawal" },
     ],
   },
   { title: "Messages", icon: "mdi-email-outline", link: "/user/ticket" },
