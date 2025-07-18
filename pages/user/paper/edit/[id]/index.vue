@@ -656,21 +656,21 @@ const updateQuestion = async () => {
   }
 
   try {
-    const response = await useFetch(`/api/v1/tests/${route.params.id}`, {
-      method: "PUT",
-      body: urlencodeFormData(formSubmitData),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await useApiService.put(
+      `/api/v1/tests/${route.params.id}`,
+      urlencodeFormData(formSubmitData),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
-    if (response.data.value.data.id == 0 && response.data.value.data.repeated) {
+    if (response.data.id == 0 && response.data.repeated) {
       $toast.info("The paper is duplicated");
     } else {
       $toast.success("Updated successfully");
-      router.push({
-        path: "/user/paper",
-      });
+      router.push("/user/paper");
     }
   } catch (err) {
     if (err.response?.status == 403) {
