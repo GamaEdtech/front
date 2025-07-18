@@ -147,7 +147,7 @@
                   <div class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500">
                     Score:
                     <v-icon color="primary"> mdi-star </v-icon>
-                    {{ school?.score ? school.score.toFixed(1) : "N/A" }}
+                    {{ school?.score ? school.score.toFixed(1) : "New" }}
                   </div>
                   <v-divider :thickness="1" class="border-opacity-100 primary-gray-300 w-100" vertical></v-divider>
                   <div class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100">
@@ -196,7 +196,7 @@
                   <div class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500">
                     Score:
                     <v-icon color="primary"> mdi-star </v-icon>
-                    {{ school?.score ? school.score.toFixed(1) : "N/A" }}
+                    {{ school?.score ? school.score.toFixed(1) : "New" }}
                   </div>
                   <v-divider :thickness="1" class="border-opacity-100 primary-gray-300 w-100" vertical></v-divider>
                   <div class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100">
@@ -279,6 +279,7 @@ const navigateToSchoolDetails = (event) => {
     
     const schoolId = props.school.id;
     const schoolSlug = $slugGenerator(props.school.name);
+    const schoolUrl = `/school/${schoolId}/${schoolSlug}`;
     
     // Add active state visual feedback for touch devices
     const card = event.currentTarget;
@@ -291,8 +292,14 @@ const navigateToSchoolDetails = (event) => {
       // Emit navigation event
       emit('navigate-to-details', schoolId, schoolSlug);
       
-      // Navigate to school details page
-      router.push(`/school/${schoolId}/${schoolSlug}`);
+      // Open in new tab if in map view, otherwise navigate in same tab
+      if (window.innerWidth > 1260 && document.querySelector('.main-school-list-div:not(:has(.filter-list-div))')) {
+        // In map view - open in new tab
+        window.open(schoolUrl, '_blank');
+      } else {
+        // Normal navigation
+        window.open(schoolUrl, '_blank');
+      }
       
       // Reset opacity
       card.style.opacity = '1';
