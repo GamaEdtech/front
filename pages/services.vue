@@ -44,13 +44,13 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="6" class="order-last order-md-first">
-            <h2 class="gama-text-h4 white--text">
+            <h2 class="gama-text-h4 text-white">
               AI-Based Personalized Learning
             </h2>
-            <p class="gama-text-h6 white--text">
+            <p class="gama-text-h6 text-white">
               Your Personalized Pathway to Success
             </p>
-            <p class="gama-text-body1 white--text">
+            <p class="gama-text-body1 text-white">
               Experience the power of AI-driven personalized learning with
               GamaTrain. Our cutting-edge algorithms analyze each student's
               strengths, weaknesses, and learning style to create tailor-made

@@ -106,7 +106,6 @@ export default defineNuxtConfig({
   // Plugins
   plugins: [
     { src: "plugins/helper.js" },
-    { src: "plugins/vue-emoji-picker.js", mode: "client" },
     { src: "plugins/img-cropper", mode: "client" },
     { src: "plugins/vuedraggable", mode: "client" },
   ],
@@ -146,7 +145,13 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["vuetify", "vue-chartjs", "defu", "@ckeditor/ckeditor5-vue"],
+    transpile: [
+      "vuetify",
+      "vue-chartjs",
+      "defu",
+      "@ckeditor/ckeditor5-vue",
+      "vue3-emoji-picker",
+    ],
   },
 
   // Vite configuration

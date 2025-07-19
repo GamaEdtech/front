@@ -28,7 +28,7 @@
                 target="_blank"
                 block
                 color="#25d366"
-                class="white--text"
+                class="text-white"
               >
                 <i class="fab fa-whatsapp mr-1 icon"></i>
                 WhatsApp
@@ -38,7 +38,7 @@
               <v-btn
                 block
                 color="#00acee"
-                class="white--text"
+                class="text-white"
                 @click="shareSocial('telegram')"
               >
                 <i class="fab fa-telegram-plane mr-1 icon"></i>

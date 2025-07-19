@@ -41,10 +41,13 @@
           <!--Description-->
           <span
             class="break-word"
+            :class="{
+              'gama-text-body1': isMobile,
+              'gama-text-body2': !isMobile,
+            }"
             v-show="!editMode.describe"
-            :class="isMobile ? 'gama-text-body1' : 'gama-text-body2'"
             v-html="formattedDescription"
-          />
+          ></span>
           <v-btn
             v-if="isOwner"
             v-show="!editMode.describe"
@@ -101,9 +104,20 @@ const props = defineProps({
 });
 const route = useRoute();
 const display = useGlobalDisplay();
-const isMobile = ref(display.xs);
+const isMobile = ref(false);
 const isOwner = ref(false);
 const emits = defineEmits(["update-success", "update-error"]);
+
+onMounted(() => {
+  isMobile.value = display.xs.value;
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal;
+    }
+  );
+});
+
 const editMode = ref({
   title: false,
   describe: false,

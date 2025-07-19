@@ -52,10 +52,10 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="6" class="order-last order-md-first">
-            <h2 class="gama-text-h4 white--text">
+            <h2 class="gama-text-h4 text-white">
               Comprehensive Curriculum and Materials
             </h2>
-            <p class="gama-text-body1 white--text">
+            <p class="gama-text-body1 text-white">
               GamaTrain's extensive library of educational materials covers a
               wide range of subjects and levels. From first grade to 12th grade
               advanced courses, we have meticulously crafted content to ensure

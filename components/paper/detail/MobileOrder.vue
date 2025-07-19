@@ -22,7 +22,7 @@
           <div v-if="contentData?.files.pdf.exist">
             <v-btn
               @click="$emit('download', 'q_pdf')"
-              class="mb-2 white--text font-weight-bold"
+              class="mb-2 text-white font-weight-bold"
               block
               color="#E60012"
               :loading="qPdfFileDownloadLoading"

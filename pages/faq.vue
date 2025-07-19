@@ -18,15 +18,16 @@
         <v-col cols="12">
           <v-text-field
             class="rounded-ts pr-0"
-            dense
-            outlined
+            density="compact"
+            variant="outlined"
             hide-details
+            rounded
             v-model="searchQuery"
             label="Search"
           >
-            <template slot="append-outer">
-              <v-btn dense color="#FFB300" class="white--text">
-                <v-icon>mdi-magnify</v-icon>
+            <template #append>
+              <v-btn dense color="#FFB300" class="text-white">
+                <v-icon color="black">mdi-magnify</v-icon>
               </v-btn>
             </template>
           </v-text-field>
@@ -278,15 +279,15 @@ export default {
 
 #faq-data-container {
   margin-bottom: 1.5rem;
-
-  .v-text-field {
+  .v-field {
     width: 42.8rem;
     min-height: auto;
     height: 4rem !important;
-    border-radius: 3.8rem 0.4rem 0.4rem 3.8rem;
+    border-radius: 3.8rem 0.4rem 0.4rem 3.8rem !important;
 
     margin: 1.6rem auto 1.6rem auto;
-
+  }
+  .v-text-field {
     .v-input__control > .v-input__slot {
       min-height: auto;
       height: 4rem !important;
@@ -296,7 +297,7 @@ export default {
       }
     }
 
-    .v-input__append-outer {
+    .v-input__append {
       margin: 0 0 0 0.8rem !important;
       .v-btn {
         min-width: auto;
