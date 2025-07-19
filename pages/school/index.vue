@@ -101,44 +101,6 @@ import SchoolDetailsModal from "~/components/school/SchoolDetailsModal.vue";
 import schoolListDesktop from "~/components/school/list/Desktop.vue";
 import schoolListMobile from "~/components/school/list/Mobile.vue";
 
-useHead({
-  titleTemplate: "%s",
-  title:
-    "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-
-  meta: [
-    {
-      hid: "apple-mobile-web-app-title",
-      name: "apple-mobile-web-app-title",
-      content:
-        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-    },
-    {
-      hid: "og:title",
-      name: "og:title",
-      content:
-        "School Finder: Your Path to Ideal Education - Find Schools Near You - GamaTrain",
-    },
-    {
-      hid: "og:site_name",
-      name: "og:site_name",
-      content: "GamaTrain",
-    },
-    {
-      hid: "description",
-      name: "description",
-      content:
-        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
-    },
-    {
-      hid: "og:description",
-      name: "og:description",
-      content:
-        "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
-    },
-  ],
-});
-
 const router = useRouter();
 const route = useRoute();
 
@@ -330,6 +292,68 @@ const debouncedGetSchoolList = async () => {
   }, 800);
 };
 
+const metaTitle = ref(
+  "School Finder: Your Path to Ideal Education - Find Schools Near You"
+);
+const setMetaData = (informationResponse) => {
+  if (informationResponse.filters && informationResponse.filters.length > 0) {
+    let titles = {};
+    titles["country-title"] = "";
+    titles["state-title"] = "";
+    titles["city-title"] = "";
+    informationResponse.filters.forEach((item) => {
+      titles[item.key] = item.value ? item.value : "";
+    });
+
+    if (titles["country-title"].length > 0) {
+      metaTitle.value =
+        titles["city-title"] +
+        " " +
+        titles["state-title"] +
+        " " +
+        titles["country-title"] +
+        " Schools";
+    } else {
+      metaTitle.value =
+        "School Finder: Your Path to Ideal Education - Find Schools Near You";
+    }
+  }
+
+  useHead({
+    title: metaTitle.value,
+
+    meta: [
+      {
+        hid: "apple-mobile-web-app-title",
+        name: "apple-mobile-web-app-title",
+        content: metaTitle.value,
+      },
+      {
+        hid: "og:title",
+        name: "og:title",
+        content: metaTitle.value,
+      },
+      {
+        hid: "og:site_name",
+        name: "og:site_name",
+        content: "GamaTrain",
+      },
+      {
+        hid: "description",
+        name: "description",
+        content:
+          "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+      },
+      {
+        hid: "og:description",
+        name: "og:description",
+        content:
+          "Explore tailored K12 schools effortlessly with GamaTrain's School Finder. Find the perfect school for your unique needs and set the course for academic success.",
+      },
+    ],
+  });
+};
+
 const { data: initialSchools, pending: loadingSchoolsServer } =
   await useAsyncData("schoolListSSR", () => {
     const params = {
@@ -358,6 +382,7 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
   });
 
 if (initialSchools.value) {
+  setMetaData(initialSchools.value);
   schools.value = initialSchools.value?.data?.list || [];
   totalSchoolFind.value = initialSchools.value?.data?.totalRecordsCount || 0;
   isInitialSchoolLoading.value = false;
@@ -400,6 +425,7 @@ const getSchoolList = async () => {
     const response = await $fetch("/api/v2/schools", {
       params,
     });
+    setMetaData(response);
 
     if (response?.data?.list.length < perPage) {
       isAllSchoolLoaded.value = true;
