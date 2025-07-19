@@ -2,10 +2,13 @@ import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
 import glsl from "vite-plugin-glsl";
 
-
 export default defineNuxtConfig({
   // Add compatibility date to fix the warning
   compatibilityDate: "2024-04-03",
+
+  imports: {
+    autoImport: true,
+  },
 
   // Global page headers
   app: {
@@ -41,13 +44,16 @@ export default defineNuxtConfig({
             "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
         },
         { property: "og:site_name", content: "GamaTrain" },
-        { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        {
+          name: "apple-mobile-web-app-status-bar-style",
+          content: "black-translucent",
+        },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon-dark.ico" },
         { rel: "stylesheet", href: "/assets/css/all.min.css" },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon-light.png' },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon-light.png" },
       ],
       script: [
         {
@@ -67,7 +73,9 @@ export default defineNuxtConfig({
       googleClientId:
         process.env.GOOGLE_CLIENT_ID ||
         "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-      recapchaSiteKey: process.env.NUXT_RECAPTCHA_SITE_KEY || '6LcGF3ErAAAAAAneMnvDNOvdBg4Z7IDoL86tJr9T'
+      recapchaSiteKey:
+        process.env.NUXT_RECAPTCHA_SITE_KEY ||
+        "6LcGF3ErAAAAAAneMnvDNOvdBg4Z7IDoL86tJr9T",
     },
   },
 
@@ -87,8 +95,6 @@ export default defineNuxtConfig({
     ],
   },
 
-
-
   // Global CSS
   css: [
     "vuetify/lib/styles/main.css",
@@ -100,7 +106,6 @@ export default defineNuxtConfig({
   // Plugins
   plugins: [
     { src: "plugins/helper.js" },
-    { src: "plugins/vue-emoji-picker.js", mode: "client" },
     { src: "plugins/img-cropper", mode: "client" },
     { src: "plugins/vuedraggable", mode: "client" },
   ],
@@ -115,7 +120,6 @@ export default defineNuxtConfig({
     "nuxt-gtag",
     "@nuxt/image",
     "@nuxtjs/leaflet",
-    "@vite-pwa/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
@@ -214,7 +218,13 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["vuetify", "vue-chartjs", "defu", "@ckeditor/ckeditor5-vue"],
+    transpile: [
+      "vuetify",
+      "vue-chartjs",
+      "defu",
+      "@ckeditor/ckeditor5-vue",
+      "vue3-emoji-picker",
+    ],
   },
 
   // Vite configuration
@@ -243,7 +253,7 @@ export default defineNuxtConfig({
     },
     define: {
       global: "globalThis",
-    }
+    },
   },
 
   routeRules: {

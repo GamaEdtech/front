@@ -111,19 +111,17 @@
           </div>
           <div class="each-item-filter result-div">
             Results
-            <span class="count-result" v-if="totalSchoolFind != 0">{{
-              $numberFormat(totalSchoolFind)
-            }}</span>
+            <span class="count-result" data-v-45a0d8f4>
+              {{ totalSchoolFind ? $numberFormat(totalSchoolFind) : "0" }}
+            </span>
           </div>
         </div>
 
         <div class="result-div-mobile gama-text-overline">
           Results
-          <span
-            class="count-result gama-text-button"
-            v-if="totalSchoolFind != 0"
-            >{{ $numberFormat(totalSchoolFind) }}</span
-          >
+          <span class="count-result gama-text-button" data-v-45a0d8f4>
+            {{ totalSchoolFind ? $numberFormat(totalSchoolFind) : "0" }}
+          </span>
         </div>
       </div>
     </div>
@@ -542,6 +540,12 @@ const optionFilter = ref([
   },
 ]);
 
+const setDefaultSort = (selectedSorts) => {
+  if (!selectedSorts.includes("lastModifyDate")) {
+    return ["lastModifyDate", ...selectedSorts];
+  }
+  return selectedSorts;
+};
 const filterForm = reactive({
   keyword: route.query.keyword || "",
   country: Number(route.query.country) || "",
@@ -549,11 +553,13 @@ const filterForm = reactive({
   city: Number(route.query.city) || "",
   stage: route.query.stage || "",
   tuition_fee: Number(route.query.tuition_fee) || 0,
-  sort: Array.isArray(route.query.sort)
-    ? route.query.sort
-    : route.query.sort
-    ? route.query.sort.split(",")
-    : [],
+  sort: setDefaultSort(
+    Array.isArray(route.query.sort)
+      ? route.query.sort
+      : route.query.sort
+      ? route.query.sort.split(",")
+      : []
+  ),
   school_type: Array.isArray(route.query.school_type)
     ? route.query.school_type
     : route.query.school_type
@@ -838,6 +844,11 @@ const closeFilterMobile = () => {
   showFilterMobile.value = false;
 };
 // End Section School type
+
+// Add this composable for number formatting
+const $numberFormat = (number) => {
+  return new Intl.NumberFormat().format(number);
+};
 </script>
 
 <style scoped>

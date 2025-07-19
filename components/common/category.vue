@@ -17,7 +17,7 @@
                     :color="item.color"
                     depressed
                   >
-                    <span :class="item.icon" class="icon white--text"></span>
+                    <span :class="item.icon" class="icon text-white"></span>
                   </v-btn>
                   <div :style="`color:${item.color}`" class="category-text">
                     {{ item.text }}

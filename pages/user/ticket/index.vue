@@ -95,7 +95,7 @@
                 <v-chip
                   v-if="message.unread"
                   :color="calcColor(message.status_message, 'font')"
-                  class="ml-0 mr-2 white--text"
+                  class="ml-0 mr-2 text-white"
                   small
                 >
                   {{ message.unread }}
@@ -160,7 +160,7 @@
               to="/user/ticket/create"
               x-large
               color="teal"
-              class="white--text"
+              class="text-white"
             >
               <i class="fa fa-comment-alt fa-2xl mr-2" />
               New

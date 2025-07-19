@@ -34,7 +34,7 @@
             <v-col cols="3" md="2" class="pl-0">
               <v-btn
                 type="submit"
-                class="teal white--text"
+                class="teal text-white"
                 :loading="emailConfirmLoading"
                 :disabled="invalid"
               >
@@ -63,7 +63,7 @@
             <v-col cols="3" md="2" class="pl-0">
               <v-btn
                 type="submit"
-                class="teal white--text"
+                class="teal text-white"
                 :loading="mobileConfirmLoading"
                 :disabled="invalid"
               >

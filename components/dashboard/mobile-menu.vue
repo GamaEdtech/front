@@ -88,6 +88,12 @@ const items = reactive([
         icon: "icong-qa",
         icon_type: "custom",
       },
+      {
+        title: "Blogs",
+        link: "/user/blogs",
+        icon: "mdi-newspaper",
+        icon_type: "custom",
+      },
     ],
   },
   {
@@ -129,7 +135,7 @@ const items = reactive([
         icon: "mdi-chart-line",
         link: "/user/sell-report",
       },
-      { title: "Withdrawal", icon: "mdi-cash", link: "/user/withdrawal" },
+      // { title: "Withdrawal", icon: "mdi-cash", link: "/user/withdrawal" },
     ],
   },
   { title: "Messages", icon: "mdi-email-outline", link: "/user/ticket" },

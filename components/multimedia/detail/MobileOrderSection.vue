@@ -59,7 +59,7 @@ const props = defineProps({
     default: 0,
   },
   credit: {
-    type: Number,
+    type: [Number, String],
     default: 0,
   },
   isLoggedIn: {

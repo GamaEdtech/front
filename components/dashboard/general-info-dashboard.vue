@@ -2,7 +2,7 @@
   <v-row v-if="progressInfoData?.num < 10 || userInfoData?.username === '0'">
     <v-col cols="12" md="8">
       <div class="d-flex pb-0" v-if="progressInfoData?.num < 10">
-        <NuxtLink to="/user/edit-profile">
+        <NuxtLink to="/user/profile">
           <img
             width="72"
             height="72"
@@ -59,7 +59,7 @@
 
     <!--Profile complete progress-->
     <v-col cols="12" class="pt-0" v-if="progressInfoData?.num < 10">
-      <NuxtLink to="/user/edit-profile">
+      <NuxtLink to="/user/profile">
         <p class="text-h5 font-weight-bold mt-3 mb-3">
           Profile complete: {{ progressInfoData?.num * 10 }}% | Now complete
           <span class="text-capitalize text-green">

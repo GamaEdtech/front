@@ -50,6 +50,7 @@ const menuItems = [
     icon: "mdi-currency-usd",
     icon_color: "",
   },
+
   // {
   //   title: "Offers",
   //   link: "/offers",
@@ -134,7 +135,7 @@ const searchFilterItems = [
     key: "student",
   },
 ];
-const mobileSearchFilter = ref("exam");
+const mobileSearchFilter = ref("");
 const keyword = ref("");
 
 const user_profile_items = [
@@ -291,16 +292,18 @@ const setActiveFilter = (val) => {
 
 //Search section
 const mobileSearchResult = ref(null);
+const lineSpecifierLoadMoreMobileRef = ref(null);
 const checkSearchScroll = () => {
-  const scrollableDiv = mobileSearchResult.value;
-  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
+  const targetDiv = lineSpecifierLoadMoreMobileRef.value;
+  const rect = targetDiv.getBoundingClientRect();
+  const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+  if (isDivInView && !searchLoading.value && !allDataLoaded.value) {
     pageNum.value++;
     search();
   }
 };
-const isScrollAtBottom = (element) => {
-  return element.scrollHeight - element.scrollTop <= element.clientHeight;
-};
+
 const search = () => {
   searchLoading.value = true;
   if (timer.value) {
@@ -308,36 +311,41 @@ const search = () => {
     timer.value = null;
   }
 
-  timer.value = setTimeout(() => {
-    if (searchKey.value && allDataLoaded.value == false)
-      useApiService
-        .get("/api/v1/search/text", {
-          params: {
-            query: searchKey.value,
-            page: pageNum.value,
-          },
-        })
-        .then((response) => {
+  timer.value = setTimeout(async () => {
+    if (searchKey.value && allDataLoaded.value == false) {
+      try {
+        const params = {
+          query: searchKey.value,
+          page: pageNum.value,
+        };
+        const response = await $fetch("/api/v1/search/text", {
+          params,
+        });
+        if (response.data) {
           searchCount.value = response.data.num;
           searchResults.value.push(...response.data.list);
 
-          if (response.data.list.length === 0) allDataLoaded.value = true;
-        })
-        .catch((err) => {})
-        .finally(() => {
-          searchLoading.value = false;
-        });
+          if (response.data.list.length < 20) {
+            allDataLoaded.value = true;
+          }
+        }
+      } catch (error) {
+        console.log(err);
+      } finally {
+        searchLoading.value = false;
+      }
+    }
   }, 800);
 };
 
 const closeSearch = () => {
   searchResultsSection.value = false;
   searchKey.value = "";
-  mobileKeywordInput.value.blur();
 };
 const calcPath = (type) => {
   if (type == "gama_tests") return "paper";
-  else if (type == "gama_learnfiles") return "multimedia";
+  else if (type == "gama_learnfiles" || type == "gama_files")
+    return "multimedia";
   else if (type == "gama_azmoons") return "exams";
   else if (type == "gama_questions") return "qa";
   else if (type == "gama_dars") return "tutorial";
@@ -548,7 +556,7 @@ watch(
                       :to="item.link"
                     >
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0 nt">
+                        <v-icon size="small" class="mr-0 nt">
                           {{ item.icon }}
                         </v-icon>
                       </template>
@@ -558,7 +566,7 @@ watch(
                     </v-list-item>
                     <v-list-item class="pointer" @click="logout">
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0"> mdi-logout </v-icon>
+                        <v-icon size="small" class="mr-0"> mdi-logout </v-icon>
                       </template>
                       <v-list-item-title> Logout </v-list-item-title>
                     </v-list-item>
@@ -774,22 +782,27 @@ watch(
               >
                 <div id="search-sheet-handler"></div>
               </div>
+
               <v-slide-group
                 id="search-cate-slide"
                 v-model="mobileSearchFilter"
-                selected-class="active-item"
-                show-arrows="hover"
-                class="pt-4"
+                show-arrows
+                class="pt-1"
               >
                 <v-slide-group-item
                   v-for="(item, n) in searchFilterItems"
                   :key="n"
                   :value="item.key"
-                  :class="{ 'slide-item': true }"
                   v-slot="{ isSelected, toggle }"
                 >
-                  <div @click="toggle">
-                    <div :class="`active-avatar active-${item.key}-avatar`">
+                  <div @click="toggle" class="ma-4">
+                    <div
+                      :class="`${
+                        isSelected
+                          ? `active-avatar active-${item.key}-avatar`
+                          : ``
+                      }`"
+                    >
                       <div :class="`avatar ${item.key}-avatar`">
                         <span :class="`icon icon-${item.key}`"></span>
                       </div>
@@ -804,24 +817,33 @@ watch(
                     <v-row>
                       <v-col cols="12" class="pb-0 px-6">
                         <v-text-field
-                          ref="mobileKeywordInput"
-                          class="rounded-ts pr-0"
-                          dense
-                          outlined
-                          hide-details
-                          v-model="searchKey"
                           label="Ex: Paper Summer Session"
+                          prepend-inner-icon="mdi-magnify"
+                          glow
+                          variant="outlined"
+                          color="#FFB600"
+                          icon-color="#FFB600"
+                          density="compact"
+                          rounded="xl"
+                          v-model="searchKey"
+                          clearable
+                          @click:clear="closeSearch"
+                          autocomplete="off"
+                          class="w-100"
                         >
-                          <template v-slot:append>
+                          <template v-slot:append-inner>
                             <v-icon
-                              v-if="searchResultsSection"
-                              @click="closeSearch()"
+                              class="mr-n3"
+                              color="#FFB600"
+                              width="70"
+                              height="30"
+                              rounded="xl"
                             >
                               mdi-close-circle
                             </v-icon>
                           </template>
                           <template v-slot:append-outer>
-                            <v-btn dense color="#FFB300" class="white--text">
+                            <v-btn dense color="#FFB300" class="text-white">
                               <v-icon>mdi-magnify</v-icon>
                             </v-btn>
                           </template>
@@ -862,7 +884,10 @@ watch(
                                       <span class="icon icon-paper"></span>
                                     </div>
                                     <div
-                                      v-else-if="item.type == 'gama_learnfiles'"
+                                      v-else-if="
+                                        item.type == 'gama_learnfiles' ||
+                                        item.type == 'gama_files'
+                                      "
                                       class="avatar multimedia-avatar"
                                     >
                                       <span class="icon icon-multimedia"></span>
@@ -940,6 +965,10 @@ watch(
                                   </div>
                                 </v-col>
                               </v-row>
+                              <div
+                                class="line-specifier-load-more"
+                                ref="lineSpecifierLoadMoreMobileRef"
+                              ></div>
                               <v-row
                                 v-if="allDataLoaded == false"
                                 class="list-item"
@@ -1024,11 +1053,7 @@ watch(
               :to="item.link"
             >
               <template v-slot:prepend>
-                <v-icon
-                  class="mr-0 nt"
-                  :icon="item.icon"
-                  :size="small"
-                ></v-icon>
+                <v-icon class="mr-0 nt" :icon="item.icon" size="small"></v-icon>
               </template>
 
               <v-list-item-title>
@@ -1093,6 +1118,10 @@ watch(
 </template>
 
 <style>
+.line-specifier-load-more {
+  width: 100%;
+  height: 4px;
+}
 .v-application .primary {
   background-color: #ffb300 !important;
   border-color: #ffb300 !important;
@@ -1143,7 +1172,7 @@ watch(
   align-items: center;
   background: #f6f8fa;
   position: relative;
-  padding-top: 5.6rem;
+  padding-top: 3.6rem;
 
   #search-sheet-handler-holder {
     position: absolute;
@@ -1171,136 +1200,114 @@ watch(
   }
 
   #search-cate-slide {
-    .slide-item {
-      margin-right: 2.4rem;
-      margin-left: 2.4rem;
+    .avatar {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 2.6rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0.8rem auto 0.8rem auto;
 
-      .avatar {
-        width: 3.2rem;
-        height: 3.2rem;
-        border-radius: 2.6rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 1.2rem auto 0.8rem auto;
-
-        .icon {
-          font-size: 2.13rem;
-          color: #ffffff;
-        }
-      }
-
-      .paper-avatar {
-        background: #01c8c8;
-      }
-
-      .multimedia-avatar {
-        background: #8800b8;
-      }
-
-      .exam-avatar {
-        background: #7b61ff;
-      }
-
-      .q-a-avatar {
-        background: #ff50a6;
-      }
-
-      .tutorial-avatar {
-        background: #2a91ff;
-      }
-
-      .student-avatar {
-        background: #ff9400;
-      }
-
-      .teacher-avatar {
-        background: #1cb423;
-      }
-
-      .school-avatar {
-        background: #a15801;
-      }
-
-      .live-avatar {
-        background: #ff0000;
-      }
-
-      .gama-text-caption {
-        color: rgba(36, 41, 47, 0.5);
+      .icon {
+        font-size: 2.13rem;
+        color: #ffffff;
       }
     }
 
-    .active-item {
-      margin-right: 2.1rem;
-      margin-left: 2.1rem;
+    .paper-avatar {
+      background: #01c8c8;
+    }
 
-      .avatar {
-        width: 4.8rem;
-        height: 4.8rem;
-        border-radius: 2.6rem;
-        margin: auto auto;
+    .multimedia-avatar {
+      background: #8800b8;
+    }
 
-        .icon {
-          font-size: 3.2rem;
-        }
-      }
+    .exam-avatar {
+      background: #7b61ff;
+    }
 
-      .active-avatar {
-        width: 5.6rem;
-        height: 5.6rem;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0 auto 0.8rem auto;
-      }
+    .q-a-avatar {
+      background: #ff50a6;
+    }
 
-      .active-paper-avatar {
-        background: #bbe9bd;
-      }
+    .tutorial-avatar {
+      background: #2a91ff;
+    }
 
-      .active-multimedia-avatar {
-        background: #dcb3ea;
-      }
+    .student-avatar {
+      background: #ff9400;
+    }
 
-      .active-exam-avatar {
-        background: #d8d0ff;
-      }
+    .teacher-avatar {
+      background: #1cb423;
+    }
 
-      .active-q-a-avatar {
-        background: #ffcbe4;
-      }
+    .school-avatar {
+      background: #a15801;
+    }
 
-      .active-tutorial-avatar {
-        background: #c0deff;
-      }
+    .live-avatar {
+      background: #ff0000;
+    }
 
-      .active-student-avatar {
-        background: #ffdfb3;
-      }
+    .gama-text-caption {
+      color: rgba(36, 41, 47, 0.5);
+    }
+    .active-avatar {
+      width: 5.6rem;
+      height: 5.6rem;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 0.8rem auto;
+    }
 
-      .active-teacher-avatar {
-        background: #1cb4234d;
-      }
+    .active-paper-avatar {
+      background: #bbe9bd;
+    }
 
-      .active-school-avatar {
-        background: #e3cdb3;
-      }
+    .active-multimedia-avatar {
+      background: #dcb3ea;
+    }
 
-      .active-live-avatar {
-        background: #ffb3b3;
-      }
+    .active-exam-avatar {
+      background: #d8d0ff;
+    }
 
-      .gama-text-caption {
-        color: rgba(36, 41, 47, 0.8);
-        text-align: center;
-        font-family: Inter;
-        font-size: 1.4rem;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 2.4rem;
-      }
+    .active-q-a-avatar {
+      background: #ffcbe4;
+    }
+
+    .active-tutorial-avatar {
+      background: #c0deff;
+    }
+
+    .active-student-avatar {
+      background: #ffdfb3;
+    }
+
+    .active-teacher-avatar {
+      background: #1cb4234d;
+    }
+
+    .active-school-avatar {
+      background: #e3cdb3;
+    }
+
+    .active-live-avatar {
+      background: #ffb3b3;
+    }
+
+    .gama-text-caption {
+      color: rgba(36, 41, 47, 0.8);
+      text-align: center;
+      font-family: Inter;
+      font-size: 1.4rem;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 2.4rem;
     }
   }
 
@@ -1388,6 +1395,11 @@ watch(
       .list-item {
         height: 11.9rem;
         padding: 1.6rem;
+
+        a {
+          text-decoration: none;
+          color: unset;
+        }
 
         .gama-text-button {
           color: rgba(36, 41, 47, 0.8);
