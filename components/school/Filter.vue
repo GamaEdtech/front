@@ -109,26 +109,20 @@
               </v-list>
             </div>
           </div>
-          <ClientOnly>
-            <div class="each-item-filter result-div">
-              Results
-              <span class="count-result" v-if="totalSchoolFind != 0">{{
-                $numberFormat(totalSchoolFind)
-              }}</span>
-            </div>
-          </ClientOnly>
+          <div class="each-item-filter result-div">
+            Results
+            <span class="count-result" data-v-45a0d8f4>
+              {{ totalSchoolFind ? $numberFormat(totalSchoolFind) : "0" }}
+            </span>
+          </div>
         </div>
 
-        <ClientOnly>
-          <div class="result-div-mobile gama-text-overline">
-            Results
-            <span
-              class="count-result gama-text-button"
-              v-if="totalSchoolFind != 0"
-              >{{ $numberFormat(totalSchoolFind) }}</span
-            >
-          </div>
-        </ClientOnly>
+        <div class="result-div-mobile gama-text-overline">
+          Results
+          <span class="count-result gama-text-button" data-v-45a0d8f4>
+            {{ totalSchoolFind ? $numberFormat(totalSchoolFind) : "0" }}
+          </span>
+        </div>
       </div>
     </div>
     <div
@@ -850,6 +844,11 @@ const closeFilterMobile = () => {
   showFilterMobile.value = false;
 };
 // End Section School type
+
+// Add this composable for number formatting
+const $numberFormat = (number) => {
+  return new Intl.NumberFormat().format(number);
+};
 </script>
 
 <style scoped>

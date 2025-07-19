@@ -957,7 +957,7 @@
                       size="large"
                       density="compact"
                       color="teal"
-                      class="white--text"
+                      class="text-white"
                       block
                       style="text-transform: none; font-size: 13px !important"
                     >
@@ -1397,9 +1397,6 @@ const testList = ref(null);
 const testListContent = ref(null);
 const isFormValid = ref(false);
 const isExamPublished = ref(false); // Track if the exam has been published
-
-
-
 
 // Form data
 const form = reactive({

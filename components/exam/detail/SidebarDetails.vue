@@ -132,7 +132,7 @@ const props = defineProps({
     default: false,
   },
   credit: {
-    type: Number,
+    type: [Number, String],
     default: 0,
   },
   downloadLoading: {
