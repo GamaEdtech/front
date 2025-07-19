@@ -106,11 +106,11 @@ const props = defineProps({
     default: "",
   },
   filePages: {
-    type: Number,
+    type: [Number, String],
     default: 0,
   },
   views: {
-    type: Number,
+    type: [Number, String],
     default: 0,
   },
   upDate: {

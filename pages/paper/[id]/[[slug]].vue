@@ -2,14 +2,9 @@
   <div class="test-details-content">
     <paper-detail-skeleton-loader v-if="dataFetching" />
 
-    <!-- Show actual content when loaded -->
     <template v-else>
-      <!-- Start : Category -->
       <common-category />
 
-      <!-- End:Category -->
-
-      <!--  Start: breadcrumb  -->
       <section>
         <v-container class="py-0">
           <div class="mt-0 py-0 header-path">
@@ -17,15 +12,12 @@
           </div>
         </v-container>
       </section>
-      <!--  End: breadcrumb  -->
 
-      <!--  Start: detail  -->
       <section>
         <v-container class="py-0">
           <div class="detail mt-6 mt-md-8">
             <v-row>
               <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
-                <!--  Description   -->
                 <paper-detail-description
                   :title="contentData?.title"
                   :description="contentData?.description"
@@ -33,7 +25,7 @@
                   <template #labels>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -44,7 +36,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -54,7 +46,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -64,7 +56,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       {{ contentData?.edu_month_title }}
@@ -72,14 +64,14 @@
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                     >
                       {{ contentData?.edu_year }}
                     </v-chip>
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/subject-directory?board=${contentData?.section}&grade=${contentData?.base}&subject=${contentData?.lesson}`"
-                      class="ma-1 bg-primary white--text"
+                      class="ma-1 bg-primary text-white"
                     >
                       {{ contentData?.lesson_title }} directory
                     </v-chip>
@@ -87,15 +79,12 @@
                 </paper-detail-description>
               </v-col>
               <v-col cols="12" sm="5" lg="3" order-lg="first">
-                <!--Show gallery of preview and book first page-->
                 <details-preview-gallery
                   :image-urls="previewImages"
                   :help-link-data="galleryHelpData"
                   :initial-slide="1"
                 />
-                <!--Show gallery of preview and book first page-->
               </v-col>
-
               <v-col sm="7" md="4" lg="3">
                 <paper-detail-content-info
                   :contentData="contentData"
@@ -116,15 +105,12 @@
           />
         </v-container>
       </section>
-      <!--  End: detail  -->
 
-      <!-- Test Section -->
       <div v-if="randomTestContent">
         <v-divider class="mt-4 mx-auto" style="width: 80%" />
         <test-details :content-data="randomTestContent" />
         <v-divider class="mt-1 mx-auto" style="width: 80%" />
       </div>
-      <!--  End: Test Section  -->
     </template>
   </div>
 </template>

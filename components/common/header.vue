@@ -556,7 +556,7 @@ watch(
                       :to="item.link"
                     >
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0 nt">
+                        <v-icon size="small" class="mr-0 nt">
                           {{ item.icon }}
                         </v-icon>
                       </template>
@@ -566,7 +566,7 @@ watch(
                     </v-list-item>
                     <v-list-item class="pointer" @click="logout">
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0"> mdi-logout </v-icon>
+                        <v-icon size="small" class="mr-0"> mdi-logout </v-icon>
                       </template>
                       <v-list-item-title> Logout </v-list-item-title>
                     </v-list-item>
@@ -832,14 +832,19 @@ watch(
                           class="w-100"
                         >
                           <template v-slot:append-inner>
-                            <v-btn
+                            <v-icon
                               class="mr-n3"
                               color="#FFB600"
                               width="70"
                               height="30"
                               rounded="xl"
                             >
-                              Search
+                              mdi-close-circle
+                            </v-icon>
+                          </template>
+                          <template v-slot:append-outer>
+                            <v-btn dense color="#FFB300" class="text-white">
+                              <v-icon>mdi-magnify</v-icon>
                             </v-btn>
                           </template>
                         </v-text-field>
@@ -1048,11 +1053,7 @@ watch(
               :to="item.link"
             >
               <template v-slot:prepend>
-                <v-icon
-                  class="mr-0 nt"
-                  :icon="item.icon"
-                  :size="small"
-                ></v-icon>
+                <v-icon class="mr-0 nt" :icon="item.icon" size="small"></v-icon>
               </template>
 
               <v-list-item-title>

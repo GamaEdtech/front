@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!--Start: menu button-->
     <v-btn
       class="d-block d-md-none px-5"
       style="
@@ -25,14 +24,9 @@
         >
       </v-slide-x-reverse-transition>
     </v-btn>
-    <!--End: menu button-->
 
-    <!-- Start : Category -->
     <common-category />
-    <!-- End:Category -->
 
-    <!-- Start:Lesson title -->
-    <!-- Desktop -->
     <section class="lesson d-none d-md-block">
       <v-container class="lesson-section">
         <v-row>
@@ -63,7 +57,6 @@
       </v-container>
     </section>
 
-    <!-- Mobile -->
     <section class="lesson d-block d-md-none">
       <v-container class="lesson-section">
         <v-row>
@@ -99,71 +92,7 @@
         </v-row>
       </v-container>
     </section>
-    <!-- End: Lesson title -->
 
-    <!-- Start : Card -->
-    <!--    <section class="cards">-->
-    <!--      <v-container class="pa-0">-->
-    <!--        <v-row>-->
-    <!--          <v-col cols="12" md="6" class="pb-0">-->
-    <!--            <v-card elevation="2" outlined class="pa-3 card-body">-->
-    <!--              <v-row class="card">-->
-    <!--                <v-col cols="4" md="3">-->
-    <!--                  <div class="card-image">-->
-    <!--                    <img :src="require('@/assets/images/' + card.img)" alt="" />-->
-    <!--                  </div>-->
-    <!--                </v-col>-->
-    <!--                <v-col cols="8" md="9" class="d-flex align-center">-->
-    <!--                  <div class="d-flex flex-column card-details">-->
-    <!--                    <p class="card-title">{{ card.videoTitle }}</p>-->
-    <!--                    <p class="video-teacher">-->
-    <!--                      <i class="fa-solid fa-user mr-2"></i>{{ card.videoTeacher }}-->
-    <!--                    </p>-->
-    <!--                    <div class="d-flex justify-space-between">-->
-    <!--                      <p class="durition">-->
-    <!--                        <i class="fa-regular fa-clock mr-2"></i>Time:-->
-    <!--                        {{ card.durition }}-->
-    <!--                      </p>-->
-    <!--                      <nuxt-link to="" class="more-link d-none d-md-block">More</nuxt-link>-->
-    <!--                    </div>-->
-    <!--                  </div>-->
-    <!--                </v-col>-->
-    <!--              </v-row>-->
-    <!--            </v-card>-->
-    <!--          </v-col>-->
-    <!--          <v-col cols="12" md="6">-->
-    <!--            <v-card elevation="2" outlined class="pa-3 card-body">-->
-    <!--              <v-row class="card">-->
-    <!--                <v-col cols="4" md="3">-->
-    <!--                  <div class="card-image">-->
-    <!--                    <img :src="require('@/assets/images/' + card.img2)" alt="" />-->
-    <!--                  </div>-->
-    <!--                </v-col>-->
-    <!--                <v-col cols="8" md="9" class="d-flex align-center">-->
-    <!--                  <div class="d-flex flex-column card-details">-->
-    <!--                    <p class="card-title">{{ card.bookTitle }}</p>-->
-    <!--                    <p class="test-number">-->
-    <!--                      <i class="fa-solid fa-grip-lines mr-2"></i>Number of tests: {{-->
-    <!--                          card.testNumber-->
-    <!--                      }}-->
-    <!--                    </p>-->
-    <!--                    <div class="d-flex justify-space-between">-->
-    <!--                      <p class="levels">-->
-    <!--                        <i class="fa-solid fa-arrow-trend-up mr-2"></i>Difficulty-->
-    <!--                        :{{ card.easy }} {{ card.medium }} {{ card.hard }}-->
-    <!--                      </p>-->
-    <!--                      <nuxt-link to="" class="more-link d-none d-md-block">More</nuxt-link>-->
-    <!--                    </div>-->
-    <!--                  </div>-->
-    <!--                </v-col>-->
-    <!--              </v-row>-->
-    <!--            </v-card>-->
-    <!--          </v-col>-->
-    <!--        </v-row>-->
-    <!--      </v-container>-->
-    <!--    </section>-->
-    <!-- End: Cart -->
-    <!-- Start : Book -->
     <v-container>
       <section class="book">
         <v-row>
@@ -200,31 +129,6 @@
       </section>
     </v-container>
 
-    <!-- End: Book -->
-    <!-- Start : Sample Test -->
-    <!--    <related-content/>-->
-    <!-- End : Sample test -->
-    <!-- Start: Feed -->
-    <!--    <section class="feed">-->
-    <!--      <v-container class="pa-4 pa-md-12 pt-10">-->
-    <!--        <v-row>-->
-    <!--         <v-col cols="12" md="6">-->
-    <!--           <latest-training-content/>-->
-    <!--         </v-col>-->
-
-    <!--          <v-col cols="12" md="6" class="related-ask-test py-0 d-flex flex-column justify-space-between">-->
-    <!--              <related-qa/>-->
-
-    <!--              <related-online-exam/>-->
-    <!--          </v-col>-->
-
-    <!--        </v-row>-->
-    <!--      </v-container>-->
-    <!--    </section>-->
-    <!-- End: Feed -->
-
-    <!-- Sidebar -->
-
     <common-crash-report ref="crashReportRef" />
   </div>
 </template>
@@ -260,7 +164,7 @@ let { data: tutorialInfo, error: tutorialError } = await useAsyncData(
     }
   },
   {
-    watch: [() => route.params.id]
+    watch: [() => route.params.id],
   }
 );
 

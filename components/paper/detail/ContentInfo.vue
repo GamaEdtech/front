@@ -79,7 +79,7 @@
         <div v-if="contentData?.files.pdf.exist">
           <v-btn
             @click="startDownload('q_pdf')"
-            class="mb-2 white--text font-weight-bold"
+            class="mb-2 text-white font-weight-bold"
             block
             color="#E60012"
             :loading="qPdfFileDownloadLoading"
@@ -145,7 +145,7 @@
           :to="`/exam/${contentData?.exams[0].id}`"
           block
           color="#5600e8"
-          class="mb-2 white--text font-weight-bold"
+          class="mb-2 text-white font-weight-bold"
         >
           Begin Quiz
         </v-btn>
@@ -155,7 +155,7 @@
           block
           outlined
           color="primary"
-          class="mb-2 white--text font-weight-bold"
+          class="mb-2 text-white font-weight-bold"
         >
           Create Quiz
         </v-btn>

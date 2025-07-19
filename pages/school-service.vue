@@ -42,10 +42,10 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="6" class="order-last order-md-first">
-            <h2 class="gama-text-h4 white--text">
+            <h2 class="gama-text-h4 text-white">
               The Power of Informed Choices
             </h2>
-            <p class="gama-text-body1 white--text">
+            <p class="gama-text-body1 text-white">
               Choosing the right school is a crucial decision that can
               significantly impact a student's academic and personal growth.
               GamaTrain School Finder empowers parents and students with

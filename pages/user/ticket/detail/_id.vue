@@ -84,7 +84,7 @@
                           v-if="ticketData.contact.me.avatar"
                           :src="ticketData.contact.me.avatar"
                         />
-                        <span v-else class="white--text">
+                        <span v-else class="text-white">
                           {{ item.first_name[0] }}
                         </span>
                       </v-avatar>
