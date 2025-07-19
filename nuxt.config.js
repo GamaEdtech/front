@@ -120,12 +120,86 @@ export default defineNuxtConfig({
     "nuxt-gtag",
     "@nuxt/image",
     "@nuxtjs/leaflet",
+    "@vite-pwa/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
   ],
+  experimental: {
+    payloadExtraction: false,
+    appManifest: false,
+  },
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: "Gamatrain App",
+      short_name: "Gamatrain",
+      description: "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+      display: 'standalone',
+      start_url: '/',
+      icons: [
+        {
+          src: "/favicon-16x16-light.png",
+          sizes: "16x16",
+          type: "image/png",
+        },
+        {
+          src: "/favicon-32x32-light.png",
+          sizes: "32x32",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-192x192-light.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-512x512-light.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+      screenshots: [
+        {
+          "src": "/screenshots/home-desktop.png",
+          "sizes": "1280x720",
+          "type": "image/png",
+          "form_factor": "wide"
+        },
+        {
+          "src": "/screenshots/home-mobile.png",
+          "sizes": "540x720",
+          "type": "image/png",
+          "form_factor": "narrow"
+        }
+      ]
+    },
+    meta: {
+      theme_color: '#ffffff',
+      mobileAppIOS: true,
+      appleStatusBarStyle: 'black-translucent',
+      name: 'Gamatrain'
+    },
+    workbox: {
+      navigateFallback: "/",
+      globPatterns: [],
+      globIgnores: [
+        '**/_payload.json',
+        '_nuxt/builds/**/*.json',
+        '**/node_modules/**/*'
+      ]
+    },
+    devOptions: {
+      enabled: false,
+      type: "module",
+    },
+  },
+
 
   leaflet: {
     markerCluster: true,
