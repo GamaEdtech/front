@@ -18,12 +18,14 @@
           Confirm
         </v-btn>
       </v-card-actions>
-      <cropper
-        :src="file_url"
-        :stencil-props="stencil_props"
-        image-restriction="stencil"
-        @change="cropFile"
-      />
+      <ClientOnly>
+        <Cropper
+          :src="file_url"
+          :stencil-props="stencil_props"
+          image-restriction="stencil"
+          @change="cropFile"
+        />
+      </ClientOnly>
     </v-card>
   </v-dialog>
 </template>
@@ -31,6 +33,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import "vue-advanced-cropper/dist/style.css";
+import { Cropper } from "vue-advanced-cropper";
 
 const props = defineProps({
   modelValue: {
