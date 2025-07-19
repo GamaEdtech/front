@@ -97,7 +97,7 @@ const props = defineProps({
     default: 0,
   },
   userExamStatus: {
-    type: Number,
+    type: [Number, String],
     default: 0,
   },
   downloadLoading: {
