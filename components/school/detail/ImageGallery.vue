@@ -1,15 +1,12 @@
 <template>
   <div class="d-flex d-md-none">
-    <template
-      v-if="galleryImages && galleryImages.length > 0"
-      :class="imageClass"
-    >
       <v-carousel
+       v-if="galleryImages && galleryImages.length > 0"
         :show-arrows="false"
         hide-delimiters
         show-arrows-on-hover
         height="26.4rem"
-        class="gallery-carousel"
+        :class="imageClass"
         cycle
         interval="3000"
         @click="openGalleryDialog"
@@ -35,7 +32,6 @@
           </template>
         </v-carousel-item>
       </v-carousel>
-    </template>
     <div
       v-else
       class="enter-img-holder pointer"

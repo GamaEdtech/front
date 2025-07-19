@@ -73,11 +73,7 @@ const fetchContactUs = async () => {
 
 const viewMessageDetails = async (id) => {
   try {
-    const response = await useApiService.get(`/api/v2/admin/contacts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
-      },
-    });
+    const response = await useApiService.get(`/api/v2/admin/contacts/${id}`);
 
     selectedMessage.value = response.data.body;
     selectedEmail.value = response.data.email;
@@ -117,11 +113,7 @@ const goToPreviousMessage = (id) => {
 
 const deleteMessage = async () => {
   try {
-    await useApiService.remove(`/api/v2/admin/contacts/${selectedDeleteId.value}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
-      },
-    });
+    await useApiService.remove(`/api/v2/admin/contacts/${selectedDeleteId.value}`);
 
     list.value = list.value.filter((i) => i.id !== selectedDeleteId.value);
     filteredList.value = list.value;
@@ -156,9 +148,6 @@ const doAll = async () => {
         try {
           await $fetch(`/api/v2/admin/contacts/${id}/toggle`, {
             method:'PATCH',
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('v2_token')}`,
-            },
           });
 
           list.value[index] = { ...list.value[index], isRead: true };
@@ -381,7 +370,7 @@ watch(filter, (val) => {
 
 <style scoped>
 .scrollable-table {
-  max-height: 75vh;  
+  max-height: 70vh;  
   overflow-y: auto;
   overflow-x: hidden;
 }

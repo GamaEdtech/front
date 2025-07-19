@@ -61,6 +61,7 @@
                   @click:append-inner="closeSearch()"
                   hide-details
                   variant="solo"
+                  autocomplete="off"
                 />
               </v-col>
               <v-col cols="4" class="pl-0" id="keysearch-cate">
@@ -106,7 +107,9 @@
                   <span class="icon icon-paper"></span>
                 </div>
                 <div
-                  v-else-if="item.type == 'gama_learnfiles'"
+                  v-else-if="
+                    item.type == 'gama_learnfiles' || item.type == 'gama_files'
+                  "
                   class="avatar multimedia-avatar"
                 >
                   <span class="icon icon-multimedia"></span>
@@ -183,6 +186,10 @@
               </div>
             </v-col>
           </v-row>
+          <div
+            class="line-specifier-load-more"
+            ref="lineSpecifierLoadMoreRef"
+          ></div>
           <v-row v-if="allDataLoaded == false" class="list-item">
             <v-col cols="12">
               <v-skeleton-loader type="list-item-avatar"></v-skeleton-loader>
@@ -273,16 +280,16 @@ const openAuthDialog = (val) => {
   router.push({ query: { auth_form: val } });
 };
 
+const lineSpecifierLoadMoreRef = ref(null);
 const checkSearchScroll = () => {
-  const scrollableDiv = searchResult.value;
-  if (isScrollAtBottom(scrollableDiv) && allDataLoaded.value == false) {
+  const targetDiv = lineSpecifierLoadMoreRef.value;
+  const rect = targetDiv.getBoundingClientRect();
+  const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+  if (isDivInView && !searchLoading.value && !allDataLoaded.value) {
     pageNum.value++;
     search();
   }
-};
-
-const isScrollAtBottom = (element) => {
-  return element.scrollHeight - element.scrollTop == element.clientHeight;
 };
 
 const search = () => {
@@ -292,29 +299,30 @@ const search = () => {
     timer.value = null;
   }
 
-  timer.value = setTimeout(() => {
-    if (searchKey.value && allDataLoaded.value == false)
-      useFetch("/api/v1/search/text", {
-        method: "GET",
-        params: {
+  timer.value = setTimeout(async () => {
+    if (searchKey.value && allDataLoaded.value == false) {
+      try {
+        const params = {
           query: searchKey.value,
           page: pageNum.value,
-        },
-      })
-        .then((response) => {
+        };
+        const response = await $fetch("/api/v1/search/text", {
+          params,
+        });
+        if (response.data) {
           searchCount.value = response.data.num;
           searchResults.value.push(...response.data.list);
 
-          if (response.data.list.length < 20)
-            //20 is length of item per page
+          if (response.data.list.length < 20) {
             allDataLoaded.value = true;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          searchLoading.value = false;
-        });
+          }
+        }
+      } catch (error) {
+        console.log(err);
+      } finally {
+        searchLoading.value = false;
+      }
+    }
   }, 800);
 };
 
@@ -326,7 +334,8 @@ const closeSearch = () => {
 
 const calcPath = (type) => {
   if (type == "gama_tests") return "paper";
-  else if (type == "gama_learnfiles") return "multimedia";
+  else if (type == "gama_learnfiles" || type == "gama_files")
+    return "multimedia";
   else if (type == "gama_azmoons") return "exams";
   else if (type == "gama_questions") return "qa";
   else if (type == "gama_dars") return "tutorial";
@@ -338,6 +347,10 @@ const calcPath = (type) => {
 </script>
 
 <style>
+.line-specifier-load-more {
+  width: 100%;
+  height: 4px;
+}
 #main-slider {
   height: 25rem !important;
 }

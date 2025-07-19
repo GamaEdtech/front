@@ -6,6 +6,10 @@ export default defineNuxtConfig({
   // Add compatibility date to fix the warning
   compatibilityDate: "2024-04-03",
 
+  imports: {
+    autoImport: true,
+  },
+
   // Global page headers
   app: {
     head: {
@@ -40,10 +44,16 @@ export default defineNuxtConfig({
             "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
         },
         { property: "og:site_name", content: "GamaTrain" },
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        {
+          name: "apple-mobile-web-app-status-bar-style",
+          content: "black-translucent",
+        },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon-dark.ico" },
         { rel: "stylesheet", href: "/assets/css/all.min.css" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon-light.png" },
       ],
       script: [
         {
@@ -85,18 +95,6 @@ export default defineNuxtConfig({
     ],
   },
 
-  // pwa config
-  pwa: {
-    manifest: {
-      name: "Gamatrain App",
-      short_name: "Gamatrain",
-      description:
-        "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
-      lang: "en",
-      useWebmanifestExtension: false,
-    },
-  },
-
   // Global CSS
   css: [
     "vuetify/lib/styles/main.css",
@@ -128,6 +126,7 @@ export default defineNuxtConfig({
       });
     },
   ],
+
   leaflet: {
     markerCluster: true,
   },
