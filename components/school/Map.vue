@@ -1,34 +1,28 @@
 <template>
-  <ClientOnly>
-    <LMap
-      ref="map"
-      :zoom="zoom"
-      :min-zoom="minZoom"
-      :center="center"
-      :use-global-leaflet="true"
-      @moveend="onMoveEnd"
-      @ready="onMapReady"
-    >
-      <LTileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-        layer-type="base"
-        name="OpenStreetMap"
-      />
-      <!-- <LMarker
-        v-for="(marker, index) in items"
-        :lat-lng="[marker.lat, marker.long]"
-        :icon="schoolIcon"
-        :key="index"
+  <div style="height: 100vh; width: 100vw">
+    <ClientOnly>
+      <LMap
+        ref="map"
+        :zoom="zoom"
+        :min-zoom="minZoom"
+        :center="center"
+        :use-global-leaflet="true"
+        @moveend="onMoveEnd"
+        @ready="onMapReady"
       >
-      </LMarker> -->
-    </LMap>
-  </ClientOnly>
+        <LTileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+          layer-type="base"
+          name="OpenStreetMap"
+        />
+      </LMap>
+    </ClientOnly>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 
 const props = defineProps({
   items: {
@@ -45,14 +39,17 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["mapMoved", "userLocationFound", "school-marker-clicked"]);
-
-const router = useRouter();
+const emit = defineEmits([
+  "mapMoved",
+  "userLocationFound",
+  "school-marker-clicked",
+  "school-marker-click-error",
+]);
 
 const map = ref(null);
-const zoom = ref(props.initialZoom);
+const zoom = ref(props?.initialZoom);
 const minZoom = ref(2);
-const center = ref(props.initialCenter);
+const center = ref(props?.initialCenter);
 const schoolIcon = ref(null);
 const isMapReady = ref(false);
 const isModuleImport = ref(false);
@@ -75,62 +72,96 @@ onMounted(() => {
   }
 });
 
-const onMapReady = () => {
-  isMapReady.value = true;
-  if (isModuleImport.value) {
-    map.value.leafletObject.setView(center.value);
-    setMarkers();
-  }
+// Validate marker data before creating markers
+const validateMarkerData = (schoolData) => {
+  if (!schoolData) return false;
+  
+  const requiredFields = ["id", "name", "lat", "long"];
+  const hasAllRequired = requiredFields.every(field => 
+    schoolData[field] !== undefined && schoolData[field] !== null && schoolData[field] !== ""
+  );
+  
+  return hasAllRequired;
 };
 
-watch(
-  () => props.items,
-  () => {
-    if (isMapReady.value) {
-      setMarkers();
-    }
-  }
-);
+async function setMarkers() {
+  try {
+    // Filter and validate school items before creating markers
+    const validSchools = props?.items?.filter((item) => 
+      item.lat && item.long && validateMarkerData(item)
+    ) || [];
 
-const markerClusterGroupRef = ref([]);
-const setMarkers = async () => {
-  // if (markerClusterGroupRef.value) {
-  //   markerClusterGroupRef.value.remove();
-  // }
-
-  const mapItems = props.items
-    .filter((item) => item.lat && item.long)
-    .map((item) => ({
+    const mapItems = validSchools.map((item) => ({
       lat: item.lat,
       lng: item.long,
       name: item.name,
       id: item.id,
+      schoolData: item, // Store complete school data
       options: {
         icon: schoolIcon.value,
         alt: item.id,
       },
     }));
 
-  const { markerCluster, markers } = await useLMarkerCluster({
-    leafletObject: map.value.leafletObject,
-    markers: mapItems,
-  });
-  markerClusterGroupRef.value.push(markerCluster);
-  markers.forEach((marker) => {
-    marker.on("click", (event) => {
-      if (event.target.options.alt) {
-        // Find the school data from props.items
-        const schoolId = event.target.options.alt;
-        const school = props.items.find(item => item.id === schoolId);
-        
-        if (school) {
-          // Emit event with school data instead of direct navigation
-          emit("school-marker-clicked", school);
-        }
-      }
+    if (mapItems.length === 0) {
+      console.warn("No valid school markers to display on map");
+      return;
+    }
+
+    const { markerCluster, markers } = await useLMarkerCluster({
+      leafletObject: map.value.leafletObject,
+      markers: mapItems,
     });
-  });
-};
+
+    // Enhanced marker click handling with complete data passing
+    markers.forEach((marker, index) => {
+      // Store school data directly on marker for reliable access
+      marker.schoolData = mapItems[index].schoolData;
+      
+      marker.on("click", (e) => {
+        try {
+          // Get school data from marker (more reliable than searching props.items)
+          const schoolData = e.target.schoolData;
+          
+          if (validateMarkerData(schoolData)) {
+            emit("school-marker-clicked", schoolData);
+          } else {
+            // Emit error event with school ID for fallback handling
+            console.warn("Invalid school data in marker click:", schoolData);
+            emit("school-marker-click-error", { 
+              id: e.target.options.alt,
+              error: "Invalid school data",
+              context: {
+                zoom: map.value?.leafletObject?.getZoom(),
+                center: map.value?.leafletObject?.getCenter()
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error handling marker click:", error);
+          emit("school-marker-click-error", { 
+            id: e.target.options?.alt,
+            error: error.message,
+            context: {
+              zoom: map.value?.leafletObject?.getZoom(),
+              center: map.value?.leafletObject?.getCenter()
+            }
+          });
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error creating map markers:", error);
+  }
+}
+
+async function onMapReady() {
+  isMapReady.value = true;
+  if (isModuleImport.value) {
+    map.value.leafletObject.setView(center.value);
+    setMarkers();
+  }
+}
 
 const onMoveEnd = (event) => {
   const bounds = event.target.getBounds();
@@ -184,4 +215,12 @@ const getUserLocation = () => {
     console.error("Geolocation is not supported in this browser.");
   }
 };
+watch(
+  () => props.items,
+  () => {
+    if (isMapReady.value) {
+      setMarkers();
+    }
+  }
+);
 </script>
