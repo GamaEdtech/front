@@ -18,6 +18,7 @@
         @map-moved="changeFilterWithMapMoved"
         @user-location-found="userLocationFound"
         @school-marker-clicked="handleSchoolMarkerClick"
+        @school-marker-click-error="handleSchoolMarkerClickError"
       />
     </div>
 
@@ -27,6 +28,7 @@
       :school="selectedSchool"
       @navigate-to-details="navigateToSchoolDetails"
     />
+
     <div
       v-if="!isExpandMapInDesktop || isMobile"
       :class="`filter-list-div ${
@@ -302,7 +304,7 @@ const updateQueryParams = () => {
         (typeof value === "number" && value != 0)
       ) {
         query[key] = value;
-      } else if (Array.isArray(value) && value?.length) {
+      } else if (Array.isArray(value) && value.length) {
         const joinText = value.join(",");
         query[key] = joinText;
       }
@@ -316,42 +318,44 @@ const updateQueryParams = () => {
 const applyFiltersFromQuery = (query) => {
   debouncedGetSchoolList();
 };
-const debouncedGetSchoolList = () => {
+const debouncedGetSchoolList = async () => {
   if (timer.value) {
     clearTimeout(timer.value);
     timer.value = null;
   }
+  await nextTick()
 
   timer.value = setTimeout(() => {
     getSchoolList();
   }, 800);
 };
 
-const { data: initialSchools } = await useAsyncData("schoolListSSR", () => {
-  const params = {
-    "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
-    "PagingDto.PageFilter.Size": perPage,
-    "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
-    Name: filterForm.value.keyword,
-    section: filterForm.value.stage,
-    tuition_fee: filterForm.value.tuition_fee,
-    CountryId: filterForm.value.country,
-    StateId: filterForm.value.state,
-    CityId: filterForm.value.city,
-    school_type: filterForm.value.school_type,
-    religion: filterForm.value.religion,
-    boarding_type: filterForm.value.boarding_type,
-    coed_status: filterForm.value.coed_status,
-  };
-  if (filterForm.value.sort && filterForm?.value?.sort?.length > 0) {
-    filterForm.value.sort.forEach((sortOption, index) => {
-      params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
-      params[`PagingDto.SortFilter[${index}].column`] = sortOption;
-    });
-  }
+const { data: initialSchools, pending: loadingSchoolsServer } =
+  await useAsyncData("schoolListSSR", () => {
+    const params = {
+      "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
+      "PagingDto.PageFilter.Size": perPage,
+      "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
+      Name: filterForm.value.keyword,
+      section: filterForm.value.stage,
+      tuition_fee: filterForm.value.tuition_fee,
+      CountryId: filterForm.value.country,
+      StateId: filterForm.value.state,
+      CityId: filterForm.value.city,
+      school_type: filterForm.value.school_type,
+      religion: filterForm.value.religion,
+      boarding_type: filterForm.value.boarding_type,
+      coed_status: filterForm.value.coed_status,
+    };
+    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
+      filterForm.value.sort.forEach((sortOption, index) => {
+        params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
+        params[`PagingDto.SortFilter[${index}].column`] = sortOption;
+      });
+    }
 
-  return $fetch("/api/v2/schools", { params });
-});
+    return $fetch("/api/v2/schools", { params });
+  });
 
 if (initialSchools.value) {
   schools.value = initialSchools.value?.data?.list || [];
@@ -363,30 +367,23 @@ if (initialSchools.value) {
 
 const getSchoolList = async () => {
   if (isAllSchoolLoaded.value) return;
-
   try {
     const params = {
       "PagingDto.PageFilter.Skip": (filterForm.value.page - 1) * perPage,
       "PagingDto.PageFilter.Size": perPage,
       "PagingDto.PageFilter.ReturnTotalRecordsCount": true,
     };
-
-    // Add sort parameters if available
-    if (filterForm.value.sort && filterForm?.value?.sort?.length > 0) {
+    if (filterForm.value.sort && filterForm.value.sort.length > 0) {
       filterForm.value.sort.forEach((sortOption, index) => {
         params[`PagingDto.SortFilter[${index}].sortType`] = "Desc";
         params[`PagingDto.SortFilter[${index}].column`] = sortOption;
       });
     }
-
-    // Use different parameters based on view mode
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
-      // Map view mode - use location-based parameters
       params["Location.Radius"] = filterForm.value.distance;
       params["Location.Latitude"] = filterForm.value.lat;
       params["Location.Longitude"] = filterForm.value.lng;
     } else {
-      // List view mode - use filter-based parameters
       params["Name"] = filterForm.value.keyword;
       params["section"] = filterForm.value.stage;
       params["tuition_fee"] = filterForm.value.tuition_fee;
@@ -397,36 +394,31 @@ const getSchoolList = async () => {
       params["religion"] = filterForm.value.religion;
       params["boarding_type"] = filterForm.value.boarding_type;
       params["coed_status"] = filterForm.value.coed_status;
+      params["sort"] = filterForm.value.sort;
     }
 
-    // Fetch data
     const response = await $fetch("/api/v2/schools", {
       params,
     });
 
-    // Check if we've loaded all available data
-    if (response?.data?.list?.length < perPage) {
+    if (response?.data?.list.length < perPage) {
       isAllSchoolLoaded.value = true;
     }
+    totalSchoolFind.value = response.data.totalRecordsCount
+      ? response.data.totalRecordsCount
+      : 0;
 
-    // Update total count
-    totalSchoolFind.value = response.data.totalRecordsCount || 0;
-
-    // Update school list based on pagination direction
     if (isPaginationPreviousSchoolLoading.value) {
       schools.value = [...response.data.list, ...schools.value];
     } else {
       schools.value = [...schools.value, ...response.data.list];
     }
-
-    // Update map markers if in map view mode
     if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
       newSchoolForMarkersOnMap.value = response.data.list;
     }
   } catch (err) {
-    console.error("Error fetching school list:", err);
+    console.error(err);
   } finally {
-    // Reset loading states
     isInitialSchoolLoading.value = false;
     isPaginationSchoolLoading.value = false;
     isPaginationPreviousSchoolLoading.value = false;
@@ -460,10 +452,7 @@ const isExpandMapInDesktop = ref(false);
 
 const changeStatusExpandMap = () => {
   isExpandMapInDesktop.value = !isExpandMapInDesktop.value;
-
-  // Update filter parameters based on map view state
   if (isExpandMapInDesktop.value) {
-    // In map view mode, use location-based filtering
     filterForm.value.lat = defaultLatLongDistance.lat;
     filterForm.value.lng = defaultLatLongDistance.lng;
     filterForm.value.distance = defaultLatLongDistance.distance;
@@ -471,13 +460,10 @@ const changeStatusExpandMap = () => {
     // Clear school list when switching to map view for performance
     schools.value = [];
   } else {
-    // In list view mode, use standard filtering
     filterForm.value.lat = null;
     filterForm.value.lng = null;
     filterForm.value.distance = null;
   }
-
-  // Reset parameters and update URL
   resetParameter();
   updateQueryParams();
 };
@@ -549,28 +535,43 @@ const endDrag = () => {
 };
 // End Handle Drag To Open/Close Bottom Nav
 
+
 // Start School Modal Management
 const showSchoolModal = ref(false);
 const selectedSchool = ref(null);
 
-// Handle school marker click from map
+
 const handleSchoolMarkerClick = (school) => {
   try {
-    // Validate school data before showing modal
-    if (!school || !school.id) {
-      console.error("Invalid school data received from map marker click");
-      return;
+    // Comprehensive validation of school data
+    const validationResult = validateSchoolData(school);
+    
+    if (!validationResult.isValid) {
+      console.warn("School data validation failed:", {
+        school,
+        missingFields: validationResult.missingFields,
+        context: {
+          zoom: "marker-click",
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      // If we have at least an ID, try to fetch complete data
+      if (school?.id) {
+        fetchAdditionalSchoolDetails(school.id);
+        return;
+      } else {
+        console.error("Invalid school data received from map marker click - no ID available");
+        return;
+      }
     }
-
-    // Set loading state if needed
-    const isDataComplete = validateSchoolData(school);
 
     // Set the selected school and show modal
     selectedSchool.value = school;
     showSchoolModal.value = true;
 
-    // If data is incomplete, we could fetch additional details here
-    if (!isDataComplete) {
+    // If data is incomplete but valid, fetch additional details
+    if (!validationResult.hasDisplayData) {
       fetchAdditionalSchoolDetails(school.id);
     }
   } catch (error) {
@@ -578,37 +579,75 @@ const handleSchoolMarkerClick = (school) => {
     // Fallback to direct navigation if modal fails
     if (school && school.id) {
       const schoolSlug = $slugGenerator(school.name);
-      router.push(`/school/${school.id}/${schoolSlug}`);
+      window.open(`/school/${school.id}/${schoolSlug}`, '_blank');
     }
   }
 };
 
 // Validate school data completeness
 const validateSchoolData = (school) => {
+  if (!school) {
+    return {
+      isValid: false,
+      missingFields: ["school object"],
+      hasDisplayData: false
+    };
+  }
+
   // Check if all required fields are present
   const requiredFields = ["id", "name"];
-  const hasAllRequired = requiredFields.every((field) => !!school[field]);
+  const missingFields = requiredFields.filter(field => 
+    !school[field] || school[field] === "" || school[field] === null || school[field] === undefined
+  );
+  
+  const hasAllRequired = missingFields.length === 0;
 
-  // Check if we have enough display data
-  const hasDisplayData =
+  // Check if we have enough display data for the modal
+  const hasDisplayData = !!(
     school.defaultImageUri ||
     school.countryTitle ||
     school.stateTitle ||
-    school.cityTitle;
+    school.cityTitle ||
+    school.score ||
+    school.lastModifyDate
+  );
 
-  return hasAllRequired && hasDisplayData;
+  return {
+    isValid: hasAllRequired,
+    missingFields,
+    hasDisplayData
+  };
 };
 
 // Fetch additional school details if needed
 const fetchAdditionalSchoolDetails = async (schoolId) => {
   try {
-    // This would be implemented if we need to fetch more details
+    // Set loading state if modal is already shown
+    if (showSchoolModal.value && selectedSchool.value) {
+      // Modal is already open, we're just updating data
+    } else {
+      // We need to fetch data before showing modal
+      selectedSchool.value = { id: schoolId, name: "Loading..." };
+      showSchoolModal.value = true;
+    }
+
     const response = await $fetch(`/api/v2/schools/${schoolId}`);
     if (response && response?.data) {
       selectedSchool.value = { ...selectedSchool?.value, ...response?.data };
+    } else {
+      throw new Error("No school data received from API");
     }
   } catch (error) {
     console.error("Error fetching additional school details:", error);
+    
+    // Close modal if it was opened for loading
+    showSchoolModal.value = false;
+    
+    // Fallback to direct navigation
+    if (schoolId) {
+      const schoolSlug = selectedSchool.value?.name ? $slugGenerator(selectedSchool.value.name) : 'school';
+      window.open(`/school/${schoolId}/${schoolSlug}`, '_blank');
+    }
   }
 };
 
@@ -618,11 +657,21 @@ const navigateToSchoolDetails = (schoolId, schoolSlug) => {
   // router.push(`/school/${schoolId}/${schoolSlug}`);
   window.open(`/school/${schoolId}/${schoolSlug}`, '_blank');
 };
+
+// Handle marker click errors
+const handleSchoolMarkerClickError = (errorData) => {
+  console.warn("School marker click error:", errorData);
+  
+  // If we have a school ID, try to fetch the data and show modal
+  if (errorData?.id) {
+    fetchAdditionalSchoolDetails(errorData.id);
+  } else {
+    console.error("Cannot handle marker click error - no school ID provided");
+  }
+};
 // End School Modal Management
 </script>
 
 <style scoped>
 @import "../../assets/scss/school/index.scss";
-
-/* Additional styles for map view mode */
 </style>
