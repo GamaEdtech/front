@@ -41,10 +41,10 @@
     </v-card>
     
     <!-- School card -->
-    <v-card v-else class="school-modal-card" @click="navigateToSchoolDetails" >
+    <v-card v-else class="school-modal-card" >
       <v-card-text class="pa-0">
         <!-- Desktop Card Style -->
-        <div v-if="!$vuetify.display.xs" class="card-school">
+        <div v-if="!$vuetify.display.xs" @click="navigateToSchoolDetails" class="card-school">
           <div class="name-address-image">
             <div class="name-div">
               <span class="name gtext-t4 font-weight-semibold">{{ school?.name }}</span>
@@ -122,7 +122,7 @@
 
         <!-- Mobile Card Style -->
         <div v-else>
-          <div v-if="school?.defaultImageUri" class="school-card-bg" :style="{ backgroundImage: `url(${school?.defaultImageUri})` }">
+          <div v-if="school?.defaultImageUri" @click="navigateToSchoolDetails" class="school-card-bg" :style="{ backgroundImage: `url(${school?.defaultImageUri})` }">
             <div class="school-card-overlay">
               <div class="school-card-header">
                 <ClientOnly>
@@ -298,25 +298,16 @@ const navigateToSchoolDetails = (event) => {
     const card = event.currentTarget;
     card.style.opacity = '0.8';
     
+
     // Close the modal with a slight delay for better UX
     setTimeout(() => {
       internalValue.value = false;
       
-      // Emit navigation event
       emit('navigate-to-details', schoolId, schoolSlug);
-      
-      // Open in new tab if in map view, otherwise navigate in same tab
-      if (window.innerWidth > 1260 && document.querySelector('.main-school-list-div:not(:has(.filter-list-div))')) {
-        // In map view - open in new tab
-        window.open(schoolUrl, '_blank');
-      } else {
-        // Normal navigation
-        window.open(schoolUrl, '_blank');
-      }
-      
+
       // Reset opacity
       card.style.opacity = '1';
-    }, 150);
+    }, 50);
   } catch (error) {
     console.error('Error navigating to school details:', error);
   }
@@ -402,18 +393,6 @@ watch(() => props.school, (newSchool) => {
   @media (max-width: 600px) {
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 4px;
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 2px;
-    }
   }
 }
 

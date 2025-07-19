@@ -679,8 +679,7 @@ const fetchAdditionalSchoolDetails = async (schoolId) => {
 
 // Handle navigation from modal to school details
 const navigateToSchoolDetails = (schoolId, schoolSlug) => {
-  showSchoolModal.value = false;
-  // router.push(`/school/${schoolId}/${schoolSlug}`);
+  showSchoolModal.value = true;
   window.open(`/school/${schoolId}/${schoolSlug}`, '_blank');
 };
 
