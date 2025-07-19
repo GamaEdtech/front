@@ -854,14 +854,16 @@
                               </template>
                             </v-textarea>
                           </Field>
-                          <EmojiPicker
-                            disable-skin-tones
-                            display-recent
-                            style="margin: 0 0"
-                            v-show="emoji_box"
-                            :native="true"
-                            @select="selectEmoji"
-                          ></EmojiPicker>
+                          <ClientOnly>
+                            <EmojiPicker
+                              disable-skin-tones
+                              display-recent
+                              style="margin: 0 0"
+                              v-show="emoji_box"
+                              :native="true"
+                              @select="selectEmoji"
+                            ></EmojiPicker>
+                          </ClientOnly>
                         </v-col>
                       </v-row>
                     </Form>
@@ -947,7 +949,9 @@ import querystring from "querystring";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import breadcrumb from "~/components/widgets/breadcrumb.vue";
 // import CrashReport from "~/components/common/crash-report.vue";
-import EmojiPicker from "vue3-emoji-picker";
+const EmojiPicker = defineAsyncComponent(() =>
+  import("vue3-emoji-picker").then((EmojiPicker) => EmojiPicker)
+);
 import "vue3-emoji-picker/css";
 import { useNuxtApp } from "#app";
 const { $toast } = useNuxtApp();

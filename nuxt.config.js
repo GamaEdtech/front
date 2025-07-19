@@ -146,7 +146,13 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["vuetify", "vue-chartjs", "defu", "@ckeditor/ckeditor5-vue"],
+    transpile: [
+      "vuetify",
+      "vue-chartjs",
+      "defu",
+      "@ckeditor/ckeditor5-vue",
+      "vue3-emoji-picker",
+    ],
   },
 
   // Vite configuration

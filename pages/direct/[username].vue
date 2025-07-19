@@ -104,14 +104,16 @@
                 </template>
               </v-text-field>
               <!-- <v-emoji-picker v-show="emojiBox" @select="selectEmoji" /> -->
-              <EmojiPicker
-                disable-skin-tones
-                display-recent
-                style="margin: 0 0"
-                v-show="emojiBox"
-                :native="true"
-                @select="selectEmoji"
-              ></EmojiPicker>
+              <ClientOnly>
+                <EmojiPicker
+                  disable-skin-tones
+                  display-recent
+                  style="margin: 0 0"
+                  v-show="emojiBox"
+                  :native="true"
+                  @select="selectEmoji"
+                ></EmojiPicker>
+              </ClientOnly>
             </div>
           </v-col>
         </v-row>
@@ -154,7 +156,9 @@
 </template>
 
 <script setup>
-import EmojiPicker from "vue3-emoji-picker";
+const EmojiPicker = defineAsyncComponent(() =>
+  import("vue3-emoji-picker").then((EmojiPicker) => EmojiPicker)
+);
 import "vue3-emoji-picker/css";
 
 definePageMeta({
