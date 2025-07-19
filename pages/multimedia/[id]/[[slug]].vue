@@ -1,9 +1,7 @@
 <template>
   <div class="test-details-content">
-    <!-- Start : Category -->
     <common-category />
-    <!-- End:Category -->
-    <!--  Start: breadcrumb  -->
+
     <section>
       <v-container class="py-0">
         <v-row class="mt-0 py-0">
@@ -20,15 +18,11 @@
         </v-row>
       </v-container>
     </section>
-    <!--  End: breadcrumb  -->
 
-    <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
-        <!-- Skeleton loading state -->
         <div v-if="pending" class="detail mt-md-8">
           <v-row>
-            <!-- Skeleton for gallery -->
             <v-col cols="12" md="4">
               <v-skeleton-loader
                 class="mx-auto"
@@ -36,7 +30,6 @@
               ></v-skeleton-loader>
             </v-col>
 
-            <!-- Skeleton for description -->
             <v-col cols="12" md="5">
               <v-skeleton-loader
                 class="mx-auto"
@@ -44,7 +37,6 @@
               ></v-skeleton-loader>
             </v-col>
 
-            <!-- Skeleton for sidebar -->
             <v-col md="3">
               <v-skeleton-loader
                 class="mx-auto"
@@ -65,21 +57,17 @@
           </v-row>
         </div>
 
-        <!-- Actual content when loaded -->
         <div v-else class="detail mt-md-8">
           <v-row>
             <v-col cols="12" md="4">
-              <!--Show gallery of preview and book first page-->
               <details-multimedia-preview-gallery
                 ref="preview_gallery"
                 :gallery-images="previewImages"
                 :link-data="previewLinkData"
                 :initial-slide="0"
               />
-              <!--Show gallery of preview and book first page-->
             </v-col>
             <v-col cols="12" md="5">
-              <!--  Description   -->
               <div class="d-flex mb-4">
                 <div class="w-100">
                   <div class="d-flex align-center justify-space-between header">
@@ -121,7 +109,6 @@
                     </v-textarea>
                   </div>
 
-                  <!-- Use the new description component -->
                   <multimedia-detail-description-section
                     :description="contentData?.description"
                     :collection-list="contentData?.collectionList"
@@ -130,7 +117,6 @@
                     @save="updateDetails"
                   />
 
-                  <!-- Use the new tag section component -->
                   <multimedia-detail-tag-section
                     :section-id="contentData?.section"
                     :section-title="contentData?.section_title"
@@ -141,7 +127,6 @@
                   />
                 </div>
               </div>
-              <!--   Download Btn and Description  -->
               <div class="text-center download-sec">
                 <multimedia-detail-download-section
                   :file-ext="contentData?.files?.ext || 'pptx'"
@@ -238,13 +223,7 @@ const editMode = reactive({
   title_loading: false,
 });
 const requestURL = ref(useRequestURL().host);
-const breads = ref([
-  {
-    text: "Multimedia",
-    disabled: false,
-    href: "/search?type=learnfiles",
-  },
-]);
+const breads = ref([]);
 
 const download_loading = ref(false);
 
@@ -315,58 +294,66 @@ async function fetchContentData() {
   }
 }
 
-const {
-  pending,
-  error,
-  data: asyncContentData,
-} = useAsyncData(
+// const {
+//   pending,
+//   error,
+//   data: asyncContentData,
+// } = useAsyncData(
+//   `multimedia-details-${route.params.id}`,
+//   async () => {
+//     try {
+//       const data = await fetchContentData();
+
+//       if (data) {
+//         contentData.value = data;
+
+//         initBreadCrumb();
+//       }
+
+//       return data;
+//     } catch (err) {
+//       showError({
+//         statusCode: err.response?.status || 500,
+//         message:
+//           err.response?.data?.message ||
+//           "Something went wrong loading the content",
+//       });
+//       return null;
+//     }
+//   },
+//   {
+//     server: true,
+//     lazy: false,
+//     immediate: true,
+//     watch: [() => route.params.id],
+//   }
+// );
+const { data, pending, error } = await useAsyncData(
   `multimedia-details-${route.params.id}`,
   async () => {
-    try {
-      const data = await fetchContentData();
-
-      if (data) {
-        // Update the contentData ref with the fetched data
-        contentData.value = data;
-
-        // Initialize breadcrumbs after data is loaded
-        initBreadCrumb();
-      }
-
-      return data;
-    } catch (err) {
-      showError({
-        statusCode: err.response?.status || 500,
-        message:
-          err.response?.data?.message ||
-          "Something went wrong loading the content",
-      });
-      return null;
-    }
-  },
-  {
-    // Add these options to ensure it re-executes on page refresh
-    server: true,
-    lazy: false,
-    immediate: true,
-    watch: [() => route.params.id],
+    const data = await fetchContentData();
+    return data;
   }
 );
-
-onMounted(async () => {
-  // If data is still loading, wait for it
-  if (pending.value) {
-    await waitForAsyncData();
-  }
-
-  // Verify we have content data
-  if (!contentData.value || Object.keys(contentData.value).length === 0) {
-    if (asyncContentData.value) {
-      contentData.value = asyncContentData.value;
-      initBreadCrumb();
-    }
+watchEffect(async () => {
+  if (data.value) {
+    contentData.value = data.value;
+    await initBreadCrumb();
   }
 });
+
+// onMounted(async () => {
+//   if (pending.value) {
+//     await waitForAsyncData();
+//   }
+
+//   if (!contentData.value || Object.keys(contentData.value).length === 0) {
+//     if (asyncContentData.value) {
+//       contentData.value = asyncContentData.value;
+//       initBreadCrumb();
+//     }
+//   }
+// });
 
 function waitForAsyncData() {
   return new Promise((resolve) => {
@@ -400,18 +387,16 @@ watch(
   { deep: true }
 );
 
-function initBreadCrumb() {
+async function initBreadCrumb() {
   if (!contentData.value || !contentData.value.section_title) {
     return;
   }
 
-  breads.value = [
-    {
-      text: "Multimedia",
-      disabled: false,
-      href: "/search?type=learnfiles",
-    },
-  ];
+  breads.value.push({
+    text: "Multimedia",
+    disabled: false,
+    href: "/search?type=learnfiles",
+  });
 
   if (contentData.value.section_title) {
     breads.value.push({

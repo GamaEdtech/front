@@ -138,7 +138,7 @@
               :loading="searchLoading"
               density="compact"
               color="#FFB300"
-              class="white--text"
+              class="text-white"
             >
               <v-icon>mdi-magnify</v-icon>
             </v-btn>

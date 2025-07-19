@@ -1,32 +1,24 @@
 <template>
   <div class="test-details-content">
-    <!-- Start : Category -->
     <common-category />
-    <!-- End:Category -->
-    <!--  Start: breadcrumb  -->
+
     <section>
       <v-container class="py-0">
         <div class="mt-0 py-0 header-path">
-          <!-- Skeleton loader for breadcrumb -->
           <v-skeleton-loader
-            v-if="dataFetching"
+            v-if="pending"
             class="mx-auto"
             height="60"
           ></v-skeleton-loader>
-          <!-- Actual breadcrumb when loaded -->
           <widgets-breadcrumb v-else :breads="breads" />
         </div>
       </v-container>
     </section>
-    <!--  End: breadcrumb  -->
 
-    <!--  Start: detail  -->
     <section>
       <v-container class="py-0">
-        <!-- Skeleton loading state -->
-        <div v-if="dataFetching" class="detail mt-md-8">
+        <div v-if="pending" class="detail mt-md-8">
           <v-row>
-            <!-- Skeleton for gallery -->
             <v-col cols="12" md="3">
               <v-skeleton-loader
                 class="mx-auto"
@@ -34,7 +26,6 @@
               ></v-skeleton-loader>
             </v-col>
 
-            <!-- Skeleton for description -->
             <v-col cols="12" md="6">
               <v-skeleton-loader
                 class="mx-auto"
@@ -42,7 +33,6 @@
               ></v-skeleton-loader>
             </v-col>
 
-            <!-- Skeleton for sidebar -->
             <v-col md="3">
               <v-skeleton-loader
                 class="mx-auto"
@@ -63,20 +53,16 @@
           </v-row>
         </div>
 
-        <!-- Actual content when loaded -->
         <div v-else class="detail mt-md-8">
           <v-row>
             <v-col cols="12" md="3">
-              <!--Show gallery of preview and book first page-->
               <details-preview-gallery
                 :image-urls="galleryImages"
                 :help-link-data="galleryHelpData"
                 :initial-slide="1"
               />
-              <!--Show gallery of preview and book first page-->
             </v-col>
             <v-col cols="12" md="6">
-              <!--  Description   -->
               <exam-detail-description-section
                 :content-data="contentData"
                 :is-logged-in="auth.isAuthenticated.value"
@@ -85,6 +71,7 @@
                 @register="openAuthDialog('register')"
               />
             </v-col>
+
             <v-col md="3">
               <exam-detail-sidebar-details
                 :content-data="contentData"
@@ -102,9 +89,8 @@
       </v-container>
     </section>
 
-    <!--Mobile order section-->
     <exam-detail-mobile-order-section
-      v-if="!dataFetching"
+      v-if="!pending"
       :exam-id="contentData.id"
       :exam-prices="contentData.price"
       :is-logged-in="auth.isAuthenticated.value"
@@ -115,9 +101,6 @@
       @login="openAuthDialog('login')"
       @register="openAuthDialog('register')"
     />
-    <!--End mobile order section-->
-
-    <!--  End: detail  -->
 
     <common-crash-report ref="crash_report" />
   </div>
@@ -137,16 +120,8 @@ const crash_report = ref(null);
 const copy_btn = ref("Copy");
 const download_loading = ref(false);
 
-// Reactive data for breadcrumbs
-const breads = reactive([
-  {
-    text: "Online exam",
-    disabled: false,
-    href: "/search?type=azmoon",
-  },
-]);
+const breads = reactive([]);
 
-// Gallery data
 const galleryImages = ref([]);
 const galleryHelpData = ref({
   state: "",
@@ -173,41 +148,31 @@ async function fetchExamData() {
 }
 
 // Use asyncData to fetch data
-const {
-  data: asyncContentData,
-  error,
-  pending: dataFetching,
-} = useAsyncData(
+const { data, pending, error } = await useAsyncData(
   `exam-${route.params.id}`,
   async () => {
-    try {
-      const data = await fetchExamData();
-      if (data) {
-        contentData.value = data;
-        initBreadCrumb();
-        updateGalleryData();
-      }
-      return data;
-    } catch (err) {
-      return null;
-    }
-  },
-  {
-    server: true,
-    lazy: false,
-    immediate: true,
-    watch: [() => route.params.id],
+    const data = await fetchExamData();
+    return data;
   }
 );
 
+watchEffect(async () => {
+  if (data.value) {
+    contentData.value = data.value;
+    await initBreadCrumb();
+    await updateGalleryData();
+  }
+});
+
 // Method to initialize breadcrumbs
-function initBreadCrumb() {
+async function initBreadCrumb() {
   if (!contentData.value) return;
 
-  // Clear existing breadcrumbs except the first one
-  while (breads.length > 1) {
-    breads.pop();
-  }
+  breads.push({
+    text: "Online exam",
+    disabled: false,
+    href: "/search?type=azmoon",
+  });
 
   if (contentData.value.section_title) {
     breads.push({
@@ -295,23 +260,6 @@ const openCrashReportDialog = () => {
   crash_report.value.dialog = true;
   crash_report.value.form.type = "test";
 };
-
-// Lifecycle hooks
-onMounted(async () => {
-  // If data is already available, update the state
-  if (!contentData.value || Object.keys(contentData.value).length === 0) {
-    if (asyncContentData.value) {
-      contentData.value = asyncContentData.value;
-      updateGalleryData();
-      initBreadCrumb();
-    }
-  }
-});
-
-// Define expose for components that need to be accessed by ref
-defineExpose({
-  crash_report,
-});
 </script>
 
 <script>
