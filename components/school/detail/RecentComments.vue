@@ -42,7 +42,7 @@
             <div class="float-left">
               <v-btn
                 class="bg-primary-gray-700 text-white mr-6"
-                variant="fab"
+                variant="flat"
                 size="x-small"
                 icon
               >
@@ -50,7 +50,7 @@
               </v-btn>
               <v-btn
                 class="bg-primary-gray-700 text-white mr-6"
-                variant="fab"
+                variant="flat"
                 size="x-small"
                 icon
               >
@@ -58,7 +58,7 @@
               </v-btn>
               <v-btn
                 class="bg-primary-blue-500 text-white"
-                variant="fab"
+                variant="flat"
                 size="x-small"
                 icon
               >

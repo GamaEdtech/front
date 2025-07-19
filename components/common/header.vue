@@ -548,7 +548,7 @@ watch(
                       :to="item.link"
                     >
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0 nt">
+                        <v-icon size="small" class="mr-0 nt">
                           {{ item.icon }}
                         </v-icon>
                       </template>
@@ -558,7 +558,7 @@ watch(
                     </v-list-item>
                     <v-list-item class="pointer" @click="logout">
                       <template v-slot:prepend>
-                        <v-icon small class="mr-0"> mdi-logout </v-icon>
+                        <v-icon size="small" class="mr-0"> mdi-logout </v-icon>
                       </template>
                       <v-list-item-title> Logout </v-list-item-title>
                     </v-list-item>
@@ -1027,7 +1027,7 @@ watch(
                 <v-icon
                   class="mr-0 nt"
                   :icon="item.icon"
-                  :size="small"
+                  size="small"
                 ></v-icon>
               </template>
 

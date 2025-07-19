@@ -103,7 +103,15 @@
                   </v-btn>
                 </template>
               </v-text-field>
-              <v-emoji-picker v-show="emojiBox" @select="selectEmoji" />
+              <!-- <v-emoji-picker v-show="emojiBox" @select="selectEmoji" /> -->
+              <EmojiPicker
+                disable-skin-tones
+                display-recent
+                style="margin: 0 0"
+                v-show="emojiBox"
+                :native="true"
+                @select="selectEmoji"
+              ></EmojiPicker>
             </div>
           </v-col>
         </v-row>
@@ -146,6 +154,9 @@
 </template>
 
 <script setup>
+import EmojiPicker from "vue3-emoji-picker";
+import "vue3-emoji-picker/css";
+
 definePageMeta({
   layout: "dashboard-layout",
 });
@@ -169,7 +180,7 @@ const onScroll = (e) => {
 };
 
 const selectEmoji = (emoji) => {
-  messageToSend.value = messageToSend.value + emoji.data;
+  messageToSend.value += emoji.i;
 };
 
 const sendMsg = () => {

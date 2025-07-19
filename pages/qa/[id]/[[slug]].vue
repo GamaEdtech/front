@@ -977,7 +977,11 @@ const requestURL = ref(useRequestURL().host);
 
 const display = useGlobalDisplay();
 // use useAsyncData to getting Major Questions - SSR-friendly
-const { data: contentData, error, refresh: refreshContent } = await useAsyncData(
+const {
+  data: contentData,
+  error,
+  refresh: refreshContent,
+} = await useAsyncData(
   () => `question-${route.params.id}`,
   async () => {
     try {
@@ -991,7 +995,7 @@ const { data: contentData, error, refresh: refreshContent } = await useAsyncData
     }
   },
   {
-    watch: [() => route.params.id]
+    watch: [() => route.params.id],
   }
 );
 
