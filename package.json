@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --quiet",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pre-commit": "npm run lint"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --fix"
