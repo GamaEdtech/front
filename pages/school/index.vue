@@ -113,6 +113,7 @@ import Map from "~/components/school/Map.vue";
 import SchoolDetailsModal from "~/components/school/SchoolDetailsModal.vue";
 import schoolListDesktop from "~/components/school/list/Desktop.vue";
 import schoolListMobile from "~/components/school/list/Mobile.vue";
+import useApiService from '~/composables/useApiService';
 
 const router = useRouter();
 const route = useRoute();
@@ -406,7 +407,7 @@ const { data: initialSchools, pending: loadingSchoolsServer } =
       });
     }
 
-    return $fetch("/api/v2/schools", { params });
+    return useApiService.get("/api/v2/schools", params);
   });
 
 if (initialSchools.value) {
@@ -452,9 +453,9 @@ const getSchoolList = async () => {
       params["sort"] = filterForm.value.sort;
     }
 
-    const response = await $fetch("/api/v2/schools", {
+    const response = await useApiService.get("/api/v2/schools",
       params,
-    });
+    );
     setMetaData(response);
 
     if (response?.data?.list.length < perPage) {
@@ -689,7 +690,7 @@ const fetchAdditionalSchoolDetails = async (schoolId) => {
       showSchoolModal.value = true;
     }
 
-    const response = await $fetch(`/api/v2/schools/${schoolId}`);
+    const response = await useApiService.get(`/api/v2/schools/${schoolId}`);
     if (response && response?.data) {
       selectedSchool.value = { ...selectedSchool?.value, ...response?.data };
     } else {
