@@ -17,9 +17,20 @@
         :items="newSchoolForMarkersOnMap"
         @map-moved="changeFilterWithMapMoved"
         @user-location-found="userLocationFound"
+        @school-marker-clicked="handleSchoolMarkerClick"
+        @school-marker-click-error="handleSchoolMarkerClickError"
       />
     </div>
+
+    <!-- School Details Modal -->
+    <SchoolDetailsModal
+      v-model="showSchoolModal"
+      :school="selectedSchool"
+      @navigate-to-details="navigateToSchoolDetails"
+    />
+
     <div
+      v-if="!isExpandMapInDesktop || isMobile"
       :class="`filter-list-div ${
         openBottomNavFilterList ? `open-bottom-nav` : ``
       }`"
@@ -30,11 +41,7 @@
       @mouseup="endDrag"
       @mouseleave="endDrag"
     >
-      <div
-        class="grab-line-div"
-        @touchstart="startDrag"
-        @mousedown="startDrag"
-      >
+      <div class="grab-line-div" @touchstart="startDrag" @mousedown="startDrag">
         <div class="grab" />
       </div>
       <schoolFilter
@@ -43,10 +50,7 @@
         :is-expand-map="isExpandMapInDesktop"
         @update-filter="updateFilter"
       />
-      <div
-        v-if="!isExpandMapInDesktop"
-        class="container-div-button"
-      >
+      <div v-if="!isExpandMapInDesktop" class="container-div-button">
         <v-btn
           class="text-h4"
           elevation="4"
@@ -88,7 +92,14 @@
 </template>
 
 <script setup>
-import { onUnmounted, onMounted, ref } from 'vue'
+import { onUnmounted } from "vue";
+import { onMounted, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import schoolFilter from "~/components/school/Filter.vue";
+import Map from "~/components/school/Map.vue";
+import SchoolDetailsModal from "~/components/school/SchoolDetailsModal.vue";
+import schoolListDesktop from "~/components/school/list/Desktop.vue";
+import schoolListMobile from "~/components/school/list/Mobile.vue";
 
 import { useRouter, useRoute } from 'vue-router'
 import schoolFilter from '~/components/school/Filter.vue'
@@ -272,13 +283,14 @@ const updateQueryParams = () => {
 }
 
 const applyFiltersFromQuery = (query) => {
-  debouncedGetSchoolList()
-}
-const debouncedGetSchoolList = () => {
+  debouncedGetSchoolList();
+};
+const debouncedGetSchoolList = async () => {
   if (timer.value) {
     clearTimeout(timer.value)
     timer.value = null
   }
+  await nextTick()
 
   timer.value = setTimeout(() => {
     getSchoolList()
@@ -478,9 +490,16 @@ const isExpandMapInDesktop = ref(false)
 const changeStatusExpandMap = () => {
   isExpandMapInDesktop.value = !isExpandMapInDesktop.value
   if (isExpandMapInDesktop.value) {
-    filterForm.value.lat = defaultLatLongDistance.lat
-    filterForm.value.lng = defaultLatLongDistance.lng
-    filterForm.value.distance = defaultLatLongDistance.distance
+    filterForm.value.lat = defaultLatLongDistance.lat;
+    filterForm.value.lng = defaultLatLongDistance.lng;
+    filterForm.value.distance = defaultLatLongDistance.distance;
+
+    // Clear school list when switching to map view for performance
+    schools.value = [];
+  } else {
+    filterForm.value.lat = null;
+    filterForm.value.lng = null;
+    filterForm.value.distance = null;
   }
   else {
     filterForm.value.lat = null
@@ -558,6 +577,141 @@ const endDrag = () => {
   updateQueryParams()
 }
 // End Handle Drag To Open/Close Bottom Nav
+
+
+// Start School Modal Management
+const showSchoolModal = ref(false);
+const selectedSchool = ref(null);
+
+
+const handleSchoolMarkerClick = (school) => {
+  try {
+    // Comprehensive validation of school data
+    const validationResult = validateSchoolData(school);
+
+    if (!validationResult.isValid) {
+      console.warn("School data validation failed:", {
+        school,
+        missingFields: validationResult.missingFields,
+        context: {
+          zoom: "marker-click",
+          timestamp: new Date().toISOString()
+        }
+      });
+
+      // If we have at least an ID, try to fetch complete data
+      if (school?.id) {
+        fetchAdditionalSchoolDetails(school.id);
+        return;
+      } else {
+        console.error("Invalid school data received from map marker click - no ID available");
+        return;
+      }
+    }
+
+    // Set the selected school and show modal
+    selectedSchool.value = school;
+    showSchoolModal.value = true;
+
+    // If data is incomplete but valid, fetch additional details
+    if (!validationResult.hasDisplayData) {
+      fetchAdditionalSchoolDetails(school.id);
+    }
+  } catch (error) {
+    console.error("Error displaying school modal:", error);
+    // Fallback to direct navigation if modal fails
+    if (school && school.id) {
+      const schoolSlug = $slugGenerator(school.name);
+      window.open(`/school/${school.id}/${schoolSlug}`, '_blank');
+    }
+  }
+};
+
+// Validate school data completeness
+const validateSchoolData = (school) => {
+  if (!school) {
+    return {
+      isValid: false,
+      missingFields: ["school object"],
+      hasDisplayData: false
+    };
+  }
+
+  // Check if all required fields are present
+  const requiredFields = ["id", "name"];
+  const missingFields = requiredFields.filter(field =>
+    !school[field] || school[field] === "" || school[field] === null || school[field] === undefined
+  );
+
+  const hasAllRequired = missingFields.length === 0;
+
+  // Check if we have enough display data for the modal
+  const hasDisplayData = !!(
+    school.defaultImageUri ||
+    school.countryTitle ||
+    school.stateTitle ||
+    school.cityTitle ||
+    school.score ||
+    school.lastModifyDate
+  );
+
+  return {
+    isValid: hasAllRequired,
+    missingFields,
+    hasDisplayData
+  };
+};
+
+// Fetch additional school details if needed
+const fetchAdditionalSchoolDetails = async (schoolId) => {
+  try {
+    // Set loading state if modal is already shown
+    if (showSchoolModal.value && selectedSchool.value) {
+      // Modal is already open, we're just updating data
+    } else {
+      // We need to fetch data before showing modal
+      selectedSchool.value = { id: schoolId, name: "Loading..." };
+      showSchoolModal.value = true;
+    }
+
+    const response = await $fetch(`/api/v2/schools/${schoolId}`);
+    if (response && response?.data) {
+      selectedSchool.value = { ...selectedSchool?.value, ...response?.data };
+    } else {
+      throw new Error("No school data received from API");
+    }
+  } catch (error) {
+    console.error("Error fetching additional school details:", error);
+
+    // Close modal if it was opened for loading
+    showSchoolModal.value = false;
+
+    // Fallback to direct navigation
+    if (schoolId) {
+      const schoolSlug = selectedSchool.value?.name ? $slugGenerator(selectedSchool.value.name) : 'school';
+      window.open(`/school/${schoolId}/${schoolSlug}`, '_blank');
+    }
+  }
+};
+
+// Handle navigation from modal to school details
+const navigateToSchoolDetails = (schoolId, schoolSlug) => {
+  showSchoolModal.value = true;
+  window.open(`/school/${schoolId}/${schoolSlug}`, '_blank');
+};
+
+// Handle marker click errors
+const handleSchoolMarkerClickError = (errorData) => {
+  console.warn("School marker click error:", errorData);
+
+  // If we have a school ID, try to fetch the data and show modal
+  if (errorData?.id) {
+    fetchAdditionalSchoolDetails(errorData.id);
+  } else {
+    console.error("Cannot handle marker click error - no school ID provided");
+  }
+};
+// End School Modal Management
 </script>
 
 <style scoped>

@@ -83,7 +83,7 @@
                   >
                     Score:
                     <v-icon color="primary"> mdi-star </v-icon>
-                    {{ school.score ? school.score.toFixed(1) : "N/A" }}
+                    {{ school.score ? school.score.toFixed(1) : "New" }}
                   </div>
                   <v-divider
                     :thickness="1"
@@ -337,176 +337,192 @@ const loadPreviousPage = () => {
 /* @import "../../../assets/scss/school/list.scss"; */
 
 .main-list-school-div {
+  width: 100%;
+  padding: 40px 5px 0 5px;
+  transition: all 0.5s;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  @include style.responsive-size(
+    background-color,
+    #f2f4f7,
+    white,
+    white,
+    white
+  );
+
+  .container-list-div {
     width: 100%;
-    padding: 40px 5px 0 5px;
-    transition: all 0.5s;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1 1 auto;
+    height: 100%;
     overflow-y: auto;
-    @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+    max-width: 1600px;
 
-    .container-list-div {
+    .container-scroll {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      row-gap: 20px;
+      padding: 0 20px 20px 20px;
+      @include style.responsive-size(
+        padding,
+        0 20px 20px 20px,
+        0 20px 20px 20px,
+        0 20px 20px 20px,
+        0 10px 20px 10px
+      );
+
+      .card-school {
         width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        max-width: 1600px;
+        min-height: fit-content;
+        background-color: rgba(255, 255, 255, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
 
-        .container-scroll {
-            width: 100%;
+        .name-address-image {
+          padding: 16px;
+          width: 100%;
+          display: flex;
+          align-items: flex-start;
+          flex-wrap: wrap;
+          row-gap: 20px;
+          min-height: 130px;
+          position: relative;
+          @include style.responsive-size(
+            justify-content,
+            space-between,
+            space-between,
+            space-between,
+            center
+          );
+
+          .name-div {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             justify-content: flex-start;
             row-gap: 20px;
-            padding: 0 20px 20px 20px;
-            @include style.responsive-size(padding,
-                0 20px 20px 20px,
-                0 20px 20px 20px,
-                0 20px 20px 20px,
-                0 10px 20px 10px);
+          }
 
-            .card-school {
-                width: 100%;
-                min-height: fit-content;
-                background-color: rgba(255, 255, 255, 0.95);
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: space-between;
-
-                .name-address-image {
-                    padding: 16px;
-                    width: 100%;
-                    display: flex;
-                    align-items: flex-start;
-                    flex-wrap: wrap;
-                    row-gap: 20px;
-                    min-height: 130px;
-                    position: relative;
-                    @include style.responsive-size(justify-content,
-                        space-between,
-                        space-between,
-                        space-between,
-                        center);
-
-                    .name-div {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-start;
-                        justify-content: flex-start;
-                        row-gap: 20px
-                    }
-
-                    .img-div {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        transform: translate(-50%, -50%);
-                        z-index: 0;
-                    }
-                }
-
-                .line-seperator {
-                    width: 100%;
-                    height: 1px;
-                    background-color: rgba(242, 244, 247, 1);
-                }
-            }
-
-            .line-specifier-load-more {
-                width: 100%;
-                height: 6px;
-                // background-color: red;
-            }
-
-            .not-found-div {
-                width: 100%;
-                text-align: center;
-                font-size: 20px;
-                font-weight: 600;
-            }
+          .img-div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+          }
         }
-    }
 
-    .container-button-load-previous-data {
+        .line-seperator {
+          width: 100%;
+          height: 1px;
+          background-color: rgba(242, 244, 247, 1);
+        }
+      }
+
+      .line-specifier-load-more {
         width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px;
-        z-index: 3;
-        @include style.responsive-size(background-color, #f2f4f7, white, white, white);
+        height: 6px;
+        // background-color: red;
+      }
+
+      .not-found-div {
+        width: 100%;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+      }
     }
+  }
+
+  .container-button-load-previous-data {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    z-index: 3;
+    @include style.responsive-size(
+      background-color,
+      #f2f4f7,
+      white,
+      white,
+      white
+    );
+  }
 }
 
 .closed-list {
-    width: 550px;
-    position: absolute;
-    right: 0;
-    top: 100px;
-    padding: 40px 10px;
-    height: calc(100% - 100px);
+  width: 550px;
+  position: absolute;
+  right: 0;
+  top: 100px;
+  padding: 40px 10px;
+  height: calc(100% - 100px);
 
-    .container-list-div {
-        height: 100%;
+  .container-list-div {
+    height: 100%;
 
-        .container-scroll {
-            padding: 0 10px 20px 10px;
+    .container-scroll {
+      padding: 0 10px 20px 10px;
 
-            .card-school {
-                padding: 10px;
-            }
-        }
+      .card-school {
+        padding: 10px;
+      }
     }
+  }
 }
 .card-school:not(.school-card-bg) {
-  outline: 1px solid  rgba(252, 241, 241, 0.975);
+  outline: 1px solid rgba(252, 241, 241, 0.975);
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
 }
 
-:deep(.school-card-overlay)   {
-  outline:1px solid  rgba(252, 241, 241, 0.87);
+:deep(.school-card-overlay) {
+  outline: 1px solid rgba(252, 241, 241, 0.87);
   outline-style: auto;
 }
 
 .school-card-bg {
-    position: relative;
-    width: 100%;
-    height: 220px;
-    background-size: cover;
-    background-position: center;
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
 }
 
 .school-card-overlay {
-    width: inherit !important;
-    background: rgba(255, 255, 255, 0.87);
-    padding: 15px 12px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    position: relative;
+  width: inherit !important;
+  background: rgba(255, 255, 255, 0.87);
+  padding: 15px 12px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  position: relative;
 }
 
 .school-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .school-name {
-    font-family: Inter;
-    font-weight: 600;
-    font-style: Semi Bold;
-    font-size: 16px;
-    line-height: 26px;
-    letter-spacing: 0%;
+  font-family: Inter;
+  font-weight: 600;
+  font-style: Semi Bold;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0%;
 }
 </style>
