@@ -1,5 +1,4 @@
 <script>
-
 export default {
   props: {
     image: {
@@ -17,33 +16,33 @@ export default {
   },
   computed: {
     style() {
-      const { height, width, left, top } = this.stencilCoordinates;
+      const { height, width, left, top } = this.stencilCoordinates
       const style = {
         width: `${width}px`,
         height: `${height}px`,
         transform: `translate(${left}px, ${top}px)`,
-      };
-      if (this.transitions && this.transitions.enabled) {
-        style.transition = `${this.transitions.time}ms ${this.transitions.timingFunction}`;
       }
-      return style;
+      if (this.transitions && this.transitions.enabled) {
+        style.transition = `${this.transitions.time}ms ${this.transitions.timingFunction}`
+      }
+      return style
     },
   },
   methods: {
     onMove(moveEvent) {
-      this.$emit("move", moveEvent);
+      this.$emit('move', moveEvent)
     },
     onMoveEnd() {
-      this.$emit("move-end");
+      this.$emit('move-end')
     },
     onResize(dragEvent) {
-      const shift = dragEvent.shift();
+      const shift = dragEvent.shift()
 
-      const widthResize = shift.left;
-      const heightResize = -shift.top;
+      const widthResize = shift.left
+      const heightResize = -shift.top
 
       this.$emit(
-        "resize",
+        'resize',
         new ResizeEvent(
           {
             left: widthResize,
@@ -53,25 +52,28 @@ export default {
           },
           {
             compensate: true,
-          }
-        )
-      );
+          },
+        ),
+      )
     },
     onResizeEnd() {
-      this.$emit("resize-end");
+      this.$emit('resize-end')
     },
     aspectRatios() {
       return {
         minimum: 1,
         maximum: 1,
-      };
+      }
     },
   },
-};
+}
 </script>
 
 <template>
-  <div class="circle-stencil" :style="style">
+  <div
+    class="circle-stencil"
+    :style="style"
+  >
     <draggable-element
       class="circle-stencil__handler"
       @drag="onResize"
@@ -87,10 +89,13 @@ export default {
         <path
           fill="#FFF"
           d="M15.1 4.7L18.3 6l-3.2 3.3 2.3 2.3 3.3-3.3 1.3 3.3L26.7 0zM9.3 14.7L6 18l-1.3-3.3L0 26.3l11.6-4.7-3.3-1.3 3.3-3.3z"
-        ></path>
+        />
       </svg>
     </draggable-element>
-    <draggable-area @move="onMove" @move-end="onMoveEnd">
+    <draggable-area
+      @move="onMove"
+      @move-end="onMoveEnd"
+    >
       <stencil-preview
         class="circle-stencil__preview"
         :image="image"

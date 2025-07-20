@@ -6,7 +6,7 @@
       <v-skeleton-loader
         type="image"
         class="img-div rounded-ts-lg rounded-bs-lg"
-      ></v-skeleton-loader>
+      />
       <div
         class="content-card d-flex flex-column ga-2 align-start justify-center justify-sm-space-between"
       >
@@ -15,18 +15,18 @@
           width="200"
           height="40"
           class="w-100"
-        ></v-skeleton-loader>
+        />
         <div class="d-flex align-center justify-start flex-wrap">
           <v-skeleton-loader
             type="subtitle"
             width="150"
             height="40"
-          ></v-skeleton-loader>
+          />
           <v-skeleton-loader
             type="subtitle"
             width="150"
             height="40"
-          ></v-skeleton-loader>
+          />
         </div>
         <div class="d-none d-sm-flex align-center justify-space-between w-100">
           <v-skeleton-loader
@@ -34,7 +34,7 @@
             type="sentences"
             width="100"
             height="30"
-          ></v-skeleton-loader>
+          />
         </div>
       </div>
     </div>
@@ -44,7 +44,7 @@
         type="sentences"
         width="120"
         height="30"
-      ></v-skeleton-loader>
+      />
     </div>
   </div>
 </template>

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+  npm.cmd run lint
+else
+  npm run lint
+fi

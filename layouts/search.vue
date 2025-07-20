@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <common-header />
-    <div >
+    <div>
       <slot />
     </div>
   </v-app>
