@@ -29,7 +29,7 @@
         :rules="tuitionRule"
         v-model="tuitionFee"
         v-if="isEditMode"
-        width="250"
+        width="200"
         placeholder="Tuition fee"
         variant="underlined"
         type="number"
@@ -94,7 +94,7 @@ const handleUpdate = () => {
     .then(async (response) => {
       if (response.succeeded) {
         nuxtApp.$toast?.success(
-          "Your contribution has been successfully submitted"
+          "Thank you! Your contribution has been successfully submitted and is pending admin approval."
         );
         props.contentData.tuition = Number(tuitionFee.value);
       } else {
