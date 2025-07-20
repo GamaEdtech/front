@@ -1,69 +1,74 @@
 <script setup>
-import useApiService from '~/composables/useApiService';
-
+import useApiService from '~/composables/useApiService'
 
 const props = defineProps({
   modelValue: Boolean,
-  id: String
-});
+  id: String,
+})
 
-const { $toast } = useNuxtApp();
+const { $toast } = useNuxtApp()
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue'])
 
 const userToken = ref(null)
 const tokenExpireDate = ref(null)
 
 const getUserToken = async () => {
-    try {
-      const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/token`);
-      if(res.succeeded)
-        userToken.value = res.data.token
-    } catch (err) {
-        if (err.response?.status === 400) 
-          $toast.error(err.response.data.message);
-    }
+  try {
+    const res = await useApiService.get(`/api/v2/admin/identities/${props.id}/token`)
+    if (res.succeeded)
+      userToken.value = res.data.token
+  }
+  catch (err) {
+    if (err.response?.status === 400)
+      $toast.error(err.response.data.message)
+  }
 }
 
 const generateNewtoken = async (id) => {
-  try{
+  try {
     const res = await useApiService.post(`/api/v2/admin/identities/${id}/token`)
-    if(res.succeeded){
+    if (res.succeeded) {
       userToken.value = res.data.token
-      tokenExpireDate.value = res.data.expirationTime 
+      tokenExpireDate.value = res.data.expirationTime
       $toast.success('Token Generated Successfully')
     }
-    else 
+    else
       $toast.error(res.errors[0].message)
-  } catch(err){
-      if (err.response?.status === 400) 
-        $toast.error(err.response.data.message);
   }
-
+  catch (err) {
+    if (err.response?.status === 400)
+      $toast.error(err.response.data.message)
+  }
 }
 
-const deleteToken = async (id) =>{
-  try{
+const deleteToken = async (id) => {
+  try {
     const res = await useApiService.remove(`/api/v2/admin/identities/${id}/token`)
-    if(res.succeeded){
+    if (res.succeeded) {
       userToken.value = null
       $toast.success('Token Deleted Successfully')
     }
-    else 
+    else
       $toast.error(res.errors[0].message)
-  } catch(err){
-    if (err.response?.status === 400) 
-        $toast.error(err.response.data.message);
+  }
+  catch (err) {
+    if (err.response?.status === 400)
+      $toast.error(err.response.data.message)
   }
 }
 
 onMounted(() => {
   getUserToken()
 })
-
 </script>
+
 <template>
-  <v-dialog :model-value="modelValue" @click:outside="$emit('update:modelValue', false)" max-width="400px">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="400px"
+    @click:outside="$emit('update:modelValue', false)"
+  >
     <v-card class="bg-primary-gray-200 rounded-xl">
       <v-card-title class="d-flex justify-center pa-4 bg-white">
         <span class="gtext-t3">Token</span>
@@ -78,27 +83,28 @@ onMounted(() => {
 
       <v-card-actions class="d-flex justify-center ga-10 mb-2">
         <v-btn
-        class="closeBtn" 
-        variant="plain" 
-        @click="$emit('update:modelValue', false)"
+          class="closeBtn"
+          variant="plain"
+          @click="$emit('update:modelValue', false)"
         >
-          <span class="mdi mdi-close gtext-t1"></span>
+          <span class="mdi mdi-close gtext-t1" />
         </v-btn>
-        <v-btn 
-        class="deleteTokenBtn relative" 
-        variant="plain" 
-        @click="deleteToken(props.id)">
-          <span class="mdi mdi-delete gtext-t1"></span>
+        <v-btn
+          class="deleteTokenBtn relative"
+          variant="plain"
+          @click="deleteToken(props.id)"
+        >
+          <span class="mdi mdi-delete gtext-t1" />
           <v-tooltip
-          activator="parent"
-          location="top"
+            activator="parent"
+            location="top"
           >
             Delete Token
           </v-tooltip>
         </v-btn>
         <v-btn
-        class="rounded-pill gtext-t5 ml-4 submitBtn"
-        @click="generateNewtoken(props.id)"
+          class="rounded-pill gtext-t5 ml-4 submitBtn"
+          @click="generateNewtoken(props.id)"
         >
           <span>Generate New Token</span>
         </v-btn>
@@ -106,6 +112,7 @@ onMounted(() => {
     </v-card>
   </v-dialog>
 </template>
+
 <style scoped>
 :deep(.v-btn__content span){
   font-family: Inter, sans-serif !important;

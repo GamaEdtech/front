@@ -12,7 +12,7 @@
     >
       <LTileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        attribution="&copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors"
         layer-type="base"
         name="OpenStreetMap"
       />
@@ -28,8 +28,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   items: {
@@ -44,64 +44,64 @@ const props = defineProps({
     type: Number,
     default: 6,
   },
-});
+})
 
-const emit = defineEmits(["mapMoved", "userLocationFound"]);
+const emit = defineEmits(['mapMoved', 'userLocationFound'])
 
-const router = useRouter();
+const router = useRouter()
 
-const map = ref(null);
-const zoom = ref(props.initialZoom);
-const minZoom = ref(2);
-const center = ref(props.initialCenter);
-const schoolIcon = ref(null);
-const isMapReady = ref(false);
-const isModuleImport = ref(false);
+const map = ref(null)
+const zoom = ref(props.initialZoom)
+const minZoom = ref(2)
+const center = ref(props.initialCenter)
+const schoolIcon = ref(null)
+const isMapReady = ref(false)
+const isModuleImport = ref(false)
 
 onMounted(() => {
-  getUserLocation();
+  getUserLocation()
 
-  const L = window.L;
+  const L = window.L
   schoolIcon.value = L.icon({
-    iconUrl: "/images/school-marker.png",
+    iconUrl: '/images/school-marker.png',
     iconSize: [40, 40],
     iconAnchor: [12, 25],
     popupAnchor: [1, -25],
-  });
+  })
 
-  isModuleImport.value = true;
+  isModuleImport.value = true
   if (isMapReady.value) {
-    map.value.leafletObject.setView(center.value);
-    setMarkers();
+    map.value.leafletObject.setView(center.value)
+    setMarkers()
   }
-});
+})
 
 const onMapReady = () => {
-  isMapReady.value = true;
+  isMapReady.value = true
   if (isModuleImport.value) {
-    map.value.leafletObject.setView(center.value);
-    setMarkers();
+    map.value.leafletObject.setView(center.value)
+    setMarkers()
   }
-};
+}
 
 watch(
   () => props.items,
   () => {
     if (isMapReady.value) {
-      setMarkers();
+      setMarkers()
     }
-  }
-);
+  },
+)
 
-const markerClusterGroupRef = ref([]);
+const markerClusterGroupRef = ref([])
 const setMarkers = async () => {
   // if (markerClusterGroupRef.value) {
   //   markerClusterGroupRef.value.remove();
   // }
 
   const mapItems = props.items
-    .filter((item) => item.lat && item.long)
-    .map((item) => ({
+    .filter(item => item.lat && item.long)
+    .map(item => ({
       lat: item.lat,
       lng: item.long,
       name: item.name,
@@ -110,74 +110,75 @@ const setMarkers = async () => {
         icon: schoolIcon.value,
         alt: item.id,
       },
-    }));
+    }))
 
   const { markerCluster, markers } = await useLMarkerCluster({
     leafletObject: map.value.leafletObject,
     markers: mapItems,
-  });
-  markerClusterGroupRef.value.push(markerCluster);
+  })
+  markerClusterGroupRef.value.push(markerCluster)
   markers.forEach((marker) => {
-    marker.on("click", (event) => {
+    marker.on('click', (event) => {
       if (event.target.options.alt) {
-        window.open(`/school/${event.target.options.alt}`, "_blank");
+        window.open(`/school/${event.target.options.alt}`, '_blank')
       }
-    });
-  });
-};
+    })
+  })
+}
 
 const onMoveEnd = (event) => {
-  const bounds = event.target.getBounds();
-  const newCenter = event.target.getCenter();
-  const ne = bounds.getNorthEast();
-  const distance = calculateDistance(newCenter, ne);
-  emit("mapMoved", {
+  const bounds = event.target.getBounds()
+  const newCenter = event.target.getCenter()
+  const ne = bounds.getNorthEast()
+  const distance = calculateDistance(newCenter, ne)
+  emit('mapMoved', {
     center: [newCenter.lat, newCenter.lng],
     distance: distance,
-  });
-};
+  })
+}
 
 const calculateDistance = (point1, point2) => {
-  const R = 6371000;
-  const lat1 = point1.lat * (Math.PI / 180);
-  const lon1 = point1.lng * (Math.PI / 180);
-  const lat2 = point2.lat * (Math.PI / 180);
-  const lon2 = point2.lng * (Math.PI / 180);
+  const R = 6371000
+  const lat1 = point1.lat * (Math.PI / 180)
+  const lon1 = point1.lng * (Math.PI / 180)
+  const lat2 = point2.lat * (Math.PI / 180)
+  const lon2 = point2.lng * (Math.PI / 180)
 
-  const dLat = lat2 - lat1;
-  const dLon = lon2 - lon1;
+  const dLat = lat2 - lat1
+  const dLon = lon2 - lon1
 
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const a
+    = Math.sin(dLat / 2) ** 2
+      + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-  return formatNumber(R * c);
-};
+  return formatNumber(R * c)
+}
 
 const formatNumber = (number) => {
-  //Remove latest zero from number to avoid error from api side
-  const roundedNumber = parseFloat(number.toFixed(6));
-  const formattedString = roundedNumber.toString();
-  const trimmedString = formattedString.replace(/\.?0+$/, "");
-  return parseFloat(trimmedString);
-};
+  // Remove latest zero from number to avoid error from api side
+  const roundedNumber = parseFloat(number.toFixed(6))
+  const formattedString = roundedNumber.toString()
+  const trimmedString = formattedString.replace(/\.?0+$/, '')
+  return parseFloat(trimmedString)
+}
 
 const getUserLocation = () => {
-  if ("geolocation" in navigator) {
+  if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        center.value = [position.coords.latitude, position.coords.longitude];
-        emit("userLocationFound", center.value);
+        center.value = [position.coords.latitude, position.coords.longitude]
+        emit('userLocationFound', center.value)
       },
       (error) => {
-        console.error("Error getting user location:", error);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported in this browser.");
+        console.error('Error getting user location:', error)
+      },
+    )
   }
-};
+  else {
+    console.error('Geolocation is not supported in this browser.')
+  }
+}
 </script>
 
 <style scoped>

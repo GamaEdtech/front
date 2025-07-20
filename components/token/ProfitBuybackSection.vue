@@ -3,11 +3,16 @@
     <v-container class="profit-buyback-container">
       <v-row justify="center">
         <v-col cols="12">
-          <h2 class="profit-buyback-title">Profit Distribution and Buyback</h2>
+          <h2 class="profit-buyback-title">
+            Profit Distribution and Buyback
+          </h2>
         </v-col>
       </v-row>
       <v-row justify="center">
-        <v-col cols="12" class="d-flex justify-center px-0">
+        <v-col
+          cols="12"
+          class="d-flex justify-center px-0"
+        >
           <div class="video-card px-4 px-sm-15 px-lg-0">
             <iframe
               class="rounded youtube-container"

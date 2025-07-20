@@ -1,21 +1,20 @@
 <script setup>
-
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    required: true
+    required: true,
   },
   itemType: {
     type: String,
-    default: ""
-  }
+    default: '',
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'close'])
 
 const newItem = ref({
   title: '',
-  date: new Date().toISOString().split("T")[0] // Default to today's date
+  date: new Date().toISOString().split('T')[0], // Default to today's date
 })
 
 function handleDelete() {
@@ -33,11 +32,12 @@ function onDialogInput(val) {
   }
 }
 </script>
+
 <template>
   <v-dialog
     :model-value="modelValue"
-    @update:modelValue="$emit('update:modelValue', $event)"
     max-width="600px"
+    @update:model-value="$emit('update:modelValue', $event)"
     @input="onDialogInput"
     @click:outside="close"
   >
@@ -45,11 +45,16 @@ function onDialogInput(val) {
       <div class="d-flex flex-column align-center justify-center pt-6 mb-6">
         <div class="icon-container">
           <!-- <img src="~assets/images/Vector (1).svg" alt="Icon" /> -->
-          <v-icon color="red" style="font-size: 48px !important;">mdi-delete</v-icon>
+          <v-icon
+            color="red"
+            style="font-size: 48px !important;"
+          >
+            mdi-delete
+          </v-icon>
         </div>
-        <v-card-title class="gtext-t3 primary-gray-700 font-bold"
-          >Are you Sure?</v-card-title
-        >
+        <v-card-title class="gtext-t3 primary-gray-700 font-bold">
+          Are you Sure?
+        </v-card-title>
       </div>
 
       <div class="text-box">

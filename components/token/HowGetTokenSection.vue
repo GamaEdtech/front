@@ -3,14 +3,22 @@
     <section class="can-get-section mt-10">
       <v-container>
         <div class="d-flex justify-content-center mb-9">
-          <h2 class="can-get-title">What Can You Do With $GET?</h2>
+          <h2 class="can-get-title">
+            What Can You Do With $GET?
+          </h2>
         </div>
         <v-row class="justify-content-center">
-          <v-col cols="12" sm="8" md="6">
+          <v-col
+            cols="12"
+            sm="8"
+            md="6"
+          >
             <div class="can-get-desc d-flex">
               <div>
                 <div class="pl-lg-10">
-                  <div class="text-md-h4">You can use <b>$GET</b> to:</div>
+                  <div class="text-md-h4">
+                    You can use <b>$GET</b> to:
+                  </div>
                   <ul class="can-get-list text-h5">
                     <li><b>Vote</b> on platform decisions</li>
                     <li><b>Propose</b> new features</li>
@@ -20,12 +28,17 @@
               </div>
             </div>
           </v-col>
-          <v-col cols="12" sm="4" md="3" class="can-get-img-col">
+          <v-col
+            cols="12"
+            sm="4"
+            md="3"
+            class="can-get-img-col"
+          >
             <img
               class="can-get-img"
               src="/images/token/can.png"
               alt="What can you do with $GET token illustration"
-            />
+            >
           </v-col>
         </v-row>
         <p class="can-get-footnote text-h4 mt-7 d-none d-md-block">
@@ -37,6 +50,7 @@
     </section>
   </div>
 </template>
+
 <script setup></script>
 
 <style scoped>

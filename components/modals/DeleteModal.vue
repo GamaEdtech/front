@@ -9,11 +9,16 @@
     <v-card class="boxs">
       <div class="d-flex flex-column align-center justify-center pt-6">
         <div class="icon-container">
-          <v-icon color="red" large>mdi-delete</v-icon>
+          <v-icon
+            color="red"
+            large
+          >
+            mdi-delete
+          </v-icon>
         </div>
-        <v-card-title class="font-size-18 primary-gray-700 font-bold"
-          >Are you Sure?</v-card-title
-        >
+        <v-card-title class="font-size-18 primary-gray-700 font-bold">
+          Are you Sure?
+        </v-card-title>
       </div>
 
       <div class="text-box">
@@ -46,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 const props = defineProps({
   isOpen: {
@@ -55,26 +60,26 @@ const props = defineProps({
   },
   itemType: {
     type: String,
-    default: "",
+    default: '',
   },
-});
+})
 
-const emit = defineEmits(["update:isOpen", "confirm", "close"]);
+const emit = defineEmits(['update:isOpen', 'confirm', 'close'])
 
 const newItem = ref({
-  title: "",
-  date: new Date().toISOString().split("T")[0], // Default to today's date
-});
+  title: '',
+  date: new Date().toISOString().split('T')[0], // Default to today's date
+})
 
 const closeModal = () => {
-  emit("update:isOpen", false);
-};
+  emit('update:isOpen', false)
+}
 
 const onDialogInput = (val) => {
   if (!val) {
-    emit("close");
+    emit('close')
   }
-};
+}
 </script>
 
 <style scoped>

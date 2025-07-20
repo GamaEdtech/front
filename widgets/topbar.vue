@@ -1,19 +1,20 @@
 <template>
-  <div class="topbar"
+  <div
+    class="topbar"
     elevation="4"
   >
     <div class="d-flex align-center">
       <div>
-        <span class="mdi mdi-account-multiple-plus icon"></span>
+        <span class="mdi mdi-account-multiple-plus icon" />
       </div>
-      <div></div>
+      <div />
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       items: [
         { title: 'Dashboard', icon: 'mdi-view-dashboard' },

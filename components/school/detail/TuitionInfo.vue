@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex mt-11 mb-9">
-    <div class="gtext-h5 gtext-md-h5 primary-gray-600">Tuition fee</div>
+    <div class="gtext-h5 gtext-md-h5 primary-gray-600">
+      Tuition fee
+    </div>
     <v-spacer />
     <div class="gtext-t2 font-weight-heavy primary-gray-800">
       <span v-show="contentData.tuition_fee">
@@ -18,9 +20,9 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 function numberFormat(value) {
-  if (!value) return "";
-  return value.toLocaleString();
+  if (!value) return ''
+  return value.toLocaleString()
 }
 </script>
