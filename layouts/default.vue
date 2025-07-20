@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <VitePwaManifest />
     <div
       class="w-100 h-100 position-fixed left-0 top-0 d-flex justify-center align-center custom-ovarlay"
       v-if="isLoading"
