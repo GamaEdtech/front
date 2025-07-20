@@ -41,10 +41,10 @@
     </v-card>
     
     <!-- School card -->
-    <v-card v-else class="school-modal-card" >
+    <v-card v-else class="school-modal-card" @click="navigateToSchoolDetails">
       <v-card-text class="pa-0">
         <!-- Desktop Card Style -->
-        <div v-if="!$vuetify.display.xs" @click="navigateToSchoolDetails" class="card-school">
+        <div v-if="!$vuetify.display.xs" class="card-school">
           <div class="name-address-image">
             <div class="name-div">
               <span class="name gtext-t4 font-weight-semibold">{{ school?.name }}</span>
@@ -122,7 +122,7 @@
 
         <!-- Mobile Card Style -->
         <div v-else>
-          <div v-if="school?.defaultImageUri" @click="navigateToSchoolDetails" class="school-card-bg" :style="{ backgroundImage: `url(${school?.defaultImageUri})` }">
+          <div v-if="school?.defaultImageUri" class="school-card-bg" :style="{ backgroundImage: `url(${school?.defaultImageUri})` }">
             <div class="school-card-overlay">
               <div class="school-card-header">
                 <ClientOnly>
@@ -329,7 +329,6 @@ const navigateToSchoolDetailsDirect = () => {
     ? $slugGenerator(props.school.name) 
     : 'school';
   const schoolUrl = `/school/${props.school.id}/${schoolSlug}`;
-  
   closeModal();
   window.open(schoolUrl, '_blank');
 };
