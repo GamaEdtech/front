@@ -92,18 +92,13 @@
 </template>
 
 <script setup>
-import { onUnmounted } from "vue";
-import { onMounted, ref } from "vue";
+import { onUnmounted, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import schoolFilter from "~/components/school/Filter.vue";
 import Map from "~/components/school/Map.vue";
 import SchoolDetailsModal from "~/components/school/SchoolDetailsModal.vue";
 import schoolListDesktop from "~/components/school/list/Desktop.vue";
 import schoolListMobile from "~/components/school/list/Mobile.vue";
-
-import { useRouter, useRoute } from "vue-router";
-import schoolFilter from "~/components/school/Filter.vue";
-import Map from "~/components/school/Map.vue";
 
 const router = useRouter();
 const route = useRoute();
