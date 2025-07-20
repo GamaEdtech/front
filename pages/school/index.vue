@@ -119,7 +119,8 @@ const router = useRouter();
 const route = useRoute();
 
 const display = useGlobalDisplay();
-const isMobile = ref(display.xs);
+const isMobile = ref(false);
+
 const isUserMovingMap = ref(true) // Start with loading indicator visible
 
 const sortList = [
@@ -163,10 +164,17 @@ const setDefaultSortToRoute = () => {
 
 onMounted(() => {
   setDefaultSortToRoute();
+  isMobile.value = display.xs.value;
   const footer = document.getElementById("footer-container");
   if (footer) {
     footer.style.display = "none";
   }
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal;
+    }
+  );
 });
 
 onUnmounted(() => {
