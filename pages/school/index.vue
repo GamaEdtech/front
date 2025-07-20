@@ -16,10 +16,23 @@
       <Map
         :items="newSchoolForMarkersOnMap"
         @map-moved="changeFilterWithMapMoved"
+        @map-move-start="handleMapMoveStart"
         @user-location-found="userLocationFound"
         @school-marker-clicked="handleSchoolMarkerClick"
         @school-marker-click-error="handleSchoolMarkerClickError"
       />
+    </div>
+
+    <!-- Map Loading Indicator -->
+    <div 
+      v-if="isUserMovingMap" 
+      class="map-loading-overlay"
+    >
+      <v-progress-circular
+        color="amber"
+        indeterminate
+        size="50"
+      ></v-progress-circular>
     </div>
 
     <!-- School Details Modal -->
@@ -106,6 +119,7 @@ const route = useRoute();
 
 const display = useGlobalDisplay();
 const isMobile = ref(display.xs);
+const isUserMovingMap = ref(true) // Start with loading indicator visible
 
 const sortList = [
   {
@@ -236,12 +250,24 @@ const resetParameter = () => {
   isAllSchoolLoaded.value = false;
   isInitialSchoolLoading.value = true;
   schools.value = [];
+  // Show loading indicator when resetting parameters for new data
+  isUserMovingMap.value = true;
 };
 
 const updateFilter = (query) => {
   filterForm.value = query;
   resetParameter();
   updateQueryParams();
+};
+
+const handleMapMoveStart = () => {
+  // Only show loading if map view is active and will trigger data reload
+  if (
+    (isExpandMapInDesktop.value && window.innerWidth > 1260) ||
+    (!openBottomNavFilterList.value && window.innerWidth < 1260)
+  ) {
+    isUserMovingMap.value = true;
+  }
 };
 
 const changeFilterWithMapMoved = (locationParam) => {
@@ -255,6 +281,8 @@ const changeFilterWithMapMoved = (locationParam) => {
     resetParameter();
     updateQueryParams();
   }
+  // Always set to false when movement ends, regardless of conditions
+  isUserMovingMap.value = false;
 };
 
 const updateQueryParams = () => {
@@ -388,6 +416,8 @@ if (initialSchools.value) {
   isInitialSchoolLoading.value = false;
   isPaginationSchoolLoading.value = false;
   isPaginationPreviousSchoolLoading.value = false;
+  // Hide loading indicator after initial data is loaded
+  isUserMovingMap.value = false;
 }
 
 const getSchoolList = async () => {
@@ -448,6 +478,8 @@ const getSchoolList = async () => {
     isInitialSchoolLoading.value = false;
     isPaginationSchoolLoading.value = false;
     isPaginationPreviousSchoolLoading.value = false;
+    // Hide loading indicator after data is loaded
+    isUserMovingMap.value = false;
   }
 };
 
