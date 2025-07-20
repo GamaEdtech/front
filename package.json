@@ -45,6 +45,7 @@
   "devDependencies": {
     "@mdi/font": "^7.4.47",
     "@types/node": "22.12.0",
+    "@vite-pwa/nuxt": "^1.0.4",
     "cross-env": "^7.0.3",
     "lil-gui": "^0.20.0",
     "sass": "^1.83.4",
