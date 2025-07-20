@@ -10,7 +10,11 @@
     "start": "nuxt start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:check": "eslint . --quiet"
+    "lint:check": "eslint . --quiet",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^43.3.1",
@@ -51,7 +55,9 @@
     "@nuxt/eslint-config": "^1.6.0",
     "@types/node": "22.12.0",
     "cross-env": "^7.0.3",
+    "husky": "^9.1.7",
     "lil-gui": "^0.20.0",
+    "lint-staged": "^16.1.2",
     "sass": "^1.83.4",
     "sass-loader": "^16.0.4",
     "stats.js": "^0.17.0",
