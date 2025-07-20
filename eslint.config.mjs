@@ -5,12 +5,26 @@ export default createConfigForNuxt({
     stylistic: true,
   },
 })
+  .override("nuxt/rules", {
+    rules: {
+      "nuxt/nuxt-config-keys-order": "off",
+    },
+  })
   .override("nuxt/stylistic", {
     rules: {
       "@stylistic/quotes": "off",
       "@stylistic/member-delimiter-style": "off",
       "@stylistic/semi": "off",
       "@stylistic/max-statements-per-line": "off",
+      "@stylistic/indent": "off",
+      "@stylistic/no-trailing-spaces": "off",
+      "@stylistic/brace-style": "off",
+      "@stylistic/arrow-parens": "off",
+      "@stylistic/comma-dangle": "off",
+      "@stylistic/eol-last": "off",
+      "@stylistic/no-multiple-empty-lines": "off",
+      "@stylistic/operator-linebreak": "off",
+      "@stylistic/quote-props": "off",
     },
   })
   .override("nuxt/typescript/rules", {
@@ -23,6 +37,7 @@ export default createConfigForNuxt({
       "@typescript-eslint/no-dynamic-delete": "off",
       "@typescript-eslint/unified-signatures": "off",
       "@typescript-eslint/no-unused-expressions": "off",
+      "nuxt/nuxt-config-keys-order": "off",
     },
   })
   .override("nuxt/rules", {
@@ -62,5 +77,14 @@ export default createConfigForNuxt({
       "vue/no-reserved-component-names": "off",
       "vue/valid-template-root": "off",
       "vue/no-lone-template": "off",
+      "vue/max-attributes-per-line": "off",
+      "vue/singleline-html-element-content-newline": "off",
+      "vue/multiline-html-element-content-newline": "off",
+      "vue/attributes-order": "off",
+      "vue/html-quotes": "off",
+      "vue/html-indent": "off",
+      "vue/html-self-closing": "off",
+      "vue/html-closing-bracket-newline": "off",
+      "vue/html-closing-bracket-spacing": "off",
     },
   });

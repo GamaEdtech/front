@@ -1,10 +1,10 @@
+/* eslint-disable nuxt/nuxt-config-keys-order */
+
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
 import glsl from "vite-plugin-glsl";
 
 export default defineNuxtConfig({
-  // Add compatibility date to fix the warning
-
   // Modules
   modules: [
     "dayjs-nuxt",
@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     "nuxt-gtag",
     "@nuxt/image",
     "@nuxtjs/leaflet",
+    "@vite-pwa/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         config.plugins.push(vuetify({ autoImport: true }));
@@ -103,30 +104,8 @@ export default defineNuxtConfig({
     "@/assets/css/gama6/styles.css",
   ],
 
-  // Plugins
-  plugins: [
-    { src: "plugins/helper.js" },
-    { src: "plugins/img-cropper", mode: "client" },
-    { src: "plugins/vuedraggable", mode: "client" },
-  ],
+  // Remove duplicate Plugins and Modules below this line
 
-  // Auto import components
-  components: true,
-
-  // Modules
-  modules: [
-    "dayjs-nuxt",
-    "@nuxtjs/leaflet",
-    "nuxt-gtag",
-    "@nuxt/image",
-    "@nuxtjs/leaflet",
-    "@vite-pwa/nuxt",
-    (_options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) => {
-        config.plugins.push(vuetify({ autoImport: true }));
-      });
-    },
-  ],
   experimental: {
     payloadExtraction: false,
     appManifest: false,
