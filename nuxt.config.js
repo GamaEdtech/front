@@ -44,13 +44,14 @@ export default defineNuxtConfig({
             "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
         },
         { property: "og:site_name", content: "GamaTrain" },
-        { name: "apple-mobile-web-app-capable", content: "yes" },
+        { name: "mobile-web-app-capable", content: "yes" },
         {
           name: "apple-mobile-web-app-status-bar-style",
           content: "black-translucent",
         },
       ],
       link: [
+        { rel: "manifest", href: "/manifest.webmanifest" },
         { rel: "icon", type: "image/x-icon", href: "/favicon-dark.ico" },
         { rel: "stylesheet", href: "/assets/css/all.min.css" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon-light.png" },
@@ -135,7 +136,7 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: "Gamatrain App",
+      name: "Gamatrain",
       short_name: "Gamatrain",
       description: "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
       theme_color: '#ffffff',
@@ -177,7 +178,29 @@ export default defineNuxtConfig({
           "type": "image/png",
           "form_factor": "narrow"
         }
-      ]
+      ],
+      launch_handler: {
+        client_mode: 'focus-existing'
+      },
+      lang: "en",
+      orientation: "any",
+      categories: [
+        "books",
+        "education",
+        "games",
+        "productivity"
+      ],
+      dir: "ltr",
+      prefer_related_applications: false,
+      // related_applications: [
+      //   {
+      //     platform: "play",
+      //     url: "https://play.google.com/store/apps/details?id=com.example.app",
+      //     id: "com.example.app"
+      //   }
+      // ],
+      display_override: ["window-controls-overlay", "standalone", "fullscreen"],
+      window_controls_overlay: true,
     },
     meta: {
       theme_color: '#ffffff',
