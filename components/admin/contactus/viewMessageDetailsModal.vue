@@ -2,74 +2,112 @@
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    required: true
+    required: true,
   },
-    message: String,
-    email: String,
-    name : String,
-    disableNext: Boolean,
-    disableBack: Boolean,
+  message: String,
+  email: String,
+  name: String,
+  disableNext: Boolean,
+  disableBack: Boolean,
 })
 const messageReply = ref(null)
 </script>
+
 <template>
   <div class="text-center">
     <v-dialog
       :model-value="modelValue"
-      @click:outside="$emit('update:modelValue', false)"
       width="500"
+      @click:outside="$emit('update:modelValue', false)"
     >
       <v-card class="bg-primary-gray-100">
-          <v-card-title class="gtext-t4 bg-white flex-column d-flex align-center pt-12">
-            <div class="avatarBg">
-              <img width="64" height="64" src="/public/images/adminAuth.png" alt="avatar">
-            </div>
-            <p class="primary-gray-700 gtext-t3 font-weight-semibold mb-2">{{ name }}</p>
-            <p class="primary-gray-500 gtext-t3 mb-6">{{ email }}</p>
-          </v-card-title>
-        
+        <v-card-title class="gtext-t4 bg-white flex-column d-flex align-center pt-12">
+          <div class="avatarBg">
+            <img
+              width="64"
+              height="64"
+              src="/public/images/adminAuth.png"
+              alt="avatar"
+            >
+          </div>
+          <p class="primary-gray-700 gtext-t3 font-weight-semibold mb-2">
+            {{ name }}
+          </p>
+          <p class="primary-gray-500 gtext-t3 mb-6">
+            {{ email }}
+          </p>
+        </v-card-title>
+
         <div class="mx-16 scrollcontainerdialog">
           <div class="messageContainer">
             <v-card-text class="mt-4 messageText">
               <span class="gtext-t5 pb-4"> {{ message }} </span>
             </v-card-text>
-            <div class="bottom-fade"></div>
+            <div class="bottom-fade" />
           </div>
 
-          <v-row class="mt-4" no-gutters>
-            
-            <v-col cols="12" sm="6">
-              <v-btn class="rounded-pill mr-7 bg-F8F9FC" height="24px">
+          <v-row
+            class="mt-4"
+            no-gutters
+          >
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-btn
+                class="rounded-pill mr-7 bg-F8F9FC"
+                height="24px"
+              >
                 <span class="mdi mdi-image-area color-4E5BA6">1.png</span>
               </v-btn>
             </v-col>
 
-            <v-col cols="12" sm="6" class="d-flex align-center justify-sm-end mt-2 mt-sm-0">
-              <p class="gray--text gtext-t6 text mb-0">Send Date:&nbsp;</p>
-              <p class="primary-gray-600 gtext-t5 mb-0">02/22/2025</p>
+            <v-col
+              cols="12"
+              sm="6"
+              class="d-flex align-center justify-sm-end mt-2 mt-sm-0"
+            >
+              <p class="gray--text gtext-t6 text mb-0">
+                Send Date:&nbsp;
+              </p>
+              <p class="primary-gray-600 gtext-t5 mb-0">
+                02/22/2025
+              </p>
             </v-col>
           </v-row>
-          
 
-          <div class="dashed-divider my-4"></div>
+          <div class="dashed-divider my-4" />
           <div class="d-flex mb-2">
-            <p class="primary-gray-700 gtext-t6 font-weight-medium">Reply to&nbsp;</p>
-            <p> </p>
-            <p class="gtext-t6 font-weight-medium" style="color: #FFB600;">{{ name }}</p>
+            <p class="primary-gray-700 gtext-t6 font-weight-medium">
+              Reply to&nbsp;
+            </p>
+            <p />
+            <p
+              class="gtext-t6 font-weight-medium"
+              style="color: #FFB600;"
+            >
+              {{ name }}
+            </p>
           </div>
           <v-textarea
-          variant="solo"
-          name="replyMessage"
-          placeholder="Enter here.............."
-          class="rounded-lg p-3 gtext-t6 primary-gray-700"
-          no-resize
-          height="181"
-          v-model="messageReply"
-        ></v-textarea>
+            v-model="messageReply"
+            variant="solo"
+            name="replyMessage"
+            placeholder="Enter here.............."
+            class="rounded-lg p-3 gtext-t6 primary-gray-700"
+            no-resize
+            height="181"
+          />
 
-          <v-row class="align-center" no-gutters>
-            
-            <v-col cols="12" sm="auto" class="mb-2 mb-sm-0">
+          <v-row
+            class="align-center"
+            no-gutters
+          >
+            <v-col
+              cols="12"
+              sm="auto"
+              class="mb-2 mb-sm-0"
+            >
               <v-btn
                 class="rounded-pill mr-sm-4 align-center bg-F8F9FC gtext-t5"
                 color="#2E90FA"
@@ -81,7 +119,10 @@ const messageReply = ref(null)
               </v-btn>
             </v-col>
 
-            <v-col cols="12" sm="auto">
+            <v-col
+              cols="12"
+              sm="auto"
+            >
               <div
                 class="d-flex rounded-pill align-center bg-F8F9FC max-width-fit"
               >
@@ -95,19 +136,29 @@ const messageReply = ref(null)
           </v-row>
 
           <v-card-actions class="px-0">
-            <v-spacer></v-spacer>
-            <v-btn class="closeBtn" text @click="$emit('update:modelValue', false)">
-              <span class="mdi mdi-close gtext-t1"></span>
+            <v-spacer />
+            <v-btn
+              class="closeBtn"
+              text
+              @click="$emit('update:modelValue', false)"
+            >
+              <span class="mdi mdi-close gtext-t1" />
             </v-btn>
 
-            
-            <v-row class="w-100 mb-12 mt-11 justify-center" no-gutters align="center">
+            <v-row
+              class="w-100 mb-12 mt-11 justify-center"
+              no-gutters
+              align="center"
+            >
               <v-col
                 cols="12"
                 sm="4"
                 class="d-flex justify-center order-1 order-sm-2 mb-4 mb-sm-0 replyBtn"
               >
-                <v-btn class="bg-primary-gray-700 rounded-pill w-100" density="default">
+                <v-btn
+                  class="bg-primary-gray-700 rounded-pill w-100"
+                  density="default"
+                >
                   <span class="mdi mdi-reply text-white gtext-t4">Reply</span>
                 </v-btn>
               </v-col>
@@ -117,7 +168,12 @@ const messageReply = ref(null)
                 sm="4"
                 class="d-flex justify-start order-2 order-sm-1 max-width-fit mr-4"
               >
-                <v-btn class="bg-white rounded-pill" density="default" @click="$emit('back')" :disabled="disableBack">
+                <v-btn
+                  class="bg-white rounded-pill"
+                  density="default"
+                  :disabled="disableBack"
+                  @click="$emit('back')"
+                >
                   <span class="mdi mdi-chevron-left primary-gray-900 gtext-t5">Back</span>
                 </v-btn>
               </v-col>
@@ -127,7 +183,12 @@ const messageReply = ref(null)
                 sm="4"
                 class="d-flex justify-end order-3 order-sm-3 max-width-fit ml-4"
               >
-                <v-btn class="bg-white rounded-pill" density="default" @click="$emit('next')" :disabled="disableNext">
+                <v-btn
+                  class="bg-white rounded-pill"
+                  density="default"
+                  :disabled="disableNext"
+                  @click="$emit('next')"
+                >
                   <span class="mdi mdi-chevron-right primary-gray-900 gtext-t5 d-flex flex-row-reverse align-end">
                     Next
                   </span>
@@ -136,14 +197,12 @@ const messageReply = ref(null)
             </v-row>
           </v-card-actions>
         </div>
-
       </v-card>
     </v-dialog>
   </div>
 </template>
 
 <style scoped>
-
 :deep(.v-field__input){
   font-family: Inter, sans-serif;
   font-size: 1.6rem;

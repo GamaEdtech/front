@@ -1,14 +1,45 @@
+/* eslint-disable nuxt/nuxt-config-keys-order */
+
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
 import glsl from "vite-plugin-glsl";
 
 export default defineNuxtConfig({
-  // Add compatibility date to fix the warning
-  compatibilityDate: "2024-04-03",
+  // Modules
+  modules: [
+    "dayjs-nuxt",
+    "@nuxtjs/leaflet",
+    "@nuxt/eslint",
+    "nuxt-gtag",
+    "@nuxt/image",
+    "@nuxtjs/leaflet",
+    "@vite-pwa/nuxt",
+    (_options, nuxt) => {
+      nuxt.hooks.hook("vite:extendConfig", (config) => {
+        config.plugins.push(vuetify({ autoImport: true }));
+      });
+    },
+  ],
+
+  // Plugins
+  plugins: [
+    { src: "plugins/helper.js" },
+    { src: "plugins/img-cropper", mode: "client" },
+    { src: "plugins/vuedraggable", mode: "client" },
+  ],
+
+  // SSR configuration
+  ssr: true,
+
+  // Auto import components
+  components: true,
 
   imports: {
     autoImport: true,
   },
+
+  // Development modules
+  devtools: { enabled: true },
 
   // Global page headers
   app: {
@@ -66,36 +97,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Runtime config
-  runtimeConfig: {
-    apiSecret: process.env.API_SECRET || "123",
-    public: {
-      apiBase: process.env.API_BASE || "https://gamatrain.com",
-      googleClientId:
-        process.env.GOOGLE_CLIENT_ID ||
-        "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-      recapchaSiteKey:
-        process.env.NUXT_RECAPTCHA_SITE_KEY ||
-        "6LcGF3ErAAAAAAneMnvDNOvdBg4Z7IDoL86tJr9T",
-    },
-  },
-
-  // toast config
-  toast: {
-    position: "top-center",
-    duration: 3000,
-    register: [
-      // Register custom toasts
-      {
-        name: "my-error",
-        message: "Oops...Something went wrong",
-        options: {
-          type: "error",
-        },
-      },
-    ],
-  },
-
   // Global CSS
   css: [
     "vuetify/lib/styles/main.css",
@@ -104,45 +105,24 @@ export default defineNuxtConfig({
     "@/assets/css/gama6/styles.css",
   ],
 
-  // Plugins
-  plugins: [
-    { src: "plugins/helper.js" },
-    { src: "plugins/img-cropper", mode: "client" },
-    { src: "plugins/vuedraggable", mode: "client" },
-  ],
+  // Remove duplicate Plugins and Modules below this line
 
-  // Auto import components
-  components: true,
-
-  // Modules
-  modules: [
-    "dayjs-nuxt",
-    "@nuxtjs/leaflet",
-    "nuxt-gtag",
-    "@nuxt/image",
-    "@nuxtjs/leaflet",
-    "@vite-pwa/nuxt",
-    (_options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) => {
-        config.plugins.push(vuetify({ autoImport: true }));
-      });
-    },
-  ],
   experimental: {
     payloadExtraction: false,
     appManifest: false,
   },
 
   pwa: {
-    registerType: 'autoUpdate',
+    registerType: "autoUpdate",
     manifest: {
       name: "Gamatrain",
       short_name: "Gamatrain",
-      description: "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
-      theme_color: '#ffffff',
-      background_color: '#ffffff',
-      display: 'standalone',
-      start_url: '/',
+      description:
+        "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
+      theme_color: "#ffffff",
+      background_color: "#ffffff",
+      display: "standalone",
+      start_url: "/",
       icons: [
         {
           src: "/favicon-16x16-light.png",
@@ -167,10 +147,10 @@ export default defineNuxtConfig({
       ],
       screenshots: [
         {
-          "src": "/screenshots/home-desktop.png",
-          "sizes": "1280x720",
-          "type": "image/png",
-          "form_factor": "wide"
+          src: "/screenshots/home-desktop.png",
+          sizes: "1280x720",
+          type: "image/png",
+          form_factor: "wide",
         },
         {
           "src": "/screenshots/home-mobile.png",
@@ -203,26 +183,25 @@ export default defineNuxtConfig({
       window_controls_overlay: true,
     },
     meta: {
-      theme_color: '#ffffff',
+      theme_color: "#ffffff",
       mobileAppIOS: true,
-      appleStatusBarStyle: 'black-translucent',
-      name: 'Gamatrain'
+      appleStatusBarStyle: "black-translucent",
+      name: "Gamatrain",
     },
     workbox: {
       navigateFallback: "/",
       globPatterns: [],
       globIgnores: [
-        '**/_payload.json',
-        '_nuxt/builds/**/*.json',
-        '**/node_modules/**/*'
-      ]
+        "**/_payload.json",
+        "_nuxt/builds/**/*.json",
+        "**/node_modules/**/*",
+      ],
     },
     devOptions: {
       enabled: false,
       type: "module",
     },
   },
-
 
   leaflet: {
     markerCluster: true,
@@ -250,6 +229,25 @@ export default defineNuxtConfig({
       "vue3-emoji-picker",
     ],
   },
+
+  routeRules: {
+    "/test-maker/**": { ssr: false, prerender: true },
+    "/api/v1/**": {
+      proxy: process.env.NUXT_PROXY_API_BASE_URL,
+    },
+    "/api/v2/**": {
+      proxy: process.env.NUXT_PROXY_API2_BASE_URL,
+    },
+    "/uploads/**": {
+      proxy: process.env.NUXT_PROXY_UPLOAD_URL,
+    },
+  },
+
+  // Development server configuration
+  devServer: {
+    port: 3002,
+  },
+  compatibilityDate: "2024-04-03",
 
   // Vite configuration
   vite: {
@@ -280,24 +278,32 @@ export default defineNuxtConfig({
     },
   },
 
-  routeRules: {
-    "/test-maker/**": { ssr: false, prerender: true },
-    "/api/v1/**": {
-      proxy: process.env.NUXT_PROXY_API_BASE_URL,
-    },
-    "/api/v2/**": {
-      proxy: process.env.NUXT_PROXY_API2_BASE_URL,
-    },
-    "/uploads/**": {
-      proxy: process.env.NUXT_PROXY_UPLOAD_URL,
-    },
+  gtag: {
+    id: "G-VLSLZJR0WK",
   },
 
-  // Development server configuration
-  devServer: {
-    port: 3002,
+  // Module configuration
+  image: {
+    domains: ["core.gamatrain.com"],
   },
 
-  // SSR configuration
-  ssr: true,
+  leaflet: {
+    markerCluster: true,
+  },
+
+  // toast config
+  toast: {
+    position: "top-center",
+    duration: 3000,
+    register: [
+      // Register custom toasts
+      {
+        name: "my-error",
+        message: "Oops...Something went wrong",
+        options: {
+          type: "error",
+        },
+      },
+    ],
+  },
 });

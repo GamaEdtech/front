@@ -1,30 +1,30 @@
-import { useCookie, navigateTo } from 'nuxt/app';
-import { computed } from 'vue';
+import { useCookie, navigateTo } from 'nuxt/app'
+import { computed } from 'vue'
 
 export const useAuth = () => {
   const cookieToken = useCookie<string | null>('authToken', {
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 1 week
-  });
+  })
 
   const setUserToken = (newToken: string) => {
-    cookieToken.value = newToken;
-  };
+    cookieToken.value = newToken
+  }
 
   const getUserToken = () => {
-    return cookieToken?.value;
-  };
+    return cookieToken?.value
+  }
 
   const clearAuth = () => {
-    cookieToken.value = null;
-  };
+    cookieToken.value = null
+  }
 
   const logout = () => {
-    clearAuth();
-    navigateTo('/');
-  };
+    clearAuth()
+    navigateTo('/')
+  }
 
-  const login = async (credentials: { identity: string; pass: string }) => {
+  const login = async (credentials: { identity: string, pass: string }) => {
     try {
       const response: any = await $fetch('/api/v1/users/login', {
         method: 'POST',
@@ -32,14 +32,15 @@ export const useAuth = () => {
           ...credentials,
           type: 'request',
         },
-      });
-      return response;
-    } catch (error) {
-      throw error;
+      })
+      return response
     }
-  };
+    catch (error) {
+      throw error
+    }
+  }
 
-  const register = async (formData: { identity: string; pass: string }) => {
+  const register = async (formData: { identity: string, pass: string }) => {
     try {
       await $fetch('/api/v1/users/register', {
         method: 'POST',
@@ -47,11 +48,12 @@ export const useAuth = () => {
           ...formData,
           type: 'register',
         },
-      });
-    } catch (error) {
-      throw error;
+      })
     }
-  };
+    catch (error) {
+      throw error
+    }
+  }
 
   const forgotPassword = async (passForm: { identity: string }) => {
     try {
@@ -61,14 +63,15 @@ export const useAuth = () => {
           ...passForm,
           type: 'request',
         },
-      });
-      return response;
-    } catch (error) {
-      throw error;
+      })
+      return response
     }
-  };
+    catch (error) {
+      throw error
+    }
+  }
 
-  const isAuthenticated = computed(() => !!cookieToken.value);
+  const isAuthenticated = computed(() => !!cookieToken.value)
 
   return {
     cookieToken,
@@ -80,5 +83,5 @@ export const useAuth = () => {
     isAuthenticated,
     forgotPassword,
     getUserToken,
-  };
-};
+  }
+}

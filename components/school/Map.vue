@@ -75,21 +75,25 @@ onMounted(() => {
 // Validate marker data before creating markers
 const validateMarkerData = (schoolData) => {
   if (!schoolData) return false;
-  
+
   const requiredFields = ["id", "name", "lat", "long"];
-  const hasAllRequired = requiredFields.every(field => 
-    schoolData[field] !== undefined && schoolData[field] !== null && schoolData[field] !== ""
+  const hasAllRequired = requiredFields.every(
+    (field) =>
+      schoolData[field] !== undefined &&
+      schoolData[field] !== null &&
+      schoolData[field] !== ""
   );
-  
+
   return hasAllRequired;
 };
 
 async function setMarkers() {
   try {
     // Filter and validate school items before creating markers
-    const validSchools = props?.items?.filter((item) => 
-      item.lat && item.long && validateMarkerData(item)
-    ) || [];
+    const validSchools =
+      props?.items?.filter(
+        (item) => item.lat && item.long && validateMarkerData(item)
+      ) || [];
 
     const mapItems = validSchools.map((item) => ({
       lat: item.lat,
@@ -117,35 +121,35 @@ async function setMarkers() {
     markers.forEach((marker, index) => {
       // Store school data directly on marker for reliable access
       marker.schoolData = mapItems[index].schoolData;
-      
+
       marker.on("click", (e) => {
         try {
           // Get school data from marker (more reliable than searching props.items)
           const schoolData = e.target.schoolData;
-          
+
           if (validateMarkerData(schoolData)) {
             emit("school-marker-clicked", schoolData);
           } else {
             // Emit error event with school ID for fallback handling
             console.warn("Invalid school data in marker click:", schoolData);
-            emit("school-marker-click-error", { 
+            emit("school-marker-click-error", {
               id: e.target.options.alt,
               error: "Invalid school data",
               context: {
                 zoom: map.value?.leafletObject?.getZoom(),
-                center: map.value?.leafletObject?.getCenter()
-              }
+                center: map.value?.leafletObject?.getCenter(),
+              },
             });
           }
         } catch (error) {
           console.error("Error handling marker click:", error);
-          emit("school-marker-click-error", { 
+          emit("school-marker-click-error", {
             id: e.target.options?.alt,
             error: error.message,
             context: {
               zoom: map.value?.leafletObject?.getZoom(),
-              center: map.value?.leafletObject?.getCenter()
-            }
+              center: map.value?.leafletObject?.getCenter(),
+            },
           });
         }
       });
@@ -193,7 +197,7 @@ const calculateDistance = (point1, point2) => {
 };
 
 const formatNumber = (number) => {
-  //Remove latest zero from number to avoid error from api side
+  // Remove latest zero from number to avoid error from api side
   const roundedNumber = parseFloat(number.toFixed(6));
   const formattedString = roundedNumber.toString();
   const trimmedString = formattedString.replace(/\.?0+$/, "");
@@ -211,8 +215,6 @@ const getUserLocation = () => {
         console.error("Error getting user location:", error);
       }
     );
-  } else {
-    console.error("Geolocation is not supported in this browser.");
   }
 };
 watch(

@@ -1,48 +1,91 @@
 <template>
   <v-container class="py-8 mt-16">
     <v-row justify="center">
-      <v-col cols="12" md="10" lg="8">
+      <v-col
+        cols="12"
+        md="10"
+        lg="8"
+      >
         <div class="text-center mb-8">
-          <v-icon color="teal" size="56">mdi-test-tube</v-icon>
-          <h1 class="text-h4 font-weight-bold mt-4">MathJax Rendering Test Bench</h1>
+          <v-icon
+            color="teal"
+            size="56"
+          >
+            mdi-test-tube
+          </v-icon>
+          <h1 class="text-h4 font-weight-bold mt-4">
+            MathJax Rendering Test Bench
+          </h1>
           <p class="text-medium-emphasis mt-2">
             A comprehensive suite to validate the rendering of various LaTeX expressions by MathJax.
           </p>
         </div>
-        
+
         <div ref="mathJaxContainerRef">
           <div
             v-for="(testCase, index) in latexTestCases"
             :key="index"
             class="mb-8"
           >
-            <v-divider v-if="index > 0" class="my-8"></v-divider>
+            <v-divider
+              v-if="index > 0"
+              class="my-8"
+            />
             <div class="d-flex align-center mb-4">
-               <v-icon :color="testCase.color || 'primary'" class="mr-3">{{ testCase.icon }}</v-icon>
-               <h2 class="text-h6 font-weight-medium">{{ testCase.category }}</h2>
+              <v-icon
+                :color="testCase.color || 'primary'"
+                class="mr-3"
+              >
+                {{ testCase.icon }}
+              </v-icon>
+              <h2 class="text-h6 font-weight-medium">
+                {{ testCase.category }}
+              </h2>
             </div>
-            
+
             <v-card variant="outlined">
               <v-row no-gutters>
-                <v-col cols="12" md="6">
-                    <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
-                      <v-icon small left class="mr-2">mdi-code-braces</v-icon>
-                      Raw LaTeX Input
-                    </v-card-title>
-                    <v-divider></v-divider>
-                    <v-card-text>
-                      <pre class="raw-latex-code"><code>{{ testCase.rawString }}</code></pre>
-                    </v-card-text>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
+                    <v-icon
+                      small
+                      left
+                      class="mr-2"
+                    >
+                      mdi-code-braces
+                    </v-icon>
+                    Raw LaTeX Input
+                  </v-card-title>
+                  <v-divider />
+                  <v-card-text>
+                    <pre class="raw-latex-code"><code>{{ testCase.rawString }}</code></pre>
+                  </v-card-text>
                 </v-col>
 
-                <v-col cols="12" md="6" class="rendered-col">
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="rendered-col"
+                >
                   <v-card-title class="text-subtitle-1 font-weight-bold d-flex align-center">
-                    <v-icon small left class="mr-2">mdi-eye-outline</v-icon>
+                    <v-icon
+                      small
+                      left
+                      class="mr-2"
+                    >
+                      mdi-eye-outline
+                    </v-icon>
                     Rendered Output
                   </v-card-title>
-                  <v-divider></v-divider>
+                  <v-divider />
                   <v-card-text>
-                    <div class="expression-area" v-html="testCase.htmlString"></div>
+                    <div
+                      class="expression-area"
+                      v-html="testCase.htmlString"
+                    />
                   </v-card-text>
                 </v-col>
               </v-row>
@@ -55,12 +98,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
-import { useNuxtApp, useHead } from '#app';
+import { ref, onMounted, nextTick } from 'vue'
+import { useNuxtApp, useHead } from '#app'
 
 useHead({
   title: 'MathJax LaTeX Test Page',
-});
+})
 
 // --- Extended Test Cases ---
 const latexTestCases = ref([
@@ -134,34 +177,35 @@ const latexTestCases = ref([
     rawString: `This tests an escaped dollar sign. The price is \\$5, which should not be rendered as math.`,
     htmlString: `This tests an escaped dollar sign. The price is \\$5, which should not be rendered as math.`,
   },
-]);
+])
 
 // --- MathJax Implementation ---
-const mathJaxContainerRef = ref<HTMLElement | null>(null);
-const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
+const mathJaxContainerRef = ref<HTMLElement | null>(null)
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 
 const typesetMathInContainer = async () => {
-  if (process.client && mathJaxContainerRef.value) {
+  if (import.meta.client && mathJaxContainerRef.value) {
     try {
-      await $ensureMathJaxReady();
-      if (!window.MathJax?.Hub) return;
-      
-      const elementToProcess = (mathJaxContainerRef.value as any).$el ?? mathJaxContainerRef.value;
-      
+      await $ensureMathJaxReady()
+      if (!window.MathJax?.Hub) return
+
+      const elementToProcess = (mathJaxContainerRef.value as any).$el ?? mathJaxContainerRef.value
+
       if (elementToProcess instanceof HTMLElement) {
-        await nextTick();
-        $renderMathInElement(elementToProcess);
+        await nextTick()
+        $renderMathInElement(elementToProcess)
       }
-    } catch (err) {
-      console.error('Error during MathJax typesetting on test page:', err);
+    }
+    catch (err) {
+      console.error('Error during MathJax typesetting on test page:', err)
     }
   }
-};
+}
 
 // --- Lifecycle Hook ---
 onMounted(() => {
-  typesetMathInContainer();
-});
+  typesetMathInContainer()
+})
 </script>
 
 <style scoped>
