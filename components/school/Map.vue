@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100vh; width: 100vw">
+  <div style="height: 100%; width: 100%">
     <ClientOnly>
       <LMap
         ref="map"
@@ -7,6 +7,7 @@
         :min-zoom="minZoom"
         :center="center"
         :use-global-leaflet="true"
+        @movestart="onMoveStart"
         @moveend="onMoveEnd"
         @ready="onMapReady"
       >
@@ -41,6 +42,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   "mapMoved",
+  "mapMoveStart",
   "userLocationFound",
   "school-marker-clicked",
   "school-marker-click-error",
@@ -156,7 +158,7 @@ async function setMarkers() {
     });
   } catch (error) {
     console.error("Error creating map markers:", error);
-  }
+  } 
 }
 
 async function onMapReady() {
@@ -166,6 +168,10 @@ async function onMapReady() {
     setMarkers();
   }
 }
+
+const onMoveStart = () => {
+  emit("mapMoveStart");
+};
 
 const onMoveEnd = (event) => {
   const bounds = event.target.getBounds();

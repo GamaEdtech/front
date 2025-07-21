@@ -151,6 +151,8 @@
           item-title="title"
           item-value="id"
           hide-details
+          autocomplete="new-password"
+          role="presentation"
           :items="filter.countryList"
           clearable
           color="#ffb300"
@@ -169,6 +171,8 @@
           item-title="title"
           item-value="id"
           hide-details
+          autocomplete="new-password"
+          role="presentation"
           :items="filter.stateList"
           clearable
           color="#ffb300"
@@ -188,6 +192,8 @@
           item-title="title"
           item-value="id"
           hide-details
+          autocomplete="new-password"
+          role="presentation"
           :items="filter.cityList"
           clearable
           color="#ffb300"
