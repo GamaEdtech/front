@@ -203,7 +203,7 @@ const calculateDistance = (point1, point2) => {
 };
 
 const formatNumber = (number) => {
-  //Remove latest zero from number to avoid error from api side
+  // Remove latest zero from number to avoid error from api side
   const roundedNumber = parseFloat(number.toFixed(6));
   const formattedString = roundedNumber.toString();
   const trimmedString = formattedString.replace(/\.?0+$/, "");
@@ -221,8 +221,6 @@ const getUserLocation = () => {
         console.error("Error getting user location:", error);
       }
     );
-  } else {
-    console.error("Geolocation is not supported in this browser.");
   }
 };
 watch(

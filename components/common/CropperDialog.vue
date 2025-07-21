@@ -33,7 +33,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import "vue-advanced-cropper/dist/style.css";
-import { Cropper } from "vue-advanced-cropper";
 
 const props = defineProps({
   modelValue: {

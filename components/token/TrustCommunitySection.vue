@@ -1,7 +1,9 @@
 <template>
   <section class="trust-community-section">
     <v-container class="trust-community-container">
-      <h2 class="trust-community-title">Built On Trust, Driven By Community</h2>
+      <h2 class="trust-community-title">
+        Built On Trust, Driven By Community
+      </h2>
       <p class="trust-community-subtitle text-h5">
         At Gamatrain, our mission is to empower the community through a
         foundation of:
@@ -12,12 +14,16 @@
         align="center"
         no-gutters
       >
-        <v-col cols="12" md="4" class="trust-community-list-col">
+        <v-col
+          cols="12"
+          md="4"
+          class="trust-community-list-col"
+        >
           <ul class="trust-community-list">
             <li
-              class="trust-community-list-item"
               v-for="item in items"
               :key="item.text"
+              class="trust-community-list-item"
             >
               <span class="trust-community-icon">
                 <v-img
@@ -33,7 +39,11 @@
             </li>
           </ul>
         </v-col>
-        <v-col cols="12" md="4" class="trust-community-illustration-col">
+        <v-col
+          cols="12"
+          md="4"
+          class="trust-community-illustration-col"
+        >
           <v-img
             src="/images/token/built.png"
             alt="Community trust and collaboration illustration"
@@ -55,18 +65,18 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/trust.png",
-    text: "Trust",
+    img: '/images/token/trust.png',
+    text: 'Trust',
   },
   {
-    img: "/images/token/transparency.png",
-    text: "Transparency",
+    img: '/images/token/transparency.png',
+    text: 'Transparency',
   },
   {
-    img: "/images/token/shared.png",
-    text: "Shared Accountability",
+    img: '/images/token/shared.png',
+    text: 'Shared Accountability',
   },
-]);
+])
 </script>
 
 <style scoped>

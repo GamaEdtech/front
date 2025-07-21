@@ -1,16 +1,21 @@
 <template>
   <section class="tokenomics-section">
     <v-container class="tokenomics-container">
-      <h2 class="tokenomics-title">Tokenomics</h2>
+      <h2 class="tokenomics-title">
+        Tokenomics
+      </h2>
       <v-row justify="center">
-        <v-col cols="12" class="d-flex justify-center">
+        <v-col
+          cols="12"
+          class="d-flex justify-center"
+        >
           <figure class="d-none d-sm-block text-center">
             <img
               src="/images/token/tokenomicsdesktop.png"
               alt="Tokenomics chart desktop"
               class="tokenomics-img"
               contain
-            />
+            >
             <figcaption class="sr-only">
               Tokenomics chart for desktop view
             </figcaption>
@@ -21,7 +26,7 @@
               alt="Tokenomics chart mobile"
               class="tokenomics-img"
               contain
-            />
+            >
             <figcaption class="sr-only">
               Tokenomics chart for mobile view
             </figcaption>
@@ -30,7 +35,10 @@
         <v-col cols="12">
           <div class="d-sm-none">
             <div class="mb-2">
-              <v-card rounded="lg" elevation="3">
+              <v-card
+                rounded="lg"
+                elevation="3"
+              >
                 <v-card-text>
                   <div class="d-flex align-center">
                     <div class="flex-shrink-0 pl-5">
@@ -38,7 +46,7 @@
                         class="tokenomics-static__img"
                         src="/images/token/governance.png"
                         alt=""
-                      />
+                      >
                     </div>
                     <div class="pl-5">
                       <div class="tokenomics-static__title governance-title">
@@ -54,7 +62,10 @@
               </v-card>
             </div>
             <div class="mb-2">
-              <v-card rounded="lg" elevation="3">
+              <v-card
+                rounded="lg"
+                elevation="3"
+              >
                 <v-card-text>
                   <div class="d-flex align-center">
                     <div class="flex-shrink-0 pl-5">
@@ -62,7 +73,7 @@
                         class="tokenomics-static__img"
                         src="/images/token/team.png"
                         alt=""
-                      />
+                      >
                     </div>
                     <div class="pl-5">
                       <div class="tokenomics-static__title team-title">
@@ -78,7 +89,10 @@
               </v-card>
             </div>
             <div class="mb-2">
-              <v-card rounded="lg" elevation="3">
+              <v-card
+                rounded="lg"
+                elevation="3"
+              >
                 <v-card-text>
                   <div class="d-flex align-center">
                     <div class="flex-shrink-0 pl-5">
@@ -86,7 +100,7 @@
                         class="tokenomics-static__img"
                         src="/images/token/liquidity.png"
                         alt=""
-                      />
+                      >
                     </div>
                     <div class="pl-5">
                       <div class="tokenomics-static__title liquidity-title">
