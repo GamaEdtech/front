@@ -1220,30 +1220,28 @@ watch(
             </v-btn>
           </v-toolbar>
           <v-list three-line>
-            <template>
-              <v-list-item
-                v-for="(item, index) in notificationItems"
-                :key="index"
-              >
-                <template #prepend>
-                  <v-icon :icon="item.icon" />
-                </template>
+            <v-list-item
+              v-for="(item, index) in notificationItems"
+              :key="index"
+            >
+              <template #prepend>
+                <v-icon :icon="item.icon" />
+              </template>
 
-                <v-list-item>
-                  <div class="date">
-                    {{ item.date }}
-                  </div>
-                  <v-list-item-title
-                    class="title"
-                    :title="item.title"
-                  />
-                  <v-list-item-subtitle
-                    class="describe"
-                    :title="item.describe"
-                  />
-                </v-list-item>
+              <v-list-item>
+                <div class="date">
+                  {{ item.date }}
+                </div>
+                <v-list-item-title
+                  class="title"
+                  :title="item.title"
+                />
+                <v-list-item-subtitle
+                  class="describe"
+                  :title="item.describe"
+                />
               </v-list-item>
-            </template>
+            </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>

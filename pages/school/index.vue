@@ -41,7 +41,11 @@
       @mouseup="endDrag"
       @mouseleave="endDrag"
     >
-      <div class="grab-line-div" @touchstart="startDrag" @mousedown="startDrag">
+      <div
+        class="grab-line-div"
+        @touchstart="startDrag"
+        @mousedown="startDrag"
+      >
         <div class="grab" />
       </div>
       <schoolFilter
@@ -50,7 +54,10 @@
         :is-expand-map="isExpandMapInDesktop"
         @update-filter="updateFilter"
       />
-      <div v-if="!isExpandMapInDesktop" class="container-div-button">
+      <div
+        v-if="!isExpandMapInDesktop"
+        class="container-div-button"
+      >
         <v-btn
           class="text-h4"
           elevation="4"

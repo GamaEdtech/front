@@ -172,11 +172,10 @@
 export default {
   name: 'DesktopStatsCardComponent',
   props: {
-    stat: {
-      type: Object,
-    },
-    itm_index: {
+    itmIndex: {
       type: Number,
+      required: false,
+      default: 0,
     },
   },
   data() {

@@ -12,7 +12,6 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "nuxt-gtag",
     "@nuxt/image",
-    "@nuxtjs/leaflet",
     "@vite-pwa/nuxt",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
@@ -104,8 +103,6 @@ export default defineNuxtConfig({
     "@/assets/css/gama6/styles.css",
   ],
 
-  // Remove duplicate Plugins and Modules below this line
-
   experimental: {
     payloadExtraction: false,
     appManifest: false,
@@ -180,14 +177,11 @@ export default defineNuxtConfig({
     },
   },
 
+  // Module configurations
   leaflet: {
     markerCluster: true,
   },
 
-  // Development modules
-  devtools: { enabled: true },
-
-  // Module configuration
   image: {
     domains: ["core.gamatrain.com"],
   },
@@ -253,19 +247,6 @@ export default defineNuxtConfig({
     define: {
       global: "globalThis",
     },
-  },
-
-  gtag: {
-    id: "G-VLSLZJR0WK",
-  },
-
-  // Module configuration
-  image: {
-    domains: ["core.gamatrain.com"],
-  },
-
-  leaflet: {
-    markerCluster: true,
   },
 
   // toast config

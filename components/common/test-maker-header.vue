@@ -14,7 +14,11 @@
               class="hidden-md-and-up main-sidebar"
             >
               <!-- Start:  Menu items -->
-              <v-list dense shaped class="pl-1">
+              <v-list
+                dense
+                shaped
+                class="pl-1"
+              >
                 <!-- Profile info -->
                 <div
                   v-if="$auth.loggedIn"
@@ -30,15 +34,19 @@
                   </nuxt-link>
 
                   <div class="profile-info">
-                    <nuxt-link :to="'/user'" class="profile-name"
-                      >{{ $auth.user?.first_name }} {{ $auth.user.last_name }}
+                    <nuxt-link
+                      :to="'/user'"
+                      class="profile-name"
+                    >{{ $auth.user?.first_name }} {{ $auth.user.last_name }}
                     </nuxt-link>
 
                     <div
                       class="profile-wallet d-flex justify-space-between mr-2"
                     >
                       <div class="d-flex">
-                        <p class="wallet">Wallet:</p>
+                        <p class="wallet">
+                          Wallet:
+                        </p>
                         <p class="mx-3 wallet-balance">
                           ${{ $auth.user.credit }}
                         </p>
@@ -51,13 +59,22 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="d-flex align-center">
-                  <v-btn plain @click="openLoginDialog">
+                <div
+                  v-else
+                  class="d-flex align-center"
+                >
+                  <v-btn
+                    plain
+                    @click="openLoginDialog"
+                  >
                     <i class="fa-solid fa-sign-in mr-1" />
                     Login
                   </v-btn>
 
-                  <v-btn plain @click="openRegisterDialog">
+                  <v-btn
+                    plain
+                    @click="openRegisterDialog"
+                  >
                     <i class="fa-solid fa-user-plus mr-1" />
                     Register
                   </v-btn>
@@ -66,14 +83,20 @@
                 <!-- End Profile info -->
 
                 <!-- Mobile menu items -->
-                <div v-for="(item, side) in menuItems" :key="side">
+                <div
+                  v-for="(item, side) in menuItems"
+                  :key="side"
+                >
                   <v-list-item
                     v-if="!item.subMenuList"
                     class="py-2"
                     active-class="menu_active"
                     :to="item.link"
                   >
-                    <v-list-item-title class="menu-title" v-text="item.title" />
+                    <v-list-item-title
+                      class="menu-title"
+                      v-text="item.title"
+                    />
                   </v-list-item>
 
                   <v-list-group
@@ -84,7 +107,10 @@
                     :value="false"
                   >
                     <template #activator>
-                      <v-list-item-title class="py-2" v-text="item.title" />
+                      <v-list-item-title
+                        class="py-2"
+                        v-text="item.title"
+                      />
                     </template>
 
                     <v-list-item
@@ -107,7 +133,9 @@
                   @click="$auth.logout()"
                 >
                   <v-icon>mdi-logout</v-icon>
-                  <p class="logout-item mx-2">Logout</p>
+                  <p class="logout-item mx-2">
+                    Logout
+                  </p>
                 </div>
               </v-list>
               <!-- End:  Menu items -->
@@ -134,10 +162,18 @@
             <!-- End:  show sidebar menu in mobile -->
 
             <!-- Mobile nav -->
-            <v-app-bar class="d-block d-md-none mobile_bar" fixed>
+            <v-app-bar
+              class="d-block d-md-none mobile_bar"
+              fixed
+            >
               <!--   hamburgers-icon in mobile -->
-              <v-btn icon @click="sidebar = !sidebar">
-                <v-icon large> mdi-menu </v-icon>
+              <v-btn
+                icon
+                @click="sidebar = !sidebar"
+              >
+                <v-icon large>
+                  mdi-menu
+                </v-icon>
               </v-btn>
               <v-spacer />
 

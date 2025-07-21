@@ -246,21 +246,10 @@
 export default {
   name: 'RelatedContent',
   props: {
-    board: {
-      type: String | null,
-      default: null,
-    },
-    grade: {
-      type: String | null,
-      default: null,
-    },
-    subject: {
-      type: String | null,
-      default: null,
-    },
-    test_type: {
-      type: String | null,
-      default: null,
+    testType: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {

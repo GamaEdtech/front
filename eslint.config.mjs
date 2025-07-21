@@ -37,10 +37,8 @@ export default createConfigForNuxt({
   })
   .override("nuxt/rules", {
     rules: {
-      // "vue/no-unused-components": "off",
       "vue/no-unused-vars": "off",
       "vue/no-v-html": "off",
-      "vue/no-v-text-v-html-on-component": "off",
       "vue/no-v-text-v-html-on-component": "off",
       "vue/valid-v-slot": "off",
       "no-empty": "off",
@@ -62,21 +60,5 @@ export default createConfigForNuxt({
       "no-constant-condition": "off",
       "import/no-duplicates": "off",
       "vue/no-deprecated-dollar-listeners-api": "off",
-      "vue/prop-name-casin": "off",
-      "no-dupe-keys": "off",
-      "vue/prop-name-casing": "off",
-      "vue/valid-v-else": "off",
-      "vue/no-reserved-component-names": "off",
-      "vue/valid-template-root": "off",
-      "vue/no-lone-template": "off",
-      "vue/max-attributes-per-line": "off",
-      "vue/singleline-html-element-content-newline": "off",
-      "vue/multiline-html-element-content-newline": "off",
-      "vue/attributes-order": "off",
-      "vue/html-quotes": "off",
-      "vue/html-indent": "off",
-      "vue/html-self-closing": "off",
-      "vue/html-closing-bracket-newline": "off",
-      "vue/html-closing-bracket-spacing": "off",
     },
   });

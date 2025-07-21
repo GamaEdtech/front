@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex mt-11 mb-9">
-    <div class="gtext-h5 gtext-md-h5 primary-gray-600">Tuition fee</div>
+    <div class="gtext-h5 gtext-md-h5 primary-gray-600">
+      Tuition fee
+    </div>
     <v-spacer />
     <div class="gtext-t2 font-weight-heavy primary-gray-800">
       <span v-if="contentData.tuition && !isEditMode">
@@ -9,26 +11,28 @@
       </span>
       <span
         v-if="!contentData.tuition && !isEditMode"
-        @click="handleEdit"
         class="gtext-t4 primary-blue-500 align-self-center pointer"
+        @click="handleEdit"
       >
         Contribute
       </span>
       <template v-if="!isEditMode && contentData.tuition">
         <v-btn
-          @click="handleEdit"
           class="ml-2"
           icon
           color="blue-grey"
           variant="text"
+          @click="handleEdit"
         >
-          <v-icon size="large"> mdi-pencil </v-icon>
+          <v-icon size="large">
+            mdi-pencil
+          </v-icon>
         </v-btn>
       </template>
       <v-text-field
-        :rules="tuitionRule"
-        v-model="tuitionFee"
         v-if="isEditMode"
+        v-model="tuitionFee"
+        :rules="tuitionRule"
         width="200"
         placeholder="Tuition fee"
         variant="underlined"
@@ -40,13 +44,15 @@
           <v-btn
             :loading="submitLoader"
             color="success"
-            @click="handleUpdate"
             variant="flat"
             width="30"
             height="30"
             icon
+            @click="handleUpdate"
           >
-            <v-icon size="large"> mdi-check </v-icon>
+            <v-icon size="large">
+              mdi-check
+            </v-icon>
           </v-btn>
         </template>
       </v-text-field>

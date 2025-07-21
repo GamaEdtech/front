@@ -29,7 +29,7 @@
         This lesson hasn't any topics
       </p>
     </v-card-text>
-    <v-card-text v-else="topicList">
+    <v-card-text v-else>
       <v-row
         align="center"
         justify="center"

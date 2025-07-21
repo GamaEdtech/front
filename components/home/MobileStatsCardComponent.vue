@@ -156,11 +156,10 @@
 export default {
   name: 'MobileStatsCardComponent',
   props: {
-    stat: {
-      type: Object,
-    },
-    itm_index: {
+    itmIndex: {
       type: Number,
+      required: false,
+      default: 0,
     },
   },
   methods: {

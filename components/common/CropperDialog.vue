@@ -4,7 +4,10 @@
     transition="dialog-bottom-transition"
     max-width="600"
   >
-    <v-card id="img-cropper-dialog" color="light-green-darken-3">
+    <v-card
+      id="img-cropper-dialog"
+      color="light-green-darken-3"
+    >
       <v-card-actions class="pa-0">
         <v-btn
           color="light-green-darken-3"
@@ -39,16 +42,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  file_url: {
+  fileUrl: {
     type: String,
-    default: "",
+    required: true,
   },
-  stencil_props: {
+  stencilProps: {
     type: Object,
-    default: () => ({ width: 400, height: 150, resizable: false }),
+    required: false,
+    default: () => ({}),
   },
-  confirm_loading: {
+  confirmLoading: {
     type: Boolean,
+    required: false,
     default: false,
   },
 });
