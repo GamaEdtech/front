@@ -23,8 +23,9 @@
     >
       <div class="container-scroll">
         <CardSchoolSkeleton
-          v-for="item in 4"
+          v-for="(item, index) in 4"
           v-if="isInitialLoading"
+          :key="index"
         />
 
         <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
@@ -32,6 +33,7 @@
         <NuxtLink
           v-for="(school, index) in schoolList"
           v-if="!isInitialLoading"
+          :key="school.id || index"
           class="card-school"
           :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
         >

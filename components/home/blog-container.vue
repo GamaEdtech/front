@@ -47,7 +47,10 @@
                 :mobile="false"
                 class="slider py-sm-4"
               >
-                <v-slide-group-item v-for="i in 10">
+                <v-slide-group-item
+                  v-for="(i, index) in 10"
+                  :key="index"
+                >
                   <v-skeleton-loader
                     class="mx-auto slide-loading"
                     type="card"
@@ -59,7 +62,7 @@
               <v-slide-group class="slider py-sm-4">
                 <v-slide-group-item
                   v-for="(item, n) in slideItems"
-                  :key="n"
+                  :key="item.id || n"
                 >
                   <v-card
                     flat

@@ -8,7 +8,8 @@
     class="d-flex flex-column"
   >
     <v-skeleton-loader
-      v-for="item in 4"
+      v-for="(item, index) in 4"
+      :key="index"
       type="paragraph"
     />
   </v-col>

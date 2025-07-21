@@ -276,13 +276,15 @@
         class="w-100 d-flex flex-column align-start"
       >
         <v-skeleton-loader
-          v-for="item in 3"
+          v-for="(item, index) in 3"
+          :key="index"
           class="w-50 min-width-200"
           type="subtitle"
         />
         <div class="d-flex">
           <v-skeleton-loader
-            v-for="item in 3"
+            v-for="(item, index) in 3"
+            :key="index"
             type="avatar"
           />
         </div>

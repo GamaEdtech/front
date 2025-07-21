@@ -3,7 +3,8 @@
     <template v-if="!contentData">
       <v-skeleton-loader type="subtitle" />
       <v-skeleton-loader
-        v-for="loader in 4"
+        v-for="(loader, index) in 4"
+        :key="index"
         type="paragraph"
       />
     </template>

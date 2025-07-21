@@ -74,6 +74,7 @@
         <v-row justify="center">
           <v-col
             v-for="category in categories"
+            :key="category.key"
             cols="12"
             sm="4"
             md="3"

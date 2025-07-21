@@ -2,7 +2,10 @@
   <div
     class="w-100 d-none d-md-flex justify-center align-center flex-wrap ga-4 mt-2"
   >
-    <template v-for="(filter, index) in filters">
+    <template
+      v-for="(filter, index) in filters"
+      :key="filter.title || index"
+    >
       <v-btn
         append-icon="mdi-chevron-down"
         :class="`text-h5 primary-gray-700 ${
