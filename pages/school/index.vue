@@ -31,7 +31,6 @@
       <v-progress-circular
         color="amber"
         indeterminate
-        size="50"
       ></v-progress-circular>
     </div>
 
