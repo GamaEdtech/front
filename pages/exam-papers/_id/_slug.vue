@@ -46,7 +46,10 @@
                       Topics:
                     </p>
                     <ul>
-                      <li v-for="item in contentData.topics">
+                      <li
+                        v-for="(item, index) in contentData.topics"
+                        :key="index"
+                      >
                         {{ item.title }}
                       </li>
                     </ul>

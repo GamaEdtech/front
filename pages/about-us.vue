@@ -382,6 +382,7 @@
             <div class="d-flex memberSliderContainer">
               <div
                 v-for="(member, index) in sliceTeamMember"
+                :key="index"
                 @click="slideClicked(index)"
               >
                 <v-card

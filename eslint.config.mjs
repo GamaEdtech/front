@@ -55,9 +55,5 @@ export default createConfigForNuxt({
       "no-unsafe-optional-chaining": "off",
       "vue/valid-v-for": "off",
       "vue/no-multiple-template-root": "off",
-      "vue/require-v-for-key": "off",
-      "vue/require-valid-default-prop": "off",
-
-
     },
   });

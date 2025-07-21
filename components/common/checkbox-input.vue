@@ -38,7 +38,9 @@ const props = defineProps({
   },
   modelValue: {
     type: [Array, String, Number],
-    default: [],
+    default(rawProps) {
+      return rawProps.multiple ? [] : null
+    },
   },
 })
 
