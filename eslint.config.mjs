@@ -54,6 +54,6 @@ export default createConfigForNuxt({
       "vue/require-explicit-emits": "off",
       "no-unsafe-optional-chaining": "off",
       "vue/valid-v-for": "off",
-      "vue/no-multiple-template-root": "off",
+      // "vue/no-multiple-template-root": "off",
     },
   });
