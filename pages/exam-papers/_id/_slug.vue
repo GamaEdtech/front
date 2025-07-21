@@ -581,18 +581,10 @@ import RelatedQa from '@/components/details/related-qa'
 import RelatedOnlineExam from '@/components/details/related-online-exam'
 
 export default {
-  name: 'ExamDetails',
+  name: 'ExamPaperDetails',
   auth: false,
   components: {
-    RelatedOnlineExam,
-    RelatedQa,
-    LatestTrainingContent,
-    RelatedContent,
-    PreviewGallery,
-    Category,
-    Breadcrumb,
-    LastViews,
-    RelatedCardBox,
+    // Remove unused components
   },
   async asyncData({ params, $axios }) {
     // This could also be an action dispatch

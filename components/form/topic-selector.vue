@@ -61,24 +61,37 @@
 <script>
 export default {
   name: 'TopicSelector',
-  props: ['topicList', 'selectedTopics'],
-  // $_veeValidate: {
-  //   value () {
-  //     return this.topic;
-  //   }
-  // },
+  props: {
+    topicList: {
+      type: Array,
+      required: false,
+      default: () => [],
+      validator(value) {
+        return value.every(item =>
+          typeof item === 'object'
+          && 'id' in item
+          && 'title' in item
+        );
+      },
+    },
+    selectedTopics: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+  },
   data() {
     return {
-      topic: this.selectedTopics ? this.selectedTopics : [],
+      topic: this.selectedTopics || [],
       lesson_selected: false,
-    }
+    };
   },
   watch: {
     topic(val) {
-      this.$emit('selectTopic', val)
+      this.$emit('selectTopic', val);
     },
   },
-}
+};
 </script>
 
 <style scoped>

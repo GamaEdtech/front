@@ -192,8 +192,16 @@ import { useDisplay } from 'vuetify/lib/composables/display'
 import { computed, ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
-  content: {},
-  class: {},
+  content: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  class: {
+    type: String,
+    required: false,
+    default: '',
+  },
 })
 const emit = defineEmits(['fetch'])
 

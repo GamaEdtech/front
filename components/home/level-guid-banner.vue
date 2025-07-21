@@ -63,7 +63,9 @@ export default {
   name: 'LevelGuidBanner',
   props: {
     slideArr: {
-      default: [],
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
   data() {

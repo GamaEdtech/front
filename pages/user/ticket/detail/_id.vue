@@ -270,15 +270,12 @@
 
 <script>
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
-import TopicSelector from '~/components/form/topic-selector.vue'
 import ticket from '../index.vue'
 
 export default {
   name: 'TicketDetail',
   components: {
-    TopicSelector,
-    // ValidationProvider,
-    // ValidationObserver,
+    // Remove TopicSelector since it's not used
   },
   layout: 'dashboard_layout',
 

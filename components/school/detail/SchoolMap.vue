@@ -37,7 +37,11 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import SelectLocationDialog from '@/components/common/SelectLocationDialog.vue'
 
 const props = defineProps({
-  class: {},
+  class: {
+    type: String,
+    required: false,
+    default: '',
+  },
   content: {
     type: Object,
     required: true,

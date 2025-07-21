@@ -57,12 +57,13 @@
 </template>
 
 <script>
-import LocationSearch from '@/components/form/LocationSearch'
 import LeafletMap from '@/components/leafletMap/LeafletMap'
 
 export default {
   name: 'LocationField',
-  components: { LocationSearch, LeafletMap },
+  components: {
+    // Remove LocationSearch since it's not used
+  },
   props: {
     label: {
       type: String,

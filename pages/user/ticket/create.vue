@@ -154,11 +154,9 @@
 import TopicSelector from '@/components/form/topic-selector'
 
 export default {
-  name: 'AddTicket',
+  name: 'CreateTicket',
   components: {
-    TopicSelector,
-    // ValidationProvider,
-    // ValidationObserver,
+    // Remove TopicSelector since it's not used
   },
   layout: 'dashboard_layout',
   data() {

@@ -1,6 +1,6 @@
 <script setup>
-import { Ckeditor } from '@ckeditor/ckeditor5-vue'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { Ckeditor } from "@ckeditor/ckeditor5-vue";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 // Define props to customize the editor features
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
    */
   features: {
     type: Array,
-    default: () => ['bold', 'italic', 'underline', 'alignment'],
+    default: () => ["bold", "italic", "underline", "alignment"],
   },
 
   /**
@@ -20,7 +20,7 @@ const props = defineProps({
    */
   placeholder: {
     type: String,
-    default: '',
+    default: "",
   },
 
   /**
@@ -29,7 +29,7 @@ const props = defineProps({
    */
   initialData: {
     type: String,
-    default: '',
+    default: "",
   },
 
   /**
@@ -38,7 +38,7 @@ const props = defineProps({
    */
   minHeight: {
     type: String,
-    default: '250px',
+    default: "250px",
   },
 
   /**
@@ -49,33 +49,36 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-})
+});
 
-const modelValue = defineModel('modelValue')
+const modelValue = defineModel({
+  type: String,
+  default: "",
+});
 
 // Define the mapping between feature names and toolbar items
 const featureToToolbarItem = {
-  bold: 'bold',
-  italic: 'italic',
-  underline: 'underline',
-  alignment: 'alignment',
-}
+  bold: "bold",
+  italic: "italic",
+  underline: "underline",
+  alignment: "alignment",
+};
 
 // Create editor configuration with basic toolbar
 const editorConfig = {
   toolbar: {
-    items: ['undo', 'redo', '|', 'bold', 'italic'],
+    items: ["undo", "redo", "|", "bold", "italic"],
   },
   placeholder: props.placeholder,
   initialData: props.initialData,
-}
+};
 
 // Computed property to generate styles
 const editorStyles = {
-  width: '100%',
+  width: "100%",
   minHeight: props.minHeight,
   ...props.additionalStyles,
-}
+};
 </script>
 
 <template>
@@ -109,7 +112,7 @@ const editorStyles = {
 /* Customize the editor's toolbar */
 .rich-editor-container .ck-toolbar {
   border-bottom-color: inherit;
-  background-color: #FAFAFA !important;
+  background-color: #fafafa !important;
 }
 
 /* Customize the editor's content area */
@@ -129,11 +132,11 @@ const editorStyles = {
   gap: 8px;
 }
 
-.editor-custom-tools .v-card img{
+.editor-custom-tools .v-card img {
   height: 7rem !important;
   width: 7rem !important;
 }
-.ck-content > p{
+.ck-content > p {
   font-size: 20px !important;
 }
 </style>

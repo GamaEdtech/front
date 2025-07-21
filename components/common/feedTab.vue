@@ -81,8 +81,7 @@ import question from '~/pages/user/question/index.vue'
 export default {
   name: 'FeedTab',
   components: {
-    LatestNews,
-    FooterFeedBox,
+    // Remove LatestNews since it's not used
   },
   data() {
     return {

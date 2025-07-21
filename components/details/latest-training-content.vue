@@ -75,7 +75,9 @@ import Video from '@/components/common/video.vue'
 
 export default {
   name: 'LatestTrainingContent',
-  components: { Video },
+  components: {
+    // Remove Video since it's not used
+  },
   data() {
     return {
       videos: [
