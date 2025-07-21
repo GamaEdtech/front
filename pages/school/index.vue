@@ -23,9 +23,9 @@
       />
     </div>
 
-    <!-- Map Loading Indicator -->
+    <!-- Map Loading Indicator - Only show on map view -->
     <div 
-      v-if="isUserMovingMap" 
+      v-if="isUserMovingMap && (isExpandMapInDesktop || (!openBottomNavFilterList && isMobile))" 
       class="map-loading-overlay"
     >
       <v-progress-circular
@@ -257,8 +257,10 @@ const resetParameter = () => {
   isAllSchoolLoaded.value = false;
   isInitialSchoolLoading.value = true;
   schools.value = [];
-  // Show loading indicator when resetting parameters for new data
-  isUserMovingMap.value = true;
+  // Show loading indicator only when in map view
+  if (isExpandMapInDesktop.value || (!openBottomNavFilterList.value && isMobile.value)) {
+    isUserMovingMap.value = true;
+  }
 };
 
 const updateFilter = (query) => {
