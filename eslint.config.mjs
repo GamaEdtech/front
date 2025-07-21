@@ -57,8 +57,7 @@ export default createConfigForNuxt({
       "vue/no-multiple-template-root": "off",
       "vue/require-v-for-key": "off",
       "vue/require-valid-default-prop": "off",
-      "no-constant-condition": "off",
-      "import/no-duplicates": "off",
-      "vue/no-deprecated-dollar-listeners-api": "off",
+
+
     },
   });

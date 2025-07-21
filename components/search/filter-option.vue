@@ -563,7 +563,7 @@ const clearFilter = (filter, index) => {
     filters[FILTER_INDEX.Year].selectedItem = null
     filters[FILTER_INDEX.Year].disabled = true
   }
-  if (index => FILTER_INDEX.Classification) {
+  if (index >= FILTER_INDEX.Classification) {
     filters[index].selectedItem = null
     filters[index].disabled = false
   }
