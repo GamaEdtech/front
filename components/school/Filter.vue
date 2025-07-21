@@ -86,7 +86,7 @@
                 tick-size="6"
                 @end="endTuitionMove"
               >
-                <template v-slot:thumb-label="{ modelValue }">
+                <template #thumb-label="{ modelValue }">
                   <span class="text-h5 font-weight-black text-black"
                     >${{ modelValue }}</span
                   >
@@ -246,9 +246,9 @@
               </v-chip>
               <v-chip
                 v-if="
-                  filterForm.country &&
-                  filterForm.country.toString().length > 0 &&
-                  findTitle(`countryList`, filterForm.country)
+                  filterForm.country
+                  && filterForm.country.toString().length > 0
+                  && findTitle(`countryList`, filterForm.country)
                 "
                 class="text-h4 pa-3"
                 size="large"
@@ -261,9 +261,9 @@
               </v-chip>
               <v-chip
                 v-if="
-                  filterForm.state &&
-                  filterForm.state.toString().length > 0 &&
-                  findTitle(`stateList`, filterForm.state)
+                  filterForm.state
+                  && filterForm.state.toString().length > 0
+                  && findTitle(`stateList`, filterForm.state)
                 "
                 class="text-h4 pa-3"
                 size="large"
@@ -277,9 +277,9 @@
 
               <v-chip
                 v-if="
-                  filterForm.city &&
-                  filterForm.city.toString().length > 0 &&
-                  findTitle(`cityList`, filterForm.city)
+                  filterForm.city
+                  && filterForm.city.toString().length > 0
+                  && findTitle(`cityList`, filterForm.city)
                 "
                 class="text-h4 pa-3"
                 size="large"
@@ -395,7 +395,7 @@
               tick-size="6"
               @end="endTuitionMove"
             >
-              <template v-slot:thumb-label="{ modelValue }">
+              <template #thumb-label="{ modelValue }">
                 <span class="text-h5 font-weight-black text-black"
                   >${{ modelValue }}</span
                 >
@@ -436,9 +436,9 @@
         </v-chip>
         <v-chip
           v-if="
-            filterForm.country &&
-            filterForm.country.toString().length > 0 &&
-            findTitle(`countryList`, filterForm.country)
+            filterForm.country
+            && filterForm.country.toString().length > 0
+            && findTitle(`countryList`, filterForm.country)
           "
           class="text-h4 pa-3"
           size="large"
@@ -451,9 +451,9 @@
         </v-chip>
         <v-chip
           v-if="
-            filterForm.state &&
-            filterForm.state.toString().length > 0 &&
-            findTitle(`stateList`, filterForm.state)
+            filterForm.state
+            && filterForm.state.toString().length > 0
+            && findTitle(`stateList`, filterForm.state)
           "
           class="text-h4 pa-3"
           size="large"
@@ -467,9 +467,9 @@
 
         <v-chip
           v-if="
-            filterForm.city &&
-            filterForm.city.toString().length > 0 &&
-            findTitle(`cityList`, filterForm.city)
+            filterForm.city
+            && filterForm.city.toString().length > 0
+            && findTitle(`cityList`, filterForm.city)
           "
           class="text-h4 pa-3"
           size="large"
