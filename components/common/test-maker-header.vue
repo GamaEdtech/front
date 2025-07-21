@@ -1,7 +1,7 @@
 <template>
   <div>
     <header class="main-header">
-      <topbar ref="header_topbar" />
+      <WidgetsTopbar ref="header_topbar" />
 
       <!--   Start: navbar   main-container -->
       <v-container class="pa-0">
@@ -14,11 +14,7 @@
               class="hidden-md-and-up main-sidebar"
             >
               <!-- Start:  Menu items -->
-              <v-list
-                dense
-                shaped
-                class="pl-1"
-              >
+              <v-list dense shaped class="pl-1">
                 <!-- Profile info -->
                 <div
                   v-if="$auth.loggedIn"
@@ -34,19 +30,15 @@
                   </nuxt-link>
 
                   <div class="profile-info">
-                    <nuxt-link
-                      :to="'/user'"
-                      class="profile-name"
-                    >{{ $auth.user?.first_name }} {{ $auth.user.last_name }}
+                    <nuxt-link :to="'/user'" class="profile-name"
+                      >{{ $auth.user?.first_name }} {{ $auth.user.last_name }}
                     </nuxt-link>
 
                     <div
                       class="profile-wallet d-flex justify-space-between mr-2"
                     >
                       <div class="d-flex">
-                        <p class="wallet">
-                          Wallet:
-                        </p>
+                        <p class="wallet">Wallet:</p>
                         <p class="mx-3 wallet-balance">
                           ${{ $auth.user.credit }}
                         </p>
@@ -59,22 +51,13 @@
                     </div>
                   </div>
                 </div>
-                <div
-                  v-else
-                  class="d-flex align-center"
-                >
-                  <v-btn
-                    plain
-                    @click="openLoginDialog"
-                  >
+                <div v-else class="d-flex align-center">
+                  <v-btn plain @click="openLoginDialog">
                     <i class="fa-solid fa-sign-in mr-1" />
                     Login
                   </v-btn>
 
-                  <v-btn
-                    plain
-                    @click="openRegisterDialog"
-                  >
+                  <v-btn plain @click="openRegisterDialog">
                     <i class="fa-solid fa-user-plus mr-1" />
                     Register
                   </v-btn>
@@ -83,20 +66,14 @@
                 <!-- End Profile info -->
 
                 <!-- Mobile menu items -->
-                <div
-                  v-for="(item, side) in menuItems"
-                  :key="side"
-                >
+                <div v-for="(item, side) in menuItems" :key="side">
                   <v-list-item
                     v-if="!item.subMenuList"
                     class="py-2"
                     active-class="menu_active"
                     :to="item.link"
                   >
-                    <v-list-item-title
-                      class="menu-title"
-                      v-text="item.title"
-                    />
+                    <v-list-item-title class="menu-title" v-text="item.title" />
                   </v-list-item>
 
                   <v-list-group
@@ -107,10 +84,7 @@
                     :value="false"
                   >
                     <template #activator>
-                      <v-list-item-title
-                        class="py-2"
-                        v-text="item.title"
-                      />
+                      <v-list-item-title class="py-2" v-text="item.title" />
                     </template>
 
                     <v-list-item
@@ -121,9 +95,7 @@
                       :to="subMenuItem.link"
                     >
                       <v-list-item-content class="py-2">
-                        <v-list-item-title
-                          v-text="subMenuItem.title"
-                        />
+                        <v-list-item-title v-text="subMenuItem.title" />
                       </v-list-item-content>
                     </v-list-item>
                   </v-list-group>
@@ -135,9 +107,7 @@
                   @click="$auth.logout()"
                 >
                   <v-icon>mdi-logout</v-icon>
-                  <p class="logout-item mx-2">
-                    Logout
-                  </p>
+                  <p class="logout-item mx-2">Logout</p>
                 </div>
               </v-list>
               <!-- End:  Menu items -->
@@ -164,18 +134,10 @@
             <!-- End:  show sidebar menu in mobile -->
 
             <!-- Mobile nav -->
-            <v-app-bar
-              class="d-block d-md-none mobile_bar"
-              fixed
-            >
+            <v-app-bar class="d-block d-md-none mobile_bar" fixed>
               <!--   hamburgers-icon in mobile -->
-              <v-btn
-                icon
-                @click="sidebar = !sidebar"
-              >
-                <v-icon large>
-                  mdi-menu
-                </v-icon>
+              <v-btn icon @click="sidebar = !sidebar">
+                <v-icon large> mdi-menu </v-icon>
               </v-btn>
               <v-spacer />
 
@@ -204,94 +166,94 @@
 </template>
 
 <script>
-import topbar from '../widgets/topbar'
+import WidgetsTopbar from "../widgets/WidgetsTopbar";
 
 export default {
-  name: 'TestMakerHeader',
+  name: "TestMakerHeader",
   components: {
-    topbar,
+    WidgetsTopbar,
   },
   data() {
     return {
       sidebar: false,
       dialog: false,
-      logo: 'mainlogo-gamatrain.png',
-      avatar: 'dexter-morse.png',
+      logo: "mainlogo-gamatrain.png",
+      avatar: "dexter-morse.png",
       menuItems: [
         {
-          title: 'Home',
-          link: '/',
-          icon: '',
+          title: "Home",
+          link: "/",
+          icon: "",
         },
         {
-          title: 'Announcement',
-          link: '',
-          icon: 'fa-angle-down',
+          title: "Announcement",
+          link: "",
+          icon: "fa-angle-down",
           subMenuList: [
-            { title: 'Terms and Conditions', link: '' },
-            { title: 'Privacy Policy', link: '' },
-            { title: 'FAQs', link: '/faq' },
+            { title: "Terms and Conditions", link: "" },
+            { title: "Privacy Policy", link: "" },
+            { title: "FAQs", link: "/faq" },
           ],
         },
         {
-          title: 'Olympiad',
-          link: '',
-          icon: 'fa-angle-down',
+          title: "Olympiad",
+          link: "",
+          icon: "fa-angle-down",
           subMenuList: [
-            { title: 'International Mathematical Olympiad (IMO)', link: '' },
-            { title: 'International Physics Olympiad (IPhO)', link: '' },
-            { title: 'International Chemistry Olympiad (IChO)', link: '' },
+            { title: "International Mathematical Olympiad (IMO)", link: "" },
+            { title: "International Physics Olympiad (IPhO)", link: "" },
+            { title: "International Chemistry Olympiad (IChO)", link: "" },
           ],
         },
         {
-          title: 'High-level',
-          link: '',
-          icon: 'fa-angle-down',
+          title: "High-level",
+          link: "",
+          icon: "fa-angle-down",
           subMenuList: [
-            { title: 'Fourth grade entrance exam', link: '' },
-            { title: 'Fifth grade entrance exam', link: '' },
-            { title: 'Sixth grade entrance exam', link: '' },
+            { title: "Fourth grade entrance exam", link: "" },
+            { title: "Fifth grade entrance exam", link: "" },
+            { title: "Sixth grade entrance exam", link: "" },
           ],
         },
         {
-          title: 'Books',
-          link: '',
-          icon: 'fa-angle-down',
+          title: "Books",
+          link: "",
+          icon: "fa-angle-down",
           subMenuList: [
-            { title: 'Primary school period', link: '' },
-            { title: 'First year of high school', link: '' },
-            { title: 'Second year of high school', link: '' },
+            { title: "Primary school period", link: "" },
+            { title: "First year of high school", link: "" },
+            { title: "Second year of high school", link: "" },
           ],
         },
         {
-          title: 'Suggestions',
-          link: '',
-          icon: 'fa-angle-down',
+          title: "Suggestions",
+          link: "",
+          icon: "fa-angle-down",
           subMenuList: [
-            { title: '9th coordinated exam', link: '' },
-            { title: '6th coordinated exam', link: '' },
-            { title: '12th Coordinated Exams', link: '' },
+            { title: "9th coordinated exam", link: "" },
+            { title: "6th coordinated exam", link: "" },
+            { title: "12th Coordinated Exams", link: "" },
           ],
         },
       ],
       selectedItem: 1,
       socialList: [
-        { link: 'telegram', icon: 'fa-telegram' },
-        { link: 'twitter', icon: 'fa-twitter' },
-        { link: 'instagram', icon: 'fa-instagram' },
-        { link: 'Youtube', icon: 'fa-youtube' },
+        { link: "telegram", icon: "fa-telegram" },
+        { link: "twitter", icon: "fa-twitter" },
+        { link: "instagram", icon: "fa-instagram" },
+        { link: "Youtube", icon: "fa-youtube" },
       ],
-    }
+    };
   },
   methods: {
     openLoginDialog() {
-      this.$refs.header_topbar.openLoginDialog()
+      this.$refs.header_topbar.openLoginDialog();
     },
     openRegisterDialog() {
-      this.$refs.header_topbar.openRegisterDialog()
+      this.$refs.header_topbar.openRegisterDialog();
     },
   },
-}
+};
 </script>
 
 <style>

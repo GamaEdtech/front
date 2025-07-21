@@ -1,6 +1,5 @@
 import { defineNuxtPlugin } from "#app";
 import {
-  Cropper,
   StencilPreview,
   DraggableArea,
   DraggableElement,

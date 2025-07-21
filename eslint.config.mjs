@@ -5,11 +5,6 @@ export default createConfigForNuxt({
     stylistic: true,
   },
 })
-  .override("nuxt/rules", {
-    rules: {
-      "nuxt/nuxt-config-keys-order": "off",
-    },
-  })
   .override("nuxt/stylistic", {
     rules: {
       "@stylistic/quotes": "off",
@@ -42,9 +37,7 @@ export default createConfigForNuxt({
   })
   .override("nuxt/rules", {
     rules: {
-      "no-unused-vars": "off",
-      "vue/multi-word-component-names": "off",
-      "vue/require-prop-types": "off",
+      // "vue/require-prop-types": "off",
       "vue/no-unused-components": "off",
       "vue/no-unused-vars": "off",
       "vue/no-v-html": "off",
