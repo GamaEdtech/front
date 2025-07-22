@@ -18,6 +18,7 @@
           v-model="isFormValid"
           lazy-validation
           @submit.prevent="onSubmit"
+          autocomplete="off"
         >
           <v-row>
             <v-col
@@ -35,6 +36,7 @@
                 item-value="id"
                 label="Board"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -52,6 +54,7 @@
                 item-title="title"
                 label="Grade"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -69,6 +72,7 @@
                 item-title="title"
                 label="Subject"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -98,6 +102,7 @@
                 label="Classification"
                 placeholder="Select a board first"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -120,6 +125,7 @@
                 item-title="title"
                 label="Solution Availability"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -135,6 +141,7 @@
                 item-title="title"
                 label="Difficulty Level"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -150,6 +157,7 @@
                 :rules="[(v) => !!v || 'Year is required']"
                 label="Year"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -167,6 +175,7 @@
                 item-value="id"
                 label="Month"
                 color="#FFB300"
+                autocomplete="off" 
               />
             </v-col>
             <v-col
@@ -182,6 +191,7 @@
                 item-value="id"
                 label="Testing Scope"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
 
@@ -199,6 +209,7 @@
                 item-value="id"
                 label="State"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -215,6 +226,7 @@
                 item-value="id"
                 label="Area"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -231,6 +243,7 @@
                 item-value="id"
                 label="School"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
 
@@ -246,6 +259,7 @@
                 :rules="[(v) => !!v || 'Title is required']"
                 label="Title"
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -268,6 +282,7 @@
                 persistent-hint
                 placeholder="A brief overview of the content, outlining sections, topics, and question formats."
                 color="#FFB300"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -288,6 +303,7 @@
                 prepend-inner-icon="mdi-file-pdf-box"
                 append-icon="mdi-folder-open"
                 @change="uploadFile('file_pdf', $event)"
+                autocomplete="off"
               />
             </v-col>
             <v-col
@@ -348,6 +364,7 @@
                     item-value="id"
                     label="Select file type"
                     color="#FFB300"
+                    autocomplete="off"
                   />
                 </v-col>
                 <v-col
