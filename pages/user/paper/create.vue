@@ -91,9 +91,12 @@
                 density="compact"
                 variant="outlined"
                 :items="test_type_list"
+                :loading="test_type_loading"
+                :disabled="!formData.section || test_type_loading"
                 item-value="id"
                 item-title="title"
                 label="Classification"
+                placeholder="Select a board first"
                 color="#FFB300"
               />
             </v-col>
@@ -482,6 +485,7 @@ const file_pdf_loading = ref(false)
 const file_word_loading = ref(false)
 const file_answer_loading = ref(false)
 const file_extra_loading = ref(false)
+const test_type_loading = ref(false)
 
 const section_list = ref([])
 const grade_list = ref([])
@@ -586,6 +590,45 @@ const getTypeList = async (type, parent = '') => {
   }
   catch (err) {
     $toast.error(err)
+  }
+}
+
+const handleClassificationError = (error) => {
+  console.error('Classification loading error:', error)
+  $toast.error('Unable to load paper types. Please try selecting the board again.')
+  test_type_list.value = []
+  formData.test_type = ''
+}
+
+const getClassificationTypes = async (sectionId) => {
+  if (!sectionId) {
+    test_type_list.value = []
+    return
+  }
+
+  test_type_loading.value = true
+  try {
+    const params = { 
+      type: 'test_type',
+      section_id: sectionId 
+    }
+    const response = await useApiService.get('/api/v1/types/list', params)
+    
+    // The API should return board-specific classifications including:
+    // - General resources (Coursebook, Workbook) for all boards
+    // - CIE papers (Paper 1, Paper 2, etc.) for CIE board
+    // - Edexcel papers and Units for Edexcel board
+    // - Other board-specific classifications
+    test_type_list.value = response.data || []
+    
+    // Handle empty response
+    if (!response.data || response.data.length === 0) {
+      console.warn('No classification types returned for board:', sectionId)
+    }
+  } catch (err) {
+    handleClassificationError(err)
+  } finally {
+    test_type_loading.value = false
   }
 }
 
@@ -812,11 +855,13 @@ watch(
     formData.base = ''
     formData.lesson = ''
     formData.topics = []
+    formData.test_type = ''
     grade_list.value = []
     lesson_list.value = []
     topic_list.value = []
 
     getTypeList('base', val)
+    getClassificationTypes(val)
     if (formData.area) getTypeList('school')
   },
 )
@@ -878,9 +923,13 @@ watch(
 
 onMounted(() => {
   getTypeList('section')
-  getTypeList('test_type')
   getTypeList('state')
   getExtraFileType()
+  
+  // Load classifications if board is already selected (from user state)
+  if (formData.section) {
+    getClassificationTypes(formData.section)
+  }
 })
 </script>
 
