@@ -2602,14 +2602,14 @@ const getExamTests = async () => {
     }
 
     const response = await useApiService.get('/api/v1/examTests', params)
-    test_list.value.push(...response?.data?.list)
+    test_list.value.push(...(response?.data?.list ?? []))
 
     // Update the examTestListLength with the actual tests array length, not the response length
     if (createForm.value && 'examTestListLength' in createForm.value) {
       createForm.value.examTestListLength = tests.value.length
     }
 
-    if (response.data.list.length === 0) {
+    if ((response?.data?.list ?? []).length === 0) {
       all_tests_loaded.value = true
     }
     else {

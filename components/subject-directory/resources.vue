@@ -9,7 +9,7 @@
   >
     <v-skeleton-loader
       v-for="(item, index) in 4"
-      :key="index"
+      :key="`desktop-${index}`"
       type="paragraph"
     />
   </v-col>

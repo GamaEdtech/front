@@ -2281,7 +2281,7 @@ const handleRefreshPreviewList = async () => {
     }
 
     // First try to get all tests in one API call
-    const response = await useApiService.get(`/api/v1/examTests`, {
+    const response = await useApiService.get('/api/v1/examTests', {
       exam_id: exam_id.value,
     })
 
@@ -3001,10 +3001,10 @@ const getExamTests = async () => {
     }
 
     const response = await useApiService.get('/api/v1/examTests', params)
-    test_list.value.push(...response?.data?.list)
+    test_list.value.push(...(response?.data?.list ?? []))
 
-    createForm.value.examTestListLength = response?.data?.list?.length
-    if (response.data.list.length === 0) {
+    createForm.value.examTestListLength = response?.data?.list?.length ?? 0
+    if ((response?.data?.list ?? []).length === 0) {
       all_tests_loaded.value = true
     }
     else {
