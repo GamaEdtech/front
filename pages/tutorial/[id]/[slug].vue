@@ -266,7 +266,7 @@ let { data: tutorialInfo, error: tutorialError } = await useAsyncData(
 
 // Fetch lesson tree
 const { data: lessonTree, error: lessonTreeError } = await useAsyncData(
-  "lessonTree",
+  `lessonTree-${route.params.id}`,
   async () => {
     try {
       if (!tutorialInfo.value?.lesson) return null;
