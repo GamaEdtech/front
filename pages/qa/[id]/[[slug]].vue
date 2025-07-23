@@ -1252,14 +1252,19 @@ const typesetMathInSpecificContainer = async (containerRef) => {
           $renderMathInElement(currentElement)
         }
         else {
+          console.warn('No element found to render MathJax content')
         }
       }
       else {
+        console.warn('MathJax not initialized')
       }
     }
-    catch (error) {}
+    catch (error) {
+      console.error('Error during MathJax rendering:', error)
+    }
   }
   else {
+    console.warn('Cannot render MathJax on server side')
   }
 }
 const crashReport = ref(null)

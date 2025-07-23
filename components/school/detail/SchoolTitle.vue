@@ -110,6 +110,7 @@ function handleUpdate() {
     })
     .catch((err) => {
       if (err?.response?.status == 401 || err?.response?.status == 403) {
+        nuxtApp.$toast?.error('Please login to update school name')
       }
       else nuxtApp.$toast?.error(err?.response?.data?.message)
     })

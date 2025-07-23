@@ -465,7 +465,6 @@ async function startDownload(type) {
     const response = await useApiService.get(apiUrl)
     const FileSaver = await import('file-saver')
     await FileSaver.saveAs(response.data.url, response.data.name)
-    download_loading.value = false
   }
   catch (err) {
     if (err.response?.status == 400) {
@@ -478,6 +477,7 @@ async function startDownload(type) {
     }
   }
   finally {
+    download_loading.value = false
   }
 }
 
@@ -526,6 +526,7 @@ async function updateDetails() {
   }
   catch (err) {
     if (err.response?.status == 403) {
+      $toast.error('You do not have permission to update this content')
     }
     else if (err.response?.status == 400) {
       $toast.error(err.response.data.message)

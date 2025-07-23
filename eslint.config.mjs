@@ -39,9 +39,7 @@ export default createConfigForNuxt({
     rules: {
       "vue/no-unused-vars": "off",
       "vue/no-v-html": "off",
-      "vue/no-v-text-v-html-on-component": "off",
-      "vue/valid-v-slot": "off",
-      "no-empty": "off",
-      // "no-undef": "off",
+      // "vue/no-v-text-v-html-on-component": "off",
+
     },
   });

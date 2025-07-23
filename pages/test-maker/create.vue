@@ -1972,6 +1972,9 @@ const submitQuestion = async () => {
     test_step.value = 2
   }
   catch (error) {
+    console.error('Error creating test:', error)
+    const { $toast } = useNuxtApp()
+    if ($toast) $toast.error('Failed to create test')
   }
   finally {
     submit_loading.value = false
@@ -2014,6 +2017,7 @@ const uploadFile = async (file_name) => {
       form.file_original = response.data[0].file.name
     }
     else {
+      console.warn('No file name in upload response')
     }
   }
   catch (err) {
@@ -2063,6 +2067,9 @@ const publishTest = async () => {
     }
   }
   catch (err) {
+    console.error('Error publishing test:', err)
+    const { $toast } = useNuxtApp()
+    if ($toast) $toast.error('Failed to publish test')
   }
   finally {
     publish_loading.value = false
@@ -2755,11 +2762,15 @@ const handleStepChange = (newStep) => {
           setTimeout(() => {
             handleRefreshPreviewList().then(() => {
               if (previewTestList.value.length > 0) {
+                // Preview list already loaded
+                console.log('Preview list already loaded')
               }
             })
           }, 1000)
         }
         else if (previewTestList.value.length > 0) {
+          // Preview list already loaded
+          console.log('Preview list already loaded')
         }
       })
       .catch((err) => {

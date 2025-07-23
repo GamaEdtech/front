@@ -423,6 +423,7 @@ const updateContent = async () => {
   catch (err) {
     console.error('Update error:', err)
     if (err.response?.status === 403) {
+      $toast.error('You do not have permission to edit this question')
     }
     else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || 'Error updating question')

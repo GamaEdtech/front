@@ -63,7 +63,7 @@
         :loading="loading"
       >
         <!-- Title column with avatar -->
-        <template #item.title="{ item }">
+        <template #[`item.title`]="{ item }">
           <div class="d-flex align-center py-2">
             <v-avatar
               size="40"
@@ -79,7 +79,7 @@
         </template>
 
         <!-- Category column with icon -->
-        <template #item.category="{ item }">
+        <template #[`item.category`]="{ item }">
           <div class="d-flex align-center">
             <v-icon
               small
@@ -92,7 +92,7 @@
           </div>
         </template>
 
-        <template #item.edit="{ item }">
+        <template #[`item.edit`]="{ item }">
           <v-btn
             variant="text"
             :to="`/user/blogs/edit/${item.id}`"
@@ -106,7 +106,7 @@
           </v-btn>
         </template>
 
-        <template #item.delete="{ item }">
+        <template #[`item.delete`]="{ item }">
           <v-btn
             variant="text"
             icon

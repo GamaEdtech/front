@@ -601,6 +601,7 @@ const updateContent = async () => {
   }
   catch (err) {
     if (err.response?.status === 403) {
+      $toast.error('You do not have permission to edit this multimedia content')
     }
     else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || 'Error updating multimedia')
@@ -768,6 +769,7 @@ const startDownload = async () => {
       }
     }
     else if (err.response?.status == 403) {
+      $toast.error('You do not have permission to download this content')
     }
   }
   finally {

@@ -24,8 +24,9 @@
         <v-icon
           class="teal--text"
           small
-          v-text="`mdi-${item.chapters ? 'circle' : 'circle-outline'}`"
-        />
+        >
+          {{ `mdi-${item.chapters ? 'circle' : 'circle-outline'}` }}
+        </v-icon>
       </template>
       <template #label="{ item }">
         <!-- If tutorials length is one is a link -->

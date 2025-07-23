@@ -424,6 +424,7 @@ function handleUpdate(value) {
       console.log('err', err)
 
       if (err?.response?.status == 401 || err?.response?.status == 403) {
+        nuxtApp.$toast?.error('Please login to contribute')
       }
       else nuxtApp.$toast?.error(err?.response?.data?.message)
     })

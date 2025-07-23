@@ -782,6 +782,7 @@ const updateQuestion = async () => {
   }
   catch (err) {
     if (err.response?.status == 403) {
+      $toast.error('You do not have permission to edit this paper')
     }
     else if (err.response?.status == 400) {
       $toast.error(err.response.data.message)
@@ -1075,7 +1076,6 @@ const startDownload = async (type, extra_id = '') => {
       const response = await useApiService.get(apiUrl)
       const FileSaver = await import('file-saver')
       FileSaver.saveAs(response.data.url, response.data.name)
-      download_loading.value = false
     }
     catch (err) {
       if (err.response?.status == 400) {
@@ -1088,6 +1088,7 @@ const startDownload = async (type, extra_id = '') => {
       }
     }
     finally {
+      download_loading.value = false
     }
   }
   else {

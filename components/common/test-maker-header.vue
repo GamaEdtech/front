@@ -95,8 +95,9 @@
                   >
                     <v-list-item-title
                       class="menu-title"
-                      v-text="item.title"
-                    />
+                    >
+                      {{ item.title }}
+                    </v-list-item-title>
                   </v-list-item>
 
                   <v-list-group
@@ -109,8 +110,9 @@
                     <template #activator>
                       <v-list-item-title
                         class="py-2"
-                        v-text="item.title"
-                      />
+                      >
+                        {{ item.title }}
+                      </v-list-item-title>
                     </template>
 
                     <v-list-item
@@ -121,7 +123,7 @@
                       :to="subMenuItem.link"
                     >
                       <v-list-item-content class="py-2">
-                        <v-list-item-title v-text="subMenuItem.title" />
+                        <v-list-item-title>{{ subMenuItem.title }}</v-list-item-title>
                       </v-list-item-content>
                     </v-list-item>
                   </v-list-group>

@@ -199,7 +199,9 @@ const fetchInitialData = async () => {
   try {
     storedBoard = JSON.parse(localStorage.getItem('selectedBoard'))
   }
-  catch (e) {}
+  catch (e) {
+    // Ignore parse errors - use default board
+  }
   if (storedBoard && storedBoard.id) {
     // Find the matching board in the new boardList by id
     const match = boardList.value.find(b => b.id === storedBoard.id)
@@ -220,6 +222,7 @@ const fetchGradeList = async () => {
     selectedGrade.value = response.data[0].id
   }
   catch (error) {
+    console.error('Error fetching grade list:', error)
   }
   finally {
     gradeLoader.value = false
@@ -256,7 +259,9 @@ const fetchCategoryCounts = async () => {
         = parseInt(response.data.types_stats.tutorial) || 0
     }
   }
-  catch (error) {}
+  catch (error) {
+    console.error('Error fetching category counts:', error)
+  }
 }
 const handleBoardFocused = () => {
   if (selectedBoard.value && showBoardHint.value) {

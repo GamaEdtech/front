@@ -451,6 +451,7 @@ const submitContent = async () => {
   }
   catch (err) {
     if (err.response?.status === 403) {
+      $toast.error('You do not have permission to create multimedia content')
     }
     else if (err.response?.status === 400) {
       $toast.error(err.response.data.message || 'Error submitting multimedia')

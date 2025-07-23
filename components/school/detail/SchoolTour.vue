@@ -274,6 +274,7 @@ function uploadTourImage() {
     })
     .catch((err) => {
       if (err?.response?.status == 401 || err?.response?.status == 403) {
+        nuxtApp.$toast?.error('Please login to update tour content')
       }
       else {
         nuxtApp.$toast?.error(err?.response?.data?.message || 'Upload failed')

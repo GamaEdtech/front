@@ -785,6 +785,7 @@ const uploadFile = async (file_name, ev, index = '') => {
         extraAttr.value[index].file = response.data[0].file.name
       }
       else {
+        console.warn('No extra attribute found at index:', index)
       }
     }
   }

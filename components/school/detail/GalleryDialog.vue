@@ -303,7 +303,12 @@ async function uploadImage() {
       dialogVisible.value = false
       emit('refresh-gallery')
     }
-    catch (error) {}
+    catch (error) {
+      console.error('Error cleaning up after upload:', error)
+      $toast.error('Error occurred while finalizing upload', {
+        containerClass: 'toast-dialog-notif',
+      })
+    }
   }
   catch (err) {
     if (err.response?.status == 401 || err.response?.status == 403) {

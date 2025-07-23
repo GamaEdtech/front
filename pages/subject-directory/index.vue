@@ -313,6 +313,9 @@ const { data: lessonData, status } = await useAsyncData(
         console.error('Error fetching data:', error)
       }
       finally {
+        // Reset loading states after initial data fetch
+        isLoadingResources.value = false
+        isLoadingPapers.value = false
       }
     }
     return { resourcesData, papersData }

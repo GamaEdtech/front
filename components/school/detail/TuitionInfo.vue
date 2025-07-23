@@ -113,6 +113,7 @@ const handleUpdate = () => {
       console.log("err", err);
 
       if (err?.response?.status == 401 || err?.response?.status == 403) {
+        nuxtApp.$toast?.error("Please login to update tuition information");
       } else nuxtApp.$toast?.error(err?.response?.data?.message);
     })
     .finally(() => {

@@ -229,18 +229,18 @@
           :loading="loading"
           @update:options="loadDesktopTransactions"
         >
-          <template #item.description="{ item }">
+          <template #[`item.description`]="{ item }">
             {{ item.description }}
           </template>
 
-          <template #item.points="{ item }">
+          <template #[`item.points`]="{ item }">
             <div class="d-flex align-center">
               <span class="font-weight-bold">{{ item.points }}</span>
               <span class="ml-1 caption grey--text">$GET</span>
             </div>
           </template>
 
-          <template #item.isDebit="{ item }">
+          <template #[`item.isDebit`]="{ item }">
             <div class="d-flex align-center">
               <div v-if="item.isDebit">
                 <div class="state-icon-wrapper spent">
@@ -267,7 +267,7 @@
             </div>
           </template>
 
-          <template #item.creationDate="{ item }">
+          <template #[`item.creationDate`]="{ item }">
             <div class="d-flex align-center">
               <v-icon
                 small

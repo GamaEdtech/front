@@ -162,6 +162,8 @@ const {
       throw e
     }
     finally {
+      // Reset loading states if needed
+      loading.value = false
     }
   },
   {
