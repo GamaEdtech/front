@@ -7,12 +7,13 @@
       />
     </template>
 
-    <template
-      v-for="(item, index) in dataList"
-      v-if="!isInitialLoading"
-      :key="item.id || index"
-    >
-      <search-card :information="item" />
+    <template v-if="!isInitialLoading">
+      <template
+        v-for="(item, index) in dataList"
+        :key="item.id || index"
+      >
+        <search-card :information="item" />
+      </template>
     </template>
 
     <div

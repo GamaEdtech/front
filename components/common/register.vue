@@ -232,9 +232,10 @@ async function handleCredentialResponse(value) {
 
 <template>
   <v-dialog
-    v-model="props.dialog"
+    :model-value="props.dialog"
     max-width="300px"
     style="z-index: 20001"
+    @update:model-value="val => emit('update:dialog', val)"
     @click:outside="closeDialog"
   >
     <v-card>
@@ -385,7 +386,6 @@ async function handleCredentialResponse(value) {
                         outlined
                         :error-messages="errors"
                         dense
-                        type="password"
                         :type="show1 ? 'text' : 'password'"
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                         required

@@ -30,7 +30,6 @@
               v-slot="{ errors }" name="oldpass" rules="required|min:4" >
               <v-text-field
                 v-model="info.oldpass"
-                type="password"
                 :append-icon="show_oldpass ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="show_oldpass ? 'text' : 'password'"
                 dense
@@ -49,7 +48,6 @@
               v-slot="{ errors }" name="newpass" rules="required|min:4" >
               <v-text-field
                 v-model="info.newpass"
-                type="password"
                 :append-icon="show_newpass ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="show_newpass ? 'text' : 'password'"
                 dense
@@ -71,7 +69,6 @@
                 > -->
               <v-text-field
                 v-model="info.repeat_newpass"
-                type="password"
                 :append-icon="show_repeat_newpass ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="show_repeat_newpass ? 'text' : 'password'"
                 dense

@@ -224,7 +224,7 @@ const submit = handleSubmit(async () => {
 
 // Cancel password recovery
 const cancelPassRecover = () => {
-  props.dialog = false
+  emit('update:dialog', false)
   identityHolder.value = true
   otpHolder.value = false
   selectPassHolder.value = false
@@ -256,9 +256,10 @@ function closeDialog() {
 
 <template>
   <v-dialog
-    v-model="props.dialog"
+    :model-value="props.dialog"
     max-width="300px"
     style="z-index: 20001"
+    @update:model-value="val => emit('update:dialog', val)"
     @click:outside="closeDialog"
   >
     <v-card>

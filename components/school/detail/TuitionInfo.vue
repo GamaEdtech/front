@@ -67,6 +67,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(['update:contentData']);
 const nuxtApp = useNuxtApp();
 const route = useRoute();
 
@@ -102,7 +104,7 @@ const handleUpdate = () => {
         nuxtApp.$toast?.success(
           "Thank you! Your contribution has been successfully submitted and is pending admin approval."
         );
-        props.contentData.tuition = Number(tuitionFee.value);
+        emit('update:contentData', { ...props.contentData, tuition: Number(tuitionFee.value) });
       } else {
         nuxtApp.$toast?.error(response?.errors[0]?.message);
       }

@@ -11,6 +11,9 @@ const { $toast } = useNuxtApp()
 const props = defineProps({
   dialog: Boolean,
 })
+
+const emit = defineEmits(['update:dialog', 'switchToRegister', 'switchToRecover'])
+
 const passVisible = ref(false)
 const login_loading = ref(false)
 const validationSchema = yup.object().shape({
@@ -244,12 +247,6 @@ const tick = () => {
   }
 }
 
-const emit = defineEmits([
-  'switchToRegister',
-  'switchToRecover',
-  'update:dialog',
-])
-
 function goToRegister() {
   emit('switchToRegister')
 }
@@ -312,8 +309,9 @@ async function registerV2(identity, pass) {
 
 <template>
   <v-dialog
-    v-model="props.dialog"
+    :model-value="props.dialog"
     max-width="300px"
+    @update:model-value="val => emit('update:dialog', val)"
     @click:outside="closeDialog"
   >
     <v-card>

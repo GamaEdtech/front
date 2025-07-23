@@ -46,11 +46,10 @@ export default createConfigForNuxt({
       "vue/no-template-shadow": "off",
       "no-useless-catch": "off",
       "no-useless-escape": "off",
-      "vue/no-duplicate-attributes": "off",
-      "vue/no-side-effects-in-computed-properties": "off",
-      "vue/no-use-v-if-with-v-for": "off",
-      "vue/no-mutating-props": "off",
-      // "vue/require-prop-type-constructor": "off",
+      // "vue/no-duplicate-attributes": "off",
+
+
+
 
 
 
