@@ -58,7 +58,6 @@
                   <v-slide-group-item
                     v-for="(image, index) in images"
                     :key="index"
-                    v-slot="{ isSelected, toggle }"
                   >
                     <v-img
                       :class="{

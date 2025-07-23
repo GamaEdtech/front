@@ -37,9 +37,7 @@ export default createConfigForNuxt({
   })
   .override("nuxt/rules", {
     rules: {
-      "vue/no-unused-vars": "off",
+      // "vue/no-unused-vars": "off",
       "vue/no-v-html": "off",
-      // "vue/no-v-text-v-html-on-component": "off",
-
     },
   });

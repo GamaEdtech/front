@@ -39,7 +39,7 @@
             @update:model-value="fetchGradeList"
             @update:focused="handleBoardFocused"
           >
-            <template #selection="{ item, props }">
+            <template #selection>
               <div class="d-flex align-center ex-select-board-label pr-5">
                 <div>
                   <v-avatar size="small">

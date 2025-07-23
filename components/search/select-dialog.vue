@@ -58,7 +58,7 @@
       </v-row>
       <v-list max-height="320">
         <v-list-item
-          v-for="(item, i) in filteredItems"
+          v-for="item in filteredItems"
           :key="item.title"
           :value="item.title"
           :active="item.id == selectedItem?.id"
