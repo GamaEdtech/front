@@ -44,9 +44,8 @@ export default createConfigForNuxt({
       "no-empty": "off",
       "no-undef": "off",
       "vue/no-template-shadow": "off",
-      "no-useless-catch": "off",
-      "no-useless-escape": "off",
-      // "vue/no-duplicate-attributes": "off",
+      // "no-useless-catch": "off",
+
 
 
 

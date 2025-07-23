@@ -199,15 +199,10 @@ const route = useRoute()
 const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
   `tutorialInfo-${route.params.id}`,
   async () => {
-    try {
-      const response = await useApiService.get(
-        `/api/v1/tutorials/${route.params.id}`,
-      )
-      return response.data
-    }
-    catch (e) {
-      throw e
-    }
+    const response = await useApiService.get(
+      `/api/v1/tutorials/${route.params.id}`,
+    )
+    return response.data
   },
   {
     watch: [() => route.params.id],
@@ -218,16 +213,11 @@ const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
 const { data: lessonTree, error: lessonTreeError } = await useAsyncData(
   'lessonTree',
   async () => {
-    try {
-      if (!tutorialInfo.value?.lesson) return null
-      const response = await useApiService.get(
-        `/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`,
-      )
-      return response.data
-    }
-    catch (e) {
-      throw e
-    }
+    if (!tutorialInfo.value?.lesson) return null
+    const response = await useApiService.get(
+      `/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`,
+    )
+    return response.data
   },
 )
 

@@ -290,43 +290,38 @@ useHead(() => ({
 }))
 
 async function fetchContentData() {
-  try {
-    const { id } = route.params
+  const { id } = route.params
 
-    // Use key to ensure proper caching and refresh behavior
-    const { data: content } = await useFetch(`/api/v1/files/${id}`, {
-      key: `file-${id}`,
-      dedupe: 'cancel', // Cancel previous identical requests
-      server: true, // Ensure it runs on server
-      immediate: true, // Start fetching immediately
-    })
+  // Use key to ensure proper caching and refresh behavior
+  const { data: content } = await useFetch(`/api/v1/files/${id}`, {
+    key: `file-${id}`,
+    dedupe: 'cancel', // Cancel previous identical requests
+    server: true, // Ensure it runs on server
+    immediate: true, // Start fetching immediately
+  })
 
-    if (!content.value) {
-      throw new Error('Content not found - No data returned')
-    }
-
-    if (content.value?.status === 1 && content.value?.data) {
-      // Create a proper slug from the title
-      const correctSlug
-        = content.value.data.title_url
-          || content.value.data.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/-$/, '')
-
-      // Verify the URL slug matches the content
-      if (route.params.slug !== correctSlug) {
-        // If slugs don't match, continue with correct data
-      }
-
-      return content.value.data
-    }
-    else {
-      throw new Error('Content not found')
-    }
+  if (!content.value) {
+    throw new Error('Content not found - No data returned')
   }
-  catch (err) {
-    throw err
+
+  if (content.value?.status === 1 && content.value?.data) {
+    // Create a proper slug from the title
+    const correctSlug
+      = content.value.data.title_url
+        || content.value.data.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/-$/, '')
+
+    // Verify the URL slug matches the content
+    if (route.params.slug !== correctSlug) {
+      // If slugs don't match, continue with correct data
+    }
+
+    return content.value.data
+  }
+  else {
+    throw new Error('Content not found')
   }
 }
 

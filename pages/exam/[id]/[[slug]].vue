@@ -154,19 +154,14 @@ const galleryHelpData = ref({
 
 // Fetch the exam data
 async function fetchExamData() {
-  try {
-    const { id } = route.params
-    const response = await useApiService.get(`/api/v1/exams/${id}`)
+  const { id } = route.params
+  const response = await useApiService.get(`/api/v1/exams/${id}`)
 
-    if (response.status === 1 && response.data) {
-      return response.data
-    }
+  if (response.status === 1 && response.data) {
+    return response.data
+  }
 
-    return response
-  }
-  catch (err) {
-    throw err
-  }
+  return response
 }
 
 // Use asyncData to fetch data
