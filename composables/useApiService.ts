@@ -1,38 +1,48 @@
 export interface SearchParameters {
-  [key: string]: any;
+  [key: string]: any
 }
 
 type UseFetchOptions = {
-  key?: string;
-  method?: string;
-  query?: SearchParameters;
-  params?: SearchParameters;
-  body?: RequestInit["body"] | Record<string, any>;
-  headers?: Record<string, string> | [key: string, value: string][] | Headers;
-  baseURL?: string;
-  server?: boolean;
-  lazy?: boolean;
-  immediate?: boolean;
-  pick?: string[];
-};
+  key?: string
+  method?: string
+  query?: SearchParameters
+  params?: SearchParameters
+  body?: RequestInit['body'] | Record<string, any>
+  headers?: Record<string, string> | [key: string, value: string][] | Headers
+  baseURL?: string
+  server?: boolean
+  lazy?: boolean
+  immediate?: boolean
+  pick?: string[]
+}
 
-export const useApiService = (
+interface AuthHeaders {
+  Authorization?: string
+}
+
+interface ApiError {
+  status: number
+  message: string
+  data?: any
+}
+
+export const useApiService = <T = any>(
   request: string,
-  opts?: UseFetchOptions
-): Promise<void> | void => {
-  const config = useRuntimeConfig();
-  const headers = authHeader(request);
-  const apiFetch = $fetch.create({
-    baseURL: config.public.baseURL,
-    credentials: "include",
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  const config = useRuntimeConfig()
+  const headers = authHeader(request)
 
+  const apiFetch = $fetch.create({
+    baseURL: config.public.baseURL as string,
+    credentials: 'include',
     onResponse({ request, response, options }) {
       // Process the response data
     },
     onResponseError({ request, response, options }) {
       if (response?.status == 401 || response?.status == 403) {
-        const router = useRouter();
-        router.push({ query: { auth_form: "login" } });
+        const router = useRouter()
+        router.push({ query: { auth_form: 'login' } })
       }
     },
     onRequest({ request, options }) {
@@ -45,56 +55,66 @@ export const useApiService = (
     headers: {
       ...(opts?.headers || {}),
       ...headers,
-      Accept: "application/json",
+      Accept: 'application/json',
     },
-  });
-  return apiFetch(request);
-};
+  })
 
-export const authHeader = (req = null) => {
-  const auth = useAuth();
-  if (!auth.isAuthenticated.value) return;
+  return apiFetch<T>(request)
+}
 
-  if (process.client) {
-    if (req?.includes("v2")) {
-      return { Authorization: `Bearer ${localStorage.getItem("v2_token")}` };
-    } else {
-      return { Authorization: `Bearer ${auth.getUserToken()}` };
+export const authHeader = (req: string | null = null): AuthHeaders | undefined => {
+  const auth = useAuth()
+
+  if (!auth.isAuthenticated.value) return
+
+  if (import.meta.client) {
+    if (req?.includes('v2')) {
+      return { Authorization: `Bearer ${localStorage.getItem('v2_token')}` }
+    }
+    else {
+      return { Authorization: `Bearer ${auth.getUserToken()}` }
     }
   }
+}
 
-};
-
-export const get = (
+export const get = <T = any>(
   request: string,
   params?: SearchParameters,
-  opts?: UseFetchOptions
-): Promise<void> | void => {
-  return useApiService(request, { ...opts, method: "GET", params: params });
-};
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  return useApiService<T>(request, { ...opts, method: 'GET', params: params })
+}
 
-export const post = (
+export const post = <T = any>(
   request: string,
   params?: SearchParameters,
-  opts?: UseFetchOptions
-): Promise<void> | void => {
-  return useApiService(request, { ...opts, method: "POST", body: params });
-};
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  return useApiService<T>(request, { ...opts, method: 'POST', body: params })
+}
 
-export const put = (
+export const put = <T = any>(
   request: string,
   params: SearchParameters,
-  opts?: UseFetchOptions
-): Promise<void> | void => {
-  return useApiService(request, { ...opts, method: "PUT", body: params });
-};
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  return useApiService<T>(request, { ...opts, method: 'PUT', body: params })
+}
 
-export const remove = (
+export const patch = <T = any>(
+  request: string,
+  params: SearchParameters,
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  return useApiService<T>(request, { ...opts, method: 'PATCH', body: params })
+}
+
+export const remove = <T = any>(
   request: string,
   params?: SearchParameters,
-  opts?: UseFetchOptions
-): Promise<void> | void => {
-  return useApiService(request, { ...opts, method: "DELETE" });
-};
+  opts?: UseFetchOptions,
+): Promise<T> => {
+  return useApiService<T>(request, { ...opts, method: 'DELETE' })
+}
 
-export default { get, post, put, remove, authHeader };
+export default { get, post, put, remove, authHeader, patch }

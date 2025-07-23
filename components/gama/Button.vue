@@ -2,9 +2,9 @@
   <v-btn
     v-bind="$attrs"
     rounded
-    @click="handleClick"
     color="primary"
     class="gama-btn"
+    @click="handleClick"
   >
     <slot />
   </v-btn>
@@ -12,15 +12,15 @@
 
 <script>
 export default {
-  name: "GamaButton",
+  name: 'GamaButton',
   methods: {
     handleClick(event) {
       if (this.$listeners.click) {
-        this.$listeners.click(event); // Call the parent click handler if passed
+        this.$listeners.click(event) // Call the parent click handler if passed
       }
     },
   },
-};
+}
 </script>
 
 <style scoped>

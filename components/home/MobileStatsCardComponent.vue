@@ -1,6 +1,12 @@
 <template>
-  <v-card outlined :class="' grade-card grade-card' + (itm_index + 1)">
-    <p v-show="stat.showMore" class="total-content">
+  <v-card
+    outlined
+    :class="' grade-card grade-card' + (itm_index + 1)"
+  >
+    <p
+      v-show="stat.showMore"
+      class="total-content"
+    >
       <nuxt-link
         v-for="item in stat.lessons"
         :key="item.id"
@@ -10,9 +16,9 @@
         {{ item.title }}
       </nuxt-link>
       <v-btn
-        @click="lessonExpand(itm_index)"
         plain
         :class="'mt-5  text-lowercase showmore-btn' + (itm_index + 1)"
+        @click="lessonExpand(itm_index)"
       >
         Return
       </v-btn>
@@ -31,7 +37,7 @@
             {{ stat.base_title }}
           </nuxt-link>
           <div class="d-flex align-center res-update d-sm-none">
-            <i class="fa-solid fa-calendar-days mx-3"></i>
+            <i class="fa-solid fa-calendar-days mx-3" />
             <p>{{ $dayjs(stat.last_update).format("MMM DD") }}</p>
           </div>
         </div>
@@ -49,10 +55,12 @@
             v-show="stat.lessons.length > 3"
             class="btn-transparent more-content pointer"
             @click="lessonExpand(itm_index)"
-            >... more</span
-          >
+          >... more</span>
         </p>
-        <p v-if="stat.showMore" class="total-content">
+        <p
+          v-if="stat.showMore"
+          class="total-content"
+        >
           <nuxt-link
             v-for="item in stat.lessons"
             :key="item.id"
@@ -64,7 +72,7 @@
           </nuxt-link>
         </p>
       </v-card-title>
-      <v-divider class="my-5"></v-divider>
+      <v-divider class="my-5" />
 
       <v-card-text class="pa-0 grade-items mb-3">
         <nuxt-link
@@ -72,7 +80,7 @@
           :class="'d-flex align-center justify-space-between pa-0 pb-0 grade__item grade__item1'"
         >
           <div class="py-0 d-flex align-center right grade__item-title">
-            <v-icon class="ml-1 icon icong-test"></v-icon>
+            <v-icon class="ml-1 icon icong-test" />
             <span class="text-center type my-2 grade-item__text"> Paper </span>
           </div>
           <div class="py-1 left">
@@ -86,7 +94,7 @@
           :class="'d-flex align-center justify-space-between pa-0 pb-0 grade__item grade__item2'"
         >
           <div class="py-0 d-flex align-center right grade__item-title">
-            <v-icon class="ml-1 icon icong-learnfiles"></v-icon>
+            <v-icon class="ml-1 icon icong-learnfiles" />
             <span class="text-center type my-2 grade-item__text">
               Multimedia
             </span>
@@ -102,7 +110,7 @@
           :class="'d-flex align-center justify-space-between pa-0 pb-0 grade__item grade__item4'"
         >
           <div class="py-0 d-flex align-center right grade__item-title">
-            <v-icon class="ml-1 icon icong-azmoon"></v-icon>
+            <v-icon class="ml-1 icon icong-azmoon" />
             <span class="text-center type my-2 grade-item__text"> Exam </span>
           </div>
           <div class="py-1 left">
@@ -116,7 +124,7 @@
           :class="'d-flex align-center justify-space-between pa-0 pb-0 grade__item grade__item3'"
         >
           <div class="py-0 d-flex align-center right grade__item-title">
-            <v-icon class="ml-1 icon icong-qa"></v-icon>
+            <v-icon class="ml-1 icon icong-qa" />
             <span class="text-center type my-2 grade-item__text"> Q & A </span>
           </div>
           <div class="py-1 left">
@@ -126,26 +134,27 @@
           </div>
         </nuxt-link>
       </v-card-text>
-      <v-divider class="grade-divider"></v-divider>
+      <v-divider class="grade-divider" />
       <v-card-text
         class="pt-3 pb-2 px-0 grade-card__update d-sm-flex d-none justify-end"
       >
         <div
           class="d-flex align-center footer-card card-footer justify-end mt-2 x"
         >
-          <span class="fa-solid fa-calendar-days ml-2"></span>
+          <span class="fa-solid fa-calendar-days ml-2" />
           <span class="ml-1">Last update:&nbsp;</span>
           <span>{{ $dayjs(stat.last_update).format("MMM DD") }}</span>
         </div>
       </v-card-text>
 
-      <!--</v-card>-->
+      <!-- </v-card> -->
     </div>
   </v-card>
 </template>
 
 <script>
 export default {
+  name: 'MobileStatsCardComponent',
   props: {
     stat: {
       type: Object,
@@ -154,13 +163,12 @@ export default {
       type: Number,
     },
   },
-  name: "MobileStatsCardComponent",
   methods: {
     lessonExpand(index) {
-      this.$emit("lessonExpand", index);
+      this.$emit('lessonExpand', index)
     },
   },
-};
+}
 </script>
 
 <style scoped></style>

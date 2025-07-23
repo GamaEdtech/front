@@ -1,13 +1,6 @@
 {
   "compilerOptions": {
-    "types": [
-      "@types/node",
-      "three"
-    ]
+    "types": ["@types/node", "three"]
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
   "extends": "./.nuxt/tsconfig.json"
 }

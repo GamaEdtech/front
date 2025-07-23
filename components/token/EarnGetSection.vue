@@ -1,16 +1,37 @@
 <template>
   <section class="earn-get-section">
     <v-container class="earn-get-container">
-      <h2 class="earn-get-title">How Do You Earn $GET?</h2>
-      <v-row class="earn-get-grid" align="center" justify="center" no-gutters>
-        <v-col v-for="(card, i) in cards" :key="i" cols="6" md="6" lg="3">
+      <h2 class="earn-get-title">
+        How Do You Earn $GET?
+      </h2>
+      <v-row
+        class="earn-get-grid"
+        align="center"
+        justify="center"
+        no-gutters
+      >
+        <v-col
+          v-for="(card, i) in cards"
+          :key="i"
+          cols="6"
+          md="6"
+          lg="3"
+        >
           <div class="earn-get-card">
             <div class="earn-get-img-section">
-              <v-img :src="card.img" class="earn-get-img" contain />
+              <v-img
+                :src="card.img"
+                class="earn-get-img"
+                contain
+              />
             </div>
             <div class="earn-get-card-content">
-              <h3 class="earn-get-card-title">{{ card.title }}</h3>
-              <p class="earn-get-card-desc">{{ card.desc }}</p>
+              <h3 class="earn-get-card-title">
+                {{ card.title }}
+              </h3>
+              <p class="earn-get-card-desc">
+                {{ card.desc }}
+              </p>
             </div>
           </div>
         </v-col>
@@ -22,26 +43,26 @@
 <script setup>
 const cards = ref([
   {
-    title: "Teachers",
-    desc: "Create content and upload learning materials",
-    img: "/images/token/teachers.png",
+    title: 'Teachers',
+    desc: 'Create content and upload learning materials',
+    img: '/images/token/teachers.png',
   },
   {
-    title: "Students",
-    desc: "Use the system and submit assignments",
-    img: "/images/token/students.png",
+    title: 'Students',
+    desc: 'Use the system and submit assignments',
+    img: '/images/token/students.png',
   },
   {
-    title: "Developers",
-    desc: "Contribute to the development process",
-    img: "/images/token/developers.png",
+    title: 'Developers',
+    desc: 'Contribute to the development process',
+    img: '/images/token/developers.png',
   },
   {
-    title: "Community",
-    desc: "Use social media to help others learn about Gamatrain",
-    img: "/images/token/community.png",
+    title: 'Community',
+    desc: 'Use social media to help others learn about Gamatrain',
+    img: '/images/token/community.png',
   },
-]);
+])
 </script>
 
 <style scoped>

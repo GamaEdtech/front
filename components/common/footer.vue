@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4" id="footer-container">
+  <div id="footer-container" class="mt-4">
     <v-footer>
       <v-container id="footer" class="px-0">
         <v-row>
@@ -29,11 +29,11 @@
             </div>
           </v-col>
           <v-col
+            v-for="(item, i) in footerLinks"
+            :key="i"
             sm="3"
             md="3"
             class="d-none d-sm-block"
-            v-for="(item, i) in footerLinks"
-            :key="i"
           >
             <div class="link-title gama-text-button">
               {{ item.mainTitle }}
@@ -49,15 +49,15 @@
           </v-col>
 
           <v-col cols="12" class="d-block d-sm-none">
-            <v-expansion-panels focusable flat id="mobile-footer-panels">
+            <v-expansion-panels id="mobile-footer-panels" focusable flat>
               <v-expansion-panel
                 v-for="(item, i) in footerLinks"
                 :key="i"
                 style="border-bottom: 0.5px solid #424a53"
               >
-                <v-expansion-panel-title class="link-title gama-text-button">{{
-                  item.mainTitle
-                }}</v-expansion-panel-title>
+                <v-expansion-panel-title class="link-title gama-text-button">
+                  {{ item.mainTitle }}
+                </v-expansion-panel-title>
                 <v-expansion-panel-text class="pt-4">
                   <nuxt-link
                     v-for="link in item.subMenu"
@@ -74,7 +74,7 @@
         </v-row>
       </v-container>
     </v-footer>
-    <v-container fluid id="footer-copy-right">
+    <v-container id="footer-copy-right" fluid>
       <v-row>
         <v-col cols="12" class="pt-3 pb-1 text-center px-0">
           <span class="describe gama-text-overline">
@@ -91,6 +91,7 @@
     </v-container>
   </div>
 </template>
+
 <script>
 export default {
   data() {
