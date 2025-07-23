@@ -74,6 +74,7 @@ export default {
       default: '',
     },
   },
+  emits: ['locationSelected'],
   data() {
     return {
       locationDialog: false,

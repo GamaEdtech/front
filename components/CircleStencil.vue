@@ -14,6 +14,7 @@ export default {
       type: Object,
     },
   },
+  emits: ['move', 'move-end', 'resize', 'resize-end'],
   computed: {
     style() {
       const { height, width, left, top } = this.stencilCoordinates

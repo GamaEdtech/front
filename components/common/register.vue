@@ -53,7 +53,7 @@ watch(countDown, (val) => {
   if (val === 60) countDownTimer()
 })
 
-const emit = defineEmits(['switchToRegister', 'update:dialog'])
+const emit = defineEmits(['switchToLogin', 'switchToRegister', 'update:dialog'])
 // Switch to login page
 const switchToLogin = () => {
   emit('switchToLogin')

@@ -162,6 +162,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['lessonExpand'],
   methods: {
     lessonExpand(index) {
       this.$emit('lessonExpand', index)

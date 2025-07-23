@@ -10,6 +10,8 @@ const props = defineProps({
   disableNext: Boolean,
   disableBack: Boolean,
 })
+
+const emit = defineEmits(['update:modelValue', 'back', 'next'])
 const messageReply = ref(null)
 </script>
 

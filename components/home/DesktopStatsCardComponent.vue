@@ -178,6 +178,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['lessonExpand'],
   data() {
     return {}
   },

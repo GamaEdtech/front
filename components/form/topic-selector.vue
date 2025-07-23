@@ -80,6 +80,7 @@ export default {
       default: () => [],
     },
   },
+  emits: ['selectTopic'],
   data() {
     return {
       topic: this.selectedTopics || [],

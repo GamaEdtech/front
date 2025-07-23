@@ -28,6 +28,7 @@ import LocationSearch from '@/components/form/LocationSearch'
 export default {
   name: 'LeafletMap',
   components: { LocationSearch },
+  emits: ['locationSelected'],
   data() {
     return {
       map: {

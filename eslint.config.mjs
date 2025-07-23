@@ -50,8 +50,8 @@ export default createConfigForNuxt({
       "vue/no-side-effects-in-computed-properties": "off",
       "vue/no-use-v-if-with-v-for": "off",
       "vue/no-mutating-props": "off",
-      "vue/require-prop-type-constructor": "off",
-      // "vue/require-explicit-emits": "off",
+      // "vue/require-prop-type-constructor": "off",
+
 
 
     },

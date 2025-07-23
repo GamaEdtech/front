@@ -231,6 +231,7 @@ const cancelPassRecover = () => {
 }
 
 const emit = defineEmits([
+  'switchToLogin',
   'switchToRegister',
   'switchToRecover',
   'update:dialog',

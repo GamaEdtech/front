@@ -13,7 +13,7 @@ const props = defineProps({
 
 const { $toast } = useNuxtApp()
 
-const emit = defineEmits(['update:email', 'update:username', 'update:phoneNumber', 'selectAction', 'fetchUser'])
+const emit = defineEmits(['update:modelValue', 'update:email', 'update:username', 'update:phoneNumber', 'selectAction', 'fetchUser'])
 
 const form = reactive({
   email: props.email,
