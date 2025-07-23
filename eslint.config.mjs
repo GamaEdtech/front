@@ -42,6 +42,6 @@ export default createConfigForNuxt({
       "vue/no-v-text-v-html-on-component": "off",
       "vue/valid-v-slot": "off",
       "no-empty": "off",
-      "no-undef": "off",
+      // "no-undef": "off",
     },
   });
