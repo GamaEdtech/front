@@ -43,14 +43,5 @@ export default createConfigForNuxt({
       "vue/valid-v-slot": "off",
       "no-empty": "off",
       "no-undef": "off",
-      "vue/no-template-shadow": "off",
-      // "no-useless-catch": "off",
-
-
-
-
-
-
-
     },
   });

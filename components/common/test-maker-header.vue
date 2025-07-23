@@ -114,8 +114,8 @@
                     </template>
 
                     <v-list-item
-                      v-for="(subMenuItem, side) in item.subMenuList"
-                      :key="side.title"
+                      v-for="(subMenuItem, sideIndex) in item.subMenuList"
+                      :key="sideIndex"
                       class="pl-7"
                       active-class="menu_active"
                       :to="subMenuItem.link"

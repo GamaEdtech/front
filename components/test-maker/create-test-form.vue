@@ -83,11 +83,11 @@
               class="pr-0"
             >
               <v-tooltip location="bottom">
-                <template #activator="{ props }">
+                <template #activator="{ props: tooltipProps }">
                   <v-btn
                     color="teal"
                     class="text-white py-5 my-2"
-                    v-bind="props"
+                    v-bind="tooltipProps"
                     block
                     @click="path_panel_expand = !path_panel_expand"
                   >
@@ -146,7 +146,7 @@
                 fallback="Loading..."
               >
                 <Field
-                  v-slot="{ errorMessage }"
+                  v-slot="{ errorMessage: questionError }"
                   name="question"
                   :validate="validateQuestionField"
                 >
@@ -195,10 +195,10 @@
                     </template>
                   </RickEditor>
                   <p
-                    v-if="errorMessage"
+                    v-if="questionError"
                     class="text-error text-caption mt-1"
                   >
-                    {{ errorMessage }}
+                    {{ questionError }}
                   </p>
                 </Field>
               </ClientOnly>
@@ -251,7 +251,7 @@
 
               <!-- Test answer options -->
               <Field
-                v-slot="{ field, errorMessage }"
+                v-slot="{ field, errorMessage: trueAnswerError }"
                 name="true_answer"
                 :validate="validateTrueAnswer"
               >
@@ -259,7 +259,7 @@
                   id="test-image-options"
                   v-model="form.true_answer"
                   v-bind="field"
-                  :error-messages="errorMessage"
+                  :error-messages="trueAnswerError"
                 >
                   <v-row
                     v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
@@ -282,7 +282,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerAError }"
                         :name="'answer_a'"
                         :validate="validateAnswerField"
                       >
@@ -302,10 +302,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerAError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerAError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -373,7 +373,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerBError }"
                         :name="'answer_b'"
                         :validate="validateAnswerField"
                       >
@@ -393,10 +393,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerBError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerBError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -462,7 +462,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerCError }"
                         :name="'answer_c'"
                         :validate="validateAnswerField"
                       >
@@ -482,10 +482,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerCError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerCError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -551,7 +551,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerDError }"
                         :name="'answer_d'"
                         :validate="validateAnswerField"
                       >
@@ -571,10 +571,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerDError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerDError }}
                           </p>
                         </ClientOnly>
                       </Field>

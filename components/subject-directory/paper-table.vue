@@ -252,8 +252,8 @@
                 <!-- ExamHub Chip -->
                 <template v-if="item.exam_id">
                   <v-chip
-                    v-for="(exam, index) in safeParseArray(item.exam_id)"
-                    :key="index"
+                    v-for="(exam, examIndex) in safeParseArray(item.exam_id)"
+                    :key="examIndex"
                     class="exam-hub-chip"
                     color="#7F56D9"
                     link
