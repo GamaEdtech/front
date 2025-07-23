@@ -4,19 +4,14 @@
     transition="dialog-bottom-transition"
     max-width="600"
   >
-    <v-card id="img-cropper-dialog">
-      <cropper
-        :src="file_url"
-        :stencil-props="stencil_props"
-        image-restriction="stencil"
-        @change="cropFile"
-      />
+    <v-card id="img-cropper-dialog" 
+      color="light-green-darken-3">
       <v-card-actions
-        style="position: sticky; bottom: 0; left: 0; right: 0"
-        class="pa-0"
+      class="pa-0"
       >
         <v-btn
-          class="primary black--text text-transform-none gtext-t4 font-weight-medium"
+          color="light-green-darken-3"
+          class=" black--text text-transform-none gtext-t4 font-weight-medium"
           size="x-large"
           :loading="confirm_loading"
           block
@@ -26,6 +21,12 @@
           Confirm
         </v-btn>
       </v-card-actions>
+      <cropper
+        :src="file_url"
+        :stencil-props="stencil_props"
+        image-restriction="stencil"
+        @change="cropFile"
+      />
     </v-card>
   </v-dialog>
 </template>

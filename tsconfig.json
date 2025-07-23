@@ -5,9 +5,5 @@
       "three"
     ]
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
   "extends": "./.nuxt/tsconfig.json"
 }
