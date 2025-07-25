@@ -35,7 +35,7 @@
               class="about-get-img"
               src="/images/token/About/think.svg"
               alt="$GET token about illustration"
-            />
+            >
           </v-col>
         </v-row>
       </v-container>

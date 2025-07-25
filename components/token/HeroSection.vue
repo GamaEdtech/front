@@ -32,12 +32,16 @@
                 >
                   Buy $GET Now
                 </v-btn>
+                  Buy $GET Now
+                </v-btn>
                 <v-btn
                   to="/whitepaper"
                   class="whitepaper-btn"
                   rounded
                   elevation="0"
                 >
+                  View Whitepaper
+                </v-btn>
                   View Whitepaper
                 </v-btn>
               </div>
@@ -101,8 +105,8 @@ const animatePrice = () => {
 };
 
 onMounted(() => {
-  fetchTokenPrice();
-});
+  fetchTokenPrice()
+})
 </script>
 
 <style scoped>

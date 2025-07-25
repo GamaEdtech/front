@@ -20,12 +20,16 @@
         align="center"
         no-gutters
       >
-        <v-col cols="12" md="4" class="trust-community-list-col">
+        <v-col
+          cols="12"
+          md="4"
+          class="trust-community-list-col"
+        >
           <ul class="trust-community-list">
             <li
-              class="trust-community-list-item"
               v-for="item in items"
               :key="item.text"
+              class="trust-community-list-item"
             >
               <span class="trust-community-icon">
                 <v-img
@@ -64,7 +68,7 @@ const items = ref([
     img: "/images/token/Mission/shared.svg",
     text: "Shared Accountability",
   },
-]);
+])
 </script>
 
 <style scoped>

@@ -14,11 +14,19 @@
         >
           <div class="earn-get-card">
             <div class="earn-get-img-section">
-              <v-img :src="card.img" class="earn-get-img" contain />
+              <v-img
+                :src="card.img"
+                class="earn-get-img"
+                contain
+              />
             </div>
             <div class="earn-get-card-content">
-              <h3 class="earn-get-card-title">{{ card.title }}</h3>
-              <p class="earn-get-card-desc">{{ card.desc }}</p>
+              <h3 class="earn-get-card-title">
+                {{ card.title }}
+              </h3>
+              <p class="earn-get-card-desc">
+                {{ card.desc }}
+              </p>
             </div>
           </div>
         </v-col>
@@ -49,7 +57,7 @@ const cards = ref([
     desc: "Use social media to help others learn about Gamatrain",
     img: "/images/token/Earn/community.png",
   },
-]);
+])
 </script>
 
 <style scoped>

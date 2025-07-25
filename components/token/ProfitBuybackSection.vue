@@ -3,7 +3,9 @@
     <v-container class="profit-buyback-container">
       <v-row justify="center">
         <v-col cols="12">
-          <h2 class="profit-buyback-title">Profit Distribution and Buyback</h2>
+          <h2 class="profit-buyback-title">
+            Profit Distribution and Buyback
+          </h2>
         </v-col>
       </v-row>
       <v-row justify="center">

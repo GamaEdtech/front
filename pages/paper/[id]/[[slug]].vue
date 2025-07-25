@@ -2,14 +2,9 @@
   <div class="test-details-content">
     <paper-detail-skeleton-loader v-if="dataFetching" />
 
-    <!-- Show actual content when loaded -->
     <template v-else>
-      <!-- Start : Category -->
       <common-category />
 
-      <!-- End:Category -->
-
-      <!--  Start: breadcrumb  -->
       <section>
         <v-container class="py-0">
           <div class="mt-0 py-0 header-path">
@@ -17,15 +12,17 @@
           </div>
         </v-container>
       </section>
-      <!--  End: breadcrumb  -->
 
-      <!--  Start: detail  -->
       <section>
         <v-container class="py-0">
           <div class="detail mt-6 mt-md-8">
             <v-row>
-              <v-col cols="12" md="8" lg="6" class="px-8 px-lg=0">
-                <!--  Description   -->
+              <v-col
+                cols="12"
+                md="8"
+                lg="6"
+                class="px-8 px-lg=0"
+              >
                 <paper-detail-description
                   :title="contentData?.title"
                   :description="contentData?.description"
@@ -33,7 +30,7 @@
                   <template #labels>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -44,7 +41,7 @@
                     </v-chip>
                     <v-chip
                       link
-                      class="mr-1 bg-blue-grey-darken-1 white--text"
+                      class="mr-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -54,7 +51,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       <nuxt-link
@@ -64,7 +61,7 @@
                       </nuxt-link>
                     </v-chip>
                     <v-chip
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                       :small="display.mdAndDown"
                     >
                       {{ contentData?.edu_month_title }}
@@ -72,33 +69,39 @@
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/search?type=test&section=${contentData?.section}&base=${contentData?.base}&lesson=${contentData?.lesson}&edu_year=${contentData?.edu_year}`"
-                      class="ma-1 bg-blue-grey-darken-1 white--text"
+                      class="ma-1 bg-blue-grey-darken-1 text-white"
                     >
                       {{ contentData?.edu_year }}
                     </v-chip>
                     <v-chip
                       :small="display.mdAndDown"
                       :to="`/subject-directory?board=${contentData?.section}&grade=${contentData?.base}&subject=${contentData?.lesson}`"
-                      class="ma-1 bg-primary white--text"
+                      class="ma-1 bg-primary text-white"
                     >
                       {{ contentData?.lesson_title }} directory
                     </v-chip>
                   </template>
                 </paper-detail-description>
               </v-col>
-              <v-col cols="12" sm="5" lg="3" order-lg="first">
-                <!--Show gallery of preview and book first page-->
+              <v-col
+                cols="12"
+                sm="5"
+                lg="3"
+                order-lg="first"
+              >
                 <details-preview-gallery
                   :image-urls="previewImages"
                   :help-link-data="galleryHelpData"
                   :initial-slide="1"
                 />
-                <!--Show gallery of preview and book first page-->
               </v-col>
-
-              <v-col sm="7" md="4" lg="3">
+              <v-col
+                sm="7"
+                md="4"
+                lg="3"
+              >
                 <paper-detail-content-info
-                  :contentData="contentData"
+                  :content-data="contentData"
                   @crash-report="openCrashReportDialog"
                 >
                   <template #share-dialog>
@@ -109,30 +112,34 @@
             </v-row>
           </div>
           <common-related-portrait-content
-            pageType="paper"
-            pageName="Past Papers"
+            page-type="paper"
+            page-name="Past Papers"
             source="test"
             request="test"
           />
         </v-container>
       </section>
-      <!--  End: detail  -->
 
-      <!-- Test Section -->
       <div v-if="randomTestContent">
-        <v-divider class="mt-4 mx-auto" style="width: 80%" />
+        <v-divider
+          class="mt-4 mx-auto"
+          style="width: 80%"
+        />
         <test-details :content-data="randomTestContent" />
-        <v-divider class="mt-1 mx-auto" style="width: 80%" />
+        <v-divider
+          class="mt-1 mx-auto"
+          style="width: 80%"
+        />
       </div>
-      <!--  End: Test Section  -->
     </template>
   </div>
 </template>
+
 <script setup>
-const route = useRoute();
-const router = useRouter();
-const requestURL = ref(useRequestURL().host);
-const randomTestContent = ref(null);
+const route = useRoute()
+const router = useRouter()
+const requestURL = ref(useRequestURL().host)
+const randomTestContent = ref(null)
 
 // Track loading state
 
@@ -144,15 +151,17 @@ const {
   `paper-${route.params.id}`,
   async () => {
     try {
-      const response = await $fetch(`/api/v1/tests/${route.params.id}`, {});
+      const response = await $fetch(`/api/v1/tests/${route.params.id}`, {})
 
-      return response.data;
-    } catch (e) {
+      return response.data
+    }
+    catch (e) {
       if (e?.status === 404) {
-        router.push("/search?type=test");
+        router.push('/search?type=test')
       }
-      throw e;
-    } finally {
+      throw e
+    }
+    finally {
     }
   },
   {
@@ -160,76 +169,79 @@ const {
     lazy: false,
     immediate: true,
     watch: [() => route.params.id],
-  }
-);
+  },
+)
 
 const schemaData = computed(() => ({
-  "@context": "https://schema.org",
-  "@type": "LearningResource",
-  name: contentData.value?.title || "GamaEdtech",
-  image:
-    contentData.value?.thumb_pic ||
-    contentData.value?.lesson_pic ||
-    "https://gamatrain.com/images/gamatrain-logo.svg",
-  url: route.fullPath || "",
-  description: contentData.value?.description || "GamaEdtech",
-}));
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  'name': contentData.value?.title || 'GamaEdtech',
+  'image':
+    contentData.value?.thumb_pic
+    || contentData.value?.lesson_pic
+    || 'https://gamatrain.com/images/gamatrain-logo.svg',
+  'url': route.fullPath || '',
+  'description': contentData.value?.description || 'GamaEdtech',
+}))
 
-const previewImages = ref([]);
+const previewImages = ref([])
 const galleryHelpData = ref({
-  state: "",
-  section: "",
-  base: "",
-  course: "",
-  lesson: "",
-});
+  state: '',
+  section: '',
+  base: '',
+  course: '',
+  lesson: '',
+})
 
 useHead({
   title: contentData.value?.title,
   script: [
     {
-      hid: "json-ld-schema",
+      hid: 'json-ld-schema',
       innerHTML: JSON.stringify(schemaData.value),
-      type: "application/ld+json",
+      type: 'application/ld+json',
     },
   ],
   link: [
     {
-      rel: "canonical",
+      rel: 'canonical',
       href: `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {
-    "json-ld-schema": ["innerHTML"],
+    'json-ld-schema': ['innerHTML'],
   },
-});
+})
 
 if (contentData.value) {
-  previewImages.value.push(contentData.value.thumb_pic);
-  previewImages.value.push(contentData.value.lesson_pic);
-  previewImages.value.carouselVal = 0;
+  previewImages.value.push(contentData.value.thumb_pic)
+  if (contentData.value.lesson_pic) {
+    previewImages.value.push(contentData.value.lesson_pic)
+  }
+
+  previewImages.value.carouselVal = 0
 
   galleryHelpData.value = {
-    state: contentData.value?.state || "",
-    section: contentData.value?.section || "",
-    base: contentData.value?.base || "",
-    course: contentData.value?.course || "",
-    lesson: contentData.value?.lesson || "",
-  };
+    state: contentData.value?.state || '',
+    section: contentData.value?.section || '',
+    base: contentData.value?.base || '',
+    course: contentData.value?.course || '',
+    lesson: contentData.value?.lesson || '',
+  }
 }
 
 const breads = ref([
   {
-    text: "Paper",
+    text: 'Paper',
     disabled: false,
-    href: "/search?type=test",
+    href: '/search?type=test',
   },
-]);
+])
 
-const display = useGlobalDisplay();
+const display = useGlobalDisplay()
 
 const initBreadCrumb = () => {
-  if (!contentData.value) return;
+  if (!contentData.value) return
 
   breads.value.push(
     {
@@ -246,42 +258,42 @@ const initBreadCrumb = () => {
       text: contentData.value.lesson_title,
       disabled: false,
       href: `/search?type=test&section=${contentData.value.section}&base=${contentData.value.base}&lesson=${contentData.value.lesson}`,
-    }
-  );
-};
+    },
+  )
+}
 
 watchEffect(() => {
   if (contentData.value) {
-    initBreadCrumb();
+    initBreadCrumb()
   }
-});
+})
 
 const openCrashReportDialog = () => {
-  crash_report.value.dialog = true;
-  crash_report.value.form.type = "test";
-};
+  crash_report.value.dialog = true
+  crash_report.value.form.type = 'test'
+}
 const grabRandomTestCode = () => {
   if (contentData.value && contentData.value.lesson) {
     $fetch(`/api/v1/examTests/random?lesson=${contentData.value.lesson}`)
       .then((response) => {
         if (response.data.code) {
-          retriveRandomTest(response.data.code);
+          retriveRandomTest(response.data.code)
         }
       })
-      .catch((err) => {});
+      .catch((err) => {})
   }
-};
+}
 const retriveRandomTest = (code) => {
   $fetch(`/api/v1/examTests/${code}`)
     .then((response) => {
-      randomTestContent.value = response.data;
+      randomTestContent.value = response.data
     })
-    .catch((err) => {});
-};
+    .catch((err) => {})
+}
 
 onMounted(() => {
-  grabRandomTestCode();
-});
+  grabRandomTestCode()
+})
 </script>
 
 <style></style>

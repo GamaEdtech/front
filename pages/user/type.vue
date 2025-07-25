@@ -1,82 +1,89 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h2>Select account type</h2>
-        <p>Please select user type</p>
-        <v-divider class="my-2" />
+  <div class="mt-15">
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <h2>Select account type</h2>
+          <p>Please select user type</p>
+          <v-divider class="my-2" />
 
-        <v-radio-group v-model="user_type">
-          <v-radio value="6" label="I'm student" />
-          <v-radio value="5" label="I'm teacher" />
-        </v-radio-group>
+          <v-radio-group v-model="userType">
+            <v-radio
+              value="6"
+              label="I'm student"
+            />
+            <v-radio
+              value="5"
+              label="I'm teacher"
+            />
+          </v-radio-group>
 
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-      </v-col>
-    </v-row>
-  </v-container>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
-<script>
-export default {
-  name: "select_user_type",
-  data() {
-    return {
-      user_type: 2,
-    };
-  },
-  watch: {
-    user_type() {
-      this.setUserType();
-    },
-  },
-  mounted() {
-    this.$router.push({ path: "/user" });
-  },
-  methods: {
-    async setUserType() {
-      const querystring = require("querystring");
-      this.$fetch
-        .$post(
-          "/api/v1/users/group",
-          querystring.stringify({
-            group: this.user_type,
-          })
-        )
-        .then((response) => {
-          if (response.status === 1) {
-            var updatedData = {
-              avatar: this.$auth.user.avatar,
-              credit: this.$auth.user.credit,
-              email: this.$auth.user.email,
-              first_name: this.$auth.user?.first_name,
-              group_id: this.user_type.toString(), //New user type
-              last_name: this.$auth.user.last_name,
-              phone: this.$auth.user.phone,
-              sex: this.$auth.user.sex,
-            };
-            //Update current user data
-            this.$auth.setUser(updatedData);
-            this.$auth.user.group_id = this.user_type;
+<script setup>
+const { $toast } = useNuxtApp()
+const router = useRouter()
+const { user, setUser } = useUser()
 
-            this.$router.push({
-              path: "/user",
-            });
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err.response.data.message);
-        });
-    },
-  },
-};
+const userType = ref('2')
+
+// Redirect to user page on mount
+onMounted(() => {
+  router.push('/user')
+})
+
+// Watch for user type changes
+watch(userType, async (newType) => {
+  await setUserType()
+})
+
+// Update user type
+async function setUserType() {
+  try {
+    const response = await useApiService.post('/api/v1/users/group', {
+      group: userType.value,
+    })
+    const data = response
+    console.log('data', data)
+    if (data?.status === 1) {
+      // Update user data
+      const updatedData = {
+        avatar: user.value?.avatar,
+        credit: user.value?.credit,
+        email: user.value?.email,
+        first_name: user.value?.first_name,
+        group_id: userType.value.toString(),
+        last_name: user.value?.last_name,
+        phone: user.value?.phone,
+        sex: user.value?.sex,
+      }
+
+      console.log('updatedData', updatedData)
+
+      // Update user state
+      await setUser(updatedData)
+      user.value.group_id = userType.value.toString()
+
+      // Navigate to user page
+      router.push('/user')
+    }
+  }
+  catch (err) {
+    $toast.error(err?.message || 'An error occurred')
+  }
+}
 </script>
 
 <style scoped></style>

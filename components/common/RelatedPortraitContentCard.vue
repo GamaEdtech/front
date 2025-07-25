@@ -8,10 +8,12 @@
       class="text-white align-end"
       :height="CardHeight"
       :src="cardPicture"
-    >
-    </v-img>
+    />
     <div class="circle-container">
-      <div class="text-center" v-if="showScoreLabel">
+      <div
+        v-if="showScoreLabel"
+        class="text-center"
+      >
         <p
           class="text-subtitle-1 font-weight-bold text-white text-no-wrap"
           style="line-height: 1.5"
@@ -25,26 +27,38 @@
           score
         </p>
       </div>
-      <div class="text-center" v-else style="margin-top: 3px">
+      <div
+        v-else
+        class="text-center"
+        style="margin-top: 3px"
+      >
         <v-icon
           v-if="score == 'pp'"
           class="rounded-circle gtext-t2"
           style="color: #d24625; background-color: white"
-          >mdi-microsoft-powerpoint</v-icon
         >
-        <v-icon v-else class="text-white">mdi-play-circle-outline</v-icon>
+          mdi-microsoft-powerpoint
+        </v-icon>
+        <v-icon
+          v-else
+          class="text-white"
+        >
+          mdi-play-circle-outline
+        </v-icon>
       </div>
     </div>
 
     <v-card-text class="text--primary relative z-10 bg-white bg-opacity-80">
       <div class="inner-curve">
-        <div class="two-line-ellipsis">{{ cardTitle }}</div>
+        <div class="two-line-ellipsis">
+          {{ cardTitle }}
+        </div>
       </div>
     </v-card-text>
   </v-card>
 </template>
-<script setup>
 
+<script setup>
 const props = defineProps({
   cardPicture: String,
   cardTitle: String,
@@ -56,7 +70,8 @@ const CardHeight = computed(() => {
   return props.showScoreLabel ? '230px' : '107px'
 })
 </script>
-<style>
+
+<style scoped>
 .inner-curve {
   --r: 8px; /* control the rounded part */
   --s: 30px; /* control the size of the cut */
@@ -112,7 +127,7 @@ const CardHeight = computed(() => {
   color: white;
   text-align: center;
 }
-.v-img__img--contain{
+.v-img__img--contain {
   object-fit: fill !important;
 }
 </style>

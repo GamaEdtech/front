@@ -3,7 +3,9 @@
     <section class="can-get-section mt-10">
       <v-container>
         <div class="d-flex justify-content-center mb-9">
-          <h2 class="can-get-title">What Can You Do With $GET?</h2>
+          <h2 class="can-get-title">
+            What Can You Do With $GET?
+          </h2>
         </div>
         <v-row class="justify-content-center align-center can-get-row">
           <v-col cols="12" sm="8" md="7" class="can-get-desc-col">
@@ -18,12 +20,17 @@
               </ul>
             </div>
           </v-col>
-          <v-col cols="12" sm="4" md="3" class="can-get-img-col">
+          <v-col
+            cols="12"
+            sm="4"
+            md="3"
+            class="can-get-img-col"
+          >
             <img
               class="can-get-img"
               src="/images/token/About/Think2.svg"
               alt="What can you do with $GET token illustration"
-            />
+            >
           </v-col>
         </v-row>
         <p class="can-get-footnote">
@@ -35,6 +42,7 @@
     </section>
   </div>
 </template>
+
 <script setup></script>
 
 <style scoped>

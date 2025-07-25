@@ -2,63 +2,95 @@
   <div class="d-flex">
     <v-sheet class="chips-container">
       <v-chip
-        v-show="contentData.countryTitle"
+        v-show="localContentData.countryTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+        :to="buildSchoolListUrl('country', localContentData)"
       >
-        {{ contentData.countryTitle }}
+        {{ localContentData.countryTitle }}
       </v-chip>
       <v-chip
-        v-show="contentData.stateTitle"
+        v-show="localContentData.stateTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+        :to="buildSchoolListUrl('state', localContentData)"
       >
-        {{ contentData.stateTitle }}
+        {{ localContentData.stateTitle }}
       </v-chip>
       <v-chip
-        v-show="contentData.cityTitle"
+        v-show="localContentData.cityTitle"
         class="bg-blue-grey-darken-1 text-white mr-1"
+        :to="buildSchoolListUrl('city', localContentData)"
       >
-        {{ contentData.cityTitle }}
+        {{ localContentData.cityTitle }}
       </v-chip>
       <v-chip
-        v-if="contentData.schoolType && contentData.schoolType.name"
+        v-if="localContentData.schoolType && localContentData.schoolType.name"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData?.schoolType?.name }}
+        {{ localContentData?.schoolType?.name }}
       </v-chip>
       <v-chip
-        :to="`/school?school_type=${contentData.school_type}`"
-        v-if="contentData.school_type_title"
+        v-if="localContentData.school_type_title"
+        :to="`/school?school_type=${localContentData.school_type}`"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.school_type_title }}
+        {{ localContentData.school_type_title }}
       </v-chip>
       <v-chip
-        :to="`/school?section=${contentData.section}`"
-        v-if="contentData.section_title"
+        v-if="localContentData.section_title"
+        :to="`/school?section=${localContentData.section}`"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.section_title }}
+        {{ localContentData.section_title }}
       </v-chip>
       <v-chip
-        :to="`/school?coed_status=${contentData.sex}`"
-        v-if="contentData.sex_title"
+        v-if="localContentData.sex_title"
+        :to="`/school?coed_status=${localContentData.sex}`"
         class="bg-blue-grey-darken-1 text-white mr-1"
       >
-        {{ contentData.sex_title }}
+        {{ localContentData.sex_title }}
       </v-chip>
     </v-sheet>
     <v-spacer />
-    <div class="gtext-t4 primary-blue-500 cursor-pointer">Contribute</div>
+    <div class="gtext-t4 primary-blue-500 cursor-pointer">
+      Contribute
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref, watch, computed } from 'vue'
+
 const props = defineProps({
   contentData: {
     type: Object,
     required: true,
   },
-});
+})
+
+const emit = defineEmits(['onChipsClick'])
+
+const localContentData = ref(props.contentData)
+
+watch(
+  () => props.contentData,
+  (newContent) => {
+    localContentData.value = newContent
+  },
+  { deep: true },
+)
+
+function buildSchoolListUrl(type, data) {
+  const query = {}
+  if (data.countryId) query.country = data.countryId
+  if (type === 'state' || type === 'city') {
+    if (data.stateId) query.state = data.stateId
+  }
+  if (type === 'city') {
+    if (data.cityId) query.city = data.cityId
+  }
+  const params = new URLSearchParams(query).toString()
+  return `/school?${params}`
+}
 </script>
 
 <style scoped>

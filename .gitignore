@@ -88,17 +88,12 @@ dist
 # IDE / Editor
 .idea
 
-# Service worker
-sw.*
 
 # macOS
 .DS_Store
 
 # Vim swap files
 *.swp
-
-# Service worker
-sw.*
 
 OneSignalSDK*
 .vercel

@@ -14,7 +14,10 @@
           checked: isChecked(option.id),
         }"
       >
-        <span v-if="isChecked(option.id)" class="check-mark"></span>
+        <span
+          v-if="isChecked(option.id)"
+          class="check-mark"
+        />
       </div>
       <span class="checkbox-label">{{ option.title }}</span>
     </div>
@@ -22,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 const props = defineProps({
   options: {
@@ -37,34 +40,37 @@ const props = defineProps({
     type: [Array, String, Number],
     default: [],
   },
-});
+})
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue'])
 
 const isChecked = (value) => {
   return props.multiple
     ? props.modelValue.includes(value)
-    : props.modelValue === value;
-};
+    : props.modelValue === value
+}
 
 const toggleOption = (option) => {
   if (props.multiple) {
-    const newValues = [...props.modelValue];
-    const index = newValues.indexOf(option.id);
+    const newValues = [...props.modelValue]
+    const index = newValues.indexOf(option.id)
     if (index > -1) {
-      newValues.splice(index, 1);
-    } else {
-      newValues.push(option.id);
+      newValues.splice(index, 1)
     }
-    emit("update:modelValue", newValues);
-  } else {
+    else {
+      newValues.push(option.id)
+    }
+    emit('update:modelValue', newValues)
+  }
+  else {
     if (props.modelValue === option.id) {
-      emit("update:modelValue", null);
-    } else {
-      emit("update:modelValue", option.id);
+      emit('update:modelValue', null)
+    }
+    else {
+      emit('update:modelValue', option.id)
     }
   }
-};
+}
 </script>
 
 <style scoped>

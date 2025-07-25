@@ -26,34 +26,11 @@
             @include style.responsive-size(flex-wrap, unset, wrap, wrap, wrap);
 
             .search-input-contaier {
-                height: 100%;
-                @include style.responsive-size(width, 300px, 70%, 70%, 70%);
-            }
-            .button-sort-filter-mobile {
                 display: flex;
-                justify-content: flex-end;
-                column-gap: 10px;
-                width: 30%;
-                @include style.responsive-size(display, none, flex, flex, flex);
-                .btn-filter {
-                    border-radius: 50%;
-                    border: none;
-                    outline: none;
-                    background-color: rgb(242, 244, 247);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s;
-                    @include style.responsive-size(width, 50px, 50px, 50px, 40px);
-                    @include style.responsive-size(height, 50px, 50px, 50px, 40px);
-                }
-                .btn-filter:active {
-                    transform: scale(0.8);
-                }
-                .btn-filter:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                @include style.responsive-size(width, 300px, 67%, 67%, 67%);
             }
 
             .filter-options-div {
@@ -116,7 +93,7 @@
 
                     .main-box-Tuition {
                         width: 400px;
-                        height: 200px;
+                        height: 210px;
                         background-color: white;
                         box-shadow: rgb(76 76 76 / 52%) 0px 1px 10px 3px;
                         border-radius: 0 0 10px 10px;
@@ -134,31 +111,25 @@
                             font-size: 24px;
                             font-weight: 600;
                             color: black;
+                            margin-top: 10px;
                         }
                         .subtitle-Tuition {
                             font-size: 16px;
                             font-weight: 400;
                             color: black;
                         }
-                        .input-range {
-                            width: 100%;
-                            margin-top: 20px;
-                            -webkit-appearance: none;
-                            background: #ddd;
-                            height: 15px;
-                            border-radius: 40px;
-                            transition: all 0.5s;
-                            pointer-events: none;
-                        }
-
-                        .input-range[type="range"]::-webkit-slider-thumb {
-                            -webkit-appearance: none; /* Override default look */
-                            appearance: none;
+                        :deep(.v-slider-thumb__label) {
                             background-color: #ffb600;
-                            height: 20px;
-                            width: 20px;
-                            border-radius: 50%;
-                            pointer-events: auto;
+                            height: 36px;
+                        }
+                        :deep(.v-slider-thumb__label::before) {
+                            color: #ffb600;
+                        }
+                        :deep(.v-slider-track__tick) {
+                            background-color: #d0d5dd;
+                        }
+                        :deep(.v-slider-track__tick--filled) {
+                            background-color: #ffd58d;
                         }
                     }
 
@@ -325,7 +296,7 @@
                 width: 96%;
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                justify-content: flex-start;
                 column-gap: 10px;
                 margin-top: 60px;
                 .title-group {
@@ -334,79 +305,27 @@
                     color: black;
                 }
                 .container-input {
-                    width: 80%;
+                    width: 60%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     position: relative;
-                    .show-number-fee {
-                        font-size: 14px;
-                        font-weight: 500;
-                        color: black;
-                        padding: 4px 10px;
-                        border-radius: 6px;
+                    :deep(.v-slider-thumb__label) {
                         background-color: #ffb600;
-                        position: absolute;
-                        top: -34px;
-                        width: 80px;
-                        text-align: center;
+                        height: 36px;
                     }
-
-                    .input-range {
-                        width: 100%;
-                        -webkit-appearance: none;
-                        background: #ddd;
-                        height: 15px;
-                        border-radius: 40px;
-                        transition: all 0.5s;
-                        pointer-events: none;
+                    :deep(.v-slider-thumb__label::before) {
+                        color: #ffb600;
                     }
-
-                    .input-range[type="range"]::-webkit-slider-thumb {
-                        -webkit-appearance: none; /* Override default look */
-                        appearance: none;
-                        background-color: #ffb600;
-                        height: 20px;
-                        width: 20px;
-                        border-radius: 50%;
-                        pointer-events: auto;
+                    :deep(.v-slider-track__tick) {
+                        background-color: #d0d5dd;
+                    }
+                    :deep(.v-slider-track__tick--filled) {
+                        background-color: #ffd58d;
                     }
                 }
             }
-            .button-apply-cancel {
-                width: 100%;
-                margin-top: 30px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                column-gap: 10px;
-                .btn-cancel {
-                    width: 100px;
-                    height: 70px;
-                    border: none;
-                    outline: none;
-                    background: transparent;
-                    font-weight: 500;
-                    font-size: 18px;
-                    color: black;
-                }
-                .btn-apply {
-                    width: 180px;
-                    height: 50px;
-                    border: none;
-                    outline: none;
-                    background: #ffb600;
-                    border-radius: 30px;
-                    font-weight: 500;
-                    font-size: 18px;
-                    color: black;
-                    transition: all 0.2s;
 
-                    &:active {
-                        transform: scale(0.98);
-                    }
-                }
-            }
             .box-chips-query-mobile {
                 width: 100%;
                 display: flex;
@@ -420,18 +339,6 @@
                     column-gap: 10px;
                     flex-wrap: wrap;
                     row-gap: 10px;
-                    .chip-div {
-                        min-width: 100px;
-                        padding: 6px 10px;
-                        border: 1px solid #252626;
-                        border-radius: 20px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        column-gap: 6px;
-                        font-size: 16px;
-                        font-weight: 500;
-                    }
                 }
             }
         }
@@ -450,18 +357,6 @@
             column-gap: 10px;
             flex-wrap: wrap;
             row-gap: 10px;
-            .chip-div {
-                min-width: 100px;
-                padding: 6px 10px;
-                border: 1px solid #252626;
-                border-radius: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                column-gap: 6px;
-                font-size: 16px;
-                font-weight: 500;
-            }
         }
     }
 }

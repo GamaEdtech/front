@@ -1,96 +1,98 @@
 <template>
   <div>
-    <section id="details-gallery-portrate" class="rounded-lg">
+    <section
+      id="details-gallery-portrate"
+      class="rounded-lg"
+    >
       <div class="card-carousel">
         <v-row justify="center">
-          <!--Mobile side section-->
           <v-col
             cols="12"
             class="pr-0 d-flex d-md-none overflow-x-auto mt-3 mt-md-0"
           >
             <v-btn
+              v-for="(item, index) in items"
+              :key="index"
               icon
               large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
-              v-for="(item, index) in items"
-              :key="index"
               class="bg-blue-grey-darken-2 mx-3"
             >
-              <v-tooltip location="right">
-                <template v-slot:activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="font-size: 26px"
-                    :class="
-                      'white--text text--lighten-1 icon icon-' + item.icon
-                    "
-                  />
-                </template>
-                <span>{{ item.text }}</span>
-              </v-tooltip>
+              <span
+                v-tooltip="item.text"
+                style="font-size: 26px"
+                :class="'text-white text--lighten-1 icon icon-' + item.icon"
+              />
             </v-btn>
           </v-col>
-          <!--End mobile side section-->
 
-          <!--Desktop side section-->
           <v-col
             cols="2"
             xl="2"
             class="pr-0 pl-0 d-none d-md-flex flex-column align-center"
           >
             <v-btn
+              v-for="(item, index) in items"
+              :key="index"
               icon
               large
               :to="`${item.link}&state=${help_link_data.state}&section=${help_link_data.section}&base=${help_link_data.base}&course=${help_link_data.course}
                   &lesson=${help_link_data.lesson}`"
-              v-for="(item, index) in items"
-              :key="index"
               class="mb-3 bg-blue-grey-darken-2 flex-shrink-0"
             >
-              <v-tooltip location="right">
-                <template v-slot:activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="font-size: 26px"
-                    :class="`icon icon-${item.icon} white--text text--darken-1`"
-                  />
-                </template>
-                <span>{{ item.text }}</span>
-              </v-tooltip>
+              <span
+                v-tooltip="item.text"
+                style="font-size: 26px"
+                :class="`icon icon-${item.icon} text-white text--darken-1`"
+              />
             </v-btn>
           </v-col>
-          <!--End desktop side section-->
 
-          <v-col cols="12" md="9" xl="10" class="pl-2">
+          <v-col
+            cols="12"
+            md="9"
+            xl="10"
+            class="pl-2"
+          >
             <div class="mx-8 mx-md-0">
               <v-carousel
                 id="product-carousel"
+                v-model="carouselVal"
                 :show-arrows="false"
                 :hide-delimiters="images.length <= 1"
-                v-model="carouselVal"
                 class="product-carousel"
                 cycle
                 :show-arrows-on="images.length > 1 ? 'hover' : 'never'"
+                height="100%"
               >
                 <v-carousel-item
                   v-for="(image, index) in images"
                   :key="index"
                   cover
                 >
-                  <img :src="image" class="carousel-img" />
+                  <v-img
+                    :src="image"
+                    class="carousel-img fill-height"
+                  />
                 </v-carousel-item>
               </v-carousel>
 
-              <div class="main-thumbnails" v-if="images.length > 1">
+              <div
+                v-if="images.length > 1"
+                class="main-thumbnails"
+              >
                 <div
                   v-for="(image, index) in images"
                   :key="index"
-                  @click="changeSlide(index)"
                   class="thumbnail-box"
                   :class="{ 'active-box': carouselVal === index }"
+                  @click="changeSlide(index)"
                 >
-                  <img :src="image" class="thumbnail-preview" />
+                  <img
+                    :src="image"
+                    class="thumbnail-preview"
+                  >
                 </div>
               </div>
             </div>
@@ -111,68 +113,68 @@ const props = defineProps({
   helpLinkData: {
     type: Object,
     default: () => ({
-      state: "",
-      section: "",
-      base: "",
-      course: "",
-      lesson: "",
+      state: '',
+      section: '',
+      base: '',
+      course: '',
+      lesson: '',
     }),
   },
   initialSlide: {
     type: Number,
     default: 0,
   },
-});
+})
 
 // Reactive state
-const carouselVal = ref(0);
-const images = ref([]);
+const carouselVal = ref(0)
+const images = ref([])
 const help_link_data = reactive({
-  state: "",
-  section: "",
-  base: "",
-  course: "",
-  lesson: "",
-});
+  state: '',
+  section: '',
+  base: '',
+  course: '',
+  lesson: '',
+})
 
-const active_img = ref(1);
+const active_img = ref(1)
 
 const items = reactive([
   {
-    class: "exam",
-    text: "Related exam",
-    icon: "exam",
-    link: "/search?type=azmoon",
+    class: 'exam',
+    text: 'Related exam',
+    icon: 'exam',
+    link: '/search?type=azmoon',
   },
   {
-    class: "test",
-    text: "Related paper",
-    icon: "paper",
-    link: "/search?type=test",
+    class: 'test',
+    text: 'Related paper',
+    icon: 'paper',
+    link: '/search?type=test',
   },
   {
-    class: "content",
-    text: "Related multimedia",
-    icon: "multimedia",
-    link: "/search?type=learnfiles",
+    class: 'content',
+    text: 'Related multimedia',
+    icon: 'multimedia',
+    link: '/search?type=learnfiles',
   },
   {
-    class: "faq",
-    text: "Related Q & A",
-    icon: "q-a",
-    link: "/search?type=question",
+    class: 'faq',
+    text: 'Related Q & A',
+    icon: 'q-a',
+    link: '/search?type=question',
   },
   {
-    class: "textbook ",
-    text: "Related tutorial",
-    icon: "tutorial",
-    link: "/search?type=dars",
+    class: 'textbook ',
+    text: 'Related tutorial',
+    icon: 'tutorial',
+    link: '/search?type=dars',
   },
-]);
+])
 
 // Methods
 function changeSlide(index) {
-  carouselVal.value = index;
+  carouselVal.value = index
 }
 
 // Watch effects
@@ -180,31 +182,31 @@ watch(
   () => props.imageUrls,
   (newVal) => {
     if (newVal && newVal.length > 0) {
-      images.value = [...newVal];
+      images.value = [...newVal]
     }
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 watch(
   () => props.helpLinkData,
   (newVal) => {
     if (newVal) {
-      Object.assign(help_link_data, newVal);
+      Object.assign(help_link_data, newVal)
     }
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 watch(
   () => props.initialSlide,
   (newVal) => {
     if (newVal !== undefined) {
-      carouselVal.value = newVal;
+      // carouselVal.value = newVal;
     }
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 </script>
 
 <style lang="scss" scoped>
@@ -212,19 +214,42 @@ watch(
   #product-carousel {
     width: 100%;
     max-width: 100%;
-    height: auto !important;
+    height: 30rem !important;
     margin: auto;
     border-radius: 1.2rem;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
+    .v-window {
+      height: 100%;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
+    .v-window__container {
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .v-carousel__item {
+      height: 100%;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
     .carousel-img {
+      height: 100%;
       width: 100%;
-      height: auto;
-      object-fit: cover;
-      display: block;
-      // max-height: 500px;
-      margin: 0 auto;
+      border-radius: inherit;
+    }
+
+    :deep(.v-window__container) {
+      border-radius: inherit;
+    }
+
+    :deep(.v-carousel__item) {
+      border-radius: inherit;
+      overflow: hidden;
     }
   }
 }
@@ -282,13 +307,7 @@ watch(
 
 @media screen and (max-width: 600px) {
   #details-gallery-portrate #product-carousel {
-    width: 100%;
-    max-width: 100%;
-    height: auto !important;
-
-    .carousel-img {
-      // max-height: 300px;
-    }
+    height: 30rem !important;
   }
 
   .thumbnail-box {
@@ -319,14 +338,7 @@ watch(
 @media (min-width: 600px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
       height: 30rem !important;
-      min-height: 30rem !important;
-      max-height: 30rem !important;
-      .carousel-img {
-        // max-height: 350px;
-      }
     }
   }
 }
@@ -334,13 +346,7 @@ watch(
 @media (min-width: 960px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
-      height: auto !important;
-
-      .carousel-img {
-        // max-height: 400px;
-      }
+      height: 30rem !important;
     }
 
     .thumbnail-box {
@@ -353,13 +359,7 @@ watch(
 @media (min-width: 1264px) {
   #details-gallery-portrate {
     #product-carousel {
-      width: 100%;
-      max-width: 100%;
-      height: auto !important;
-
-      .carousel-img {
-        // max-height: 450px;
-      }
+      height: 30rem !important;
     }
 
     .thumbnail-box {

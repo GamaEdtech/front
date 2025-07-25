@@ -1,10 +1,45 @@
+/* eslint-disable nuxt/nuxt-config-keys-order */
+
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import { defineNuxtConfig } from "nuxt/config";
 import glsl from "vite-plugin-glsl";
 
 export default defineNuxtConfig({
-  // Add compatibility date to fix the warning
-  compatibilityDate: "2024-04-03",
+  // Modules
+  modules: [
+    "dayjs-nuxt",
+    "@nuxtjs/leaflet",
+    "@nuxt/eslint",
+    "nuxt-gtag",
+    "@nuxt/image",
+    "@nuxtjs/leaflet",
+    "@vite-pwa/nuxt",
+    (_options, nuxt) => {
+      nuxt.hooks.hook("vite:extendConfig", (config) => {
+        config.plugins.push(vuetify({ autoImport: true }));
+      });
+    },
+  ],
+
+  // Plugins
+  plugins: [
+    { src: "plugins/helper.js" },
+    { src: "plugins/img-cropper", mode: "client" },
+    { src: "plugins/vuedraggable", mode: "client" },
+  ],
+
+  // SSR configuration
+  ssr: true,
+
+  // Auto import components
+  components: true,
+
+  imports: {
+    autoImport: true,
+  },
+
+  // Development modules
+  devtools: { enabled: true },
 
   // Global page headers
   app: {
@@ -40,10 +75,17 @@ export default defineNuxtConfig({
             "GamaTrain: Smart K12 Learning with AI, Community, and Personalized Education",
         },
         { property: "og:site_name", content: "GamaTrain" },
+        { name: "mobile-web-app-capable", content: "yes" },
+        {
+          name: "apple-mobile-web-app-status-bar-style",
+          content: "black-translucent",
+        },
       ],
       link: [
+        { rel: "manifest", href: "/manifest.webmanifest" },
         { rel: "icon", type: "image/x-icon", href: "/favicon-dark.ico" },
         { rel: "stylesheet", href: "/assets/css/all.min.css" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon-light.png" },
       ],
       script: [
         {
@@ -55,46 +97,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Runtime config
-  runtimeConfig: {
-    apiSecret: process.env.API_SECRET || "123",
-    public: {
-      apiBase: process.env.API_BASE || "https://gamatrain.com",
-      googleClientId:
-        process.env.GOOGLE_CLIENT_ID ||
-        "231452968451-rd7maq3v4c8ce6d1e36uk3qacep20lp8.apps.googleusercontent.com",
-      recapchaSiteKey: process.env.NUXT_RECAPTCHA_SITE_KEY || '6LcGF3ErAAAAAAneMnvDNOvdBg4Z7IDoL86tJr9T'
-    },
-  },
-
-  // toast config
-  toast: {
-    position: "top-center",
-    duration: 3000,
-    register: [
-      // Register custom toasts
-      {
-        name: "my-error",
-        message: "Oops...Something went wrong",
-        options: {
-          type: "error",
-        },
-      },
-    ],
-  },
-
-  // pwa config
-  pwa: {
-    manifest: {
-      name: "Gamatrain App",
-      short_name: "Gamatrain",
-      description:
-        "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
-      lang: "en",
-      useWebmanifestExtension: false,
-    },
-  },
-
   // Global CSS
   css: [
     "vuetify/lib/styles/main.css",
@@ -103,30 +105,104 @@ export default defineNuxtConfig({
     "@/assets/css/gama6/styles.css",
   ],
 
-  // Plugins
-  plugins: [
-    { src: "plugins/helper.js" },
-    { src: "plugins/vue-emoji-picker.js", mode: "client" },
-    { src: "plugins/img-cropper", mode: "client" },
-    { src: "plugins/vuedraggable", mode: "client" },
-  ],
+  // Remove duplicate Plugins and Modules below this line
 
-  // Auto import components
-  components: true,
+  experimental: {
+    payloadExtraction: false,
+    appManifest: false,
+  },
 
-  // Modules
-  modules: [
-    "dayjs-nuxt",
-    "@nuxtjs/leaflet",
-    "nuxt-gtag",
-    "@nuxt/image",
-    "@nuxtjs/leaflet",
-    (_options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) => {
-        config.plugins.push(vuetify({ autoImport: true }));
-      });
+  pwa: {
+    registerType: "autoUpdate",
+    manifest: {
+      name: "Gamatrain",
+      short_name: "Gamatrain",
+      description:
+        "Discover GamaTrain, an innovative K12 learning platform transforming education with AI-powered instruction, a vibrant community, and personalized learning experiences.",
+      theme_color: "#ffffff",
+      background_color: "#ffffff",
+      display: "standalone",
+      start_url: "/",
+      icons: [
+        {
+          src: "/favicon-16x16-light.png",
+          sizes: "16x16",
+          type: "image/png",
+        },
+        {
+          src: "/favicon-32x32-light.png",
+          sizes: "32x32",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-192x192-light.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/android-chrome-512x512-light.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+      screenshots: [
+        {
+          src: "/screenshots/home-desktop.png",
+          sizes: "1280x720",
+          type: "image/png",
+          form_factor: "wide",
+        },
+        {
+          "src": "/screenshots/home-mobile.png",
+          "sizes": "540x720",
+          "type": "image/png",
+          "form_factor": "narrow"
+        }
+      ],
+      launch_handler: {
+        client_mode: 'focus-existing'
+      },
+      lang: "en",
+      orientation: "any",
+      categories: [
+        "books",
+        "education",
+        "games",
+        "productivity"
+      ],
+      dir: "ltr",
+      prefer_related_applications: false,
+      // related_applications: [
+      //   {
+      //     platform: "play",
+      //     url: "https://play.google.com/store/apps/details?id=com.example.app",
+      //     id: "com.example.app"
+      //   }
+      // ],
+      display_override: ["window-controls-overlay", "standalone", "fullscreen"],
+      window_controls_overlay: true,
     },
-  ],
+    meta: {
+      theme_color: "#ffffff",
+      mobileAppIOS: true,
+      appleStatusBarStyle: "black-translucent",
+      name: "Gamatrain",
+    },
+    workbox: {
+      navigateFallback: "/",
+      globPatterns: [],
+      globIgnores: [
+        "**/_payload.json",
+        "_nuxt/builds/**/*.json",
+        "**/node_modules/**/*",
+      ],
+    },
+    devOptions: {
+      enabled: false,
+      type: "module",
+    },
+  },
+
   leaflet: {
     markerCluster: true,
   },
@@ -145,8 +221,33 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["vuetify", "vue-chartjs", "defu", "@ckeditor/ckeditor5-vue"],
+    transpile: [
+      "vuetify",
+      "vue-chartjs",
+      "defu",
+      "@ckeditor/ckeditor5-vue",
+      "vue3-emoji-picker",
+    ],
   },
+
+  routeRules: {
+    "/test-maker/**": { ssr: false, prerender: true },
+    "/api/v1/**": {
+      proxy: process.env.NUXT_PROXY_API_BASE_URL,
+    },
+    "/api/v2/**": {
+      proxy: process.env.NUXT_PROXY_API2_BASE_URL,
+    },
+    "/uploads/**": {
+      proxy: process.env.NUXT_PROXY_UPLOAD_URL,
+    },
+  },
+
+  // Development server configuration
+  devServer: {
+    port: 3002,
+  },
+  compatibilityDate: "2024-04-03",
 
   // Vite configuration
   vite: {
@@ -177,24 +278,32 @@ export default defineNuxtConfig({
     },
   },
 
-  routeRules: {
-    "/test-maker/**": { ssr: false, prerender: true },
-    "/api/v1/**": {
-      proxy: process.env.NUXT_PROXY_API_BASE_URL,
-    },
-    "/api/v2/**": {
-      proxy: process.env.NUXT_PROXY_API2_BASE_URL,
-    },
-    "/uploads/**": {
-      proxy: process.env.NUXT_PROXY_UPLOAD_URL,
-    },
+  gtag: {
+    id: "G-VLSLZJR0WK",
   },
 
-  // Development server configuration
-  devServer: {
-    port: 3002,
+  // Module configuration
+  image: {
+    domains: ["core.gamatrain.com"],
   },
 
-  // SSR configuration
-  ssr: true,
+  leaflet: {
+    markerCluster: true,
+  },
+
+  // toast config
+  toast: {
+    position: "top-center",
+    duration: 3000,
+    register: [
+      // Register custom toasts
+      {
+        name: "my-error",
+        message: "Oops...Something went wrong",
+        options: {
+          type: "error",
+        },
+      },
+    ],
+  },
 });

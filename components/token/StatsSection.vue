@@ -2,7 +2,9 @@
   <div class="stats-section">
     <v-container>
       <div class="stats-section__content">
-        <h1 class="stats-section__title">LIVE STATISTICS</h1>
+        <h1 class="stats-section__title">
+          LIVE STATISTICS
+        </h1>
         <p class="stats-section__desc pt-1">
           Real-time data and analytics for the $GET token ecosystem
         </p>
@@ -24,10 +26,13 @@
                       </template>
                     </ClientOnly>
                   </div>
-                  <div class="stats-section-stats__card--percent">+5.2%</div>
                 </div>
-                <div class="stats-section-stats__card--title">Market Cap</div>
-                <div class="stats-section-stats__card--value">$ 2.3B</div>
+                <div class="stats-section-stats__card--title">
+                  Market Cap
+                </div>
+                <div class="stats-section-stats__card--value">
+                  $ 2.3B
+                </div>
               </div>
             </v-col>
             <v-col cols="6">
@@ -45,10 +50,13 @@
                       </template>
                     </ClientOnly>
                   </div>
-                  <div class="stats-section-stats__card--percent">+10%</div>
                 </div>
-                <div class="stats-section-stats__card--title">24h Volume</div>
-                <div class="stats-section-stats__card--value">$ 1124.5M</div>
+                <div class="stats-section-stats__card--title">
+                  24h Volume
+                </div>
+                <div class="stats-section-stats__card--value">
+                  $ 1124.5M
+                </div>
               </div>
             </v-col>
             <v-col cols="6">
@@ -73,7 +81,9 @@
                 <div class="stats-section-stats__card--title">
                   Circuleating Supply
                 </div>
-                <div class="stats-section-stats__card--value">750M GET</div>
+                <div class="stats-section-stats__card--value">
+                  750M GET
+                </div>
               </div>
             </v-col>
             <v-col cols="6">
@@ -97,21 +107,33 @@
                     -3.4%
                   </div>
                 </div>
-                <div class="stats-section-stats__card--title">Holders</div>
-                <div class="stats-section-stats__card--value">45.672</div>
+                <div class="stats-section-stats__card--title">
+                  Holders
+                </div>
+                <div class="stats-section-stats__card--value">
+                  45.672
+                </div>
               </div>
             </v-col>
           </v-row>
         </div>
         <div class="mt-4">
-          <h2 class="stats-section-chart__title">Price Performance</h2>
+          <h2 class="stats-section-chart__title">
+            Price Performance
+          </h2>
         </div>
 
         <v-row class="mt-2 mx-5">
-          <v-col cols="4" sm="3" class="d-flex flex-column h-100 px-2 py-0">
+          <v-col
+            cols="4"
+            sm="3"
+            class="d-flex flex-column h-100 px-2 py-0"
+          >
             <div>
               <div class="stats-section-chart__card">
-                <div class="stats-section-chart__box">$0.00892</div>
+                <div class="stats-section-chart__box">
+                  $0.00892
+                </div>
               </div>
               <div class="stats-section-chart__coins flex-grow-1">
                 <div class="d-flex align-center mb-2 mb-md-4">
@@ -119,7 +141,7 @@
                     src="/images/token/Stats/token-get.png"
                     alt="GET"
                     class="token-icon mr-2"
-                  />
+                  >
                   <span class="token-label">GET</span>
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
@@ -127,7 +149,7 @@
                     src="/images/token/Stats/token-usdc.png"
                     alt="USDC"
                     class="token-icon mr-2"
-                  />
+                  >
                   <span class="token-label">USDC</span>
                 </div>
                 <div class="d-flex align-center mb-2 mb-md-4">
@@ -135,7 +157,7 @@
                     src="/images/token/Stats/token-usdt.png"
                     alt="USDT"
                     class="token-icon mr-2"
-                  />
+                  >
                   <span class="token-label">USDT</span>
                 </div>
                 <div class="d-flex align-center">
@@ -143,21 +165,24 @@
                     src="/images/token/Stats/token-wbtc.png"
                     alt="WBTC"
                     class="token-icon mr-2"
-                  />
+                  >
                   <span class="token-label">WBTC</span>
                 </div>
               </div>
             </div>
           </v-col>
-          <v-col cols="8" sm="9" class="px-2 py-0">
+          <v-col
+            cols="8"
+            sm="9"
+            class="px-2 py-0"
+          >
             <iframe
               class="stats-section-chart__iframe"
               width="100%"
               src="https://birdeye.so/tv-widget/GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv?chain=solana&viewMode=pair&chartInterval=1D&chartType=Candle&chartTimezone=Etc%2FUTC&chartLeftToolbar=show&theme=dark"
               frameborder="0"
               allowfullscreen
-            >
-            </iframe>
+            />
           </v-col>
         </v-row>
       </div>
@@ -166,8 +191,20 @@
 </template>
 
 <script setup>
-import { useDisplay } from "vuetify";
-const display = useDisplay();
+import { useDisplay } from 'vuetify'
+
+const display = useDisplay()
+const isMobile = ref(false)
+
+onMounted(() => {
+  isMobile.value = display.xs.value
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal
+    },
+  )
+})
 </script>
 
 <style scoped>

@@ -2,7 +2,9 @@
   <section class="token-purchase-bg">
     <div class="token-purchase-container">
       <div class="token-purchase-content">
-        <h2 class="main-heading">Join the Movement</h2>
+        <h2 class="main-heading">
+          Join the Movement
+        </h2>
         <h3 class="sub-heading">
           Buy <span class="head-yellow">$GET</span> Today
         </h3>
@@ -10,7 +12,9 @@
           Empower education. Power the Gama ecosystem.
         </p>
         <div class="d-flex justify-center align-center flex-column mt-8">
-          <div class="token-purchase__title mb-1">Buy now on</div>
+          <div class="token-purchase__title mb-1">
+            Buy now on
+          </div>
           <a
             target="_blank"
             href="https://jup.ag/swap/So11111111111111111111111111111111111111112-GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
@@ -21,7 +25,7 @@
               src="/images/token/CTA/jupiter.png"
               alt="Jupiter exchange logo"
               class="jupiter-logo"
-            />
+            >
             <div class="pl-3">Jupiter</div>
           </a>
         </div>
@@ -31,17 +35,17 @@
           src="/images/token/CTA/CTA_People_Mobile.svg"
           alt="People holding Gama tokens illustration"
           class="token-purchase__illustration d-none d-md-block"
-        />
+        >
         <img
           src="/images/token/CTA/CTA_People_Tablet.svg"
           alt="People holding Gama tokens illustration for tablet"
           class="token-purchase__illustration d-none d-sm-block d-md-none"
-        />
+        >
         <img
           src="/images/token//CTA/CTA_People_mobile.svg"
           alt="People holding Gama tokens illustration for mobile"
           class="token-purchase__illustration d-sm-none"
-        />
+        >
       </figure>
     </div>
   </section>
