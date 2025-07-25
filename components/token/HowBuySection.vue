@@ -59,7 +59,8 @@
                         <div class="step-title">{{ row[0].title }}</div>
                       </div>
                       <ul class="step-list">
-                        <li v-for="(item, i) in row[0].items" :key="i" 
+                        <li
+                            v-for="(item, i) in row[0].items" :key="i" 
                             :class="{ 'warning-text': item.isWarning }">
                           <template v-if="item.link">
                             Go to
@@ -95,7 +96,8 @@
                         <div class="step-title">{{ row[1].title }}</div>
                       </div>
                       <ul class="step-list">
-                        <li v-for="(item, i) in row[1].items" :key="i" 
+                        <li
+                            v-for="(item, i) in row[1].items" :key="i" 
                             :class="{ 'warning-text': item.isWarning }">
                           <template v-if="item.link">
                             Go to
@@ -131,7 +133,7 @@ const steps = [
       { link: 'https://phantom.com' },
       { text: 'Create a wallet and receive your secret recovery phrase' },
       { text: 'Write your phrase down somewhere safe' },
-      { text: 'Never share this phrase with anyone ❗'}
+      { text: 'Never share this phrase with anyone ❗' }
     ]
   },
   {
@@ -459,4 +461,4 @@ const stepRows = computed(() => {
     width: 100%;
   }
 }
-</style scoped>
+</style>
