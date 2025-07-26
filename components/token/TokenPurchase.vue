@@ -42,7 +42,7 @@
           class="token-purchase__illustration d-none d-sm-block d-md-none"
         >
         <img
-          src="/images/token//CTA/CTA_People_mobile.svg"
+          src="/images/token/CTA/CTA_People_Mobile.svg"
           alt="People holding Gama tokens illustration for mobile"
           class="token-purchase__illustration d-sm-none"
         >
