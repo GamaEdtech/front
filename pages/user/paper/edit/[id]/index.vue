@@ -26,8 +26,8 @@
             ref="form"
             v-model="isFormValid"
             lazy-validation
-            @submit.prevent="updateQuestion"
             autocomplete="off"
+            @submit.prevent="updateQuestion"
           >
             <v-row>
               <v-col
@@ -682,14 +682,12 @@ const _changeOption = (optionName, optionVal) => {
   }
 }
 
-
 const handleClassificationError = (error) => {
   console.error('Classification loading error:', error)
   $toast.error('Unable to load paper types. Please try selecting the board again.')
   test_type_list.value = []
   formData.test_type = ''
 }
-
 
 const getClassificationTypes = async (sectionId) => {
   if (!sectionId) {
@@ -699,26 +697,28 @@ const getClassificationTypes = async (sectionId) => {
 
   test_type_loading.value = true
   try {
-    const params = { 
+    const params = {
       type: 'test_type',
-      section_id: sectionId 
+      section_id: sectionId,
     }
     const response = await useApiService.get('/api/v1/types/list', params)
-    
+
     // The API should return board-specific classifications including:
     // - General resources (Coursebook, Workbook) for all boards
     // - CIE papers (Paper 1, Paper 2, etc.) for CIE board
     // - Edexcel papers and Units for Edexcel board
     // - Other board-specific classifications
     test_type_list.value = response.data || []
-    
+
     // Handle empty response
     if (!response.data || response.data.length === 0) {
       console.warn('No classification types returned for board:', sectionId)
     }
-  } catch (err) {
+  }
+  catch (err) {
     handleClassificationError(err)
-  } finally {
+  }
+  finally {
     test_type_loading.value = false
   }
 }
