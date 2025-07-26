@@ -11,8 +11,6 @@ export default createConfigForNuxt({
   })
   .override('nuxt/typescript/rules', {
     rules: {
-      '@typescript-eslint/ban-types': 'off',
-      // '@typescript-eslint/no-unused-vars': 'off',
     },
   })
   .override('nuxt/rules', {
