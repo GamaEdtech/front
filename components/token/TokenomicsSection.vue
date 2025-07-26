@@ -180,6 +180,7 @@ onMounted(() => {
   display: block;
   margin: 0 auto 2rem auto;
   justify-content: center;
+  mix-blend-mode: multiply;
 }
 
 @media (max-width: 480px) {
