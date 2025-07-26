@@ -256,7 +256,6 @@ const contentData = ref(props.content)
 const emit = defineEmits(['edit', 'update'])
 const nuxtApp = useNuxtApp()
 const route = useRoute()
-const router = useRouter()
 const generalDataEditMode = reactive({
   website: false,
   email: false,
@@ -322,7 +321,7 @@ function isValidUrl(url) {
     new URL(url)
     return /^https?:\/\//.test(url)
   }
-  catch (e) {
+  catch {
     return false
   }
 }
@@ -331,7 +330,7 @@ function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
-  catch (e) {
+  catch {
     return false
   }
 }
@@ -339,7 +338,7 @@ function isRequired(value) {
   try {
     return !!value.trim()
   }
-  catch (e) {
+  catch {
     return false
   }
 }

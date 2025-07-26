@@ -112,7 +112,7 @@ async function setMarkers() {
       return
     }
 
-    const { markerCluster, markers } = await useLMarkerCluster({
+    const { markers } = await useLMarkerCluster({
       leafletObject: map.value.leafletObject,
       markers: mapItems,
     })

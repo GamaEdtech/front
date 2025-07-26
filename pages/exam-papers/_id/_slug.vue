@@ -573,15 +573,7 @@
 </template>
 
 <script>
-import Breadcrumb from '../../../components/widgets/breadcrumb'
-import LastViews from '@/components/common/last-views'
-import RelatedCardBox from './components/related-card-box'
-import Category from '@/components/common/category'
-import PreviewGallery from '@/components/details/preview-gallery'
-import RelatedContent from '@/components/details/related-content'
-import LatestTrainingContent from '@/components/details/latest-training-content'
-import RelatedQa from '@/components/details/related-qa'
-import RelatedOnlineExam from '@/components/details/related-online-exam'
+// Removed unused imports
 
 export default {
   name: 'ExamPaperDetails',

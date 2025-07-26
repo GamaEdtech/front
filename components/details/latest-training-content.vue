@@ -71,12 +71,10 @@
 </template>
 
 <script>
-import Video from '@/components/common/video.vue'
-
 export default {
   name: 'LatestTrainingContent',
   components: {
-    // Remove Video since it's not used
+    // Video component removed as it was unused
   },
   data() {
     return {

@@ -153,7 +153,7 @@ const debouncedSearchText = () => {
   }, 800)
 }
 
-const { data: initialData, pending: loadingDataServer } = await useAsyncData(
+const { data: initialData, pending: _loadingDataServer } = await useAsyncData(
   'dataSearchSSR',
   () => {
     const params = {

@@ -1,4 +1,4 @@
-import { useNuxtApp, useRuntimeConfig } from 'nuxt/app'
+import { useRuntimeConfig } from 'nuxt/app'
 import { ref } from 'vue'
 
 interface RecaptchaContext {

@@ -29,9 +29,7 @@
           dark
         >
           <v-toolbar-title class="text-h4">
-            {{
-              "Select " + label
-            }}
+            {{ "Select " + label }}
           </v-toolbar-title>
           <v-spacer />
           <v-toolbar-items>
@@ -57,12 +55,10 @@
 </template>
 
 <script>
-import LeafletMap from '@/components/leafletMap/LeafletMap'
-
 export default {
   name: 'LocationField',
   components: {
-    // Remove LocationSearch since it's not used
+    // LeafletMap component removed as it was unused
   },
   props: {
     label: {
@@ -137,7 +133,7 @@ export default {
           console.log(response)
           // this.reverseLocation(response.location.latitude, response.location.longitude)
         })
-        .finally((msg) => {
+        .finally((_msg) => {
           this.location_loading = false
         })
     },

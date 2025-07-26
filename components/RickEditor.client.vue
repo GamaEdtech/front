@@ -57,7 +57,7 @@ const modelValue = defineModel({
 })
 
 // Define the mapping between feature names and toolbar items
-const featureToToolbarItem = {
+const _featureToToolbarItem = {
   bold: 'bold',
   italic: 'italic',
   underline: 'underline',

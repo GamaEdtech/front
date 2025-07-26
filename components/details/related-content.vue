@@ -291,7 +291,7 @@ export default {
 
           if (type === 'test') this.relatedPapers.push(...response.data.list)
         })
-        .catch((err) => {})
+        .catch((_err) => {})
         .finally(() => {
           this.loading = false
         })

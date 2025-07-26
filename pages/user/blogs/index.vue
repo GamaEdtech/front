@@ -190,7 +190,7 @@ useHead({
 })
 
 // State
-const singleSelect = ref(false)
+const _singleSelect = ref(false)
 const selected = ref([])
 const activeTab = ref('Published')
 const page = ref(1)
@@ -264,7 +264,7 @@ const handleDelete = async () => {
         item => item.id !== itemToDelete.value.id,
       )
     }
-    catch (e) {
+    catch {
       $toast.error('Failed to delete blog.')
     }
   }
@@ -279,7 +279,7 @@ const handleBulkAction = async () => {
       $toast.success('Selected items deleted successfully!')
       selected.value = []
     }
-    catch (e) {
+    catch {
       $toast.error('Failed to delete selected items.')
     }
   }

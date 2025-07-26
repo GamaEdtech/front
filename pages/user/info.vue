@@ -122,7 +122,7 @@ export default {
 
       this.$fetch
         .$post('/api/v1/users/info', querystring.stringify(this.info))
-        .then((response) => {
+        .then((_response) => {
           const updatedData = {
             avatar: this.$auth.user.avatar,
             credit: this.$auth.user.credit,

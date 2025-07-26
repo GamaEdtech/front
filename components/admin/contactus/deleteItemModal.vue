@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+const _props = defineProps({
   modelValue: {
     type: Boolean,
     required: true,
@@ -17,7 +17,7 @@ const newItem = ref({
   date: new Date().toISOString().split('T')[0], // Default to today's date
 })
 
-function handleDelete() {
+function _handleDelete() {
   emit('confirm', { ...newItem.value })
   close()
 }
@@ -47,7 +47,7 @@ function onDialogInput(val) {
           <!-- <img src="~assets/images/Vector (1).svg" alt="Icon" /> -->
           <v-icon
             color="red"
-            style="font-size: 48px !important;"
+            style="font-size: 48px !important"
           >
             mdi-delete
           </v-icon>
@@ -65,7 +65,7 @@ function onDialogInput(val) {
         <v-card-actions class="action-buttons">
           <v-btn
             class="w-50 rounded-pill primary-gray-900 gtext-t5"
-            style="background-color: white; border: 1px solid #E4E7EC;"
+            style="background-color: white; border: 1px solid #e4e7ec"
             @click="close"
           >
             Cancel
@@ -73,7 +73,7 @@ function onDialogInput(val) {
 
           <v-btn
             class="w-50 rounded-pill text-white gtext-t5"
-            style="background-color: #F04438;"
+            style="background-color: #f04438"
             @click="$emit('confirm')"
           >
             Delete

@@ -165,7 +165,7 @@ async function fetchExamData() {
 }
 
 // Use asyncData to fetch data
-const { data, pending, error } = await useAsyncData(
+const { data, pending, _error } = await useAsyncData(
   `exam-${route.params.id}`,
   async () => {
     const data = await fetchExamData()

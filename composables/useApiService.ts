@@ -20,7 +20,7 @@ interface AuthHeaders {
   Authorization?: string
 }
 
-interface ApiError {
+interface _ApiError {
   status: number
   message: string
   data?: unknown
@@ -36,19 +36,23 @@ export const useApiService = <T = unknown>(
   const apiFetch = $fetch.create({
     baseURL: config.public.baseURL as string,
     credentials: 'include',
-    onResponse({ request, response, options }) {
+    onResponse({ request: _request, response: _response, options: _options }) {
       // Process the response data
     },
-    onResponseError({ request, response, options }) {
+    onResponseError({
+      request: _request,
+      response: _response,
+      options: _options,
+    }) {
       if (response?.status == 401 || response?.status == 403) {
         const router = useRouter()
         router.push({ query: { auth_form: 'login' } })
       }
     },
-    onRequest({ request, options }) {
+    onRequest({ request: _request, options: _options }) {
       // Set the request headers
     },
-    onRequestError({ request, options, error }) {
+    onRequestError({ request: _request, options: _options, error: _error }) {
       // Handle the request errors
     },
     ...opts,

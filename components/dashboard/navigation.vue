@@ -66,11 +66,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useNuxtApp } from '#app'
+import { ref } from 'vue'
 import { useUser } from '~/composables/useUser'
 
-const { user, setUser, cleanUser } = useUser()
+const { user } = useUser()
 const openGroups = ref({})
 
 const toggleGroup = (index) => {

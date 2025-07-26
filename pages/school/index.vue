@@ -284,7 +284,7 @@ const updateQueryParams = () => {
   applyFiltersFromQuery(query)
 }
 
-const applyFiltersFromQuery = (query) => {
+const applyFiltersFromQuery = (_query) => {
   debouncedGetSchoolList()
 }
 const debouncedGetSchoolList = async () => {
@@ -362,7 +362,7 @@ const setMetaData = (informationResponse) => {
   })
 }
 
-const { data: initialSchools, pending: loadingSchoolsServer }
+const { data: initialSchools, pending: _loadingSchoolsServer }
   = await useAsyncData('schoolListSSR', () => {
     const params = {
       'PagingDto.PageFilter.Skip': (filterForm.value.page - 1) * perPage,

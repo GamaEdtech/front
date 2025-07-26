@@ -143,11 +143,7 @@ const randomTestContent = ref(null)
 
 // Track loading state
 
-const {
-  data: contentData,
-  error,
-  pending: dataFetching,
-} = await useAsyncData(
+const { data: contentData, pending: dataFetching } = await useAsyncData(
   `paper-${route.params.id}`,
   async () => {
     try {
@@ -163,7 +159,6 @@ const {
     }
     finally {
       // Reset loading states if needed
-      loading.value = false
     }
   },
   {
@@ -207,7 +202,7 @@ useHead({
   link: [
     {
       rel: 'canonical',
-      href: `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`,
+      href: contentData.value ? `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}` : `https://${requestURL.value}/paper/${route.params.id}`,
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {
@@ -215,22 +210,25 @@ useHead({
   },
 })
 
-if (contentData.value) {
-  previewImages.value.push(contentData.value.thumb_pic)
-  if (contentData.value.lesson_pic) {
-    previewImages.value.push(contentData.value.lesson_pic)
-  }
+watchEffect(() => {
+  if (contentData.value) {
+    previewImages.value = []
+    previewImages.value.push(contentData.value.thumb_pic)
+    if (contentData.value.lesson_pic) {
+      previewImages.value.push(contentData.value.lesson_pic)
+    }
 
-  previewImages.value.carouselVal = 0
+    previewImages.value.carouselVal = 0
 
-  galleryHelpData.value = {
-    state: contentData.value?.state || '',
-    section: contentData.value?.section || '',
-    base: contentData.value?.base || '',
-    course: contentData.value?.course || '',
-    lesson: contentData.value?.lesson || '',
+    galleryHelpData.value = {
+      state: contentData.value?.state || '',
+      section: contentData.value?.section || '',
+      base: contentData.value?.base || '',
+      course: contentData.value?.course || '',
+      lesson: contentData.value?.lesson || '',
+    }
   }
-}
+})
 
 const breads = ref([
   {
@@ -282,7 +280,7 @@ const grabRandomTestCode = () => {
           retriveRandomTest(response.data.code)
         }
       })
-      .catch((err) => {})
+      .catch((_err) => {})
   }
 }
 const retriveRandomTest = (code) => {
@@ -290,7 +288,7 @@ const retriveRandomTest = (code) => {
     .then((response) => {
       randomTestContent.value = response.data
     })
-    .catch((err) => {})
+    .catch((_err) => {})
 }
 
 onMounted(() => {

@@ -382,7 +382,7 @@ function openAuthDialog(val) {
 
 function croppedData(data) {
   const timestamp = new Date().getTime()
-  const originalFile = pendingUploads.value[currentCropIndex.value]
+  const _originalFile = pendingUploads.value[currentCropIndex.value]
   const fileType = 'image/webp'
   const fileExt = 'webp'
   const filename = `image_${timestamp}_${currentCropIndex.value}.${fileExt}`

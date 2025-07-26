@@ -359,7 +359,7 @@ async function fetchContentData() {
 //     watch: [() => route.params.id],
 //   }
 // );
-const { data, pending, error } = await useAsyncData(
+const { data, pending, _error } = await useAsyncData(
   `multimedia-details-${route.params.id}`,
   async () => {
     const data = await fetchContentData()
@@ -375,7 +375,7 @@ watchEffect(async () => {
 
 // onMounted(async () => {
 //   if (pending.value) {
-//     await waitForAsyncData();
+//     await _waitForAsyncData();
 //   }
 
 //   if (!contentData.value || Object.keys(contentData.value).length === 0) {
@@ -386,7 +386,7 @@ watchEffect(async () => {
 //   }
 // });
 
-function waitForAsyncData() {
+function _waitForAsyncData() {
   return new Promise((resolve) => {
     if (!pending.value) {
       resolve()
@@ -458,7 +458,7 @@ function openAuthDialog(val) {
   router.push({ query: { auth_form: val } })
 }
 
-async function startDownload(type) {
+async function startDownload(_type) {
   download_loading.value = true
   const apiUrl = `/api/v1/files/download/${route.params.id}`
   try {

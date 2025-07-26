@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   timeline: {
     type: Array,
     required: true,

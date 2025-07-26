@@ -510,11 +510,25 @@ const countryRules = [
 ]
 
 // Computed
-const isUsernameValid = computed(() => {
+const _isUsernameValid = computed(() => {
   return (
     username.value.length >= 3
     && username.value.length <= 20
     && /^[a-zA-Z0-9_]+$/.test(username.value)
+  )
+})
+
+const _fieldValid = computed(() => {
+  return (
+    form.first_name.length >= 2
+    && form.last_name.length >= 2
+    && form.gender !== null
+    && form.state !== null
+    && form.area !== null
+    && form.level !== null
+    && form.grade !== null
+    && form.school !== null
+    && form.country !== null
   )
 })
 
@@ -617,8 +631,8 @@ const submitProfile = async () => {
   const isValid = true
   Object.keys(form).forEach((key) => {
     if (key !== 'avatar') {
-      const fieldValid = validateField(key, form[key as keyof UserForm])
-      // if (!fieldValid) isValid = false;
+      const _fieldValid = validateField(key, form[key as keyof UserForm])
+      // if (!_fieldValid) isValid = false;
     }
   })
 

@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   contentData: {
@@ -66,8 +66,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const emit = defineEmits(['onChipsClick'])
 
 const localContentData = ref(props.contentData)
 

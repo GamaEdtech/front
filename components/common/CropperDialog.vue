@@ -67,7 +67,7 @@ const dialogVisible = computed({
 const crop_file_loading = ref(false)
 const cropped_data = ref(null)
 
-function cropFile({ coordinates, canvas, image }) {
+function cropFile({ coordinates: _coordinates, canvas, image: _image }) {
   if (!canvas) return
   crop_file_loading.value = true
   canvas.toBlob((blob) => {

@@ -3,7 +3,7 @@ import { shallowRef, ref, watch, computed, type Ref } from 'vue'
 import { animate } from 'animejs'
 import useGate from './useGate'
 import type { DoorModels } from '~/interfaces/DoorModels.interface'
-import type { Doors, Level, Step } from '~/interfaces/DoorStatus'
+import type { Level, Step } from '~/interfaces/DoorStatus'
 import { useSound } from '~/composables/game/useSound'
 
 // Define types for better code organization
@@ -189,7 +189,7 @@ export function useCharacterController(
 
   watch(
     openedDoors,
-    (newVal) => {
+    (_newVal) => {
       if (currentStep.value.door001 == true) {
         if (doorModels.door001.model) {
           animate(doorModels.door001.model.rotation, {

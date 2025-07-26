@@ -936,7 +936,7 @@ import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import { Form as VeeForm, useForm, Field } from 'vee-validate'
-import TopicSelector from '~/components/form/topic-selector.vue'
+import _TopicSelector from '~/components/form/topic-selector.vue'
 import { Cropper } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
 
@@ -1204,7 +1204,7 @@ const fetchTestData = async () => {
 }
 
 // Update test
-const { handleSubmit: veeHandleSubmit } = useForm()
+const { handleSubmit: _veeHandleSubmit } = useForm()
 
 // Create a proper form submission handler that uses veeHandleSubmit
 const handleSubmit = (evt) => {
@@ -1449,7 +1449,7 @@ const uploadFile = (file_name, fileEvent) => {
   cropper_dialog.value = true
 }
 
-const cropFile = ({ coordinates, canvas }) => {
+const cropFile = ({ _coordinates, canvas }) => {
   // Store the cropped image data
   const croppedBase64 = canvas.toDataURL()
 
@@ -1644,7 +1644,7 @@ const validateTrueAnswer = (value) => {
 }
 
 // Computed properties
-const buttonDisabled = computed(() => {
+const _buttonDisabled = computed(() => {
   // Check basic mandatory fields
   const requiredFields
     = form.section && form.base && form.lesson && form.topic && form.question

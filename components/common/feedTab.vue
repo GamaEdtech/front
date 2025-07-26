@@ -74,9 +74,9 @@
 </template>
 
 <script>
-import FooterFeedBox from '@/components/common/footer-feed-box'
-import LatestNews from '@/components/common/latest-news'
-import question from '~/pages/user/question/index.vue'
+import _FooterFeedBox from '@/components/common/footer-feed-box'
+import _LatestNews from '@/components/common/latest-news'
+import _question from '~/pages/user/question/index.vue'
 
 export default {
   name: 'FeedTab',

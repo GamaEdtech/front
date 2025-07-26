@@ -413,7 +413,11 @@ const resetAndFetchInitialData = async () => {
 /**
  * Fetches subsequent pages for the DESKTOP table.
  */
-const loadDesktopTransactions = async ({ page, itemsPerPage, sortBy }) => {
+const loadDesktopTransactions = async ({
+  page,
+  itemsPerPage,
+  sortBy: _sortBy,
+}) => {
   loading.value = true
   const skip = (page - 1) * itemsPerPage
 

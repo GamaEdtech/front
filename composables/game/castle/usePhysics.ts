@@ -26,7 +26,7 @@ export const usePhysics = (scene: THREE.Scene) => {
 
     const wallColor = 0x00ffff
     const wallOpacity = 0.2
-    const meshMaterial = new THREE.MeshStandardMaterial({
+    const _meshMaterial = new THREE.MeshStandardMaterial({
       color: wallColor,
       transparent: true,
       opacity: wallOpacity,

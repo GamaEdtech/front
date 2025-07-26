@@ -145,7 +145,7 @@ watch(
   },
 )
 
-const active_img = ref(1)
+const _active_img = ref(1)
 
 const items = [
   {

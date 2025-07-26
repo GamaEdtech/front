@@ -79,7 +79,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: '',

@@ -254,41 +254,6 @@ const router = useRouter()
 const nuxtApp = useNuxtApp()
 const helpLoading = ref(false)
 const submitLoading = ref(false)
-function isValidUrl(url) {
-  try {
-    new URL(url)
-    return /^https?:\/\//.test(url)
-  }
-  catch (e) {
-    return false
-  }
-}
-function isValidEmail(email) {
-  try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
-  catch (e) {
-    return false
-  }
-}
-function isValidPhone(phone) {
-  try {
-    const phoneRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return phoneRegex.test(phone)
-  }
-  catch (e) {
-    return false
-  }
-}
-function isRequired(value) {
-  try {
-    return !!value.trim()
-  }
-  catch (e) {
-    return false
-  }
-}
 
 async function sendToAI() {
   const userComment = `You are an educational review assistant. Your task is to evaluate the following school and return a structured JSON response.\n\n### **School Information:**\n- **Name:** ${

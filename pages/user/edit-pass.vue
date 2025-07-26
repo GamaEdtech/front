@@ -139,7 +139,7 @@ export default {
 
       this.$fetch
         .$put('/api/v1/users/password', querystring.stringify(this.info))
-        .then((response) => {
+        .then((_response) => {
           this.$toast.success('Changed successfully')
           this.$router.push({
             path: '/user',

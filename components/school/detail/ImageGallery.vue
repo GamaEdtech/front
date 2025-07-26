@@ -127,9 +127,6 @@
 import { useDisplay } from 'vuetify/lib/composables/display'
 
 const display = useDisplay()
-const nuxtApp = useNuxtApp()
-const route = useRoute()
-const router = useRouter()
 const imageClass = ref(null)
 const emit = defineEmits(['fetch'])
 const props = defineProps({
@@ -148,7 +145,11 @@ const props = defineProps({
     required: false,
     default: () => [],
     validator(value) {
-      return value.every(item => typeof item === 'string' || (typeof item === 'object' && 'url' in item))
+      return value.every(
+        item =>
+          typeof item === 'string'
+          || (typeof item === 'object' && 'url' in item),
+      )
     },
   },
 })

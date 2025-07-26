@@ -74,7 +74,7 @@ import {
   watch,
   computed,
   reactive,
-  type Ref,
+  type _Ref,
 } from 'vue'
 import { useThreeJS } from '../../composables/game/useThreejs'
 import { useCharacterController } from '../../composables/game/castle/useCharacterController'

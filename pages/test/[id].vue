@@ -24,9 +24,9 @@ const testId = ref(route.params.id)
 // Fetch data
 const {
   data: contentData,
-  pending,
+  pending: _pending,
   refresh,
-  execute,
+  execute: _execute,
 } = await useAsyncData(`exam-test-${route.params.id}`, async () => {
   const res = await $fetch(`/api/v1/examTests/${route.params.id}`, {
     params: { full: true },

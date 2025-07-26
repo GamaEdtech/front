@@ -538,7 +538,7 @@ const file_extra_loading = ref(false)
 // Lists
 const section_list = ref([])
 const grade_list = ref([])
-const field_list = ref([])
+const _field_list = ref([])
 const lesson_list = ref([])
 const topic_list = ref([])
 const test_type_list = ref([])
@@ -610,7 +610,7 @@ const { data: paperData } = await useAsyncData('paper-data', async () => {
 })
 
 // Methods
-const changeOption = (optionName, optionVal) => {
+const _changeOption = (optionName, optionVal) => {
   if (optionName === 'section') {
     formData.base = ''
     formData.lesson = ''
@@ -943,7 +943,7 @@ const addExtraAttr = () => {
   extraAttr.value.push({ type: '', file: null, file_extra: null })
 }
 
-const applyExtraType = (value, index) => {
+const _applyExtraType = (value, index) => {
   extraAttr.value[index].type = value
 }
 

@@ -43,12 +43,12 @@
               <div class="d-flex align-center ex-select-board-label pr-5">
                 <div>
                   <v-avatar size="small">
-                    <v-img :src="selectedBoard.img" />
+                    <v-img :src="selectedBoard?.img" />
                   </v-avatar>
                 </div>
                 <div class="pl-2 ex-select-board-label">
                   <span class="ex-select-board-title">
-                    {{ selectedBoard.title }}
+                    {{ selectedBoard?.title }}
                   </span>
                 </div>
               </div>
@@ -170,7 +170,7 @@ const categories = ref([
     icon: 'icon-tutorial',
   },
 ])
-const selectLoader = ref(true)
+const _selectLoader = ref(true)
 const boardList = ref([])
 const gradeList = ref([])
 const gradeLoader = ref(false)
@@ -199,7 +199,7 @@ const fetchInitialData = async () => {
   try {
     storedBoard = JSON.parse(localStorage.getItem('selectedBoard'))
   }
-  catch (e) {
+  catch {
     // Ignore parse errors - use default board
   }
   if (storedBoard && storedBoard.id) {
@@ -214,6 +214,10 @@ const fetchInitialData = async () => {
 }
 const fetchGradeList = async () => {
   try {
+    if (!selectedBoard.value) {
+      return
+    }
+
     gradeLoader.value = true
     const params = { type: 'base' }
     params.section_id = selectedBoard.value.id
@@ -230,6 +234,10 @@ const fetchGradeList = async () => {
 }
 const fetchCategoryCounts = async () => {
   try {
+    if (!selectedBoard.value || !selectedGrade.value) {
+      return
+    }
+
     const params = new URLSearchParams()
     params.append('type', 'test')
     params.append('page', '1')
@@ -243,19 +251,19 @@ const fetchCategoryCounts = async () => {
       && response.data
       && response.data.types_stats
     ) {
-      categories.value.find((cat, i) => cat.key == 'tests').stat
+      categories.value.find((cat, _i) => cat.key == 'tests').stat
         = parseInt(response.data.types_stats.test) || 0
 
-      categories.value.find((cat, i) => cat.key == 'files').stat
+      categories.value.find((cat, _i) => cat.key == 'files').stat
         = parseInt(response.data.types_stats.learnfiles) || 0
 
-      categories.value.find((cat, i) => cat.key == 'exams').stat
+      categories.value.find((cat, _i) => cat.key == 'exams').stat
         = parseInt(response.data.types_stats.azmoon) || 0
 
-      categories.value.find((cat, i) => cat.key == 'questions').stat
+      categories.value.find((cat, _i) => cat.key == 'questions').stat
         = parseInt(response.data.types_stats.question) || 0
 
-      categories.value.find((cat, i) => cat.key == 'tutorial').stat
+      categories.value.find((cat, _i) => cat.key == 'tutorial').stat
         = parseInt(response.data.types_stats.tutorial) || 0
     }
   }
@@ -271,7 +279,7 @@ const handleBoardFocused = () => {
 }
 watch(
   () => selectedGrade.value,
-  (val) => {
+  (_val) => {
     fetchCategoryCounts()
   },
   {
@@ -281,7 +289,7 @@ watch(
 
 watch(
   () => selectedBoard.value,
-  (val) => {
+  (_val) => {
     localStorage.setItem('selectedBoard', JSON.stringify(selectedBoard.value))
   },
 )

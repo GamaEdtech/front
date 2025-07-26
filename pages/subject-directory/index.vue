@@ -271,7 +271,7 @@ const generateTimeLine = () => {
 
 // End Section Timeline
 
-const { data: lessonData, status } = await useAsyncData(
+const { data: lessonData, status: _status } = await useAsyncData(
   'lessonData',
   async () => {
     let resourcesData

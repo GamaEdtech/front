@@ -12,7 +12,11 @@ const props = defineProps({
   dialog: Boolean,
 })
 
-const emit = defineEmits(['update:dialog', 'switchToRegister', 'switchToRecover'])
+const emit = defineEmits([
+  'update:dialog',
+  'switchToRegister',
+  'switchToRecover',
+])
 
 const passVisible = ref(false)
 const login_loading = ref(false)
@@ -135,7 +139,7 @@ onMounted(() => {
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
   try {
-    const response = await useApiService.post(
+    const _response = await useApiService.post(
       '/api/v1/users/',
       new URLSearchParams({
         type: 'resend_code',
@@ -311,7 +315,7 @@ async function registerV2(identity, pass) {
   <v-dialog
     :model-value="props.dialog"
     max-width="300px"
-    @update:model-value="val => emit('update:dialog', val)"
+    @update:model-value="(val) => emit('update:dialog', val)"
     @click:outside="closeDialog"
   >
     <v-card>

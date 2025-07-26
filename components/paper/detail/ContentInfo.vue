@@ -220,7 +220,7 @@ const auth = useAuth()
 const user = useUser()
 const rating = ref(4.5)
 const crash_report = ref(null)
-const emits = defineEmits(['crash-report'])
+const _emits = defineEmits(['crash-report'])
 
 const qPdfFileDownloadLoading = ref(false)
 const qWordFileDownloadLoading = ref(false)

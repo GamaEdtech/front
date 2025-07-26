@@ -128,11 +128,21 @@ const HighlightedText = defineComponent({
       }))
     })
 
-    return () => h('span', parts.value.map(part =>
-      h('span', {
-        style: part.highlight ? 'background-color: #FFB600; color: white;' : '',
-      }, part.text),
-    ))
+    return () =>
+      h(
+        'span',
+        parts.value.map(part =>
+          h(
+            'span',
+            {
+              style: part.highlight
+                ? 'background-color: #FFB600; color: white;'
+                : '',
+            },
+            part.text,
+          ),
+        ),
+      )
   },
 })
 
@@ -166,7 +176,7 @@ const filteredItems = computed(() => {
     item.title.toLowerCase().includes(searchText.value.toLowerCase()),
   )
 })
-const highlightSearchText = (text) => {
+const _highlightSearchText = (text) => {
   if (!searchText.value) return text
   const regex = new RegExp(`(${searchText.value})`, 'gi')
   return text.replace(regex, '<mark>$1</mark>')

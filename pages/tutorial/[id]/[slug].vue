@@ -114,8 +114,7 @@
                   class="error-report pointer"
                   @click="openCrashReportDialog"
                 >
-                  <i class="fa-solid fa-circle-exclamation mr-2" />Crash
-                  report
+                  <i class="fa-solid fa-circle-exclamation mr-2" />Crash report
                 </div>
               </v-col>
             </v-row>
@@ -189,14 +188,14 @@ import {
   computed,
 } from 'vue'
 
-const config = useRuntimeConfig()
+const _config = useRuntimeConfig()
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 const bookContentRef = ref(null)
 
 const route = useRoute()
 
 // Fetch tutorial data
-const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
+const { data: tutorialInfo, error: _tutorialError } = await useAsyncData(
   `tutorialInfo-${route.params.id}`,
   async () => {
     const response = await useApiService.get(
@@ -210,7 +209,7 @@ const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
 )
 
 // Fetch lesson tree
-const { data: lessonTree, error: lessonTreeError } = await useAsyncData(
+const { data: lessonTree, error: _lessonTreeError } = await useAsyncData(
   'lessonTree',
   async () => {
     if (!tutorialInfo.value?.lesson) return null

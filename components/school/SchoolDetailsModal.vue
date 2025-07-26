@@ -24,10 +24,11 @@
           mdi-alert-circle
         </v-icon>
         <div class="text-h6 mb-2">
-          {{ errorMessage || 'Unable to display school information' }}
+          {{ errorMessage || "Unable to display school information" }}
         </div>
         <div class="text-body-2 mb-4 text-center text-grey-600">
-          There was an issue loading the school details. You can still view the full information by visiting the school page directly.
+          There was an issue loading the school details. You can still view the
+          full information by visiting the school page directly.
         </div>
         <div class="d-flex gap-2">
           <v-btn
@@ -79,7 +80,9 @@
         >
           <div class="name-address-image">
             <div class="name-div">
-              <span class="name gtext-t4 font-weight-semibold">{{ school?.name }}</span>
+              <span class="name gtext-t4 font-weight-semibold">{{
+                school?.name
+              }}</span>
               <div class="d-flex align-center justify-start flex-wrap ga-3">
                 <v-chip
                   v-if="school?.countryTitle && school.countryTitle.length > 0"
@@ -115,7 +118,9 @@
                 v-show="school?.defaultImageUri"
                 :alt="school?.name"
                 width="180px"
-                :src="school?.defaultImageUri?.replace(/^http:\/\//, 'https://')"
+                :src="
+                  school?.defaultImageUri?.replace(/^http:\/\//, 'https://')
+                "
                 placeholder
                 class="h-100"
               />
@@ -205,9 +210,13 @@
               </div>
 
               <div class="d-flex-col">
-                <div class="d-flex align-center ga-2 flex-wrap my-4 justify-space-start">
+                <div
+                  class="d-flex align-center ga-2 flex-wrap my-4 justify-space-start"
+                >
                   <v-chip
-                    v-if="school?.countryTitle && school.countryTitle.length > 0"
+                    v-if="
+                      school?.countryTitle && school.countryTitle.length > 0
+                    "
                     class="text-subtitle-1"
                     variant="flat"
                     density="comfortable"
@@ -235,7 +244,9 @@
                   </v-chip>
                 </div>
                 <div class="d-flex align-strach justify-space-between pt-2">
-                  <div class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500">
+                  <div
+                    class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500"
+                  >
                     Score:
                     <v-icon color="primary">
                       mdi-star
@@ -247,7 +258,9 @@
                     class="border-opacity-100 primary-gray-300 w-100"
                     vertical
                   />
-                  <div class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100">
+                  <div
+                    class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100"
+                  >
                     <v-icon color="rgba(52, 64, 84, 1)">
                       mdi-update
                     </v-icon>
@@ -271,9 +284,13 @@
               </div>
 
               <div class="d-flex-col">
-                <div class="d-flex align-center ga-2 flex-wrap my-6 justify-space-start">
+                <div
+                  class="d-flex align-center ga-2 flex-wrap my-6 justify-space-start"
+                >
                   <v-chip
-                    v-if="school?.countryTitle && school.countryTitle.length > 0"
+                    v-if="
+                      school?.countryTitle && school.countryTitle.length > 0
+                    "
                     class="text-subtitle-1"
                     variant="flat"
                     density="comfortable"
@@ -300,8 +317,12 @@
                     United {{ school.cityTitle }}
                   </v-chip>
                 </div>
-                <div class="w-100 d-flex align-strach justify-space-between pt-2">
-                  <div class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500">
+                <div
+                  class="w-100 d-flex align-strach justify-space-between pt-2"
+                >
+                  <div
+                    class="d-flex align-center w-100 gtext-t6 font-weight-semibold ga-1 primary-gray-500"
+                  >
                     Score:
                     <v-icon color="primary">
                       mdi-star
@@ -313,7 +334,9 @@
                     class="border-opacity-100 primary-gray-300 w-100"
                     vertical
                   />
-                  <div class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100">
+                  <div
+                    class="d-flex align-center justify-end ga-2 gtext-t6 primary-gray-300 w-100"
+                  >
                     <v-icon color="rgba(52, 64, 84, 1)">
                       mdi-update
                     </v-icon>
@@ -423,7 +446,7 @@ const hasError = ref(false)
 const errorMessage = ref('')
 const isLoading = ref(false)
 
-const router = useRouter()
+const _router = useRouter()
 const { $dayjs, $slugGenerator } = useNuxtApp()
 
 // Handle v-model binding
@@ -442,7 +465,7 @@ const navigateToSchoolDetails = (event) => {
 
     const schoolId = props.school.id
     const schoolSlug = $slugGenerator(props.school.name)
-    const schoolUrl = `/school/${schoolId}/${schoolSlug}`
+    const _schoolUrl = `/school/${schoolId}/${schoolSlug}`
 
     // Add active state visual feedback for touch devices
     const card = event.currentTarget
@@ -475,9 +498,10 @@ const closeModal = () => {
 const navigateToSchoolDetailsDirect = () => {
   if (!props.school?.id) return
 
-  const schoolSlug = props.school.name && props.school.name !== 'Loading...'
-    ? $slugGenerator(props.school.name)
-    : 'school'
+  const schoolSlug
+    = props.school.name && props.school.name !== 'Loading...'
+      ? $slugGenerator(props.school.name)
+      : 'school'
   const schoolUrl = `/school/${props.school.id}/${schoolSlug}`
 
   closeModal()
@@ -498,34 +522,38 @@ const validateSchoolForDisplay = (school) => {
 }
 
 // Watch for school changes to handle edge cases and loading states
-watch(() => props.school, (newSchool) => {
-  if (!newSchool) {
-    // If school data is removed, close the modal
-    internalValue.value = false
-    hasError.value = false
-    isLoading.value = false
-    return
-  }
+watch(
+  () => props.school,
+  (newSchool) => {
+    if (!newSchool) {
+      // If school data is removed, close the modal
+      internalValue.value = false
+      hasError.value = false
+      isLoading.value = false
+      return
+    }
 
-  const validation = validateSchoolForDisplay(newSchool)
+    const validation = validateSchoolForDisplay(newSchool)
 
-  if (validation.isLoadingState) {
-    // School is in loading state
-    isLoading.value = true
-    hasError.value = false
-  }
-  else if (validation.hasMinimalData) {
-    // School has valid data
-    isLoading.value = false
-    hasError.value = false
-  }
-  else {
-    // School data is invalid
-    hasError.value = true
-    isLoading.value = false
-    errorMessage.value = 'Unable to load school information'
-  }
-}, { deep: true, immediate: true })
+    if (validation.isLoadingState) {
+      // School is in loading state
+      isLoading.value = true
+      hasError.value = false
+    }
+    else if (validation.hasMinimalData) {
+      // School has valid data
+      isLoading.value = false
+      hasError.value = false
+    }
+    else {
+      // School data is invalid
+      hasError.value = true
+      isLoading.value = false
+      errorMessage.value = 'Unable to load school information'
+    }
+  },
+  { deep: true, immediate: true },
+)
 </script>
 
 <style lang="scss" scoped>
@@ -665,7 +693,6 @@ watch(() => props.school, (newSchool) => {
     right: auto !important;
     transform: translateX(-50%) !important;
   }
-
 }
 
 :deep(.v-overlay__content) {

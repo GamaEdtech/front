@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+const _props = defineProps({
   modelValue: {
     type: Boolean,
     required: true,
@@ -11,7 +11,7 @@ const props = defineProps({
   disableBack: Boolean,
 })
 
-const emit = defineEmits(['update:modelValue', 'back', 'next'])
+const _emit = defineEmits(['update:modelValue', 'back', 'next'])
 const messageReply = ref(null)
 </script>
 
@@ -23,7 +23,9 @@ const messageReply = ref(null)
       @click:outside="$emit('update:modelValue', false)"
     >
       <v-card class="bg-primary-gray-100">
-        <v-card-title class="gtext-t4 bg-white flex-column d-flex align-center pt-12">
+        <v-card-title
+          class="gtext-t4 bg-white flex-column d-flex align-center pt-12"
+        >
           <div class="avatarBg">
             <img
               width="64"
@@ -86,7 +88,7 @@ const messageReply = ref(null)
             <p />
             <p
               class="gtext-t6 font-weight-medium"
-              style="color: #FFB600;"
+              style="color: #ffb600"
             >
               {{ name }}
             </p>
@@ -191,7 +193,9 @@ const messageReply = ref(null)
                   :disabled="disableNext"
                   @click="$emit('next')"
                 >
-                  <span class="mdi mdi-chevron-right primary-gray-900 gtext-t5 d-flex flex-row-reverse align-end">
+                  <span
+                    class="mdi mdi-chevron-right primary-gray-900 gtext-t5 d-flex flex-row-reverse align-end"
+                  >
                     Next
                   </span>
                 </v-btn>
@@ -205,41 +209,41 @@ const messageReply = ref(null)
 </template>
 
 <style scoped>
-:deep(.v-field__input){
+:deep(.v-field__input) {
   font-family: Inter, sans-serif;
   font-size: 1.6rem;
   line-height: 1.8rem;
   font-weight: 400;
 }
-:deep(.v-field){
+:deep(.v-field) {
   border-radius: 16px;
-  border: 1px solid #E4E7EC;
+  border: 1px solid #e4e7ec;
   box-shadow: none;
 }
-.v-input{
+.v-input {
   font-family: Inter, sans-serif !important;
   font-size: 1.2rem !important;
   line-height: 1.8rem !important;
   font-weight: 400 !important;
 }
 .dashed-divider {
-  border-top: 1px dashed #D0D5DD; /* similar to v-divider */
+  border-top: 1px dashed #d0d5dd; /* similar to v-divider */
   width: 100%;
 }
-.avatarBg{
+.avatarBg {
   display: flex;
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: #F2F4F7;
+  background-color: #f2f4f7;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
 }
-.messageContainer{
+.messageContainer {
   position: relative;
 }
-.messageText{
+.messageText {
   height: 212px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -255,7 +259,7 @@ const messageReply = ref(null)
 }
 
 .messageText::-webkit-scrollbar-thumb {
-  background-color: #98A2B3; /* lighter thumb */
+  background-color: #98a2b3; /* lighter thumb */
   border-radius: 4px;
 }
 
@@ -267,14 +271,18 @@ const messageReply = ref(null)
   width: 100%;
   pointer-events: none;
   z-index: 1;
-  background: linear-gradient(to bottom, transparent, #F2F4F7); /* Adjust color to match your background */
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #f2f4f7
+  ); /* Adjust color to match your background */
 }
 
-.closeBtn{
+.closeBtn {
   width: 24px !important;
   min-width: 24px !important;
   height: 24px !important;
-  color: #D0D5DD;
+  color: #d0d5dd;
   position: absolute;
   top: 16px;
   left: 16px;
@@ -301,18 +309,18 @@ const messageReply = ref(null)
   scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
 
-.bg-F8F9FC{
-  background-color: #F8F9FC;
+.bg-F8F9FC {
+  background-color: #f8f9fc;
 }
-.color-4E5BA6{
-color: #4E5BA6;
-}
-
-.max-width-fit{
-max-width: fit-content;
+.color-4E5BA6 {
+  color: #4e5ba6;
 }
 
-.replyBtn{
+.max-width-fit {
+  max-width: fit-content;
+}
+
+.replyBtn {
   min-width: 170px;
 }
 </style>

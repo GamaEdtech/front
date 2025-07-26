@@ -76,7 +76,7 @@ export default {
     }
   },
   watch: {
-    slideIndex(val) {
+    slideIndex(_val) {
       this.expand = false
 
       setTimeout(() => {

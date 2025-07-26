@@ -292,7 +292,7 @@ const fetchRatingData = async () => {
 const {
   data: contentDataRaw,
   status,
-  refresh,
+  _refresh,
 } = await useAsyncData('contentData', () => fetchSchoolData(), {
   server: true,
   lazy: false,
@@ -301,8 +301,8 @@ const {
 
 const {
   data: ratingDataRaw,
-  status: ratingStatus,
-  refresh: refreshRating,
+  status: _ratingStatus,
+  refresh: _refreshRating,
 } = await useAsyncData('ratingData', () => fetchRatingData(), {
   server: true,
   lazy: false,
@@ -344,10 +344,13 @@ useSeoMeta({
   ogTitle: `${contentData.value?.name} | GamaTrain Schools`,
   ogDescription: `Learn more about ${contentData.value?.name} located in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle}. See ratings, facilities, and more.`,
   ogImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
-  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(contentData?.value?.name)}`,
+  ogUrl: `${requestURL.value}/school/${contentData.value?.id}/${$slugGenerator(
+    contentData?.value?.name,
+  )}`,
   twitterTitle: `${contentData.value?.name} | GamaTrain Schools`,
   twitterDescription: `Discover ${contentData.value?.name} in ${contentData.value?.cityTitle}, ${contentData.value?.countryTitle} on GamaTrain.`,
-  twitterImage: contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
+  twitterImage:
+    contentData.value?.defaultImageUri || '/images/gamatrain-logo.png',
   twitterCard: 'summary_large_image',
 })
 
@@ -428,29 +431,27 @@ function handleCommentSubmitted() {
 }
 
 function handleQueryParameters(data) {
-  const query = {}
-  if (data.countryId) query.country = data.countryId
+  const _query = {}
+  if (data.countryId) _query.country = data.countryId
   if (data.type === 'state' || data.type === 'city') {
-    if (data.stateId) query.state = data.stateId
+    if (data.stateId) _query.state = data.stateId
   }
   if (data.type === 'city') {
-    if (data.cityId) query.city = data.cityId
+    if (data.cityId) _query.city = data.cityId
   }
-  router.push({ path: '/school', query })
+  router.push({ path: '/school', query: _query })
 }
 
 const {
   data: commentsData,
-  refresh: refreshComments,
-  pending: commentsPending,
+  refresh: _refreshComments,
+  pending: _commentsPending,
 } = await useAsyncData(
   `comments-${route.params.id}`,
-  () => useApiService.get(
-    `/api/v2/schools/${route.params.id}/comments`,
-    {
+  () =>
+    useApiService.get(`/api/v2/schools/${route.params.id}/comments`, {
       'PagingDto.PageFilter.Size': 20,
-    },
-  ),
+    }),
   {
     server: true,
     lazy: false,

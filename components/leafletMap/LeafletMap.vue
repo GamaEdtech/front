@@ -43,7 +43,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.map.object = this.$refs.map.mapObject
-      this.map.object.on('drag', (e) => {
+      this.map.object.on('drag', (_e) => {
         const center = this.map.object.getCenter()
         this.map.markerLocation = [center.lat, center.lng]
       })

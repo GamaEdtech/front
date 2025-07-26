@@ -57,7 +57,9 @@
             @click="openFilterSection($event, item)"
           >
             {{ item.name }}
-            <v-icon :color="item.active && !isExpandMap ? `#ffffff` : `#828385`">
+            <v-icon
+              :color="item.active && !isExpandMap ? `#ffffff` : `#828385`"
+            >
               mdi-chevron-down
             </v-icon>
 
@@ -546,7 +548,7 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['update-filter'])
-const router = useRouter()
+const _router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
@@ -831,7 +833,7 @@ useClickOutside(boxTuitionRef, () => {
   )[0].isShow = false
 })
 
-const rangeInputChange = (event) => {
+const rangeInputChange = (_event) => {
   updateQueryParams()
 }
 

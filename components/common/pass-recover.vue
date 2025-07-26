@@ -27,7 +27,7 @@ const props = defineProps({
   dialog: Boolean,
 })
 
-const pass_recover_dialog = ref(false)
+const _pass_recover_dialog = ref(false)
 const google_register_loading = ref(true)
 const show1 = ref(false)
 const confirmPassword = useField('confirmPassword')
@@ -154,7 +154,7 @@ const onFinish = async () => {
 // Resend OTP code
 const sendOtpCodeAgain = async () => {
   try {
-    const response = await useApiService.post(
+    const _response = await useApiService.post(
       '/api/v1/users/recovery',
       new URLSearchParams({
         type: 'resend_code',
@@ -223,7 +223,7 @@ const submit = handleSubmit(async () => {
 })
 
 // Cancel password recovery
-const cancelPassRecover = () => {
+const _cancelPassRecover = () => {
   emit('update:dialog', false)
   identityHolder.value = true
   otpHolder.value = false
@@ -259,7 +259,7 @@ function closeDialog() {
     :model-value="props.dialog"
     max-width="300px"
     style="z-index: 20001"
-    @update:model-value="val => emit('update:dialog', val)"
+    @update:model-value="(val) => emit('update:dialog', val)"
     @click:outside="closeDialog"
   >
     <v-card>

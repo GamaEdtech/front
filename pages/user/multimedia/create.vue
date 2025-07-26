@@ -313,7 +313,7 @@ const isFormValid = ref(false)
 // Reference to the topic selector component
 const topicSelectorRef = ref(null)
 
-const onSubmit = () => {
+const _onSubmit = () => {
   submitContent()
 }
 
@@ -389,8 +389,8 @@ const getTypeList = async (type, parent = '') => {
       content_type_list.value = response.data
     }
   }
-  catch (err) {
-    $toast.error(err.message || 'Error loading data')
+  catch {
+    $toast.error('Error loading data')
   }
   finally {
     loading.section = false
@@ -400,7 +400,7 @@ const getTypeList = async (type, parent = '') => {
   }
 }
 
-const changeOption = (type, value) => {
+const _changeOption = (type, value) => {
   if (type === 'topic') {
     formData.topics = value
   }
@@ -449,16 +449,8 @@ const submitContent = async () => {
       router.push('/user/multimedia')
     }
   }
-  catch (err) {
-    if (err.response?.status === 403) {
-      $toast.error('You do not have permission to create multimedia content')
-    }
-    else if (err.response?.status === 400) {
-      $toast.error(err.response.data.message || 'Error submitting multimedia')
-    }
-    else {
-      $toast.error(err.message || 'Error submitting multimedia')
-    }
+  catch {
+    $toast.error('Error submitting multimedia')
   }
   finally {
     loading.form = false
@@ -498,7 +490,7 @@ const uploadFile = async (value) => {
     formData.file = response.data[0].file.name
     $toast.success('File uploaded successfully')
   }
-  catch (err) {
+  catch {
     $toast.error('An error occurred during file upload')
   }
   finally {
