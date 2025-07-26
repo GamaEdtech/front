@@ -104,6 +104,7 @@
 
 <script>
 // import { ValidationProvider, ValidationObserver } from "vee-validate";
+import querystring from 'querystring'
 
 export default {
   name: 'ChangePass',
@@ -135,7 +136,6 @@ export default {
   methods: {
     updatePass() {
       this.update_loading = true
-      const querystring = require('querystring')
 
       this.$fetch
         .$put('/api/v1/users/password', querystring.stringify(this.info))

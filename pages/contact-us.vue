@@ -9,7 +9,9 @@
     >
       <span
         class="snakebar-icon mdi"
-        :class="snankebar.status === 'error' ? 'mdi-close-circle' : 'mdi-check-circle'"
+        :class="
+          snankebar.status === 'error' ? 'mdi-close-circle' : 'mdi-check-circle'
+        "
       />
       <span class="snackbar-text">
         {{ snankebar.text }}
@@ -122,9 +124,7 @@
               class="icon"
               icon="mdi-map-marker"
             />
-            <span>
-              2419 West 53rd Street, Apt 5B, New York, NY 10019
-            </span>
+            <span> 2419 West 53rd Street, Apt 5B, New York, NY 10019 </span>
           </div>
           <LMap
             ref="map"
@@ -163,159 +163,157 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRecaptcha } from '~/composables/useRecapcha'
-import useApiService from '~/composables/useApiService'
+import { ref, reactive, onMounted } from "vue";
+import { useRecaptcha } from "~/composables/useRecapcha";
+import useApiService from "~/composables/useApiService";
 
-const zoom = ref(20)
+const zoom = ref(20);
 const rules = {
-  required: (v: string) => !!v || 'This field is required.',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid.',
-  min25: (v: string) => (v && v.length >= 25) || 'Minimum 25 characters required.',
-}
+  required: (v: string) => !!v || "This field is required.",
+  email: (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid.",
+  min25: (v: string) =>
+    (v && v.length >= 25) || "Minimum 25 characters required.",
+};
 const formsData = reactive({
-  name: '',
-  email: '',
-  message: '',
-  subject: '',
-})
-const isFormValid = ref<boolean>(false)
-const formLoading = ref<boolean>(false)
+  name: "",
+  email: "",
+  message: "",
+  subject: "",
+});
+const isFormValid = ref<boolean>(false);
+const formLoading = ref<boolean>(false);
 const snankebar = reactive({
   isShow: false,
-  text: '',
-  status: '',
-})
-const showSnackebar = (status: 'success' | 'error', message: string) => {
-  snankebar.isShow = true
-  snankebar.status = status
-  snankebar.text = message
-}
-const form = ref<HTMLFormElement | null>(null)
-const { getToken, initCaptcha, isLoaded } = useRecaptcha()
+  text: "",
+  status: "",
+});
+const showSnackebar = (status: "success" | "error", message: string) => {
+  snankebar.isShow = true;
+  snankebar.status = status;
+  snankebar.text = message;
+};
+const form = ref<HTMLFormElement | null>(null);
+const { getToken, initCaptcha, isLoaded } = useRecaptcha();
 
 const submitForm = async () => {
-  formLoading.value = true
+  formLoading.value = true;
 
   if (isFormValid.value) {
     try {
       if (!isLoaded()) {
-        throw new Error('reCAPTCHA not loaded yet. Please try again.')
+        throw new Error("reCAPTCHA not loaded yet. Please try again.");
       }
 
-      const token = await getToken('submit')
+      const token = await getToken("submit");
 
-      const res: any = await useApiService.post('/api/v2/contacts', {
-        captcha: token,
-        fullName: formsData.name,
-        email: formsData.email,
-        subject: formsData.subject,
-        body: formsData.message,
-      })
+      const res: { succeeded: boolean; errors?: Array<{ message: string }> } =
+        await useApiService.post("/api/v2/contacts", {
+          captcha: token,
+          fullName: formsData.name,
+          email: formsData.email,
+          subject: formsData.subject,
+          body: formsData.message,
+        });
 
       if (res.succeeded) {
-        showSnackebar('success', 'Your message has been sent successfully.')
-      }
-      else {
-        res.errors.forEach((error: any) => {
-          showSnackebar('error', error.message)
-        })
+        showSnackebar("success", "Your message has been sent successfully.");
+      } else {
+        res.errors?.forEach((error: { message: string }) => {
+          showSnackebar("error", error.message);
+        });
       }
 
       // Reset form
       if (form.value) {
-        form.value.reset()
+        form.value.reset();
       }
+    } catch (error: unknown) {
+      console.log(error);
+      formLoading.value = false;
+      showSnackebar("error", "An error occurred. Please try again.");
+    } finally {
+      formLoading.value = false;
     }
-    catch (error: any) {
-      console.log(error)
-      formLoading.value = false
-      showSnackebar('error', 'An error occurred. Please try again.')
-    }
-    finally {
-      formLoading.value = false
-    }
+  } else {
+    formLoading.value = false;
   }
-  else {
-    formLoading.value = false
-  }
-}
+};
 
 onMounted(() => {
-  initCaptcha()
-})
+  initCaptcha();
+});
 </script>
 
 <style scoped>
-.snackbar{
-    /* transform: translate(-50%, 0); */
-    --v-layout-top: 0 !important;
-    --v-layout-left: 0 !important;
+.snackbar {
+  /* transform: translate(-50%, 0); */
+  --v-layout-top: 0 !important;
+  --v-layout-left: 0 !important;
 }
 
-.snakebar-icon{
-    font-size: 1.8rem !important;
+.snakebar-icon {
+  font-size: 1.8rem !important;
 }
 
-.snackbar-text{
-    font-size: 1.8rem !important;
-    font-weight: 600;
-    margin-left: 1rem;
+.snackbar-text {
+  font-size: 1.8rem !important;
+  font-weight: 600;
+  margin-left: 1rem;
 }
 
 .form {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .label {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 600;
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 
-.map-container{
-    position: relative;
+.map-container {
+  position: relative;
 }
 
-.address{
-    width: calc(100% - 24px);
-    background-color: #F2F4F7;
-    margin: 0 24px;
-    padding: 1rem 2rem;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transform: translate(-1.2rem, -1.2rem );
-    z-index: 1000;
-    border-radius: 0 0 2rem 2rem;
+.address {
+  width: calc(100% - 24px);
+  background-color: #f2f4f7;
+  margin: 0 24px;
+  padding: 1rem 2rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translate(-1.2rem, -1.2rem);
+  z-index: 1000;
+  border-radius: 0 0 2rem 2rem;
 }
 
 .address span {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #334053;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #334053;
 }
 
-.map{
-    border-radius: 2rem;
-    -webkit-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
-    -moz-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
-    box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
+.map {
+  border-radius: 2rem;
+  -webkit-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
+  -moz-box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
+  box-shadow: 8px 8px 24px 0px rgba(66, 68, 90, 0.08);
 }
 
 .marker-image {
-    width: 50px;
-    height: 50px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 @media (max-width: 599px) {
-    .map{
-        height: 40rem !important;
-    }
+  .map {
+    height: 40rem !important;
+  }
 }
 </style>

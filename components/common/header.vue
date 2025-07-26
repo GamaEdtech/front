@@ -358,7 +358,7 @@ const calcPath = (type) => {
   else if (type == 'gama_schools') return 'school'
   else if (type == 'gama_live') return 'live'
   else if (type == 'gama_students') return 'student'
-  else '/'
+  else return '/'
 }
 
 const startDrag = (e) => {

@@ -25,13 +25,14 @@ export const useAuth = () => {
   };
 
   const login = async (credentials: { identity: string; pass: string }) => {
-    const response: any = await $fetch("/api/v1/users/login", {
-      method: "POST",
-      body: {
-        ...credentials,
-        type: "request",
-      },
-    });
+    const response: { token?: string; message?: string; success?: boolean } =
+      await $fetch("/api/v1/users/login", {
+        method: "POST",
+        body: {
+          ...credentials,
+          type: "request",
+        },
+      });
     return response;
   };
 
@@ -46,13 +47,16 @@ export const useAuth = () => {
   };
 
   const forgotPassword = async (passForm: { identity: string }) => {
-    const response: any = await $fetch("/api/v1/users/recovery", {
-      method: "POST",
-      body: {
-        ...passForm,
-        type: "request",
-      },
-    });
+    const response: { message?: string; success?: boolean } = await $fetch(
+      "/api/v1/users/recovery",
+      {
+        method: "POST",
+        body: {
+          ...passForm,
+          type: "request",
+        },
+      }
+    );
     return response;
   };
 

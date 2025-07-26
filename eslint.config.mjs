@@ -26,18 +26,10 @@ export default createConfigForNuxt({
     rules: {
       "@typescript-eslint/ban-types": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-unsafe-function-type": "off",
-      "@typescript-eslint/no-dynamic-delete": "off",
-      "@typescript-eslint/unified-signatures": "off",
-      "@typescript-eslint/no-unused-expressions": "off",
-      "nuxt/nuxt-config-keys-order": "off",
     },
   })
   .override("nuxt/rules", {
     rules: {
-      // "vue/no-unused-vars": "off",
       "vue/no-v-html": "off",
     },
   });

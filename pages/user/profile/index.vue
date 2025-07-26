@@ -375,43 +375,43 @@
 <script setup lang="ts">
 // Types
 interface ListItem {
-  id: number
-  title: string
+  id: number;
+  title: string;
 }
 
 interface UserForm {
-  first_name: string
-  last_name: string
-  gender: number | null
-  state: number | null
-  area: number | null
-  level: number | null
-  grade: number | null
-  school: number | null
-  avatar: File | null
-  country: number | null
+  first_name: string;
+  last_name: string;
+  gender: number | null;
+  state: number | null;
+  area: number | null;
+  level: number | null;
+  grade: number | null;
+  school: number | null;
+  avatar: File | null;
+  country: number | null;
 }
 
 // Define page meta
 definePageMeta({
-  layout: 'dashboard-layout',
-  title: 'Edit Profile',
-})
+  layout: "dashboard-layout",
+  title: "Edit Profile",
+});
 
 useHead({
-  title: 'Edit Profile',
-})
+  title: "Edit Profile",
+});
 
 // Reactive data
-const userData = useUser()
-const { $toast } = useNuxtApp()
+const userData = useUser();
+const { $toast } = useNuxtApp();
 const userType = computed(() =>
-  userData.user.value ? userData.user.value.group_id : null,
-)
+  userData.user.value ? userData.user.value.group_id : null
+);
 
 const form = reactive<UserForm>({
-  first_name: '',
-  last_name: '',
+  first_name: "",
+  last_name: "",
   gender: null,
   state: null,
   area: null,
@@ -420,123 +420,123 @@ const form = reactive<UserForm>({
   school: null,
   avatar: null,
   country: null,
-})
+});
 
-const username = ref('')
-const avatarUrl = ref('')
-const cropAvatarUrl = ref('')
-const cropAvatarLoading = ref(false)
-const cropperDialog = ref(false)
-const isSubmitting = ref(false)
-const stencilProps = ref(() => ({ width: 180, height: 180 }))
+const username = ref("");
+const avatarUrl = ref("");
+const cropAvatarUrl = ref("");
+const cropAvatarLoading = ref(false);
+const cropperDialog = ref(false);
+const isSubmitting = ref(false);
+const stencilProps = ref(() => ({ width: 180, height: 180 }));
 
 // Lists
 const genderList = ref<ListItem[]>([
-  { id: 1, title: 'Male' },
-  { id: 2, title: 'Female' },
-])
+  { id: 1, title: "Male" },
+  { id: 2, title: "Female" },
+]);
 
-const levelList = ref<ListItem[]>([])
-const gradeList = ref<ListItem[]>([])
-const schoolList = ref<ListItem[]>([])
-const stateList = ref<ListItem[]>([])
-const areaList = ref<ListItem[]>([])
-const countryList = ref<ListItem[]>([])
+const levelList = ref<ListItem[]>([]);
+const gradeList = ref<ListItem[]>([]);
+const schoolList = ref<ListItem[]>([]);
+const stateList = ref<ListItem[]>([]);
+const areaList = ref<ListItem[]>([]);
+const countryList = ref<ListItem[]>([]);
 
 // Error messages
-const usernameErrors = ref<string[]>([])
-const firstNameErrors = ref<string[]>([])
-const lastNameErrors = ref<string[]>([])
-const genderErrors = ref<string[]>([])
-const stateErrors = ref<string[]>([])
-const areaErrors = ref<string[]>([])
-const levelErrors = ref<string[]>([])
-const gradeErrors = ref<string[]>([])
-const schoolErrors = ref<string[]>([])
-const countryErrors = ref<string[]>([])
+const usernameErrors = ref<string[]>([]);
+const firstNameErrors = ref<string[]>([]);
+const lastNameErrors = ref<string[]>([]);
+const genderErrors = ref<string[]>([]);
+const stateErrors = ref<string[]>([]);
+const areaErrors = ref<string[]>([]);
+const levelErrors = ref<string[]>([]);
+const gradeErrors = ref<string[]>([]);
+const schoolErrors = ref<string[]>([]);
+const countryErrors = ref<string[]>([]);
 
 // Validation rules
 const usernameRules = [
-  (v: string) => !!v || 'Username is required',
-  (v: string) => v.length >= 3 || 'Username must be at least 3 characters',
-  (v: string) => v.length <= 20 || 'Username must be less than 20 characters',
+  (v: string) => !!v || "Username is required",
+  (v: string) => v.length >= 3 || "Username must be at least 3 characters",
+  (v: string) => v.length <= 20 || "Username must be less than 20 characters",
   (v: string) =>
-    /^[a-zA-Z0-9_]+$/.test(v)
-    || 'Username can only contain letters, numbers, and underscores',
-]
+    /^[a-zA-Z0-9_]+$/.test(v) ||
+    "Username can only contain letters, numbers, and underscores",
+];
 
 const firstNameRules = [
-  (v: string) => !!v || 'First name is required',
-  (v: string) => v.length >= 2 || 'First name must be at least 2 characters',
-  (v: string) => v.length <= 50 || 'First name must be less than 50 characters',
+  (v: string) => !!v || "First name is required",
+  (v: string) => v.length >= 2 || "First name must be at least 2 characters",
+  (v: string) => v.length <= 50 || "First name must be less than 50 characters",
   (v: string) =>
-    /^[a-zA-Z\s]+$/.test(v) || 'First name can only contain letters and spaces',
-]
+    /^[a-zA-Z\s]+$/.test(v) || "First name can only contain letters and spaces",
+];
 
 const lastNameRules = [
-  (v: string) => !!v || 'Last name is required',
-  (v: string) => v.length >= 2 || 'Last name must be at least 2 characters',
-  (v: string) => v.length <= 50 || 'Last name must be less than 50 characters',
+  (v: string) => !!v || "Last name is required",
+  (v: string) => v.length >= 2 || "Last name must be at least 2 characters",
+  (v: string) => v.length <= 50 || "Last name must be less than 50 characters",
   (v: string) =>
-    /^[a-zA-Z\s]+$/.test(v) || 'Last name can only contain letters and spaces',
-]
+    /^[a-zA-Z\s]+$/.test(v) || "Last name can only contain letters and spaces",
+];
 
 const genderRules = [
-  (v: number) => (v !== null && v !== undefined) || 'Gender is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "Gender is required",
+];
 
 const stateRules = [
-  (v: number) => (v !== null && v !== undefined) || 'State is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "State is required",
+];
 
 const areaRules = [
-  (v: number) => (v !== null && v !== undefined) || 'Area is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "Area is required",
+];
 
 const levelRules = [
-  (v: number) => (v !== null && v !== undefined) || 'Board is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "Board is required",
+];
 
 const gradeRules = [
-  (v: number) => (v !== null && v !== undefined) || 'Grade is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "Grade is required",
+];
 
 const schoolRules = [
-  (v: number) => (v !== null && v !== undefined) || 'School is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "School is required",
+];
 
 const countryRules = [
-  (v: number) => (v !== null && v !== undefined) || 'Country is required',
-]
+  (v: number) => (v !== null && v !== undefined) || "Country is required",
+];
 
 // Computed
 const isUsernameValid = computed(() => {
   return (
-    username.value.length >= 3
-    && username.value.length <= 20
-    && /^[a-zA-Z0-9_]+$/.test(username.value)
-  )
-})
+    username.value.length >= 3 &&
+    username.value.length <= 20 &&
+    /^[a-zA-Z0-9_]+$/.test(username.value)
+  );
+});
 
 const isFormValid = computed(() => {
   return (
-    form.first_name.length >= 2
-    && form.last_name.length >= 2
-    && form.gender !== null
-    && form.state !== null
-    && form.area !== null
-    && form.level !== null
-    && form.grade !== null
-  )
+    form.first_name.length >= 2 &&
+    form.last_name.length >= 2 &&
+    form.gender !== null &&
+    form.state !== null &&
+    form.area !== null &&
+    form.level !== null &&
+    form.grade !== null
+  );
   //  form.school !== null;
-})
+});
 
 // Template refs
-const avatarInput = ref<HTMLInputElement>()
+const avatarInput = ref<HTMLInputElement>();
 
 // Methods
-const validateField = (field: string, value: any) => {
-  const errorArrays: { [key: string]: any } = {
+const validateField = (field: string, value: string | number | null) => {
+  const errorArrays: { [key: string]: Ref<string[]> } = {
     username: usernameErrors,
     first_name: firstNameErrors,
     last_name: lastNameErrors,
@@ -546,9 +546,11 @@ const validateField = (field: string, value: any) => {
     level: levelErrors,
     grade: gradeErrors,
     school: schoolErrors,
-  }
+  };
 
-  const rules: { [key: string]: any } = {
+  const rules: {
+    [key: string]: ((value: string | number | null) => true | string)[];
+  } = {
     username: usernameRules,
     first_name: firstNameRules,
     last_name: lastNameRules,
@@ -558,73 +560,75 @@ const validateField = (field: string, value: any) => {
     level: levelRules,
     grade: gradeRules,
     school: schoolRules,
-  }
+  };
 
-  const errors: string[] = []
-  const fieldRules = rules[field]
+  const errors: string[] = [];
+  const fieldRules = rules[field];
 
   if (fieldRules) {
-    fieldRules.forEach((rule: Function) => {
-      const result = rule(value)
-      if (result !== true) {
-        errors.push(result)
+    fieldRules.forEach(
+      (rule: (value: string | number | null) => true | string) => {
+        const result = rule(value);
+        if (result !== true) {
+          errors.push(result);
+        }
       }
-    })
+    );
   }
 
-  errorArrays[field].value = errors
-  return errors.length === 0
-}
+  errorArrays[field].value = errors;
+  return errors.length === 0;
+};
 
 const getUserInfo = async () => {
   try {
-    const apiUrl
-      = userType.value === 5
-        ? '/api/v1/teachers/dashboard'
-        : '/api/v1/students/dashboard'
-    const response = await useApiService.get(apiUrl)
+    const apiUrl =
+      userType.value === 5
+        ? "/api/v1/teachers/dashboard"
+        : "/api/v1/students/dashboard";
+    const response = await useApiService.get(apiUrl);
 
-    console.log(response)
+    console.log(response);
 
-    const userData = response.data.user
-    avatarUrl.value = userData.avatar
-    username.value = userData.username
+    const userData = response.data.user;
+    avatarUrl.value = userData.avatar;
+    username.value = userData.username;
 
     // Populate form with existing data
-    if (userData.first_name) form.first_name = userData.first_name
-    if (userData.last_name) form.last_name = userData.last_name
-    if (userData.gender) form.gender = userData.gender
-    if (userData.state) form.state = userData.state
-    if (userData.area) form.area = userData.area
-    if (userData.level) form.level = userData.level
-    if (userData.grade) form.grade = userData.grade
-    if (userData.school) form.school = userData.school
-  }
-  catch (err: any) {
+    if (userData.first_name) form.first_name = userData.first_name;
+    if (userData.last_name) form.last_name = userData.last_name;
+    if (userData.gender) form.gender = userData.gender;
+    if (userData.state) form.state = userData.state;
+    if (userData.area) form.area = userData.area;
+    if (userData.level) form.level = userData.level;
+    if (userData.grade) form.grade = userData.grade;
+    if (userData.school) form.school = userData.school;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
     $toast.error(
-      err.response?.data?.message || 'Failed to load user information',
-    )
+      error.response?.data?.message || "Failed to load user information"
+    );
   }
-}
+};
 
 const submitProfile = async () => {
   // Validate all fields
-  const isValid = true
+  const isValid = true;
   Object.keys(form).forEach((key) => {
-    if (key !== 'avatar') {
-      const fieldValid = validateField(key, form[key as keyof UserForm])
+    if (key !== "avatar") {
+      const fieldValid = validateField(key, form[key as keyof UserForm]);
       // if (!fieldValid) isValid = false;
     }
-  })
+  });
 
   if (!isValid) {
-    $toast.error('Please fix the validation errors')
-    return
+    $toast.error("Please fix the validation errors");
+    return;
   }
 
-  isSubmitting.value = true
-  $toast.success('Profile updated successfully')
-  isSubmitting.value = false
+  isSubmitting.value = true;
+  $toast.success("Profile updated successfully");
+  isSubmitting.value = false;
 
   // try {
   //   const apiUrl = userType.value === 5 ? "/api/v1/teachers/profile" : "/api/v1/students/profile";
@@ -639,7 +643,7 @@ const submitProfile = async () => {
   // } finally {
   //   isSubmitting.value = false;
   // }
-}
+};
 
 // const updateUsername = async () => {
 //   if (!validateField('username', username.value)) {
@@ -657,151 +661,153 @@ const submitProfile = async () => {
 //   }
 // };
 
-const getTypeList = async (type: string, parent: string | number = '') => {
+const getTypeList = async (type: string, parent: string | number = "") => {
   try {
-    const params: any = { type }
+    const params: Record<string, string | number> = { type };
 
-    if (type === 'base') params.section_id = parent
-    if (type === 'area') params.state_id = parent
-    if (type === 'school') {
-      params.section_id = form.level
-      params.area_id = form.area
+    if (type === "base") params.section_id = parent;
+    if (type === "area") params.state_id = parent;
+    if (type === "school") {
+      params.section_id = form.level;
+      params.area_id = form.area;
     }
 
-    const res = await useApiService.get('/api/v1/types/list', params)
-    console.log('res.data')
-    console.log(res.data)
+    const res = await useApiService.get("/api/v1/types/list", params);
+    console.log("res.data");
+    console.log(res.data);
 
     switch (type) {
-      case 'country':
-        countryList.value = res.data
-        break
-      case 'section':
-        levelList.value = res.data
-        break
-      case 'base':
-        gradeList.value = res.data
-        break
-      case 'state':
-        stateList.value = res.data
-        break
-      case 'area':
-        areaList.value = res.data
-        break
-      case 'school':
-        schoolList.value = res.data
-        break
+      case "country":
+        countryList.value = res.data;
+        break;
+      case "section":
+        levelList.value = res.data;
+        break;
+      case "base":
+        gradeList.value = res.data;
+        break;
+      case "state":
+        stateList.value = res.data;
+        break;
+      case "area":
+        areaList.value = res.data;
+        break;
+      case "school":
+        schoolList.value = res.data;
+        break;
     }
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    $toast.error(
+      error.response?.data?.message || `Failed to load ${type} list`
+    );
   }
-  catch (err: any) {
-    $toast.error(err.response?.data?.message || `Failed to load ${type} list`)
-  }
-}
+};
 
 const selectAvatar = () => {
-  avatarInput.value?.click()
-}
+  avatarInput.value?.click();
+};
 
 const uploadAvatar = () => {
-  const file = form.avatar
+  const file = form.avatar;
   if (file) {
-    const maxSize = 5 * 1024 * 1024 // 5MB
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      $toast.error('File size must be less than 5MB')
-      return
+      $toast.error("File size must be less than 5MB");
+      return;
     }
 
-    cropAvatarLoading.value = true
-    cropAvatarUrl.value = URL.createObjectURL(file)
-    cropperDialog.value = true
+    cropAvatarLoading.value = true;
+    cropAvatarUrl.value = URL.createObjectURL(file);
+    cropperDialog.value = true;
   }
-}
+};
 
 const confirmCrop = (url: Blob) => {
-  avatarUrl.value = URL.createObjectURL(url)
-  cropAvatarLoading.value = false
-  cropperDialog.value = false
-}
+  avatarUrl.value = URL.createObjectURL(url);
+  cropAvatarLoading.value = false;
+  cropperDialog.value = false;
+};
 
 // Watchers
 watch(
   () => form.level,
   (val) => {
     if (val) {
-      getTypeList('base', val)
-      form.grade = null // Reset grade when level changes
-      if (form.area) getTypeList('school')
+      getTypeList("base", val);
+      form.grade = null; // Reset grade when level changes
+      if (form.area) getTypeList("school");
     }
-  },
-)
+  }
+);
 
 watch(
   () => form.state,
   (val) => {
-    console.log('it changed')
+    console.log("it changed");
 
     if (val) {
-      getTypeList('area', val)
-      form.area = null // Reset area when state changes
+      getTypeList("area", val);
+      form.area = null; // Reset area when state changes
     }
-  },
-)
+  }
+);
 
 watch(
   () => form.area,
   (val) => {
     if (val && form.level) {
-      getTypeList('school')
+      getTypeList("school");
     }
-    form.school = null // Reset school when area changes
-  },
-)
+    form.school = null; // Reset school when area changes
+  }
+);
 
 // Watch for form changes and validate
 watch(
   () => form.first_name,
-  val => validateField('first_name', val),
-)
+  (val) => validateField("first_name", val)
+);
 watch(
   () => form.last_name,
-  val => validateField('last_name', val),
-)
+  (val) => validateField("last_name", val)
+);
 watch(
   () => form.gender,
-  val => validateField('gender', val),
-)
+  (val) => validateField("gender", val)
+);
 watch(
   () => form.state,
-  val => validateField('state', val),
-)
+  (val) => validateField("state", val)
+);
 watch(
   () => form.area,
-  val => validateField('area', val),
-)
+  (val) => validateField("area", val)
+);
 watch(
   () => form.level,
-  val => validateField('level', val),
-)
+  (val) => validateField("level", val)
+);
 watch(
   () => form.grade,
-  val => validateField('grade', val),
-)
+  (val) => validateField("grade", val)
+);
 watch(
   () => form.school,
-  val => validateField('school', val),
-)
+  (val) => validateField("school", val)
+);
 watch(
   () => username.value,
-  val => validateField('username', val),
-)
+  (val) => validateField("username", val)
+);
 
 // Lifecycle
 onMounted(() => {
-  getTypeList('country')
-  getTypeList('section')
-  getTypeList('state')
-  getUserInfo()
-})
+  getTypeList("country");
+  getTypeList("section");
+  getTypeList("state");
+  getUserInfo();
+});
 </script>
 
 <style scoped>

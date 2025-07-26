@@ -28,8 +28,7 @@ const props = defineProps<{
 
 // Event emitter for movement controls
 const emit = defineEmits<{
-  (e: 'moveStart', direction: string): void
-  (e: 'moveEnd', direction: string): void
+  (e: 'moveStart' | 'moveEnd', direction: string): void
 }>()
 
 // Movement buttons configuration
