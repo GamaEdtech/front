@@ -84,7 +84,7 @@
       <v-dialog
         v-model="dialog"
         max-width="600"
-        persistent
+        :persistent="isMobile === true ? false : true "
         class="tokenomics-modal-dialog"
       >
         <v-card class="tokenomics-modal-card">
@@ -110,6 +110,8 @@
 <script setup>
 import { ref } from "vue";
 
+const display = useGlobalDisplay()
+const isMobile = ref(false)
 const dialog = ref(false);
 const selectedBreakdown = ref(null);
 
@@ -150,6 +152,16 @@ const breakdowns = [
     color: "#95c9d7"
   },
 ];
+
+onMounted(() => {
+  isMobile.value = display.xs.value
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal
+    },
+  )
+})
 </script>
 
 <style scoped>
