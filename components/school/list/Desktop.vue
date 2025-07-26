@@ -22,114 +22,118 @@
       }`"
     >
       <div class="container-scroll">
-        <CardSchoolSkeleton
-          v-for="item in 4"
-          v-if="isInitialLoading"
-        />
+        <template v-if="isInitialLoading">
+          <CardSchoolSkeleton
+            v-for="(item, index) in 4"
+            :key="index"
+          />
+        </template>
 
         <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
 
-        <NuxtLink
-          v-for="(school, index) in schoolList"
-          v-if="!isInitialLoading"
-          class="card-school"
-          :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
-        >
-          <div class="name-address-image">
-            <div class="name-div">
-              <span class="name gtext-t4 font-weight-semibold">{{
-                school.name
-              }}</span>
-              <div class="d-flex align-center justify-start flex-wrap ga-3">
-                <v-chip
-                  v-if="school.countryTitle && school.countryTitle.length > 0"
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                >
-                  {{ school.countryTitle }}
-                </v-chip>
-                <v-chip
-                  v-if="school.stateTitle && school.stateTitle.length > 0"
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                >{{ school.stateTitle }}</v-chip>
-                <v-chip
-                  v-if="school.cityTitle && school.cityTitle.length > 0"
-                  class="text-subtitle-1"
-                  variant="elevated"
-                  color="#546e7a"
-                >United {{ school.cityTitle }}</v-chip>
-              </div>
-            </div>
-            <div
-              v-if="school.defaultImageUri && isExpanded"
-              class="img-div d-none d-md-block"
-            >
-              <NuxtImg
-                v-show="school.defaultImageUri"
-                alt="school.name"
-                width="180px"
-                :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')"
-                placeholder
-                class="h-100"
-              />
-            </div>
-          </div>
-          <div class="line-seperator" />
-          <div
-            class="w-100 d-flex align-center justify-space-between mt-3 flex-wrap ga-5"
+        <template v-if="!isInitialLoading">
+          <NuxtLink
+            v-for="(school, index) in schoolList"
+            :key="school.id || index"
+            class="card-school"
+            :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
           >
-            <div class="d-flex align-center">
-              <v-btn
-                variant="text"
-                icon
-                :disabled="!school.hasLocation"
-              >
-                <v-icon size="x-large"> mdi-map-marker </v-icon>
-              </v-btn>
-              <v-btn
-                variant="text"
-                icon
-                :disabled="!school.hasPhon"
-              >
-                <v-icon size="x-large"> mdi-phone </v-icon>
-              </v-btn>
-              <v-btn
-                variant="text"
-                icon
-                :disabled="!school.hasEmail"
-              >
-                <v-icon size="x-large"> mdi-email </v-icon>
-              </v-btn>
-              <v-btn
-                variant="text"
-                icon
-                :disabled="!school.hasWebsite"
-              >
-                <v-icon size="x-large"> mdi-web </v-icon>
-              </v-btn>
-            </div>
-            <div class="d-flex align-center ga-2">
+            <div class="name-address-image">
+              <div class="name-div">
+                <span class="name gtext-t4 font-weight-semibold">{{
+                  school.name
+                }}</span>
+                <div class="d-flex align-center justify-start flex-wrap ga-3">
+                  <v-chip
+                    v-if="school.countryTitle && school.countryTitle.length > 0"
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                  >
+                    {{ school.countryTitle }}
+                  </v-chip>
+                  <v-chip
+                    v-if="school.stateTitle && school.stateTitle.length > 0"
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                  >{{ school.stateTitle }}</v-chip>
+                  <v-chip
+                    v-if="school.cityTitle && school.cityTitle.length > 0"
+                    class="text-subtitle-1"
+                    variant="elevated"
+                    color="#546e7a"
+                  >United {{ school.cityTitle }}</v-chip>
+                </div>
+              </div>
               <div
-                class="d-flex align-center ga-2 gtext-t6 font-weight-semibold"
+                v-if="school.defaultImageUri && isExpanded"
+                class="img-div d-none d-md-block"
               >
-                <v-icon
-                  size="x-large"
-                  color="primary"
-                > mdi-star </v-icon>
-                {{ school.score ? school.score.toFixed(1) : "New" }}
-              </div>
-              <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
-                <v-icon size="x-large">mdi-update</v-icon>
-                <span class="primary-gray-600">
-                  {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
-                </span>
+                <NuxtImg
+                  v-show="school.defaultImageUri"
+                  alt="school.name"
+                  width="180px"
+                  :src="school.defaultImageUri?.replace(/^http:\/\//, 'https://')"
+                  placeholder
+                  class="h-100"
+                />
               </div>
             </div>
-          </div>
-        </NuxtLink>
+            <div class="line-seperator" />
+            <div
+              class="w-100 d-flex align-center justify-space-between mt-3 flex-wrap ga-5"
+            >
+              <div class="d-flex align-center">
+                <v-btn
+                  variant="text"
+                  icon
+                  :disabled="!school.hasLocation"
+                >
+                  <v-icon size="x-large"> mdi-map-marker </v-icon>
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  icon
+                  :disabled="!school.hasPhon"
+                >
+                  <v-icon size="x-large"> mdi-phone </v-icon>
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  icon
+                  :disabled="!school.hasEmail"
+                >
+                  <v-icon size="x-large"> mdi-email </v-icon>
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  icon
+                  :disabled="!school.hasWebsite"
+                >
+                  <v-icon size="x-large"> mdi-web </v-icon>
+                </v-btn>
+              </div>
+              <div class="d-flex align-center ga-2">
+                <div
+                  class="d-flex align-center ga-2 gtext-t6 font-weight-semibold"
+                >
+                  <v-icon
+                    size="x-large"
+                    color="primary"
+                  > mdi-star </v-icon>
+                  {{ school.score ? school.score.toFixed(1) : "New" }}
+                </div>
+                <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
+                  <v-icon size="x-large">mdi-update</v-icon>
+                  <span class="primary-gray-600">
+                    {{ $dayjs(school.lastModifyDate).format("YYYY-MM-DD") }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </NuxtLink>
+        </template>
 
         <div
           ref="lineSpecifierLoadMoreRef"

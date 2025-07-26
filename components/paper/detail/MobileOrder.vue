@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   contentData: {
     type: Object,
     required: true,
@@ -160,7 +160,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['download', 'open-auth'])
+const _emits = defineEmits(['download', 'open-auth'])
 </script>
 
 <style scoped>

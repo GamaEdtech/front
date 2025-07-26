@@ -83,11 +83,11 @@
               class="pr-0"
             >
               <v-tooltip location="bottom">
-                <template #activator="{ props }">
+                <template #activator="{ props: tooltipProps }">
                   <v-btn
                     color="teal"
                     class="text-white py-5 my-2"
-                    v-bind="props"
+                    v-bind="tooltipProps"
                     block
                     @click="path_panel_expand = !path_panel_expand"
                   >
@@ -146,7 +146,7 @@
                 fallback="Loading..."
               >
                 <Field
-                  v-slot="{ errorMessage }"
+                  v-slot="{ errorMessage: questionError }"
                   name="question"
                   :validate="validateQuestionField"
                 >
@@ -195,10 +195,10 @@
                     </template>
                   </RickEditor>
                   <p
-                    v-if="errorMessage"
+                    v-if="questionError"
                     class="text-error text-caption mt-1"
                   >
-                    {{ errorMessage }}
+                    {{ questionError }}
                   </p>
                 </Field>
               </ClientOnly>
@@ -251,7 +251,7 @@
 
               <!-- Test answer options -->
               <Field
-                v-slot="{ field, errorMessage }"
+                v-slot="{ field, errorMessage: trueAnswerError }"
                 name="true_answer"
                 :validate="validateTrueAnswer"
               >
@@ -259,7 +259,7 @@
                   id="test-image-options"
                   v-model="form.true_answer"
                   v-bind="field"
-                  :error-messages="errorMessage"
+                  :error-messages="trueAnswerError"
                 >
                   <v-row
                     v-if="['fourchoice', 'twochoice', 'tf'].includes(form.type)"
@@ -282,7 +282,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerAError }"
                         :name="'answer_a'"
                         :validate="validateAnswerField"
                       >
@@ -302,10 +302,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerAError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerAError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -373,7 +373,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerBError }"
                         :name="'answer_b'"
                         :validate="validateAnswerField"
                       >
@@ -393,10 +393,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerBError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerBError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -462,7 +462,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerCError }"
                         :name="'answer_c'"
                         :validate="validateAnswerField"
                       >
@@ -482,10 +482,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerCError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerCError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -551,7 +551,7 @@
                       cols="11"
                     >
                       <Field
-                        v-slot="{ errorMessage }"
+                        v-slot="{ errorMessage: answerDError }"
                         :name="'answer_d'"
                         :validate="validateAnswerField"
                       >
@@ -571,10 +571,10 @@
                             :additional-styles="{ marginInlineStart: '10px' }"
                           />
                           <p
-                            v-if="errorMessage"
+                            v-if="answerDError"
                             class="text-error text-caption mt-1"
                           >
-                            {{ errorMessage }}
+                            {{ answerDError }}
                           </p>
                         </ClientOnly>
                       </Field>
@@ -895,10 +895,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Form as VeeForm, Field, useForm, defineRule } from 'vee-validate'
-import { required } from '@vee-validate/rules'
-
-import FormTopicSelector from '~/components/form/topic-selector.vue'
+import { Form as VeeForm, Field, useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { useState } from '#app'
 import { useAuth } from '~/composables/useAuth'
@@ -974,7 +971,7 @@ const userToken = ref('')
  */
 const path_panel_expand = ref(true)
 const create_loading = ref(false)
-const test_step = ref(1)
+const _test_step = ref(1)
 const text_answer = ref(true)
 const text_answer_rules = ref('required')
 const photo_answer = ref(false)
@@ -1054,7 +1051,7 @@ const form_hidden_data = reactive({
  */
 const level_list = ref([])
 const grade_list = ref([])
-const field_list = ref([])
+const _field_list = ref([])
 const lesson_list = ref([])
 const topic_list = ref([])
 
@@ -1072,7 +1069,7 @@ const examTestListLength = computed(() => {
  * Handle topic selection from topic selector
  * @param {Array} topics - Array of selected topic IDs
  */
-const selectTopic = (topics) => {
+const _selectTopic = (topics) => {
   selected_topics.value = topics
   const topicIds = topics.map(id => parseInt(id))
   form.topic = topicIds.length > 0 ? topicIds[0] : null
@@ -1081,7 +1078,7 @@ const selectTopic = (topics) => {
 /**
  * Static data lists
  */
-const txt_direction_list = [
+const _txt_direction_list = [
   { value: 'ltr', title: 'LTR' },
   { value: 'rtl', title: 'RTL' },
 ]
@@ -1089,7 +1086,7 @@ const txt_direction_list = [
 /**
  * Cropper stencil properties
  */
-const stencil_props = reactive({
+const _stencil_props = reactive({
   width: 180,
   height: 180,
   aspectRatio: 1,
@@ -1190,10 +1187,10 @@ const validationSchema = yup.object({
  * Initialize VeeValidate form
  */
 const {
-  handleSubmit: veeHandleSubmit,
-  isSubmitting,
+  handleSubmit: _veeHandleSubmit,
+  isSubmitting: _isSubmitting,
   validate,
-  meta,
+  meta: _meta,
   resetForm,
 } = useForm({
   validationSchema,
@@ -1530,7 +1527,7 @@ const submitQuestion = async () => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       })
-      .then((response) => {
+      .then((_response) => {
         if (response.status === 1) {
           path_panel_expand.value = false
           const userState = useState('user')
@@ -1620,7 +1617,7 @@ const uploadFile = (file_name, fileEvent) => {
  * Handle image cropping
  * @param {Object} param0 - Cropper data
  */
-const cropFile = ({ coordinates, canvas }) => {
+const cropFile = ({ coordinates: _coordinates, canvas }) => {
   // Store the cropped image data as base64
   const croppedBase64 = canvas.toDataURL()
 
@@ -1789,7 +1786,7 @@ const getCurrentExamInfo = async () => {
  * Get base64 from URL
  * @param {string} url - The URL to fetch
  */
-const getBase64FromUrl = async (url) => {
+const _getBase64FromUrl = async (url) => {
   try {
     const response = await useApiService.get(
       url.replace(process.env.FILE_BASE_URL, ''),
@@ -1809,7 +1806,7 @@ const getBase64FromUrl = async (url) => {
  * @param {FormData} fd - Form data object
  * @returns {string} URL encoded string
  */
-const urlencodeFormData = (fd) => {
+const _urlencodeFormData = (fd) => {
   let s = ''
   for (const pair of fd.entries()) {
     if (typeof pair[1] === 'string') {
@@ -2269,7 +2266,7 @@ const validateQuestionField = (value) => {
 /**
  * Trigger form validation manually and submit
  */
-const manualSubmit = async () => {
+const _manualSubmit = async () => {
   clearFieldValidationErrors()
 
   if (
@@ -2346,7 +2343,7 @@ const manualSubmit = async () => {
           const examTestsFormData = new URLSearchParams()
           examTestsFormData.append('tests[]', createdTestId)
 
-          const associationResponse = await useApiService.put(
+          const _associationResponse = await useApiService.put(
             `/api/v1/exams/tests/${currentExamId}`,
             examTestsFormData,
             {

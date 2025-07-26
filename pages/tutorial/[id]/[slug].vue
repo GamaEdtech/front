@@ -114,8 +114,7 @@
                   class="error-report pointer"
                   @click="openCrashReportDialog"
                 >
-                  <i class="fa-solid fa-circle-exclamation mr-2" />Crash
-                  report
+                  <i class="fa-solid fa-circle-exclamation mr-2" />Crash report
                 </div>
               </v-col>
             </v-row>
@@ -189,25 +188,20 @@ import {
   computed,
 } from 'vue'
 
-const config = useRuntimeConfig()
+const _config = useRuntimeConfig()
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 const bookContentRef = ref(null)
 
 const route = useRoute()
 
 // Fetch tutorial data
-const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
+const { data: tutorialInfo, error: _tutorialError } = await useAsyncData(
   `tutorialInfo-${route.params.id}`,
   async () => {
-    try {
-      const response = await useApiService.get(
-        `/api/v1/tutorials/${route.params.id}`,
-      )
-      return response.data
-    }
-    catch (e) {
-      throw e
-    }
+    const response = await useApiService.get(
+      `/api/v1/tutorials/${route.params.id}`,
+    )
+    return response.data
   },
   {
     watch: [() => route.params.id],
@@ -215,19 +209,14 @@ const { data: tutorialInfo, error: tutorialError } = await useAsyncData(
 )
 
 // Fetch lesson tree
-const { data: lessonTree, error: lessonTreeError } = await useAsyncData(
+const { data: lessonTree, error: _lessonTreeError } = await useAsyncData(
   `lessonTree-${route.params.id}`,
   async () => {
-    try {
-      if (!tutorialInfo.value?.lesson) return null
-      const response = await useApiService.get(
-        `/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`,
-      )
-      return response.data
-    }
-    catch (e) {
-      throw e
-    }
+    if (!tutorialInfo.value?.lesson) return null
+    const response = await useApiService.get(
+      `/api/v1/tutorials/lessonTree/${tutorialInfo.value.lesson}`,
+    )
+    return response.data
   },
 )
 

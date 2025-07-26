@@ -260,7 +260,7 @@ watch(filter, (val) => {
         hide-default-footer
         show-select
       >
-        <template #item.fullName="{ item }">
+        <template #[`item.fullName`]="{ item }">
           <div class="d-flex align-center">
             <v-avatar
               v-if="item.avatar"
@@ -275,13 +275,14 @@ watch(filter, (val) => {
             <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.fullName }}</span>
           </div>
         </template>
-        <template #item.subject="{ item }">
+
+        <template #[`item.subject`]="{ item }">
           <div class="d-flex align-center">
             <span :class="item.isRead === false ? 'font-weight-bold' : ''">{{ item.subject }}</span>
           </div>
         </template>
 
-        <template #header.attachedFile>
+        <template #[`header.attachedFile`]>
           <div class="d-flex align-center">
             <v-icon
               small
@@ -293,7 +294,7 @@ watch(filter, (val) => {
           </div>
         </template>
 
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <div class="d-flex">
             <v-icon
               small
