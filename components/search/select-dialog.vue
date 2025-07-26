@@ -108,12 +108,12 @@ const HighlightedText = defineComponent({
   props: {
     text: {
       type: String,
-      required: true
+      required: true,
     },
     searchText: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const parts = computed(() => {
@@ -124,16 +124,16 @@ const HighlightedText = defineComponent({
 
       return segments.map(segment => ({
         text: segment,
-        highlight: segment.toLowerCase() === props.searchText.toLowerCase()
+        highlight: segment.toLowerCase() === props.searchText.toLowerCase(),
       }))
     })
 
     return () => h('span', parts.value.map(part =>
       h('span', {
-        style: part.highlight ? 'background-color: #FFB600; color: white;' : ''
-      }, part.text)
+        style: part.highlight ? 'background-color: #FFB600; color: white;' : '',
+      }, part.text),
     ))
-  }
+  },
 })
 
 const { mdAndUp } = useDisplay()

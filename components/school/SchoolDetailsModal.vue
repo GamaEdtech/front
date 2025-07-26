@@ -36,10 +36,10 @@
           >
             Close
           </v-btn>
-          <v-btn 
-            v-if="school?.id" 
-            variant="outlined" 
-            color="primary" 
+          <v-btn
+            v-if="school?.id"
+            variant="outlined"
+            color="primary"
             @click="navigateToSchoolDetailsDirect"
           >
             View Details
@@ -47,7 +47,7 @@
         </div>
       </v-card-text>
     </v-card>
-    
+
     <!-- Loading state -->
     <v-card
       v-else-if="isLoading"
@@ -64,7 +64,7 @@
         </div>
       </v-card-text>
     </v-card>
-    
+
     <!-- School card -->
     <v-card
       v-else
@@ -402,128 +402,130 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, watch, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   school: {
     type: Object,
-    default: null
-  }
-});
+    default: null,
+  },
+})
 
-const emit = defineEmits(['update:modelValue', 'navigate-to-details']);
+const emit = defineEmits(['update:modelValue', 'navigate-to-details'])
 
 // Error handling state
-const hasError = ref(false);
-const errorMessage = ref('');
-const isLoading = ref(false);
+const hasError = ref(false)
+const errorMessage = ref('')
+const isLoading = ref(false)
 
-const router = useRouter();
-const { $dayjs, $slugGenerator } = useNuxtApp();
+const router = useRouter()
+const { $dayjs, $slugGenerator } = useNuxtApp()
 
 // Handle v-model binding
 const internalValue = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-});
+  set: value => emit('update:modelValue', value),
+})
 
 // Navigate to school details page
 const navigateToSchoolDetails = (event) => {
-  if (!props.school) return;
-  
+  if (!props.school) return
+
   try {
     // Prevent event propagation to avoid double-clicks
-    event.stopPropagation();
-    
-    const schoolId = props.school.id;
-    const schoolSlug = $slugGenerator(props.school.name);
-    const schoolUrl = `/school/${schoolId}/${schoolSlug}`;
-    
+    event.stopPropagation()
+
+    const schoolId = props.school.id
+    const schoolSlug = $slugGenerator(props.school.name)
+    const schoolUrl = `/school/${schoolId}/${schoolSlug}`
+
     // Add active state visual feedback for touch devices
-    const card = event.currentTarget;
-    card.style.opacity = '0.8';
-    
+    const card = event.currentTarget
+    card.style.opacity = '0.8'
 
     // Close the modal with a slight delay for better UX
     setTimeout(() => {
-      internalValue.value = false;
-      
-      emit('navigate-to-details', schoolId, schoolSlug);
+      internalValue.value = false
+
+      emit('navigate-to-details', schoolId, schoolSlug)
 
       // Reset opacity
-      card.style.opacity = '1';
-    }, 50);
-  } catch (error) {
-    console.error('Error navigating to school details:', error);
+      card.style.opacity = '1'
+    }, 50)
   }
-};
+  catch (error) {
+    console.error('Error navigating to school details:', error)
+  }
+}
 
 // Close the modal
 const closeModal = () => {
-  internalValue.value = false;
-  hasError.value = false;
-  isLoading.value = false;
-  errorMessage.value = '';
-};
+  internalValue.value = false
+  hasError.value = false
+  isLoading.value = false
+  errorMessage.value = ''
+}
 
 // Navigate directly to school details (for error fallback)
 const navigateToSchoolDetailsDirect = () => {
-  if (!props.school?.id) return;
-  
-  const schoolSlug = props.school.name && props.school.name !== "Loading..." 
-    ? $slugGenerator(props.school.name) 
-    : 'school';
-  const schoolUrl = `/school/${props.school.id}/${schoolSlug}`;
-  
-  closeModal();
-  window.open(schoolUrl, '_blank');
-};
+  if (!props.school?.id) return
+
+  const schoolSlug = props.school.name && props.school.name !== 'Loading...'
+    ? $slugGenerator(props.school.name)
+    : 'school'
+  const schoolUrl = `/school/${props.school.id}/${schoolSlug}`
+
+  closeModal()
+  window.open(schoolUrl, '_blank')
+}
 
 // Validate school data for display
 const validateSchoolForDisplay = (school) => {
-  if (!school) return false;
-  
+  if (!school) return false
+
   // Check if we have minimal data for display
-  const hasMinimalData = school.id && school.name;
-  
+  const hasMinimalData = school.id && school.name
+
   // Check if we're in a loading state (has ID but minimal other data)
-  const isLoadingState = school.id && school.name === "Loading...";
-  
-  return { hasMinimalData, isLoadingState };
-};
+  const isLoadingState = school.id && school.name === 'Loading...'
+
+  return { hasMinimalData, isLoadingState }
+}
 
 // Watch for school changes to handle edge cases and loading states
 watch(() => props.school, (newSchool) => {
   if (!newSchool) {
     // If school data is removed, close the modal
-    internalValue.value = false;
-    hasError.value = false;
-    isLoading.value = false;
-    return;
+    internalValue.value = false
+    hasError.value = false
+    isLoading.value = false
+    return
   }
-  
-  const validation = validateSchoolForDisplay(newSchool);
-  
+
+  const validation = validateSchoolForDisplay(newSchool)
+
   if (validation.isLoadingState) {
     // School is in loading state
-    isLoading.value = true;
-    hasError.value = false;
-  } else if (validation.hasMinimalData) {
-    // School has valid data
-    isLoading.value = false;
-    hasError.value = false;
-  } else {
-    // School data is invalid
-    hasError.value = true;
-    isLoading.value = false;
-    errorMessage.value = "Unable to load school information";
+    isLoading.value = true
+    hasError.value = false
   }
-}, { deep: true, immediate: true });
+  else if (validation.hasMinimalData) {
+    // School has valid data
+    isLoading.value = false
+    hasError.value = false
+  }
+  else {
+    // School data is invalid
+    hasError.value = true
+    isLoading.value = false
+    errorMessage.value = 'Unable to load school information'
+  }
+}, { deep: true, immediate: true })
 </script>
 
 <style lang="scss" scoped>
@@ -533,12 +535,12 @@ watch(() => props.school, (newSchool) => {
   cursor: pointer;
   transition: transform 0.2s ease;
   position: relative;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
-  
+
   // Mobile-specific styles
   @media (max-width: 600px) {
     border-top-left-radius: 16px;
@@ -557,7 +559,7 @@ watch(() => props.school, (newSchool) => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 16px;
-  
+
   .name-address-image {
     width: 100%;
     display: flex;
@@ -566,7 +568,7 @@ watch(() => props.school, (newSchool) => {
     row-gap: 20px;
     min-height: 130px;
     justify-content: space-between;
-    
+
     .name-div {
       display: flex;
       flex-direction: column;
@@ -576,13 +578,13 @@ watch(() => props.school, (newSchool) => {
       flex: 1;
       padding-right: 16px;
     }
-    
+
     .img-div {
       min-width: 180px;
       height: 130px;
     }
   }
-  
+
   .line-seperator {
     width: 100%;
     height: 2px;
@@ -650,7 +652,7 @@ watch(() => props.school, (newSchool) => {
   border-top-right-radius: 16px !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
-  
+
   @media (min-width: 600px) {
     max-width: 500px !important;
     left: 50% !important;
@@ -663,7 +665,7 @@ watch(() => props.school, (newSchool) => {
     right: auto !important;
     transform: translateX(-50%) !important;
   }
-  
+
 }
 
 :deep(.v-overlay__content) {

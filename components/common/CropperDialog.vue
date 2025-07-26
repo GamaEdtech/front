@@ -34,8 +34,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import "vue-advanced-cropper/dist/style.css";
+import { ref, computed } from 'vue'
+import 'vue-advanced-cropper/dist/style.css'
 
 const props = defineProps({
   modelValue: {
@@ -56,27 +56,27 @@ const props = defineProps({
     required: false,
     default: false,
   },
-});
-const emit = defineEmits(["update:modelValue", "croppedData"]);
+})
+const emit = defineEmits(['update:modelValue', 'croppedData'])
 
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
+  set: value => emit('update:modelValue', value),
+})
 
-const crop_file_loading = ref(false);
-const cropped_data = ref(null);
+const crop_file_loading = ref(false)
+const cropped_data = ref(null)
 
 function cropFile({ coordinates, canvas, image }) {
-  if (!canvas) return;
-  crop_file_loading.value = true;
+  if (!canvas) return
+  crop_file_loading.value = true
   canvas.toBlob((blob) => {
-    cropped_data.value = blob;
-    crop_file_loading.value = false;
-  }, "image/webp");
+    cropped_data.value = blob
+    crop_file_loading.value = false
+  }, 'image/webp')
 }
 
 function emitFile() {
-  emit("croppedData", cropped_data.value);
+  emit('croppedData', cropped_data.value)
 }
 </script>

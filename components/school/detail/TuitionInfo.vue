@@ -66,59 +66,61 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(['update:contentData']);
-const nuxtApp = useNuxtApp();
-const route = useRoute();
+const emit = defineEmits(['update:contentData'])
+const nuxtApp = useNuxtApp()
+const route = useRoute()
 
-const isEditMode = ref(false);
-const submitLoader = ref(false);
-const tuitionFee = ref(0);
+const isEditMode = ref(false)
+const submitLoader = ref(false)
+const tuitionFee = ref(0)
 const tuitionRule = [
-  (v) => !!v || "Tuition fee is required",
-  (v) => /^\d+$/.test(v) || "Please enter only numbers",
-];
+  v => !!v || 'Tuition fee is required',
+  v => /^\d+$/.test(v) || 'Please enter only numbers',
+]
 
 const handleEdit = () => {
-  tuitionFee.value = props.contentData.tuition ? props.contentData.tuition : 0;
-  isEditMode.value = true;
-};
+  tuitionFee.value = props.contentData.tuition ? props.contentData.tuition : 0
+  isEditMode.value = true
+}
 
 function isValid(value) {
-  return /^\d+$/.test(value);
+  return /^\d+$/.test(value)
 }
 const handleUpdate = () => {
-  let formData = {};
+  let formData = {}
   if (!isValid(tuitionFee.value)) {
-    nuxtApp.$toast?.error("Please enter a valid Tuition Fee");
-    return;
+    nuxtApp.$toast?.error('Please enter a valid Tuition Fee')
+    return
   }
-  formData = { tuition: tuitionFee.value ?? null };
-  submitLoader.value = true;
+  formData = { tuition: tuitionFee.value ?? null }
+  submitLoader.value = true
 
   useApiService
     .post(`/api/v2/schools/${route.params.id}/contributions`, formData)
     .then(async (response) => {
       if (response.succeeded) {
         nuxtApp.$toast?.success(
-          "Thank you! Your contribution has been successfully submitted and is pending admin approval."
-        );
-        emit('update:contentData', { ...props.contentData, tuition: Number(tuitionFee.value) });
-      } else {
-        nuxtApp.$toast?.error(response?.errors[0]?.message);
+          'Thank you! Your contribution has been successfully submitted and is pending admin approval.',
+        )
+        emit('update:contentData', { ...props.contentData, tuition: Number(tuitionFee.value) })
+      }
+      else {
+        nuxtApp.$toast?.error(response?.errors[0]?.message)
       }
     })
     .catch((err) => {
-      console.log("err", err);
+      console.log('err', err)
 
       if (err?.response?.status == 401 || err?.response?.status == 403) {
-        nuxtApp.$toast?.error("Please login to update tuition information");
-      } else nuxtApp.$toast?.error(err?.response?.data?.message);
+        nuxtApp.$toast?.error('Please login to update tuition information')
+      }
+      else nuxtApp.$toast?.error(err?.response?.data?.message)
     })
     .finally(() => {
-      isEditMode.value = false;
-      submitLoader.value = false;
-    });
-};
+      isEditMode.value = false
+      submitLoader.value = false
+    })
+}
 </script>

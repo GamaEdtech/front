@@ -105,115 +105,116 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
-import { useNuxtApp, useHead } from "#app";
+import { ref, onMounted, nextTick } from 'vue'
+import { useNuxtApp, useHead } from '#app'
 
 useHead({
-  title: "MathJax LaTeX Test Page",
-});
+  title: 'MathJax LaTeX Test Page',
+})
 
 // --- Extended Test Cases ---
 const latexTestCases = ref([
   {
-    icon: "mdi-variable",
-    color: "blue-darken-1",
-    category: "Inline & Display Math",
+    icon: 'mdi-variable',
+    color: 'blue-darken-1',
+    category: 'Inline & Display Math',
     rawString: `Inline: $x^2 + y_i = z_i$ and Display: $$\\frac{1}{n}\\sum_{i=1}^n x_i$$`,
     htmlString: `Inline: $x^2 + y_i = z_i$ and Display: $$\\frac{1}{n}\\sum_{i=1}^n x_i$$`,
   },
   {
-    icon: "mdi-division",
-    color: "green-darken-1",
-    category: "Fractions & Radicals",
+    icon: 'mdi-division',
+    color: 'green-darken-1',
+    category: 'Fractions & Radicals',
     rawString: `A nested fraction and radical: $$\\frac{\\sqrt{x^2 - 1}}{1 + \\frac{a}{b}}$$`,
     htmlString: `A nested fraction and radical: $$\\frac{\\sqrt{x^2 - 1}}{1 + \\frac{a}{b}}$$`,
   },
   {
-    icon: "mdi-omega",
-    color: "deep-purple-darken-1",
-    category: "Greek Letters & Common Symbols",
+    icon: 'mdi-omega',
+    color: 'deep-purple-darken-1',
+    category: 'Greek Letters & Common Symbols',
     rawString: `Common symbols: $\\lambda, \\pi, \\sigma, \\forall, \\exists, \\in, \\pm, \\rightarrow, \\approx$`,
     htmlString: `Common symbols: $\\lambda, \\pi, \\sigma, \\forall, \\exists, \\in, \\pm, \\rightarrow, \\approx$`,
   },
   {
-    icon: "mdi-matrix",
-    color: "orange-darken-3",
-    category: "Matrices & Arrays",
+    icon: 'mdi-matrix',
+    color: 'orange-darken-3',
+    category: 'Matrices & Arrays',
     rawString: `Using 'pmatrix' for parentheses: $$A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$`,
     htmlString: `Using 'pmatrix' for parentheses: $$A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$`,
   },
   {
-    icon: "mdi-align-vertical-distribute",
-    color: "cyan-darken-2",
-    category: "Aligned Equations",
+    icon: 'mdi-align-vertical-distribute',
+    color: 'cyan-darken-2',
+    category: 'Aligned Equations',
     rawString: `Using the 'aligned' environment: $$\\begin{aligned} f(x) &= (x+a)(x+b) \\\\ &= x^2 + (a+b)x + ab \\end{aligned}$$`,
     htmlString: `Using the 'aligned' environment: $$\\begin{aligned} f(x) &= (x+a)(x+b) \\\\ &= x^2 + (a+b)x + ab \\end{aligned}$$`,
   },
   {
-    icon: "mdi-chart-bell-curve",
-    color: "red-darken-2",
-    category: "Integrals & Limits",
+    icon: 'mdi-chart-bell-curve',
+    color: 'red-darken-2',
+    category: 'Integrals & Limits',
     rawString: `An integral $\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$ and a limit $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$.`,
     htmlString: `An integral $\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$ and a limit $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$.`,
   },
   {
-    icon: "mdi-format-font",
-    color: "brown-darken-1",
-    category: "Font Styles",
+    icon: 'mdi-format-font',
+    color: 'brown-darken-1',
+    category: 'Font Styles',
     rawString: `Bold: $\\mathbf{X}$, Calligraphy: $\\mathcal{Y}$, Blackboard Bold: $\\mathbb{Z}$.`,
     htmlString: `Bold: $\\mathbf{X}$, Calligraphy: $\\mathcal{Y}$, Blackboard Bold: $\\mathbb{Z}$.`,
   },
   {
-    icon: "mdi-function-variant",
-    color: "teal-darken-2",
-    category: "Piecewise Functions",
+    icon: 'mdi-function-variant',
+    color: 'teal-darken-2',
+    category: 'Piecewise Functions',
     rawString: `$$f(n) = \\begin{cases} n/2, & \\text{if } n \\text{ is even} \\\\ 3n+1, & \\text{if } n \\text{ is odd} \\end{cases}$$`,
     htmlString: `$$f(n) = \\begin{cases} n/2, & \\text{if } n \\text{ is even} \\\\ 3n+1, & \\text{if } n \\text{ is odd} \\end{cases}$$`,
   },
   {
-    icon: "mdi-flask-outline",
-    color: "indigo-darken-1",
-    category: "Chemical Formulas (Standard TeX)",
+    icon: 'mdi-flask-outline',
+    color: 'indigo-darken-1',
+    category: 'Chemical Formulas (Standard TeX)',
     rawString: `A chemical reaction: $\\mathrm{H_2 + O_2 \\rightarrow H_2O}$.`,
     htmlString: `A chemical reaction: $\\mathrm{H_2 + O_2 \\rightarrow H_2O}$. Note: This uses standard TeX, not the mhchem extension.`,
   },
   {
-    icon: "mdi-currency-usd-off",
-    color: "grey-darken-1",
-    category: "Escaped Characters",
+    icon: 'mdi-currency-usd-off',
+    color: 'grey-darken-1',
+    category: 'Escaped Characters',
     rawString: `This tests an escaped dollar sign. The price is \\$5, which should not be rendered as math.`,
     htmlString: `This tests an escaped dollar sign. The price is \\$5, which should not be rendered as math.`,
   },
-]);
+])
 
 // --- MathJax Implementation ---
-const mathJaxContainerRef = ref<HTMLElement | null>(null);
-const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp();
+const mathJaxContainerRef = ref<HTMLElement | null>(null)
+const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 
 const typesetMathInContainer = async () => {
   if (import.meta.client && mathJaxContainerRef.value) {
     try {
-      await $ensureMathJaxReady();
-      if (!window.MathJax?.Hub) return;
+      await $ensureMathJaxReady()
+      if (!window.MathJax?.Hub) return
 
-      const elementToProcess =
-        (mathJaxContainerRef.value as { $el?: HTMLElement })?.$el ??
-        mathJaxContainerRef.value;
+      const elementToProcess
+        = (mathJaxContainerRef.value as { $el?: HTMLElement })?.$el
+          ?? mathJaxContainerRef.value
 
       if (elementToProcess instanceof HTMLElement) {
-        await nextTick();
-        $renderMathInElement(elementToProcess);
+        await nextTick()
+        $renderMathInElement(elementToProcess)
       }
-    } catch (err) {
-      console.error("Error during MathJax typesetting on test page:", err);
+    }
+    catch (err) {
+      console.error('Error during MathJax typesetting on test page:', err)
     }
   }
-};
+}
 
 // --- Lifecycle Hook ---
 onMounted(() => {
-  typesetMathInContainer();
-});
+  typesetMathInContainer()
+})
 </script>
 
 <style scoped>

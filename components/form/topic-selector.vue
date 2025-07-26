@@ -70,8 +70,8 @@ export default {
         return value.every(item =>
           typeof item === 'object'
           && 'id' in item
-          && 'title' in item
-        );
+          && 'title' in item,
+        )
       },
     },
     selectedTopics: {
@@ -85,14 +85,14 @@ export default {
     return {
       topic: this.selectedTopics || [],
       lesson_selected: false,
-    };
+    }
   },
   watch: {
     topic(val) {
-      this.$emit('selectTopic', val);
+      this.$emit('selectTopic', val)
     },
   },
-};
+}
 </script>
 
 <style scoped>

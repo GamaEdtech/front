@@ -624,12 +624,13 @@ export default {
         if (width < 960) {
           this.activeMember = 1
           this.tmpShowMemeber = 2
-        } else {
+        }
+        else {
           this.activeMember = 2
           this.tmpShowMemeber = 1
         }
-      }
-    }
+      },
+    },
   },
   // auth: false,
   // head() {

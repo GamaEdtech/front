@@ -163,85 +163,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import { useRecaptcha } from "~/composables/useRecapcha";
-import useApiService from "~/composables/useApiService";
+import { ref, reactive, onMounted } from 'vue'
+import { useRecaptcha } from '~/composables/useRecapcha'
+import useApiService from '~/composables/useApiService'
 
-const zoom = ref(20);
+const zoom = ref(20)
 const rules = {
-  required: (v: string) => !!v || "This field is required.",
-  email: (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid.",
+  required: (v: string) => !!v || 'This field is required.',
+  email: (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid.',
   min25: (v: string) =>
-    (v && v.length >= 25) || "Minimum 25 characters required.",
-};
+    (v && v.length >= 25) || 'Minimum 25 characters required.',
+}
 const formsData = reactive({
-  name: "",
-  email: "",
-  message: "",
-  subject: "",
-});
-const isFormValid = ref<boolean>(false);
-const formLoading = ref<boolean>(false);
+  name: '',
+  email: '',
+  message: '',
+  subject: '',
+})
+const isFormValid = ref<boolean>(false)
+const formLoading = ref<boolean>(false)
 const snankebar = reactive({
   isShow: false,
-  text: "",
-  status: "",
-});
-const showSnackebar = (status: "success" | "error", message: string) => {
-  snankebar.isShow = true;
-  snankebar.status = status;
-  snankebar.text = message;
-};
-const form = ref<HTMLFormElement | null>(null);
-const { getToken, initCaptcha, isLoaded } = useRecaptcha();
+  text: '',
+  status: '',
+})
+const showSnackebar = (status: 'success' | 'error', message: string) => {
+  snankebar.isShow = true
+  snankebar.status = status
+  snankebar.text = message
+}
+const form = ref<HTMLFormElement | null>(null)
+const { getToken, initCaptcha, isLoaded } = useRecaptcha()
 
 const submitForm = async () => {
-  formLoading.value = true;
+  formLoading.value = true
 
   if (isFormValid.value) {
     try {
       if (!isLoaded()) {
-        throw new Error("reCAPTCHA not loaded yet. Please try again.");
+        throw new Error('reCAPTCHA not loaded yet. Please try again.')
       }
 
-      const token = await getToken("submit");
+      const token = await getToken('submit')
 
-      const res: { succeeded: boolean; errors?: Array<{ message: string }> } =
-        await useApiService.post("/api/v2/contacts", {
+      const res: { succeeded: boolean, errors?: Array<{ message: string }> }
+        = await useApiService.post('/api/v2/contacts', {
           captcha: token,
           fullName: formsData.name,
           email: formsData.email,
           subject: formsData.subject,
           body: formsData.message,
-        });
+        })
 
       if (res.succeeded) {
-        showSnackebar("success", "Your message has been sent successfully.");
-      } else {
+        showSnackebar('success', 'Your message has been sent successfully.')
+      }
+      else {
         res.errors?.forEach((error: { message: string }) => {
-          showSnackebar("error", error.message);
-        });
+          showSnackebar('error', error.message)
+        })
       }
 
       // Reset form
       if (form.value) {
-        form.value.reset();
+        form.value.reset()
       }
-    } catch (error: unknown) {
-      console.log(error);
-      formLoading.value = false;
-      showSnackebar("error", "An error occurred. Please try again.");
-    } finally {
-      formLoading.value = false;
     }
-  } else {
-    formLoading.value = false;
+    catch (error: unknown) {
+      console.log(error)
+      formLoading.value = false
+      showSnackebar('error', 'An error occurred. Please try again.')
+    }
+    finally {
+      formLoading.value = false
+    }
   }
-};
+  else {
+    formLoading.value = false
+  }
+}
 
 onMounted(() => {
-  initCaptcha();
-});
+  initCaptcha()
+})
 </script>
 
 <style scoped>

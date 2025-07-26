@@ -128,51 +128,51 @@ export default {
     return {
       footerLinks: [
         {
-          mainTitle: "We",
+          mainTitle: 'We',
           subMenu: [
             {
-              title: "About us",
-              link: "/about-us",
+              title: 'About us',
+              link: '/about-us',
             },
             {
-              title: "Contact us",
-              link: "/contact-us",
+              title: 'Contact us',
+              link: '/contact-us',
             },
             {
-              title: "Terms",
-              link: "/terms",
+              title: 'Terms',
+              link: '/terms',
             },
             {
-              title: "FAQ",
-              link: "/faq",
+              title: 'FAQ',
+              link: '/faq',
             },
           ],
         },
         {
-          mainTitle: "Services",
+          mainTitle: 'Services',
           subMenu: [
             {
-              title: "Paper",
-              link: "/search?type=test",
+              title: 'Paper',
+              link: '/search?type=test',
             },
             {
-              title: "School Finder",
-              link: "/school-service",
+              title: 'School Finder',
+              link: '/school-service',
             },
             {
-              title: "Exam",
-              link: "/search?type=azmoon",
+              title: 'Exam',
+              link: '/search?type=azmoon',
             },
             {
-              title: "$GET Token",
-              link: "/get-token",
+              title: '$GET Token',
+              link: '/get-token',
             },
           ],
         },
       ],
-    };
+    }
   },
-};
+}
 </script>
 
 <style>

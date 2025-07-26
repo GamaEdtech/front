@@ -148,7 +148,7 @@ const props = defineProps({
     required: false,
     default: () => [],
     validator(value) {
-      return value.every(item => typeof item === 'string' || (typeof item === 'object' && 'url' in item));
+      return value.every(item => typeof item === 'string' || (typeof item === 'object' && 'url' in item))
     },
   },
 })

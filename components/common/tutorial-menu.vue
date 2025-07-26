@@ -56,7 +56,7 @@ export default {
       required: false,
       validator(value) {
         return Object.prototype.hasOwnProperty.call(value || {}, 'title')
-          && Object.prototype.hasOwnProperty.call(value || {}, 'list');
+          && Object.prototype.hasOwnProperty.call(value || {}, 'list')
       },
       default: () => ({
         title: '',
@@ -138,17 +138,17 @@ export default {
       ],
       search: null,
       caseSensitive: false,
-    };
+    }
   },
   mounted() {
-    this.initOpenMenu();
+    this.initOpenMenu()
   },
   methods: {
     openLink(id, title, tutorials) {
       if (tutorials.length === 1) {
         this.$router.push({
           path: `/tutorial/${tutorials[0].id}/${this.$slugGenerator.convert(title)}`,
-        });
+        })
       }
     },
     initOpenMenu() {
@@ -159,15 +159,15 @@ export default {
             && this.lessonTree.list[lessonIndex].chapters[i].tutorials[0]
             && this.lessonTree.list[lessonIndex].chapters[i].tutorials[0].id === this.$route.params.id
           ) {
-            this.openMenu.push(this.lessonTree.list[lessonIndex].id);
-            this.activeMenu.push(this.lessonTree.list[lessonIndex].chapters[i].id);
-            break;
+            this.openMenu.push(this.lessonTree.list[lessonIndex].id)
+            this.activeMenu.push(this.lessonTree.list[lessonIndex].chapters[i].id)
+            break
           }
         }
       }
     },
   },
-};
+}
 </script>
 
 <style>

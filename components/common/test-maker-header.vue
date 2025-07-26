@@ -204,10 +204,10 @@
 </template>
 
 <script>
-import WidgetsTopbar from "../widgets/WidgetsTopbar";
+import WidgetsTopbar from '../widgets/WidgetsTopbar'
 
 export default {
-  name: "TestMakerHeader",
+  name: 'TestMakerHeader',
   components: {
     WidgetsTopbar,
   },
@@ -215,83 +215,83 @@ export default {
     return {
       sidebar: false,
       dialog: false,
-      logo: "mainlogo-gamatrain.png",
-      avatar: "dexter-morse.png",
+      logo: 'mainlogo-gamatrain.png',
+      avatar: 'dexter-morse.png',
       menuItems: [
         {
-          title: "Home",
-          link: "/",
-          icon: "",
+          title: 'Home',
+          link: '/',
+          icon: '',
         },
         {
-          title: "Announcement",
-          link: "",
-          icon: "fa-angle-down",
+          title: 'Announcement',
+          link: '',
+          icon: 'fa-angle-down',
           subMenuList: [
-            { title: "Terms and Conditions", link: "" },
-            { title: "Privacy Policy", link: "" },
-            { title: "FAQs", link: "/faq" },
+            { title: 'Terms and Conditions', link: '' },
+            { title: 'Privacy Policy', link: '' },
+            { title: 'FAQs', link: '/faq' },
           ],
         },
         {
-          title: "Olympiad",
-          link: "",
-          icon: "fa-angle-down",
+          title: 'Olympiad',
+          link: '',
+          icon: 'fa-angle-down',
           subMenuList: [
-            { title: "International Mathematical Olympiad (IMO)", link: "" },
-            { title: "International Physics Olympiad (IPhO)", link: "" },
-            { title: "International Chemistry Olympiad (IChO)", link: "" },
+            { title: 'International Mathematical Olympiad (IMO)', link: '' },
+            { title: 'International Physics Olympiad (IPhO)', link: '' },
+            { title: 'International Chemistry Olympiad (IChO)', link: '' },
           ],
         },
         {
-          title: "High-level",
-          link: "",
-          icon: "fa-angle-down",
+          title: 'High-level',
+          link: '',
+          icon: 'fa-angle-down',
           subMenuList: [
-            { title: "Fourth grade entrance exam", link: "" },
-            { title: "Fifth grade entrance exam", link: "" },
-            { title: "Sixth grade entrance exam", link: "" },
+            { title: 'Fourth grade entrance exam', link: '' },
+            { title: 'Fifth grade entrance exam', link: '' },
+            { title: 'Sixth grade entrance exam', link: '' },
           ],
         },
         {
-          title: "Books",
-          link: "",
-          icon: "fa-angle-down",
+          title: 'Books',
+          link: '',
+          icon: 'fa-angle-down',
           subMenuList: [
-            { title: "Primary school period", link: "" },
-            { title: "First year of high school", link: "" },
-            { title: "Second year of high school", link: "" },
+            { title: 'Primary school period', link: '' },
+            { title: 'First year of high school', link: '' },
+            { title: 'Second year of high school', link: '' },
           ],
         },
         {
-          title: "Suggestions",
-          link: "",
-          icon: "fa-angle-down",
+          title: 'Suggestions',
+          link: '',
+          icon: 'fa-angle-down',
           subMenuList: [
-            { title: "9th coordinated exam", link: "" },
-            { title: "6th coordinated exam", link: "" },
-            { title: "12th Coordinated Exams", link: "" },
+            { title: '9th coordinated exam', link: '' },
+            { title: '6th coordinated exam', link: '' },
+            { title: '12th Coordinated Exams', link: '' },
           ],
         },
       ],
       selectedItem: 1,
       socialList: [
-        { link: "telegram", icon: "fa-telegram" },
-        { link: "twitter", icon: "fa-twitter" },
-        { link: "instagram", icon: "fa-instagram" },
-        { link: "Youtube", icon: "fa-youtube" },
+        { link: 'telegram', icon: 'fa-telegram' },
+        { link: 'twitter', icon: 'fa-twitter' },
+        { link: 'instagram', icon: 'fa-instagram' },
+        { link: 'Youtube', icon: 'fa-youtube' },
       ],
-    };
+    }
   },
   methods: {
     openLoginDialog() {
-      this.$refs.header_topbar.openLoginDialog();
+      this.$refs.header_topbar.openLoginDialog()
     },
     openRegisterDialog() {
-      this.$refs.header_topbar.openRegisterDialog();
+      this.$refs.header_topbar.openRegisterDialog()
     },
   },
-};
+}
 </script>
 
 <style>
