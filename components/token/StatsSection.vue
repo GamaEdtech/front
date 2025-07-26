@@ -143,7 +143,7 @@
                   alt="GET token"
                   class="token-icon mobile-token-icon mr-3"
                   loading="lazy"
-                  @error="$event.target.style.display='none'"
+                  @error="createImageLoadHandler()"
                 >
                 <span class="token-label mobile-token-label">GET</span>
               </div>
@@ -264,6 +264,7 @@
 import { useDisplay } from 'vuetify'
 
 const display = useDisplay()
+const { createImageLoadHandler } = useSafeImage()
 
 // Reactive state for responsive layout management
 const isMobile = ref(false)
