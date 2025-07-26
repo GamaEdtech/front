@@ -210,7 +210,7 @@ const { data: tutorialInfo, error: _tutorialError } = await useAsyncData(
 
 // Fetch lesson tree
 const { data: lessonTree, error: _lessonTreeError } = await useAsyncData(
-  'lessonTree',
+  `lessonTree-${route.params.id}`,
   async () => {
     if (!tutorialInfo.value?.lesson) return null
     const response = await useApiService.get(

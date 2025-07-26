@@ -16,9 +16,21 @@
       <Map
         :items="newSchoolForMarkersOnMap"
         @map-moved="changeFilterWithMapMoved"
+        @map-move-start="handleMapMoveStart"
         @user-location-found="userLocationFound"
         @school-marker-clicked="handleSchoolMarkerClick"
         @school-marker-click-error="handleSchoolMarkerClickError"
+      />
+    </div>
+
+    <!-- Map Loading Indicator - Only show on map view -->
+    <div
+      v-if="isUserMovingMap && (isExpandMapInDesktop || (!openBottomNavFilterList && isMobile))"
+      class="map-loading-overlay"
+    >
+      <v-progress-circular
+        color="amber"
+        indeterminate
       />
     </div>
 
@@ -111,7 +123,9 @@ const router = useRouter()
 const route = useRoute()
 
 const display = useGlobalDisplay()
-const isMobile = ref(display.xs)
+const isMobile = ref(false)
+
+const isUserMovingMap = ref(true) // Start with loading indicator visible
 
 const sortList = [
   {
@@ -155,9 +169,16 @@ const setDefaultSortToRoute = () => {
 onMounted(() => {
   setDefaultSortToRoute()
   const footer = document.getElementById('footer-container')
+  isMobile.value = display.xs.value
   if (footer) {
     footer.style.display = 'none'
   }
+  watch(
+    () => display.xs.value,
+    (newVal) => {
+      isMobile.value = newVal
+    },
+  )
 })
 
 onUnmounted(() => {
@@ -174,7 +195,8 @@ const filterForm = ref({
   state: route.query.state || '',
   city: route.query.city || '',
   stage: route.query.stage || '',
-  tuition_fee: Number(route.query.tuition_fee) || 0,
+  tuitionFeeMax: Number(route.query.tuitionFeeMax) || 0,
+  tuitionFeeMin: Number(route.query.tuitionFeeMin) || 0,
   sort: setDefaultSort(
     Array.isArray(route.query.sort)
       ? route.query.sort
@@ -242,12 +264,26 @@ const resetParameter = () => {
   isAllSchoolLoaded.value = false
   isInitialSchoolLoading.value = true
   schools.value = []
+  // Show loading indicator only when in map view
+  if (isExpandMapInDesktop.value || (!openBottomNavFilterList.value && isMobile.value)) {
+    isUserMovingMap.value = true
+  }
 }
 
 const updateFilter = (query) => {
   filterForm.value = query
   resetParameter()
   updateQueryParams()
+}
+
+const handleMapMoveStart = () => {
+  // Only show loading if map view is active and will trigger data reload
+  if (
+    (isExpandMapInDesktop.value && window.innerWidth > 1260)
+    || (!openBottomNavFilterList.value && window.innerWidth < 1260)
+  ) {
+    isUserMovingMap.value = true
+  }
 }
 
 const changeFilterWithMapMoved = (locationParam) => {
@@ -261,6 +297,8 @@ const changeFilterWithMapMoved = (locationParam) => {
     resetParameter()
     updateQueryParams()
   }
+  // Always set to false when movement ends, regardless of conditions
+  isUserMovingMap.value = false
 }
 
 const updateQueryParams = () => {
@@ -370,7 +408,14 @@ const { data: initialSchools, pending: _loadingSchoolsServer }
       'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
       'Name': filterForm.value.keyword,
       'section': filterForm.value.stage,
-      'tuition_fee': filterForm.value.tuition_fee,
+      'Tuition.Start':
+        filterForm.value.tuitionFeeMin == 0
+          ? undefined
+          : filterForm.value.tuitionFeeMin,
+      'Tuition.End':
+        filterForm.value.tuitionFeeMax == 0
+          ? undefined
+          : filterForm.value.tuitionFeeMax,
       'CountryId': filterForm.value.country,
       'StateId': filterForm.value.state,
       'CityId': filterForm.value.city,
@@ -386,7 +431,7 @@ const { data: initialSchools, pending: _loadingSchoolsServer }
       })
     }
 
-    return $fetch('/api/v2/schools', { params })
+    return useApiService.get('/api/v2/schools', params)
   })
 
 if (initialSchools.value) {
@@ -396,6 +441,8 @@ if (initialSchools.value) {
   isInitialSchoolLoading.value = false
   isPaginationSchoolLoading.value = false
   isPaginationPreviousSchoolLoading.value = false
+  // Hide loading indicator after initial data is loaded
+  isUserMovingMap.value = false
 }
 
 const getSchoolList = async () => {
@@ -420,7 +467,14 @@ const getSchoolList = async () => {
     else {
       params['Name'] = filterForm.value.keyword
       params['section'] = filterForm.value.stage
-      params['tuition_fee'] = filterForm.value.tuition_fee
+      params['Tuition.Start']
+        = filterForm.value.tuitionFeeMin == 0
+          ? undefined
+          : filterForm.value.tuitionFeeMin
+      params['Tuition.End']
+        = filterForm.value.tuitionFeeMax == 0
+          ? undefined
+          : filterForm.value.tuitionFeeMax
       params['CountryId'] = filterForm.value.country
       params['StateId'] = filterForm.value.state
       params['CityId'] = filterForm.value.city
@@ -431,26 +485,31 @@ const getSchoolList = async () => {
       params['sort'] = filterForm.value.sort
     }
 
-    const response = await $fetch('/api/v2/schools', {
+    const response = await useApiService.get('/api/v2/schools',
       params,
-    })
+    )
     setMetaData(response)
 
-    if (response?.data?.list.length < perPage) {
-      isAllSchoolLoaded.value = true
-    }
-    totalSchoolFind.value = response.data.totalRecordsCount
-      ? response.data.totalRecordsCount
-      : 0
+    if (response?.data?.list) {
+      if (response?.data?.list.length < perPage) {
+        isAllSchoolLoaded.value = true
+      }
+      totalSchoolFind.value = response.data.totalRecordsCount
+        ? response.data.totalRecordsCount
+        : 0
 
-    if (isPaginationPreviousSchoolLoading.value) {
-      schools.value = [...response.data.list, ...schools.value]
+      if (isPaginationPreviousSchoolLoading.value) {
+        schools.value = [...response.data.list, ...schools.value]
+      }
+      else {
+        schools.value = [...schools.value, ...response.data.list]
+      }
+      if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
+        newSchoolForMarkersOnMap.value = response.data.list
+      }
     }
     else {
-      schools.value = [...schools.value, ...response.data.list]
-    }
-    if (isExpandMapInDesktop.value || !openBottomNavFilterList.value) {
-      newSchoolForMarkersOnMap.value = response.data.list
+      isAllSchoolLoaded.value = true
     }
   }
   catch (err) {
@@ -460,6 +519,8 @@ const getSchoolList = async () => {
     isInitialSchoolLoading.value = false
     isPaginationSchoolLoading.value = false
     isPaginationPreviousSchoolLoading.value = false
+    // Hide loading indicator after data is loaded
+    isUserMovingMap.value = false
   }
 }
 
@@ -678,7 +739,7 @@ const fetchAdditionalSchoolDetails = async (schoolId) => {
       showSchoolModal.value = true
     }
 
-    const response = await $fetch(`/api/v2/schools/${schoolId}`)
+    const response = await useApiService.get(`/api/v2/schools/${schoolId}`)
     if (response && response?.data) {
       selectedSchool.value = { ...selectedSchool?.value, ...response?.data }
     }

@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100vh; width: 100vw">
+  <div style="height: 100%; width: 100%">
     <ClientOnly>
       <LMap
         ref="map"
@@ -7,6 +7,7 @@
         :min-zoom="minZoom"
         :center="center"
         :use-global-leaflet="true"
+        @movestart="onMoveStart"
         @moveend="onMoveEnd"
         @ready="onMapReady"
       >
@@ -41,6 +42,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'mapMoved',
+  'mapMoveStart',
   'userLocationFound',
   'school-marker-clicked',
   'school-marker-click-error',
@@ -168,6 +170,10 @@ async function onMapReady() {
     map.value.leafletObject.setView(center.value)
     setMarkers()
   }
+}
+
+const onMoveStart = () => {
+  emit('mapMoveStart')
 }
 
 const onMoveEnd = (event) => {
