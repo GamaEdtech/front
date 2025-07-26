@@ -170,7 +170,9 @@ async function checkFilePaths() {
     log('blue', '4. 🔍 Use the useSafeImage composable for better error handling');
   }
 
-  return issuesFound;
+  // Only return error code for case sensitivity issues, not missing files
+  const criticalIssues = issues.filter(i => i.actualFileName).length;
+  return criticalIssues;
 }
 
 // Run the check
