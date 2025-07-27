@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Script to check file path case sensitivity issues
- * This helps prevent issues when deploying to case-sensitive file systems (Linux/macOS)
- * while developing on case-insensitive systems (Windows)
+ * Development Script: File Path Case Sensitivity Checker
+ *
+ * This script is for development use only and is not served publicly.
+ * It helps prevent issues when deploying to case-sensitive file systems (Linux/macOS)
+ * while developing on case-insensitive systems (Windows).
+ *
+ * Location: /scripts/ directory (not publicly accessible)
+ * Usage: npm run check-paths
  */
 
 import fs from 'fs'
