@@ -4,6 +4,7 @@ import { VStepperVertical } from 'vuetify/labs/VStepperVertical'
 import { VSlideGroup } from 'vuetify/components'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
+import { defineNuxtPlugin } from 'nuxt/app'
 
 export default defineNuxtPlugin(
   (app: { vueApp: { use: (plugin: unknown) => void } }) => {
