@@ -7,6 +7,7 @@
     <v-footer padless>
       <main_footer />
     </v-footer>
+    <AppGlobalSnackbar />
   </v-app>
 </template>
 

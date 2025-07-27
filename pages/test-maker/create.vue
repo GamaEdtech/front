@@ -1522,11 +1522,10 @@ import draggable from 'vuedraggable'
 import FormTopicSelector from '~/components/form/topic-selector.vue'
 import CreateTestForm from '~/components/test-maker/create-test-form.vue'
 import { definePageMeta, useHead } from '#imports'
-
 // Get Nuxt app instance for accessing plugins like toast
 const _config = useRuntimeConfig()
 const _nuxtApp = useNuxtApp()
-const { $renderMathInElement, $ensureMathJaxReady } = _nuxtApp
+const { $renderMathInElement, $ensureMathJaxReady, $toast } = _nuxtApp
 
 // Define validation rules
 defineRule('required', required)
@@ -1973,7 +1972,6 @@ const submitQuestion = async () => {
   }
   catch (_err) {
     console.error('Error creating test:', _err)
-    const { $toast } = useNuxtApp()
     if ($toast) $toast.error('Failed to create test')
   }
   finally {
@@ -2001,7 +1999,6 @@ const _encode = (s) => {
 
 const copyUrl = () => {
   navigator.clipboard.writeText(test_share_link.value)
-  const { $toast } = useNuxtApp()
   if ($toast) $toast.success('Copied')
 }
 
@@ -2068,7 +2065,6 @@ const publishTest = async () => {
   }
   catch (_err) {
     console.error('Error publishing test:', _err)
-    const { $toast } = useNuxtApp()
     if ($toast) $toast.error('Failed to publish test')
   }
   finally {
@@ -2122,20 +2118,22 @@ const submitTest = async (skipListRefresh = false) => {
     )
     console.log('Tests:', tests.value)
 
-    await useApiService
-      .put(`/api/v1/exams/tests/${exam_id.value}`, formData.toString(), {
+    const response = await useApiService.put(
+      `/api/v1/exams/tests/${exam_id.value}`,
+      formData.toString(),
+      {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         },
-      })
-      .then(async (res) => {
-        if (res.status === 1) {
-          await nextTick()
-          await forceUIUpdate()
-          await handleRefreshPreviewList()
-          createForm.value.examTestListLength = tests.value.length
-        }
-      })
+      },
+    )
+
+    if (response.status === 1) {
+      await nextTick()
+      await forceUIUpdate()
+      await handleRefreshPreviewList()
+      createForm.value.examTestListLength = tests.value.length
+    }
 
     // Add a small delay to ensure the backend has processed the update
     await new Promise(resolve => setTimeout(resolve, 300))
