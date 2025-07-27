@@ -1228,7 +1228,6 @@ const {
  */
 const getTypeList = async (type, parent = '') => {
   const params = { type }
-  const { $toast } = useNuxtApp()
 
   // Set up parameters based on type
   if (type === 'base') params.section_id = parent
@@ -1379,8 +1378,6 @@ const resetFormFields = () => {
  * @returns {boolean} True if validation passes, false otherwise
  */
 const validateForm = () => {
-  const { $toast } = useNuxtApp()
-
   // Check basic required fields
   if (!form.section) {
     if ($toast) $toast.error('Please select a Board')
@@ -1472,7 +1469,6 @@ const validateForm = () => {
  * Handle form submission
  */
 const submitQuestion = async () => {
-  console.log('submitQuestion Called')
   create_loading.value = true
 
   // Force clear error messages again
@@ -1521,34 +1517,34 @@ const submitQuestion = async () => {
     if (form.c_file) formData.append('c_file', form.c_file)
     if (form.d_file) formData.append('d_file', form.d_file)
 
-    const response = await useApiService
-      .post('/api/v1/examTests', formData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-      .then((_response) => {
-        if (response.status === 1) {
-          path_panel_expand.value = false
-          const userState = useState('user')
+    const response = await useApiService.post('/api/v1/examTests', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
 
-          // Edit mode or create exam progress
-          if (userState.value.currentExamCode || props.examEditMode === true) {
-            emit('update:updateTestList', response.data.id)
-            emit('update:refreshTests')
-            resetFormFields()
-          }
-        }
-      })
+    if (response.status === 1) {
+      path_panel_expand.value = false
+      const userState = useState('user')
+
+      // Edit mode or create exam progress
+      if (userState.value.currentExamCode || props.examEditMode === true) {
+        emit('update:updateTestList', response.data.id)
+        emit('update:refreshTests')
+        resetFormFields()
+      }
+    }
   }
   catch (err) {
     console.error('Error submitting form:', err)
-    if (err.response?.status == 400) {
-      console.error('Bad request error:', err.response.data)
-      $toast.error(err.response.data.message || 'Bad request')
+
+    // Handle different error object structures
+    if (err.status === 400) {
+      console.error('Bad request error:', err.data)
+      $toast.error(err.data?.message || 'Bad request')
     }
-    else if (err.response?.status == 403) {
-      // Handle authentication error
+    else if (err.response?.status === 403) {
+      // Traditional axios-like error structure
       console.error('Authentication error')
       $toast.error('Authentication error')
       router.push('/login')
@@ -1766,7 +1762,6 @@ const getCurrentExamInfo = async () => {
       }
       catch (err) {
         console.error('Error fetching exam info:', err)
-        const { $toast } = useNuxtApp()
         if ($toast) $toast.error('Failed to load exam information')
         throw err // Rethrow to allow parent component to handle it
       }
@@ -1774,7 +1769,6 @@ const getCurrentExamInfo = async () => {
   }
   catch (error) {
     console.error('Error in getCurrentExamInfo:', error)
-    const { $toast } = useNuxtApp()
     if ($toast)
       $toast.error(
         'Failed to initialize test form. Please try refreshing the page.',
@@ -2379,7 +2373,6 @@ const _manualSubmit = async () => {
     }
   }
   catch (err) {
-    const { $toast } = useNuxtApp()
     if (err.response?.status == 400) {
       if ($toast) $toast.error(err.response.data.message || 'Bad request')
     }
