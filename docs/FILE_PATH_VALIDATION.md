@@ -1,43 +1,43 @@
 # File Path Case Sensitivity Validation
 
-این پروژه شامل ابزارهایی برای جلوگیری از مشکلات case sensitivity در مسیرهای فایل است که معمولاً هنگام deploy کردن روی سیستم‌های Linux/macOS رخ می‌دهد.
+This project includes tools to prevent case sensitivity issues in file paths that commonly occur when deploying to Linux/macOS systems.
 
-## مشکل
+## Problem
 
-در Windows، سیستم فایل case-insensitive است، یعنی `image.PNG` و `image.png` یکسان در نظر گرفته می‌شوند. اما در Linux و macOS، سیستم فایل case-sensitive است و این دو فایل متفاوت هستند.
+On Windows, the file system is case-insensitive, meaning `image.PNG` and `image.png` are treated as the same file. However, on Linux and macOS, the file system is case-sensitive, and these would be considered different files.
 
-## راه‌حل‌های پیاده شده
+## Implemented Solutions
 
-### 1. اسکریپت بررسی مسیرها (`scripts/check-file-paths.js`)
+### 1. Path Checking Script (`scripts/check-file-paths.js`)
 
-اسکریپتی که تمام فایل‌های Vue/JS/TS را اسکن می‌کند و مشکلات case sensitivity در مسیرهای تصاویر را شناسایی می‌کند.
+A script that scans all Vue/JS/TS files and identifies case sensitivity issues in image paths.
 
-**استفاده:**
+**Usage:**
 ```bash
 npm run check-paths
 ```
 
-**ویژگی‌ها:**
-- بررسی مسیرهای تصاویر در `/images/`
-- تشخیص case mismatch و فایل‌های missing
-- نمایش واضح مشکلات و راه‌حل‌ها
-- فقط مشکلات case sensitivity باعث fail شدن می‌شوند
+**Features:**
+- Checks image paths in `/images/` directory
+- Detects case mismatches and missing files
+- Clear display of issues and solutions
+- Only case sensitivity issues cause failures
 
 ### 2. Pre-commit Hook
 
-هر commit به صورت خودکار بررسی می‌شود تا مشکلات case sensitivity commit نشوند.
+Every commit is automatically checked to prevent case sensitivity issues from being committed.
 
-**فایل:** `.husky/pre-commit`
+**File:** `.husky/pre-commit`
 
-### 3. Composable امن (`composables/useSafeImage.js`)
+### 3. Safe Composable (`composables/useSafeImage.js`)
 
-ابزاری برای مدیریت امن تصاویر با error handling بهتر.
+A tool for safe image management with better error handling.
 
-**استفاده:**
+**Usage:**
 ```javascript
 const { createImageLoadHandler, getSafeImagePath } = useSafeImage()
 
-// در template
+// In template
 <img 
   :src="getSafeImagePath('/images/my-image.png')"
   @error="createImageLoadHandler()"
@@ -45,40 +45,40 @@ const { createImageLoadHandler, getSafeImagePath } = useSafeImage()
 >
 ```
 
-### 4. Plugin توسعه (`plugins/file-path-validator.client.js`)
+### 4. Development Plugin (`plugins/file-path-validator.client.js`)
 
-در حالت development، به صورت خودکار تصاویر را validate می‌کند و در console هشدار می‌دهد.
+In development mode, automatically validates images and warns in console.
 
-**ویژگی‌ها:**
-- فقط در development mode فعال است
-- بررسی خودکار پس از load شدن صفحه
-- هشدار در console برای تصاویر شکسته
+**Features:**
+- Only active in development mode
+- Automatic validation after page load
+- Console warnings for broken images
 
-## بهترین روش‌ها
+## Best Practices
 
-### 1. نام‌گذاری فایل‌ها
+### 1. File Naming
 ```bash
-# ✅ درست
+# ✅ Correct
 my-image.png
 user-avatar.jpg
 logo-small.svg
 
-# ❌ غلط
+# ❌ Incorrect
 MyImage.PNG
 User_Avatar.JPG
 logoSmall.SVG
 ```
 
-### 2. قبل از commit
+### 2. Before Committing
 ```bash
-# همیشه قبل از commit اجرا کنید
+# Always run before commit
 npm run check-paths
 
-# یا lint و check-paths با هم
+# Or lint and check-paths together
 npm run pre-commit
 ```
 
-### 3. در کامپوننت‌ها
+### 3. In Components
 ```vue
 <template>
   <img 
@@ -95,45 +95,45 @@ const handleImageError = createImageLoadHandler()
 </script>
 ```
 
-## عیب‌یابی
+## Troubleshooting
 
-### مشکل: تصویر در Windows کار می‌کند ولی در Linux نه
-1. `npm run check-paths` را اجرا کنید
-2. case mismatch را پیدا کنید
-3. نام فایل یا مسیر را اصلاح کنید
+### Issue: Image works on Windows but not on Linux
+1. Run `npm run check-paths`
+2. Find the case mismatch
+3. Fix the file name or path
 
-### مشکل: Pre-commit hook fail می‌شود
-1. خروجی اسکریپت را بخوانید
-2. مشکلات case sensitivity را حل کنید
-3. دوباره commit کنید
+### Issue: Pre-commit hook fails
+1. Read the script output
+2. Fix case sensitivity issues
+3. Commit again
 
-### مشکل: تصویر در development نمایش داده نمی‌شود
-1. Console browser را چک کنید
-2. Plugin خودکار هشدار می‌دهد
-3. مسیر فایل را بررسی کنید
+### Issue: Image not displayed in development
+1. Check browser console
+2. Plugin automatically warns
+3. Verify file path
 
-## مثال‌های رایج
+## Common Examples
 
-### قبل (مشکل‌دار):
+### Before (problematic):
 ```vue
 <img src="/images/token/CTA/CTA_People_mobile.svg" alt="People">
 ```
 
-### بعد (درست):
+### After (correct):
 ```vue
 <img src="/images/token/CTA/CTA_People_Mobile.svg" alt="People">
 ```
 
-## نکات مهم
+## Important Notes
 
-- ⚠️ همیشه قبل از PR، `npm run check-paths` را اجرا کنید
-- 🔍 در development، console browser را برای هشدارها چک کنید  
-- 📝 از نام‌گذاری consistent استفاده کنید
-- 🚀 Pre-commit hook به صورت خودکار شما را محافظت می‌کند
+- ⚠️ Always run `npm run check-paths` before PR
+- 🔍 In development, check browser console for warnings
+- 📝 Use consistent naming conventions
+- 🚀 Pre-commit hook automatically protects you
 
-## پشتیبانی
+## Support
 
-اگر مشکلی داشتید، می‌توانید:
-1. `npm run check-paths` را اجرا کنید
-2. خروجی را با تیم به اشتراک بگذارید
-3. از composable `useSafeImage` استفاده کنید
+If you encounter issues:
+1. Run `npm run check-paths`
+2. Share the output with the team
+3. Use the `useSafeImage` composable
