@@ -18,7 +18,7 @@
                   :size="`${isMobile ? 'large' : 'x-large'}`"
                   elevation="0"
                 >
-                  <span class="live-trading-dot mr-2"></span>
+                  <span class="live-trading-dot mr-2" />
                   Live Trading
                 </v-btn>
               </div>
@@ -33,7 +33,7 @@
                   src="/images/token/token.png"
                   alt="Token"
                   class="hero-token__image--mobile"
-                />
+                >
               </div>
             </div>
             <div class="d-flex justify-center flex-column align-center">
@@ -42,9 +42,7 @@
                 enabling growth, and creating value for the community.
               </div>
               <div class="mb-1">
-                <span class="hero-token__price text-white"
-                  >${{ finalPrice }}</span
-                >
+                <span class="hero-token__price text-white">${{ finalPrice }}</span>
               </div>
               <div class="mb-6">
                 <span class="hero-token__percentage">+6.47%</span>
@@ -57,16 +55,18 @@
                   class="buy-btn mr-4"
                   rounded
                   elevation="0"
-                  >Buy $GET Now</v-btn
                 >
+                  Buy $GET Now
+                </v-btn>
                 <v-btn
                   to="/whitepaper"
                   class="whitepaper-btn"
                   rounded
                   :size="`${isMobile ? 'large' : 'x-large'}`"
                   elevation="0"
-                  >View Whitepaper</v-btn
                 >
+                  View Whitepaper
+                </v-btn>
               </div>
             </div>
           </v-col>
@@ -79,7 +79,7 @@
               src="/images/token/token.png"
               alt="Token"
               class="token-image d-none d-md-block horizontal-coin"
-            />
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -88,31 +88,32 @@
 </template>
 
 <script setup>
-import { useDisplay } from "vuetify";
-const display = useDisplay();
-const isMobile = ref(false);
-const finalPrice = ref(0);
+import { useDisplay } from 'vuetify'
+
+const display = useDisplay()
+const isMobile = ref(false)
+const finalPrice = ref(0)
 
 onMounted(() => {
-  isMobile.value = display.xs.value;
+  isMobile.value = display.xs.value
   watch(
     () => display.xs.value,
     (newVal) => {
-      isMobile.value = newVal;
-    }
-  );
-});
+      isMobile.value = newVal
+    },
+  )
+})
 
 const fetchTokenPrice = async () => {
   const data = await $fetch(
-    "https://lite-api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
-  );
-  finalPrice.value = Object.values(data.data)[0]["price"];
-};
+    'https://lite-api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv',
+  )
+  finalPrice.value = Object.values(data.data)[0]['price']
+}
 
 onMounted(() => {
-  fetchTokenPrice();
-});
+  fetchTokenPrice()
+})
 </script>
 
 <style scoped>

@@ -7,11 +7,20 @@
     "dev": "cross-env NODE_OPTIONS=--unhandled-rejections=warn nuxt dev",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 nuxt build",
     "generate": "cross-env NODE_OPTIONS=--max-old-space-size=8192 nuxt generate",
-    "start": "nuxt start"
+    "start": "nuxt start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:check": "eslint . --quiet",
+    "prepare": "husky",
+    "pre-commit": "npm run lint"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^43.3.1",
     "@ckeditor/ckeditor5-vue": "^7.3.0",
+    "@nuxt/eslint": "^1.6.0",
     "@nuxt/image": "^1.10.0",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/leaflet": "^1.2.6",
@@ -26,8 +35,10 @@
     "core-js": "3.40.0",
     "dayjs-nuxt": "2.1.11",
     "defu": "^6.1.4",
+    "eslint": "^9.31.0",
     "file-saver": "^2.0.5",
     "leaflet.markercluster": "^1.5.3",
+    "@types/leaflet.markercluster": "^1",
     "nuxt": "^3.16.2",
     "nuxt-gtag": "^3.0.2",
     "three": "^0.175.0",
@@ -43,9 +54,13 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
+    "@nuxt/eslint-config": "^1.6.0",
     "@types/node": "22.12.0",
+    "@vite-pwa/nuxt": "^1.0.4",
     "cross-env": "^7.0.3",
+    "husky": "^9.1.7",
     "lil-gui": "^0.20.0",
+    "lint-staged": "^16.1.2",
     "sass": "^1.83.4",
     "sass-loader": "^16.0.4",
     "stats.js": "^0.17.0",
