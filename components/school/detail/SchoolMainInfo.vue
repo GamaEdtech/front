@@ -256,7 +256,6 @@ const contentData = ref(props.content)
 const emit = defineEmits(['edit', 'update'])
 const nuxtApp = useNuxtApp()
 const route = useRoute()
-const router = useRouter()
 const generalDataEditMode = reactive({
   website: false,
   email: false,
@@ -276,7 +275,7 @@ const addressSubmitLoader = ref(false)
 const webUrlRule = [
   v =>
     !v
-    || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+    || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(
       v,
     )
     || 'Please enter a valid URL',
@@ -322,7 +321,7 @@ function isValidUrl(url) {
     new URL(url)
     return /^https?:\/\//.test(url)
   }
-  catch (e) {
+  catch {
     return false
   }
 }
@@ -331,7 +330,7 @@ function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
-  catch (e) {
+  catch {
     return false
   }
 }
@@ -339,7 +338,7 @@ function isRequired(value) {
   try {
     return !!value.trim()
   }
-  catch (e) {
+  catch {
     return false
   }
 }
@@ -424,6 +423,7 @@ function handleUpdate(value) {
       console.log('err', err)
 
       if (err?.response?.status == 401 || err?.response?.status == 403) {
+        nuxtApp.$toast?.error('Please login to contribute')
       }
       else nuxtApp.$toast?.error(err?.response?.data?.message)
     })

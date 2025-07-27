@@ -58,7 +58,6 @@
                   <v-slide-group-item
                     v-for="(image, index) in images"
                     :key="index"
-                    v-slot="{ isSelected, toggle }"
                   >
                     <v-img
                       :class="{
@@ -146,7 +145,7 @@ watch(
   },
 )
 
-const active_img = ref(1)
+const _active_img = ref(1)
 
 const items = [
   {

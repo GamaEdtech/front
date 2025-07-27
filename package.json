@@ -11,8 +11,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --quiet",
+    "check-paths": "node scripts/check-file-paths.js",
     "prepare": "husky",
-    "pre-commit": "npm run lint"
+    "pre-commit": "npm run lint && npm run check-paths"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --fix"
@@ -25,6 +26,7 @@
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/leaflet": "^1.2.6",
     "@nuxtjs/toast": "^3.3.1",
+    "@types/leaflet.markercluster": "^1",
     "@types/three": "^0.175.0",
     "@vee-validate/rules": "^4.15.0",
     "animejs": "^4.0.1",
@@ -38,7 +40,6 @@
     "eslint": "^9.31.0",
     "file-saver": "^2.0.5",
     "leaflet.markercluster": "^1.5.3",
-    "@types/leaflet.markercluster": "^1",
     "nuxt": "^3.16.2",
     "nuxt-gtag": "^3.0.2",
     "three": "^0.175.0",
@@ -58,6 +59,7 @@
     "@types/node": "22.12.0",
     "@vite-pwa/nuxt": "^1.0.4",
     "cross-env": "^7.0.3",
+    "glob": "^11.0.3",
     "husky": "^9.1.7",
     "lil-gui": "^0.20.0",
     "lint-staged": "^16.1.2",

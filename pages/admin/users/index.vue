@@ -188,25 +188,25 @@ watch(selectedPageSize, () => {
         hide-default-footer
         show-select
       >
-        <template #item.username="{ item }">
+        <template #[`item.username`]="{ item }">
           <div class="d-flex align-center">
             <span class="truncate-text">{{ item.username }}</span>
           </div>
         </template>
 
-        <template #item.email="{ item }">
+        <template #[`item.email`]="{ item }">
           <div class="d-flex align-center">
             <span class="truncate-text">{{ item.email }}</span>
           </div>
         </template>
 
-        <template #header.actions>
+        <template #[`header.actions`]>
           <div class="d-flex justify-end pr-6">
             Actions
           </div>
         </template>
 
-        <template #item.enabled="{ item }">
+        <template #[`item.enabled`]="{ item }">
           <span
             v-if="item.enabled == true"
             class="gtext-t5 green-12b76a"
@@ -217,7 +217,7 @@ watch(selectedPageSize, () => {
           >disable</span>
         </template>
 
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <div class="d-flex justify-end pr-2">
             <v-btn
               variant="plain"

@@ -2,7 +2,10 @@
   <div
     class="w-100 d-none d-md-flex justify-center align-center flex-wrap ga-4 mt-2"
   >
-    <template v-for="(filter, index) in filters">
+    <template
+      v-for="(filter, index) in filters"
+      :key="filter.title || index"
+    >
       <v-btn
         append-icon="mdi-chevron-down"
         :class="`text-h5 primary-gray-700 ${
@@ -164,7 +167,7 @@ const props = defineProps({
   },
   countDataFound: {
     type: String,
-    default: 0,
+    default: () => '0',
   },
 })
 
@@ -563,7 +566,7 @@ const clearFilter = (filter, index) => {
     filters[FILTER_INDEX.Year].selectedItem = null
     filters[FILTER_INDEX.Year].disabled = true
   }
-  if (index => FILTER_INDEX.Classification) {
+  if (index >= FILTER_INDEX.Classification) {
     filters[index].selectedItem = null
     filters[index].disabled = false
   }

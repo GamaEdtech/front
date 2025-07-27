@@ -207,11 +207,11 @@ import { useDisplay } from 'vuetify/lib/framework.mjs'
 
 const display = useDisplay()
 // Data
-const test_schools = ref('')
-const less = ref(true)
-const showLess = ref(true)
+const _test_schools = ref('')
+const _less = ref(true)
+const _showLess = ref(true)
 
-const items = ref([
+const _items = ref([
   {
     src: 'banner_home_2.jpg',
   },
@@ -243,7 +243,7 @@ const slideArr = ref([
   },
 ])
 
-const slideColor = computed(() => {
+const _slideColor = computed(() => {
   if (colors.value && carousel_model.value) {
     return colors.value[carousel_model.value]
   }
