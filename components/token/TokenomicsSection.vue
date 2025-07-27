@@ -1,11 +1,13 @@
 <template>
   <section class="tokenomics-section">
     <div class="tokenomics-container">
-      <h2 class="tokenomics-title">Tokenomics</h2>
+      <h2 class="tokenomics-title">
+        Tokenomics
+      </h2>
       <h4 class="tokenomics-subtitle">
         See exactly how $GET tokens are allocated
       </h4>
-      
+
       <!-- Desktop View -->
       <div class="tokenomics-main">
         <div class="tokenomics-chart-card">
@@ -13,27 +15,39 @@
             src="/images/token/Tokenomics/Tokenomics_Pie_Green.png"
             alt="Tokenomics Section"
             class="tokenomics-svg"
-          />
+          >
         </div>
         <div class="tokenomics-breakdowns">
           <div
             v-for="item in breakdowns"
             :key="item.key"
             class="tokenomics-breakdown-card"
-            @click="openBreakdown(item)"
             style="cursor: pointer"
+            @click="openBreakdown(item)"
           >
             <img
               :src="item.icon"
               :alt="item.title"
               class="tokenomics-icon"
-            />
+            >
             <div class="tokenomics-info">
               <div class="tokenomics-detail-row">
-                <div class="tokenomics-percent" :style="{ color: item.color }">{{ item.percent }}</div>
+                <div
+                  class="tokenomics-percent"
+                  :style="{ color: item.color }"
+                >
+                  {{ item.percent }}
+                </div>
                 <div class="tokenomics-title-detail">
-                  <div class="tokenomics-title" :style="{ color: item.color }">{{ item.title }}</div>
-                  <div class="tokenomics-detail">{{ item.detail }}</div>
+                  <div
+                    class="tokenomics-title"
+                    :style="{ color: item.color }"
+                  >
+                    {{ item.title }}
+                  </div>
+                  <div class="tokenomics-detail">
+                    {{ item.detail }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -47,7 +61,7 @@
           src="/images/token/Tokenomics/TokenomicsSec.png"
           alt="Tokenomics for iPad Mini"
           class="tokenomics-ipad-svg"
-        />
+        >
       </div>
 
       <!-- Mobile View -->
@@ -56,7 +70,7 @@
           src="/images/token/Tokenomics/Tokenomics_Pie_Green.png"
           alt="Tokenomics Mobile"
           class="tokenomics-mobile-svg"
-        />
+        >
         <div class="mobile-breakdowns">
           <div
             v-for="item in breakdowns"
@@ -68,13 +82,25 @@
               :src="item.icon"
               :alt="item.title"
               class="mobile-icon"
-            />
+            >
             <div class="mobile-info">
               <div class="mobile-title-row">
-                <div class="mobile-title" :style="{ color: item.color }">{{ item.title }}</div>
-                <div class="mobile-percent" :style="{ color: item.color }">{{ item.percent }}</div>
+                <div
+                  class="mobile-title"
+                  :style="{ color: item.color }"
+                >
+                  {{ item.title }}
+                </div>
+                <div
+                  class="mobile-percent"
+                  :style="{ color: item.color }"
+                >
+                  {{ item.percent }}
+                </div>
               </div>
-              <div class="mobile-detail">{{ item.detail }}</div>
+              <div class="mobile-detail">
+                {{ item.detail }}
+              </div>
             </div>
           </div>
         </div>
@@ -88,18 +114,29 @@
         class="tokenomics-modal-dialog"
       >
         <v-card class="tokenomics-modal-card">
-          <v-card-title class="headline modal-title">{{
-            selectedBreakdown?.title
-          }}</v-card-title>
+          <v-card-title class="headline modal-title">
+            {{
+              selectedBreakdown?.title
+            }}
+          </v-card-title>
           <v-card-text>
-            <div class="modal-percent">{{ selectedBreakdown?.percent }}</div>
-            <div class="modal-amount">{{ selectedBreakdown?.amount }}</div>
+            <div class="modal-percent">
+              {{ selectedBreakdown?.percent }}
+            </div>
+            <div class="modal-amount">
+              {{ selectedBreakdown?.amount }}
+            </div>
             <div class="modal-popup-text">
               {{ selectedBreakdown?.popupText }}
             </div>
           </v-card-text>
           <v-card-actions>
-            <v-btn class="modal-close-btn" @click="dialog = false">Close</v-btn>
+            <v-btn
+              class="modal-close-btn"
+              @click="dialog = false"
+            >
+              Close
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -108,50 +145,50 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 const display = useGlobalDisplay()
 const isMobile = ref(false)
-const dialog = ref(false);
-const selectedBreakdown = ref(null);
+const dialog = ref(false)
+const selectedBreakdown = ref(null)
 
 function openBreakdown(item) {
-  selectedBreakdown.value = item;
-  dialog.value = true;
+  selectedBreakdown.value = item
+  dialog.value = true
 }
 
 const breakdowns = [
   {
-    key: "governance",
-    icon: "/images/token/Tokenomics/Governance.svg",
-    title: "Governance",
-    detail: "7B $GET - Locked for 10 years.",
+    key: 'governance',
+    icon: '/images/token/Tokenomics/Governance.svg',
+    title: 'Governance',
+    detail: '7B $GET - Locked for 10 years.',
     popupText:
       'These tokens are reserved for community governance. "Locked" means that these tokens are not available for a certain amount of time. After unlocking, these tokens will help guide decisions like new features, tokenomics, and more.',
-    percent: "70%",
-    color: "#188896"
+    percent: '70%',
+    color: '#188896',
   },
   {
-    key: "team",
-    icon: "/images/token/Tokenomics/Team.svg",
-    title: "Team",
-    detail: "2B $GET - Development fund",
+    key: 'team',
+    icon: '/images/token/Tokenomics/Team.svg',
+    title: 'Team',
+    detail: '2B $GET - Development fund',
     popupText:
-      "These tokens are reserved for core contributors. This includes the team, developers, and anyone else contributing to the development and maintenance of the GamaTrain platform.",
-    percent: "20%",
-    color: "#df2121"
+      'These tokens are reserved for core contributors. This includes the team, developers, and anyone else contributing to the development and maintenance of the GamaTrain platform.',
+    percent: '20%',
+    color: '#df2121',
   },
   {
-    key: "liquidity",
-    icon: "/images/token/Tokenomics/Liquidity.svg",
-    title: "Liquidity",
-    detail: "1B $GET - Market liquidity",
+    key: 'liquidity',
+    icon: '/images/token/Tokenomics/Liquidity.svg',
+    title: 'Liquidity',
+    detail: '1B $GET - Market liquidity',
     popupText:
-      "These tokens are used to make it easier to buy and sell $GET on exchanges. They help provide price stability of the token and avoid big price swings.",
-    percent: "10%",
-    color: "#95c9d7"
+      'These tokens are used to make it easier to buy and sell $GET on exchanges. They help provide price stability of the token and avoid big price swings.',
+    percent: '10%',
+    color: '#95c9d7',
   },
-];
+]
 
 onMounted(() => {
   isMobile.value = display.xs.value

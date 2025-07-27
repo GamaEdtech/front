@@ -24,7 +24,7 @@
     <section>
       <token-purchase />
     </section>
-     <section>
+    <section>
       <token-stats-section />
     </section>
     <section>

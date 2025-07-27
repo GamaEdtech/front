@@ -1,7 +1,9 @@
 <template>
   <section class="trust-community-section">
     <v-container class="trust-community-container">
-      <h2 class="trust-community-title">Built On Trust, Driven By Community</h2>
+      <h2 class="trust-community-title">
+        Built On Trust, Driven By Community
+      </h2>
       <v-img
         src="/images/token/Mission/community.svg"
         alt="Community trust and collaboration illustration"
@@ -57,16 +59,16 @@
 <script setup>
 const items = ref([
   {
-    img: "/images/token/Mission/trust.svg",
-    text: "Trust",
+    img: '/images/token/Mission/trust.svg',
+    text: 'Trust',
   },
   {
-    img: "/images/token/Mission/transparency.svg",
-    text: "Transparency",
+    img: '/images/token/Mission/transparency.svg',
+    text: 'Transparency',
   },
   {
-    img: "/images/token/Mission/shared.svg",
-    text: "Shared Accountability",
+    img: '/images/token/Mission/shared.svg',
+    text: 'Shared Accountability',
   },
 ])
 </script>

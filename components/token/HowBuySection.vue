@@ -1,50 +1,82 @@
 <template>
   <section class="how-buy-section py-8">
     <div class="how-buy-wrapper">
-      <h2 class="how-buy-title text-center">How To Buy $GET</h2>
+      <h2 class="how-buy-title text-center">
+        How To Buy $GET
+      </h2>
       <v-container>
         <v-row justify="center">
-          <v-col cols="12" md="12" lg="12">
+          <v-col
+            cols="12"
+            md="12"
+            lg="12"
+          >
             <!-- New illustration layout: tokens + man -->
             <div class="how-buy-hero mb-8">
               <!-- Token icons and names -->
               <div class="how-buy-tokens">
                 <div class="token-row">
                   <div class="token-icon-col">
-                    <img src="/images/token/Buy/token-get2.png" alt="GET" class="token-icon" />
+                    <img
+                      src="/images/token/Buy/token-get2.png"
+                      alt="GET"
+                      class="token-icon"
+                    >
                   </div>
                   <span class="how-buy-token-label">GET</span>
                 </div>
                 <div class="token-row">
                   <div class="token-icon-col">
-                    <img src="/images/token/Buy/token-usdc.png" alt="USDC" class="token-icon" />
+                    <img
+                      src="/images/token/Buy/token-usdc.png"
+                      alt="USDC"
+                      class="token-icon"
+                    >
                   </div>
                   <span class="how-buy-token-label">USDC</span>
                 </div>
                 <div class="token-row">
                   <div class="token-icon-col">
-                    <img src="/images/token/Buy/token-usdt.png" alt="USDT" class="token-icon" />
+                    <img
+                      src="/images/token/Buy/token-usdt.png"
+                      alt="USDT"
+                      class="token-icon"
+                    >
                   </div>
                   <span class="how-buy-token-label">USDT</span>
                 </div>
                 <div class="token-row">
                   <div class="token-icon-col">
-                    <img src="/images/token/Buy/token-wbtc.png" alt="WBTC" class="token-icon" />
+                    <img
+                      src="/images/token/Buy/token-wbtc.png"
+                      alt="WBTC"
+                      class="token-icon"
+                    >
                   </div>
                   <span class="how-buy-token-label">WBTC</span>
                 </div>
               </div>
               <!-- Man illustration -->
               <div class="how-buy-man d-flex justify-center align-center">
-                <img src="/images/token/Buy/guide.svg" alt="Buy Illustration" class="how-buy-illustration" />
+                <img
+                  src="/images/token/Buy/guide.svg"
+                  alt="Buy Illustration"
+                  class="how-buy-illustration"
+                >
               </div>
             </div>
             <!-- End hero -->
             <div class="steps-rows">
-              <div v-for="(row, rowIndex) in stepRows" :key="'row-' + rowIndex" class="steps-row">
+              <div
+                v-for="(row, rowIndex) in stepRows"
+                :key="'row-' + rowIndex"
+                class="steps-row"
+              >
                 <!-- Step 1 -->
                 <div class="step-wrapper">
-                  <div class="step-number">{{ rowIndex * 2 + 1 }}</div>
+                  <div class="step-number">
+                    {{ rowIndex * 2 + 1 }}
+                  </div>
                   <div class="step-item">
                     <div class="step-content">
                       <div class="step-header">
@@ -54,20 +86,31 @@
                             :alt="row[0].title + ' Icon'"
                             class="how-buy-icon"
                             contain
-                          />
+                          >
                         </div>
-                        <div class="step-title">{{ row[0].title }}</div>
+                        <div class="step-title">
+                          {{ row[0].title }}
+                        </div>
                       </div>
                       <ul class="step-list">
                         <li
-                            v-for="(item, i) in row[0].items" :key="i" 
-                            :class="{ 'warning-text': item.isWarning }">
+                          v-for="(item, i) in row[0].items"
+                          :key="i"
+                          :class="{ 'warning-text': item.isWarning }"
+                        >
                           <template v-if="item.link">
                             Go to
-                            <a :href="item.link" target="_blank" rel="noopener" class="how-buy-link">
+                            <a
+                              :href="item.link"
+                              target="_blank"
+                              rel="noopener"
+                              class="how-buy-link"
+                            >
                               {{ item.link }}
                             </a>
-                            <template v-if="item.extraText">{{ item.extraText }}</template>
+                            <template v-if="item.extraText">
+                              {{ item.extraText }}
+                            </template>
                           </template>
                           <template v-else>
                             <span :class="{ 'font-weight-bold': item.isBold }">{{ item.text }}</span>
@@ -78,10 +121,18 @@
                   </div>
                 </div>
                 <!-- Arrow -->
-                <span v-if="row[1]" class="step-arrow">→</span>
+                <span
+                  v-if="row[1]"
+                  class="step-arrow"
+                >→</span>
                 <!-- Step 2 or placeholder -->
-                <div v-if="row[1]" class="step-wrapper">
-                  <div class="step-number">{{ rowIndex * 2 + 2 }}</div>
+                <div
+                  v-if="row[1]"
+                  class="step-wrapper"
+                >
+                  <div class="step-number">
+                    {{ rowIndex * 2 + 2 }}
+                  </div>
                   <div class="step-item">
                     <div class="step-content">
                       <div class="step-header">
@@ -91,20 +142,31 @@
                             :alt="row[1].title + ' Icon'"
                             class="how-buy-icon"
                             contain
-                          />
+                          >
                         </div>
-                        <div class="step-title">{{ row[1].title }}</div>
+                        <div class="step-title">
+                          {{ row[1].title }}
+                        </div>
                       </div>
                       <ul class="step-list">
                         <li
-                            v-for="(item, i) in row[1].items" :key="i" 
-                            :class="{ 'warning-text': item.isWarning }">
+                          v-for="(item, i) in row[1].items"
+                          :key="i"
+                          :class="{ 'warning-text': item.isWarning }"
+                        >
                           <template v-if="item.link">
                             Go to
-                            <a :href="item.link" target="_blank" rel="noopener" class="how-buy-link">
+                            <a
+                              :href="item.link"
+                              target="_blank"
+                              rel="noopener"
+                              class="how-buy-link"
+                            >
                               {{ item.link }}
                             </a>
-                            <template v-if="item.extraText">{{ item.extraText }}</template>
+                            <template v-if="item.extraText">
+                              {{ item.extraText }}
+                            </template>
                           </template>
                           <template v-else>
                             <span :class="{ 'font-weight-bold': item.isBold }">{{ item.text }}</span>
@@ -114,7 +176,10 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="step-placeholder"></div>
+                <div
+                  v-else
+                  class="step-placeholder"
+                />
               </div>
             </div>
           </v-col>
@@ -133,24 +198,24 @@ const steps = [
       { link: 'https://phantom.com' },
       { text: 'Create a wallet and receive your secret recovery phrase' },
       { text: 'Write your phrase down somewhere safe' },
-      { text: 'Never share this phrase with anyone ❗' }
-    ]
+      { text: 'Never share this phrase with anyone ❗' },
+    ],
   },
   {
     title: 'Connect to a Decentralized Exchange',
     icon: '/images/token/Buy/buy.svg',
     items: [
       { link: 'https://jup.ag', extraText: ' and create an account' },
-      { text: 'Click Connect Wallet and choose Phantom' }
-    ]
+      { text: 'Click Connect Wallet and choose Phantom' },
+    ],
   },
   {
     title: 'Find the $GET Token',
     icon: '/images/token/Buy/token-get.png',
     items: [
       { text: 'Search for the $GET icon' },
-      { text: 'Click on the icon to select it ' }
-    ]
+      { text: 'Click on the icon to select it ' },
+    ],
   },
   {
     title: 'Choose the Amount & Currency',
@@ -158,8 +223,8 @@ const steps = [
     items: [
       { text: 'Select how much $GET you want to buy' },
       { text: 'Choose which currency to pay with (USDC, USDT, etc.)' },
-      { text: 'Review the exchange rate and fees' }
-    ]
+      { text: 'Review the exchange rate and fees' },
+    ],
   },
   {
     title: 'Confirm Transaction',
@@ -167,8 +232,8 @@ const steps = [
     items: [
       { text: 'Double-check all transaction details' },
       { text: 'Ensure you have enough funds to cover the purchase and fees' },
-      { text: 'Approve the transaction in your wallet' }
-    ]
+      { text: 'Approve the transaction in your wallet' },
+    ],
   },
   {
     title: 'Verify & Store',
@@ -176,19 +241,19 @@ const steps = [
     items: [
       { text: 'Wait for transaction confirmation' },
       { text: 'Check your wallet balance for the $GET tokens' },
-      { text: 'Store your tokens securely' }
-    ]
-  }
-];
+      { text: 'Store your tokens securely' },
+    ],
+  },
+]
 
 // Chunk steps into pairs for rows
 const stepRows = computed(() => {
-  const rows = [];
+  const rows = []
   for (let i = 0; i < steps.length; i += 2) {
-    rows.push([steps[i], steps[i + 1]]);
+    rows.push([steps[i], steps[i + 1]])
   }
-  return rows;
-});
+  return rows
+})
 </script>
 
 <style scoped>

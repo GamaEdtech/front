@@ -8,7 +8,12 @@
           </h2>
         </div>
         <v-row class="justify-content-center align-center can-get-row">
-          <v-col cols="12" sm="8" md="7" class="can-get-desc-col">
+          <v-col
+            cols="12"
+            sm="8"
+            md="7"
+            class="can-get-desc-col"
+          >
             <div class="can-get-desc-block">
               <div class="can-get-desc-label">
                 You can use <b>$GET</b> to:
@@ -114,7 +119,7 @@
     font-size: 32px;
     font-weight: 700;
   }
-  
+
   .can-get-desc-label,
   .can-get-list li,
   .can-get-footnote {
@@ -207,31 +212,31 @@
     width: 100%;
     padding: 0 1.5rem 1.5rem 1.5rem;
   }
-  
+
   .can-get-desc-block {
     min-height: unset;
     padding: 0;
   }
-  
+
   .can-get-title {
     font-size: 24px;
   }
-  
+
   .can-get-desc-label {
     font-size: 18px;
     margin-bottom: 2.5rem;
   }
-  
+
   .can-get-list {
     gap: 0.8rem;
     margin: 0.5rem 0 1rem 1.5rem;
   }
-  
+
   .can-get-list li {
     font-size: 16px;
     line-height: 1.7;
   }
-  
+
   .can-get-footnote {
     font-size: 16px;
     margin-top: 1.5rem;
@@ -243,7 +248,7 @@
   }
 
   .can-get-img {
-    width: 180px; 
+    width: 180px;
   }
 }
 
@@ -251,11 +256,11 @@
   .can-get-section {
     padding: 0 1.5rem 1rem 1.5rem;
   }
-  
+
   .can-get-img {
-    width: 180px; 
+    width: 180px;
   }
-  
+
   .can-get-list {
     margin-left: 1.25rem;
   }

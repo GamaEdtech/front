@@ -510,11 +510,25 @@ const countryRules = [
 ]
 
 // Computed
-const isUsernameValid = computed(() => {
+const _isUsernameValid = computed(() => {
   return (
     username.value.length >= 3
     && username.value.length <= 20
     && /^[a-zA-Z0-9_]+$/.test(username.value)
+  )
+})
+
+const _fieldValid = computed(() => {
+  return (
+    form.first_name.length >= 2
+    && form.last_name.length >= 2
+    && form.gender !== null
+    && form.state !== null
+    && form.area !== null
+    && form.level !== null
+    && form.grade !== null
+    && form.school !== null
+    && form.country !== null
   )
 })
 
@@ -535,8 +549,8 @@ const isFormValid = computed(() => {
 const avatarInput = ref<HTMLInputElement>()
 
 // Methods
-const validateField = (field: string, value: any) => {
-  const errorArrays: { [key: string]: any } = {
+const validateField = (field: string, value: string | number | null) => {
+  const errorArrays: { [key: string]: Ref<string[]> } = {
     username: usernameErrors,
     first_name: firstNameErrors,
     last_name: lastNameErrors,
@@ -548,7 +562,9 @@ const validateField = (field: string, value: any) => {
     school: schoolErrors,
   }
 
-  const rules: { [key: string]: any } = {
+  const rules: {
+    [key: string]: ((value: string | number | null) => true | string)[]
+  } = {
     username: usernameRules,
     first_name: firstNameRules,
     last_name: lastNameRules,
@@ -564,12 +580,14 @@ const validateField = (field: string, value: any) => {
   const fieldRules = rules[field]
 
   if (fieldRules) {
-    fieldRules.forEach((rule: Function) => {
-      const result = rule(value)
-      if (result !== true) {
-        errors.push(result)
-      }
-    })
+    fieldRules.forEach(
+      (rule: (value: string | number | null) => true | string) => {
+        const result = rule(value)
+        if (result !== true) {
+          errors.push(result)
+        }
+      },
+    )
   }
 
   errorArrays[field].value = errors
@@ -600,9 +618,10 @@ const getUserInfo = async () => {
     if (userData.grade) form.grade = userData.grade
     if (userData.school) form.school = userData.school
   }
-  catch (err: any) {
+  catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } }
     $toast.error(
-      err.response?.data?.message || 'Failed to load user information',
+      error.response?.data?.message || 'Failed to load user information',
     )
   }
 }
@@ -612,8 +631,8 @@ const submitProfile = async () => {
   const isValid = true
   Object.keys(form).forEach((key) => {
     if (key !== 'avatar') {
-      const fieldValid = validateField(key, form[key as keyof UserForm])
-      // if (!fieldValid) isValid = false;
+      const _fieldValid = validateField(key, form[key as keyof UserForm])
+      // if (!_fieldValid) isValid = false;
     }
   })
 
@@ -659,7 +678,7 @@ const submitProfile = async () => {
 
 const getTypeList = async (type: string, parent: string | number = '') => {
   try {
-    const params: any = { type }
+    const params: Record<string, string | number> = { type }
 
     if (type === 'base') params.section_id = parent
     if (type === 'area') params.state_id = parent
@@ -693,8 +712,11 @@ const getTypeList = async (type: string, parent: string | number = '') => {
         break
     }
   }
-  catch (err: any) {
-    $toast.error(err.response?.data?.message || `Failed to load ${type} list`)
+  catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } }
+    $toast.error(
+      error.response?.data?.message || `Failed to load ${type} list`,
+    )
   }
 }
 

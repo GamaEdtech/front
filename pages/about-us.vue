@@ -382,6 +382,7 @@
             <div class="d-flex memberSliderContainer">
               <div
                 v-for="(member, index) in sliceTeamMember"
+                :key="index"
                 @click="slideClicked(index)"
               >
                 <v-card
@@ -611,16 +612,24 @@ export default {
   },
   computed: {
     sliceTeamMember() {
-      if (this.screenWidth < 960) {
-        this.activeMember = 1
-        this.tmpShowMemeber = 2
-        return this.teamMembers.slice(2, 5)
-      }
-      else {
-        this.activeMember = 2
-        this.tmpShowMemeber = 1
-        return this.teamMembers.slice(1, 6)
-      }
+      return this.screenWidth < 960
+        ? this.teamMembers.slice(2, 5)
+        : this.teamMembers.slice(1, 6)
+    },
+  },
+  watch: {
+    screenWidth: {
+      immediate: true,
+      handler(width) {
+        if (width < 960) {
+          this.activeMember = 1
+          this.tmpShowMemeber = 2
+        }
+        else {
+          this.activeMember = 2
+          this.tmpShowMemeber = 1
+        }
+      },
     },
   },
   // auth: false,

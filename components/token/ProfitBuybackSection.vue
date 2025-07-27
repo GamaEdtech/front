@@ -9,7 +9,12 @@
         </v-col>
       </v-row>
       <v-row justify="center">
-        <v-col cols="12" md="10" lg="9" class="profit-buyback-content">
+        <v-col
+          cols="12"
+          md="10"
+          lg="9"
+          class="profit-buyback-content"
+        >
           <div class="video-and-text-wrapper">
             <div class="video-card">
               <iframe

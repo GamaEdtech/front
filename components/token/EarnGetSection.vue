@@ -1,11 +1,17 @@
 <template>
   <section class="earn-get-section">
     <v-container class="earn-get-container">
-      <h2 class="earn-get-title">How Do You Earn $GET?</h2>
-      <v-row class="earn-get-grid" align="center" justify="center">
-        <v-col 
-          v-for="(card, i) in cards" 
-          :key="i" 
+      <h2 class="earn-get-title">
+        How Do You Earn $GET?
+      </h2>
+      <v-row
+        class="earn-get-grid"
+        align="center"
+        justify="center"
+      >
+        <v-col
+          v-for="(card, i) in cards"
+          :key="i"
           cols="6"
           sm="6"
           md="6"
@@ -38,24 +44,24 @@
 <script setup>
 const cards = ref([
   {
-    title: "Teachers",
-    desc: "Create content and upload learning materials",
-    img: "/images/token/Earn/teachers.png",
+    title: 'Teachers',
+    desc: 'Create content and upload learning materials',
+    img: '/images/token/Earn/teachers.png',
   },
   {
-    title: "Students",
-    desc: "Use the system and submit assignments",
-    img: "/images/token/Earn/students.png",
+    title: 'Students',
+    desc: 'Use the system and submit assignments',
+    img: '/images/token/Earn/students.png',
   },
   {
-    title: "Developers",
-    desc: "Contribute to the development process",
-    img: "/images/token/Earn/developers.png",
+    title: 'Developers',
+    desc: 'Contribute to the development process',
+    img: '/images/token/Earn/developers.png',
   },
   {
-    title: "Community",
-    desc: "Use social media to help others learn about Gamatrain",
-    img: "/images/token/Earn/community.png",
+    title: 'Community',
+    desc: 'Use social media to help others learn about Gamatrain',
+    img: '/images/token/Earn/community.png',
   },
 ])
 </script>
@@ -244,35 +250,35 @@ const cards = ref([
   .earn-get-container {
     padding: 0 8px;
   }
-  
+
   .earn-get-title {
     font-size: 20px;
     margin-bottom: 24px;
   }
-  
+
   .earn-get-img-section {
     height: 100px;
     padding: 1rem;
   }
-  
+
   .earn-get-section {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
 
   .earn-get-card {
-    height: 210px; 
+    height: 210px;
   }
 
   .earn-get-card-content {
     padding: 0.8rem;
-    height: 90px; 
+    height: 90px;
     overflow: hidden;
   }
 
   .earn-get-card-title {
     font-size: 16px;
-    margin-bottom: 6px; 
+    margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -286,7 +292,7 @@ const cards = ref([
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 50px; 
+    height: 50px;
   }
 
   .earn-get-col {

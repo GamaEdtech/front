@@ -3,7 +3,9 @@
     <section class="about-get-section">
       <v-container>
         <div class="d-flex justify-content-center mb-4">
-          <h2 class="about-get-title">What is <b>$GET</b></h2>
+          <h2 class="about-get-title">
+            What is <b>$GET</b>
+          </h2>
         </div>
         <!-- Mobile Image -->
         <div class="about-get-img-mobile d-block d-sm-none text-center mb-4">
@@ -11,10 +13,14 @@
             class="about-get-img"
             src="/images/token/About/think.svg"
             alt="$GET token about illustration"
-          />
+          >
         </div>
         <v-row class="justify-content-center about-get-row">
-          <v-col cols="12" sm="8" class="about-get-text-col">
+          <v-col
+            cols="12"
+            sm="8"
+            class="about-get-text-col"
+          >
             <p class="about-get-desc">
               <b>$GET</b> is GamaTrain's own cryptocurrency used for
               governance and incentivizing the Gama ecosystem.
@@ -30,7 +36,11 @@
             </p>
           </v-col>
           <!-- Desktop/Tablet Image -->
-          <v-col cols="12" sm="4" class="about-get-img-col d-none d-sm-flex">
+          <v-col
+            cols="12"
+            sm="4"
+            class="about-get-img-col d-none d-sm-flex"
+          >
             <img
               class="about-get-img"
               src="/images/token/About/think.svg"
@@ -96,7 +106,7 @@
   .about-get-title {
     font-size: 32px;
   }
-  
+
   .about-get-desc {
     font-size: 20px;
   }
@@ -161,7 +171,7 @@
   .about-get-section {
     padding: 1rem 1.5rem 1rem 1.5rem;
   }
-  
+
   .about-get-desc {
     padding: 0;
   }

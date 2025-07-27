@@ -19,10 +19,16 @@
                       <v-icon
                         :size="`${display.xs.value ? 'small' : 'x-large'}`"
                         color="white"
-                        >mdi-poll</v-icon
                       >
+                        mdi-poll
+                      </v-icon>
                       <template #fallback>
-                        <v-icon size="x-large" color="white">mdi-poll</v-icon>
+                        <v-icon
+                          size="x-large"
+                          color="white"
+                        >
+                          mdi-poll
+                        </v-icon>
                       </template>
                     </ClientOnly>
                   </div>
@@ -43,10 +49,16 @@
                       <v-icon
                         :size="`${display.xs.value ? 'small' : 'x-large'}`"
                         color="white"
-                        >mdi-finance</v-icon
                       >
+                        mdi-finance
+                      </v-icon>
                       <template #fallback>
-                        <v-icon size="x-large" color="white">mdi-finance</v-icon>
+                        <v-icon
+                          size="x-large"
+                          color="white"
+                        >
+                          mdi-finance
+                        </v-icon>
                       </template>
                     </ClientOnly>
                   </div>
@@ -67,10 +79,16 @@
                       <v-icon
                         :size="`${display.xs.value ? 'small' : 'x-large'}`"
                         color="white"
-                        >mdi-cached</v-icon
                       >
+                        mdi-cached
+                      </v-icon>
                       <template #fallback>
-                        <v-icon size="x-large" color="white">mdi-cached</v-icon>
+                        <v-icon
+                          size="x-large"
+                          color="white"
+                        >
+                          mdi-cached
+                        </v-icon>
                       </template>
                     </ClientOnly>
                   </div>
@@ -94,10 +112,16 @@
                       <v-icon
                         :size="`${display.xs.value ? 'small' : 'x-large'}`"
                         color="white"
-                        >mdi-account-arrow-up</v-icon
                       >
+                        mdi-account-arrow-up
+                      </v-icon>
                       <template #fallback>
-                        <v-icon size="x-large" color="white">mdi-account-arrow-up</v-icon>
+                        <v-icon
+                          size="x-large"
+                          color="white"
+                        >
+                          mdi-account-arrow-up
+                        </v-icon>
                       </template>
                     </ClientOnly>
                   </div>
@@ -124,7 +148,10 @@
         </div>
 
         <!-- Mobile Layout: Vertical Stacking -->
-        <div v-if="isMobile" class="mobile-chart-layout">
+        <div
+          v-if="isMobile"
+          class="mobile-chart-layout"
+        >
           <!-- Mobile Price Display -->
           <div class="mobile-price-section mb-4">
             <div class="stats-section-chart__card mobile-price-card">
@@ -133,7 +160,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Mobile Token List -->
           <div class="mobile-token-section mb-4">
             <div class="stats-section-chart__coins mobile-token-list">
@@ -179,7 +206,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Mobile Chart -->
           <div class="mobile-chart-section">
             <iframe
@@ -193,7 +220,10 @@
         </div>
 
         <!-- Desktop Layout: Horizontal -->
-        <v-row v-else class="mt-2 mx-5">
+        <v-row
+          v-else
+          class="mt-2 mx-5"
+        >
           <v-col
             cols="4"
             sm="3"
@@ -291,7 +321,8 @@ const updateResponsiveState = () => {
     isMobile.value = display.xs.value
     layoutMode.value = display.xs.value ? 'vertical' : 'horizontal'
     chartHeight.value = display.xs.value ? '250px' : '100%'
-  } catch (error) {
+  }
+  catch (error) {
     // Fallback for display detection failures
     console.warn('Display detection failed, using mobile-safe defaults:', error)
     isMobile.value = true
@@ -302,14 +333,14 @@ const updateResponsiveState = () => {
 
 onMounted(() => {
   updateResponsiveState()
-  
+
   // Watch for screen size changes with error handling
   watch(
     () => display.xs.value,
     () => {
       updateResponsiveState()
     },
-    { immediate: true }
+    { immediate: true },
   )
 })
 </script>
@@ -472,20 +503,20 @@ onMounted(() => {
   .mobile-chart-layout {
     padding: 0 16px;
   }
-  
+
   .mobile-price-section {
     margin-bottom: 20px;
   }
-  
+
   .mobile-token-section {
     margin-bottom: 20px;
   }
-  
+
   .mobile-token-list .d-flex {
     min-height: 44px; /* Minimum touch target size */
     align-items: center;
   }
-  
+
   .stats-section {
     padding: 2rem 0;
   }

@@ -1,25 +1,37 @@
 <template>
   <section class="hero-section">
     <v-container class="hero-container">
-      <v-row align="center" justify="center">
-        <v-col cols="12" class="hero-content">
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-col
+          cols="12"
+          class="hero-content"
+        >
           <div class="content-left">
             <div class="content-left-top">
               <div class="live-trading-badge">
-                <span class="live-dot"></span>
+                <span class="live-dot" />
                 Live Trading
               </div>
-              
-              <h1 class="main-title">$GET</h1>
+
+              <h1 class="main-title">
+                $GET
+              </h1>
 
               <p class="description">
                 The future of decentralized finance, powering innovation,<br>
                 enabling growth, and creating value for the community.
               </p>
-              
+
               <div class="price-section">
-                <div class="price">${{ formattedPrice }}</div>
-                <div class="change">+6.47%</div>
+                <div class="price">
+                  ${{ formattedPrice }}
+                </div>
+                <div class="change">
+                  +6.47%
+                </div>
               </div>
 
               <div class="action-buttons">
@@ -46,7 +58,10 @@
 
           <div class="content-right">
             <div class="token-wrapper">
-              <img src="/images/token/Hero/GET-coin.svg" alt="GET Token" />
+              <img
+                src="/images/token/Hero/GET-coin.svg"
+                alt="GET Token"
+              >
             </div>
           </div>
         </v-col>
@@ -56,49 +71,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from 'vue'
 
-const finalPrice = ref(0);
-const animatedPrice = ref(0);
+const finalPrice = ref(0)
+const animatedPrice = ref(0)
 
 const formattedPrice = computed(() => {
   // Format to show fewer decimal places
-  return animatedPrice.value.toFixed(6);
-});
+  return animatedPrice.value.toFixed(6)
+})
 
 const fetchTokenPrice = async () => {
   try {
     const data = await $fetch(
-      "https://lite-api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv"
-    );
-    finalPrice.value = Object.values(data.data)[0]["price"];
-    
+      'https://lite-api.jup.ag/price/v2?ids=GeutGuhcTYRf4rkbZmWDMEgjt5jHyJN4nHko38GJjQhv',
+    )
+    finalPrice.value = Object.values(data.data)[0]['price']
+
     // Start animation after fetching the price
-    animatePrice();
-  } catch (error) {
-    console.error("Error fetching token price:", error);
-    finalPrice.value = 0.002546; // Fallback price
-    animatePrice();
+    animatePrice()
   }
-};
+  catch (error) {
+    console.error('Error fetching token price:', error)
+    finalPrice.value = 0.002546 // Fallback price
+    animatePrice()
+  }
+}
 
 const animatePrice = () => {
-  const duration = 1200;
-  const frameRate = 60;
-  const totalFrames = Math.round((duration / 1000) * frameRate);
-  let frame = 0;
+  const duration = 1200
+  const frameRate = 60
+  const totalFrames = Math.round((duration / 1000) * frameRate)
+  let frame = 0
 
   const animate = () => {
-    frame++;
-    const progress = Math.min(frame / totalFrames, 1);
-    animatedPrice.value = +(finalPrice.value * progress).toFixed(6);
+    frame++
+    const progress = Math.min(frame / totalFrames, 1)
+    animatedPrice.value = +(finalPrice.value * progress).toFixed(6)
     if (progress < 1) {
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animate)
     }
-  };
+  }
 
-  animate();
-};
+  animate()
+}
 
 onMounted(() => {
   fetchTokenPrice()
@@ -124,7 +140,7 @@ onMounted(() => {
 .hero-content {
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   gap: 2rem;
 }
 
@@ -360,13 +376,11 @@ onMounted(() => {
     gap: 3rem;
   }
 
-   
  .live-trading-badge {
     padding: 14px 14px;
     font-size: 16px;
     margin: 0 auto 1.5rem;
   }
-
 
   .content-left {
     width: 100%;
