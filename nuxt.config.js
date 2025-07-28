@@ -5,6 +5,12 @@ import { defineNuxtConfig } from 'nuxt/config'
 import glsl from 'vite-plugin-glsl'
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      GOOGLE_ADSENSE: process.env.NUXT_GOOGLE_ADSENSE_ID,
+    },
+  },
+
   // Modules
   modules: [
     'dayjs-nuxt',
