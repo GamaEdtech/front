@@ -45,7 +45,34 @@ jobs:
             should start with a lowercase letter and be written in imperative mood.
             Please check the CONTRIBUTING.md for examples.
           # Configure body validation pattern (at least 20 chars, not just whitespace)
-          bodyPattern: '^(?=.*\S).{20,}'$'$'
+          bodyPattern: '^(?=.*\S).{20,}'
+          bodyPatternError: |
+            The pull request body should contain at least 20 meaningful characters with a clear description.
+            
+            Please provide:
+            - **What**: Clear description of changes made
+            - **Why**: Explanation of why these changes were necessary  
+            - **How**: Brief overview of the approach taken (if complex)
+            - **Testing**: Information about testing performed
+            
+            Example:
+            ```
+            ## What
+            Add JWT authentication system to secure API endpoints.
+            
+            ## Why  
+            Current authentication system has security vulnerabilities.
+            
+            ## Testing
+            - Added unit tests for JWT utilities
+            - Tested login/logout flows manually
+            ```
+            
+            See CONTRIBUTING.md for detailed PR standards.
+          # Skip validation for certain labels
+          ignoreLabels: |
+            dependencies
+            automated-pr$'$'
           bodyPatternError: |
             The pull request body should contain at least 20 meaningful characters with a clear description.
             
