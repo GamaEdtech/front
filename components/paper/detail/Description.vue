@@ -5,7 +5,7 @@
         <div class="d-flex align-center justify-space-between header">
           <h1
             v-show="!editMode.title"
-            class="gama-text-h5"
+            class="gama-text-h6"
           >
             {{ title }}
             <v-btn
@@ -42,15 +42,20 @@
         </div>
         <div class="description-holder my-4">
           <!-- Description -->
-          <span
+          <div
             v-show="!editMode.describe"
-            class="break-word"
+            class="description-content"
             :class="{
               'gama-text-body1': isMobile,
               'gama-text-body2': !isMobile,
             }"
-            v-html="formattedDescription"
-          />
+          >
+            <common-show-more-text
+              :content="props.description"
+              max-height="150px"
+              :preserve-line-breaks="true"
+            />
+          </div>
           <v-btn
             v-if="isOwner"
             v-show="!editMode.describe"
@@ -129,10 +134,6 @@ const editMode = ref({
 })
 const titleModel = ref(props.title)
 const descriptionModel = ref(props.description)
-
-const formattedDescription = computed(() => {
-  return props.description ? props.description.replace(/\n/g, '<br />') : ''
-})
 
 watch(
   () => props.title,
@@ -214,5 +215,9 @@ const updateDetails = () => {
 
 .break-word {
   word-break: break-word;
+}
+
+.description-content {
+  position: relative;
 }
 </style>
