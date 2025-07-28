@@ -45,7 +45,7 @@ jobs:
             should start with a lowercase letter and be written in imperative mood.
             Please check the CONTRIBUTING.md for examples.
           # Configure body validation pattern (at least 20 chars, not just whitespace)
-          bodyPattern: '^(?=.*\S).{20,}$'$'
+          bodyPattern: '^(?=.*\S).{20,}'$'$'
           bodyPatternError: |
             The pull request body should contain at least 20 meaningful characters with a clear description.
             
