@@ -44,7 +44,6 @@ function onDialogInput(val) {
     <v-card class="boxs">
       <div class="d-flex flex-column align-center justify-center pt-6 mb-6">
         <div class="icon-container">
-          <!-- <img src="~assets/images/Vector (1).svg" alt="Icon" /> -->
           <v-icon
             color="red"
             style="font-size: 48px !important"

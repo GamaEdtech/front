@@ -448,8 +448,6 @@
       </v-container>
     </v-container>
   </div>
-
-  <!-- <v-img src="/images/about-us-header.png" alt="About us" /> -->
 </template>
 
 <script>

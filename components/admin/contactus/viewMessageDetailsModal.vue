@@ -30,7 +30,7 @@ const messageReply = ref(null)
             <img
               width="64"
               height="64"
-              src="/public/images/adminAuth.png"
+              src="/images/adminAuth.png"
               alt="avatar"
             >
           </div>
