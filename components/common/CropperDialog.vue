@@ -4,14 +4,19 @@
     transition="dialog-bottom-transition"
     max-width="600"
   >
-    <v-card
-      id="img-cropper-dialog"
-      color="light-green-darken-3"
-    >
-      <v-card-actions class="pa-0">
+    <v-card id="img-cropper-dialog">
+      <cropper
+        :src="file_url"
+        :stencil-props="stencil_props"
+        image-restriction="stencil"
+        @change="cropFile"
+      />
+      <v-card-actions
+        style="position: sticky; bottom: 0; left: 0; right: 0"
+        class="pa-0"
+      >
         <v-btn
-          color="light-green-darken-3"
-          class="black--text text-transform-none gtext-t4 font-weight-medium"
+          class="primary black--text text-transform-none gtext-t4 font-weight-medium"
           size="x-large"
           :loading="confirm_loading"
           block
@@ -21,14 +26,6 @@
           Confirm
         </v-btn>
       </v-card-actions>
-      <ClientOnly>
-        <Cropper
-          :src="file_url"
-          :stencil-props="stencil_props"
-          image-restriction="stencil"
-          @change="cropFile"
-        />
-      </ClientOnly>
     </v-card>
   </v-dialog>
 </template>
@@ -42,18 +39,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  fileUrl: {
+  file_url: {
     type: String,
-    required: true,
+    default: '',
   },
-  stencilProps: {
+  stencil_props: {
     type: Object,
-    required: false,
-    default: () => ({}),
+    default: () => ({ width: 400, height: 150, resizable: false }),
   },
-  confirmLoading: {
+  confirm_loading: {
     type: Boolean,
-    required: false,
     default: false,
   },
 })
@@ -67,7 +62,7 @@ const dialogVisible = computed({
 const crop_file_loading = ref(false)
 const cropped_data = ref(null)
 
-function cropFile({ coordinates: _coordinates, canvas, image: _image }) {
+function cropFile({ canvas }) {
   if (!canvas) return
   crop_file_loading.value = true
   canvas.toBlob((blob) => {
