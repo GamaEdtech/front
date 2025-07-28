@@ -870,7 +870,7 @@ const addExtraAttr = () => {
 
 watch(
   () => formData.section,
-  () => {
+  (val) => {
     userState.value.lastSelectedCurriculum = formData.section
     formData.base = ''
     formData.lesson = ''
