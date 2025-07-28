@@ -1,0 +1,39 @@
+name: 'Test PR Workflow'
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  test:
+    name: Test Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print PR Info
+        run: |
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          echo "PR Body: ${{ github.event.pull_request.body }}"
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          
+      - name: Check Title Format
+        run: |
+          title="${{ github.event.pull_request.title }}"
+          if [[ $title =~ ^(feat|fix|docs|chore|style|refactor|test)(\(.+\))?:\ .+ ]]; then
+            echo "✅ Title format is valid"
+          else
+            echo "❌ Title format is invalid"
+            echo "Expected format: type(scope): description"
+            echo "Examples: feat(auth): add login, fix: resolve bug"
+            exit 1
+          fi
+          
+      - name: Check Body Length
+        run: |
+          body="${{ github.event.pull_request.body }}"
+          if [[ ${#body} -ge 20 ]]; then
+            echo "✅ Body length is sufficient"
+          else
+            echo "❌ Body is too short (${#body} characters)"
+            echo "Please provide at least 20 characters with meaningful description"
+            exit 1
+          fi

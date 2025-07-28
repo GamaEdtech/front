@@ -1,6 +1,11 @@
 name: 'Validate PR Title and Body'
 
 on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
   pull_request_target:
     types:
       - opened
@@ -10,13 +15,14 @@ on:
 permissions:
   pull-requests: write
   statuses: write
+  checks: write
 
 jobs:
   validate-pr:
     name: Validate PR Title and Body
     runs-on: ubuntu-latest
     steps:
-      - name: Validate PR Title
+      - name: Validate PR Title and Body
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,7 +45,7 @@ jobs:
             should start with a lowercase letter and be written in imperative mood.
             Please check the CONTRIBUTING.md for examples.
           # Configure body validation pattern (at least 20 chars, not just whitespace)
-          bodyPattern: '^(?=.*\S).{20,}$'
+          bodyPattern: '^(?=.*\S).{20,}$'$'
           bodyPatternError: |
             The pull request body should contain at least 20 meaningful characters with a clear description.
             
