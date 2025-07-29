@@ -177,8 +177,12 @@ watch(selectedPageSize, () => {
       </v-btn>
     </div>
     <div class="d-flex justify-end ga-2 align-center px-2">
-      <p class="primary-gray-500 gtext-t6 font-weight-bold">{{ totalCount }}</p>
-      <p class="gray--text gtext-t6 font-weight-semibold">User</p>
+      <p class="primary-gray-500 gtext-t6 font-weight-bold">
+        {{ totalCount }}
+      </p>
+      <p class="gray--text gtext-t6 font-weight-semibold">
+        User
+      </p>
     </div>
     <div class="scrollable-table">
       <v-data-table
@@ -295,7 +299,7 @@ watch(selectedPageSize, () => {
       />
       <addUserDialog
         v-model="showAddUserDialog"
-        @fetchUser="fetchUsers"
+        @fetch-user="fetchUsers"
       />
     </div>
 

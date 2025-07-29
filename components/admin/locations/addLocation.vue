@@ -1,18 +1,17 @@
 <script setup>
-import useApiService from '~/composables/useApiService';
+import useApiService from '~/composables/useApiService'
 
 const props = defineProps({
   modelValue: Boolean,
   location: String,
-  locationType: String
-});
-const { $toast } = useNuxtApp();
+  locationType: String,
+})
+const { $toast } = useNuxtApp()
 
-const emit = defineEmits(['update:modelValue','fetchLocations']);
+const emit = defineEmits(['update:modelValue', 'fetchLocations'])
 
-
-const form = ref(null);
-const formIsValid = ref(false);
+const form = ref(null)
+const formIsValid = ref(false)
 
 const newLocation = reactive({
   title: '',
@@ -20,100 +19,175 @@ const newLocation = reactive({
   code: '',
   parentId: null,
   latitude: null,
-  longitude: null
-});
+  longitude: null,
+})
 
 const rules = {
   required: v => !!v || 'This field is required',
-  onlyNumbers: v => /^-?\d+(\.\d+)?$/.test(v) || 'Only numbers are allowed'
+  onlyNumbers: v => /^-?\d+(\.\d+)?$/.test(v) || 'Only numbers are allowed',
 }
 
+const parentCountries = ref([])
+const parentStates = ref([])
+const chosenCountry = ref(null)
 
-
-
-const submitLocation = async () => {
-  try{
-    const res = await useApiService.post(`/api/v2/admin/locations/${props.locationType}`, {
-        title: newLocation.title,
-        localTitle: newLocation.localTitle,
-        code: newLocation.code,
-        parentId: newLocation.parentId,
-        latitude: newLocation.latitude,
-        longitude: newLocation.longitude,
-      });
-    if(res.succeeded){
-      Object.keys(newLocation).forEach(key => {
-        newLocation[key] = '';
-      });
-      form.value.reset();
-      $toast.success("Location Added Successfully")
-      emit('update:modelValue', false);
-      emit('fetchLocations');
+const fetchCountries = async () => {
+  if (parentCountries.value.length == 0) {
+    try {
+      const response = await useApiService.get(`/api/v2/admin/locations/countries`, {
+        'PagingDto.PageFilter.Size': 300,
+        'PagingDto.PageFilter.Skip': 0,
+        'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
+      })
+      parentCountries.value = response.data.list.slice().reverse()
     }
-    else 
-      $toast.error(res.errors[0].message)
-  } catch(err){
-      if (err.response?.status === 400) 
-        $toast.error(err.response.data.message);
+    catch (err) {
+      if (err.response?.status === 400) {
+        $toast.error(err.response.data.message)
+      }
+    }
   }
 }
+const fetchStates = async () => {
+  try {
+    const response = await useApiService.get(`/api/v2/locations/states/${chosenCountry.value}`, {
+      'PagingDto.PageFilter.Size': 1000,
+      'PagingDto.PageFilter.Skip': 0,
+      'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
+    })
+    parentStates.value = response.data.list.slice().reverse()
+  }
+  catch (err) {
+    if (err.response?.status === 400) {
+      $toast.error(err.response.data.message)
+    }
+  }
+}
+
+const submitLocation = async () => {
+  if (props.locationType == 'states')
+    newLocation.parentId = chosenCountry.value
+  try {
+    const res = await useApiService.post(`/api/v2/admin/locations/${props.locationType}`, {
+      title: newLocation.title,
+      localTitle: newLocation.localTitle,
+      code: newLocation.code,
+      parentId: newLocation.parentId || null,
+      latitude: newLocation.latitude,
+      longitude: newLocation.longitude,
+    })
+    if (res.succeeded) {
+      Object.keys(newLocation).forEach((key) => {
+        newLocation[key] = ''
+      })
+      form.value.reset()
+      $toast.success('Location Added Successfully')
+      emit('update:modelValue', false)
+      emit('fetchLocations')
+    }
+    else
+      $toast.error(res.errors[0].message)
+  }
+  catch (err) {
+    if (err.response?.status === 400)
+      $toast.error(err.response.data.message)
+  }
+}
+
+watch(chosenCountry, (_newVal) => {
+  fetchStates()
+})
 </script>
+
 <template>
-  <v-dialog :model-value="modelValue" @click:outside="$emit('update:modelValue', false)" max-width="500px">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="500px"
+    @click:outside="$emit('update:modelValue', false)"
+  >
     <v-card class="bg-primary-gray-200 rounded-xl">
       <v-card-title class="d-flex flex-column align-center py-10 pb-6 ga-3 bg-white">
         <div class="rounded-pill bg-primary-gray-100 pa-4">
-            <v-icon class="fontsize-80 color-12b76a">mdi mdi-plus-circle</v-icon>
+          <v-icon class="fontsize-80 color-12b76a">
+            mdi mdi-plus-circle
+          </v-icon>
         </div>
         <span class="gtext-t3 font-weight-medium">Add New {{ location }}</span>
       </v-card-title>
 
       <v-card-text class="py-2">
-        <v-form ref="form" v-model="formIsValid">
-          <div class="d-flex flex-column w-100 ga-2 flex-sm-row">
-            <div class="w-100">
-              <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
-                Title
-              </label>
-              <v-text-field
+        <v-form
+          ref="form"
+          v-model="formIsValid"
+        >
+          <div class="w-100">
+            <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
+              Title
+            </label>
+            <v-text-field
               v-model="newLocation.title"
               variant="solo"
               density="compact"
-              />
-            </div>
+            />
+          </div>
+          <div class="d-flex flex-column w-100 ga-2 flex-sm-row">
             <div class="w-100">
               <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
                 Local Title
               </label>
               <v-text-field
-              v-model="newLocation.localTitle"
-              variant="solo"
-              density="compact"
+                v-model="newLocation.localTitle"
+                variant="solo"
+                density="compact"
               />
             </div>
-          </div>
-          <div class="d-flex flex-column w-100 ga-2 flex-sm-row">
             <div class="w-100">
               <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
                 Code
               </label>
               <v-text-field
-              v-model="newLocation.code"
-              variant="solo"
-              density="compact"
-              :rules="[rules.required]"
+                v-model="newLocation.code"
+                variant="solo"
+                density="compact"
+                :rules="[rules.required]"
               />
             </div>
-            <div class="w-100">
+          </div>
+          <div class="d-flex flex-column w-100 ga-2 flex-sm-row">
+            <div
+              v-if="props.locationType != 'countries'"
+              class="w-100"
+            >
               <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
-                Parent Id
+                Country
               </label>
-              <v-text-field
-              v-model="newLocation.parentId"
-              variant="solo"
-              density="compact"
-              type="number"
-              :rules="[rules.required, rules.onlyNumbers]"
+              <v-select
+                v-model="chosenCountry"
+                variant="solo"
+                density="compact"
+                :rules="[rules.required]"
+                :items="parentCountries"
+                item-title="title"
+                item-value="id"
+                @click="fetchCountries"
+              />
+            </div>
+            <div
+              v-if="props.locationType == 'cities'"
+              class="w-100"
+            >
+              <label class="primary-gray-700 gtext-t6 font-weight-medium mt-3">
+                State
+              </label>
+              <v-select
+                v-model="newLocation.parentId"
+                :disabled="!chosenCountry"
+                variant="solo"
+                density="compact"
+                :rules="[rules.required]"
+                :items="parentStates"
+                item-title="title"
+                item-value="id"
               />
             </div>
           </div>
@@ -123,11 +197,11 @@ const submitLocation = async () => {
                 Latitude
               </label>
               <v-text-field
-              v-model="newLocation.latitude"
-              variant="solo"
-              density="compact"
-              type="number"
-              :rules="[rules.required, rules.onlyNumbers]"
+                v-model="newLocation.latitude"
+                variant="solo"
+                density="compact"
+                type="number"
+                :rules="[rules.required, rules.onlyNumbers]"
               />
             </div>
             <div class="w-100">
@@ -135,11 +209,11 @@ const submitLocation = async () => {
                 Longitude
               </label>
               <v-text-field
-              v-model="newLocation.longitude"
-              variant="solo"
-              density="compact"
-              type="number"
-              :rules="[rules.required, rules.onlyNumbers]"
+                v-model="newLocation.longitude"
+                variant="solo"
+                density="compact"
+                type="number"
+                :rules="[rules.required, rules.onlyNumbers]"
               />
             </div>
           </div>
@@ -147,17 +221,17 @@ const submitLocation = async () => {
       </v-card-text>
 
       <v-card-actions class="d-flex justify-center ga-10 mb-2">
-        <v-btn 
-        class="closeBtn" 
-        variant="plain" 
-        @click="$emit('update:modelValue', false)"
+        <v-btn
+          class="closeBtn"
+          variant="plain"
+          @click="$emit('update:modelValue', false)"
         >
-          <span class="mdi mdi-close gtext-t1"></span>
+          <span class="mdi mdi-close gtext-t1" />
         </v-btn>
         <v-btn
-        class="rounded-pill gtext-t5 ml-4 submitBtn"
-        @click="submitLocation" 
-        :disabled="!formIsValid"
+          class="rounded-pill gtext-t5 ml-4 submitBtn"
+          :disabled="!formIsValid"
+          @click="submitLocation"
         >
           <span>Submit</span>
         </v-btn>
@@ -165,6 +239,7 @@ const submitLocation = async () => {
     </v-card>
   </v-dialog>
 </template>
+
 <style scoped>
 :deep(.v-btn__content span){
   font-family: Inter, sans-serif !important;

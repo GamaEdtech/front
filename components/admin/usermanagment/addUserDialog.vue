@@ -73,7 +73,9 @@ const submitUser = async () => {
     <v-card class="bg-primary-gray-200 rounded-xl">
       <v-card-title class="d-flex flex-column align-center py-10 pb-6 ga-3 bg-white">
         <div class="rounded-pill bg-primary-gray-100 pa-4">
-            <v-icon class="fontsize-80 primary-blue-500">mdi mdi-account-multiple-plus</v-icon>
+          <v-icon class="fontsize-80 primary-blue-500">
+            mdi mdi-account-multiple-plus
+          </v-icon>
         </div>
         <span class="gtext-t3 font-weight-medium">Add New User</span>
       </v-card-title>

@@ -206,6 +206,7 @@ watch(filter, (val) => {
           rounded
           variant="plain"
           class="gtext-t4 font-weight-medium"
+          @click="filter = 'all'"
         >
           All
         </v-btn>
@@ -215,6 +216,7 @@ watch(filter, (val) => {
           rounded
           variant="plain"
           class="gtext-t4 font-weight-medium"
+          @click="filter = 'unread'"
         >
           Unread
         </v-btn>
@@ -223,9 +225,9 @@ watch(filter, (val) => {
           :class="{ 'active-filter': filter === 'read', 'inactive-filter': filter !== 'read' }"
           depressed
           class="ml-2 gtext-t4 font-weight-medium"
-          @click="filter = 'read'"
           rounded
           variant="plain"
+          @click="filter = 'read'"
         >
           Read
         </v-btn>
@@ -247,8 +249,12 @@ watch(filter, (val) => {
       </v-text-field>
     </div>
     <div class="d-flex justify-end ga-2 align-center px-2">
-      <p class="primary-gray-500 gtext-t6 font-weight-bold">{{ totalCount }}</p>
-      <p class="gray--text gtext-t6 font-weight-semibold">Messages</p>
+      <p class="primary-gray-500 gtext-t6 font-weight-bold">
+        {{ totalCount }}
+      </p>
+      <p class="gray--text gtext-t6 font-weight-semibold">
+        Messages
+      </p>
     </div>
     <div class="scrollable-table">
       <v-data-table
@@ -295,26 +301,40 @@ watch(filter, (val) => {
           </div>
         </template>
 
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <div class="d-flex ga-2">
-            <v-btn variant="plain" class="px-0 min-width-10">
-              <v-icon small class="gtext-t1" @click="viewMessageDetails(item.id)">
+            <v-btn
+              variant="plain"
+              class="px-0 min-width-10"
+            >
+              <v-icon
+                small
+                class="gtext-t1"
+                @click="viewMessageDetails(item.id)"
+              >
                 mdi-file-find
               </v-icon>
               <v-tooltip
-              activator="parent"
-              location="top"
+                activator="parent"
+                location="top"
               >
                 Details
               </v-tooltip>
             </v-btn>
-            <v-btn variant="plain" class="px-0 min-width-10">
-              <v-icon small class="gtext-t1" @click="handleDelete(item.id)">
+            <v-btn
+              variant="plain"
+              class="px-0 min-width-10"
+            >
+              <v-icon
+                small
+                class="gtext-t1"
+                @click="handleDelete(item.id)"
+              >
                 mdi-delete
               </v-icon>
               <v-tooltip
-              activator="parent"
-              location="top"
+                activator="parent"
+                location="top"
               >
                 Delete
               </v-tooltip>
@@ -502,5 +522,4 @@ watch(filter, (val) => {
   min-width: 10px !important;
   height: 20px !important;
 }
-
 </style>

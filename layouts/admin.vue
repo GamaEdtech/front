@@ -16,16 +16,16 @@ const router = useRouter()
 const route = useRoute()
 
 const captionMenuItems = [
-        { title: "Type", link: "/admin/type", icon: "mdi-basket" },
-        { title: "Blogs", link: "/admin/blogs", icon: "mdi-book-open-outline" },
-        { title: "My Stock", link: "/admin/stock", icon: "mdi-finance" },
-        { title: "Analysis", link: "/admin/analysis", icon: "mdi-chart-line" },
-        { title: "Contact Us", link: "/admin/contact-us", icon: "mdi-archive-arrow-down-outline",},
-        { title: "User Managment ", link: "/admin/users", icon: "mdi-account-group-outline",},
-      ]
+  { title: 'Type', link: '/admin/type', icon: 'mdi-basket' },
+  { title: 'Blogs', link: '/admin/blogs', icon: 'mdi-book-open-outline' },
+  { title: 'My Stock', link: '/admin/stock', icon: 'mdi-finance' },
+  { title: 'Analysis', link: '/admin/analysis', icon: 'mdi-chart-line' },
+  { title: 'Contact Us', link: '/admin/contact-us', icon: 'mdi-archive-arrow-down-outline' },
+  { title: 'User Managment ', link: '/admin/users', icon: 'mdi-account-group-outline' },
+]
 const typeManagementMenuItems = [
-        { title: "Location", link: "/admin/Locations"},
-      ]
+  { title: 'Location', link: '/admin/Locations' },
+]
 
 const navigate = (link) => {
   router.push(link)
@@ -59,15 +59,20 @@ function isActive(link) {
         Admin Panel
       </div>
       <v-list>
-      <h4 class="px-5 primary-gray-400 gtext-t5 font-weight-semibold mt-2">Caption</h4>
+        <h4 class="px-5 primary-gray-400 gtext-t5 font-weight-semibold mt-2">
+          Caption
+        </h4>
         <v-list-item
           v-for="item in captionMenuItems"
           :key="item.link"
           link
-          @click="navigate(item.link)"
           class="px-6 py-0"
+          @click="navigate(item.link)"
         >
-        <div class="d-flex align-center ga-3 py-2 px-5" :class="{ 'active-tab': isActive(item.link) }">
+          <div
+            class="d-flex align-center ga-3 py-2 px-5"
+            :class="{ 'active-tab': isActive(item.link) }"
+          >
             <v-list-item-icon>
               <v-icon class="primary-gray-400">
                 {{ item.icon }}
@@ -80,25 +85,39 @@ function isActive(link) {
         </v-list-item>
       </v-list>
       <v-list>
-      <h4 class="px-5 primary-gray-400 gtext-t5 font-weight-semibold">Type Managment</h4>
+        <h4 class="px-5 primary-gray-400 gtext-t5 font-weight-semibold">
+          Type Managment
+        </h4>
         <v-list-item
           v-for="item in typeManagementMenuItems"
           :key="item.link"
           link
-          @click="navigate(item.link)"
           class="px-6 py-0"
+          @click="navigate(item.link)"
         >
-        <div class="d-flex align-center ga-3 py-2 px-5" :class="{ 'active-tab': isActive(item.link) }">
+          <div
+            class="d-flex align-center ga-3 py-2 px-5"
+            :class="{ 'active-tab': isActive(item.link) }"
+          >
             <v-list-item-icon>
-                <v-icon class="primary-gray-400 mdi mdi-circle text-button"></v-icon>
+              <v-icon class="primary-gray-400 mdi mdi-circle text-button" />
             </v-list-item-icon>
-            <v-list-item-title class="primary-gray-400 gtext-t5">{{ item.title }}</v-list-item-title>
-        </div>
-          
+            <v-list-item-title class="primary-gray-400 gtext-t5">
+              {{ item.title }}
+            </v-list-item-title>
+          </div>
         </v-list-item>
       </v-list>
-      <div class="d-flex align-center ga-2" style="position: absolute;bottom: 20px; left: 20px;">
-        <img class="rounded-pill" style="width: 36px; height: 36px;border: 1px solid white;" src="/public/images/adminAuth.png" alt="">
+      <div
+        class="d-flex align-center ga-2"
+        style="position: absolute;bottom: 20px; left: 20px;"
+      >
+        <img
+          class="rounded-pill"
+          style="width: 36px; height: 36px;border: 1px solid white;"
+          src="/public/images/adminAuth.png"
+          alt=""
+        >
         <div>
           <p class="gtext-t5 font-weight-medium">
             shelina Shay

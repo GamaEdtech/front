@@ -1,285 +1,307 @@
 <script setup>
 import DeleteItemModal from '@/components/admin/contactus/deleteItemModal.vue'
-import addLocation from '~/components/admin/locations/addLocation.vue';
-import editLocation from '~/components/admin/locations/editLocation.vue';
-import useApiService from '~/composables/useApiService';
+import addLocation from '~/components/admin/locations/addLocation.vue'
+import editLocation from '~/components/admin/locations/editLocation.vue'
+import useApiService from '~/composables/useApiService'
 
 definePageMeta({
   layout: 'admin',
   auth: true,
-});
+})
 
-const { $toast } = useNuxtApp();
+const { $toast } = useNuxtApp()
 
-const list = ref([]);
+const list = ref([])
 
 const headers = [
   { title: 'Title', key: 'title', sortable: false, width: '25vw' },
   { title: 'Code', key: 'code', sortable: false, width: '15vw' },
   { title: 'Actions', key: 'actions', sortable: false, width: '5vw' },
-];
+]
 
-const tableLoading = ref(true);
+const tableLoading = ref(true)
 const showAddLocationDialog = ref(false)
 const showEditLocationDialog = ref(false)
-const isDeleteModalOpen = ref(false);
-const selectedId = ref(null);
-const selectedDeleteId = ref(null);
-const search = ref(null);
-const filter = ref('country');
-const filteredList = ref([]);
-const selectedAction = ref(null);
-const selectedPageSize = ref(10);
-const page = ref(1);
-const pageCount = ref(0);
-const totalCount = ref(0);
-let selected = ref([]);
+const isDeleteModalOpen = ref(false)
+const selectedId = ref(null)
+const selectedDeleteId = ref(null)
+const search = ref(null)
+const filter = ref('country')
+const filteredList = ref([])
+const selectedAction = ref(null)
+const selectedPageSize = ref(10)
+const page = ref(1)
+const pageCount = ref(0)
+const totalCount = ref(0)
+const selected = ref([])
 const locationType = ref('countries')
 
 const selectedLocation = reactive({
-    id: null,
-    title: "",
-    localTitle: "",
-    code: "",
-    parentId: 0,
-    parentTitle: "",
-    latitude: 0,
-    longitude: 0
+  id: null,
+  title: '',
+  localTitle: '',
+  code: '',
+  parentId: 0,
+  parentTitle: '',
+  latitude: 0,
+  longitude: 0,
 })
 
 const allActions = [
   { label: 'Delete All', value: 'deleteAll' },
-];
+]
 
 const allPageSize = [
   { label: '10 Rows', value: 10 },
   { label: '20 Rows', value: 20 },
   { label: '50 Rows', value: 50 },
-];
-
+]
 
 const fetchLocations = async () => {
-  tableLoading.value = true;
+  tableLoading.value = true
   try {
     const response = await useApiService.get(`/api/v2/admin/locations/${locationType.value}`, {
-        'PagingDto.PageFilter.Size': selectedPageSize.value,
-        'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
-        'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
-    });
-    list.value = response.data.list;
-    filteredList.value = list.value;
-    totalCount.value = response.data.totalRecordsCount;
-    pageCount.value = Math.ceil(totalCount.value / selectedPageSize.value);
-  } catch (err) {
-    if (err.response?.status === 400) {
-      $toast.error(err.response.data.message);
-    }
-  } finally {
-    tableLoading.value = false;
+      'PagingDto.PageFilter.Size': selectedPageSize.value,
+      'PagingDto.PageFilter.Skip': (page.value - 1) * selectedPageSize.value,
+      'PagingDto.PageFilter.ReturnTotalRecordsCount': true,
+    })
+    list.value = response.data.list
+    filteredList.value = list.value
+    totalCount.value = response.data.totalRecordsCount
+    pageCount.value = Math.ceil(totalCount.value / selectedPageSize.value)
   }
-};
+  catch (err) {
+    if (err.response?.status === 400) {
+      $toast.error(err.response.data.message)
+    }
+  }
+  finally {
+    tableLoading.value = false
+  }
+}
 
 const viewLocationDetails = async (id) => {
   try {
-    const response = await useApiService.get(`/api/v2/admin/locations/${locationType.value}/${id}`);
+    const response = await useApiService.get(`/api/v2/admin/locations/${locationType.value}/${id}`)
 
-    selectedLocation.id = response.data.id;
-    selectedLocation.title = response.data.title;
-    selectedLocation.localTitle = response.data.localTitle;
-    selectedLocation.code = response.data.code;
-    selectedLocation.parentId = response.data.parentId;
-    selectedLocation.parentTitle = response.data.parentTitle;
-    selectedLocation.latitude = response.data.latitude;
-    selectedLocation.longitude = response.data.longitude;
-    showEditLocationDialog.value = true;
-  } catch (err) {
+    selectedLocation.id = response.data.id
+    selectedLocation.title = response.data.title
+    selectedLocation.localTitle = response.data.localTitle
+    selectedLocation.code = response.data.code
+    selectedLocation.parentId = response.data.parentId
+    selectedLocation.parentTitle = response.data.parentTitle
+    selectedLocation.latitude = response.data.latitude
+    selectedLocation.longitude = response.data.longitude
+    showEditLocationDialog.value = true
+  }
+  catch (err) {
     if (err.response?.status === 400) {
-      $toast.error(err.response.data.message);
+      $toast.error(err.response.data.message)
     }
   }
-};
+}
 
 const deleteLocation = async () => {
   try {
-    await useApiService.remove(`/api/v2/admin/locations/${locationType.value}/${selectedDeleteId.value}`);
+    await useApiService.remove(`/api/v2/admin/locations/${locationType.value}/${selectedDeleteId.value}`)
 
-    list.value = list.value.filter((i) => i.id !== selectedDeleteId.value);
-    filteredList.value = list.value;
-    $toast.success('Location deleted successfully!');
-  } catch (err) {
-    if (err.response?.status === 400) {
-      $toast.error(err.response.data.message);
-    }
-  } finally {
-    isDeleteModalOpen.value = false;
-    fetchLocations();
+    list.value = list.value.filter(i => i.id !== selectedDeleteId.value)
+    filteredList.value = list.value
+    $toast.success('Location deleted successfully!')
   }
-};
+  catch (err) {
+    if (err.response?.status === 400) {
+      $toast.error(err.response.data.message)
+    }
+  }
+  finally {
+    isDeleteModalOpen.value = false
+    fetchLocations()
+  }
+}
 
 const handleDelete = (id) => {
-  isDeleteModalOpen.value = true;
-  selectedDeleteId.value = id;
-};
+  isDeleteModalOpen.value = true
+  selectedDeleteId.value = id
+}
 
 const doAll = async () => {
   if (selectedAction.value === 'Delete All') {
     for (const item of selected.value) {
-      selectedDeleteId.value = item;
-      await deleteLocation();
+      selectedDeleteId.value = item
+      await deleteLocation()
     }
 
-    selected.value = [];
-    $toast.success('All selected Locations are deleted Succesfully');
+    selected.value = []
+    $toast.success('All selected Locations are deleted Succesfully')
   }
-};
+}
 
 onMounted(() => {
-  selectedAction.value = allActions[0].label;
-  selectedPageSize.value = allPageSize[0].value;
-});
+  selectedAction.value = allActions[0].label
+  selectedPageSize.value = allPageSize[0].value
+})
 
 watch(page, () => {
-  fetchLocations();
-});
+  fetchLocations()
+})
 
 watch(selectedPageSize, () => {
-  page.value = 1;
-  fetchLocations();
-});
+  page.value = 1
+  fetchLocations()
+})
 
 watch(filter, (val) => {
   if (val === 'country') {
     locationType.value = 'countries'
     page.value = 1
     fetchLocations()
-  } else if (val === 'state') {
+  }
+  else if (val === 'state') {
     locationType.value = 'states'
     page.value = 1
     fetchLocations()
-  } else {
+  }
+  else {
     locationType.value = 'cities'
     page.value = 1
     fetchLocations()
   }
-}, { immediate: true });
+}, { immediate: true })
 
 watch(search, (val) => {
   if (!val) {
-    filteredList.value = list.value;
-  } else {
-    const term = val.toString().toLowerCase();
-    filteredList.value = list.value.filter(item =>
-      item.title?.toLowerCase().includes(term) ||
-      item.code?.toString().toLowerCase().includes(term)
-    );
+    filteredList.value = list.value
   }
-});
+  else {
+    const term = val.toString().toLowerCase()
+    filteredList.value = list.value.filter(item =>
+      item.title?.toLowerCase().includes(term)
+      || item.code?.toString().toLowerCase().includes(term),
+    )
+  }
+})
 </script>
 
 <template>
   <div>
     <div class="d-flex flex-column justify-space-between align-center ga-2 mb-1 flex-md-row">
-        <div class="d-flex flex-column flex-sm-row align center ga-2 align-center">
-            <div class="filterBtns mb-0">
-              <v-btn
-                :class="{ 'active-filter': filter === 'country', 'inactive-filter': filter !== 'country' }"
-                depressed
-                @click="filter = 'country'"
-                rounded
-                variant="plain"
-                class="gtext-t4 font-weight-medium"
-              >
-                Countries
-              </v-btn>
-              <v-btn
-                :class="{ 'active-filter': filter === 'state', 'inactive-filter': filter !== 'state' }"
-                depressed
-                @click="filter = 'state'"
-                rounded
-                variant="plain"
-                class="gtext-t4 font-weight-medium"
-              >
-                States
-              </v-btn>
-      
-              <v-btn
-                :class="{ 'active-filter': filter === 'city', 'inactive-filter': filter !== 'city' }"
-                depressed
-                class="ml-2 gtext-t4 font-weight-medium"
-                @click="filter = 'city'"
-                rounded
-                variant="plain"
-              >
-                Cities
-              </v-btn>
-            </div>
-            <v-btn
-                depressed
-                @click="showAddLocationDialog = true"
-                rounded
-                variant="tonal"
-                class="gtext-t5 font-weight-medium bg-primary-success-500 text-white max-width-fit"
-            >
-                <v-icon class="mr-1">
-                    mdi mdi-plus-circle
-                </v-icon>
-                New {{ filter }}
-            </v-btn>
+      <div class="d-flex flex-column flex-sm-row align center ga-2 align-center">
+        <div class="filterBtns mb-0">
+          <v-btn
+            :class="{ 'active-filter': filter === 'country', 'inactive-filter': filter !== 'country' }"
+            depressed
+            rounded
+            variant="plain"
+            class="gtext-t4 font-weight-medium"
+            @click="filter = 'country'"
+          >
+            Countries
+          </v-btn>
+          <v-btn
+            :class="{ 'active-filter': filter === 'state', 'inactive-filter': filter !== 'state' }"
+            depressed
+            rounded
+            variant="plain"
+            class="gtext-t4 font-weight-medium"
+            @click="filter = 'state'"
+          >
+            States
+          </v-btn>
 
+          <v-btn
+            :class="{ 'active-filter': filter === 'city', 'inactive-filter': filter !== 'city' }"
+            depressed
+            class="ml-2 gtext-t4 font-weight-medium"
+            rounded
+            variant="plain"
+            @click="filter = 'city'"
+          >
+            Cities
+          </v-btn>
         </div>
-          <v-text-field
-                v-model="search"
-                label="Search anything..."
-                variant="outlined"
-                density="compact"
-                rounded
-                hide-details
-                class="searchInput"
-              >
-                <template #prepend-inner>
-                    <span class="primary-gray-300"><v-icon>mdi-magnify </v-icon></span>
-                    <span class="primary-gray-300 ">|</span>
-                </template>
-             </v-text-field>
-
+        <v-btn
+          depressed
+          rounded
+          variant="tonal"
+          class="gtext-t5 font-weight-medium bg-primary-success-500 text-white max-width-fit"
+          @click="showAddLocationDialog = true"
+        >
+          <v-icon class="mr-1">
+            mdi mdi-plus-circle
+          </v-icon>
+          New {{ filter }}
+        </v-btn>
+      </div>
+      <v-text-field
+        v-model="search"
+        label="Search anything..."
+        variant="outlined"
+        density="compact"
+        rounded
+        hide-details
+        class="searchInput"
+      >
+        <template #prepend-inner>
+          <span class="primary-gray-300"><v-icon>mdi-magnify </v-icon></span>
+          <span class="primary-gray-300 ">|</span>
+        </template>
+      </v-text-field>
     </div>
 
     <div class="d-flex justify-end ga-2 align-center pr-2">
-      <p class="primary-gray-500 gtext-t6 font-weight-bold">{{ totalCount }}</p>
-      <p class="gray--text gtext-t6 font-weight-semibold">{{ filter }}</p>
+      <p class="primary-gray-500 gtext-t6 font-weight-bold">
+        {{ totalCount }}
+      </p>
+      <p class="gray--text gtext-t6 font-weight-semibold">
+        {{ filter }}
+      </p>
     </div>
     <div class="scrollable-table">
       <v-data-table
+        v-model="selected"
         :headers="headers"
         :items="filteredList"
         :items-per-page="selectedPageSize"
         class="elevation-1"
         :loading="tableLoading"
-        v-model="selected"
         hide-default-footer
         show-select
       >
-
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <div class="d-flex">
-            <v-btn variant="plain" class="px-0 min-width-10">
-              <v-icon small class="mr-2 gtext-t1" @click="viewLocationDetails(item.id)">
+            <v-btn
+              variant="plain"
+              class="px-0 min-width-10"
+            >
+              <v-icon
+                small
+                class="mr-2 gtext-t1"
+                @click="viewLocationDetails(item.id)"
+              >
                 mdi mdi-file-edit
               </v-icon>
               <v-tooltip
-              activator="parent"
-              location="top"
+                activator="parent"
+                location="top"
               >
                 Edit
               </v-tooltip>
             </v-btn>
-            <v-btn variant="plain" class="px-0 min-width-10">
-              <v-icon small class="gtext-t1" @click="handleDelete(item.id)">
+            <v-btn
+              variant="plain"
+              class="px-0 min-width-10"
+            >
+              <v-icon
+                small
+                class="gtext-t1"
+                @click="handleDelete(item.id)"
+              >
                 mdi-delete
               </v-icon>
               <v-tooltip
-              activator="parent"
-              location="top"
+                activator="parent"
+                location="top"
               >
                 Delete
               </v-tooltip>
@@ -296,20 +318,28 @@ watch(search, (val) => {
       <addLocation
         v-model="showAddLocationDialog"
         :location="filter"
-        :locationType="locationType"
-        @fetchLocations="fetchLocations"
+        :location-type="locationType"
+        @fetch-locations="fetchLocations"
       />
       <editLocation
-        v-model="showEditLocationDialog"
-        :locationType="locationType"
-        @fetchLocations="fetchLocations"
         :id="selectedId"
+        v-model="showEditLocationDialog"
+        :location-type="locationType"
         :location="selectedLocation"
+        @fetch-locations="fetchLocations"
       />
     </div>
 
-    <v-row class="mt-2" align="center" justify="space-between" no-gutters>
-      <v-col cols="12" class="d-flex flex-wrap flex-sm-nowrap align-center justify-space-between">
+    <v-row
+      class="mt-2"
+      align="center"
+      justify="space-between"
+      no-gutters
+    >
+      <v-col
+        cols="12"
+        class="d-flex flex-wrap flex-sm-nowrap align-center justify-space-between"
+      >
         <div class="d-flex align-center mb-2 mb-sm-0">
           <v-select
             v-model="selectedAction"
@@ -325,7 +355,8 @@ watch(search, (val) => {
           />
           <v-btn
             class="rounded-pill gtext-t5 bg-primary-gray-700 text-white ml-4"
-            :disabled="selected.length === 0" @click="doAll"
+            :disabled="selected.length === 0"
+            @click="doAll"
           >
             <span>Do</span>
           </v-btn>
@@ -359,7 +390,10 @@ watch(search, (val) => {
       </v-col>
 
       <!-- Pagination (visible only on xs, second row) -->
-      <v-col cols="12" class="d-flex justify-center d-sm-none mt-2">
+      <v-col
+        cols="12"
+        class="d-flex justify-center d-sm-none mt-2"
+      >
         <v-pagination
           v-model="page"
           :length="pageCount"
@@ -375,7 +409,7 @@ watch(search, (val) => {
 
 <style scoped>
 .scrollable-table {
-  max-height: 70vh;  
+  max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -461,5 +495,4 @@ watch(search, (val) => {
   min-width: 10px !important;
   height: 20px !important;
 }
-
 </style>
