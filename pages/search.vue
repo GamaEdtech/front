@@ -281,6 +281,13 @@ const setMetaData = (type) => {
 }
 
 const setPageTitle = (type, titles, joinTextTitles) => {
+  let appendText = ''
+  if (titles.is_paper) {
+    appendText = 'Past Papers'
+  }
+  else {
+    appendText = ''
+  }
   const titleTemplates = {
     learnfiles: {
       dynamic: `${joinTextTitles} multimedia`,
@@ -288,7 +295,7 @@ const setPageTitle = (type, titles, joinTextTitles) => {
         'Multimedia Interactive Educational Content; PowerPoint, Video, Class Voice, GamaTrain',
     },
     test: {
-      dynamic: `${joinTextTitles} Past Papers`,
+      dynamic: `${joinTextTitles} ${appendText}`,
       fallback: 'Educational Resources | K12 Education Papers and Materials',
     },
     question: {
@@ -333,27 +340,34 @@ const pageDescriptions = {
 }
 
 const setPageDescribe = (type, titles, joinTextTitles) => {
+  let appendText = ''
+  if (titles.is_paper) {
+    appendText = 'Includes mark scheme for exam preparation.'
+  }
+  else {
+    appendText = 'Useful for study, practice, and exam preparation.'
+  }
   const descriptionTemplates = {
     learnfiles: {
-      dynamic: `Free download list of ${joinTextTitles}  multimedia. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles}  multimedia. ${appendText}`,
     },
     test: {
-      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. ${appendText}`,
     },
     question: {
-      dynamic: `Free download list of ${joinTextTitles} Forum. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Forum. ${appendText}`,
     },
     azmoon: {
-      dynamic: `Free download list of ${joinTextTitles} Online test. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Online test. ${appendText}`,
     },
     dars: {
-      dynamic: `Free download list of ${joinTextTitles} Textbook. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Textbook. ${appendText}`,
     },
     tutor: {
-      dynamic: `Free download list of ${joinTextTitles} Teacher. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Teacher. ${appendText}`,
     },
     default: {
-      dynamic: `Free download list of ${joinTextTitles} Past Papers. Includes mark scheme for exam preparation.`,
+      dynamic: `Free download list of ${joinTextTitles} Past Papers. ${appendText}`,
     },
   }
 
