@@ -2,43 +2,8 @@
   <div>
     <div class="d-flex mb-4">
       <div class="w-100">
-        <div class="d-flex align-center justify-space-between header">
-          <h1
-            v-show="!editMode.title"
-            class="gama-text-h6"
-          >
-            {{ title }}
-            <v-btn
-              v-if="isOwner"
-              fab
-              depressed
-              x-small
-              @click="editMode.title = true"
-            >
-              <v-icon> mdi-pencil </v-icon>
-            </v-btn>
-          </h1>
-        </div>
-        <div class="w-100">
-          <v-textarea
-            v-if="editMode.title"
-            v-model="titleModel"
-            placeholder="Title"
-            rows="3"
-          >
-            <template #append-outer>
-              <v-btn
-                color="success"
-                fab
-                depressed
-                :loading="editMode.title_loading"
-                x-small
-                @click="updateDetails"
-              >
-                <v-icon> mdi-check </v-icon>
-              </v-btn>
-            </template>
-          </v-textarea>
+        <div class="d-none d-lg-block">
+          <paper-detail-title :title="props.title" />
         </div>
         <div class="description-holder my-4">
           <!-- Description -->
@@ -90,7 +55,6 @@
           </div>
           <!-- End description -->
         </div>
-
         <div class="label-holder">
           <slot name="labels" />
         </div>
