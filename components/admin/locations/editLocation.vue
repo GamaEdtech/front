@@ -67,15 +67,15 @@ const fetchStates = async () => {
   }
 }
 
-watch(chosenCountry, (_newVal) => {
-  fetchStates()
+watch(chosenCountry, (newVal) => {
+  if (newVal != null)
+    fetchStates()
 })
 
 const editLocation = async () => {
-  if (props.locationType == 'states')
-    location.parentId = chosenCountry.value
-  if (props.locationType == 'cities')
-    location.parentId = location.parentTitle
+  if (props.locationType === 'countries') location.parentId = null
+  if (props.locationType === 'states') location.parentId = chosenCountry.value
+  if (props.locationType === 'cities') location.parentId = location.parentTitle
   try {
     const res = await useApiService.put(`/api/v2/admin/locations/${props.locationType}/${props.location.id}`,
       {
