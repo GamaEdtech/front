@@ -7,8 +7,7 @@
       color="#344054"
       size="small"
       class="d-flex d-md-none position-absolute position-bookmark"
-      >md:bookmark</v-icon
-    >
+    >md:bookmark</v-icon>
     <NuxtImg
       v-if="school?.defaultImageUri"
       :alt="school?.name"
@@ -41,16 +40,14 @@
             size="small"
             variant="elevated"
             color="#546e7a"
-            >{{ school.stateTitle }}</v-chip
-          >
+          >{{ school.stateTitle }}</v-chip>
           <v-chip
             v-if="school.cityTitle && school.cityTitle.length > 0"
             class="text-subtitle-2 text-md-subtitle-1"
             size="small"
             variant="elevated"
             color="#546e7a"
-            >United {{ school.cityTitle }}</v-chip
-          >
+          >United {{ school.cityTitle }}</v-chip>
         </div>
 
         <div
@@ -78,7 +75,10 @@
           </div>
         </div>
       </div>
-      <div v-if="school.defaultImageUri" class="d-none d-md-block image-school">
+      <div
+        v-if="school.defaultImageUri"
+        class="d-none d-md-block image-school"
+      >
         <NuxtImg
           v-show="school.defaultImageUri"
           alt="school.name"
@@ -90,7 +90,10 @@
         />
       </div>
     </div>
-    <v-divider class="w-100 mt-2 d-none d-md-flex" thickness="2" />
+    <v-divider
+      class="w-100 mt-2 d-none d-md-flex"
+      thickness="2"
+    />
     <div
       class="w-100 d-flex align-center justify-space-between rounded-b-lg mt-0 mt-md-3 flex-wrap ga-5 bottom-section pt-1 pb-1 pl-2 pr-2 pt-md-0 pb-md-0 pl-md-0 pr-md-0"
     >
@@ -134,11 +137,17 @@
       </div>
       <div class="d-flex d-md-none align-center">
         <span class="text-h6 font-weight-normal primary-gray-700">Details</span>
-        <v-icon size="small" color="#344054">mdi-chevron-right</v-icon>
+        <v-icon
+          size="small"
+          color="#344054"
+        >mdi-chevron-right</v-icon>
       </div>
       <div class="d-none d-md-flex align-center ga-2">
         <div class="d-flex align-center ga-2 gtext-t6 font-weight-semibold">
-          <v-icon size="x-large" color="primary"> mdi-star </v-icon>
+          <v-icon
+            size="x-large"
+            color="primary"
+          > mdi-star </v-icon>
           {{ school.score ? school.score.toFixed(1) : "New" }}
         </div>
         <div class="d-flex align-center ga-2 gtext-t6 primary-gray-300">
@@ -153,11 +162,11 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   school: {
     type: Object,
   },
-});
+})
 </script>
 
 <style scoped>

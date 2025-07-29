@@ -23,19 +23,26 @@
     >
       <div class="container-scroll">
         <template v-if="isInitialLoading">
-          <CardSchoolSkeleton v-for="(item, index) in 4" :key="index" />
+          <CardSchoolSkeleton
+            v-for="item in 4"
+            :key="item"
+          />
         </template>
 
         <CardSchoolSkeleton v-if="isPaginationPreviousLoading" />
 
-        <template
-          v-if="!isInitialLoading"
-          v-for="(school, index) in schoolList"
-        >
-          <CardSchool :school="school" />
+        <template v-for="school in schoolList">
+          <CardSchool
+            v-if="!isInitialLoading"
+            :key="school"
+            :school="school"
+          />
         </template>
 
-        <div ref="lineSpecifierLoadMoreRef" class="line-specifier-load-more" />
+        <div
+          ref="lineSpecifierLoadMoreRef"
+          class="line-specifier-load-more"
+        />
 
         <CardSchoolSkeleton v-if="isPaginationLoading" />
         <div
@@ -50,9 +57,9 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from "vue";
-import CardSchool from "./CardSchool.vue";
-import CardSchoolSkeleton from "./CardSchoolSkeleton.vue";
+import { onMounted, onUnmounted } from 'vue'
+import CardSchool from './CardSchool.vue'
+import CardSchoolSkeleton from './CardSchoolSkeleton.vue'
 
 const props = defineProps({
   schoolList: {
@@ -83,45 +90,45 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(["loadNextPage", "loadPreviousPage"]);
+const emit = defineEmits(['loadNextPage', 'loadPreviousPage'])
 
-const lineSpecifierLoadMoreRef = ref(null);
-const scrollDivRef = ref(null);
+const lineSpecifierLoadMoreRef = ref(null)
+const scrollDivRef = ref(null)
 
 onMounted(() => {
-  setupScrollListener();
-});
+  setupScrollListener()
+})
 
 onUnmounted(() => {
   if (scrollDivRef.value) {
-    scrollDivRef.value.removeEventListener("scroll", handleScrollListener);
+    scrollDivRef.value.removeEventListener('scroll', handleScrollListener)
   }
-});
+})
 
 const setupScrollListener = () => {
-  scrollDivRef.value.addEventListener("scroll", handleScrollListener);
-};
+  scrollDivRef.value.addEventListener('scroll', handleScrollListener)
+}
 
 const handleScrollListener = () => {
-  const targetDiv = lineSpecifierLoadMoreRef.value;
-  const rect = targetDiv.getBoundingClientRect();
-  const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  const targetDiv = lineSpecifierLoadMoreRef.value
+  const rect = targetDiv.getBoundingClientRect()
+  const isDivInView = rect.top >= 0 && rect.bottom <= window.innerHeight
 
   if (
-    isDivInView &&
-    !props.isInitialLoading &&
-    !props.isPaginationLoading &&
-    !props.isAllDataLoaded
+    isDivInView
+    && !props.isInitialLoading
+    && !props.isPaginationLoading
+    && !props.isAllDataLoaded
   ) {
-    emit("loadNextPage");
+    emit('loadNextPage')
   }
-};
+}
 
 const loadPreviousPage = () => {
-  emit("loadPreviousPage");
-};
+  emit('loadPreviousPage')
+}
 </script>
 
 <style scoped>

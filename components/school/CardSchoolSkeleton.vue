@@ -6,7 +6,7 @@
       width="100"
       height="100"
       class="d-flex d-md-none w-100 h-100 rounded-lg position-absolute"
-    ></v-skeleton-loader>
+    />
     <div
       class="name-address-image pa-2 pa-md-0 w-100 d-flex ga-1 ga-md-5 position-relative justify-start justify-sm-space-between rounded-t-xl"
     >
@@ -17,23 +17,23 @@
           width="200"
           height="20"
           class="rounded-xl"
-        ></v-skeleton-loader>
+        />
         <div class="d-flex align-center justify-start flex-wrap ga-2">
           <v-skeleton-loader
             width="80"
             height="20"
             class="rounded-xl"
-          ></v-skeleton-loader>
+          />
           <v-skeleton-loader
             width="60"
             height="20"
             class="rounded-xl"
-          ></v-skeleton-loader>
+          />
           <v-skeleton-loader
             width="110"
             height="20"
             class="rounded-xl"
-          ></v-skeleton-loader>
+          />
         </div>
 
         <div
@@ -43,7 +43,7 @@
             width="60"
             height="20"
             class="rounded-xl"
-          ></v-skeleton-loader>
+          />
           <v-divider
             :thickness="1"
             class="border-opacity-100 primary-gray-300 w-100"
@@ -53,7 +53,7 @@
             width="60"
             height="20"
             class="rounded-xl"
-          ></v-skeleton-loader>
+          />
         </div>
       </div>
       <div class="d-none d-md-block image-school">
@@ -61,10 +61,13 @@
           width="130"
           height="130"
           class="rounded-lg"
-        ></v-skeleton-loader>
+        />
       </div>
     </div>
-    <v-divider class="w-100 mt-2 d-none d-md-flex" thickness="2" />
+    <v-divider
+      class="w-100 mt-2 d-none d-md-flex"
+      thickness="2"
+    />
     <div
       class="w-100 d-flex align-center justify-space-between rounded-b-lg mt-0 mt-md-3 flex-wrap ga-5 bottom-section pt-1 pb-1 pl-2 pr-2 pt-md-0 pb-md-0 pl-md-0 pr-md-0"
     >
@@ -75,26 +78,26 @@
           width="30"
           height="30"
           class="rounded-circle"
-        ></v-skeleton-loader>
+        />
       </div>
       <div class="d-flex d-md-none align-center">
         <v-skeleton-loader
           width="50"
           height="20"
           class="rounded-xl"
-        ></v-skeleton-loader>
+        />
       </div>
       <div class="d-none d-md-flex align-center ga-2">
         <v-skeleton-loader
           width="60"
           height="20"
           class="rounded-xl"
-        ></v-skeleton-loader>
+        />
         <v-skeleton-loader
           width="60"
           height="20"
           class="rounded-xl"
-        ></v-skeleton-loader>
+        />
       </div>
     </div>
   </div>
