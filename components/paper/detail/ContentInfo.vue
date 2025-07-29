@@ -132,7 +132,6 @@
             >
               mdi-file-pdf-box
             </v-icon>
-            <!-- {{ contentData?.test_type_title }} -->
             Download Question Paper
             {{
               contentData?.files?.pdf.price > 0
@@ -200,12 +199,14 @@
             :loading="extraFileDownloadLoading"
             @click="startDownload('extra', extra.id)"
           >
-            <v-icon
-              size="x-large"
-              class="mr-1"
-            >
-              mdi-volume-high
-            </v-icon>
+            <template v-if="extra?.ext =='mp3'">
+              <v-icon
+                size="x-large"
+                class="mr-1"
+              >
+                mdi-volume-high
+              </v-icon>
+            </template>
             Download {{ extra.type_title ? extra.type_title : "Extra" }}
             {{ extra.price > 0 ? "| $" + extra.price : "" }}
           </v-btn>
@@ -327,6 +328,7 @@ const startDownload = async (type, extraId) => {
 defineExpose({
   crash_report,
 })
+console.log('contentData.files.extra', props.contentData.files.extra)
 </script>
 
 <style scoped>
