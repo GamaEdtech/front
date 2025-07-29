@@ -5,6 +5,7 @@
       <test-maker-menu />
       <NuxtPage />
     </div>
+    <AppGlobalSnackbar />
   </v-app>
 </template>
 

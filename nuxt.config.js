@@ -5,6 +5,12 @@ import { defineNuxtConfig } from 'nuxt/config'
 import glsl from 'vite-plugin-glsl'
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      GOOGLE_ADSENSE: process.env.NUXT_GOOGLE_ADSENSE_ID,
+    },
+  },
+
   // Modules
   modules: [
     'dayjs-nuxt',
@@ -13,6 +19,7 @@ export default defineNuxtConfig({
     'nuxt-gtag',
     '@nuxt/image',
     '@vite-pwa/nuxt',
+    '@nuxtjs/google-adsense',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
@@ -198,6 +205,11 @@ export default defineNuxtConfig({
       enabled: false,
       type: 'module',
     },
+  },
+
+  googleAdsense: {
+    id: process.env.NUXT_GOOGLE_ADSENSE_ID,
+    pageLevelAds: true,
   },
 
   // Module configurations

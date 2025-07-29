@@ -53,7 +53,7 @@ function isActive(link) {
         <img
           class="rounded-pill"
           style="width: 36px; height: 36px;"
-          src="/public/images/adminAuth.png"
+          src="/images/adminAuth.png"
           alt=""
         >
         Admin Panel
@@ -115,7 +115,7 @@ function isActive(link) {
         <img
           class="rounded-pill"
           style="width: 36px; height: 36px;border: 1px solid white;"
-          src="/public/images/adminAuth.png"
+          src="/images/adminAuth.png"
           alt=""
         >
         <div>

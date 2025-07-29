@@ -132,6 +132,20 @@
         />
       </div>
     </template>
+    <v-row
+      justify="center"
+      class="mt-10"
+    >
+      <v-col
+        cols="12"
+        md="8"
+        class="text-center"
+      >
+        <common-ad-banner
+          addslot="7199289937"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
