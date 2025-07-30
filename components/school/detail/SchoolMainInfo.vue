@@ -163,7 +163,6 @@
         <v-text-field
           v-if="generalDataEditMode.phone1"
           v-model="form.phone"
-          :rules="phoneRule"
           placeholder="Phone"
           variant="underlined"
         >
@@ -225,7 +224,6 @@
           v-if="generalDataEditMode.address"
           v-model="form.address"
           placeholder="Enter address"
-          :rules="addressRule"
           variant="underlined"
         >
           <template #append-inner>
@@ -282,13 +280,13 @@ const webUrlRule = [
   v => !v || v.length <= 255 || 'URL must be less than 255 characters',
 ]
 const emailRule = [
-  v => !!v || 'Email is required',
   v =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+    !v
+    || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
     || 'Please enter a valid email address',
 ]
-const phoneRule = [v => !!v || 'Phone number is required']
-const addressRule = [v => !!v || 'Address is required']
+// const phoneRule = [v => !!v || 'Phone number is required']
+// const addressRule = [v => !!v || 'Address is required']
 
 function normalizeURL(url) {
   if (!url) return ''
@@ -334,18 +332,18 @@ function isValidEmail(email) {
     return false
   }
 }
-function isRequired(value) {
-  try {
-    return !!value.trim()
-  }
-  catch {
-    return false
-  }
-}
+// function isRequired(value) {
+//   try {
+//     return !!value.trim()
+//   }
+//   catch {
+//     return false
+//   }
+// }
 function handleUpdate(value) {
   let formData = {}
   if (value == 'website') {
-    if (!isValidUrl(form.web)) {
+    if (!isValidUrl(form.web) && form.web != '') {
       nuxtApp.$toast?.error('Please enter a valid website URL')
       return
     }
@@ -353,7 +351,7 @@ function handleUpdate(value) {
     formData = { webSite: form.web ?? null }
   }
   if (value == 'email') {
-    if (!isValidEmail(form.email)) {
+    if (!isValidEmail(form.email) && form.email != '') {
       nuxtApp.$toast?.error('Please enter a valid Email')
       return
     }
@@ -361,20 +359,10 @@ function handleUpdate(value) {
     formData = { email: form.email ?? null }
   }
   if (value == 'phone') {
-    if (!isRequired(form.phone)) {
-      nuxtApp.$toast?.error('Please enter a valid Phone Number')
-      return
-    }
     generalDataEditMode.phone1 = false
     formData = { phoneNumber: form.phone ?? null }
   }
   if (value == 'address') {
-    if (!isRequired(form.address)) {
-      nuxtApp.$toast?.error(
-        'Please enter a valid address (minimum 10 characters)',
-      )
-      return
-    }
     generalDataEditMode.address = false
     formData = { address: form.address ?? null }
   }
