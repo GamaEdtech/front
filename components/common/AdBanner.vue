@@ -34,14 +34,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <ClientOnly>
-    <ins
-      class="adsbygoogle"
-      :style="style"
-      :data-ad-client="adClient"
-      :data-ad-slot="adslot"
-      :data-ad-format="format"
-      :data-full-width-responsive="responsive.toString()"
-    />
-  </ClientOnly>
+  <ins
+    class="adsbygoogle"
+    :style="style"
+    :data-ad-client="adClient"
+    :data-ad-slot="adslot"
+    :data-ad-format="format"
+    :data-full-width-responsive="responsive.toString()"
+  />
 </template>

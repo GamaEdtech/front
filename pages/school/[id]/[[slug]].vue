@@ -225,7 +225,7 @@
               class="text-center"
             >
               <common-ad-banner
-                addslot="7199289937"
+                addslot="9511163476"
               />
             </v-col>
           </v-row>
