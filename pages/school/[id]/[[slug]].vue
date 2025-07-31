@@ -215,6 +215,20 @@
 
           <!-- End general data section -->
 
+          <v-row
+            justify="center"
+            class="mt-10"
+          >
+            <v-col
+              cols="12"
+              md="8"
+              class="text-center"
+            >
+              <common-ad-banner
+                addslot="9511163476"
+              />
+            </v-col>
+          </v-row>
           <school-detail-users-score
             :rating-data="ratingData"
             @leave-comment="showLeaveCommentDialog = true"
