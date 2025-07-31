@@ -5,10 +5,10 @@ import { defineNuxtConfig } from 'nuxt/config'
 import glsl from 'vite-plugin-glsl'
 
 export default defineNuxtConfig({
-  publicRuntimeConfig: {
-    googleAdsense: {
-      id: process.env.GOOGLE_ADSENSE_ID,
-      // test: process.env.GOOGLE_ADSENSE_TEST_MODE === 'true',
+
+  runtimeConfig: {
+    public: {
+      GOOGLE_ADSENSE: process.env.NUXT_GOOGLE_ADSENSE_ID,
     },
   },
 
@@ -20,7 +20,6 @@ export default defineNuxtConfig({
     'nuxt-gtag',
     '@nuxt/image',
     '@vite-pwa/nuxt',
-    '@nuxtjs/google-adsense',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
@@ -96,10 +95,17 @@ export default defineNuxtConfig({
       ],
       script: [
         {
+          'src': 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+          'async': true,
+          'crossorigin': 'anonymous',
+          'data-ad-client': process.env.NUXT_GOOGLE_ADSENSE_ID,
+        },
+        {
           src: 'https://accounts.google.com/gsi/client',
           defer: true,
           async: true,
         },
+
       ],
     },
   },
@@ -207,13 +213,6 @@ export default defineNuxtConfig({
       type: 'module',
     },
   },
-
-  // googleAdsense: {
-  //   id: process.env.NUXT_GOOGLE_ADSENSE_ID,
-  //   pageLevelAds: false,
-  //   onPageLoad: false,
-
-  // },
 
   // Module configurations
   leaflet: {

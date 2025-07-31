@@ -182,9 +182,8 @@
         md="8"
         class="text-center"
       >
-        <ads-by-google
-          :id="adClient"
-          ad-slot="7199289937"
+        <common-ad-banner
+          addslot="7199289937"
         />
       </v-col>
     </v-row>
@@ -192,7 +191,6 @@
 </template>
 
 <script setup>
-import { useRuntimeConfig } from 'nuxt/app'
 import { useNuxtApp } from '#app'
 import {
   ref,
@@ -203,8 +201,6 @@ import {
   computed,
 } from 'vue'
 
-const config = useRuntimeConfig()
-const adClient = config.public.GOOGLE_ADSENSE
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 const bookContentRef = ref(null)
 
