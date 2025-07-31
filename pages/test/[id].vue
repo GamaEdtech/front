@@ -14,10 +14,28 @@
       :content-data="contentData"
       @next="handleLoadNextTest"
     />
+
+    <v-row
+      justify="center"
+      class="mt-10"
+    >
+      <v-col
+        cols="12"
+        md="8"
+        class="text-center"
+      >
+        <!-- <ads-by-google
+          :id="adClient"
+          ad-slot="7199289937"
+        /> -->
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
+const adClient = config.public.GOOGLE_ADSENSE
 const route = useRoute()
 const testId = ref(route.params.id)
 
