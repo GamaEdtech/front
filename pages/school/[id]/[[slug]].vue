@@ -215,6 +215,21 @@
 
           <!-- End general data section -->
 
+          <v-row
+            justify="center"
+            class="mt-10"
+          >
+            <v-col
+              cols="12"
+              md="8"
+              class="text-center"
+            >
+              <!-- <ads-by-google
+                :id="adClient"
+                ad-slot="7199289937"
+              /> -->
+            </v-col>
+          </v-row>
           <school-detail-users-score
             :rating-data="ratingData"
             @leave-comment="showLeaveCommentDialog = true"
@@ -248,9 +263,10 @@
         md="8"
         class="text-center"
       >
-        <common-ad-banner
-          addslot="7199289937"
-        />
+        <!-- <ads-by-google
+          :id="adClient"
+          ad-slot="7199289937"
+        /> -->
       </v-col>
     </v-row>
   </div>
@@ -259,6 +275,8 @@
 <script setup>
 import { useRouter, useRoute } from 'nuxt/app'
 
+const config = useRuntimeConfig()
+const adClient = config.public.GOOGLE_ADSENSE
 const route = useRoute()
 const router = useRouter()
 const tourPanoramas = ref([])

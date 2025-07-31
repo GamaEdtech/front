@@ -124,11 +124,29 @@
     />
 
     <common-crash-report ref="crash_report" />
+
+    <v-row
+      justify="center"
+      class="mt-10"
+    >
+      <v-col
+        cols="12"
+        md="8"
+        class="text-center"
+      >
+        <!-- <ads-by-google
+          :id="adClient"
+          ad-slot="7199289937"
+        /> -->
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup>
 // Get api, router, and route
+const config = useRuntimeConfig()
+const adClient = config.public.GOOGLE_ADSENSE
 const route = useRoute()
 const router = useRouter()
 const auth = useAuth()

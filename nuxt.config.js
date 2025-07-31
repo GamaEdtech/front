@@ -5,9 +5,10 @@ import { defineNuxtConfig } from 'nuxt/config'
 import glsl from 'vite-plugin-glsl'
 
 export default defineNuxtConfig({
-  runtimeConfig: {
-    public: {
-      GOOGLE_ADSENSE: process.env.NUXT_GOOGLE_ADSENSE_ID,
+  publicRuntimeConfig: {
+    googleAdsense: {
+      id: process.env.GOOGLE_ADSENSE_ID,
+      // test: process.env.GOOGLE_ADSENSE_TEST_MODE === 'true',
     },
   },
 
@@ -207,10 +208,12 @@ export default defineNuxtConfig({
     },
   },
 
-  googleAdsense: {
-    id: process.env.NUXT_GOOGLE_ADSENSE_ID,
-    pageLevelAds: true,
-  },
+  // googleAdsense: {
+  //   id: process.env.NUXT_GOOGLE_ADSENSE_ID,
+  //   pageLevelAds: false,
+  //   onPageLoad: false,
+
+  // },
 
   // Module configurations
   leaflet: {
