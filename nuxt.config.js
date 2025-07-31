@@ -13,6 +13,7 @@ export default defineNuxtConfig({
 
   // Modules
   modules: [
+    '@pinia/nuxt',
     'dayjs-nuxt',
     '@nuxtjs/leaflet',
     '@nuxt/eslint',
@@ -263,6 +264,13 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    optimizeDeps: {
+      include: [
+        '@solana/web3.js',
+        '@solana/wallet-adapter-base',
+        '@solana/wallet-adapter-phantom',
+      ],
+    },
     build: {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
@@ -278,6 +286,11 @@ export default defineNuxtConfig({
           },
         },
       },
+      transpile: [
+        '@solana/web3.js',
+        '@solana/wallet-adapter-base',
+        '@solana/wallet-adapter-phantom',
+      ],
     },
     define: {
       global: 'globalThis',
@@ -298,5 +311,17 @@ export default defineNuxtConfig({
         },
       },
     ],
+  },
+  nitro: {
+    rollupConfig: {
+      external: [
+        'borsh',
+        'util',
+        'secp256k1',
+        '@solana/web3.js',
+        '@solana/wallet-adapter-phantom',
+        '@solana/wallet-adapter-base',
+      ],
+    },
   },
 })
