@@ -12,8 +12,11 @@
             && !isEditMode
         "
       >
-        <span class="gtext-t6">$</span>
-        {{ initialValueTuition.toLocaleString() }}
+        {{
+          initialValueTuition == 0
+            ? "Free"
+            : "$ " + initialValueTuition.toLocaleString()
+        }}
       </span>
       <span
         v-if="
