@@ -141,9 +141,9 @@
         md="8"
         class="text-center"
       >
-        <!-- <ads-by-google
-          ad-slot="7199289937"
-        /> -->
+        <common-ad-banner
+          addslot="7199289937"
+        />
       </v-col>
     </v-row>
   </div>
@@ -154,8 +154,6 @@ const route = useRoute()
 const router = useRouter()
 const requestURL = ref(useRequestURL().host)
 const randomTestContent = ref(null)
-const config = useRuntimeConfig()
-const adClient = config.public.GOOGLE_ADSENSE
 
 // Track loading state
 
