@@ -41,7 +41,7 @@
 
               <!-- Test Actions -->
               <div
-                v-if="solanaStore.connected"
+                v-if="solana.connected.value"
                 class="test-actions mt-6"
               >
                 <h3 class="text-h6 mb-3">
@@ -116,16 +116,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useSolanaStore } from '~/stores/solana'
-
 // Page meta
 definePageMeta({
   title: 'Wallet Test',
   layout: 'default',
 })
 
-// Store
-const solanaStore = useSolanaStore()
+// Composable
+const solana = useSolana()
 
 // Local state
 const signingMessage = ref(false)
@@ -133,17 +131,17 @@ const testResults = ref([])
 
 // Computed
 const storeState = computed(() => ({
-  connected: solanaStore.connected,
-  connecting: solanaStore.connecting,
-  publicKey: solanaStore.publicKey?.toString() || null,
-  walletAddress: solanaStore.walletAddress,
-  truncatedAddress: solanaStore.truncatedAddress,
-  hasError: solanaStore.hasError,
-  error: solanaStore.error,
-  wallet: solanaStore.wallet
+  connected: solana.connected.value,
+  connecting: solana.connecting.value,
+  publicKey: solana.publicKey.value?.toString() || null,
+  walletAddress: solana.walletAddress.value,
+  truncatedAddress: solana.truncatedAddress.value,
+  hasError: solana.hasError.value,
+  error: solana.error.value,
+  wallet: solana.wallet.value
     ? {
-        name: solanaStore.wallet.name,
-        url: solanaStore.wallet.url,
+        name: solana.wallet.value.name,
+        url: solana.wallet.value.url,
       }
     : null,
 }))
@@ -154,7 +152,7 @@ const testSignMessage = async () => {
     signingMessage.value = true
     const message = `Test message from GamaTrain at ${new Date().toISOString()}`
 
-    const signature = await solanaStore.signMessage(message)
+    const signature = await solana.signMessage(message)
 
     testResults.value.unshift({
       success: true,
@@ -176,7 +174,7 @@ const testSignMessage = async () => {
 
 const refreshConnection = async () => {
   try {
-    await solanaStore.autoReconnect()
+    await solana.autoReconnect()
     testResults.value.unshift({
       success: true,
       message: 'Connection refresh completed',

@@ -2,7 +2,7 @@
   <div class="wallet-connect">
     <!-- Connection Status Display -->
     <div
-      v-if="solanaStore.connected"
+      v-if="solana.connected.value"
       class="wallet-connected"
     >
       <div class="wallet-info">
@@ -13,7 +13,7 @@
           mdi-wallet
         </v-icon>
         <div class="wallet-details">
-          <span class="wallet-address">{{ solanaStore.truncatedAddress }}</span>
+          <span class="wallet-address">{{ solana.truncatedAddress.value }}</span>
           <span class="wallet-status">Connected</span>
         </div>
       </div>
@@ -40,29 +40,29 @@
         :variant="variant || 'elevated'"
         :size="size || 'default'"
         color="primary"
-        :loading="solanaStore.connecting"
-        :disabled="solanaStore.connecting"
+        :loading="solana.connecting.value"
+        :disabled="solana.connecting.value"
         @click="handleConnect"
       >
         <v-icon start>
           mdi-wallet-plus
         </v-icon>
-        {{ solanaStore.connecting ? 'Connecting...' : 'Connect Wallet' }}
+        {{ solana.connecting.value ? 'Connecting...' : 'Connect Wallet' }}
       </v-btn>
     </div>
 
     <!-- Error Display -->
     <v-alert
-      v-if="solanaStore.hasError"
+      v-if="solana.hasError.value"
       type="error"
       variant="tonal"
       class="mt-3"
       closable
-      @click:close="solanaStore.clearError"
+      @click:close="solana.clearError"
     >
       <div class="error-content">
         <strong>Connection Error</strong>
-        <p>{{ solanaStore.error }}</p>
+        <p>{{ solana.error.value }}</p>
         <v-btn
           v-if="isPhantomNotInstalled"
           variant="text"
@@ -82,7 +82,7 @@
 
     <!-- Loading Indicator -->
     <div
-      v-if="solanaStore.connecting"
+      v-if="solana.connecting.value"
       class="loading-indicator mt-3"
     >
       <v-progress-linear
@@ -98,7 +98,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useSolanaStore } from '~/stores/solana'
 
 // Props
 defineProps({
@@ -116,24 +115,24 @@ defineProps({
   },
 })
 
-// Store
-const solanaStore = useSolanaStore()
+// Composable
+const solana = useSolana()
 
 // Local state
 const disconnecting = ref(false)
 
 // Computed
 const isPhantomNotInstalled = computed(() => {
-  return solanaStore.error && solanaStore.error.includes('not installed')
+  return solana.error.value && solana.error.value.includes('not installed')
 })
 
 // Methods
 const handleConnect = async () => {
   try {
-    await solanaStore.connect()
+    await solana.connect()
   }
   catch (error) {
-    // Error is already handled in the store
+    // Error is already handled in the composable
     console.error('Connection failed:', error)
   }
 }
@@ -141,7 +140,7 @@ const handleConnect = async () => {
 const handleDisconnect = async () => {
   try {
     disconnecting.value = true
-    await solanaStore.disconnect()
+    await solana.disconnect()
   }
   catch (error) {
     console.error('Disconnect failed:', error)
@@ -153,7 +152,7 @@ const handleDisconnect = async () => {
 
 // Auto-reconnect on component mount
 onMounted(() => {
-  solanaStore.autoReconnect()
+  solana.autoReconnect()
 })
 </script>
 
