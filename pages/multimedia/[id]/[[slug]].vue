@@ -245,7 +245,8 @@
         class="text-center"
       >
         <common-ad-banner
-          addslot="7199289937"
+          v-model="isAdsLoad"
+          adslot="7199289937"
         />
       </v-col>
     </v-row>
@@ -275,6 +276,8 @@ const requestURL = ref(useRequestURL().host)
 const breads = ref([])
 
 const download_loading = ref(false)
+
+const isAdsLoad = ref(false)
 
 const previewImages = computed(() => {
   return contentData.value?.previewData?.preview || []
