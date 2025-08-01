@@ -142,7 +142,8 @@
         class="text-center"
       >
         <common-ad-banner
-          addslot="7199289937"
+          v-model="isAdsLoad"
+          adslot="7199289937"
         />
       </v-col>
     </v-row>
@@ -156,6 +157,8 @@ const requestURL = ref(useRequestURL().host)
 const randomTestContent = ref(null)
 const pageDescribe = ref('')
 const pageTitle = ref('')
+const isAdsLoad = ref(false)
+
 // Track loading state
 
 const { data: contentData, pending: dataFetching } = await useAsyncData(
@@ -262,7 +265,9 @@ const setMetaData = () => {
     link: [
       {
         rel: 'canonical',
-        href: contentData.value ? `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}` : `https://${requestURL.value}/paper/${route.params.id}`,
+        href: contentData.value
+          ? `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}`
+          : `https://${requestURL.value}/paper/${route.params.id}`,
       },
     ],
     __dangerouslyDisableSanitizersByTagID: {

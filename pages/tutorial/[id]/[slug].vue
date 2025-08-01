@@ -183,7 +183,8 @@
         class="text-center"
       >
         <common-ad-banner
-          addslot="7199289937"
+          v-model="isAdsLoad"
+          adslot="7199289937"
         />
       </v-col>
     </v-row>
@@ -205,6 +206,7 @@ const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 const bookContentRef = ref(null)
 
 const route = useRoute()
+const isAdsLoad = ref(false)
 
 // Fetch tutorial data
 const { data: tutorialInfo, error: _tutorialError } = await useAsyncData(
