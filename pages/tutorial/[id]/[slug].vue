@@ -173,11 +173,24 @@
     </v-container>
 
     <common-crash-report ref="crashReportRef" />
+    <v-row
+      justify="center"
+      class="mt-10"
+    >
+      <v-col
+        cols="12"
+        md="8"
+        class="text-center"
+      >
+        <common-ad-banner
+          addslot="7199289937"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup>
-import { useRuntimeConfig } from 'nuxt/app'
 import { useNuxtApp } from '#app'
 import {
   ref,
@@ -188,7 +201,6 @@ import {
   computed,
 } from 'vue'
 
-const _config = useRuntimeConfig()
 const { $renderMathInElement, $ensureMathJaxReady } = useNuxtApp()
 const bookContentRef = ref(null)
 

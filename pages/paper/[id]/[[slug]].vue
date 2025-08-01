@@ -154,7 +154,8 @@ const route = useRoute()
 const router = useRouter()
 const requestURL = ref(useRequestURL().host)
 const randomTestContent = ref(null)
-
+const pageDescribe = ref('')
+const pageTitle = ref('')
 // Track loading state
 
 const { data: contentData, pending: dataFetching } = await useAsyncData(
@@ -204,25 +205,71 @@ const galleryHelpData = ref({
   lesson: '',
 })
 
-useHead({
-  title: contentData.value?.title,
-  script: [
-    {
-      hid: 'json-ld-schema',
-      innerHTML: JSON.stringify(schemaData.value),
-      type: 'application/ld+json',
+const setMetaData = () => {
+  if (!contentData.value) return
+
+  const { section_title, base_title, title, is_paper } = contentData.value
+
+  // Build common title parts
+  const titleParts = [section_title, base_title, title].filter(Boolean)
+  const baseTitle = titleParts.join(' ')
+
+  if (is_paper) {
+    pageTitle.value = `${baseTitle} past paper`
+    pageDescribe.value = `Download ${baseTitle} past paper with mark scheme (MS). Access a full collection of past papers for study, revision, and exam practice.`
+  }
+  else {
+    pageTitle.value = baseTitle
+    pageDescribe.value = `Free download of ${title} – ${base_title}, ${section_title} curriculum. Ideal for quick revision, practice, and exam prep.`
+  }
+
+  useHead({
+    title: pageTitle.value,
+    meta: [
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: pageTitle.value,
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: pageTitle.value,
+      },
+      {
+        hid: 'og:site_name',
+        name: 'og:site_name',
+        content: 'GamaTrain',
+      },
+      {
+        hid: 'description',
+        name: 'description',
+        content: pageDescribe.value,
+      },
+      {
+        hid: 'og:description',
+        name: 'og:description',
+        content: pageDescribe.value,
+      },
+    ],
+    script: [
+      {
+        hid: 'json-ld-schema',
+        innerHTML: JSON.stringify(schemaData.value),
+        type: 'application/ld+json',
+      },
+    ],
+    link: [
+      {
+        rel: 'canonical',
+        href: contentData.value ? `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}` : `https://${requestURL.value}/paper/${route.params.id}`,
+      },
+    ],
+    __dangerouslyDisableSanitizersByTagID: {
+      'json-ld-schema': ['innerHTML'],
     },
-  ],
-  link: [
-    {
-      rel: 'canonical',
-      href: contentData.value ? `https://${requestURL.value}/paper/${contentData.value.id}/${contentData.value.title_url}` : `https://${requestURL.value}/paper/${route.params.id}`,
-    },
-  ],
-  __dangerouslyDisableSanitizersByTagID: {
-    'json-ld-schema': ['innerHTML'],
-  },
-})
+  })
+}
 
 watchEffect(() => {
   if (contentData.value) {
@@ -244,19 +291,18 @@ watchEffect(() => {
   }
 })
 
-const breads = ref([
-  {
-    text: 'Paper',
-    disabled: false,
-    href: '/search?type=test',
-  },
-])
+const breads = ref([])
 
 const display = useGlobalDisplay()
 
 const initBreadCrumb = () => {
   if (!contentData.value) return
-
+  breads.value = []
+  breads.value.push({
+    text: 'Paper',
+    disabled: false,
+    href: '/search?type=test',
+  })
   breads.value.push(
     {
       text: contentData.value.section_title,
@@ -279,6 +325,7 @@ const initBreadCrumb = () => {
 watchEffect(() => {
   if (contentData.value) {
     initBreadCrumb()
+    setMetaData()
   }
 })
 
