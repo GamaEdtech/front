@@ -14,7 +14,6 @@ export default defineNuxtConfig({
 
   // Modules
   modules: [
-    '@pinia/nuxt',
     'dayjs-nuxt',
     '@nuxtjs/leaflet',
     '@nuxt/eslint',
