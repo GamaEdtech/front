@@ -25,7 +25,8 @@
         class="text-center"
       >
         <common-ad-banner
-          addslot="7199289937"
+          v-model="isAdsLoad"
+          adslot="7199289937"
         />
       </v-col>
     </v-row>
@@ -35,6 +36,7 @@
 <script setup>
 const route = useRoute()
 const testId = ref(route.params.id)
+const isAdsLoad = ref(false)
 
 // Fetch data
 const {
