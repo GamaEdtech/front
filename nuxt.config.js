@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     { src: 'plugins/helper.js' },
     { src: 'plugins/img-cropper', mode: 'client' },
     { src: 'plugins/vuedraggable', mode: 'client' },
+    { src: 'plugins/solana.ts', mode: 'client' },
   ],
 
   // SSR configuration
@@ -265,14 +266,23 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    esbuild: {
+      target: 'esnext',
+    },
     optimizeDeps: {
       include: [
         '@solana/web3.js',
         '@solana/wallet-adapter-base',
         '@solana/wallet-adapter-phantom',
+        '@coral-xyz/anchor',
+        'buffer',
       ],
+      esbuildOptions: {
+        target: 'esnext',
+      },
     },
     build: {
+      target: 'esnext',
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
@@ -294,7 +304,8 @@ export default defineNuxtConfig({
       ],
     },
     define: {
-      global: 'globalThis',
+      'global': 'globalThis',
+      'process.env.BROWSER': true,
     },
   },
 
