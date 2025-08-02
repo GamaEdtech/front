@@ -1,9 +1,12 @@
 <template>
   <NuxtLink
-    class="w-100 pa-0 pa-md-4 rounded-lg d-flex flex-column align-start justify-md-space-between card-school justify-end position-relative"
+    :class="`w-100 pa-0 pa-md-4 rounded-lg d-flex flex-column align-start justify-md-space-between card-school justify-end position-relative ${
+      school?.defaultImageUri ? `` : `without-image`
+    }`"
     :to="`/school/${school.id}/${$slugGenerator(school.name)}`"
   >
     <v-icon
+      v-if="school?.defaultImageUri"
       color="#344054"
       size="small"
       class="d-flex d-md-none position-absolute position-bookmark"
@@ -18,7 +21,9 @@
       class="d-flex d-md-none w-100 h-100 rounded-lg position-absolute"
     />
     <div
-      class="name-address-image pa-2 pa-md-0 w-100 d-flex ga-1 ga-md-5 position-relative justify-start justify-sm-space-between rounded-t-xl"
+      :class="`name-address-image pa-2 pa-md-0 w-100 d-flex ga-1 ga-md-5 position-relative justify-start justify-sm-space-between ${
+        school?.defaultImageUri ? `rounded-t-xl` : `rounded-t-lg`
+      }`"
     >
       <div
         class="w-100 d-flex flex-column align-start justify-start ga-2 ga-md-5"
@@ -177,6 +182,9 @@ defineProps({
   max-width: 560px;
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+.without-image {
+  min-height: unset;
 }
 .image-school {
   max-height: 130px;
