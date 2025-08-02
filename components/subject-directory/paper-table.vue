@@ -96,7 +96,6 @@
               color="#7F56D9"
               link
               :to="`/exam/${exam}`"
-              :disabled="!item.exam_id"
             >
               <v-icon
                 size="x-large"
@@ -121,41 +120,6 @@
           </v-chip>
         </div>
       </template>
-
-      <!-- ExamHub Chip -->
-      <template v-if="item.exam_id">
-        <v-chip
-          v-for="(exam, index) in safeParseArray(item.exam_id)"
-          :key="index"
-          class="exam-hub-chip"
-          color="#7F56D9"
-          link
-          x-small
-          :to="`/exam/${exam}`"
-          :disabled="!item.exam_id"
-        >
-          <v-icon
-            size="large"
-            color="#7F56D9"
-          >
-            mdi-clipboard-text-outline
-          </v-icon>
-        </v-chip>
-      </template>
-      <v-chip
-        v-if="!item.exam_id"
-        class="exam-hub-chip"
-        color="#7F56D9"
-        x-small
-        :disabled="true"
-      >
-        <v-icon
-          size="large"
-          color="#7F56D9"
-        >
-          mdi-clipboard-text-outline
-        </v-icon>
-      </v-chip>
     </v-data-table>
     <!-- Start Desktop View  -->
 
@@ -259,7 +223,6 @@
                     link
                     x-small
                     :to="`/exam/${exam}`"
-                    :disabled="!item.exam_id"
                   >
                     <v-icon
                       size="large"
